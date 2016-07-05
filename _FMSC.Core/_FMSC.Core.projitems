@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>2e588d9f-08b9-4308-8d20-3d22b40b2201</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>FMSC.Core</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Convert.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Math.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\Datum.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\DeclinationType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\Distance.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\Slope.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeTools.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\DelayActionHandler.cs" />
+  </ItemGroup>
+</Project>

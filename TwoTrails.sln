@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoTrails", "TwoTrails\TwoTrails.csproj", "{38E886B8-3FCA-4A41-A465-8FD5746E47EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoTrails.Core", "TwoTrails.Core\TwoTrails.Core.csproj", "{2E68A71D-89E5-4178-A977-B6832901CBF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoTrails.DAL", "TwoTrails.DAL\TwoTrails.DAL.csproj", "{0A35612E-514F-4826-805C-FC7DDD71FB79}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "_FMSC.Core", "_FMSC.Core\_FMSC.Core.shproj", "{2E588D9F-08B9-4308-8D20-3D22B40B2201}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "_FMSC.GeoSpatial", "_FMSC.GeoSpatial\_FMSC.GeoSpatial.shproj", "{4E12BE73-5F4D-4B6A-90A7-B0A130A6C654}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "_TwoTrails.Core", "_TwoTrails.Core\_TwoTrails.Core.shproj", "{3B159637-9999-4E86-88C5-035A96F5AC72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoTrailsTest", "TwoTrailsTest\TwoTrailsTest.csproj", "{2769B2B9-CAC8-427C-B4DA-296867526781}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		_FMSC.GeoSpatial\_FMSC.GeoSpatial.projitems*{4e12be73-5f4d-4b6a-90a7-b0a130a6c654}*SharedItemsImports = 13
+		_TwoTrails.Core\_TwoTrails.Core.projitems*{3b159637-9999-4e86-88c5-035a96f5ac72}*SharedItemsImports = 13
+		_FMSC.GeoSpatial\_FMSC.GeoSpatial.projitems*{0a35612e-514f-4826-805c-fc7ddd71fb79}*SharedItemsImports = 4
+		_TwoTrails.Core\_TwoTrails.Core.projitems*{0a35612e-514f-4826-805c-fc7ddd71fb79}*SharedItemsImports = 4
+		_FMSC.Core\_FMSC.Core.projitems*{0a35612e-514f-4826-805c-fc7ddd71fb79}*SharedItemsImports = 4
+		_FMSC.GeoSpatial\_FMSC.GeoSpatial.projitems*{2e68a71d-89e5-4178-a977-b6832901cbf1}*SharedItemsImports = 4
+		_TwoTrails.Core\_TwoTrails.Core.projitems*{2e68a71d-89e5-4178-a977-b6832901cbf1}*SharedItemsImports = 4
+		_FMSC.Core\_FMSC.Core.projitems*{2e68a71d-89e5-4178-a977-b6832901cbf1}*SharedItemsImports = 4
+		_FMSC.Core\_FMSC.Core.projitems*{2e588d9f-08b9-4308-8d20-3d22b40b2201}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{38E886B8-3FCA-4A41-A465-8FD5746E47EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38E886B8-3FCA-4A41-A465-8FD5746E47EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38E886B8-3FCA-4A41-A465-8FD5746E47EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38E886B8-3FCA-4A41-A465-8FD5746E47EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E68A71D-89E5-4178-A977-B6832901CBF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E68A71D-89E5-4178-A977-B6832901CBF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E68A71D-89E5-4178-A977-B6832901CBF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E68A71D-89E5-4178-A977-B6832901CBF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A35612E-514F-4826-805C-FC7DDD71FB79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A35612E-514F-4826-805C-FC7DDD71FB79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A35612E-514F-4826-805C-FC7DDD71FB79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A35612E-514F-4826-805C-FC7DDD71FB79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2769B2B9-CAC8-427C-B4DA-296867526781}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2769B2B9-CAC8-427C-B4DA-296867526781}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2769B2B9-CAC8-427C-B4DA-296867526781}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2769B2B9-CAC8-427C-B4DA-296867526781}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

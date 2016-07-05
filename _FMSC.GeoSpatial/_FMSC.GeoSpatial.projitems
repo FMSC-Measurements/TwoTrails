@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>4e12be73-5f4d-4b6a-90a7-b0a130a6c654</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>FMSC.GeoSpatial</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)NMEA\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DMS.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GeoPosition.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GeoTools.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Latitude.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Longitude.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Position.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\EastWest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\GnssType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\NorthSouth.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UTM\UTMCoords.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UTM\UTMTools.cs" />
+  </ItemGroup>
+</Project>

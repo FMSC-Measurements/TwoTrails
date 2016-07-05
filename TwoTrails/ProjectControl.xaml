@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="TwoTrails.ProjectControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TwoTrails"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600">
+
+    <DockPanel LastChildFill="True" Margin="-1, -1, 0, 0">
+        <Grid Width="25" Background="Green" DockPanel.Dock="Left">
+
+        </Grid>
+        
+        <Grid DockPanel.Dock="Top" Height="3" Background="Green" HorizontalAlignment="Stretch"/>
+
+        <Grid>
+            
+        </Grid>
+    </DockPanel>
+</UserControl>
