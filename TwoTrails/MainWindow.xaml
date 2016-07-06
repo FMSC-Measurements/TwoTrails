@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1000">
+        Title="MainWindow" Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
     <!--<Window.CommandBindings>
@@ -25,13 +26,16 @@
     
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top" Height="25" Background="Gray">
-            <MenuItem Header="_File" ContextMenuOpening="menuFileOpening">
-                <MenuItem Header="New"/>
-                <MenuItem Header="Open"/>
-                <MenuItem Header="Recent Projects" Name="miRecent" />
-                <MenuItem Header="Save"/>
-                <MenuItem Header="Close Project"/>
-                <MenuItem Header="Exit"/>
+            <MenuItem Header="_File">
+                <MenuItem Header="New" Command="{Binding NewCommand}"/>
+                <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
+                <Separator/>
+                <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}"/>
+                <Separator/>
+                <MenuItem Header="Close Project" Command="{Binding CloseProjectCommand}" CommandParameter="{Binding CurrentProject}" IsEnabled="{Binding Path=HasOpenedProject}"/>
+                <MenuItem Header="Recent Projects" Name="miRecent" IsEnabled="{Binding Path=RecentItemsAvail}" />
+                <Separator/>
+                <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
             </MenuItem>
         </Menu>
         <ToolBarPanel Background="Gray" Height="25" VerticalAlignment="Top" Width="Auto" DockPanel.Dock="Top">

@@ -8,6 +8,8 @@ namespace TwoTrails.DAL
 {
     public interface ITtDataLayer
     {
+        String FilePath { get; }
+
         #region Points
         List<TtPoint> GetPoints(String polyCN = null);
         List<TtPoint> GetPointsUnlinked(String polyCN = null);

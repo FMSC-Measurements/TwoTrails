@@ -18,10 +18,17 @@ namespace TwoTrails
     /// <summary>
     /// Interaction logic for ProjectControl.xaml
     /// </summary>
-    public partial class ProjectControl : UserControl
+    public partial class ProjectControl : UserControl, ITtTabContent
     {
-        public ProjectControl()
+
+        public TtTabModel TabModel { get; }
+
+
+
+        public ProjectControl(TtTabModel tabModel)
         {
+            TabModel = tabModel;
+
             InitializeComponent();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,16 +21,25 @@ namespace TwoTrails
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainWindowModel MainModel;
+        bool exiting = false;
+
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new MainWindowModel(this);
+            MainModel = new MainWindowModel(this);
+            this.DataContext = MainModel;
         }
 
-
-        private void menuFileOpening(object sender, ContextMenuEventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
+            e.Cancel = !exiting && !MainModel.CanExit();
+        }
 
+        public void Close(bool @override)
+        {
+            exiting = @override;
+            this.Close();
         }
     }
 }

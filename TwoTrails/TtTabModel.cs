@@ -11,7 +11,7 @@ using TwoTrails.Commands;
 
 namespace TwoTrails
 {
-    public abstract class TtTabItem : NotifyPropertyChangedEx
+    public abstract class TtTabModel : NotifyPropertyChangedEx
     {
         public TtProject Project { get; private set; }
 
@@ -25,22 +25,27 @@ namespace TwoTrails
 
         public abstract bool IsDetachable { get; }
         
-        public abstract ICommand Close { get; }
-        public abstract ICommand Save { get; }
+        public ICommand Close { get; }
+        public ICommand Save { get; }
 
 
         protected MainWindowModel MainModel;
 
 
-        public TtTabItem(MainWindowModel mainModel, TtProject project) : base()
+        public TtTabModel(MainWindowModel mainModel, TtProject project) : base()
         {
             MainModel = mainModel;
 
             this.Project = project;
             this.Tab = new TabItem();
-            Tab.Content = new ProjectControl();
-            Tab.DataContext = this;
 
+
+            Save = new RelayCommand((x) => SaveProject());
+            Close = new RelayCommand((x) => CloseTab());
+
+            Tab.Content = new ProjectControl(this);
+            Tab.DataContext = this;
+            
 
             project.PropertyChanged += Project_PropertyChanged;
         }
@@ -53,5 +58,10 @@ namespace TwoTrails
                 OnPropertyChanged(nameof(TabTitle));
             }
         }
+
+
+        protected abstract void CloseTab();
+
+        protected abstract void SaveProject();
     }
 }

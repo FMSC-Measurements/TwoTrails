@@ -8,7 +8,7 @@ using TwoTrails.Commands;
 
 namespace TwoTrails
 {
-    public class MapTab : TtTabItem
+    public class MapTab : TtTabModel
     {
         public override bool IsDetachable
         {
@@ -26,15 +26,21 @@ namespace TwoTrails
         {
             get { return String.Format("(Map){0}", base.TabTitle); }
         }
-
-        public override ICommand Close { get; }
-        public override ICommand Save { get; }
+       
 
         public MapTab(MainWindowModel mainModel, TtProject project, ProjectControl projectControl) : base(mainModel, project)
         {
-            Save = new SaveProjectCommand();
-            Close = new CloseProjectCommand(mainModel);
+
         }
 
+        protected override void CloseTab()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void SaveProject()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

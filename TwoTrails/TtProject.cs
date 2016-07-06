@@ -11,33 +11,31 @@ namespace TwoTrails
 {
     public class TtProject : NotifyPropertyChangedEx
     {
-        public Guid ID { get; } = Guid.NewGuid();
+        public String FilePath { get { return DAL.FilePath; } }
 
 
         public TtProjectInfo ProjectInfo { get; private set; }
         
-        private String _ProjectName;
         public String ProjectName
         {
-            get { return _ProjectName; }
-            set { SetField(ref _ProjectName, value); }
+            get { return Get<String>(); }
+            set { Set(value); }
         }
-
-        private bool _RequiresSave;
+        
         public bool RequiresSave
         {
-            get { return _RequiresSave; }
-            set { SetField(ref _RequiresSave, value); }
+            get { return Get<bool>(); }
+            set { Set(value); }
         }
 
 
         public bool RequiresUpgrade { get; private set; }
 
 
-        private TtSqliteDataAccessLayer DAL;
+        private ITtDataLayer DAL;
 
 
-        public TtProject(TtSqliteDataAccessLayer dal)
+        public TtProject(ITtDataLayer dal)
         {
             DAL = dal;
 
@@ -51,6 +49,16 @@ namespace TwoTrails
 
                 ProjectName = ProjectInfo.Name;
             }
+
+            RequiresSave = true;
+        }
+
+
+
+
+        public void Save()
+        {
+            //TODO save info to dal
         }
 
 

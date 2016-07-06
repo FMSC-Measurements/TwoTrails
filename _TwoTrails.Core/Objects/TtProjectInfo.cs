@@ -9,15 +9,15 @@ namespace TwoTrails.Core
         public String Region { get; set; }
         public String Forest { get; set; }
         public String District { get; set; }
-        public Version Version { get; set; }
-        public Version CreationVersion { get; }
+        public String Version { get; set; }
+        public String CreationVersion { get; }
         public Version DbVersion { get; }
         public String CreationDeviceID { get; }
         public DateTime CreationDate { get; }
 
 
         public TtProjectInfo(String name, String desc, String region, String forest, String district,
-            Version version, Version creationVersion, Version dbVersion, String deviceID, DateTime date)
+            String version, String creationVersion, Version dbVersion, String deviceID, DateTime date)
         {
             Name = name;
             Description = desc;

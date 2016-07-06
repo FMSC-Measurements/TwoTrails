@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace TwoTrails.Core
 {
@@ -15,5 +17,8 @@ namespace TwoTrails.Core
         TtGroup CreateDefaultGroup();
 
         TtProjectInfo CreateProjectInfo(Version programVersion);
+
+
+        StringCollection GetRecentProjects();
     }
 }

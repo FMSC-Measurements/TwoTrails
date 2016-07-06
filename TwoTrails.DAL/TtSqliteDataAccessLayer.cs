@@ -18,11 +18,14 @@ namespace TwoTrails.DAL
     {
         private static String DATE_FORMAT = "M/d/yyyy h:mm:ss.SSS";
 
+        public String FilePath { get; }
+
         private SQLiteDatabase database;
 
 
         public TtSqliteDataAccessLayer(String filePath)
         {
+            FilePath = filePath;
             database = new SQLiteDatabase(filePath);
         }
 
@@ -1538,8 +1541,8 @@ namespace TwoTrails.DAL
                     {
                         while (dr.Read())
                         {
-                            string name, desc, region, forest, district, deviceID;
-                            Version version, creationVersion, dbVersion;
+                            string name, desc, region, forest, district, deviceID, version, creationVersion;
+                            Version dbVersion;
                             DateTime date;
 
                             name = dr.GetString(0);
@@ -1547,11 +1550,12 @@ namespace TwoTrails.DAL
                             forest = dr.GetString(2);
                             region = dr.GetString(3);
                             deviceID = dr.GetString(4);
-                            date = DateTime.ParseExact(dr.GetString(5), DATE_FORMAT, CultureInfo.InvariantCulture);
+                            date = DateTime.Parse(dr.GetString(5));
+                            //date = DateTime.ParseExact(dr.GetString(5), DATE_FORMAT, CultureInfo.InvariantCulture);
                             desc = dr.GetString(6);
                             dbVersion = new Version(dr.GetString(7));
-                            version = new Version(dr.GetString(8));
-                            creationVersion = new Version(dr.GetString(9));
+                            version = dr.GetString(8);
+                            creationVersion = dr.GetString(9);
 
                             info = new TtProjectInfo(name, desc, region, forest, district,
                                 version, creationVersion, dbVersion, deviceID, date);
