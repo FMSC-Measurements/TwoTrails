@@ -22,10 +22,7 @@ namespace TwoTrails
 
         protected override void CloseTab()
         {
-            if (MainModel.CanCloseProject(Project))
-            {
-                MainModel.CloseProject(Project);
-            }
+            MainModel.CloseProject(Project);
         }
 
         protected override void SaveProject()

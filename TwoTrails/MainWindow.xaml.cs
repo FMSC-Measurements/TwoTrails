@@ -22,7 +22,6 @@ namespace TwoTrails
     public partial class MainWindow : Window
     {
         private MainWindowModel MainModel;
-        bool exiting = false;
 
         public MainWindow()
         {
@@ -33,13 +32,7 @@ namespace TwoTrails
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            e.Cancel = !exiting && !MainModel.CanExit();
-        }
-
-        public void Close(bool @override)
-        {
-            exiting = @override;
-            this.Close();
+            e.Cancel = !MainModel.CanExit;
         }
     }
 }

@@ -28,12 +28,31 @@ namespace TwoTrails
         public TtTabModel CurrentTab
         {
             get { return Get<TtTabModel>(); }
-            set { Set(value, () => OnPropertyChanged(nameof(CurrentProject), nameof(HasOpenedProject))); }
+            set { Set(value, () =>
+                    OnPropertyChanged(
+                        nameof(CurrentProject),
+                        nameof(HasOpenedProject),
+                        nameof(CanSaveCurrentProject)
+                        )
+                    );
+            }
         }
 
         public TtProject CurrentProject { get { return CurrentTab?.Project; } }
 
         public bool HasOpenedProject { get { return CurrentTab != null; } }
+
+
+        public bool CanSaveCurrentProject
+        {
+            get { return CurrentProject != null && CurrentProject.RequiresSave; }
+        }
+        
+        public bool HasUnsavedProjects
+        {
+            get { return _Projects.Values.Any(p => p.RequiresSave); }
+        }
+
 
         public bool RecentItemsAvail
         {
@@ -41,6 +60,12 @@ namespace TwoTrails
             set { Set(value); }
         }
 
+        
+        private bool exiting = false;
+        public bool CanExit
+        {
+            get { return exiting || !HasUnsavedProjects || Exit(false); }
+        }
 
 
         public TtSettings Settings { get; private set; }
@@ -71,9 +96,9 @@ namespace TwoTrails
             NewCommand = new RelayCommand((x) => CreateProject());
             OpenCommand = new RelayCommand((x) => OpenProject());
             OpenProjectCommand = new RelayCommand((x) => OpenProject(x as string));
-            SaveCommand = new RelayCommand((x) => SaveCurrentProject(), (x) => CanSaveCurrentProject());
-            CloseProjectCommand = new RelayCommand((x) => CloseProject(x as TtProject), (x) => CanCloseProject(x as TtProject));
-            ExitCommand = new RelayCommand((x) => Exit(), (x) => CanExit());
+            SaveCommand = new RelayCommand((x) => SaveCurrentProject());
+            CloseProjectCommand = new RelayCommand((x) => CloseProject(x as TtProject));
+            ExitCommand = new RelayCommand((x) => Exit());
 
             _Tabs = mainWindow.tabControl;
             _Tabs.SelectionChanged += Tabs_SelectionChanged;
@@ -81,7 +106,27 @@ namespace TwoTrails
             UpdateRecentProjectMenu();
 
             CurrentTab = null;
+
+
+            string[] args = Environment.GetCommandLineArgs();
+
+            if (args != null && args.Length > 0)
+            {
+                ParseCommandLineArgs(args);
+            }
         }
+
+
+        private void ParseCommandLineArgs(String[] args)
+        {
+            foreach (String file in args.Select(f => f.Trim('"')))
+            {
+                if (file.EndsWith(".tt"))
+                    OpenProject(file);
+            }
+        }
+
+
 
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -119,9 +164,14 @@ namespace TwoTrails
                     {
                         TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
 
-                        TtProject project = new TtProject(dal);
-
-                        AddProject(project);
+                        if (dal.RequiresUpgrade)
+                        {
+                            //ask to upgrade
+                        }
+                        else
+                        {
+                            AddProject(new TtProject(dal, Settings));
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -164,7 +214,7 @@ namespace TwoTrails
                 TtProjectInfo info = dialog.ProjectInfo;
 
                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
-                TtProject proj = new TtProject(dal);
+                TtProject proj = new TtProject(dal, Settings);
 
                 AddProject(proj);
 
@@ -177,15 +227,7 @@ namespace TwoTrails
 
         public void SaveCurrentProject()
         {
-            if (CurrentProject != null)
-            {
-                //save
-            }
-        }
-
-        public bool CanSaveCurrentProject()
-        {
-            return CurrentProject != null && CurrentProject.RequiresSave;
+            CurrentProject.Save();
         }
 
 
@@ -204,11 +246,6 @@ namespace TwoTrails
             UpdateRecentProjectMenu();
         }
 
-        public void SaveSettings()
-        {
-
-        }
-
         
         public void OpenMapTab(TtProject project)
         {
@@ -220,49 +257,47 @@ namespace TwoTrails
 
         }
 
-
-
-        public bool CanCloseProject(TtProject project)
-        {
-            if (project != null)
-            {
-                MessageBoxResult result = MessageBox.Show("Would you like to save before closing this project?",
-                         String.Empty,
-                         MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    try
-                    {
-                        project.Save();
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                }
-                else if (result == MessageBoxResult.Cancel)
-                    return false;
-            }
-
-            return true;
-        }
-
-
         public void CloseProject(TtProject project)
         {
             if (project != null)
             {
-                if (_ProjectTabs.ContainsKey(project.FilePath))
+                if (project.RequiresSave)
                 {
-                    _Tabs.Items.Remove(_ProjectTabs[project.FilePath].Tab);
-                    _ProjectTabs.Remove(project.FilePath);
+                    MessageBoxResult result = MessageBox.Show("Would you like to save before closing this project?",
+                                                 String.Empty,
+                                                 MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        try
+                        {
+                            project.Save();
+                        }
+                        catch
+                        {
+                            //Error
+                            return;
+                        }
+                    }
+                    else if (result == MessageBoxResult.Cancel)
+                        return;
                 }
 
-                CloseMap(project);
-
-                _Projects.Remove(project.FilePath); 
+                CloseProjectTab(project);
             }
+        }
+
+        public void CloseProjectTab(TtProject project)
+        {
+            if (_ProjectTabs.ContainsKey(project.FilePath))
+            {
+                _Tabs.Items.Remove(_ProjectTabs[project.FilePath].Tab);
+                _ProjectTabs.Remove(project.FilePath);
+            }
+
+            CloseMap(project);
+
+            _Projects.Remove(project.FilePath);
         }
 
         public void CloseMap(TtProject project)
@@ -284,13 +319,8 @@ namespace TwoTrails
             }
         }
 
-
-        private void Exit()
-        {
-            _MainWindow.Close(true);
-        }
-
-        public bool CanExit()
+        
+        private bool Exit(bool closeWindow = true)
         {
             IEnumerable<TtProject> openProjects = _Projects.Values.Where(p => p.RequiresSave);
 
@@ -309,17 +339,23 @@ namespace TwoTrails
                     {
                         foreach (TtProject proj in openProjects)
                         {
-                            //save
+                            CloseProject(proj);
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        MessageBox.Show(ex.Message);
                         return false;
                     }
                 }
                 else if (result == MessageBoxResult.Cancel)
                     return false;
             }
+
+            exiting = true;
+
+            if (closeWindow)
+                _MainWindow.Close();
 
             return true;
         }

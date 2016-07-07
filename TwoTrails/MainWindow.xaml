@@ -30,7 +30,7 @@
                 <MenuItem Header="New" Command="{Binding NewCommand}"/>
                 <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
                 <Separator/>
-                <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}"/>
+                <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}" IsEnabled="{Binding Path=CanSaveCurrentProject}" />
                 <Separator/>
                 <MenuItem Header="Close Project" Command="{Binding CloseProjectCommand}" CommandParameter="{Binding CurrentProject}" IsEnabled="{Binding Path=HasOpenedProject}"/>
                 <MenuItem Header="Recent Projects" Name="miRecent" IsEnabled="{Binding Path=RecentItemsAvail}" />

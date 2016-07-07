@@ -735,7 +735,8 @@ namespace TwoTrails.DAL
                             acc = dr.GetDouble(3);
                             inc = dr.GetInt32(4);
                             psi = dr.GetInt32(5);
-                            time = DateTime.ParseExact(dr.GetString(6), DATE_FORMAT, CultureInfo.InvariantCulture);
+                            time = DateTime.Parse(dr.GetString(6), CultureInfo.InvariantCulture);
+                            //time = DateTime.ParseExact(dr.GetString(6), DATE_FORMAT, CultureInfo.InvariantCulture);
                             area = dr.GetDouble(7);
                             perim = dr.GetDouble(8);
 

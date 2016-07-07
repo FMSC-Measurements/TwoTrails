@@ -252,7 +252,7 @@ namespace TwoTrails.DAL
                 SharedSchema.CN + " TEXT, " +
                 Name + " TEXT, " +
                 Description + " TEXT, " +
-                Type + " TEXT, " +
+                Type + " INTEGER, " +
                 "PRIMARY KEY (" + SharedSchema.CN + "));";
 
 
@@ -385,12 +385,12 @@ namespace TwoTrails.DAL
                 SharedSchema.CN + " TEXT NOT NULL, " +
                 Name + " TEXT, " +
                 UtmZone + " INTEGER, " +
-                Distance + " TEXT, " +
-                Slope + " TEXT, " +
+                Distance + " INTEGER, " +
+                Slope + " INTEGER, " +
                 MagDec + " REAL, " +
-                DeclinationType + " TEXT, " +
-                Elevation + " TEXT, " +
-                Datum + " TEXT, " +
+                DeclinationType + " INTEGER, " +
+                Elevation + " INTEGER, " +
+                Datum + " INTEGER, " +
                 Comment + " TEXT, " +
                 GpsReceiver + " TEXT, " +
                 RangeFinder + " TEXT, " +

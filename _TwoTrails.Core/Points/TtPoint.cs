@@ -425,5 +425,10 @@ namespace TwoTrails.Core.Points
         {
             return String.Format("{0} ({1})", PID, OpType);
         }
+
+        public String Description
+        {
+            get { return ToString(); }
+        }
     }
 }

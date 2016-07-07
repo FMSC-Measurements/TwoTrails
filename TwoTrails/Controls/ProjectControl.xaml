@@ -4,18 +4,32 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TwoTrails"
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600">
 
+    <UserControl.Resources>
+        <!--<CollectionViewSource x:Key="cvsPoints" Source="{Binding Path=Points}" >
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="CN" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>-->
+
+    </UserControl.Resources>
+
     <DockPanel LastChildFill="True" Margin="-1, -1, 0, 0">
+        <Grid DockPanel.Dock="Top" Height="3" Background="Green" HorizontalAlignment="Stretch"/>
+
         <Grid Width="25" Background="Green" DockPanel.Dock="Left">
 
         </Grid>
-        
-        <Grid DockPanel.Dock="Top" Height="3" Background="Green" HorizontalAlignment="Stretch"/>
 
-        <Grid>
+        <Grid Background="Green" DockPanel.Dock="Right" Width="100">
             
+        </Grid>
+
+        <Grid Background="White">
+            <DataGrid Name="dgPoints" ItemsSource="{Binding Points}" />
         </Grid>
     </DockPanel>
 </UserControl>

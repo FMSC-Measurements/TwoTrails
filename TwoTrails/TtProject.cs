@@ -32,23 +32,21 @@ namespace TwoTrails
         public bool RequiresUpgrade { get; private set; }
 
 
-        private ITtDataLayer DAL;
+        public ITtDataLayer DAL { get; private set; }
+
+        public ITtManager Manager { get; private set; }
 
 
-        public TtProject(ITtDataLayer dal)
+        public TtProject(ITtDataLayer dal, ITtSettings settings)
         {
             DAL = dal;
 
-            if (dal.RequiresUpgrade)
-            {
-                //ask to upgrade
-            }
-            else
-            {
-                ProjectInfo = dal.GetProjectInfo();
+            ProjectInfo = dal.GetProjectInfo();
+            ProjectName = ProjectInfo.Name;
 
-                ProjectName = ProjectInfo.Name;
-            }
+            RequiresSave = false;
+
+            Manager = new TtManager(dal, settings);
         }
 
 
@@ -56,14 +54,10 @@ namespace TwoTrails
 
         public void Save()
         {
-            //TODO save info to dal
-        }
-
-
-
-        public static TtProject Create(String filePath, TtProjectInfo projInfo)
-        {
-            return new TtProject(TtSqliteDataAccessLayer.Create(filePath, projInfo));
-        }
+            if (RequiresSave)
+            {
+                //TODO save info to dal
+            }
+        } 
     }
 }

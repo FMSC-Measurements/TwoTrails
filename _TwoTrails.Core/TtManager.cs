@@ -92,23 +92,27 @@ namespace TwoTrails.Core
             {
                 _Polygons.Add(poly.CN, poly);
                 _PolygonsOrig.Add(poly.CN, new TtPolygon(poly));
+                
                 _Points.Add(poly.CN, new List<TtPoint>(_DAL.GetPointsUnlinked(poly.CN)));
-
+                
                 AttachPolygonEvents(poly);
             }
 
-            foreach (TtPoint point in _PointsMap.Values)
+            foreach (List<TtPoint> points in _Points.Values)
             {
-                if (point.OpType == OpType.Quondam)
+                foreach (TtPoint point in points)
                 {
-                    QuondamPoint qp = (QuondamPoint)point;
-                    qp.ParentPoint = _PointsMap[qp.ParentPointCN];
-                }
+                    if (point.OpType == OpType.Quondam)
+                    {
+                        QuondamPoint qp = (QuondamPoint)point;
+                        qp.ParentPoint = _PointsMap[qp.ParentPointCN];
+                    }
 
-                _PointsMap.Add(point.CN, point);
-                _PointsMapOrig.Add(point.CN, point.DeepCopy());
+                    _PointsMap.Add(point.CN, point);
+                    _PointsMapOrig.Add(point.CN, point.DeepCopy());
 
-                AttachPoint(point);
+                    AttachPoint(point);
+                } 
             }
         }
 

@@ -34,6 +34,8 @@ namespace TwoTrailsTest
             TtMetadata meta = manager.DefaultMetadata;
             TtGroup group = manager.MainGroup;
 
+            List<TtPoint> points = new List<TtPoint>();
+
             TtPoint point = new GpsPoint()
             {
                 Index = 0,
@@ -50,20 +52,55 @@ namespace TwoTrailsTest
                 Group = group
             };
 
-            List<TtPoint> points = new List<TtPoint>();
+            points.Add(point);
+
+            point = new GpsPoint()
+            {
+                Index = 1,
+                PID = 1020,
+                OnBoundary = true,
+                UnAdjX = 100,
+                UnAdjY = 200,
+                UnAdjZ = 5,
+                Latitude = 100,
+                Longitude = 200,
+                Elevation = 25,
+                Metadata = meta,
+                Polygon = poly,
+                Group = group
+            };
 
             points.Add(point);
 
-            point = new SideShotPoint()
+            point = new GpsPoint()
             {
-                Index = 1,
+                Index = 2,
                 PID = 1030,
                 OnBoundary = true,
-                UnAdjX = 1,
-                UnAdjY = 2,
-                UnAdjZ = 3,
-                FwdAzimuth = 180,
-                SlopeDistance = 25,
+                UnAdjX = 200,
+                UnAdjY = 200,
+                UnAdjZ = 5,
+                Latitude = 100,
+                Longitude = 200,
+                Elevation = 25,
+                Metadata = meta,
+                Polygon = poly,
+                Group = group
+            };
+
+            points.Add(point);
+
+            point = new GpsPoint()
+            {
+                Index = 3,
+                PID = 1040,
+                OnBoundary = true,
+                UnAdjX = 200,
+                UnAdjY = 100,
+                UnAdjZ = 5,
+                Latitude = 100,
+                Longitude = 200,
+                Elevation = 25,
                 Metadata = meta,
                 Polygon = poly,
                 Group = group
@@ -73,12 +110,12 @@ namespace TwoTrailsTest
 
             point = new QuondamPoint()
             {
-                Index = 2,
-                PID = 1040,
+                Index = 4,
+                PID = 1050,
                 OnBoundary = true,
-                UnAdjX = 1,
-                UnAdjY = 2,
-                UnAdjZ = 3,
+                UnAdjX = 100,
+                UnAdjY = 100,
+                UnAdjZ = 5,
                 ParentPoint = points[0],
                 Metadata = meta,
                 Polygon = poly,
