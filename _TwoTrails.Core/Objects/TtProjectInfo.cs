@@ -1,17 +1,18 @@
-﻿using System;
+﻿using CSUtil.ComponentModel;
+using System;
 
 namespace TwoTrails.Core
 {
-    public class TtProjectInfo
+    public class TtProjectInfo : NotifyPropertyChangedEx
     {
-        public String Name { get; set; }
-        public String Description { get; set; }
-        public String Region { get; set; }
-        public String Forest { get; set; }
-        public String District { get; set; }
-        public String Version { get; set; }
-        public String CreationVersion { get; }
+        public String Name { get { return Get<string>(); } set { Set(value); } }
+        public String Description { get { return Get<string>(); } set { Set(value); } }
+        public String Region { get { return Get<string>(); } set { Set(value); } }
+        public String Forest { get { return Get<string>(); } set { Set(value); } }
+        public String District { get { return Get<string>(); } set { Set(value); } }
         public Version DbVersion { get; }
+        public String Version { get; }
+        public String CreationVersion { get; }
         public String CreationDeviceID { get; }
         public DateTime CreationDate { get; }
 

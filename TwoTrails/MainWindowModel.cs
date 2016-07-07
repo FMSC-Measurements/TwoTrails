@@ -46,24 +46,25 @@ namespace TwoTrails
         public TtSettings Settings { get; private set; }
 
 
-
+        #region Commands
         public ICommand NewCommand { get; private set; }
         public ICommand OpenCommand { get; private set; }
         public ICommand OpenProjectCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
         public ICommand CloseProjectCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
+        #endregion
 
 
-        private TabControl Tabs { get; }
-        
+        private TabControl _Tabs;
+        private MainWindow _MainWindow;
 
-        private MainWindow mainWindow;
+
 
 
         public MainWindowModel(MainWindow mainWindow)
         {
-            this.mainWindow = mainWindow;
+            _MainWindow = mainWindow;
 
             Settings = new TtSettings(new DeviceSettings(), new MetadataSettings());
 
@@ -74,8 +75,8 @@ namespace TwoTrails
             CloseProjectCommand = new RelayCommand((x) => CloseProject(x as TtProject), (x) => CanCloseProject(x as TtProject));
             ExitCommand = new RelayCommand((x) => Exit(), (x) => CanExit());
 
-            Tabs = mainWindow.tabControl;
-            Tabs.SelectionChanged += Tabs_SelectionChanged;
+            _Tabs = mainWindow.tabControl;
+            _Tabs.SelectionChanged += Tabs_SelectionChanged;
 
             UpdateRecentProjectMenu();
 
@@ -84,11 +85,14 @@ namespace TwoTrails
 
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (Tabs.SelectedIndex > -1)
-                CurrentTab = (Tabs.Items[Tabs.SelectedIndex] as TabItem).DataContext as TtTabModel;
+            if (_Tabs.SelectedIndex > -1)
+                CurrentTab = (_Tabs.Items[_Tabs.SelectedIndex] as TabItem).DataContext as TtTabModel;
             else
                 CurrentTab = null;
         }
+
+
+
 
         public void OpenProject()
         {
@@ -129,11 +133,11 @@ namespace TwoTrails
                     MessageBox.Show("Project is already opened.");
 
                     TabItem tab = _ProjectTabs[filePath].Tab;
-                    for (int i = 0; i < Tabs.Items.Count; i++)
+                    for (int i = 0; i < _Tabs.Items.Count; i++)
                     {
-                        if (Tabs.Items[i] == tab)
+                        if (_Tabs.Items[i] == tab)
                         {
-                            Tabs.SelectedIndex = i;
+                            _Tabs.SelectedIndex = i;
                             break;
                         }
                     }
@@ -153,14 +157,19 @@ namespace TwoTrails
 
         public void CreateProject()
         {
-            NewProjectDialog dialog = new NewProjectDialog(Settings.CreateProjectInfo(AppInfo.Version));
+            NewProjectDialog dialog = new NewProjectDialog(_MainWindow, Settings.CreateProjectInfo(AppInfo.Version));
 
             if (dialog.ShowDialog() == true)
             {
-                TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, dialog.ProjectInfo);
+                TtProjectInfo info = dialog.ProjectInfo;
+
+                TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
                 TtProject proj = new TtProject(dal);
 
                 AddProject(proj);
+
+                Settings.Region = info.Region;
+                Settings.District = info.District;
             }
         }
 
@@ -188,8 +197,8 @@ namespace TwoTrails
             ProjectTab tab = new ProjectTab(this, proj);
             _ProjectTabs.Add(proj.FilePath, tab);
 
-            Tabs.Items.Add(tab.Tab);
-            Tabs.SelectedIndex = Tabs.Items.Count - 1;
+            _Tabs.Items.Add(tab.Tab);
+            _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
 
             Settings.AddRecentProject(proj.FilePath);
             UpdateRecentProjectMenu();
@@ -246,7 +255,7 @@ namespace TwoTrails
             {
                 if (_ProjectTabs.ContainsKey(project.FilePath))
                 {
-                    Tabs.Items.Remove(_ProjectTabs[project.FilePath].Tab);
+                    _Tabs.Items.Remove(_ProjectTabs[project.FilePath].Tab);
                     _ProjectTabs.Remove(project.FilePath);
                 }
 
@@ -263,7 +272,7 @@ namespace TwoTrails
                 if (_MapTabs.ContainsKey(project.FilePath))
                 {
 
-                    Tabs.Items.Remove(_MapTabs[project.FilePath].Tab);
+                    _Tabs.Items.Remove(_MapTabs[project.FilePath].Tab);
                     _MapTabs.Remove(project.FilePath);
                 }
 
@@ -278,7 +287,7 @@ namespace TwoTrails
 
         private void Exit()
         {
-            mainWindow.Close(true);
+            _MainWindow.Close(true);
         }
 
         public bool CanExit()
@@ -319,7 +328,7 @@ namespace TwoTrails
 
         private void UpdateRecentProjectMenu()
         {
-            MenuItem miRecent = mainWindow.miRecent, item;
+            MenuItem miRecent = _MainWindow.miRecent, item;
 
             miRecent.Items.Clear();
 

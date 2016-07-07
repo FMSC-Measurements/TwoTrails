@@ -49,8 +49,6 @@ namespace TwoTrails
 
                 ProjectName = ProjectInfo.Name;
             }
-
-            RequiresSave = true;
         }
 
 

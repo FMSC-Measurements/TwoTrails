@@ -4,14 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.IO;
 using TwoTrails.Core;
+using Microsoft.Win32;
 
 namespace TwoTrails.Dialogs
 {
@@ -24,13 +19,87 @@ namespace TwoTrails.Dialogs
 
         public String FilePath { get; private set; }
 
-        public NewProjectDialog(TtProjectInfo projectInfo, String defaultDir = null)
+        public NewProjectDialog(Window owner, TtProjectInfo projectInfo, String defaultDir = null)
         {
-            ProjectInfo = projectInfo;
+            this.Owner = owner;
+            ProjectInfo = new TtProjectInfo(projectInfo);
             InitializeComponent();
+            prjInfoCtrl.SetProjectInfo(ProjectInfo);
 
+            ProjectInfo.PropertyChanged += ProjectInfo_PropertyChanged;
+        }
+
+        private void ProjectInfo_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("Name", StringComparison.InvariantCultureIgnoreCase))
+            {
+                txtName.Text = ProjectInfo.Name.Replace(' ', '_');
+            }
         }
 
 
+        private void Browse_Click(object sender, RoutedEventArgs e)
+        {
+            using (System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    txtLocation.Text = dialog.SelectedPath;
+                }
+            }
+        }
+
+        private void Create_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (String.IsNullOrWhiteSpace(ProjectInfo.Name))
+                {
+                    MessageBox.Show("Project must have a name.");
+                    prjInfoCtrl.FocusName();
+                }
+                else
+                {
+                    String fileName = txtName.Text;
+
+                    if (!fileName.EndsWith(".tt"))
+                        fileName = fileName + ".tt";
+
+                    if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0)
+                    {
+                        FilePath = Path.Combine(txtLocation.Text, fileName);
+                        
+                        if (File.Exists(FilePath))
+                        {
+                            if (MessageBox.Show(String.Format("{0} already exists. Would you like to overwrite it?", fileName), "File Exists",
+                                MessageBoxButton.YesNo, MessageBoxImage.Warning)  == MessageBoxResult.Yes)
+                            {
+                                DialogResult = true;
+                            }
+                        }
+                        else
+                            DialogResult = true;
+
+                        if (DialogResult == true)
+                            this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Invalid File Name.");
+                        txtName.Focus();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
+        }
     }
 }

@@ -47,6 +47,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -66,9 +67,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppInfo.cs" />
-    <Compile Include="Commands\CloseProjectCommand.cs" />
     <Compile Include="Commands\RelayCommand.cs" />
-    <Compile Include="Commands\SaveProjectCommand.cs" />
     <Compile Include="Dialogs\NewProjectDialog.xaml.cs">
       <DependentUpon>NewProjectDialog.xaml</DependentUpon>
     </Compile>
@@ -77,11 +76,14 @@
     <Compile Include="MapWindow.xaml.cs">
       <DependentUpon>MapWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ProjectControl.xaml.cs">
+    <Compile Include="Controls\ProjectControl.xaml.cs">
       <DependentUpon>ProjectControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="DeviceSettings.cs" />
     <Compile Include="MetadataSettings.cs" />
+    <Compile Include="Controls\ProjectInfoControl.xaml.cs">
+      <DependentUpon>ProjectInfoControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ProjectTab.cs" />
     <Compile Include="TtProject.cs" />
     <Compile Include="TtSettings.cs" />
@@ -95,7 +97,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ProjectControl.xaml">
+    <Page Include="Controls\ProjectControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -111,6 +113,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Controls\ProjectInfoControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

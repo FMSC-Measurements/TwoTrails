@@ -26,11 +26,12 @@ namespace TwoTrails.DAL
         public TtSqliteDataAccessLayer(String filePath)
         {
             FilePath = filePath;
-            database = new SQLiteDatabase(filePath);
+            database = new SQLiteDatabase(FilePath);
         }
 
         public TtSqliteDataAccessLayer(SQLiteDatabase database)
         {
+            this.FilePath = database.FileName;
             this.database = database;
         }
 
