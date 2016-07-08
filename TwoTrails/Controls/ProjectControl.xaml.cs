@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -14,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 
@@ -22,43 +24,30 @@ namespace TwoTrails.Controls
     /// <summary>
     /// Interaction logic for ProjectControl.xaml
     /// </summary>
-    public partial class ProjectControl : UserControl, ITtTabContent
+    public partial class ProjectControl : UserControl
     {
+        DataEditorModel DataEditor;
+        DataStyleModel DataStyles;
 
-        public TtTabModel TabModel { get; }
-
-
-
-
-        public ObservableCollection<TtPoint> _Points { get; set; }
-        //public ICollectionView Points { get; set; }
-        public CollectionViewSource Points { get; set; }
-
-
-
-        ITtManager manager;
-
-        public ProjectControl(TtTabModel tabModel)
+        public ProjectControl(DataEditorModel dataEditor, DataStyleModel dataStyles)
         {
-            TabModel = tabModel;
+            DataEditor = dataEditor;
+            DataStyles = dataStyles;
 
-            this.manager = TabModel.Project.Manager;
+            this.DataContext = dataEditor;
 
             InitializeComponent();
-            
-            _Points = new ObservableCollection<TtPoint>(manager.GetPoints());
-
-            Points = new CollectionViewSource();
-            Points.Source = _Points;
-            //Points.SortDescriptions = new SortDescriptionCollection();
-            //Points = CollectionViewSource.GetDefaultView(_Points);
-
-            this.DataContext = this;
         }
 
+        private void DataGrid_OnLoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() => AlterRow(e)));
+        }
 
-
-
-
+        private void AlterRow(DataGridRowEventArgs e)
+        {
+            //e.Row.Style = DataStyles.GetRowStyle(e.Row.Item as TtPoint);
+        }
+        
     }
 }

@@ -1,0 +1,79 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using TwoTrails.Core;
+using TwoTrails.Core.Points;
+
+namespace TwoTrails.Controls
+{
+    public class DataStyleModel
+    {
+        private Dictionary<String, Style> _PolygonStyles, _PolygonStylesAlt;
+        private Dictionary<String, bool> _PolygonStylesIsAlt = new Dictionary<string, bool>();
+
+
+        public DataStyleModel(TtProject project)
+        {
+            _PolygonStyles = new Dictionary<string, Style>();
+            _PolygonStylesAlt = new Dictionary<string, Style>();
+
+            foreach (TtPolygon poly in project.Manager.GetPolyons())
+            {
+                _PolygonStylesIsAlt.Add(poly.CN, false);
+                CreatePolygonStyle(poly);
+            }
+        }
+        
+        private void CreatePolygonStyle(TtPolygon polygon)
+        {
+            Style style = new Style(typeof(DataGridRow));
+            
+            //get poly color, if not default use that with adaptions
+
+            SolidColorBrush rowBrush = new SolidColorBrush(Colors.DeepPink);
+            SolidColorBrush rowBrushAlt = new SolidColorBrush(Colors.LightPink);
+            SolidColorBrush rowBrushHover = new SolidColorBrush(Colors.Red);
+
+            
+            style.Setters.Add(new Setter(DataGridRow.BackgroundProperty, rowBrush));
+            
+            Trigger trig = new Trigger()
+            {
+                Property = DataGridRow.IsMouseOverProperty,
+                Value = true
+            };
+            trig.Setters.Add(new Setter(DataGridRow.BackgroundProperty, rowBrushHover));
+            style.Triggers.Add(trig);
+
+            _PolygonStyles.Add(polygon.CN, style);
+
+
+            style = new Style(typeof(DataGridRow));
+
+            style.Setters.Add(new Setter(DataGridRow.BackgroundProperty, rowBrushAlt));
+
+            trig = new Trigger()
+            {
+                Property = DataGridRow.IsMouseOverProperty,
+                Value = true
+            };
+            trig.Setters.Add(new Setter(DataGridRow.BackgroundProperty, rowBrushHover));
+            style.Triggers.Add(trig);
+
+            _PolygonStylesAlt.Add(polygon.CN, style);
+        }
+
+        public Style GetRowStyle(TtPoint point)
+        {
+            bool alt = _PolygonStylesIsAlt[point.PolygonCN];
+            _PolygonStylesIsAlt[point.PolygonCN] = !alt;
+
+            return alt ? _PolygonStylesAlt[point.PolygonCN] : _PolygonStyles[point.PolygonCN];
+        }
+    }
+}

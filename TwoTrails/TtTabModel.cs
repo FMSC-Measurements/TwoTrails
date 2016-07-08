@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Commands;
 using TwoTrails.Controls;
+using TwoTrails.Core;
 
 namespace TwoTrails
 {
@@ -44,7 +45,7 @@ namespace TwoTrails
             Save = new RelayCommand((x) => SaveProject());
             Close = new RelayCommand((x) => CloseTab());
 
-            Tab.Content = new ProjectControl(this);
+            Tab.Content = new ProjectControl(new DataEditorModel(project), new DataStyleModel(project));
             Tab.DataContext = this;
             
 
