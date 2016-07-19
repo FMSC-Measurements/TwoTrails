@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1000"
+        Title="MainWindow"
+        Width="1000" Height="700"
+        MinWidth="640" MinHeight="480"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -46,7 +48,7 @@
         <Grid DockPanel.Dock="Top">
             <DockPanel LastChildFill="True" Background="Gray">
                 <TabControl x:Name="tabControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                            Margin="0" Padding="0">
+                            Margin="0" Padding="0" Drop="tabControl_Drop" AllowDrop="True">
 
                     <TabControl.Resources>
                         <Style TargetType="{x:Type TabItem}">

@@ -6,145 +6,272 @@
              xmlns:local="clr-namespace:TwoTrails"
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:ctrls="clr-namespace:TwoTrails.Controls"
+             xmlns:cvt="clr-namespace:CSUtil.WPF;assembly=CSUtilSlim"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600">
 
     <UserControl.Resources>
-        
+        <cvt:InverseBooleanConverter x:Key="IBC"/>
+
+        <Style x:Key="styleFieldTitle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,5,0" />
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+
+        <Style x:Key="styleFieldValue" TargetType="Control">
+            <Setter Property="Margin" Value="0,2.5,0,2.5" />
+        </Style>
     </UserControl.Resources>
 
-    <DockPanel LastChildFill="True" Margin="-1, -1, 0, 0">
+    <DockPanel LastChildFill="True" Margin="-1, -1, 0, 0" Background="White">
         <Grid DockPanel.Dock="Top" Height="3" Background="Green" HorizontalAlignment="Stretch"/>
 
         <Grid Width="25" Background="Green" DockPanel.Dock="Left">
 
         </Grid>
 
-        <Grid Background="Green" DockPanel.Dock="Right" Width="100">
-            
-        </Grid>
+        <Grid DockPanel.Dock="Right" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="150"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="170" MinWidth="140" MaxWidth="300"/>
+            </Grid.ColumnDefinitions>
 
-        <Grid Background="White">
-            <DataGrid Name="dgPoints" ItemsSource="{Binding Points}" AutoGenerateColumns="False"
-                        CanUserReorderColumns="True" CanUserResizeColumns="True" 
-                        CanUserResizeRows="False" CanUserSortColumns="False"
-                      LoadingRow="DataGrid_OnLoadingRow" CanUserAddRows="False"
-                      AlternatingRowBackground="WhiteSmoke">
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="Index" Width="Auto" IsReadOnly="True">
+            <DataGrid Name="dgPoints"
+                Grid.Column="0"
+                BorderThickness="0"
+                ItemsSource="{Binding Points}"
+                AutoGenerateColumns="False"
+                CanUserReorderColumns="True" CanUserResizeColumns="True" 
+                CanUserResizeRows="False" CanUserSortColumns="True"
+                CanUserAddRows="False"
+                LoadingRow="DataGrid_OnLoadingRow"
+                EnableRowVirtualization="True"
+                EnableColumnVirtualization="True"
+                VirtualizingStackPanel.IsVirtualizing="True"
+                VirtualizingStackPanel.VirtualizationMode="Recycling">
+                    <!--AlternatingRowBackground="WhiteSmoke"-->
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Index" IsReadOnly="True" Binding="{Binding Index}"/>
+                        <DataGridTextColumn Header="PID" IsReadOnly="True" Binding="{Binding PID}"/>
+                        <DataGridTextColumn Header="OpType" IsReadOnly="True" Binding="{Binding OpType}"/>
+                        <DataGridTextColumn Header="Polygon" IsReadOnly="True" Binding="{Binding Polygon.Name}"/>
+                        <DataGridTextColumn Header="Group" IsReadOnly="True" Binding="{Binding Group.Name}"/>
+                        <DataGridTextColumn Header="Metadata" IsReadOnly="True" Binding="{Binding Metadata.Name}"/>
+                        <DataGridTextColumn Header="OnBoundary" IsReadOnly="True" Binding="{Binding OnBoundary}"/>
+                        <DataGridTextColumn Header="AdjX" IsReadOnly="True" Binding="{Binding AdjX}"/>
+                        <DataGridTextColumn Header="AdjY" IsReadOnly="True" Binding="{Binding AdjY}"/>
+                        <DataGridTextColumn Header="AdjZ" IsReadOnly="True" Binding="{Binding AdjZ}"/>
+                        <DataGridTextColumn Header="UnAdjX" IsReadOnly="True" Binding="{Binding UnAdjX}" Visibility="Collapsed"/>
+                        <DataGridTextColumn Header="UnAdjY" IsReadOnly="True" Binding="{Binding UnAdjY}" Visibility="Collapsed"/>
+                        <DataGridTextColumn Header="UnAdjZ" IsReadOnly="True" Binding="{Binding UnAdjZ}" Visibility="Collapsed"/>
+                        <DataGridTextColumn Header="HasQuondamLinks" IsReadOnly="True" Binding="{Binding HasQuondamLinks}"/>
+                        <DataGridTextColumn Header="Comment" IsReadOnly="True" Binding="{Binding Comment}" Visibility="Collapsed"/>
+                        <!--<DataGridTemplateColumn Header="Index" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Index}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="PID" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="PID" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding PID}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="OpType" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="OpType" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding OpType}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Polygon" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="Polygon" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Polygon.Name}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Group" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="Group" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Group.Name}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Metadata" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="Metadata" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Metadata.Name}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="OnBoundary" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="OnBoundary" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding OnBoundary}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="AdjX" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="AdjX" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding AdjX}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="AdjY" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="AdjY" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding AdjY}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="AdjZ" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="AdjZ" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding AdjZ}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="UnAdjX" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="UnAdjX" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding UnAdjX}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="UnAdjY" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="UnAdjY" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding UnAdjY}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="UnAdjZ" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="UnAdjZ" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding UnAdjZ}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="HasQuondamLinks" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="HasQuondamLinks" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding HasQuondamLinks}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="PID" Width="Auto" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding PID}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Comment" Width="Auto" IsReadOnly="True">
+                    <DataGridTemplateColumn Header="Comment" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Comment}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                    </DataGridTemplateColumn>-->
                 </DataGrid.Columns>
             </DataGrid>
+
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="LightGray" />
+
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="PID"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                             IsEnabled="{Binding Path=MultipleSelections, Converter={StaticResource IBC}}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Polygon"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Index"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" IsEnabled="False">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type TextBox}">
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding MultipleSelections}" Value="False"/>
+                                            <Condition Binding="{Binding IsAdvancedMode}" Value="True"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <MultiDataTrigger.Setters>
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                        </MultiDataTrigger.Setters>
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Metadata"/>
+                    <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Group"/>
+                    <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <CheckBox Grid.Row="5" Grid.Column="1" Content="OnBound" />
+
+                    <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjX"/>
+                    <TextBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="7" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjY"/>
+                    <TextBox Grid.Row="7" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjZ"/>
+                    <TextBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="9" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Man Acc"/>
+                    <TextBox Grid.Row="9" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Fwd Az"/>
+                    <TextBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="11" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Back Az"/>
+                    <TextBox Grid.Row="11" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Slp Dist"/>
+                    <TextBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="13" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Slp Ang"/>
+                    <TextBox Grid.Row="13" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="14" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Qndm Link"/>
+                    <TextBox Grid.Row="14" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+
+                    <TextBlock Grid.Row="15" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" VerticalAlignment="Top" Margin="0,2.5,5,0" Text="Comment"/>
+                    <TextBox Grid.Row="15" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                             MinLines="2"
+                             TextWrapping="Wrap"/>
+                </Grid>
+            </ScrollViewer>
         </Grid>
     </DockPanel>
 </UserControl>

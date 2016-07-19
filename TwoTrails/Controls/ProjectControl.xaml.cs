@@ -46,7 +46,7 @@ namespace TwoTrails.Controls
 
         private void AlterRow(DataGridRowEventArgs e)
         {
-            //e.Row.Style = DataStyles.GetRowStyle(e.Row.Item as TtPoint);
+            e.Row.Style = DataStyles.GetRowStyle(e.Row.Item as TtPoint);
         }
         
     }

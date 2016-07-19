@@ -115,7 +115,7 @@ namespace TwoTrails.DAL
             List<TtPoint> points = new List<TtPoint>();
 
             String query = String.Format(@"select {0}.{1}, {2}, {3}, {4} from {0} left join {5} on {5}.{8} = {0}.{8} 
- left join {6} on {6}.{8} = {0}.{8}  left join {7} on {7}.{8} = {0}.{8}",
+ left join {6} on {6}.{8} = {0}.{8}  left join {7} on {7}.{8} = {0}.{8}{9}",
                 TwoTrailsSchema.PointSchema.TableName,              //0
                 TwoTrailsSchema.PointSchema.SelectItems,            //1
                 TwoTrailsSchema.GpsPointSchema.SelectItemsNoCN,     //2
@@ -124,7 +124,8 @@ namespace TwoTrails.DAL
                 TwoTrailsSchema.GpsPointSchema.TableName,           //5
                 TwoTrailsSchema.TravPointSchema.TableName,          //6
                 TwoTrailsSchema.QuondamPointSchema.TableName,       //7
-                TwoTrailsSchema.SharedSchema.CN                     //8
+                TwoTrailsSchema.SharedSchema.CN,                    //8
+                where != null ? String.Format(" where {0}", where) : String.Empty
             );
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
@@ -157,7 +158,8 @@ namespace TwoTrails.DAL
                             comment = dr.GetStringN(6);
                             op = (OpType)dr.GetInt32(7);
                             metacn = dr.GetString(8);
-                            time = DateTime.ParseExact(dr.GetString(9), DATE_FORMAT, CultureInfo.InvariantCulture);
+                            time = DateTime.Parse(dr.GetString(9));
+                            //time = DateTime.ParseExact(dr.GetString(9), DATE_FORMAT, CultureInfo.InvariantCulture);
 
                             adjx = dr.GetDouble(10);
                             adjy = dr.GetDouble(11);
@@ -1000,7 +1002,7 @@ namespace TwoTrails.DAL
                         {
                             cn = dr.GetString(0);
                             name = dr.GetString(1);
-                            cmt = dr.GetString(2);
+                            cmt = dr.GetStringN(2);
                             zone = dr.GetInt32(3);
                             datum = (Datum)dr.GetInt32(4);
                             dist = (Distance)dr.GetInt32(5);
@@ -1008,10 +1010,10 @@ namespace TwoTrails.DAL
                             slope = (Slope)dr.GetInt32(7);
                             decType = (DeclinationType)dr.GetInt32(8);
                             magdec = dr.GetDouble(9);
-                            gps = dr.GetString(10);
-                            rf = dr.GetString(11);
-                            compass = dr.GetString(12);
-                            crew = dr.GetString(13);
+                            gps = dr.GetStringN(10);
+                            rf = dr.GetStringN(11);
+                            compass = dr.GetStringN(12);
+                            crew = dr.GetStringN(13);
 
                             metas.Add(new TtMetadata(cn, name, cmt, zone,
                                 decType, magdec, datum, dist,

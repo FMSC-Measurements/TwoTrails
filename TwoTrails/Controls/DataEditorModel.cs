@@ -25,12 +25,70 @@ namespace TwoTrails.Controls
         ITtManager _Manager;
 
 
+        public bool IsAdvancedMode { get { return Get<bool>(); } set { Set(value); } }
+
+        public bool MultipleSelections
+        {
+            get { return _SelectedPoints != null && _SelectedPoints.Count > 0; }
+        }
+
+        public TtPoint SelectedPoint
+        {
+            get { return Get<TtPoint>(); }
+            set
+            {
+                if (Set(value))
+                {
+                    OnPropertyChanged(
+                        nameof(PID),
+                        nameof(MultipleSelections)
+                    );
+                }
+            }
+        }
+
+        private List<TtPoint> _SelectedPoints;
+        public List<TtPoint> SelectedPoints
+        {
+            get { return _SelectedPoints; }
+            set
+            {
+                _SelectedPoints = value;
+
+                OnPropertyChanged(
+                    nameof(SelectedPoints),
+                    nameof(MultipleSelections)
+                );
+            }
+        }
+
+        public string PID
+        {
+            get { return Get<string>(); }
+            set
+            {
+
+            }
+        }
+
+
+
+
+
+
+
+
         public DataEditorModel(TtProject project)
         {
             _Manager = project.Manager;
+            List<TtPoint> points = _Manager.GetPoints();
+            points.Sort();
+            Points = CollectionViewSource.GetDefaultView(points);
 
-            Points = CollectionViewSource.GetDefaultView(_Manager.GetPoints());
-            Points.Filter = Filter;
+            SelectedPoints = points;
+            //Points.Filter = Filter;
+
+
         }
         
 

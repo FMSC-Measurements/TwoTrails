@@ -34,5 +34,18 @@ namespace TwoTrails
         {
             e.Cancel = !MainModel.CanExit;
         }
+
+        private void tabControl_Drop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+            if (files != null && files.Length > 0)
+            {
+                foreach (string file in files.Where(f => f.EndsWith(".tt")))
+                {
+                    MainModel.OpenProject(file);
+                }
+            }
+        }
     }
 }

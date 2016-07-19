@@ -35,9 +35,9 @@ namespace TwoTrails.Controls
             
             //get poly color, if not default use that with adaptions
 
-            SolidColorBrush rowBrush = new SolidColorBrush(Colors.DeepPink);
-            SolidColorBrush rowBrushAlt = new SolidColorBrush(Colors.LightPink);
-            SolidColorBrush rowBrushHover = new SolidColorBrush(Colors.Red);
+            SolidColorBrush rowBrush = new SolidColorBrush(Colors.White);
+            SolidColorBrush rowBrushAlt = new SolidColorBrush(Colors.WhiteSmoke);
+            SolidColorBrush rowBrushHover = new SolidColorBrush(Colors.Aqua);
 
             
             style.Setters.Add(new Setter(DataGridRow.BackgroundProperty, rowBrush));

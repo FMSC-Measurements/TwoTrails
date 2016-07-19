@@ -371,7 +371,7 @@ namespace TwoTrails.Core.Points
             if (other == null)
                 return 1;
 
-            int val = @this.Polygon.Name.CompareTo(other.Polygon.Name);
+            int val = @this.Polygon.CompareTo(other.Polygon);
 
             if (val != 0)
                 return val;

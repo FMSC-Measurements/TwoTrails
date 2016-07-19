@@ -154,7 +154,7 @@ namespace TwoTrails
             }
         }
 
-        private void OpenProject(String filePath)
+        public void OpenProject(String filePath)
         {
             if (filePath != null && File.Exists(filePath))
             {
