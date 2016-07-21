@@ -37,6 +37,13 @@ namespace TwoTrails.Controls
             this.DataContext = dataEditor;
 
             InitializeComponent();
+
+            dgPoints.SelectionChanged += DgPoints_SelectionChanged;
+        }
+
+        private void DgPoints_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DataEditor.UpdatePoints(e.AddedItems.Cast<TtPoint>(), e.RemovedItems.Cast<TtPoint>());
         }
 
         private void DataGrid_OnLoadingRow(object sender, DataGridRowEventArgs e)
@@ -48,6 +55,5 @@ namespace TwoTrails.Controls
         {
             e.Row.Style = DataStyles.GetRowStyle(e.Row.Item as TtPoint);
         }
-        
     }
 }

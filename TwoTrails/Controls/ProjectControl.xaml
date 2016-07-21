@@ -207,13 +207,15 @@
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="PID"/>
                     <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
-                             IsEnabled="{Binding Path=MultipleSelections, Converter={StaticResource IBC}}"/>
+                             IsEnabled="{Binding Path=MultipleSelections, Converter={StaticResource IBC}}"
+                             Text="{Binding PID}"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Polygon"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Index"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" IsEnabled="False">
+                    <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" IsEnabled="False"
+                             Text="{Binding Index}">
                         <TextBox.Resources>
                             <Style TargetType="{x:Type TextBox}">
                                 <Style.Triggers>
@@ -240,36 +242,45 @@
                     <CheckBox Grid.Row="5" Grid.Column="1" Content="OnBound" />
 
                     <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjX"/>
-                    <TextBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+                    <TextBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                             Text="{Binding UnAdjX}"/>
 
                     <TextBlock Grid.Row="7" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjY"/>
-                    <TextBox Grid.Row="7" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+                    <TextBox Grid.Row="7" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                             Text="{Binding UnAdjY}"/>
 
                     <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjZ"/>
-                    <TextBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+                    <TextBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                             Text="{Binding UnAdjZ}"/>
 
                     <TextBlock Grid.Row="9" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Man Acc"/>
-                    <TextBox Grid.Row="9" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+                    <TextBox Grid.Row="9" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                             Text="{Binding ManAcc}"/>
 
                     <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Fwd Az"/>
-                    <TextBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+                    <TextBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                             Text="{Binding FwdAz}"/>
 
                     <TextBlock Grid.Row="11" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Back Az"/>
-                    <TextBox Grid.Row="11" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+                    <TextBox Grid.Row="11" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                             Text="{Binding BkAz}"/>
 
                     <TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Slp Dist"/>
-                    <TextBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+                    <TextBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                             Text="{Binding SlpDist}"/>
 
                     <TextBlock Grid.Row="13" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Slp Ang"/>
-                    <TextBox Grid.Row="13" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
+                    <TextBox Grid.Row="13" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                             Text="{Binding SlpAng}"/>
 
                     <TextBlock Grid.Row="14" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Qndm Link"/>
                     <TextBox Grid.Row="14" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"/>
 
                     <TextBlock Grid.Row="15" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" VerticalAlignment="Top" Margin="0,2.5,5,0" Text="Comment"/>
                     <TextBox Grid.Row="15" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
-                             MinLines="2"
-                             TextWrapping="Wrap"/>
+                             MinLines="4"
+                             TextWrapping="Wrap"
+                             Text="{Binding Comment}"/>
                 </Grid>
             </ScrollViewer>
         </Grid>
