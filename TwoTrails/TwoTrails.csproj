@@ -70,6 +70,7 @@
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Controls\DataEditorModel.cs" />
     <Compile Include="Controls\DataStyleModel.cs" />
+    <Compile Include="CustomProperties\ControlProperties.cs" />
     <Compile Include="Dialogs\NewProjectDialog.xaml.cs">
       <DependentUpon>NewProjectDialog.xaml</DependentUpon>
     </Compile>

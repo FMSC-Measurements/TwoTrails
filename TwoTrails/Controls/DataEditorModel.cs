@@ -157,6 +157,8 @@ namespace TwoTrails.Controls
                         }
                         else if (point.OpType == OpType.Quondam && !_HasQndm)
                         {
+                            _HasQndm = true;
+
                             parseTrav = false;
                         }
 
@@ -542,8 +544,27 @@ namespace TwoTrails.Controls
             }
         }
 
+        private void CompareAndSet(ref bool same, ref string oldVal, string newVal)
+        {
+            if (String.IsNullOrWhiteSpace(oldVal) ^ String.IsNullOrWhiteSpace(newVal))
+            {
+                same = (oldVal != null && newVal != null) ?
+                    oldVal == newVal :
+                    String.IsNullOrWhiteSpace(oldVal) == String.IsNullOrWhiteSpace(newVal);
 
-        private bool _SamePID;
+                if (!same)
+                {
+                    oldVal = null;
+                }
+            }
+            else
+            {
+                oldVal = newVal;
+            }
+        }
+
+
+        private bool _SamePID = true;
         public bool SamePID { get { return _SamePID; } }
 
         private int? _PID;
@@ -557,7 +578,7 @@ namespace TwoTrails.Controls
         }
 
 
-        private bool _SamePolygons;
+        private bool _SamePolygons = true;
         public bool SamePolygon { get { return _SamePolygons; } }
 
         private TtPolygon _Polygon;
@@ -571,7 +592,7 @@ namespace TwoTrails.Controls
         }
 
 
-        private bool _SameIndex;
+        private bool _SameIndex = true;
         public bool SameIndex { get { return _SameIndex; } }
 
         private int? _Index;
@@ -584,7 +605,7 @@ namespace TwoTrails.Controls
             }
         }
 
-        private bool _SameComment;
+        private bool _SameComment = true;
         public bool SameComment { get { return _SameComment; } }
 
         private string _Comment;
@@ -598,7 +619,7 @@ namespace TwoTrails.Controls
         }
 
 
-        private bool _SameMetadata;
+        private bool _SameMetadata = true;
         public bool SameMetadata
         {
             get { return _SameMetadata; }
@@ -615,7 +636,7 @@ namespace TwoTrails.Controls
         }
 
 
-        private bool _SameGroup;
+        private bool _SameGroup = true;
         public bool SameGroup { get { return _SameGroup; } }
 
         private TtGroup _Group;
@@ -629,7 +650,7 @@ namespace TwoTrails.Controls
         }
 
 
-        private bool _SameOnBound;
+        private bool _SameOnBound = true;
         public bool SameOnBound { get { return _SameOnBound; } }
 
         private bool? _OnBound;
@@ -642,7 +663,7 @@ namespace TwoTrails.Controls
             }
         }
 
-        private bool _SameUnAdjX;
+        private bool _SameUnAdjX = true;
         public bool SameUnAdjX { get { return _SameUnAdjX; } }
 
         private double? _UnAdjX;
@@ -656,7 +677,7 @@ namespace TwoTrails.Controls
         }
 
 
-        private bool _SameUnAdjY;
+        private bool _SameUnAdjY = true;
         public bool SameUnAdjY { get { return _SameUnAdjY; } }
 
         private double? _UnAdjY;
@@ -670,7 +691,7 @@ namespace TwoTrails.Controls
         }
 
 
-        private bool _SameUnAdjZ;
+        private bool _SameUnAdjZ = true;
         public bool SameUnAdjZ { get { return _SameUnAdjZ; } }
 
         private double? _UnAdjZ;
@@ -684,7 +705,7 @@ namespace TwoTrails.Controls
         }
 
 
-        private bool _SameManAcc;
+        private bool _SameManAcc = true;
         public bool SameManAcc { get { return _SameManAcc; } }
 
         private double? _ManAcc;
@@ -698,7 +719,7 @@ namespace TwoTrails.Controls
         }
 
 
-        private bool _SameFwdAz;
+        private bool _SameFwdAz = true;
         public bool SameFwdAz { get { return _SameFwdAz; } }
 
         private double? _FwdAz;
@@ -713,7 +734,7 @@ namespace TwoTrails.Controls
 
 
 
-        private bool _SameBkAz;
+        private bool _SameBkAz = true;
         public bool SameBkAz { get { return _SameBkAz; } }
 
         private double? _BkAz;
@@ -729,7 +750,7 @@ namespace TwoTrails.Controls
 
 
 
-        private bool _SameSlpAng;
+        private bool _SameSlpAng = true;
         public bool SameSlpAng { get { return _SameSlpAng; } }
 
         private double? _SlpAng;
@@ -744,7 +765,7 @@ namespace TwoTrails.Controls
 
 
 
-        private bool _SameSlpDist;
+        private bool _SameSlpDist = true;
         public bool SameSlpDist { get { return _SameSlpDist; } }
 
         private double? _SlpDist;
@@ -760,7 +781,7 @@ namespace TwoTrails.Controls
 
 
 
-        private bool _SameParentPoint;
+        private bool _SameParentPoint = true;
         public bool SameParentPoint { get { return _SameParentPoint; } }
 
         private TtPoint _ParentPoint;

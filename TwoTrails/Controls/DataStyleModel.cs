@@ -14,7 +14,6 @@ namespace TwoTrails.Controls
     public class DataStyleModel
     {
         private Dictionary<String, Style> _PolygonStyles, _PolygonStylesAlt;
-        private Dictionary<String, bool> _PolygonStylesIsAlt = new Dictionary<string, bool>();
 
 
         public DataStyleModel(TtProject project)
@@ -24,7 +23,6 @@ namespace TwoTrails.Controls
 
             foreach (TtPolygon poly in project.Manager.GetPolyons())
             {
-                _PolygonStylesIsAlt.Add(poly.CN, false);
                 CreatePolygonStyle(poly);
             }
         }
@@ -70,10 +68,7 @@ namespace TwoTrails.Controls
 
         public Style GetRowStyle(TtPoint point)
         {
-            bool alt = _PolygonStylesIsAlt[point.PolygonCN];
-            _PolygonStylesIsAlt[point.PolygonCN] = !alt;
-
-            return alt ? _PolygonStylesAlt[point.PolygonCN] : _PolygonStyles[point.PolygonCN];
+            return point.Index % 2 == 0 ? _PolygonStyles[point.PolygonCN] : _PolygonStylesAlt[point.PolygonCN];
         }
     }
 }
