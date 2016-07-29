@@ -9,7 +9,7 @@ namespace TwoTrails.Core.Points
         public Double? ManualAccuracy
         {
             get { return _ManualAccuracy; }
-            set { SetField<Double?>(ref _ManualAccuracy, value); }
+            set { SetField(ref _ManualAccuracy, value, () => SetAccuracy(Polygon.Accuracy)); }
         }
 
         public override double UnAdjX
@@ -125,6 +125,13 @@ namespace TwoTrails.Core.Points
             _Elevation = point._Elevation;
 
             _ManualAccuracy = point._ManualAccuracy;
+        }
+
+
+        protected override void OnMetadataChanged()
+        {
+            base.OnMetadataChanged();
+            OnPropertyChanged(nameof(Elevation));
         }
 
 

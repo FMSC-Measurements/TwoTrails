@@ -5,7 +5,7 @@ namespace FMSC.Core
     public enum Slope
     {
         Percent = 0,
-        Degress = 1
+        Degrees = 1
     }
 
     public static partial class Types
@@ -19,7 +19,7 @@ namespace FMSC.Core
                 case "percent": return Slope.Percent;
                 case "1":
                 case "d":
-                case "degrees": return Slope.Degress;
+                case "degrees": return Slope.Degrees;
             }
 
             throw new Exception("Unknown Slope Type");

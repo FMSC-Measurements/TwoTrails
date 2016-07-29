@@ -9,11 +9,11 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public abstract class ITtPointCommand : ITtCommand
     {
-        protected TtPoint point;
+        protected TtPoint Point;
 
         public ITtPointCommand(TtPoint point)
         {
-            this.point = point;
+            this.Point = point;
         }
 
         public abstract void Redo();

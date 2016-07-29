@@ -102,6 +102,7 @@ namespace TwoTrails.Core.Points
                 if (SetField(ref _Metadata, value))
                 {
                     MetadataCN = value?.CN;
+                    OnMetadataChanged();
                 }
             }
         }
@@ -209,6 +210,8 @@ namespace TwoTrails.Core.Points
 
         public TtPoint(TtPoint point) : base(point.CN)
         {
+            _LinkedPoints.CollectionChanged += LinkedPoints_CollectionChanged;
+
             _Index = point._Index;
             _PID = point._PID;
             _TimeCreated = point._TimeCreated;
@@ -246,6 +249,8 @@ namespace TwoTrails.Core.Points
             string comment, bool onbnd, double adjx, double adjy, double adjz, double unadjx, double unadjy, double unadjz,
             double acc, string qlinks) : base(cn)
         {
+            _LinkedPoints.CollectionChanged += LinkedPoints_CollectionChanged;
+
             _Index = index;
             _PID = pid;
             _TimeCreated = time;
@@ -271,7 +276,8 @@ namespace TwoTrails.Core.Points
             {
                 foreach (String lcn in qlinks.Split('_'))
                 {
-                    _LinkedPoints.Add(lcn);
+                    if (!String.IsNullOrWhiteSpace(lcn))
+                        _LinkedPoints.Add(lcn);
                 } 
             }
         }
@@ -304,6 +310,13 @@ namespace TwoTrails.Core.Points
             }
         }
 
+        protected virtual void OnMetadataChanged()
+        {
+            OnPropertyChanged(
+                nameof(AdjZ),
+                nameof(UnAdjZ)
+            );
+        }
 
         public virtual void SetAccuracy(double accuracy)
         {

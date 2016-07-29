@@ -2,29 +2,29 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Threading;
 using TwoTrails.Core;
+using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Controls
 {
     public class DataEditorModel : NotifyPropertyChangedEx
     {
-        private ICollectionView _Points;
-        public ICollectionView Points
+        private ListCollectionView _Points;
+        public ListCollectionView Points
         {
             get { return _Points; }
             set { SetField(ref _Points, value); }
         }
-
-        ITtManager _Manager;
-
 
         public bool IsAdvancedMode { get { return Get<bool>(); } set { Set(value); } }
 
@@ -37,11 +37,6 @@ namespace TwoTrails.Controls
         {
             get { return _SelectedPoints.Count > 1; }
         }
-
-
-
-        private List<TtPoint> _AllPoints;
-        private List<TtPoint> _VisiblePoints;
 
 
         private TtPoint _SelectedPoint;
@@ -101,6 +96,8 @@ namespace TwoTrails.Controls
                     bool sameUnAdjX = true, sameUnAdjY = true, sameUnAdjZ = true, 
                         sameFwAz = true, sameBkAz = true, sameManAcc = true,
                         sameSlpDist = true, sameSlpAng = true;
+
+                    bool fmanacc = true, fqndm = true;
 
                     _HasGps = false;
                     _HasTrav = false;
@@ -215,13 +212,15 @@ namespace TwoTrails.Controls
                             
                             if (sameManAcc)
                             {
-                                if (manacc != null && manacc != ima.ManualAccuracy)
+                                if (!fmanacc && manacc != ima.ManualAccuracy)
                                 {
-                                    sameManAcc = false; 
+                                    sameManAcc = false;
+                                    manacc = null;
                                 }
                                 else
                                 {
                                     manacc = ima.ManualAccuracy;
+                                    fmanacc = false;
                                 }
                             }
 
@@ -231,13 +230,15 @@ namespace TwoTrails.Controls
 
                                 if (sameQParent)
                                 {
-                                    if (qParent != null && qp.ParentPointCN != qParent.CN)
+                                    if (!fqndm && qp.ParentPointCN != qParent.CN)
                                     {
-                                        sameQParent = false; 
+                                        sameQParent = false;
+                                        qParent = null;
                                     }
                                     else
                                     {
                                         qParent = qp.ParentPoint;
+                                        fqndm = false;
                                     }
                                 }
                             }
@@ -265,17 +266,17 @@ namespace TwoTrails.Controls
 
                     if (hasOnbnd ^ hasOffBnd)
                     {
-                        _OnBound = hasOnbnd;
+                        _OnBoundary = hasOnbnd;
                         _SameOnBound = true;
                     }
                     else
                     {
-                        _OnBound = null;
+                        _OnBoundary = null;
                         _SameOnBound = true;
                     }
 
                     _ManAcc = parseManAcc ? manacc : null;
-                    _SameManAcc = parseManAcc ? sameManAcc : true;
+                    _SameManAcc = sameManAcc;
                     
 
                     if (parseTrav)
@@ -329,6 +330,8 @@ namespace TwoTrails.Controls
                 }
                 else
                 {
+                    _SelectedPoint = _SelectedPoints[0];
+
                     _HasGps = false;
                     _HasTrav = false;
                     _HasQndm = false;
@@ -351,7 +354,7 @@ namespace TwoTrails.Controls
                     _Group = _SelectedPoint.Group;
                     _SameGroup = true;
                     
-                    _OnBound = _SelectedPoint.OnBoundary;
+                    _OnBoundary = _SelectedPoint.OnBoundary;
                     _SameOnBound = true;
 
 
@@ -451,7 +454,7 @@ namespace TwoTrails.Controls
                 _Group = null;
                 _SameGroup = true;
 
-                _OnBound = false;
+                _OnBoundary = false;
                 _SameOnBound = true;
                 
                 _ManAcc = null;
@@ -506,7 +509,7 @@ namespace TwoTrails.Controls
                     nameof(SameMetadata),
                     nameof(Group),
                     nameof(SameGroup),
-                    nameof(OnBound),
+                    nameof(OnBoundary),
                     nameof(SameOnBound),
                     nameof(UnAdjX),
                     nameof(SameUnAdjX),
@@ -564,6 +567,7 @@ namespace TwoTrails.Controls
         }
 
 
+        #region Properties
         private bool _SamePID = true;
         public bool SamePID { get { return _SamePID; } }
 
@@ -571,10 +575,7 @@ namespace TwoTrails.Controls
         public int? PID
         {
             get { return _PID; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _PID, value, PointProperties.PID); }
         }
 
 
@@ -599,10 +600,7 @@ namespace TwoTrails.Controls
         public int? Index
         {
             get { return _Index; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _Index, value, PointProperties.INDEX); }
         }
 
         private bool _SameComment = true;
@@ -614,7 +612,28 @@ namespace TwoTrails.Controls
             get { return _Comment; }
             set
             {
-                //TODO
+                bool same = false;
+
+                if (String.IsNullOrWhiteSpace(_Comment) ^ String.IsNullOrWhiteSpace(value))
+                {
+                    same = (_Comment != null && value != null) ?
+                        _Comment == value :
+                        String.IsNullOrWhiteSpace(_Comment) == String.IsNullOrWhiteSpace(value);
+                }
+
+                _Comment = value;
+
+                if (!same)
+                {
+                    if (MultipleSelections)
+                    {
+                        Manager.EditPoints(_SelectedPoints, PointProperties.COMMENT, value);
+                    }
+                    else
+                    {
+                        Manager.EditPoint(_SelectedPoint, PointProperties.COMMENT, value);
+                    }
+                }
             }
         }
 
@@ -653,14 +672,11 @@ namespace TwoTrails.Controls
         private bool _SameOnBound = true;
         public bool SameOnBound { get { return _SameOnBound; } }
 
-        private bool? _OnBound;
-        public bool? OnBound
+        private bool? _OnBoundary;
+        public bool? OnBoundary
         {
-            get { return _SameOnBound; }
-            set
-            {
-                //TODO
-            }
+            get { return _OnBoundary; }
+            set { EditValue(ref _OnBoundary, value, PointProperties.BOUNDARY); }
         }
 
         private bool _SameUnAdjX = true;
@@ -670,10 +686,7 @@ namespace TwoTrails.Controls
         public double? UnAdjX
         {
             get { return _UnAdjX; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _UnAdjZ, value, PointProperties.UNADJX); }
         }
 
 
@@ -684,10 +697,7 @@ namespace TwoTrails.Controls
         public double? UnAdjY
         {
             get { return _UnAdjY; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _UnAdjZ, value, PointProperties.UNADJY); }
         }
 
 
@@ -698,10 +708,7 @@ namespace TwoTrails.Controls
         public double? UnAdjZ
         {
             get { return _UnAdjZ; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _UnAdjZ, value, PointProperties.UNADJZ); }
         }
 
 
@@ -714,7 +721,31 @@ namespace TwoTrails.Controls
             get { return _ManAcc; }
             set
             {
-                //TODO
+                if (!_ManAcc.Equals(value))
+                {
+                    _ManAcc = value;
+                    
+                    if (MultipleSelections)
+                    {
+                        List<PropertyInfo> properties = new List<PropertyInfo>();
+                        foreach (TtPoint point in _SelectedPoints)
+                        {
+                            if (point.OpType == OpType.Quondam)
+                                properties.Add(PointProperties.MAN_ACC_QP);
+                            else
+                                properties.Add(PointProperties.MAN_ACC_GPS);
+                        }
+
+                        Manager.EditPoints(_SelectedPoints, properties, value);
+                    }
+                    else
+                    {
+                        if (_SelectedPoint.OpType == OpType.Quondam)
+                            Manager.EditPoint(_SelectedPoint, PointProperties.MAN_ACC_QP, value);
+                        else
+                            Manager.EditPoint(_SelectedPoint, PointProperties.MAN_ACC_GPS, value);
+                    }
+                }
             }
         }
 
@@ -726,10 +757,7 @@ namespace TwoTrails.Controls
         public double? FwdAz
         {
             get { return _FwdAz; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _FwdAz, value, PointProperties.FWD_AZ, true); }
         }
 
 
@@ -741,10 +769,7 @@ namespace TwoTrails.Controls
         public double? BkAz
         {
             get { return _BkAz; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _BkAz, value, PointProperties.BK_AZ, true); }
         }
 
 
@@ -757,10 +782,7 @@ namespace TwoTrails.Controls
         public double? SlpAng
         {
             get { return _SlpAng; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _SlpAng, value, PointProperties.SLP_ANG); }
         }
 
 
@@ -772,10 +794,7 @@ namespace TwoTrails.Controls
         public double? SlpDist
         {
             get { return _SlpDist; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _SlpDist, value, PointProperties.SLP_DIST); }
         }
 
 
@@ -793,30 +812,26 @@ namespace TwoTrails.Controls
                 //TODO
             }
         }
+        #endregion
+        
 
-
-
-
-
-
+        public TtHistoryManager Manager { get; private set; }
 
         public DataEditorModel(TtProject project)
         {
-            _Manager = project.Manager;
-            _AllPoints = _Manager.GetPoints();
+            Manager = project.Manager;
 
-            _AllPoints.Sort();
-            _VisiblePoints = _AllPoints;
-            Points = CollectionViewSource.GetDefaultView(_VisiblePoints);
+            Points = CollectionViewSource.GetDefaultView(Manager.Points) as ListCollectionView;
             
+            Points.CustomSort = new PointSorter();
+
             //Points.Filter = Filter;
-
-
         }
 
+        
 
 
-        public void UpdatePoints(IEnumerable<TtPoint> addedPoints, IEnumerable<TtPoint> removedPoints)
+        public void UpdateSelectedPoints(IEnumerable<TtPoint> addedPoints, IEnumerable<TtPoint> removedPoints)
         {
             foreach (TtPoint p in removedPoints)
             {
@@ -828,9 +843,29 @@ namespace TwoTrails.Controls
                 _SelectedPoints.Add(p);
             }
 
-            _SelectedPoint = _SelectedPoints.Count == 1 ? _SelectedPoints[0] : null;
-
             OnSelectionChanged();
+        }
+
+
+
+        private void EditValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
+        {
+            if (!origValue.Equals(newValue))
+            {
+                origValue = newValue;
+
+                if (allowNull || newValue != null)
+                {
+                    if (MultipleSelections)
+                    {
+                        Manager.EditPoints(_SelectedPoints, property, newValue);
+                    }
+                    else
+                    {
+                        Manager.EditPoint(_SelectedPoint, property, newValue);
+                    } 
+                }
+            }
         }
 
 
@@ -840,6 +875,5 @@ namespace TwoTrails.Controls
             TtPoint point = obj as TtPoint;
             return point.IsGpsAtBase();
         }
-
     }
 }

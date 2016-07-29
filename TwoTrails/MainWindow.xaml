@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails"
+        xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
         Title="MainWindow"
         Width="1000" Height="700"
@@ -12,7 +13,15 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
     </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding UndoCommand}" Key="Z" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding RedoCommand}" Key="Y" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
+    </Window.InputBindings>
 
     <!--<Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Cut" CanExecute="CutCommand_CanExecute" Executed="CutCommand_Executed" />
@@ -30,14 +39,25 @@
         <Menu DockPanel.Dock="Top" Height="25" Background="Gray">
             <MenuItem Header="_File">
                 <MenuItem Header="New" Command="{Binding NewCommand}"/>
-                <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
+                <MenuItem Header="Open" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
                 <Separator/>
-                <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}" IsEnabled="{Binding Path=CanSaveCurrentProject}" />
+                <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}" IsEnabled="{Binding Path=CanSaveCurrentProject}" InputGestureText="Ctrl+S"/>
                 <Separator/>
                 <MenuItem Header="Close Project" Command="{Binding CloseProjectCommand}" CommandParameter="{Binding CurrentProject}" IsEnabled="{Binding Path=HasOpenedProject}"/>
                 <MenuItem Header="Recent Projects" Name="miRecent" IsEnabled="{Binding Path=RecentItemsAvail}" />
                 <Separator/>
                 <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="Undo" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z">
+                    <MenuItem.IsEnabled>
+                        <MultiBinding Converter="{StaticResource NullOrBool}">
+                            <Binding Path="CurrentProject"/>
+                            <Binding Path="CurrentProject.Manager.CanUndo"/>
+                        </MultiBinding>
+                    </MenuItem.IsEnabled>
+                </MenuItem>
+                <MenuItem Header="Redo" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Y" IsEnabled="{Binding Path=CurrentProject.Manager.CanRedo}"/>
             </MenuItem>
         </Menu>
         <ToolBarPanel Background="Gray" Height="25" VerticalAlignment="Top" Width="Auto" DockPanel.Dock="Top">
@@ -62,7 +82,7 @@
 
                                                     <Button Name="btnCloseProject" Visibility="Hidden" DockPanel.Dock="Right" HorizontalAlignment="Right"
                                                             BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                                            Command="{Binding Close}" CommandParameter="{Binding Project}">
+                                                            Command="{Binding CloseCommand}" CommandParameter="{Binding Project}">
                                                         <Label Foreground="White" Padding="0" Margin="0" Width="15" Height="15" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center">X</Label>
                                                     </Button>
                                                     

@@ -45,7 +45,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
 
-            pointsManager.DeletePoint(point);
+            pointsManager.DeletePoint(Point);
         }
 
         public override void Undo()
@@ -58,7 +58,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
 
-            pointsManager.AddPoint(point);
+            pointsManager.AddPoint(Point);
         }
     }
 }

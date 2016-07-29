@@ -5,7 +5,7 @@ namespace FMSC.Core
     public enum Distance
     {
         FeetTenths = 0,
-        FeethInches = 1,
+        FeetInches = 1,
         Meters = 2,
         Chains = 3,
         Yards = 4
@@ -18,7 +18,7 @@ namespace FMSC.Core
             switch (dist)
             {
                 case Distance.FeetTenths: return "FtT";
-                case Distance.FeethInches: return "FtIn";
+                case Distance.FeetInches: return "FtIn";
                 case Distance.Meters: return "M";
                 case Distance.Chains: return "C";
                 case Distance.Yards: return "Yd";
@@ -40,7 +40,7 @@ namespace FMSC.Core
                 case "1":
                 case "fti":
                 case "ftin":
-                case "feetinches": return Distance.FeethInches;
+                case "feetinches": return Distance.FeetInches;
                 case "2":
                 case "m":
                 case "mt":

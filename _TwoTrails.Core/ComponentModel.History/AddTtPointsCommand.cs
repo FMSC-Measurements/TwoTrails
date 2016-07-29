@@ -17,12 +17,12 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public override void Redo()
         {
-            pointsManager.AddPoints(points);
+            pointsManager.AddPoints(Points);
         }
 
         public override void Undo()
         {
-            pointsManager.DeletePoints(points);
+            pointsManager.DeletePoints(Points);
         }
     }
 }

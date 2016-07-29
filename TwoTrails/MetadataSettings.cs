@@ -16,7 +16,7 @@ namespace TwoTrails
 
         public double MagDec { get; private set; } = 0;
 
-        public Slope Slope { get; private set; } = Slope.Degress;
+        public Slope Slope { get; private set; } = Slope.Degrees;
 
         public int Zone { get; private set; } = 13;
 

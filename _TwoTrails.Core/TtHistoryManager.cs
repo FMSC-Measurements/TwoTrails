@@ -1,15 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using CSUtil.ComponentModel;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core
 {
-    public class TtHistoryManager : ITtManager
+    public class TtHistoryManager : NotifyPropertyChangedEx, ITtManager
     {
         protected TtManager _Manager;
 
+        public event EventHandler HistoryChanged;
+        
+        public ReadOnlyObservableCollection<TtPoint> Points { get { return _Manager.Points; } }
+        public ReadOnlyObservableCollection<TtPolygon> Polygons { get { return _Manager.Polygons; } }
+        public ReadOnlyObservableCollection<TtMetadata> Metadata { get { return _Manager.Metadata; } }
+        public ReadOnlyObservableCollection<TtGroup> Groups { get { return _Manager.Groups; } }
+
         private Stack<ITtCommand> _UndoStack = new Stack<ITtCommand>();
         private Stack<ITtCommand> _RedoStack = new Stack<ITtCommand>();
+        
 
         public bool CanUndo { get { return _UndoStack.Count > 0; } }
         public bool CanRedo { get { return _RedoStack.Count > 0; } }
@@ -18,10 +31,19 @@ namespace TwoTrails.Core
         public TtHistoryManager(TtManager manager)
         {
             _Manager = manager;
+            List<TtPoint> points = _Manager.GetPoints();
+            points.Sort();
         }
 
 
         #region History Management
+        protected void AddCommand(ITtCommand command)
+        {
+            _UndoStack.Push(command);
+            _RedoStack.Clear();
+            OnHistoryChanged();
+        }
+
         public void Undo()
         {
             if (CanUndo)
@@ -29,6 +51,8 @@ namespace TwoTrails.Core
                 ITtCommand hist = _UndoStack.Pop();
                 _RedoStack.Push(hist);
                 hist.Undo();
+
+                OnHistoryChanged();
             }
         }
 
@@ -44,6 +68,8 @@ namespace TwoTrails.Core
                     _RedoStack.Push(hist);
                     hist.Undo();
                 }
+
+                OnHistoryChanged();
             }
         }
 
@@ -52,8 +78,10 @@ namespace TwoTrails.Core
             if (CanRedo)
             {
                 ITtCommand hist = _RedoStack.Pop();
-                _UndoStack.Push(hist);
+                AddCommand(hist);
                 hist.Redo();
+
+                OnHistoryChanged();
             }
         }
 
@@ -66,15 +94,14 @@ namespace TwoTrails.Core
                 for (int i = 0; i < levels && CanRedo; i++)
                 {
                     hist = _RedoStack.Pop();
-                    _UndoStack.Push(hist);
+                    AddCommand(hist);
                     hist.Redo();
                 }
+
+                OnHistoryChanged();
             }
         }
         #endregion
-
-
-
 
 
         public bool PointExists(string pointCN)
@@ -89,7 +116,7 @@ namespace TwoTrails.Core
 
         public List<TtPoint> GetPoints(string polyCN = null)
         {
-            return GetPoints(polyCN);
+            return _Manager.GetPoints(polyCN);
         }
 
         public List<TtPolygon> GetPolyons()
@@ -111,68 +138,94 @@ namespace TwoTrails.Core
         #region Adding and Deleting
         public void AddPoint(TtPoint point)
         {
-            _UndoStack.Push(new AddTtPointCommand(point, _Manager));
-            _RedoStack.Clear();
+            AddCommand(new AddTtPointCommand(point, _Manager));
         }
 
         public void AddPoints(List<TtPoint> points)
         {
-
-            _UndoStack.Push(new AddTtPointsCommand(points, _Manager));
-            _RedoStack.Clear();
+            AddCommand(new AddTtPointsCommand(points, _Manager));
         }
 
         public void DeletePoint(TtPoint point)
         {
-            _UndoStack.Push(new DeleteTtPointCommand(point, _Manager));
-            _RedoStack.Clear();
+            AddCommand(new DeleteTtPointCommand(point, _Manager));
         }
 
         public void DeletePoints(List<TtPoint> points)
         {
-            _UndoStack.Push(new DeleteTtPointsCommand(points, _Manager));
-            _RedoStack.Clear();
-
+            AddCommand(new DeleteTtPointsCommand(points, _Manager));
         }
 
 
         public void AddPolygon(TtPolygon polygon)
         {
-            _UndoStack.Push(new AddTtPolygonCommand(polygon, _Manager));
-            _RedoStack.Clear();
+            AddCommand(new AddTtPolygonCommand(polygon, _Manager));
         }
 
         public void DeletePolygon(TtPolygon polygon)
         {
-            _UndoStack.Push(new DeleteTtPolygonCommand(polygon, _Manager));
-            _RedoStack.Clear();
+            AddCommand(new DeleteTtPolygonCommand(polygon, _Manager));
         }
 
 
         public void AddMetadata(TtMetadata metadata)
         {
-            _UndoStack.Push(new AddTtMetadataCommand(metadata, _Manager));
-            _RedoStack.Clear();
+            AddCommand(new AddTtMetadataCommand(metadata, _Manager));
         }
 
         public void DeleteMetadata(TtMetadata metadata)
         {
-            _UndoStack.Push(new DeleteTtMetadataCommand(metadata, _Manager));
-            _RedoStack.Clear();
+            AddCommand(new DeleteTtMetadataCommand(metadata, _Manager));
         }
 
 
         public void AddGroup(TtGroup group)
         {
-            _UndoStack.Push(new AddTtGroupCommand(group, _Manager));
-            _RedoStack.Clear();
+            AddCommand(new AddTtGroupCommand(group, _Manager));
         }
 
         public void DeleteGroup(TtGroup group)
         {
-            _UndoStack.Push(new DeleteTtGroupCommand(group, _Manager));
-            _RedoStack.Clear();
+            AddCommand(new DeleteTtGroupCommand(group, _Manager));
         }
         #endregion
+
+
+        #region Editing
+
+        public void EditPoint(TtPoint point, PropertyInfo property, object newValue)
+        {
+            AddCommand(new EditTtPointCommand(point, property, newValue));
+        }
+
+        public void EditPoints(List<TtPoint> points, PropertyInfo property, object newValue)
+        {
+            AddCommand(new EditTtPointsCommand(points, property, newValue));
+        }
+
+        public void EditPoints(List<TtPoint> points, PropertyInfo property, List<object> newValues)
+        {
+            AddCommand(new EditTtPointsMultiValueCommand(points, property, newValues));
+        }
+
+        public void EditPoints(List<TtPoint> points, List<PropertyInfo> properties, object newValue)
+        {
+            AddCommand(new EditTtPointsMultiPropertyCommand(points, properties, points.Select(p => newValue).Cast<object>()));
+        }
+
+        public void EditPoints(List<TtPoint> points, List<PropertyInfo> properties, List<object> newValues)
+        {
+            AddCommand(new EditTtPointsMultiPropertyCommand(points, properties, newValues));
+        }
+
+        #endregion
+
+
+        private void OnHistoryChanged()
+        {
+            HistoryChanged?.Invoke(this, new EventArgs());
+            OnPropertyChanged(nameof(CanUndo));
+            OnPropertyChanged(nameof(CanRedo));
+        }
     }
 }

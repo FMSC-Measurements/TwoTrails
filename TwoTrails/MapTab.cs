@@ -27,7 +27,6 @@ namespace TwoTrails
         {
             get { return String.Format("(Map){0}", base.TabTitle); }
         }
-       
 
         public MapTab(MainWindowModel mainModel, TtProject project, ProjectControl projectControl) : base(mainModel, project)
         {

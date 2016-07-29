@@ -9,7 +9,7 @@ namespace TwoTrails.Core.Points
         public Double? ManualAccuracy
         {
             get { return _ManualAccuracy; }
-            set { SetField(ref _ManualAccuracy, value); }
+            set { SetField(ref _ManualAccuracy, value, () => SetAccuracy(Polygon.Accuracy)); }
         }
 
         public override double AdjX { get { return ParentPoint.AdjX; } }

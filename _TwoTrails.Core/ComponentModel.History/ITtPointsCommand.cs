@@ -5,11 +5,11 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public abstract class ITtPointsCommand : ITtCommand
     {
-        protected List<TtPoint> points;
+        protected List<TtPoint> Points;
 
         public ITtPointsCommand(List<TtPoint> points)
         {
-            this.points = points;
+            this.Points = new List<TtPoint>(points);
         }
 
         public abstract void Redo();

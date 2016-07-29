@@ -116,6 +116,18 @@ namespace TwoTrails.Core.Points
             //dont set accuracy
         }
 
+        protected override void OnMetadataChanged()
+        {
+            base.OnMetadataChanged();
+            
+            OnPropertyChanged(
+                nameof(SlopeDistance),
+                nameof(SlopeAngle),
+                nameof(HorizontalDistance),
+                nameof(Declination)
+            );
+        }
+
 
         protected void OnPositionChanged()
         {
@@ -197,18 +209,18 @@ namespace TwoTrails.Core.Points
 
                 if (isPrevAdjusted)
                 {
-                    bool changed = SetField(ref _AdjX, x);
-                    changed &= SetField(ref _AdjY, y);
-                    changed &= SetField(ref _AdjZ, z);
+                    bool changed = SetField(ref _AdjX, x, nameof(AdjX));
+                    changed |= SetField(ref _AdjY, y, nameof(AdjY));
+                    changed |= SetField(ref _AdjZ, z, nameof(AdjZ));
 
                     if (changed)
                         OnLocationChanged();
                 }
                 else
                 {
-                    SetField(ref _UnAdjX, x);
-                    SetField(ref _UnAdjY, y);
-                    SetField(ref _UnAdjZ, z);
+                    SetField(ref _UnAdjX, x,  nameof(UnAdjX));
+                    SetField(ref _UnAdjY, y, nameof(UnAdjY));
+                    SetField(ref _UnAdjZ, z, nameof(UnAdjZ));
                 }
             }
         }

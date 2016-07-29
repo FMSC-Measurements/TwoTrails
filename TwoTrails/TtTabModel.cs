@@ -27,8 +27,8 @@ namespace TwoTrails
 
         public abstract bool IsDetachable { get; }
         
-        public ICommand Close { get; }
-        public ICommand Save { get; }
+        public ICommand CloseCommand { get; }
+        public ICommand SaveCommand { get; }
 
 
         protected MainWindowModel MainModel;
@@ -40,16 +40,13 @@ namespace TwoTrails
 
             this.Project = project;
             this.Tab = new TabItem();
-
-
-            Save = new RelayCommand((x) => SaveProject());
-            Close = new RelayCommand((x) => CloseTab());
-
-            Tab.Content = new ProjectControl(new DataEditorModel(project), new DataStyleModel(project));
-            Tab.DataContext = this;
             
-
+            SaveCommand = new RelayCommand((x) => SaveProject());
+            CloseCommand = new RelayCommand((x) => CloseTab());
+            
             project.PropertyChanged += Project_PropertyChanged;
+
+            Tab.DataContext = this;
         }
 
         private void Project_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

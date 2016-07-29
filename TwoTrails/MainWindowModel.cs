@@ -78,6 +78,8 @@ namespace TwoTrails
         public ICommand SaveCommand { get; private set; }
         public ICommand CloseProjectCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
+        public ICommand UndoCommand { get; private set; }
+        public ICommand RedoCommand { get; private set; }
         #endregion
 
 
@@ -99,6 +101,9 @@ namespace TwoTrails
             SaveCommand = new RelayCommand((x) => SaveCurrentProject());
             CloseProjectCommand = new RelayCommand((x) => CloseProject(x as TtProject));
             ExitCommand = new RelayCommand((x) => Exit());
+
+            UndoCommand = new RelayCommand((x) => CurrentProject.Manager.Undo());
+            RedoCommand = new RelayCommand((x) => CurrentProject.Manager.Redo());
 
             _Tabs = mainWindow.tabControl;
             _Tabs.SelectionChanged += Tabs_SelectionChanged;

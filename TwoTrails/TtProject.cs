@@ -34,7 +34,7 @@ namespace TwoTrails
 
         public ITtDataLayer DAL { get; private set; }
 
-        public ITtManager Manager { get; private set; }
+        public TtHistoryManager Manager { get; private set; }
 
 
         public TtProject(ITtDataLayer dal, ITtSettings settings)
@@ -46,7 +46,7 @@ namespace TwoTrails
 
             RequiresSave = false;
 
-            Manager = new TtManager(dal, settings);
+            Manager = new TtHistoryManager(new TtManager(dal, settings));
         }
 
 

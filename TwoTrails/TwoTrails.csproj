@@ -70,6 +70,10 @@
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Controls\DataEditorModel.cs" />
     <Compile Include="Controls\DataStyleModel.cs" />
+    <Compile Include="Converters\BindingReflector.cs" />
+    <Compile Include="Converters\MetadataValueConverter.cs" />
+    <Compile Include="Converters\NullableDoubleConverter.cs" />
+    <Compile Include="Converters\NullOrBoolConverter.cs" />
     <Compile Include="CustomProperties\ControlProperties.cs" />
     <Compile Include="Dialogs\NewProjectDialog.xaml.cs">
       <DependentUpon>NewProjectDialog.xaml</DependentUpon>
@@ -87,6 +91,7 @@
     <Compile Include="Controls\ProjectInfoControl.xaml.cs">
       <DependentUpon>ProjectInfoControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PointSorter.cs" />
     <Compile Include="ProjectTab.cs" />
     <Compile Include="TtProject.cs" />
     <Compile Include="TtSettings.cs" />
@@ -162,9 +167,7 @@
   <ItemGroup>
     <Resource Include="res\open_in_new.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Converters\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -38,12 +38,26 @@ namespace TwoTrails.Controls
 
             InitializeComponent();
 
+
             dgPoints.SelectionChanged += DgPoints_SelectionChanged;
+        }
+
+        private void TextBox_UpdateBinding(object sender, RoutedEventArgs e)
+        {
+            TextBox tb = (sender as TextBox);
+
+            if (tb != null && tb.IsEnabled)
+            {
+                var expression = tb.GetBindingExpression(TextBox.TextProperty);
+
+                if (expression != null)
+                    expression.UpdateSource();
+            }
         }
 
         private void DgPoints_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            DataEditor.UpdatePoints(e.AddedItems.Cast<TtPoint>(), e.RemovedItems.Cast<TtPoint>());
+            DataEditor.UpdateSelectedPoints(e.AddedItems.Cast<TtPoint>(), e.RemovedItems.Cast<TtPoint>());
         }
 
         private void DataGrid_OnLoadingRow(object sender, DataGridRowEventArgs e)

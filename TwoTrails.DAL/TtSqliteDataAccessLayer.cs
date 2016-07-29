@@ -115,7 +115,7 @@ namespace TwoTrails.DAL
             List<TtPoint> points = new List<TtPoint>();
 
             String query = String.Format(@"select {0}.{1}, {2}, {3}, {4} from {0} left join {5} on {5}.{8} = {0}.{8} 
- left join {6} on {6}.{8} = {0}.{8}  left join {7} on {7}.{8} = {0}.{8}{9}",
+ left join {6} on {6}.{8} = {0}.{8}  left join {7} on {7}.{8} = {0}.{8}{9} order by {10} asc",
                 TwoTrailsSchema.PointSchema.TableName,              //0
                 TwoTrailsSchema.PointSchema.SelectItems,            //1
                 TwoTrailsSchema.GpsPointSchema.SelectItemsNoCN,     //2
@@ -125,7 +125,8 @@ namespace TwoTrails.DAL
                 TwoTrailsSchema.TravPointSchema.TableName,          //6
                 TwoTrailsSchema.QuondamPointSchema.TableName,       //7
                 TwoTrailsSchema.SharedSchema.CN,                    //8
-                where != null ? String.Format(" where {0}", where) : String.Empty
+                where != null ? String.Format(" where {0}", where) : String.Empty,
+                TwoTrailsSchema.PointSchema.Index
             );
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
