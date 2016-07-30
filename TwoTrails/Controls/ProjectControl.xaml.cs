@@ -34,9 +34,9 @@ namespace TwoTrails.Controls
             DataEditor = dataEditor;
             DataStyles = dataStyles;
 
-            this.DataContext = dataEditor;
-
             InitializeComponent();
+
+            this.DataContext = dataEditor;
 
 
             dgPoints.SelectionChanged += DgPoints_SelectionChanged;

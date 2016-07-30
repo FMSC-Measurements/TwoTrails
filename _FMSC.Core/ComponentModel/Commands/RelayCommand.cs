@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace TwoTrails.Commands
+namespace FMSC.Core.ComponentModel.Commands
 {
     public class RelayCommand : ICommand
     {

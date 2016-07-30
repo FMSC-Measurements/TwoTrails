@@ -47,10 +47,13 @@ namespace TwoTrails
             RequiresSave = false;
 
             Manager = new TtHistoryManager(new TtManager(dal, settings));
+            Manager.HistoryChanged += Manager_HistoryChanged;
         }
 
-
-
+        private void Manager_HistoryChanged(object sender, EventArgs e)
+        {
+            Set(Manager.CanUndo, nameof(RequiresSave));
+        }
 
         public void Save()
         {

@@ -1,4 +1,5 @@
 ﻿using CSUtil.ComponentModel;
+using FMSC.Core.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using TwoTrails.Commands;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 

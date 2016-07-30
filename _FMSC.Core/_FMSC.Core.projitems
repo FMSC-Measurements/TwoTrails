@@ -9,6 +9,8 @@
     <Import_RootNamespace>FMSC.Core</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel\CheckedListItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel\Commands\RelayCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Convert.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Math.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\Datum.cs" />

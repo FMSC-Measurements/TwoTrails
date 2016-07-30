@@ -7,7 +7,7 @@
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
         Title="MainWindow"
-        Width="1000" Height="700"
+        Width="1000" Height="840"
         MinWidth="640" MinHeight="480"
         WindowStartupLocation="CenterScreen">
 
@@ -83,7 +83,18 @@
                                                     <Button Name="btnCloseProject" Visibility="Hidden" DockPanel.Dock="Right" HorizontalAlignment="Right"
                                                             BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                                             Command="{Binding CloseCommand}" CommandParameter="{Binding Project}">
-                                                        <Label Foreground="White" Padding="0" Margin="0" Width="15" Height="15" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center">X</Label>
+                                                        <TextBlock Name="lblClose" Foreground="White" Padding="0" Margin="0" Width="15" Height="15"
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" Text="X">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                                            <Setter Property="Background" Value="LimeGreen" />
+                                                                        </Trigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
                                                     </Button>
                                                     
                                                     <Button Name="btnOpenInWindow" Visibility="Collapsed" DockPanel.Dock="Right" HorizontalAlignment="Right"
@@ -113,7 +124,7 @@
                                                 </MultiTrigger.Conditions>
 
                                                 <MultiTrigger.Setters>
-                                                    <Setter TargetName="Grid" Property="Background" Value="LimeGreen"/>
+                                                    <Setter TargetName="Grid" Property="Background" Value="ForestGreen"/>
                                                 </MultiTrigger.Setters>
                                             </MultiTrigger>
 

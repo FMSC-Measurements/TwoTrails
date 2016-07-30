@@ -1,19 +1,18 @@
 ﻿using CSUtil.ComponentModel;
+using FMSC.Core.ComponentModel;
+using FMSC.Core.ComponentModel.Commands;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+using System.Windows;
 using System.Windows.Data;
-using System.Windows.Threading;
+using System.Windows.Input;
 using TwoTrails.Core;
-using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
+using TwoTrails.Dialogs;
 
 namespace TwoTrails.Controls
 {
@@ -30,46 +29,30 @@ namespace TwoTrails.Controls
 
         public bool HasSelection
         {
-            get { return _SelectedPoints.Count > 0; }
+            get { return SelectedPoints.Count > 0; }
         }
 
         public bool MultipleSelections
         {
-            get { return _SelectedPoints.Count > 1; }
+            get { return SelectedPoints.Count > 1; }
         }
 
 
-        private TtPoint _SelectedPoint;
-        public TtPoint SelectedPoint
-        {
-            get { return _SelectedPoint; }
-        }
+        public ICommand ChangeQuondamParentCommand { get; }
 
-        private List<TtPoint> _SelectedPoints = new List<TtPoint>();
-        public List<TtPoint> SelectedPoints
-        {
-            get { return _SelectedPoints; }
-        }
+        
+        public TtPoint SelectedPoint { get; private set; }
+        public List<TtPoint> SelectedPoints { get; private set; }
 
 
+        public bool HasGps { get; private set; }
+        public bool HasTrav { get; private set; }
+        public bool HasQndm { get; private set; }
 
-        private bool _HasGps, _HasTrav, _HasQndm;
-
-        public bool HasGps { get { return _HasGps; } }
-        public bool HasTrav { get { return _HasTrav; } }
-        public bool HasQndm { get { return _HasQndm; } }
-
-        private bool _EnableTrav;
-        public bool EnableTrav { get { return _EnableTrav; } }
-
-        private bool _EnableManAcc;
-        public bool EnableManAcc { get { return _EnableManAcc; } }
-
-        private bool _EnableXYZ;
-        public bool EnableXYZ { get { return _EnableXYZ; } }
-
-        private bool _EnableQndm;
-        public bool EnableQndm{ get { return _EnableQndm; } }
+        public bool EnableTrav { get; private set; }
+        public bool EnableManAcc { get; private set; }
+        public bool EnableXYZ { get; private set; }
+        public bool EnableQndm { get; private set; }
 
 
         private void OnSelectionChanged()
@@ -99,9 +82,9 @@ namespace TwoTrails.Controls
 
                     bool fmanacc = true, fqndm = true;
 
-                    _HasGps = false;
-                    _HasTrav = false;
-                    _HasQndm = false;
+                    HasGps = false;
+                    HasTrav = false;
+                    HasQndm = false;
 
                     bool hasOnbnd = false, hasOffBnd = false;
 
@@ -138,23 +121,23 @@ namespace TwoTrails.Controls
                         }
 
 
-                        if (point.IsGpsType() && !_HasGps)
+                        if (point.IsGpsType() && !HasGps)
                         {
-                            _HasGps = true;
+                            HasGps = true;
                             
                             parseTrav = false;
                             parseQndm = false;
                         }
-                        else if (point.IsTravType() && !_HasTrav)
+                        else if (point.IsTravType() && !HasTrav)
                         {
-                            _HasTrav = true;
+                            HasTrav = true;
                             
                             parseManAcc = false;
                             parseQndm = false;
                         }
-                        else if (point.OpType == OpType.Quondam && !_HasQndm)
+                        else if (point.OpType == OpType.Quondam && !HasQndm)
                         {
-                            _HasQndm = true;
+                            HasQndm = true;
 
                             parseTrav = false;
                         }
@@ -330,46 +313,46 @@ namespace TwoTrails.Controls
                 }
                 else
                 {
-                    _SelectedPoint = _SelectedPoints[0];
+                    SelectedPoint = SelectedPoints[0];
 
-                    _HasGps = false;
-                    _HasTrav = false;
-                    _HasQndm = false;
+                    HasGps = false;
+                    HasTrav = false;
+                    HasQndm = false;
 
-                    _PID = _SelectedPoint.PID;
+                    _PID = SelectedPoint.PID;
                     _SamePID = true;
 
-                    _Index = _SelectedPoint.Index;
+                    _Index = SelectedPoint.Index;
                     _SameIndex = true;
 
-                    _Comment = _SelectedPoint.Comment;
+                    _Comment = SelectedPoint.Comment;
                     _SameComment = true;
 
-                    _Polygon = _SelectedPoint.Polygon;
+                    _Polygon = SelectedPoint.Polygon;
                     _SamePolygons = true;
 
-                    _Metadata = _SelectedPoint.Metadata;
+                    _Metadata = SelectedPoint.Metadata;
                     _SameMetadata = true;
 
-                    _Group = _SelectedPoint.Group;
+                    _Group = SelectedPoint.Group;
                     _SameGroup = true;
                     
-                    _OnBoundary = _SelectedPoint.OnBoundary;
+                    _OnBoundary = SelectedPoint.OnBoundary;
                     _SameOnBound = true;
 
 
-                    if (_SelectedPoint.IsGpsType())
+                    if (SelectedPoint.IsGpsType())
                     {
-                        _HasGps = true;
+                        HasGps = true;
 
-                        _ManAcc = (_SelectedPoint as GpsPoint).ManualAccuracy;
+                        _ManAcc = (SelectedPoint as GpsPoint).ManualAccuracy;
                         _ParentPoint = null;
                     }
-                    else if (_SelectedPoint.OpType == OpType.Quondam)
+                    else if (SelectedPoint.OpType == OpType.Quondam)
                     {
-                        QuondamPoint qp = _SelectedPoint as QuondamPoint;
+                        QuondamPoint qp = SelectedPoint as QuondamPoint;
 
-                        _HasQndm = true;
+                        HasQndm = true;
 
                         _ManAcc = qp.ManualAccuracy;
                         _ParentPoint = qp.ParentPoint;
@@ -383,19 +366,19 @@ namespace TwoTrails.Controls
                     _SameParentPoint = true;
 
 
-                    if (_SelectedPoint.OpType == OpType.Quondam)
-                        _ParentPoint = (_SelectedPoint as QuondamPoint).ParentPoint;
+                    if (SelectedPoint.OpType == OpType.Quondam)
+                        _ParentPoint = (SelectedPoint as QuondamPoint).ParentPoint;
                     else
                         _ParentPoint = null;
 
                     _SameParentPoint = true;
 
 
-                    if (_SelectedPoint.IsTravType())
+                    if (SelectedPoint.IsTravType())
                     {
-                        _HasTrav = true;
+                        HasTrav = true;
 
-                        TravPoint tp = _SelectedPoint as TravPoint;
+                        TravPoint tp = SelectedPoint as TravPoint;
 
                         _FwdAz = tp.FwdAzimuth;
                         _SameFwdAz = true;
@@ -424,13 +407,13 @@ namespace TwoTrails.Controls
                         _SameSlpDist = true;
                     }
 
-                    _UnAdjX = _SelectedPoint.UnAdjX;
+                    _UnAdjX = SelectedPoint.UnAdjX;
                     _SameUnAdjX = true;
 
-                    _UnAdjY = _SelectedPoint.UnAdjY;
+                    _UnAdjY = SelectedPoint.UnAdjY;
                     _SameUnAdjY = true;
 
-                    _UnAdjZ = _SelectedPoint.UnAdjZ;
+                    _UnAdjZ = SelectedPoint.UnAdjZ;
                     _SameUnAdjZ = true;
                 } 
             }
@@ -485,10 +468,10 @@ namespace TwoTrails.Controls
                 _SameUnAdjZ = true;
             }
 
-            _EnableTrav = HasTrav && !HasGps && !HasQndm;
-            _EnableManAcc = !HasTrav && HasGps || HasQndm;
-            _EnableXYZ = !HasTrav && HasGps && !HasQndm;
-            _EnableQndm = !HasTrav && !HasGps && HasQndm;
+            EnableTrav = HasTrav && !HasGps && !HasQndm;
+            EnableManAcc = !HasTrav && HasGps || HasQndm;
+            EnableXYZ = !HasTrav && HasGps && !HasQndm;
+            EnableQndm = !HasTrav && !HasGps && HasQndm;
 
             OnPropertyChanged(
                     nameof(HasSelection),
@@ -603,6 +586,7 @@ namespace TwoTrails.Controls
             set { EditValue(ref _Index, value, PointProperties.INDEX); }
         }
 
+
         private bool _SameComment = true;
         public bool SameComment { get { return _SameComment; } }
 
@@ -627,11 +611,11 @@ namespace TwoTrails.Controls
                 {
                     if (MultipleSelections)
                     {
-                        Manager.EditPoints(_SelectedPoints, PointProperties.COMMENT, value);
+                        Manager.EditPoints(SelectedPoints, PointProperties.COMMENT, value);
                     }
                     else
                     {
-                        Manager.EditPoint(_SelectedPoint, PointProperties.COMMENT, value);
+                        Manager.EditPoint(SelectedPoint, PointProperties.COMMENT, value);
                     }
                 }
             }
@@ -678,6 +662,7 @@ namespace TwoTrails.Controls
             get { return _OnBoundary; }
             set { EditValue(ref _OnBoundary, value, PointProperties.BOUNDARY); }
         }
+
 
         private bool _SameUnAdjX = true;
         public bool SameUnAdjX { get { return _SameUnAdjX; } }
@@ -728,7 +713,7 @@ namespace TwoTrails.Controls
                     if (MultipleSelections)
                     {
                         List<PropertyInfo> properties = new List<PropertyInfo>();
-                        foreach (TtPoint point in _SelectedPoints)
+                        foreach (TtPoint point in SelectedPoints)
                         {
                             if (point.OpType == OpType.Quondam)
                                 properties.Add(PointProperties.MAN_ACC_QP);
@@ -736,14 +721,14 @@ namespace TwoTrails.Controls
                                 properties.Add(PointProperties.MAN_ACC_GPS);
                         }
 
-                        Manager.EditPoints(_SelectedPoints, properties, value);
+                        Manager.EditPoints(SelectedPoints, properties, value);
                     }
                     else
                     {
-                        if (_SelectedPoint.OpType == OpType.Quondam)
-                            Manager.EditPoint(_SelectedPoint, PointProperties.MAN_ACC_QP, value);
+                        if (SelectedPoint.OpType == OpType.Quondam)
+                            Manager.EditPoint(SelectedPoint, PointProperties.MAN_ACC_QP, value);
                         else
-                            Manager.EditPoint(_SelectedPoint, PointProperties.MAN_ACC_GPS, value);
+                            Manager.EditPoint(SelectedPoint, PointProperties.MAN_ACC_GPS, value);
                     }
                 }
             }
@@ -760,8 +745,7 @@ namespace TwoTrails.Controls
             set { EditValue(ref _FwdAz, value, PointProperties.FWD_AZ, true); }
         }
 
-
-
+        
         private bool _SameBkAz = true;
         public bool SameBkAz { get { return _SameBkAz; } }
 
@@ -773,8 +757,6 @@ namespace TwoTrails.Controls
         }
 
 
-
-
         private bool _SameSlpAng = true;
         public bool SameSlpAng { get { return _SameSlpAng; } }
 
@@ -784,8 +766,7 @@ namespace TwoTrails.Controls
             get { return _SlpAng; }
             set { EditValue(ref _SlpAng, value, PointProperties.SLP_ANG); }
         }
-
-
+        
 
         private bool _SameSlpDist = true;
         public bool SameSlpDist { get { return _SameSlpDist; } }
@@ -796,9 +777,7 @@ namespace TwoTrails.Controls
             get { return _SlpDist; }
             set { EditValue(ref _SlpDist, value, PointProperties.SLP_DIST); }
         }
-
-
-
+        
 
         private bool _SameParentPoint = true;
         public bool SameParentPoint { get { return _SameParentPoint; } }
@@ -813,7 +792,26 @@ namespace TwoTrails.Controls
             }
         }
         #endregion
-        
+
+
+        Dictionary<string, bool> _CheckedPolygons = new Dictionary<string, bool>();
+        Dictionary<string, bool> _CheckedMetadata = new Dictionary<string, bool>();
+        Dictionary<string, bool> _CheckedGroups = new Dictionary<string, bool>();
+        Dictionary<OpType, bool> _CheckedOpTypes = new Dictionary<OpType, bool>();
+
+
+        private ObservableCollection<CheckedListItem<TtPolygon>> _Polygons = new ObservableCollection<CheckedListItem<TtPolygon>>();
+        public ReadOnlyObservableCollection<CheckedListItem<TtPolygon>> Polygons { get; private set; }
+
+        private ObservableCollection<CheckedListItem<TtMetadata>> _Metadatas = new ObservableCollection<CheckedListItem<TtMetadata>>();
+        public ReadOnlyObservableCollection<CheckedListItem<TtMetadata>> Metadatas { get; private set; }
+
+        private ObservableCollection<CheckedListItem<TtGroup>> _Groups = new ObservableCollection<CheckedListItem<TtGroup>>();
+        public ReadOnlyObservableCollection<CheckedListItem<TtGroup>> Groups { get; private set; }
+
+        private List<CheckedListItem<string>> _OpTypes = new List<CheckedListItem<string>>();
+        public ReadOnlyCollection<CheckedListItem<String>> OpTypes { get; private set; }
+
 
         public TtHistoryManager Manager { get; private set; }
 
@@ -821,26 +819,257 @@ namespace TwoTrails.Controls
         {
             Manager = project.Manager;
 
+            ChangeQuondamParentCommand = new RelayCommand((x) => ChangeQuondamParent());
+
+            CheckedListItem<TtPolygon> tmpPoly;
+            tmpPoly = new CheckedListItem<TtPolygon>(new TtPolygon() { Name = "All", CN = Consts.FullGuid }, true);
+            _Polygons.Add(tmpPoly);
+            tmpPoly.ItemCheckedChanged += Polygon_ItemCheckedChanged;
+
+            foreach (TtPolygon polygon in Manager.Polygons)
+            {
+                tmpPoly = new CheckedListItem<TtPolygon>(polygon, true);
+                _Polygons.Add(tmpPoly);
+                tmpPoly.ItemCheckedChanged += Polygon_ItemCheckedChanged;
+                _CheckedPolygons.Add(polygon.CN, true);
+            }
+
+            ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += Polygons_CollectionChanged;
+
+
+            CheckedListItem<TtMetadata> tmpMeta;
+            tmpMeta = new CheckedListItem<TtMetadata>(new TtMetadata() { Name = "All", CN = Consts.FullGuid }, true);
+            _Metadatas.Add(tmpMeta);
+            tmpMeta.ItemCheckedChanged += Metadata_ItemCheckedChanged;
+
+            foreach (TtMetadata metadata in Manager.Metadata)
+            {
+                tmpMeta = new CheckedListItem<TtMetadata>(metadata, true);
+                _Metadatas.Add(tmpMeta);
+                tmpMeta.ItemCheckedChanged += Metadata_ItemCheckedChanged;
+                _CheckedMetadata.Add(metadata.CN, true);
+            }
+
+            ((INotifyCollectionChanged)Manager.Metadata).CollectionChanged += Metadata_CollectionChanged;
+
+
+            CheckedListItem<TtGroup> tmpGroup;
+            tmpGroup = new CheckedListItem<TtGroup>(new TtGroup() { Name = "All", CN = Consts.FullGuid }, true);
+            _Groups.Add(tmpGroup);
+            tmpGroup.ItemCheckedChanged += Group_ItemCheckedChanged;
+
+            foreach (TtGroup group in Manager.Groups)
+            {
+                tmpGroup = new CheckedListItem<TtGroup>(group, true);
+                _Groups.Add(tmpGroup);
+                tmpGroup.ItemCheckedChanged += Group_ItemCheckedChanged;
+                _CheckedGroups.Add(group.CN, true);
+            }
+
+            ((INotifyCollectionChanged)Manager.Groups).CollectionChanged += Groups_CollectionChanged;
+
+
+            CheckedListItem<string> tmpOpType;
+            tmpOpType = new CheckedListItem<string>("All", true);
+            tmpOpType.ItemCheckedChanged += OpType_ItemCheckedChanged;
+            _OpTypes.Add(tmpOpType);
+
+            foreach (OpType op in Enum.GetValues(typeof(OpType)))
+            {
+                tmpOpType = new CheckedListItem<string>(op.ToString(), true);
+                _OpTypes.Add(tmpOpType);
+                tmpOpType.ItemCheckedChanged += OpType_ItemCheckedChanged;
+                _CheckedOpTypes.Add(op, true);
+            }
+
+
+            Polygons = new ReadOnlyObservableCollection<CheckedListItem<TtPolygon>>(_Polygons);
+            Groups = new ReadOnlyObservableCollection<CheckedListItem<TtGroup>>(_Groups);
+            Metadatas = new ReadOnlyObservableCollection<CheckedListItem<TtMetadata>>(_Metadatas);
+            OpTypes = new ReadOnlyCollection<CheckedListItem<string>>(_OpTypes);
+
+
             Points = CollectionViewSource.GetDefaultView(Manager.Points) as ListCollectionView;
             
             Points.CustomSort = new PointSorter();
 
-            //Points.Filter = Filter;
+            Points.Filter = Filter;
         }
 
+
+
+        private void Polygons_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (TtPolygon polygon in e.NewItems)
+                {
+                    _Polygons.Add(new CheckedListItem<TtPolygon>(polygon, true));
+                    _CheckedPolygons.Add(polygon.CN, true);
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (TtPolygon polygon in e.NewItems)
+                {
+                    for (int i = 0; i < _Polygons.Count; i++)
+                    {
+                        if (_Polygons[i].Item == polygon)
+                        {
+                            _Polygons.RemoveAt(i);
+                            _CheckedPolygons.Remove(polygon.CN);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Polygon_ItemCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateCheckedItems<TtPolygon>(sender, ref _CheckedPolygons, ref _Polygons);
+        }
+
+
+        private void Metadata_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (TtMetadata Metadata in e.NewItems)
+                {
+                    _Metadatas.Add(new CheckedListItem<TtMetadata>(Metadata, true));
+                    _CheckedMetadata.Add(Metadata.CN, true);
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (TtMetadata Metadata in e.NewItems)
+                {
+                    for (int i = 0; i < _Metadatas.Count; i++)
+                    {
+                        if (_Metadatas[i].Item == Metadata)
+                        {
+                            _Metadatas.RemoveAt(i);
+                            _CheckedMetadata.Remove(Metadata.CN);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Metadata_ItemCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateCheckedItems<TtMetadata>(sender, ref _CheckedMetadata, ref _Metadatas);
+        }
         
+
+        private void Groups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (TtGroup Group in e.NewItems)
+                {
+                    _Groups.Add(new CheckedListItem<TtGroup>(Group, true));
+                    _CheckedGroups.Add(Group.CN, true);
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (TtGroup Group in e.NewItems)
+                {
+                    for (int i = 0; i < _Groups.Count; i++)
+                    {
+                        if (_Groups[i].Item == Group)
+                        {
+                            _Groups.RemoveAt(i);
+                            _CheckedGroups.Remove(Group.CN);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Group_ItemCheckedChanged(object sender, EventArgs e)
+        {
+            UpdateCheckedItems<TtGroup>(sender, ref _CheckedGroups, ref _Groups);
+        }
+
+
+        private void UpdateCheckedItems<T>(object sender, ref Dictionary<string, bool> checkedItems,
+            ref ObservableCollection<CheckedListItem<T>> items) where T : TtObject
+        {
+            CheckedListItem<T> cp = sender as CheckedListItem<T>;
+
+            if (cp != null)
+            {
+                if (cp.Item.CN != Consts.FullGuid)
+                {
+                    checkedItems[cp.Item.CN] = cp.IsChecked;
+                }
+                else
+                {
+                    bool isChecked = cp.IsChecked;
+
+                    foreach (var key in checkedItems.Keys.ToList())
+                    {
+                        checkedItems[key] = isChecked;
+                    }
+
+                    foreach (CheckedListItem<T> item in items)
+                    {
+                        item.SetChecked(isChecked, false);
+                    }
+                }
+
+                Points.Refresh();
+            }
+        }
+
+
+        private void OpType_ItemCheckedChanged(object sender, EventArgs e)
+        {
+            CheckedListItem<string> cp = sender as CheckedListItem<string>;
+
+            if (cp != null)
+            {
+                if (cp.Item != "All")
+                {
+                    _CheckedOpTypes[(OpType)Enum.Parse(typeof(OpType), cp.Item)] = cp.IsChecked;
+                }
+                else
+                {
+                    bool isChecked = cp.IsChecked;
+
+                    foreach (var key in _CheckedOpTypes.Keys.ToList())
+                    {
+                        _CheckedOpTypes[key] = isChecked;
+                    }
+
+                    foreach (CheckedListItem<string> item in _OpTypes)
+                    {
+                        item.SetChecked(isChecked, false);
+                    }
+                }
+
+                Points.Refresh();
+            }
+        }
+
+
 
 
         public void UpdateSelectedPoints(IEnumerable<TtPoint> addedPoints, IEnumerable<TtPoint> removedPoints)
         {
             foreach (TtPoint p in removedPoints)
             {
-                _SelectedPoints.Remove(p);
+                SelectedPoints.Remove(p);
             }
 
             foreach (TtPoint p in addedPoints)
             {
-                _SelectedPoints.Add(p);
+                SelectedPoints.Add(p);
             }
 
             OnSelectionChanged();
@@ -858,11 +1087,11 @@ namespace TwoTrails.Controls
                 {
                     if (MultipleSelections)
                     {
-                        Manager.EditPoints(_SelectedPoints, property, newValue);
+                        Manager.EditPoints(SelectedPoints, property, newValue);
                     }
                     else
                     {
-                        Manager.EditPoint(_SelectedPoint, property, newValue);
+                        Manager.EditPoint(SelectedPoint, property, newValue);
                     } 
                 }
             }
@@ -873,7 +1102,44 @@ namespace TwoTrails.Controls
         private bool Filter(object obj)
         {
             TtPoint point = obj as TtPoint;
-            return point.IsGpsAtBase();
+            
+            if (!_CheckedPolygons[point.PolygonCN])
+                return false;
+
+            if (!_CheckedMetadata[point.MetadataCN])
+                return false;
+
+            if (!_CheckedGroups[point.GroupCN])
+                return false;
+
+            if (!_CheckedOpTypes[point.OpType])
+                return false;
+
+            return true;
+        }
+
+
+        private void ChangeQuondamParent()
+        {
+            if (!MultipleSelections || MessageBox.Show("Multiple Quondams are selected. Do you wish to change all of their ParentPoints to a new Point?",
+                    "Multiple ParentPoints Changing", MessageBoxButton.YesNo, MessageBoxImage.Stop, MessageBoxResult.No) == MessageBoxResult.Yes)
+            {
+                List<TtPoint> hidePoints = new List<TtPoint>(SelectedPoints);
+
+                SelectPointDialog spd = new SelectPointDialog(Manager, hidePoints);
+
+                if (spd.ShowDialog() == true && spd.SelectedPoint != null)
+                {
+                    if (MultipleSelections)
+                    {
+                        Manager.EditPoints(SelectedPoints, PointProperties.PARENT_POINT, spd.SelectedPoint);
+                    }
+                    else
+                    {
+                        Manager.EditPoint(SelectedPoint, PointProperties.PARENT_POINT, spd.SelectedPoint);
+                    }
+                }
+            }
         }
     }
 }

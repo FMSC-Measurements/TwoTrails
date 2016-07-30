@@ -1,4 +1,5 @@
 ﻿using CSUtil.ComponentModel;
+using FMSC.Core.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using TwoTrails.Commands;
 using TwoTrails.Core;
 using TwoTrails.DAL;
 using TwoTrails.Dialogs;
@@ -28,13 +28,18 @@ namespace TwoTrails
         public TtTabModel CurrentTab
         {
             get { return Get<TtTabModel>(); }
-            set { Set(value, () =>
+            set {
+                Set(value, () =>
+                {
                     OnPropertyChanged(
                         nameof(CurrentProject),
                         nameof(HasOpenedProject),
                         nameof(CanSaveCurrentProject)
-                        )
-                    );
+                        );
+
+                    _MainWindow.Title = String.Format("{0}TwoTrails",
+                        value != null ? String.Format("{0} - ", value.Project.ProjectName) : null);
+                });
             }
         }
 

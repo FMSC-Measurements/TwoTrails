@@ -10,7 +10,7 @@
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
              xmlns:cc="clr-namespace:TwoTrails.CustomControls"
              mc:Ignorable="d" 
-             d:DesignHeight="400" d:DesignWidth="600">
+             d:DesignHeight="600" d:DesignWidth="800">
 
     <UserControl.Resources>
         <csucvt:InverseBooleanConverter x:Key="IBC"/>
@@ -19,6 +19,9 @@
         <cvt:MetadataValueConverter x:Key="mdvcSlpAng" MetadataPropertyName="SlopeAngle"/>
         <cvt:NullableDoubleConverter x:Key="ndblcvtr" />
 
+        
+        
+        
 
         <Style x:Key="styleFieldTitle" TargetType="TextBlock">
             <Setter Property="Margin" Value="0,0,5,0" />
@@ -30,12 +33,36 @@
         <Style x:Key="styleFieldValue" TargetType="Control">
             <Setter Property="Margin" Value="0,2.5,0,2.5" />
             <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
+            <Setter Property="Height" Value="20"/>
             
+
             <Style.Triggers>
-                <Trigger Property="cc:ControlProperties.BackgroundEnabled" Value="True">
+                <!--<Trigger Property="cc:ControlProperties.BackgroundEnabled" Value="True">
                     <Setter Property="Background" Value="LightGreen"/>
-                </Trigger>
-                
+                </Trigger>-->
+
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsEnabled" Value="True"/>
+                        <Condition Property="cc:ControlProperties.BackgroundEnabled" Value="True"/>
+                    </MultiTrigger.Conditions>
+
+                    <MultiTrigger.Setters>
+                        <Setter Property="Background" Value="LightGreen"/>
+                    </MultiTrigger.Setters>
+                </MultiTrigger>
+
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsEnabled" Value="False"/>
+                        <Condition Property="cc:ControlProperties.BackgroundEnabled" Value="True"/>
+                    </MultiTrigger.Conditions>
+
+                    <MultiTrigger.Setters>
+                        <Setter Property="Background" Value="PaleGreen"/>
+                    </MultiTrigger.Setters>
+                </MultiTrigger>
+
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
                         <Condition Property="IsEnabled" Value="False"/>
@@ -47,6 +74,21 @@
                     </MultiTrigger.Setters>
                 </MultiTrigger>
             </Style.Triggers>
+        </Style>
+
+        <Style x:Key="styleTextButtonValue" TargetType="Button" BasedOn="{StaticResource styleFieldValue}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter x:Name="MyContentPresenter" 
+                                          Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center" 
+                                          VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="styleXYZEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
@@ -82,7 +124,7 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="styleQndmEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
+        <Style x:Key="styleQndmEnable" TargetType="Button" BasedOn="{StaticResource ResourceKey=styleTextButtonValue}">
             <Setter Property="IsEnabled" Value="False" />
             <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
 
@@ -104,6 +146,72 @@
         
         <Grid DockPanel.Dock="Top" Height="3" Background="Green" HorizontalAlignment="Stretch"/>
 
+        <Grid DockPanel.Dock="Top" Height="Auto" MinHeight="100" MaxHeight="150" Background="LightGray" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" MinWidth="100" MaxWidth="250"/>
+                <ColumnDefinition Width="125"/>
+                <ColumnDefinition Width="170" MinWidth="100" MaxWidth="250"/>
+                <ColumnDefinition Width="150" MinWidth="100" MaxWidth="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+
+            <TextBlock Text="Polygons" Grid.Column="0" Grid.Row="0" TextAlignment="Center"/>
+
+            <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Polygons}" Margin="2">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Viewbox Margin="-1">
+                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}"/>
+                        </Viewbox>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+
+            <TextBlock Text="OpTypes" Grid.Column="1" Grid.Row="0" TextAlignment="Center"/>
+
+            <ListBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding OpTypes}" Margin="2">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item}" Margin="2"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+
+            <TextBlock Text="Groups" Grid.Column="2" Grid.Row="0" TextAlignment="Center"/>
+
+            <ListBox Grid.Column="2" Grid.Row="1" ItemsSource="{Binding Groups}" Margin="2">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+
+            <TextBlock Text="Metadata" Grid.Column="3" Grid.Row="0" TextAlignment="Center"/>
+
+            <ListBox Grid.Column="3" Grid.Row="1" ItemsSource="{Binding Metadatas}" Margin="2">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Grid Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Background="Gray">
+                
+            </Grid>
+        </Grid>
+        
+        
         <!-- TODO implement left panel -->
         <Grid Width="0" Background="Green" DockPanel.Dock="Left">
 
@@ -113,7 +221,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MinWidth="150"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="170" MinWidth="140" MaxWidth="300"/>
+                <ColumnDefinition Width="185" MinWidth="150" MaxWidth="300"/>
             </Grid.ColumnDefinitions>
 
             <DataGrid Name="dgPoints"
@@ -284,7 +392,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="PID"/>
@@ -393,16 +501,18 @@
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="14" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Qndm Link"/>
-                    <TextBox Grid.Row="14" Grid.Column="1" Style="{StaticResource ResourceKey=styleQndmEnable}"
+                    <Button Grid.Row="14" Grid.Column="1" Style="{StaticResource ResourceKey=styleQndmEnable}"
                              cc:ControlProperties.BackgroundEnabled="{Binding SameParentPoint, Converter={StaticResource IBC}}"
-                             LostFocus="TextBox_UpdateBinding"/>
+                            Content="{Binding ParentPoint.PID}"
+                            Command="{Binding ChangeQuondamParentCommand}"/>
 
                     <TextBlock Grid.Row="15" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" VerticalAlignment="Top" Margin="0,2.5,5,0" Text="Comment"/>
                     <TextBox Grid.Row="15" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
-                             MinLines="4"
-                             TextWrapping="Wrap"
+                             TextWrapping="Wrap" VerticalAlignment="Top"
                              Text="{Binding Comment, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              cc:ControlProperties.BackgroundEnabled="{Binding SameComment, Converter={StaticResource IBC}}"
+                             MinHeight="75"
+                             Height="Auto"
                              LostFocus="TextBox_UpdateBinding"/>
                 </Grid>
             </ScrollViewer>

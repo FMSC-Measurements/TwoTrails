@@ -67,7 +67,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppInfo.cs" />
-    <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Controls\DataEditorModel.cs" />
     <Compile Include="Controls\DataStyleModel.cs" />
     <Compile Include="Converters\BindingReflector.cs" />
@@ -77,6 +76,9 @@
     <Compile Include="CustomProperties\ControlProperties.cs" />
     <Compile Include="Dialogs\NewProjectDialog.xaml.cs">
       <DependentUpon>NewProjectDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SelectPointDialog.xaml.cs">
+      <DependentUpon>SelectPointDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindowModel.cs" />
     <Compile Include="MapTab.cs" />
@@ -98,6 +100,10 @@
     <Compile Include="ITtTabContent.cs" />
     <Compile Include="TtTabModel.cs" />
     <Page Include="Dialogs\NewProjectDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SelectPointDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -167,7 +173,9 @@
   <ItemGroup>
     <Resource Include="res\open_in_new.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Commands\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
