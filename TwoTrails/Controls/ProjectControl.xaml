@@ -19,10 +19,6 @@
         <cvt:MetadataValueConverter x:Key="mdvcSlpAng" MetadataPropertyName="SlopeAngle"/>
         <cvt:NullableDoubleConverter x:Key="ndblcvtr" />
 
-        
-        
-        
-
         <Style x:Key="styleFieldTitle" TargetType="TextBlock">
             <Setter Property="Margin" Value="0,0,5,0" />
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -96,7 +92,7 @@
             <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
             
             <Style.Triggers>
-                <DataTrigger Binding="{Binding EnableXYZ}" Value="True">
+                <DataTrigger Binding="{Binding OnlyGpsTypes}" Value="True">
                     <Setter Property="IsEnabled" Value="True" />
                 </DataTrigger>
             </Style.Triggers>
@@ -107,7 +103,7 @@
             <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
 
             <Style.Triggers>
-                <DataTrigger Binding="{Binding EnableManAcc}" Value="True">
+                <DataTrigger Binding="{Binding OnlyManAccTypes}" Value="True">
                     <Setter Property="IsEnabled" Value="True" />
                 </DataTrigger>
             </Style.Triggers>
@@ -118,7 +114,7 @@
             <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
 
             <Style.Triggers>
-                <DataTrigger Binding="{Binding EnableTrav}" Value="True">
+                <DataTrigger Binding="{Binding OnlyTravTypes}" Value="True">
                     <Setter Property="IsEnabled" Value="True" />
                 </DataTrigger>
             </Style.Triggers>
@@ -129,14 +125,30 @@
             <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
 
             <Style.Triggers>
-                <DataTrigger Binding="{Binding EnableQndm}" Value="True">
+                <DataTrigger Binding="{Binding OnlyQuondams}" Value="True">
                     <Setter Property="IsEnabled" Value="True" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
-    <DockPanel LastChildFill="True" Margin="-1, -1, 0, 0" Background="White">
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding UndoCommand}" Key="Z" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
+        <KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
+    </UserControl.InputBindings>
+
+
+    <Grid Margin="-1, -1, 0, 0" Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3" MinHeight="3" MaxHeight="3"/>
+            <RowDefinition Height="150" MinHeight="100" MaxHeight="300"/>
+            <RowDefinition Height="3" MinHeight="3" MaxHeight="3"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
         <cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcElev}, Path=Metadata}"
             Source="{Binding Path=Metadata, Mode=OneWay}" />
         <cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcSlpDist}, Path=Metadata}"
@@ -144,9 +156,9 @@
         <cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcSlpAng}, Path=Metadata}"
             Source="{Binding Path=Metadata, Mode=OneWay}" />
         
-        <Grid DockPanel.Dock="Top" Height="3" Background="Green" HorizontalAlignment="Stretch"/>
+        <Grid Grid.Row="0" Height="3" Background="Green" HorizontalAlignment="Stretch"/>
 
-        <Grid DockPanel.Dock="Top" Height="Auto" MinHeight="100" MaxHeight="150" Background="LightGray" HorizontalAlignment="Stretch">
+        <Grid Grid.Row="1" Background="LightGray" HorizontalAlignment="Stretch">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200" MinWidth="100" MaxWidth="250"/>
                 <ColumnDefinition Width="125"/>
@@ -163,7 +175,7 @@
 
             <TextBlock Text="Polygons" Grid.Column="0" Grid.Row="0" TextAlignment="Center"/>
 
-            <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Polygons}" Margin="2">
+            <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Polygons}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Viewbox Margin="-1">
@@ -176,7 +188,7 @@
 
             <TextBlock Text="OpTypes" Grid.Column="1" Grid.Row="0" TextAlignment="Center"/>
 
-            <ListBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding OpTypes}" Margin="2">
+            <ListBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding OpTypes}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item}" Margin="2"/>
@@ -187,7 +199,7 @@
 
             <TextBlock Text="Groups" Grid.Column="2" Grid.Row="0" TextAlignment="Center"/>
 
-            <ListBox Grid.Column="2" Grid.Row="1" ItemsSource="{Binding Groups}" Margin="2">
+            <ListBox Grid.Column="2" Grid.Row="1" ItemsSource="{Binding Groups}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
@@ -198,7 +210,7 @@
 
             <TextBlock Text="Metadata" Grid.Column="3" Grid.Row="0" TextAlignment="Center"/>
 
-            <ListBox Grid.Column="3" Grid.Row="1" ItemsSource="{Binding Metadatas}" Margin="2">
+            <ListBox Grid.Column="3" Grid.Row="1" ItemsSource="{Binding Metadatas}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
@@ -210,17 +222,13 @@
                 
             </Grid>
         </Grid>
-        
-        
-        <!-- TODO implement left panel -->
-        <Grid Width="0" Background="Green" DockPanel.Dock="Left">
 
-        </Grid>
+        <GridSplitter Grid.Row="2" Background="Gray" Height="3" HorizontalAlignment="Stretch"/>
 
-        <Grid DockPanel.Dock="Right" >
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MinWidth="150"/>
-                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="3"/>
                 <ColumnDefinition Width="185" MinWidth="150" MaxWidth="300"/>
             </Grid.ColumnDefinitions>
 
@@ -366,7 +374,7 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="LightGray" />
+            <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Stretch" Background="Gray" />
 
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <Grid Margin="5">
@@ -517,5 +525,5 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
-    </DockPanel>
+    </Grid>
 </UserControl>

@@ -560,5 +560,33 @@ namespace TwoTrails.DAL
         }
         #endregion
         #endregion
+
+
+        #region Activity
+        public static class ActivitySchema
+        {
+            public const String TableName = "Activity";
+
+            public const String UserName = "UserName";
+            public const String DeviceName = "DeviceName";
+            public const String ActivityDate = "ActivityDate";
+            public const String DataActivity = "ActivityType";
+
+            public const String CreateTable =
+                "CREATE TABLE " + TableName + " (" +
+                UserName + " TEXT, " +
+                DeviceName + " TEXT, " +
+                ActivityDate + " TEXT, " +
+                DataActivity + " INTEGER" +
+                ");";
+
+
+            public const String SelectItems =
+                UserName + ", " +
+                DeviceName + ", " +
+                ActivityDate + ", " +
+                DataActivity;
+        }
+        #endregion
     }
 }

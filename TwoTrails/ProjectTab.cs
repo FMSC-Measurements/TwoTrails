@@ -13,8 +13,8 @@ namespace TwoTrails
 
         public override bool IsDetachable { get; } = false;
 
-        private DataEditorModel DataEditor;
-        private DataStyleModel DataStyles;
+        public DataEditorModel DataEditor { get; private set; }
+        public DataStyleModel DataStyles { get; private set; }
 
 
         public ProjectTab(MainWindowModel mainModel, TtProject project) : base(mainModel, project)

@@ -9,7 +9,8 @@ namespace TwoTrails.Core
         IMetadataSettings MetadataSettings { get; }
         IDeviceSettings DeviceSettings { get; }
 
-        String DeviceID { get; }
+        String UserName { get; }
+        String DeviceName { get; }
         
         String Region { get; set; }
         String District { get; set; }

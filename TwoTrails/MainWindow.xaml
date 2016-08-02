@@ -14,11 +14,45 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
+
+        
+        <Style x:Key="styleMiHasChanges" TargetType="MenuItem">
+            <Setter Property="IsEnabled">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource NullOrBool}">
+                        <Binding Path="CurrentProject"/>
+                        <Binding Path="CurrentProject.RequiresSave"/>
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="styleMiMultipleSelections" TargetType="MenuItem">
+            <Setter Property="IsEnabled">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource NullOrBool}">
+                        <Binding Path="CurrentEditor"/>
+                        <Binding Path="CurrentEditor.MultipleSelections"/>
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="styleMiHasSelection" TargetType="MenuItem">
+            <Setter Property="IsEnabled">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource NullOrBool}">
+                        <Binding Path="CurrentEditor"/>
+                        <Binding Path="CurrentEditor.HasSelection"/>
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Window.InputBindings>
         <KeyBinding Command="{Binding UndoCommand}" Key="Z" Modifiers="Ctrl"/>
-        <KeyBinding Command="{Binding RedoCommand}" Key="Y" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
         <KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
     </Window.InputBindings>
@@ -30,34 +64,115 @@
         <CommandBinding Command="ApplicationCommands.New" Executed="NewCommand_Executed" />
         <CommandBinding Command="ApplicationCommands.Close" CanExecute="CloseCommand_CanExecute" Executed="CloseCommand_Executed" />
     </Window.CommandBindings>-->
-
-    <!--<Window.InputBindings>
-        <KeyBinding Key="C" Modifiers="Ctrl" Command="{Binding ApplicationCommands.Copy}"/>
-    </Window.InputBindings>-->
     
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top" Height="25" Background="Gray">
             <MenuItem Header="_File">
                 <MenuItem Header="New" Command="{Binding NewCommand}"/>
                 <MenuItem Header="Open" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
+                
                 <Separator/>
+                
                 <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}" IsEnabled="{Binding Path=CanSaveCurrentProject}" InputGestureText="Ctrl+S"/>
+                
                 <Separator/>
+                
                 <MenuItem Header="Close Project" Command="{Binding CloseProjectCommand}" CommandParameter="{Binding CurrentProject}" IsEnabled="{Binding Path=HasOpenedProject}"/>
                 <MenuItem Header="Recent Projects" Name="miRecent" IsEnabled="{Binding Path=RecentItemsAvail}" />
+                
                 <Separator/>
+                
                 <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
             </MenuItem>
+            
             <MenuItem Header="_Edit">
                 <MenuItem Header="Undo" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z">
                     <MenuItem.IsEnabled>
                         <MultiBinding Converter="{StaticResource NullOrBool}">
                             <Binding Path="CurrentProject"/>
-                            <Binding Path="CurrentProject.Manager.CanUndo"/>
+                            <Binding Path="CurrentProject.HistoryManager.CanUndo"/>
                         </MultiBinding>
                     </MenuItem.IsEnabled>
                 </MenuItem>
-                <MenuItem Header="Redo" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Y" IsEnabled="{Binding Path=CurrentProject.Manager.CanRedo}"/>
+                <MenuItem Header="Redo" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Shift+Z">
+                    <MenuItem.IsEnabled>
+                        <MultiBinding Converter="{StaticResource NullOrBool}">
+                            <Binding Path="CurrentProject"/>
+                            <Binding Path="CurrentProject.HistoryManager.CanRedo"/>
+                        </MultiBinding>
+                    </MenuItem.IsEnabled>
+                </MenuItem>
+                
+                <Separator/>
+                
+                <MenuItem Header="Rename Points" Command="{Binding CurrentEditor.RenamePointsCommand}"
+                          Style="{StaticResource ResourceKey=styleMiMultipleSelections}"/>
+                <MenuItem Header="Reverse Points" Command="{Binding CurrentEditor.ReverseSelectedCommand}"
+                          Style="{StaticResource ResourceKey=styleMiMultipleSelections}"/>
+                
+                <Separator/>
+
+                <MenuItem Header="Reset Point" Command="{Binding CurrentEditor.ResetPointCommand}" InputGestureText="Ctrl+R"
+                          Style="{StaticResource ResourceKey=styleMiHasSelection}"/>
+                <MenuItem Header="Discard Changes" Command="{Binding CurrentEditor.DiscardChangesCommand}"
+                          Style="{StaticResource ResourceKey=styleMiHasChanges}"/>
+
+                <Separator/>
+
+                <MenuItem Header="Delete" Command="{Binding CurrentEditor.DeleteCommand}" InputGestureText="Del"
+                          Style="{StaticResource ResourceKey=styleMiHasSelection}"/>
+            </MenuItem>
+            
+            <MenuItem Header="_Data">
+                <MenuItem Header="Modify Project" Command="{Binding EditProjectCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Modify Polygons" Command="{Binding EditPolygonsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Modify Groups" Command="{Binding EditGroupsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Modify Metadata" Command="{Binding EditMetadataCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+
+                <Separator/>
+
+                <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+
+                <Separator/>
+
+                <MenuItem Header="Create Polygon" Command="{Binding CurrentEditor.CreatePolygonCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Create Group" Command="{Binding CurrentEditor.CreateGroupCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+            </MenuItem>
+            
+            <MenuItem Header="_Tools">
+                <MenuItem Header="Create Quondams" Command="{Binding CurrentEditor.CreateQuondamsCommand}"
+                        Style="{StaticResource ResourceKey=styleMiHasSelection}"/>
+                <MenuItem Header="Move Points" Command="{Binding CurrentEditor.MovePointsCommand}"
+                        Style="{StaticResource ResourceKey=styleMiHasSelection}"/>
+                <MenuItem Header="Retrace Points" Command="{Binding CurrentEditor.RetraceCommand}"
+                        Style="{StaticResource ResourceKey=styleMiHasSelection}"/>
+
+                <Separator/>
+
+                <MenuItem Header="Create Plots" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}">
+                    <MenuItem.IsEnabled>
+                        <MultiBinding Converter="{StaticResource NullOrBool}">
+                            <Binding Path="CurrentEditor"/>
+                            <Binding Path="CurrentEditor.HasPossibleCorridor"/>
+                        </MultiBinding>
+                    </MenuItem.IsEnabled>
+                </MenuItem>
+
+                <Separator/>
+
+                <MenuItem Header="Settings" Command="{Binding SettingsCommand}"/>
+            </MenuItem>
+
+            <MenuItem Header="_Help">
+                <MenuItem Header="View Error Log" Command="{Binding ViewLogCommand}"/>
+                <MenuItem Header="View User Activity" Command="{Binding ViewUserActivityCommand}"
+                          Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource ResourceKey=BoolToVis}}"/>
+
+                <Separator/>
+
+                <MenuItem Header="About TwoTrails" Command="{Binding AboutCommand}"/>
             </MenuItem>
         </Menu>
         <ToolBarPanel Background="Gray" Height="25" VerticalAlignment="Top" Width="Auto" DockPanel.Dock="Top">

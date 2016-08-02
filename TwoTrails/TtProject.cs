@@ -19,22 +19,26 @@ namespace TwoTrails
         public String ProjectName
         {
             get { return Get<String>(); }
-            set { Set(value); }
+            private set { Set(value); }
         }
         
         public bool RequiresSave
         {
             get { return Get<bool>(); }
-            set { Set(value); }
+            private set { Set(value); }
         }
 
 
         public bool RequiresUpgrade { get; private set; }
 
 
+        public bool DataChanged { get; private set; }
+
+
         public ITtDataLayer DAL { get; private set; }
 
-        public TtHistoryManager Manager { get; private set; }
+        private TtManager _Manager;
+        public TtHistoryManager HistoryManager { get; private set; }
 
 
         public TtProject(ITtDataLayer dal, ITtSettings settings)
@@ -46,20 +50,29 @@ namespace TwoTrails
 
             RequiresSave = false;
 
-            Manager = new TtHistoryManager(new TtManager(dal, settings));
-            Manager.HistoryChanged += Manager_HistoryChanged;
+            _Manager = new TtManager(dal, settings);
+            HistoryManager = new TtHistoryManager(_Manager);
+            HistoryManager.HistoryChanged += Manager_HistoryChanged;
         }
 
         private void Manager_HistoryChanged(object sender, EventArgs e)
         {
-            Set(Manager.CanUndo, nameof(RequiresSave));
+            Set(HistoryManager.CanUndo || DataChanged, nameof(RequiresSave));
         }
 
         public void Save()
         {
             if (RequiresSave)
             {
-                //TODO save info to dal
+                try
+                {
+                    _Manager.Save();
+                    RequiresSave = DataChanged = false;
+                }
+                catch (Exception ex)
+                {
+                    //Unable to save
+                }
             }
         } 
     }

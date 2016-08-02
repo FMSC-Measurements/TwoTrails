@@ -39,6 +39,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtImage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtPanorama.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtPhotoShpere.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\DataActivityType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\IDeviceSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\IMetadataSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\IPointSegment.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtPolygon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\ITtSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtUserActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PointProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\GpsPoint.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\IManualAccuracy.cs" />

@@ -112,6 +112,12 @@ namespace TwoTrails.DAL
         #endregion
 
 
+        #region Activity
+        void InsertActivity(TtUserActivity activity);
+        List<TtUserActivity> GetUserActivity();
+        #endregion
+
+
         #region Util
         //TODO Util
         bool RequiresUpgrade { get; }

@@ -2007,6 +2007,79 @@ namespace TwoTrails.DAL
         #endregion
 
 
+        #region Activity
+
+        public void InsertActivity(TtUserActivity activity)
+        {
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        database.Insert(TwoTrailsSchema.ActivitySchema.TableName, GetUserActivityValues(activity), trans);
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        private Dictionary<string, object> GetUserActivityValues(TtUserActivity activity)
+        {
+            return new Dictionary<string, object>()
+            {
+                [TwoTrailsSchema.ActivitySchema.UserName] = activity.UserName,
+                [TwoTrailsSchema.ActivitySchema.DeviceName] = activity.DeviceName,
+                [TwoTrailsSchema.ActivitySchema.ActivityDate] = activity.Date,
+                [TwoTrailsSchema.ActivitySchema.DataActivity] = (int)activity.Activity
+            };
+        }
+
+        public List<TtUserActivity> GetUserActivity()
+        {
+            List<TtUserActivity> activity = new List<TtUserActivity>();
+
+            String query = String.Format(@"select {0} from {1}",
+                TwoTrailsSchema.ActivitySchema.SelectItems,
+                TwoTrailsSchema.ActivitySchema.TableName
+            );
+
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                {
+                    if (dr != null)
+                    {
+                        string username, devicename;
+                        DateTime date;
+                        DataActivityType dat;
+
+                        while (dr.Read())
+                        {
+                            username = dr.GetString(0);
+                            devicename = dr.GetString(1);
+                            date = DateTime.Parse(dr.GetString(2), CultureInfo.InvariantCulture);
+                            dat = (DataActivityType)dr.GetInt32(3);
+
+                            activity.Add(new TtUserActivity(username, devicename, date, dat));
+                        }
+
+                        dr.Close();
+                    }
+                }
+
+                return activity;
+            }
+        }
+        #endregion
+
         #region Utils
         public bool Duplicate(ITtDataLayer dataLayer)
         {

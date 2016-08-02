@@ -36,6 +36,22 @@ namespace TwoTrails.Core
         }
 
 
+        public void Save()
+        {
+            try
+            {
+                _Manager.Save();
+                _UndoStack.Clear();
+                _RedoStack.Clear();
+                OnHistoryChanged();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("History Manager unable to save do to: " + ex.Message);
+            }
+        }
+
+
         #region History Management
         protected void AddCommand(ITtCommand command)
         {

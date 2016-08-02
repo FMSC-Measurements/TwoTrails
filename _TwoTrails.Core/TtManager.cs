@@ -19,6 +19,8 @@ namespace TwoTrails.Core
         private ITtSettings _Settings;
         private ITtDataLayer _DAL;
 
+        private TtUserActivity _Activity;
+
         private Dictionary<String, TtPoint> _PointsMap, _PointsMapOrig;
         private Dictionary<String, List<TtPoint>> _PointsByPoly;
         private Dictionary<String, TtPolygon> _PolygonsMap, _PolygonsMapOrig;
@@ -50,6 +52,9 @@ namespace TwoTrails.Core
         {
             _DAL = dal;
             _Settings = settings;
+
+            _Activity = new TtUserActivity(_Settings.UserName, _Settings.DeviceName);
+
             Load();
         }
 
@@ -256,6 +261,9 @@ namespace TwoTrails.Core
                     _PolygonsMapOrig = _PolygonsMap.Values.ToDictionary(p => p.CN, p => new TtPolygon(p));
                     _MetadataMapOrig = _MetadataMapOrig.Values.ToDictionary(m => m.CN, m => new TtMetadata(m));
                     _GroupsMapOrig = _GroupsMap.Values.ToDictionary(g => g.CN, g => new TtGroup(g));
+
+                    _DAL.InsertActivity(_Activity);
+                    _Activity.Reset();
                 }
                 catch (Exception ex)
                 {
@@ -293,13 +301,22 @@ namespace TwoTrails.Core
             IEnumerable<TtPoint> pointsToRemove = _PointsMapOrig.Values.Where(g => !_PointsMap.ContainsKey(g.CN)).ToList();
 
             if (pointsToAdd.Count > 0)
+            {
                 _DAL.InsertPoints(pointsToAdd);
+                _Activity.UpdateActivity(DataActivityType.InsertedPoints);
+            }
 
             if (pointsToUpdate.Count > 0)
+            {
                 _DAL.UpdatePoints(pointsToUpdate);
+                _Activity.UpdateActivity(DataActivityType.ModifiedPoints);
+            }
 
             if (pointsToRemove.Any())
+            {
                 _DAL.DeletePoints(pointsToRemove);
+                _Activity.UpdateActivity(DataActivityType.DeletedPoints);
+            }
         }
 
         private void SavePolygons()
@@ -325,13 +342,22 @@ namespace TwoTrails.Core
             IEnumerable<TtPolygon> polygonsToRemove = _PolygonsMapOrig.Values.Where(g => !_PolygonsMap.ContainsKey(g.CN));
 
             if (polygonsToAdd.Count > 0)
+            {
                 _DAL.InsertPolygons(polygonsToAdd);
+                _Activity.UpdateActivity(DataActivityType.InsertedPolygons);
+            }
 
             if (polygonsToUpdate.Count > 0)
+            {
                 _DAL.UpdatePolygons(polygonsToUpdate);
+                _Activity.UpdateActivity(DataActivityType.ModifiedPolygons);
+            }
 
             if (polygonsToRemove.Any())
+            {
                 _DAL.DeletePolygons(polygonsToRemove);
+                _Activity.UpdateActivity(DataActivityType.DeletedPolygons);
+            }
         }
 
         private void SaveMetadata()
@@ -357,13 +383,22 @@ namespace TwoTrails.Core
             IEnumerable<TtMetadata> metadataToRemove = _MetadataMapOrig.Values.Where(g => !_MetadataMap.ContainsKey(g.CN));
 
             if (metadataToAdd.Count > 0)
+            {
                 _DAL.InsertMetadata(metadataToAdd);
+                _Activity.UpdateActivity(DataActivityType.InsertedMetadata);
+            }
 
             if (metadataToUpdate.Count > 0)
+            {
                 _DAL.UpdateMetadata(metadataToUpdate);
+                _Activity.UpdateActivity(DataActivityType.ModifiedMetadata);
+            }
 
             if (metadataToRemove.Any())
+            {
                 _DAL.DeleteMetadata(metadataToRemove);
+                _Activity.UpdateActivity(DataActivityType.DeletedMetadata);
+            }
         }
 
         private void SaveGroups()
@@ -389,14 +424,23 @@ namespace TwoTrails.Core
             IEnumerable<TtGroup> groupsToRemove = _GroupsMapOrig.Values.Where(g => !_GroupsMap.ContainsKey(g.CN));
 
             if (groupsToAdd.Count > 0)
+            {
                 _DAL.InsertGroups(groupsToAdd);
+                _Activity.UpdateActivity(DataActivityType.InsertedGroups);
+            }
 
             if (groupsToUpdate.Count > 0)
+            {
                 _DAL.UpdateGroups(groupsToUpdate);
+                _Activity.UpdateActivity(DataActivityType.ModifiedGroups);
+            }
 
             if (groupsToRemove.Any())
+            {
                 _DAL.DeleteGroups(groupsToRemove);
-        } 
+                _Activity.UpdateActivity(DataActivityType.DeletedGroups);
+            }
+        }
         #endregion
 
         

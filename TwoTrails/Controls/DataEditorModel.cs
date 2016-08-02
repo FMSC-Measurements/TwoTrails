@@ -39,24 +39,49 @@ namespace TwoTrails.Controls
 
 
         public ICommand ChangeQuondamParentCommand { get; }
+        public ICommand RenamePointsCommand { get; }
+        public ICommand ReverseSelectedCommand { get; }
+        public ICommand ResetPointCommand { get; }
+        public ICommand DiscardChangesCommand { get; }
+        public ICommand DeleteCommand { get; }
 
+        public ICommand CreatePolygonCommand { get; }
+        public ICommand CreateGroupCommand { get; }
+
+        public ICommand CreateQuondamsCommand { get; }
+        public ICommand MovePointsCommand { get; }
+        public ICommand RetraceCommand { get; }
+        public ICommand CreatePlotsCommand { get; }
+        public ICommand CreateCorridorCommand { get; }
         
+        public ICommand SelectAlternateCommand { get; }
+        public ICommand SelectGpsCommand { get; }
+        public ICommand SelectTravCommand { get; }
+        public ICommand SelectInverseCommand { get; }
+        
+
         public TtPoint SelectedPoint { get; private set; }
-        public List<TtPoint> SelectedPoints { get; private set; }
+        public List<TtPoint> SelectedPoints { get; private set; } = new List<TtPoint>();
 
 
-        public bool HasGps { get; private set; }
-        public bool HasTrav { get; private set; }
-        public bool HasQndm { get; private set; }
+        public bool HasGpsTypes { get; private set; }
+        public bool HasTravTypes { get; private set; }
+        public bool HasQndms { get; private set; }
 
-        public bool EnableTrav { get; private set; }
-        public bool EnableManAcc { get; private set; }
-        public bool EnableXYZ { get; private set; }
-        public bool EnableQndm { get; private set; }
+        public bool OnlyTravTypes { get; private set; }
+        public bool OnlyManAccTypes { get; private set; }
+        public bool OnlyGpsTypes { get; private set; }
+        public bool OnlyQuondams { get; private set; }
+        public bool HasPossibleCorridor { get; private set; }
 
 
         private void OnSelectionChanged()
         {
+            HasGpsTypes = false;
+            HasTravTypes = false;
+            HasQndms = false;
+            HasPossibleCorridor = false;
+
             if (HasSelection)
             {
                 if (MultipleSelections)
@@ -82,11 +107,9 @@ namespace TwoTrails.Controls
 
                     bool fmanacc = true, fqndm = true;
 
-                    HasGps = false;
-                    HasTrav = false;
-                    HasQndm = false;
-
                     bool hasOnbnd = false, hasOffBnd = false;
+
+                    bool hasSS = false, hasTrav = false;
 
                     bool sameCmt = true;
                     string cmt = fpt.Comment;
@@ -121,23 +144,31 @@ namespace TwoTrails.Controls
                         }
 
 
-                        if (point.IsGpsType() && !HasGps)
+                        if (point.IsGpsType() && !HasGpsTypes)
                         {
-                            HasGps = true;
+                            HasGpsTypes = true;
                             
                             parseTrav = false;
                             parseQndm = false;
                         }
-                        else if (point.IsTravType() && !HasTrav)
+                        else if (point.IsTravType() && !HasTravTypes)
                         {
-                            HasTrav = true;
+                            if (!hasTrav)
+                            {
+                                if (point.OpType == OpType.SideShot)
+                                    hasSS = true;
+                                else
+                                    hasTrav = true; 
+                            }
+
+                            HasTravTypes = true;
                             
                             parseManAcc = false;
                             parseQndm = false;
                         }
-                        else if (point.OpType == OpType.Quondam && !HasQndm)
+                        else if (point.OpType == OpType.Quondam && !HasQndms)
                         {
-                            HasQndm = true;
+                            HasQndms = true;
 
                             parseTrav = false;
                         }
@@ -228,6 +259,7 @@ namespace TwoTrails.Controls
                         }
                     }
 
+                    HasPossibleCorridor = HasGpsTypes && hasSS && !HasQndms && !hasTrav;
 
                     _PID = null;
                     _SamePID = false;
@@ -315,10 +347,6 @@ namespace TwoTrails.Controls
                 {
                     SelectedPoint = SelectedPoints[0];
 
-                    HasGps = false;
-                    HasTrav = false;
-                    HasQndm = false;
-
                     _PID = SelectedPoint.PID;
                     _SamePID = true;
 
@@ -343,7 +371,7 @@ namespace TwoTrails.Controls
 
                     if (SelectedPoint.IsGpsType())
                     {
-                        HasGps = true;
+                        HasGpsTypes = true;
 
                         _ManAcc = (SelectedPoint as GpsPoint).ManualAccuracy;
                         _ParentPoint = null;
@@ -352,7 +380,7 @@ namespace TwoTrails.Controls
                     {
                         QuondamPoint qp = SelectedPoint as QuondamPoint;
 
-                        HasQndm = true;
+                        HasQndms = true;
 
                         _ManAcc = qp.ManualAccuracy;
                         _ParentPoint = qp.ParentPoint;
@@ -376,7 +404,7 @@ namespace TwoTrails.Controls
 
                     if (SelectedPoint.IsTravType())
                     {
-                        HasTrav = true;
+                        HasTravTypes = true;
 
                         TravPoint tp = SelectedPoint as TravPoint;
 
@@ -468,20 +496,21 @@ namespace TwoTrails.Controls
                 _SameUnAdjZ = true;
             }
 
-            EnableTrav = HasTrav && !HasGps && !HasQndm;
-            EnableManAcc = !HasTrav && HasGps || HasQndm;
-            EnableXYZ = !HasTrav && HasGps && !HasQndm;
-            EnableQndm = !HasTrav && !HasGps && HasQndm;
+            OnlyTravTypes = HasTravTypes && !HasGpsTypes && !HasQndms;
+            OnlyManAccTypes = !HasTravTypes && HasGpsTypes || HasQndms;
+            OnlyGpsTypes = !HasTravTypes && HasGpsTypes && !HasQndms;
+            OnlyQuondams = !HasTravTypes && !HasGpsTypes && HasQndms;
 
             OnPropertyChanged(
                     nameof(HasSelection),
                     nameof(SelectedPoint),
                     nameof(SelectedPoints),
                     nameof(MultipleSelections),
-                    nameof(EnableXYZ),
-                    nameof(EnableTrav),
-                    nameof(EnableManAcc),
-                    nameof(EnableQndm),
+                    nameof(OnlyGpsTypes),
+                    nameof(OnlyTravTypes),
+                    nameof(OnlyManAccTypes),
+                    nameof(OnlyQuondams),
+                    nameof(HasPossibleCorridor),
                     nameof(PID),
                     nameof(SamePID),
                     nameof(Index),
@@ -817,7 +846,7 @@ namespace TwoTrails.Controls
 
         public DataEditorModel(TtProject project)
         {
-            Manager = project.Manager;
+            Manager = project.HistoryManager;
 
             ChangeQuondamParentCommand = new RelayCommand((x) => ChangeQuondamParent());
 

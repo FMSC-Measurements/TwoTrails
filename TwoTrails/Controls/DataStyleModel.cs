@@ -21,7 +21,7 @@ namespace TwoTrails.Controls
             _PolygonStyles = new Dictionary<string, Style>();
             _PolygonStylesAlt = new Dictionary<string, Style>();
 
-            foreach (TtPolygon poly in project.Manager.GetPolyons())
+            foreach (TtPolygon poly in project.HistoryManager.GetPolyons())
             {
                 CreatePolygonStyle(poly);
             }

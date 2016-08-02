@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSUtil.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -9,39 +10,28 @@ using TwoTrails.DAL;
 
 namespace TwoTrails
 {
-    public class TtSettings : ITtSettings
+    public class TtSettings : NotifyPropertyChangedEx, ITtSettings
     {
         private static String DISTRICT = "District";
         private static String REGION = "Region";
         private static String RECENT_PROJECTS = "RecentProjects";
+        private static String ADVANCED_MODE = "AdvancedMode";
 
         public IMetadataSettings MetadataSettings { get; set; }
         public IDeviceSettings DeviceSettings { get; set; }
 
-        public String DeviceID
-        {
-            get
-            {
-                return "DeviceID";
-            }
-        }
+        public String UserName { get { return Environment.UserName; } }
+
+        public String DeviceName { get { return Environment.MachineName; } }
 
         private String _Region;
         public String Region
         {
-            get
-            {
-                if (_Region == null)
-                {
-                    _Region = Properties.Settings.Default[REGION] as string;
-                }
-
-                return _Region;
-            }
+            get {  return _Region ?? (_Region = Properties.Settings.Default[REGION] as string); }
 
             set
             {
-                _Region = value;
+                SetField(ref _Region, value);
                 Properties.Settings.Default[REGION] = value;
                 Properties.Settings.Default.Save();
             }
@@ -50,29 +40,40 @@ namespace TwoTrails
         private String _District;
         public String District
         {
-            get
-            {
-                if (_District == null)
-                {
-                    _District = Properties.Settings.Default[DISTRICT] as string;
-                }
-
-                return _District;
-            }
+            get { return _District ?? (_District = Properties.Settings.Default[DISTRICT] as string); }
 
             set
             {
-                _District = value;
+                SetField(ref _District, value);
                 Properties.Settings.Default[DISTRICT] = value;
                 Properties.Settings.Default.Save();
             }
         }
 
+        private bool _IsAdvancedMode;
+        public bool IsAdvancedMode
+        {
+            get { return _IsAdvancedMode; }
+
+            set
+            {
+                SetField(ref _IsAdvancedMode, value);
+                Properties.Settings.Default[ADVANCED_MODE] = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+        
 
         public TtSettings(IDeviceSettings deviceSettings, IMetadataSettings metadataSettings)
         {
             DeviceSettings = deviceSettings;
             MetadataSettings = metadataSettings;
+
+#if DEBUG
+            _IsAdvancedMode = true;
+#else
+            _IsAdvancedMode = (bool)Properties.Settings.Default[ADVANCED_MODE];
+#endif
         }
 
 
@@ -90,7 +91,7 @@ namespace TwoTrails
         {
             String version = String.Format("PC: {0}", programVersion);
             return new TtProjectInfo("Unamed Project", String.Empty, Region, String.Empty, District,
-                version, version, TwoTrailsSchema.SchemaVersion, DeviceID, DateTime.Now);
+                version, version, TwoTrailsSchema.SchemaVersion, DeviceName, DateTime.Now);
         }
 
 

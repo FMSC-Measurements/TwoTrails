@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
 using TwoTrails.Dialogs;
@@ -31,10 +32,15 @@ namespace TwoTrails
             set {
                 Set(value, () =>
                 {
+
+                    ProjectTab pt = value as ProjectTab;
+                    CurrentEditor = pt?.DataEditor;
+
                     OnPropertyChanged(
                         nameof(CurrentProject),
                         nameof(HasOpenedProject),
-                        nameof(CanSaveCurrentProject)
+                        nameof(CanSaveCurrentProject),
+                        nameof(CurrentEditor)
                         );
 
                     _MainWindow.Title = String.Format("{0}TwoTrails",
@@ -44,6 +50,10 @@ namespace TwoTrails
         }
 
         public TtProject CurrentProject { get { return CurrentTab?.Project; } }
+
+
+        public DataEditorModel CurrentEditor { get; private set; }
+
 
         public bool HasOpenedProject { get { return CurrentTab != null; } }
 
@@ -83,8 +93,22 @@ namespace TwoTrails
         public ICommand SaveCommand { get; private set; }
         public ICommand CloseProjectCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
+
         public ICommand UndoCommand { get; private set; }
         public ICommand RedoCommand { get; private set; }
+
+        public ICommand EditProjectCommand { get; private set; }
+        public ICommand EditPolygonsCommand { get; private set; }
+        public ICommand EditGroupsCommand { get; private set; }
+        public ICommand EditMetadataCommand { get; private set; }
+        public ICommand ImportCommand { get; private set; }
+        public ICommand ExportCommand { get; private set; }
+
+        public ICommand SettingsCommand { get; private set; }
+
+        public ICommand ViewUserActivityCommand { get; private set; }
+        public ICommand ViewLogCommand { get; private set; }
+        public ICommand AboutCommand { get; private set; }
         #endregion
 
 
@@ -107,8 +131,10 @@ namespace TwoTrails
             CloseProjectCommand = new RelayCommand((x) => CloseProject(x as TtProject));
             ExitCommand = new RelayCommand((x) => Exit());
 
-            UndoCommand = new RelayCommand((x) => CurrentProject.Manager.Undo());
-            RedoCommand = new RelayCommand((x) => CurrentProject.Manager.Redo());
+            UndoCommand = new RelayCommand((x) => CurrentProject.HistoryManager.Undo());
+            RedoCommand = new RelayCommand((x) => CurrentProject.HistoryManager.Redo());
+
+
 
             _Tabs = mainWindow.tabControl;
             _Tabs.SelectionChanged += Tabs_SelectionChanged;
