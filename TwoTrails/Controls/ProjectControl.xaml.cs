@@ -37,9 +37,6 @@ namespace TwoTrails.Controls
             InitializeComponent();
 
             this.DataContext = dataEditor;
-
-
-            dgPoints.SelectionChanged += DgPoints_SelectionChanged;
         }
 
         private void TextBox_UpdateBinding(object sender, RoutedEventArgs e)
@@ -54,11 +51,7 @@ namespace TwoTrails.Controls
                     expression.UpdateSource();
             }
         }
-
-        private void DgPoints_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            DataEditor.UpdateSelectedPoints(e.AddedItems.Cast<TtPoint>(), e.RemovedItems.Cast<TtPoint>());
-        }
+        
 
         private void DataGrid_OnLoadingRow(object sender, DataGridRowEventArgs e)
         {
@@ -68,6 +61,11 @@ namespace TwoTrails.Controls
         private void AlterRow(DataGridRowEventArgs e)
         {
             e.Row.Style = DataStyles.GetRowStyle(e.Row.Item as TtPoint);
+        }
+
+        private void dgPoints_SelectedItemListChanged(System.Collections.IList items)
+        {
+            DataEditor.OnSelectionChanged();
         }
     }
 }

@@ -214,22 +214,22 @@ namespace TwoTrails.Core
             AddCommand(new EditTtPointCommand(point, property, newValue));
         }
 
-        public void EditPoints(List<TtPoint> points, PropertyInfo property, object newValue)
+        public void EditPoints(IEnumerable<TtPoint> points, PropertyInfo property, object newValue)
         {
             AddCommand(new EditTtPointsCommand(points, property, newValue));
         }
 
-        public void EditPoints(List<TtPoint> points, PropertyInfo property, List<object> newValues)
+        public void EditPoints(IEnumerable<TtPoint> points, PropertyInfo property, List<object> newValues)
         {
             AddCommand(new EditTtPointsMultiValueCommand(points, property, newValues));
         }
 
-        public void EditPoints(List<TtPoint> points, List<PropertyInfo> properties, object newValue)
+        public void EditPoints(IEnumerable<TtPoint> points, List<PropertyInfo> properties, object newValue)
         {
             AddCommand(new EditTtPointsMultiPropertyCommand(points, properties, points.Select(p => newValue).Cast<object>()));
         }
 
-        public void EditPoints(List<TtPoint> points, List<PropertyInfo> properties, List<object> newValues)
+        public void EditPoints(IEnumerable<TtPoint> points, List<PropertyInfo> properties, List<object> newValues)
         {
             AddCommand(new EditTtPointsMultiPropertyCommand(points, properties, newValues));
         }

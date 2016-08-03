@@ -7,7 +7,7 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         protected List<TtPoint> Points;
 
-        public ITtPointsCommand(List<TtPoint> points)
+        public ITtPointsCommand(IEnumerable<TtPoint> points)
         {
             this.Points = new List<TtPoint>(points);
         }

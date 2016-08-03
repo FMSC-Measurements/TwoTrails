@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace TwoTrails.CustomControls
+namespace TwoTrails.CustomProperties
 {
     public static class ControlProperties
     {

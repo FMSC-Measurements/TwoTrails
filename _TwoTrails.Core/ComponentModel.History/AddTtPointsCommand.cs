@@ -7,7 +7,7 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         private ITtManager pointsManager;
 
-        public AddTtPointsCommand(List<TtPoint> points, ITtManager pointsManager, bool autoCommit = true) : base(points)
+        public AddTtPointsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, bool autoCommit = true) : base(points)
         {
             this.pointsManager = pointsManager;
 

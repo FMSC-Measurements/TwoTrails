@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace FMSC.Core.ComponentModel.Commands
@@ -27,6 +23,10 @@ namespace FMSC.Core.ComponentModel.Commands
             _CanExecute = canExecute;
         }
 
+        public void OnCanExecuteChanged(object sender = null, EventArgs e = null)
+        {
+            CanExecuteChanged?.Invoke(sender, e);
+        }
 
         public bool CanExecute(object parameter)
         {

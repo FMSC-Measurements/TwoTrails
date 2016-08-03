@@ -8,7 +8,8 @@
              xmlns:ctrls="clr-namespace:TwoTrails.Controls"
              xmlns:csucvt="clr-namespace:CSUtil.WPF;assembly=CSUtilSlim"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
-             xmlns:cc="clr-namespace:TwoTrails.CustomControls"
+             xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
+             xmlns:cc="clr-namespace:TwoTrails.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
 
@@ -28,19 +29,19 @@
         
         <Style x:Key="styleFieldValue" TargetType="Control">
             <Setter Property="Margin" Value="0,2.5,0,2.5" />
-            <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
+            <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
             <Setter Property="Height" Value="20"/>
             
 
             <Style.Triggers>
-                <!--<Trigger Property="cc:ControlProperties.BackgroundEnabled" Value="True">
+                <!--<Trigger Property="cp:ControlProperties.BackgroundEnabled" Value="True">
                     <Setter Property="Background" Value="LightGreen"/>
                 </Trigger>-->
 
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
                         <Condition Property="IsEnabled" Value="True"/>
-                        <Condition Property="cc:ControlProperties.BackgroundEnabled" Value="True"/>
+                        <Condition Property="cp:ControlProperties.BackgroundEnabled" Value="True"/>
                     </MultiTrigger.Conditions>
 
                     <MultiTrigger.Setters>
@@ -51,7 +52,7 @@
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
                         <Condition Property="IsEnabled" Value="False"/>
-                        <Condition Property="cc:ControlProperties.BackgroundEnabled" Value="True"/>
+                        <Condition Property="cp:ControlProperties.BackgroundEnabled" Value="True"/>
                     </MultiTrigger.Conditions>
 
                     <MultiTrigger.Setters>
@@ -62,7 +63,7 @@
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
                         <Condition Property="IsEnabled" Value="False"/>
-                        <Condition Property="cc:ControlProperties.BackgroundEnabled" Value="False"/>
+                        <Condition Property="cp:ControlProperties.BackgroundEnabled" Value="False"/>
                     </MultiTrigger.Conditions>
 
                     <MultiTrigger.Setters>
@@ -89,7 +90,7 @@
 
         <Style x:Key="styleXYZEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
             <Setter Property="IsEnabled" Value="False" />
-            <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
+            <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
             
             <Style.Triggers>
                 <DataTrigger Binding="{Binding OnlyGpsTypes}" Value="True">
@@ -100,7 +101,7 @@
 
         <Style x:Key="styleManAccEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
             <Setter Property="IsEnabled" Value="False" />
-            <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
+            <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding OnlyManAccTypes}" Value="True">
@@ -111,7 +112,7 @@
 
         <Style x:Key="styleTravEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
             <Setter Property="IsEnabled" Value="False" />
-            <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
+            <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding OnlyTravTypes}" Value="True">
@@ -122,7 +123,7 @@
 
         <Style x:Key="styleQndmEnable" TargetType="Button" BasedOn="{StaticResource ResourceKey=styleTextButtonValue}">
             <Setter Property="IsEnabled" Value="False" />
-            <Setter Property="cc:ControlProperties.BackgroundEnabled" Value="False" />
+            <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding OnlyQuondams}" Value="True">
@@ -134,10 +135,10 @@
 
 
     <UserControl.InputBindings>
-        <KeyBinding Command="{Binding UndoCommand}" Key="Z" Modifiers="Ctrl"/>
-        <KeyBinding Command="{Binding RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
-        <KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Ctrl"/>
-        <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding SelectAlternateCommand}" Key="A" Modifiers="Ctrl+Alt" />
+        <KeyBinding Command="{Binding SelectGpsCommand}" Key="G" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding SelectTravCommand}" Key="T" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding SelectInverseCommand}" Key="I" Modifiers="Ctrl"/>
     </UserControl.InputBindings>
 
 
@@ -232,20 +233,30 @@
                 <ColumnDefinition Width="185" MinWidth="150" MaxWidth="300"/>
             </Grid.ColumnDefinitions>
 
-            <DataGrid Name="dgPoints"
+            <cc:DataGridEx x:Name="dgPoints"
                 Grid.Column="0"
                 BorderThickness="0"
                 ItemsSource="{Binding Points}"
                 AutoGenerateColumns="False"
                 CanUserReorderColumns="True" CanUserResizeColumns="True" 
                 CanUserResizeRows="False" CanUserSortColumns="True"
-                CanUserAddRows="False"
+                CanUserDeleteRows="False" CanUserAddRows="False"
                 LoadingRow="DataGrid_OnLoadingRow"
                 EnableRowVirtualization="True"
                 EnableColumnVirtualization="True"
                 VirtualizingStackPanel.IsVirtualizing="True"
-                VirtualizingStackPanel.VirtualizationMode="Recycling">
+                VirtualizingStackPanel.VirtualizationMode="Recycling"
+                SelectedItemListChanged="dgPoints_SelectedItemListChanged"
+                SelectionMode="Extended"
+                SelectionUnit="FullRow"
+                IsReadOnly="True"
+                VisibleItemsList="{Binding VisiblePoints, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
+                SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
 
+                <DataGrid.InputBindings>
+                    <KeyBinding Command="{Binding DeleteCommand}" Key="Delete"/>
+                </DataGrid.InputBindings>
+                
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="DodgerBlue"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
@@ -266,113 +277,8 @@
                     <DataGridTextColumn Header="UnAdjZ (M)" IsReadOnly="True" Binding="{Binding UnAdjZ}" Visibility="Collapsed"/>
                     <DataGridTextColumn Header="QndmLink" IsReadOnly="True" Binding="{Binding HasQuondamLinks}"/>
                     <DataGridTextColumn Header="Comment" IsReadOnly="True" Binding="{Binding Comment}" Visibility="Collapsed"/>
-                    <!--<DataGridTemplateColumn Header="Index" IsReadOnly="True">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Index}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="PID" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding PID}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="OpType" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding OpType}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Polygon" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Polygon.Name}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Group" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Group.Name}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Metadata" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Metadata.Name}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="OnBoundary" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding OnBoundary}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="AdjX" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding AdjX}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="AdjY" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding AdjY}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="AdjZ" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding AdjZ}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="UnAdjX" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding UnAdjX}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="UnAdjY" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding UnAdjY}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="UnAdjZ" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding UnAdjZ}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="HasQuondamLinks" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding HasQuondamLinks}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Comment" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Comment}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>-->
                 </DataGrid.Columns>
-            </DataGrid>
+            </cc:DataGridEx>
 
             <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Stretch" Background="Gray" />
 
@@ -407,12 +313,12 @@
                     <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
                                 IsEnabled="{Binding Path=MultipleSelections, Converter={StaticResource IBC}}"
                                 Text="{Binding PID, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                cc:ControlProperties.BackgroundEnabled="{Binding SamePID, Converter={StaticResource IBC}}"
+                                cp:ControlProperties.BackgroundEnabled="{Binding SamePID, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Polygon"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
-                                cc:ControlProperties.BackgroundEnabled="{Binding SamePolygon, Converter={StaticResource IBC}}"
+                                cp:ControlProperties.BackgroundEnabled="{Binding SamePolygon, Converter={StaticResource IBC}}"
                                 ItemsSource="{Binding Manager.Polygons, Mode=OneWay}"
                                 DisplayMemberPath="Name"
                                 SelectedItem="{Binding Polygon}"
@@ -421,7 +327,7 @@
                     <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Index"/>
                     <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" IsEnabled="False"
                              Text="{Binding Index, Delay=250, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameIndex, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameIndex, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding">
                         <TextBox.Resources>
                             <Style TargetType="{x:Type TextBox}">
@@ -442,75 +348,75 @@
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Metadata"/>
                     <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
-                                cc:ControlProperties.BackgroundEnabled="{Binding SameMetadata, Converter={StaticResource IBC}}"
+                                cp:ControlProperties.BackgroundEnabled="{Binding SameMetadata, Converter={StaticResource IBC}}"
                                 ItemsSource="{Binding Manager.Metadata, Mode=OneWay}"
                                 DisplayMemberPath="Name"
                                 SelectedItem="{Binding Metadata}"/>
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Group"/>
                     <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
-                                cc:ControlProperties.BackgroundEnabled="{Binding SameGroup, Converter={StaticResource IBC}}"
+                                cp:ControlProperties.BackgroundEnabled="{Binding SameGroup, Converter={StaticResource IBC}}"
                                 ItemsSource="{Binding Manager.Groups, Mode=OneWay}"
                                 DisplayMemberPath="Name"
                                 SelectedItem="{Binding Group}"/>
 
                     <CheckBox Grid.Row="5" Grid.Column="1" Content="OnBound"
                               Style="{StaticResource ResourceKey=styleFieldValue}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameOnBound, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameOnBound, Converter={StaticResource IBC}}"
                               IsChecked="{Binding OnBoundary}"/>
 
                     <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjX"/>
                     <TextBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ResourceKey=styleXYZEnable}"
                              Name="txtUnAdjX"
                              Text="{Binding UnAdjX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameUnAdjX, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameUnAdjX, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="7" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjY"/>
                     <TextBox Grid.Row="7" Grid.Column="1" Style="{StaticResource ResourceKey=styleXYZEnable}"
                              Text="{Binding UnAdjY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameUnAdjY, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameUnAdjY, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjZ"/>
                     <TextBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ResourceKey=styleXYZEnable}"
                              Text="{Binding UnAdjZ, Converter={StaticResource mdvcElev}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameUnAdjZ, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameUnAdjZ, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="9" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Man Acc"/>
                     <TextBox Grid.Row="9" Grid.Column="1" Style="{StaticResource ResourceKey=styleManAccEnable}"
                              Text="{Binding ManAcc, Converter={StaticResource ndblcvtr}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameManAcc, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameManAcc, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Fwd Az"/>
                     <TextBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
                              Text="{Binding FwdAz, Converter={StaticResource ndblcvtr}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameFwdAz, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameFwdAz, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="11" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Back Az"/>
                     <TextBox Grid.Row="11" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
                              Text="{Binding BkAz, Converter={StaticResource ndblcvtr}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameBkAz, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameBkAz, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Slp Dist"/>
                     <TextBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
                              Text="{Binding SlpDist, Converter={StaticResource mdvcSlpDist}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameSlpDist, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameSlpDist, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="13" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Slp Ang"/>
                     <TextBox Grid.Row="13" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
                              Text="{Binding SlpAng, Converter={StaticResource mdvcSlpAng}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameSlpAng, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameSlpAng, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="14" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Qndm Link"/>
                     <Button Grid.Row="14" Grid.Column="1" Style="{StaticResource ResourceKey=styleQndmEnable}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameParentPoint, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameParentPoint, Converter={StaticResource IBC}}"
                             Content="{Binding ParentPoint.PID}"
                             Command="{Binding ChangeQuondamParentCommand}"/>
 
@@ -518,7 +424,7 @@
                     <TextBox Grid.Row="15" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
                              TextWrapping="Wrap" VerticalAlignment="Top"
                              Text="{Binding Comment, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             cc:ControlProperties.BackgroundEnabled="{Binding SameComment, Converter={StaticResource IBC}}"
+                             cp:ControlProperties.BackgroundEnabled="{Binding SameComment, Converter={StaticResource IBC}}"
                              MinHeight="75"
                              Height="Auto"
                              LostFocus="TextBox_UpdateBinding"/>

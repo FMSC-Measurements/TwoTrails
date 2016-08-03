@@ -12,14 +12,14 @@ namespace TwoTrails.Core.ComponentModel.History
         private List<object> OldValues = new List<object>();
         private List<PropertyInfo> Properties;
 
-        public EditTtPointsMultiPropertyCommand(List<TtPoint> points, List<PropertyInfo> properties, IEnumerable<object> newValues, bool autoCommit = true) : base(points)
+        public EditTtPointsMultiPropertyCommand(IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues, bool autoCommit = true) : base(points)
         {
             this.Properties = new List<PropertyInfo>(properties);
             this.NewValues = new List<object>(newValues);
             
             for (int i = 0; i < Points.Count; i++)
             {
-                OldValues.Add(properties[i].GetValue(points[i]));
+                OldValues.Add(Properties[i].GetValue(Points[i]));
             }
 
             if (autoCommit)

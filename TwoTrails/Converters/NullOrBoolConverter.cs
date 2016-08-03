@@ -16,8 +16,18 @@ namespace TwoTrails.Converters
             {
                 if (values[0] != null)
                 {
-                    if (values[1] is bool)
-                        return (bool)values[1];
+                    bool r = true;
+                    for (int i = 1; i < values.Length; i++)
+                    {
+                        if (values[i] is bool)
+                        {
+                            r &= (bool)values[i];
+                        }
+                        else
+                            return false;
+                    }
+
+                    return r;
                 }
             }
 

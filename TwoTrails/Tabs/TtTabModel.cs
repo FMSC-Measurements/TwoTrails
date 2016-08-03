@@ -15,36 +15,34 @@ namespace TwoTrails
 {
     public abstract class TtTabModel : NotifyPropertyChangedEx
     {
-        public TtProject Project { get; private set; }
-
         public TabItem Tab { get; private set; }
 
         public virtual String TabTitle
         {
-            get { return String.Format("{0}{1}", Project.ProjectName, Project.RequiresSave ? "*" : String.Empty); }
+            get { return String.Format("{0}{1}",
+                Project.ProjectName,
+                Project.RequiresSave ? "*" : String.Empty); }
         }
 
+        public TtProject Project { get; private set; }
 
         public abstract bool IsDetachable { get; }
+
+        public abstract bool IsPointsEditable { get; }
         
-        public ICommand CloseCommand { get; }
+        public ICommand CloseTabCommand { get; }
         public ICommand SaveCommand { get; }
-
-
-        protected MainWindowModel MainModel;
-
-
-        public TtTabModel(MainWindowModel mainModel, TtProject project) : base()
+        
+        public TtTabModel(TtProject project) : base()
         {
-            MainModel = mainModel;
+            Project = project;
 
-            this.Project = project;
             this.Tab = new TabItem();
             
-            SaveCommand = new RelayCommand((x) => SaveProject());
-            CloseCommand = new RelayCommand((x) => CloseTab());
-            
-            project.PropertyChanged += Project_PropertyChanged;
+            SaveCommand = new RelayCommand((x) => Project.Save());
+            CloseTabCommand = new RelayCommand((x) => Project.CloseTab(this));
+
+            Project.PropertyChanged += Project_PropertyChanged;
 
             Tab.DataContext = this;
         }
@@ -57,10 +55,5 @@ namespace TwoTrails
                 OnPropertyChanged(nameof(TabTitle));
             }
         }
-
-
-        protected abstract void CloseTab();
-
-        protected abstract void SaveProject();
     }
 }

@@ -9,6 +9,7 @@
     <Import_RootNamespace>FMSC.Core</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel\RelayMenuItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel\BindableMenuItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel\CheckedListItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel\Commands\RelayCommand.cs" />

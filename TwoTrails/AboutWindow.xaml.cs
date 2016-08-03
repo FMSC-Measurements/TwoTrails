@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace TwoTrails
 {
     /// <summary>
-    /// Interaction logic for MapWindow.xaml
+    /// Interaction logic for AboutWindow.xaml
     /// </summary>
-    public partial class MapWindow : TtWindow
+    public partial class AboutWindow : Window
     {
-        public MapWindow(TtProject project)
+        public AboutWindow()
         {
             InitializeComponent();
         }

@@ -12,7 +12,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private List<object> OldValues = new List<object>();
         private PropertyInfo Property;
 
-        public EditTtPointsCommand(List<TtPoint> points, PropertyInfo property, object newValue, bool autoCommit = true) : base(points)
+        public EditTtPointsCommand(IEnumerable<TtPoint> points, PropertyInfo property, object newValue, bool autoCommit = true) : base(points)
         {
             this.Property = property;
             this.NewValue = newValue;

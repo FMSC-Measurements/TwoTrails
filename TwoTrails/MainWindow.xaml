@@ -15,8 +15,18 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
 
-        
-        <Style x:Key="styleMiHasChanges" TargetType="MenuItem">
+
+
+        <Style x:Key="styleMiDisableNullCommand" TargetType="{x:Type MenuItem}">
+            <Style.Triggers>
+                <Trigger Property="Command" Value="{x:Null}">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+
+        <Style x:Key="styleMiHasChanges" TargetType="MenuItem" BasedOn="{StaticResource styleMiDisableNullCommand}">
             <Setter Property="IsEnabled">
                 <Setter.Value>
                     <MultiBinding Converter="{StaticResource NullOrBool}">
@@ -27,23 +37,25 @@
             </Setter>
         </Style>
 
-        <Style x:Key="styleMiMultipleSelections" TargetType="MenuItem">
+        <Style x:Key="styleMiMultipleSelections" TargetType="MenuItem" BasedOn="{StaticResource styleMiDisableNullCommand}">
             <Setter Property="IsEnabled">
                 <Setter.Value>
                     <MultiBinding Converter="{StaticResource NullOrBool}">
                         <Binding Path="CurrentEditor"/>
                         <Binding Path="CurrentEditor.MultipleSelections"/>
+                        <Binding Path="CurrentTab.IsPointsEditable"/>
                     </MultiBinding>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <Style x:Key="styleMiHasSelection" TargetType="MenuItem">
+        <Style x:Key="styleMiHasSelection" TargetType="MenuItem" BasedOn="{StaticResource styleMiDisableNullCommand}">
             <Setter Property="IsEnabled">
                 <Setter.Value>
                     <MultiBinding Converter="{StaticResource NullOrBool}">
                         <Binding Path="CurrentEditor"/>
                         <Binding Path="CurrentEditor.HasSelection"/>
+                        <Binding Path="CurrentTab.IsPointsEditable"/>
                     </MultiBinding>
                 </Setter.Value>
             </Setter>
@@ -56,14 +68,6 @@
         <KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
     </Window.InputBindings>
-
-    <!--<Window.CommandBindings>
-        <CommandBinding Command="ApplicationCommands.Cut" CanExecute="CutCommand_CanExecute" Executed="CutCommand_Executed" />
-        <CommandBinding Command="ApplicationCommands.Copy" CanExecute="CopyCommand_CanExecute" Executed="CopyCommand_Executed" />
-        <CommandBinding Command="ApplicationCommands.Paste" CanExecute="PasteCommand_CanExecute" Executed="PasteCommand_Executed" />
-        <CommandBinding Command="ApplicationCommands.New" Executed="NewCommand_Executed" />
-        <CommandBinding Command="ApplicationCommands.Close" CanExecute="CloseCommand_CanExecute" Executed="CloseCommand_Executed" />
-    </Window.CommandBindings>-->
     
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top" Height="25" Background="Gray">
@@ -86,19 +90,21 @@
             </MenuItem>
             
             <MenuItem Header="_Edit">
-                <MenuItem Header="Undo" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z">
+                <MenuItem Header="Undo" Command="{Binding CurrentProject.UndoCommand}" InputGestureText="Ctrl+Z">
                     <MenuItem.IsEnabled>
                         <MultiBinding Converter="{StaticResource NullOrBool}">
                             <Binding Path="CurrentProject"/>
                             <Binding Path="CurrentProject.HistoryManager.CanUndo"/>
+                            <Binding Path="CurrentTab.IsPointsEditable"/>
                         </MultiBinding>
                     </MenuItem.IsEnabled>
                 </MenuItem>
-                <MenuItem Header="Redo" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Shift+Z">
+                <MenuItem Header="Redo" Command="{Binding CurrentProject.RedoCommand}" InputGestureText="Ctrl+Shift+Z">
                     <MenuItem.IsEnabled>
                         <MultiBinding Converter="{StaticResource NullOrBool}">
                             <Binding Path="CurrentProject"/>
                             <Binding Path="CurrentProject.HistoryManager.CanRedo"/>
+                            <Binding Path="CurrentTab.IsPointsEditable"/>
                         </MultiBinding>
                     </MenuItem.IsEnabled>
                 </MenuItem>
@@ -114,13 +120,13 @@
 
                 <MenuItem Header="Reset Point" Command="{Binding CurrentEditor.ResetPointCommand}" InputGestureText="Ctrl+R"
                           Style="{StaticResource ResourceKey=styleMiHasSelection}"/>
-                <MenuItem Header="Discard Changes" Command="{Binding CurrentEditor.DiscardChangesCommand}"
+                <MenuItem Header="Discard Changes" Command="{Binding Project.DiscardChangesCommand}"
                           Style="{StaticResource ResourceKey=styleMiHasChanges}"/>
 
                 <Separator/>
 
                 <MenuItem Header="Delete" Command="{Binding CurrentEditor.DeleteCommand}" InputGestureText="Del"
-                          Style="{StaticResource ResourceKey=styleMiHasSelection}"/>
+                          Style="{StaticResource styleMiHasSelection}"/>
             </MenuItem>
             
             <MenuItem Header="_Data">
@@ -146,7 +152,7 @@
                 <MenuItem Header="Move Points" Command="{Binding CurrentEditor.MovePointsCommand}"
                         Style="{StaticResource ResourceKey=styleMiHasSelection}"/>
                 <MenuItem Header="Retrace Points" Command="{Binding CurrentEditor.RetraceCommand}"
-                        Style="{StaticResource ResourceKey=styleMiHasSelection}"/>
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
 
                 <Separator/>
 
@@ -197,7 +203,7 @@
 
                                                     <Button Name="btnCloseProject" Visibility="Hidden" DockPanel.Dock="Right" HorizontalAlignment="Right"
                                                             BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                                            Command="{Binding CloseCommand}" CommandParameter="{Binding Project}">
+                                                            Command="{Binding CloseTabCommand}" CommandParameter="{Binding CurrentTab}">
                                                         <TextBlock Name="lblClose" Foreground="White" Padding="0" Margin="0" Width="15" Height="15"
                                                                    HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" Text="X">
                                                             <TextBlock.Style>

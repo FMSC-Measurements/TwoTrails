@@ -66,8 +66,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AppInfo.cs" />
     <Compile Include="Controls\DataEditorModel.cs" />
+    <Compile Include="Controls\DataGridEx.cs" />
     <Compile Include="Controls\DataStyleModel.cs" />
     <Compile Include="Converters\BindingReflector.cs" />
     <Compile Include="Converters\MetadataValueConverter.cs" />
@@ -81,7 +85,7 @@
       <DependentUpon>SelectPointDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindowModel.cs" />
-    <Compile Include="MapTab.cs" />
+    <Compile Include="Tabs\MapTab.cs" />
     <Compile Include="MapWindow.xaml.cs">
       <DependentUpon>MapWindow.xaml</DependentUpon>
     </Compile>
@@ -94,11 +98,18 @@
       <DependentUpon>ProjectInfoControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="PointSorter.cs" />
-    <Compile Include="ProjectTab.cs" />
+    <Compile Include="Tabs\DataEditorTab.cs" />
+    <Compile Include="Tabs\ProjectTab.cs" />
+    <Compile Include="Tabs\UserActivityTab.cs" />
     <Compile Include="TtProject.cs" />
     <Compile Include="TtSettings.cs" />
     <Compile Include="ITtTabContent.cs" />
-    <Compile Include="TtTabModel.cs" />
+    <Compile Include="Tabs\TtTabModel.cs" />
+    <Compile Include="TtWindow.cs" />
+    <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\NewProjectDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

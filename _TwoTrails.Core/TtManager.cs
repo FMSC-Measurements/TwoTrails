@@ -866,6 +866,11 @@ namespace TwoTrails.Core
                 } 
             }
         }
+
+        public void Reset()
+        {
+            throw new NotImplementedException("Reset");
+        }
         #endregion
 
 

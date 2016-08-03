@@ -19,12 +19,7 @@ namespace TwoTrails
 {
     public class MainWindowModel : NotifyPropertyChangedEx
     {
-        private Dictionary<String, ProjectTab> _ProjectTabs = new Dictionary<String, ProjectTab>();
-        private Dictionary<String, MapTab> _MapTabs = new Dictionary<String, MapTab>();
-        private Dictionary<String, MapWindow> _MapWindows = new Dictionary<String, MapWindow>();
-
         private Dictionary<String, TtProject> _Projects = new Dictionary<String, TtProject>();
-
         
         public TtTabModel CurrentTab
         {
@@ -32,9 +27,9 @@ namespace TwoTrails
             set {
                 Set(value, () =>
                 {
+                    CurrentEditor = value?.Project.DataEditor;
 
-                    ProjectTab pt = value as ProjectTab;
-                    CurrentEditor = pt?.DataEditor;
+                    EditorVisible = value is DataEditorTab;
 
                     OnPropertyChanged(
                         nameof(CurrentProject),
@@ -50,9 +45,10 @@ namespace TwoTrails
         }
 
         public TtProject CurrentProject { get { return CurrentTab?.Project; } }
-
-
+        
         public DataEditorModel CurrentEditor { get; private set; }
+
+        public bool EditorVisible { get; private set; }
 
 
         public bool HasOpenedProject { get { return CurrentTab != null; } }
@@ -94,9 +90,6 @@ namespace TwoTrails
         public ICommand CloseProjectCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
 
-        public ICommand UndoCommand { get; private set; }
-        public ICommand RedoCommand { get; private set; }
-
         public ICommand EditProjectCommand { get; private set; }
         public ICommand EditPolygonsCommand { get; private set; }
         public ICommand EditGroupsCommand { get; private set; }
@@ -105,8 +98,7 @@ namespace TwoTrails
         public ICommand ExportCommand { get; private set; }
 
         public ICommand SettingsCommand { get; private set; }
-
-        public ICommand ViewUserActivityCommand { get; private set; }
+        
         public ICommand ViewLogCommand { get; private set; }
         public ICommand AboutCommand { get; private set; }
         #endregion
@@ -116,25 +108,33 @@ namespace TwoTrails
         private MainWindow _MainWindow;
 
 
-
-
         public MainWindowModel(MainWindow mainWindow)
         {
             _MainWindow = mainWindow;
 
             Settings = new TtSettings(new DeviceSettings(), new MetadataSettings());
 
+
+
             NewCommand = new RelayCommand((x) => CreateProject());
             OpenCommand = new RelayCommand((x) => OpenProject());
             OpenProjectCommand = new RelayCommand((x) => OpenProject(x as string));
             SaveCommand = new RelayCommand((x) => SaveCurrentProject());
-            CloseProjectCommand = new RelayCommand((x) => CloseProject(x as TtProject));
+            CloseProjectCommand = new RelayCommand((x) => CurrentProject.Close());
             ExitCommand = new RelayCommand((x) => Exit());
 
-            UndoCommand = new RelayCommand((x) => CurrentProject.HistoryManager.Undo());
-            RedoCommand = new RelayCommand((x) => CurrentProject.HistoryManager.Redo());
+            EditProjectCommand = new RelayCommand((x) => EditProject());
+            EditPolygonsCommand = new RelayCommand((x) => EditProject());
+            EditMetadataCommand = new RelayCommand((x) => EditProject());
+            EditGroupsCommand = new RelayCommand((x) => EditProject());
 
+            ImportCommand = new RelayCommand((x) => ImportData());
+            ExportCommand = new RelayCommand((x) => ExportProject());
 
+            SettingsCommand = new RelayCommand((x) => EditSettings());
+
+            ViewLogCommand = new RelayCommand((x) => MessageBox.Show("log file"));
+            AboutCommand = new RelayCommand((x) => new AboutWindow().ShowDialog());
 
             _Tabs = mainWindow.tabControl;
             _Tabs.SelectionChanged += Tabs_SelectionChanged;
@@ -206,7 +206,7 @@ namespace TwoTrails
                         }
                         else
                         {
-                            AddProject(new TtProject(dal, Settings));
+                            AddProject(new TtProject(dal, Settings, this));
                         }
                     }
                     catch (Exception ex)
@@ -217,14 +217,17 @@ namespace TwoTrails
                 else
                 {
                     MessageBox.Show("Project is already opened.");
-
-                    TabItem tab = _ProjectTabs[filePath].Tab;
+                    
                     for (int i = 0; i < _Tabs.Items.Count; i++)
                     {
-                        if (_Tabs.Items[i] == tab)
+                        if (String.Equals((_Tabs.Items[i] as DataEditorTab)?.Project.FilePath, filePath, StringComparison.InvariantCultureIgnoreCase))
                         {
                             _Tabs.SelectedIndex = i;
                             break;
+                        }
+                        else
+                        {
+                            AddTab(_Projects[filePath].DataEditorTab);
                         }
                     }
                 }
@@ -250,7 +253,7 @@ namespace TwoTrails
                 TtProjectInfo info = dialog.ProjectInfo;
 
                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
-                TtProject proj = new TtProject(dal, Settings);
+                TtProject proj = new TtProject(dal, Settings, this);
 
                 AddProject(proj);
 
@@ -270,30 +273,22 @@ namespace TwoTrails
 
         private void AddProject(TtProject proj)
         {
-            _Projects.Add(proj.FilePath, proj);
-
-            ProjectTab tab = new ProjectTab(this, proj);
-            _ProjectTabs.Add(proj.FilePath, tab);
-
-            _Tabs.Items.Add(tab.Tab);
+            _Tabs.Items.Add(proj.DataEditorTab.Tab);
             _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
 
+            _Projects.Add(proj.FilePath, proj);
             Settings.AddRecentProject(proj.FilePath);
             UpdateRecentProjectMenu();
         }
 
+        public void AddTab(TtTabModel tabModel)
+        {
+            _Tabs.Items.Add(tabModel.Tab);
+            _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
+        }
         
-        public void OpenMapTab(TtProject project)
-        {
 
-        }
-
-        public void OpenMapWindow(TtProject project)
-        {
-
-        }
-
-        public void CloseProject(TtProject project)
+        public bool CloseProject(TtProject project)
         {
             if (project != null)
             {
@@ -309,53 +304,33 @@ namespace TwoTrails
                         {
                             project.Save();
                         }
-                        catch
+                        catch (Exception ex)
                         {
-                            //Error
-                            return;
+                            MessageBox.Show(ex.Message);
+                            return false;
                         }
                     }
                     else if (result == MessageBoxResult.Cancel)
-                        return;
+                        return false;
                 }
 
-                CloseProjectTab(project);
+                _Projects.Remove(project.FilePath);
+
+                return true;
             }
+
+            return false;
         }
 
-        public void CloseProjectTab(TtProject project)
+
+        public void CloseTab(TtTabModel tab)
         {
-            if (_ProjectTabs.ContainsKey(project.FilePath))
-            {
-                _Tabs.Items.Remove(_ProjectTabs[project.FilePath].Tab);
-                _ProjectTabs.Remove(project.FilePath);
-            }
-
-            CloseMap(project);
-
-            _Projects.Remove(project.FilePath);
+            if (tab != null)
+                _Tabs.Items.Remove(tab.Tab);
         }
 
-        public void CloseMap(TtProject project)
-        {
-            if (project != null)
-            {
-                if (_MapTabs.ContainsKey(project.FilePath))
-                {
 
-                    _Tabs.Items.Remove(_MapTabs[project.FilePath].Tab);
-                    _MapTabs.Remove(project.FilePath);
-                }
 
-                if (_MapWindows.ContainsKey(project.FilePath))
-                {
-                    _MapWindows[project.FilePath].Close();
-                    _MapWindows.Remove(project.FilePath);
-                } 
-            }
-        }
-
-        
         private bool Exit(bool closeWindow = true)
         {
             IEnumerable<TtProject> openProjects = _Projects.Values.Where(p => p.RequiresSave);
@@ -416,6 +391,28 @@ namespace TwoTrails
             }
 
             RecentItemsAvail = miRecent.Items.Count > 0;
+        }
+
+
+
+        private void EditProject()
+        {
+
+        }
+
+        private void ImportData()
+        {
+
+        }
+
+        private void ExportProject()
+        {
+
+        }
+
+        private void EditSettings()
+        {
+
         }
     }
 }
