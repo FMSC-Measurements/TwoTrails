@@ -6,9 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using TwoTrails.Core.Points;
 
-namespace TwoTrails.Controls
+namespace FMSC.Core.Controls
 {
     public delegate void ListChangedEvent(IList items);
 

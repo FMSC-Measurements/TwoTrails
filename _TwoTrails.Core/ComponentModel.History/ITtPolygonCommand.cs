@@ -9,6 +9,8 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public abstract class ITtPolygonCommand : ITtCommand
     {
+        public bool RequireRefresh { get; } = false;
+
         protected TtPolygon polygon;
 
         public ITtPolygonCommand(TtPolygon polygon)

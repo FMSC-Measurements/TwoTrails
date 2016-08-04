@@ -12,9 +12,9 @@ namespace TwoTrails.Core
         TtPoint GetPoint(String pointCN);
         List<TtPoint> GetPoints(String polyCN = null);
         void AddPoint(TtPoint point);
-        void AddPoints(List<TtPoint> points);
+        void AddPoints(IEnumerable<TtPoint> points);
         void DeletePoint(TtPoint point);
-        void DeletePoints(List<TtPoint> points);
+        void DeletePoints(IEnumerable<TtPoint> points);
 
         List<TtPolygon> GetPolyons();
         void AddPolygon(TtPolygon polygon);

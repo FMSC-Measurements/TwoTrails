@@ -9,7 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Controls;
-using TwoTrails.Core;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails
 {

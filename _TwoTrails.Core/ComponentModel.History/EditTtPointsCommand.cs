@@ -14,12 +14,14 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public EditTtPointsCommand(IEnumerable<TtPoint> points, PropertyInfo property, object newValue, bool autoCommit = true) : base(points)
         {
+            RequireRefresh = property == PointProperties.INDEX;
+
             this.Property = property;
             this.NewValue = newValue;
 
             foreach (TtPoint point in points)
             {
-                OldValues.Add(property.GetValue(points));
+                OldValues.Add(property.GetValue(point));
             }
 
             if (autoCommit)

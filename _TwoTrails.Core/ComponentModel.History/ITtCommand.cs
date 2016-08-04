@@ -2,6 +2,7 @@
 {
     public interface ITtCommand
     {
+        bool RequireRefresh { get; }
         void Undo();
         void Redo();
     }

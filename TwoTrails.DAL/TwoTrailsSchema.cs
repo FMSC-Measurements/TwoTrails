@@ -364,7 +364,7 @@ namespace TwoTrails.DAL
         #region MetaData Table
         public static class MetadataSchema
         {
-            public const String TableName = "MetaData";
+            public const String TableName = "Metadata";
 
             public const String Name = "Name";
             public const String Distance = "Distance";

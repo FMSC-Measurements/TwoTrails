@@ -9,10 +9,14 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public abstract class ITtPointCommand : ITtCommand
     {
+        public bool RequireRefresh { get; protected set; } = true;
+
         protected TtPoint Point;
 
         public ITtPointCommand(TtPoint point)
         {
+            if (point == null)
+                throw new ArgumentNullException(nameof(point));
             this.Point = point;
         }
 

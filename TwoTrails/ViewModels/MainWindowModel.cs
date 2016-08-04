@@ -14,8 +14,9 @@ using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
 using TwoTrails.Dialogs;
+using TwoTrails.ViewModels;
 
-namespace TwoTrails
+namespace TwoTrails.ViewModels
 {
     public class MainWindowModel : NotifyPropertyChangedEx
     {
@@ -116,25 +117,26 @@ namespace TwoTrails
 
 
 
-            NewCommand = new RelayCommand((x) => CreateProject());
-            OpenCommand = new RelayCommand((x) => OpenProject());
-            OpenProjectCommand = new RelayCommand((x) => OpenProject(x as string));
-            SaveCommand = new RelayCommand((x) => SaveCurrentProject());
-            CloseProjectCommand = new RelayCommand((x) => CurrentProject.Close());
-            ExitCommand = new RelayCommand((x) => Exit());
+            NewCommand = new RelayCommand(x => CreateProject());
+            OpenCommand = new RelayCommand(x => OpenProject());
+            OpenProjectCommand = new RelayCommand(x => OpenProject(x as string));
+            SaveCommand = new RelayCommand(x => SaveCurrentProject());
+            CloseProjectCommand = new RelayCommand(x => CurrentProject.Close());
+            ExitCommand = new RelayCommand(x => Exit());
 
-            EditProjectCommand = new RelayCommand((x) => EditProject());
-            EditPolygonsCommand = new RelayCommand((x) => EditProject());
-            EditMetadataCommand = new RelayCommand((x) => EditProject());
-            EditGroupsCommand = new RelayCommand((x) => EditProject());
+            EditProjectCommand = new RelayCommand(x => EditProject());
+            EditPolygonsCommand = new RelayCommand(x => EditProject());
+            EditMetadataCommand = new RelayCommand(x => EditProject());
+            EditGroupsCommand = new RelayCommand(x => EditProject());
 
-            ImportCommand = new RelayCommand((x) => ImportData());
-            ExportCommand = new RelayCommand((x) => ExportProject());
+            ImportCommand = new RelayCommand(x => ImportData());
+            ExportCommand = new RelayCommand(x => ExportProject());
 
-            SettingsCommand = new RelayCommand((x) => EditSettings());
+            SettingsCommand = new RelayCommand(x => EditSettings());
 
-            ViewLogCommand = new RelayCommand((x) => MessageBox.Show("log file"));
-            AboutCommand = new RelayCommand((x) => new AboutWindow().ShowDialog());
+
+            ViewLogCommand = new RelayCommand(x => MessageBox.Show("log file"));
+            AboutCommand = new RelayCommand(x => new AboutWindow().ShowDialog());
 
             _Tabs = mainWindow.tabControl;
             _Tabs.SelectionChanged += Tabs_SelectionChanged;
@@ -217,19 +219,8 @@ namespace TwoTrails
                 else
                 {
                     MessageBox.Show("Project is already opened.");
-                    
-                    for (int i = 0; i < _Tabs.Items.Count; i++)
-                    {
-                        if (String.Equals((_Tabs.Items[i] as DataEditorTab)?.Project.FilePath, filePath, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            _Tabs.SelectedIndex = i;
-                            break;
-                        }
-                        else
-                        {
-                            AddTab(_Projects[filePath].DataEditorTab);
-                        }
-                    }
+
+                    SwitchToTab(_Projects[filePath].DataEditorTab);
                 }
             }
             else
@@ -287,6 +278,10 @@ namespace TwoTrails
             _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
         }
         
+        public void SwitchToTab(TtTabModel tab)
+        {
+            _Tabs.SelectedItem = tab.Tab;
+        }
 
         public bool CloseProject(TtProject project)
         {

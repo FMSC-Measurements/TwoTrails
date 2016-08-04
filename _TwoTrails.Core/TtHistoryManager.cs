@@ -13,7 +13,7 @@ namespace TwoTrails.Core
     {
         protected TtManager _Manager;
 
-        public event EventHandler HistoryChanged;
+        public event EventHandler<HistoryEventArgs> HistoryChanged;
         
         public ReadOnlyObservableCollection<TtPoint> Points { get { return _Manager.Points; } }
         public ReadOnlyObservableCollection<TtPolygon> Polygons { get { return _Manager.Polygons; } }
@@ -43,7 +43,7 @@ namespace TwoTrails.Core
                 _Manager.Save();
                 _UndoStack.Clear();
                 _RedoStack.Clear();
-                OnHistoryChanged();
+                OnHistoryChanged(HistoryEventType.Reset, true);
             }
             catch (Exception ex)
             {
@@ -57,18 +57,18 @@ namespace TwoTrails.Core
         {
             _UndoStack.Push(command);
             _RedoStack.Clear();
-            OnHistoryChanged();
+            OnHistoryChanged(HistoryEventType.Redone, command.RequireRefresh);
         }
 
         public void Undo()
         {
             if (CanUndo)
             {
-                ITtCommand hist = _UndoStack.Pop();
-                _RedoStack.Push(hist);
-                hist.Undo();
+                ITtCommand command = _UndoStack.Pop();
+                _RedoStack.Push(command);
+                command.Undo();
 
-                OnHistoryChanged();
+                OnHistoryChanged(HistoryEventType.Undone, command.RequireRefresh);
             }
         }
 
@@ -76,16 +76,19 @@ namespace TwoTrails.Core
         {
             if (CanUndo)
             {
-                ITtCommand hist;
+                ITtCommand command;
+                bool requireRefresh = false;
 
                 for (int i = 0; i < levels && CanUndo; i++)
                 {
-                    hist = _UndoStack.Pop();
-                    _RedoStack.Push(hist);
-                    hist.Undo();
+                    command = _UndoStack.Pop();
+                    requireRefresh |= command.RequireRefresh;
+                    _RedoStack.Push(command);
+                    command.Undo();
                 }
 
-                OnHistoryChanged();
+
+                OnHistoryChanged(HistoryEventType.Undone, requireRefresh);
             }
         }
 
@@ -93,11 +96,11 @@ namespace TwoTrails.Core
         {
             if (CanRedo)
             {
-                ITtCommand hist = _RedoStack.Pop();
-                AddCommand(hist);
-                hist.Redo();
+                ITtCommand command = _RedoStack.Pop();
+                AddCommand(command);
+                command.Redo();
 
-                OnHistoryChanged();
+                OnHistoryChanged(HistoryEventType.Undone, command.RequireRefresh);
             }
         }
 
@@ -105,16 +108,18 @@ namespace TwoTrails.Core
         {
             if (CanRedo)
             {
-                ITtCommand hist;
+                ITtCommand command;
+                bool requireRefresh = false;
 
                 for (int i = 0; i < levels && CanRedo; i++)
                 {
-                    hist = _RedoStack.Pop();
-                    AddCommand(hist);
-                    hist.Redo();
+                    command = _RedoStack.Pop();
+                    requireRefresh |= command.RequireRefresh;
+                    AddCommand(command);
+                    command.Redo();
                 }
 
-                OnHistoryChanged();
+                OnHistoryChanged(HistoryEventType.Undone, requireRefresh);
             }
         }
         #endregion
@@ -157,7 +162,7 @@ namespace TwoTrails.Core
             AddCommand(new AddTtPointCommand(point, _Manager));
         }
 
-        public void AddPoints(List<TtPoint> points)
+        public void AddPoints(IEnumerable<TtPoint> points)
         {
             AddCommand(new AddTtPointsCommand(points, _Manager));
         }
@@ -167,7 +172,7 @@ namespace TwoTrails.Core
             AddCommand(new DeleteTtPointCommand(point, _Manager));
         }
 
-        public void DeletePoints(List<TtPoint> points)
+        public void DeletePoints(IEnumerable<TtPoint> points)
         {
             AddCommand(new DeleteTtPointsCommand(points, _Manager));
         }
@@ -214,12 +219,18 @@ namespace TwoTrails.Core
             AddCommand(new EditTtPointCommand(point, property, newValue));
         }
 
+        public void EditPoint(TtPoint point, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues)
+        {
+            AddCommand(new EditTtPointMultiPropertyCommand(point, properties, newValues));
+        }
+
+
         public void EditPoints(IEnumerable<TtPoint> points, PropertyInfo property, object newValue)
         {
             AddCommand(new EditTtPointsCommand(points, property, newValue));
         }
 
-        public void EditPoints(IEnumerable<TtPoint> points, PropertyInfo property, List<object> newValues)
+        public void EditPointsMultiValues(IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<object> newValues)
         {
             AddCommand(new EditTtPointsMultiValueCommand(points, property, newValues));
         }
@@ -229,19 +240,49 @@ namespace TwoTrails.Core
             AddCommand(new EditTtPointsMultiPropertyCommand(points, properties, points.Select(p => newValue).Cast<object>()));
         }
 
-        public void EditPoints(IEnumerable<TtPoint> points, List<PropertyInfo> properties, List<object> newValues)
+        public void EditPointsMultiValues(IEnumerable<TtPoint> points, List<PropertyInfo> properties, List<object> newValues)
         {
             AddCommand(new EditTtPointsMultiPropertyCommand(points, properties, newValues));
+        }
+
+
+        public void ResetPoint(TtPoint point)
+        {
+            AddCommand(new ResetTtPointCommand(point, _Manager));
+        }
+
+        public void ResetPoints(IEnumerable<TtPoint> points)
+        {
+            AddCommand(new ResetTtPointsCommand(points, _Manager));
         }
 
         #endregion
 
 
-        private void OnHistoryChanged()
+        private void OnHistoryChanged(HistoryEventType historyEventType, bool requireRefresh)
         {
-            HistoryChanged?.Invoke(this, new EventArgs());
+            HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, requireRefresh));
             OnPropertyChanged(nameof(CanUndo));
             OnPropertyChanged(nameof(CanRedo));
+        }
+    }
+
+    public enum HistoryEventType
+    {
+        Undone,
+        Redone,
+        Reset
+    }
+
+    public class HistoryEventArgs : EventArgs
+    {
+        public bool RequireRefresh { get; }
+        public HistoryEventType HistoryEventType { get; }
+
+        public HistoryEventArgs(HistoryEventType historyEventType, bool requireRefresh)
+        {
+            RequireRefresh = requireRefresh;
+            HistoryEventType = historyEventType;
         }
     }
 }

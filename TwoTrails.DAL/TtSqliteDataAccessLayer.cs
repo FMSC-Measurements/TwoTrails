@@ -1,6 +1,5 @@
 ﻿using CSUtil;
 using CSUtil.Databases;
-using FMSC.Core;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -11,6 +10,7 @@ using System.Text;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.Core.Media;
+using FMSC.Core;
 
 namespace TwoTrails.DAL
 {
@@ -159,8 +159,7 @@ namespace TwoTrails.DAL
                             comment = dr.GetStringN(6);
                             op = (OpType)dr.GetInt32(7);
                             metacn = dr.GetString(8);
-                            time = DateTime.Parse(dr.GetString(9));
-                            //time = DateTime.ParseExact(dr.GetString(9), DATE_FORMAT, CultureInfo.InvariantCulture);
+                            time = ParseTime(dr.GetString(9));
 
                             adjx = dr.GetDouble(10);
                             adjy = dr.GetDouble(11);
@@ -274,7 +273,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtPoint point in points)
                         {
-                            InsertBasePoint(point, trans);
+                            InsertBasePoint(point, conn, trans);
                         }
 
                         trans.Commit();
@@ -302,7 +301,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        InsertBasePoint(point, trans);
+                        InsertBasePoint(point, conn, trans);
                         trans.Commit();
                     }
                     catch
@@ -320,13 +319,13 @@ namespace TwoTrails.DAL
             return true;
         }
 
-        private bool InsertBasePoint(TtPoint point, SQLiteTransaction transaction)
+        private bool InsertBasePoint(TtPoint point, SQLiteConnection conn, SQLiteTransaction transaction)
         {
             try
             {
-                database.Insert(TwoTrailsSchema.PointSchema.TableName, GetBasePointValues(point), transaction);
+                database.Insert(TwoTrailsSchema.PointSchema.TableName, GetBasePointValues(point), conn, transaction);
 
-                InsertBaseData(point, transaction);
+                InsertBaseData(point, conn, transaction);
             }
             catch
             {
@@ -336,7 +335,7 @@ namespace TwoTrails.DAL
             return true;
         }
 
-        private void InsertBaseData(TtPoint point, SQLiteTransaction transaction)
+        private void InsertBaseData(TtPoint point, SQLiteConnection conn, SQLiteTransaction transaction)
         {
             switch (point.OpType)
             {
@@ -344,14 +343,14 @@ namespace TwoTrails.DAL
                 case OpType.Take5:
                 case OpType.Walk:
                 case OpType.WayPoint:
-                    database.Insert(TwoTrailsSchema.GpsPointSchema.TableName, GetGpsPointValues(point as GpsPoint), transaction);
+                    database.Insert(TwoTrailsSchema.GpsPointSchema.TableName, GetGpsPointValues(point as GpsPoint), conn, transaction);
                     break;
                 case OpType.Traverse:
                 case OpType.SideShot:
-                    database.Insert(TwoTrailsSchema.TravPointSchema.TableName, GetTravPointValues(point as TravPoint), transaction);
+                    database.Insert(TwoTrailsSchema.TravPointSchema.TableName, GetTravPointValues(point as TravPoint), conn, transaction);
                     break;
                 case OpType.Quondam:
-                    database.Insert(TwoTrailsSchema.QuondamPointSchema.TableName, GetQndmPointValues(point as QuondamPoint), transaction);
+                    database.Insert(TwoTrailsSchema.QuondamPointSchema.TableName, GetQndmPointValues(point as QuondamPoint), conn, transaction);
                     break;
             }
         }
@@ -372,7 +371,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (Tuple<TtPoint, TtPoint> point in points)
                         {
-                            UpdateBasePoint(point.Item1, point.Item2, trans);
+                            UpdateBasePoint(point.Item1, point.Item2, conn, trans);
                         }
 
                         trans.Commit();
@@ -401,7 +400,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        UpdateBasePoint(point, oldPoint, trans);
+                        UpdateBasePoint(point, oldPoint, conn, trans);
                         trans.Commit();
                     }
                     catch
@@ -419,7 +418,7 @@ namespace TwoTrails.DAL
             return true;
         }
 
-        private bool UpdateBasePoint(TtPoint point, TtPoint oldPoint, SQLiteTransaction transaction)
+        private bool UpdateBasePoint(TtPoint point, TtPoint oldPoint, SQLiteConnection conn, SQLiteTransaction transaction)
         {
             try
             {
@@ -428,24 +427,25 @@ namespace TwoTrails.DAL
                 database.Update(TwoTrailsSchema.PointSchema.TableName,
                     GetBasePointValues(point),
                     where,
+                    conn,
                     transaction);
 
                 if (point.OpType != oldPoint.OpType)
                 {
                     if (oldPoint.IsGpsType())
                     {
-                        database.Delete(TwoTrailsSchema.GpsPointSchema.TableName, where, transaction);
+                        database.Delete(TwoTrailsSchema.GpsPointSchema.TableName, where, conn, transaction);
                     }
                     else if (oldPoint.IsTravType())
                     {
-                        database.Delete(TwoTrailsSchema.TravPointSchema.TableName, where, transaction);
+                        database.Delete(TwoTrailsSchema.TravPointSchema.TableName, where, conn, transaction);
                     }
                     else
                     {
-                        database.Delete(TwoTrailsSchema.QuondamPointSchema.TableName, where, transaction);
+                        database.Delete(TwoTrailsSchema.QuondamPointSchema.TableName, where, conn, transaction);
                     }
 
-                    InsertBaseData(point, transaction);
+                    InsertBaseData(point, conn, transaction);
                 }
                 else
                 {
@@ -458,6 +458,7 @@ namespace TwoTrails.DAL
                             database.Update(TwoTrailsSchema.GpsPointSchema.TableName,
                                 GetGpsPointValues(point as GpsPoint),
                                 where,
+                                conn,
                                 transaction);
                             break;
                         case OpType.Traverse:
@@ -465,20 +466,23 @@ namespace TwoTrails.DAL
                             database.Update(TwoTrailsSchema.TravPointSchema.TableName,
                                 GetTravPointValues(point as TravPoint),
                                 where,
+                                conn,
                                 transaction);
                             break;
                         case OpType.Quondam:
                             database.Update(TwoTrailsSchema.QuondamPointSchema.TableName,
                                 GetQndmPointValues(point as QuondamPoint),
                                 where,
+                                conn,
                                 transaction);
                             break;
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                throw ex;
+                //return false;
             }
 
             return true;
@@ -565,7 +569,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         String where = String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, point.CN);
-                        if (DeleteBasePoints(where, trans))
+                        if (DeleteBasePoints(where, conn, trans))
                         {
                             switch (point.OpType)
                             {
@@ -573,14 +577,14 @@ namespace TwoTrails.DAL
                                 case OpType.Take5:
                                 case OpType.Walk:
                                 case OpType.WayPoint:
-                                    DeleteGpsPointData(where, trans);
+                                    DeleteGpsPointData(where, conn, trans);
                                     break;
                                 case OpType.Traverse:
                                 case OpType.SideShot:
-                                    DeleteTravPointData(where, trans);
+                                    DeleteTravPointData(where, conn, trans);
                                     break;
                                 case OpType.Quondam:
-                                    DeleteQndmPointData(where, trans);
+                                    DeleteQndmPointData(where, conn, trans);
                                     break;
                             }
 
@@ -627,7 +631,7 @@ namespace TwoTrails.DAL
                             {
                                 sb.Append(where);
 
-                                if (!DeleteBasePoints(sb.ToString(), trans))
+                                if (!DeleteBasePoints(sb.ToString(), conn, trans))
                                 {
                                     trans.Rollback();
                                     return -1;
@@ -645,14 +649,14 @@ namespace TwoTrails.DAL
                                 case OpType.Take5:
                                 case OpType.Walk:
                                 case OpType.WayPoint:
-                                    DeleteGpsPointData(where, trans);
+                                    DeleteGpsPointData(where, conn, trans);
                                     break;
                                 case OpType.Traverse:
                                 case OpType.SideShot:
-                                    DeleteTravPointData(where, trans);
+                                    DeleteTravPointData(where, conn, trans);
                                     break;
                                 case OpType.Quondam:
-                                    DeleteQndmPointData(where, trans);
+                                    DeleteQndmPointData(where, conn, trans);
                                     break;
                             }
                         }
@@ -660,7 +664,7 @@ namespace TwoTrails.DAL
                         where = sb.ToString();
 
                         if (!String.IsNullOrEmpty(where))
-                            DeleteBasePoints(where, trans);
+                            DeleteBasePoints(where, conn, trans);
 
                         trans.Commit();
                     }
@@ -680,24 +684,24 @@ namespace TwoTrails.DAL
         } 
 
 
-        private bool DeleteBasePoints(String where, SQLiteTransaction transaction)
+        private bool DeleteBasePoints(String where, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            return database.Delete(TwoTrailsSchema.PointSchema.TableName, where, transaction) > 0;
+            return database.Delete(TwoTrailsSchema.PointSchema.TableName, where, conn, transaction) > 0;
         }
 
-        private void DeleteGpsPointData(String where, SQLiteTransaction transaction)
+        private void DeleteGpsPointData(String where, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            database.Delete(TwoTrailsSchema.GpsPointSchema.TableName, where, transaction);
+            database.Delete(TwoTrailsSchema.GpsPointSchema.TableName, where, conn, transaction);
         }
 
-        private void DeleteTravPointData(String where, SQLiteTransaction transaction)
+        private void DeleteTravPointData(String where, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            database.Delete(TwoTrailsSchema.TravPointSchema.TableName, where, transaction);
+            database.Delete(TwoTrailsSchema.TravPointSchema.TableName, where, conn, transaction);
         }
 
-        private void DeleteQndmPointData(String where, SQLiteTransaction transaction)
+        private void DeleteQndmPointData(String where, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            database.Delete(TwoTrailsSchema.QuondamPointSchema.TableName, where, transaction);
+            database.Delete(TwoTrailsSchema.QuondamPointSchema.TableName, where, conn, transaction);
         }
         #endregion
         #endregion
@@ -738,8 +742,7 @@ namespace TwoTrails.DAL
                             acc = dr.GetDouble(3);
                             inc = dr.GetInt32(4);
                             psi = dr.GetInt32(5);
-                            time = DateTime.Parse(dr.GetString(6), CultureInfo.InvariantCulture);
-                            //time = DateTime.ParseExact(dr.GetString(6), DATE_FORMAT, CultureInfo.InvariantCulture);
+                            time = ParseTime(dr.GetString(6));
                             area = dr.GetDouble(7);
                             perim = dr.GetDouble(8);
 
@@ -768,7 +771,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.PolygonSchema.TableName, GetPolygonValues(polygon), trans);
+                        database.Insert(TwoTrailsSchema.PolygonSchema.TableName, GetPolygonValues(polygon), conn, trans);
                         trans.Commit();
                     }
                     catch
@@ -796,7 +799,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtPolygon poly in polygons)
                         {
-                            database.Insert(TwoTrailsSchema.PolygonSchema.TableName, GetPolygonValues(poly), trans);
+                            database.Insert(TwoTrailsSchema.PolygonSchema.TableName, GetPolygonValues(poly), conn, trans);
                         }
 
                         trans.Commit();
@@ -828,6 +831,7 @@ namespace TwoTrails.DAL
                         database.Update(TwoTrailsSchema.PolygonSchema.TableName,
                             GetPolygonValues(polygon),
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, polygon.CN),
+                            conn,
                             trans);
 
                         trans.Commit();
@@ -860,6 +864,7 @@ namespace TwoTrails.DAL
                             database.Update(TwoTrailsSchema.PolygonSchema.TableName,
                                 GetPolygonValues(poly),
                                 String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, poly.CN),
+                                conn,
                                 trans);
                         }
 
@@ -906,6 +911,7 @@ namespace TwoTrails.DAL
                     {
                         database.Delete(TwoTrailsSchema.PolygonSchema.TableName,
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, polygon.CN),
+                            conn,
                             trans);
 
                         trans.Commit();
@@ -950,7 +956,7 @@ namespace TwoTrails.DAL
 
                         if (!String.IsNullOrEmpty(where) &&
                             database.Delete(TwoTrailsSchema.PolygonSchema.TableName,
-                            where, transaction) < 0)
+                            where, conn, transaction) < 0)
                         {
                             transaction.Rollback();
                             return -1;
@@ -1042,7 +1048,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.MetadataSchema.TableName, GetMetadataValues(metadata), trans);
+                        database.Insert(TwoTrailsSchema.MetadataSchema.TableName, GetMetadataValues(metadata), conn, trans);
                         trans.Commit();
                     }
                     catch
@@ -1070,7 +1076,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtMetadata meta in metadata)
                         {
-                            database.Insert(TwoTrailsSchema.MetadataSchema.TableName, GetMetadataValues(meta), trans);
+                            database.Insert(TwoTrailsSchema.MetadataSchema.TableName, GetMetadataValues(meta), conn, trans);
                         }
 
                         trans.Commit();
@@ -1102,6 +1108,7 @@ namespace TwoTrails.DAL
                         database.Update(TwoTrailsSchema.MetadataSchema.TableName,
                             GetMetadataValues(metadata),
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, metadata.CN),
+                            conn,
                             trans);
                     }
                     catch
@@ -1132,6 +1139,7 @@ namespace TwoTrails.DAL
                             database.Update(TwoTrailsSchema.MetadataSchema.TableName,
                                 GetMetadataValues(meta),
                                 String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, meta.CN),
+                                conn,
                                 trans);
                         }
 
@@ -1183,6 +1191,7 @@ namespace TwoTrails.DAL
                     {
                         database.Delete(TwoTrailsSchema.MetadataSchema.TableName,
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, metadata.CN),
+                            conn,
                             trans);
                     }
                     catch
@@ -1224,7 +1233,7 @@ namespace TwoTrails.DAL
 
                         if (!String.IsNullOrEmpty(where) &&
                             database.Delete(TwoTrailsSchema.MetadataSchema.TableName,
-                            where, trans) < 0)
+                            where, conn, trans) < 0)
                         {
                             trans.Rollback();
                             return -1;
@@ -1299,7 +1308,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.GroupSchema.TableName, GetGroupValues(group), trans);
+                        database.Insert(TwoTrailsSchema.GroupSchema.TableName, GetGroupValues(group), conn, trans);
                     }
                     catch
                     {
@@ -1326,7 +1335,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtGroup group in groups)
                         {
-                            database.Insert(TwoTrailsSchema.GroupSchema.TableName, GetGroupValues(group), trans);
+                            database.Insert(TwoTrailsSchema.GroupSchema.TableName, GetGroupValues(group), conn, trans);
                         }
 
                         trans.Commit();
@@ -1358,6 +1367,7 @@ namespace TwoTrails.DAL
                         database.Update(TwoTrailsSchema.GroupSchema.TableName,
                             GetGroupValues(group),
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, group.CN),
+                            conn,
                             trans);
                     }
                     catch
@@ -1388,6 +1398,7 @@ namespace TwoTrails.DAL
                             database.Update(TwoTrailsSchema.GroupSchema.TableName,
                                 GetGroupValues(group),
                                 String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, group.CN),
+                                conn,
                                 trans);
                         }
 
@@ -1429,6 +1440,7 @@ namespace TwoTrails.DAL
                     {
                         database.Delete(TwoTrailsSchema.GroupSchema.TableName,
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, group.CN),
+                            conn,
                             trans);
                     }
                     catch
@@ -1471,7 +1483,7 @@ namespace TwoTrails.DAL
 
                         if (!String.IsNullOrEmpty(where) &&
                             database.Delete(TwoTrailsSchema.GroupSchema.TableName,
-                            where, trans) < 0)
+                            where, conn, trans) < 0)
                         {
                             trans.Rollback();
                             return -1;
@@ -1555,8 +1567,7 @@ namespace TwoTrails.DAL
                             forest = dr.GetString(2);
                             region = dr.GetString(3);
                             deviceID = dr.GetString(4);
-                            date = DateTime.Parse(dr.GetString(5));
-                            //date = DateTime.ParseExact(dr.GetString(5), DATE_FORMAT, CultureInfo.InvariantCulture);
+                            date = ParseTime(dr.GetString(5));
                             desc = dr.GetString(6);
                             dbVersion = new Version(dr.GetString(7));
                             version = dr.GetString(8);
@@ -1627,7 +1638,9 @@ namespace TwoTrails.DAL
                                 [TwoTrailsSchema.ProjectInfoSchema.TtDbSchemaVersion] = info.DbVersion.ToString(),
                                 [TwoTrailsSchema.ProjectInfoSchema.TtVersion] = info.Version.ToString(),
                                 [TwoTrailsSchema.ProjectInfoSchema.CreatedTtVersion] = info.CreationVersion.ToString()
-                            }, trans);
+                            },
+                            conn,
+                            trans);
 
                         trans.Commit();
                     }
@@ -1665,6 +1678,7 @@ namespace TwoTrails.DAL
                                 [TwoTrailsSchema.ProjectInfoSchema.Description] = info.Description,
                                 [TwoTrailsSchema.ProjectInfoSchema.TtVersion] = info.Version.ToString()
                             },
+                            conn,
                             trans);
                     }
                     catch
@@ -1718,7 +1732,7 @@ namespace TwoTrails.DAL
                             mt = (MediaType)dr.GetInt32(2);
                             name = dr.GetString(3);
                             file = dr.GetStringN(4);
-                            date = DateTime.ParseExact(dr.GetString(5), DATE_FORMAT, CultureInfo.InvariantCulture);
+                            date = ParseTime(dr.GetString(5));
                             cmt = dr.GetStringN(6);
 
                             pt = (PictureType)dr.GetInt32(7);
@@ -1762,12 +1776,12 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        if (database.Insert(TwoTrailsSchema.MediaSchema.TableName, GetMediaValues(media), trans) > 0)
+                        if (database.Insert(TwoTrailsSchema.MediaSchema.TableName, GetMediaValues(media), conn, trans) > 0)
                         {
                             switch (media.MediaType)
                             {
                                 case MediaType.Picture:
-                                    database.Insert(TwoTrailsSchema.PictureSchema.TableName, GetImageValues(media as TtImage), trans);
+                                    database.Insert(TwoTrailsSchema.PictureSchema.TableName, GetImageValues(media as TtImage), conn, trans);
                                     break;
                                 case MediaType.Video:
                                     break;
@@ -1800,6 +1814,7 @@ namespace TwoTrails.DAL
                         database.Update(TwoTrailsSchema.MediaSchema.TableName,
                             GetMediaValues(media),
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, media.CN),
+                            conn,
                             trans);
 
                         switch (media.MediaType)
@@ -1808,6 +1823,7 @@ namespace TwoTrails.DAL
                                 database.Update(TwoTrailsSchema.PictureSchema.TableName,
                                     GetImageValues(media as TtImage),
                                     String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, media.CN),
+                                    conn,
                                     trans);
                                 break;
                             case MediaType.Video:
@@ -1866,12 +1882,14 @@ namespace TwoTrails.DAL
                     {
                         database.Delete(TwoTrailsSchema.MediaSchema.TableName,
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, media.CN),
+                            conn,
                             trans);
 
                         if (media.MediaType == MediaType.Picture)
                         {
                             database.Delete(TwoTrailsSchema.PictureSchema.TableName,
                                 String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, media.CN),
+                                conn,
                                 trans);
                         }
                         
@@ -1946,7 +1964,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.PolygonAttrSchema.TableName, GetGraphicOptionValues(option), trans);
+                        database.Insert(TwoTrailsSchema.PolygonAttrSchema.TableName, GetGraphicOptionValues(option), conn, trans);
                     }
                     catch
                     {
@@ -1988,6 +2006,7 @@ namespace TwoTrails.DAL
                     {
                         database.Delete(TwoTrailsSchema.PolygonAttrSchema.TableName,
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, option.CN),
+                            conn,
                             trans);
                     }
                     catch
@@ -2017,7 +2036,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.ActivitySchema.TableName, GetUserActivityValues(activity), trans);
+                        database.Insert(TwoTrailsSchema.ActivitySchema.TableName, GetUserActivityValues(activity), conn, trans);
                     }
                     catch
                     {
@@ -2065,7 +2084,7 @@ namespace TwoTrails.DAL
                         {
                             username = dr.GetString(0);
                             devicename = dr.GetString(1);
-                            date = DateTime.Parse(dr.GetString(2), CultureInfo.InvariantCulture);
+                            date = ParseTime(dr.GetString(2));
                             dat = (DataActivityType)dr.GetInt32(3);
 
                             activity.Add(new TtUserActivity(username, devicename, date, dat));
@@ -2089,6 +2108,19 @@ namespace TwoTrails.DAL
         public bool Clean()
         {
             throw new NotImplementedException();
+        }
+
+
+        private DateTime ParseTime(String value)
+        {
+            try
+            {
+                return DateTime.Parse(value);
+            }
+            catch
+            {
+                return DateTime.ParseExact(value, DATE_FORMAT, CultureInfo.InvariantCulture);
+            }
         }
         #endregion
     }

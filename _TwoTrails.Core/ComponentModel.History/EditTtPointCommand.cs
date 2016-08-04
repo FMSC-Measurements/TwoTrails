@@ -14,6 +14,8 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public EditTtPointCommand(TtPoint point, PropertyInfo property, object newValue, bool autoCommit = true) : base(point)
         {
+            RequireRefresh = property == PointProperties.INDEX;
+
             this.Property = property;
             this.NewValue = newValue;
             this.OldValue = property.GetValue(point);

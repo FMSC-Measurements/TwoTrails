@@ -9,7 +9,7 @@ using System.Windows.Media;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 
-namespace TwoTrails.Controls
+namespace TwoTrails.ViewModels
 {
     public class DataStyleModel
     {
@@ -35,7 +35,7 @@ namespace TwoTrails.Controls
 
             SolidColorBrush rowBrush = new SolidColorBrush(Colors.White);
             SolidColorBrush rowBrushAlt = new SolidColorBrush(Colors.WhiteSmoke);
-            SolidColorBrush rowBrushHover = new SolidColorBrush(Colors.Aqua);
+            SolidColorBrush rowBrushHover = new SolidColorBrush(Colors.DarkSeaGreen);
 
             
             style.Setters.Add(new Setter(DataGridRow.BackgroundProperty, rowBrush));

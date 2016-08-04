@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="TwoTrails.Controls.ProjectControl"
+﻿<UserControl x:Class="TwoTrails.Controls.DataEditorControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,7 +9,7 @@
              xmlns:csucvt="clr-namespace:CSUtil.WPF;assembly=CSUtilSlim"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
              xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
-             xmlns:cc="clr-namespace:TwoTrails.Controls"
+             xmlns:cc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
 
@@ -26,12 +26,12 @@
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="Foreground" Value="Black"/>
         </Style>
-        
+
         <Style x:Key="styleFieldValue" TargetType="Control">
             <Setter Property="Margin" Value="0,2.5,0,2.5" />
             <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
             <Setter Property="Height" Value="20"/>
-            
+
 
             <Style.Triggers>
                 <!--<Trigger Property="cp:ControlProperties.BackgroundEnabled" Value="True">
@@ -91,7 +91,7 @@
         <Style x:Key="styleXYZEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
             <Setter Property="IsEnabled" Value="False" />
             <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
-            
+
             <Style.Triggers>
                 <DataTrigger Binding="{Binding OnlyGpsTypes}" Value="True">
                     <Setter Property="IsEnabled" Value="True" />
@@ -133,12 +133,13 @@
         </Style>
     </UserControl.Resources>
 
-
     <UserControl.InputBindings>
         <KeyBinding Command="{Binding SelectAlternateCommand}" Key="A" Modifiers="Ctrl+Alt" />
         <KeyBinding Command="{Binding SelectGpsCommand}" Key="G" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SelectTravCommand}" Key="T" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SelectInverseCommand}" Key="I" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding DeselectCommand}" Key="D" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding ReverseSelectedCommand}" Key="R" Modifiers="Ctrl+Alt"/>
     </UserControl.InputBindings>
 
 
@@ -278,6 +279,30 @@
                     <DataGridTextColumn Header="QndmLink" IsReadOnly="True" Binding="{Binding HasQuondamLinks}"/>
                     <DataGridTextColumn Header="Comment" IsReadOnly="True" Binding="{Binding Comment}" Visibility="Collapsed"/>
                 </DataGrid.Columns>
+
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"  />
+                        <MenuItem Header="Export Values" Command="{Binding ExportValuesCommand}"  />
+                        
+                        <Separator/>
+
+                        <MenuItem Header="Rename" Command="{Binding RenameCommand}" />
+
+                        <Separator/>
+
+                        <MenuItem Header="Move" Command="{Binding MovePointsCommand}" />
+                        <MenuItem Header="Quondam" Command="{Binding CreateQuondamsCommand}" />
+
+                        <Separator/>
+
+                        <MenuItem Header="Reset" Command="{Binding ResetCommand}" />
+
+                        <Separator/>
+
+                        <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
             </cc:DataGridEx>
 
             <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Stretch" Background="Gray" />
@@ -310,11 +335,33 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="PID"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
-                                IsEnabled="{Binding Path=MultipleSelections, Converter={StaticResource IBC}}"
+                    <TextBox Grid.Row="0" Grid.Column="1"
                                 Text="{Binding PID, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 cp:ControlProperties.BackgroundEnabled="{Binding SamePID, Converter={StaticResource IBC}}"
-                             LostFocus="TextBox_UpdateBinding"/>
+                             LostFocus="TextBox_UpdateBinding">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource styleFieldValue}">
+                                <Setter Property="IsEnabled" Value="False" />
+                                <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MultipleSelections}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding HasSelection}" Value="True"/>
+                                            <Condition Binding="{Binding MultipleSelections}" Value="False"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <MultiDataTrigger.Setters>
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                        </MultiDataTrigger.Setters>
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Polygon"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
@@ -325,12 +372,12 @@
                                 IsEnabled="{Binding Path=SamePolygon}"/>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Index"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" IsEnabled="False"
+                    <TextBox Grid.Row="2" Grid.Column="1" IsEnabled="False"
                              Text="{Binding Index, Delay=250, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              cp:ControlProperties.BackgroundEnabled="{Binding SameIndex, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding">
                         <TextBox.Resources>
-                            <Style TargetType="{x:Type TextBox}">
+                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
                                 <Style.Triggers>
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>

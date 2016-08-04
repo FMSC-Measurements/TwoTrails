@@ -70,9 +70,8 @@
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppInfo.cs" />
-    <Compile Include="Controls\DataEditorModel.cs" />
-    <Compile Include="Controls\DataGridEx.cs" />
-    <Compile Include="Controls\DataStyleModel.cs" />
+    <Compile Include="ViewModels\DataEditorModel.cs" />
+    <Compile Include="ViewModels\DataStyleModel.cs" />
     <Compile Include="Converters\BindingReflector.cs" />
     <Compile Include="Converters\MetadataValueConverter.cs" />
     <Compile Include="Converters\NullableDoubleConverter.cs" />
@@ -84,13 +83,13 @@
     <Compile Include="Dialogs\SelectPointDialog.xaml.cs">
       <DependentUpon>SelectPointDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainWindowModel.cs" />
+    <Compile Include="ViewModels\MainWindowModel.cs" />
     <Compile Include="Tabs\MapTab.cs" />
     <Compile Include="MapWindow.xaml.cs">
       <DependentUpon>MapWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ProjectControl.xaml.cs">
-      <DependentUpon>ProjectControl.xaml</DependentUpon>
+    <Compile Include="Controls\DataEditorControl.xaml.cs">
+      <DependentUpon>DataEditorControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="DeviceSettings.cs" />
     <Compile Include="MetadataSettings.cs" />
@@ -101,7 +100,7 @@
     <Compile Include="Tabs\DataEditorTab.cs" />
     <Compile Include="Tabs\ProjectTab.cs" />
     <Compile Include="Tabs\UserActivityTab.cs" />
-    <Compile Include="TtProject.cs" />
+    <Compile Include="ViewModels\TtProject.cs" />
     <Compile Include="TtSettings.cs" />
     <Compile Include="ITtTabContent.cs" />
     <Compile Include="Tabs\TtTabModel.cs" />
@@ -122,7 +121,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\ProjectControl.xaml">
+    <Page Include="Controls\DataEditorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -176,6 +175,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FMSC.Core\FMSC.Core.csproj">
+      <Project>{08212cde-1e42-4638-9365-65bd9a08bca8}</Project>
+      <Name>FMSC.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TwoTrails.DAL\TwoTrails.DAL.csproj">
       <Project>{0a35612e-514f-4826-805c-fc7ddd71fb79}</Project>
       <Name>TwoTrails.DAL</Name>

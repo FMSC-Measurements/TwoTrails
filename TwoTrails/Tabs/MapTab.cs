@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using TwoTrails.Controls;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails
 {

@@ -1,35 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails.Controls
 {
     /// <summary>
-    /// Interaction logic for ProjectControl.xaml
+    /// Interaction logic for DataEditorControl.xaml
     /// </summary>
-    public partial class ProjectControl : UserControl
+    public partial class DataEditorControl : UserControl
     {
-        DataEditorModel DataEditor;
-        DataStyleModel DataStyles;
+        private DataEditorModel DataEditor;
+        private DataStyleModel DataStyles;
 
-        public ProjectControl(DataEditorModel dataEditor, DataStyleModel dataStyles)
+        public DataEditorControl(DataEditorModel dataEditor, DataStyleModel dataStyles)
         {
             DataEditor = dataEditor;
             DataStyles = dataStyles;
@@ -51,7 +38,6 @@ namespace TwoTrails.Controls
                     expression.UpdateSource();
             }
         }
-        
 
         private void DataGrid_OnLoadingRow(object sender, DataGridRowEventArgs e)
         {
@@ -63,9 +49,9 @@ namespace TwoTrails.Controls
             e.Row.Style = DataStyles.GetRowStyle(e.Row.Item as TtPoint);
         }
 
-        private void dgPoints_SelectedItemListChanged(System.Collections.IList items)
+        private void dgPoints_SelectedItemListChanged(IList items)
         {
-            DataEditor.OnSelectionChanged();
+            //DataEditor.OnSelectionChanged();
         }
     }
 }

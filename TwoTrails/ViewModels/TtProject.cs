@@ -9,27 +9,38 @@ using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
+using TwoTrails.ViewModels;
 
-namespace TwoTrails
+namespace TwoTrails.ViewModels
 {
     public class TtProject : NotifyPropertyChangedEx
     {
         public String FilePath { get { return DAL.FilePath; } }
-        
 
-        public ICommand UndoCommand { get; private set; }
-        public ICommand RedoCommand { get; private set; }
+        public ICommand OpenDataEditor { get; }
+        public ICommand OpenProject { get; }
+        public ICommand OpenUserActivity { get; }
+        public ICommand OpenMap { get; }
+        public ICommand OpenMapWindow { get; }
+        public ICommand ViewUserActivityCommand { get; set; }
+
+        public ICommand UndoCommand { get; set; }
+        public ICommand RedoCommand { get; set; }
 
         public ICommand DiscardChangesCommand { get; }
 
-        public ICommand ViewUserActivityCommand { get; private set; }
-
-        public ProjectTab ProjectTab { get; private set; }
         public DataEditorTab DataEditorTab { get; private set; }
-        public MapTab MapTab { get; private set; }
-        public UserActivityTab UserActivityTab { get; private set; }
-        public MapWindow MapWindow { get; private set; }
-        
+        private ProjectTab ProjectTab { get; set; }
+        private MapTab MapTab { get; set; }
+        private UserActivityTab UserActivityTab { get; set; }
+        private MapWindow MapWindow { get; set; }
+
+        public bool DataEditorTabIsOpen { get { return DataEditorTab != null; } }
+        public bool MapTabIsOpen { get { return MapTab != null; } }
+        public bool ProjectTabIsOpen { get { return ProjectTab != null; } }
+        public bool UserActivityTabIsOpen { get { return DataEditorTab != null; } }
+        public bool MapWindowIsOpen { get { return DataEditorTab != null; } }
+
         private bool MultipleProjectViews
         {
             get
@@ -107,17 +118,16 @@ namespace TwoTrails
             HistoryManager.HistoryChanged += Manager_HistoryChanged;
 
             DataEditorTab = new DataEditorTab(this);
+            
+            UndoCommand = new BindedRelayCommand<TtHistoryManager>(
+                (x) => HistoryManager.Undo(), x => HistoryManager.CanUndo, HistoryManager, x => x.CanUndo);
 
-
-
-            UndoCommand = new RelayCommand((x) => HistoryManager.Undo());
-            RedoCommand = new RelayCommand((x) => HistoryManager.Redo());
+            RedoCommand = new BindedRelayCommand<TtHistoryManager>(
+                (x) => HistoryManager.Redo(), x => HistoryManager.CanRedo, HistoryManager, x => x.CanRedo);
 
             DiscardChangesCommand = new RelayCommand((x) => _Manager.Reset());
 
-            ViewUserActivityCommand = new RelayCommand((x) => ViewUserActivity());
-
-            OnPropertyChanged(nameof(DataEditor));
+            ViewUserActivityCommand = new RelayCommand(x => ViewUserActivityTab());
         }
 
         private void Manager_HistoryChanged(object sender, EventArgs e)
@@ -184,6 +194,10 @@ namespace TwoTrails
                 {
                     ProjectTab = null;
                 }
+                else if (tab is UserActivityTab)
+                {
+                    UserActivityTab = null;
+                }
             }
         }
 
@@ -197,7 +211,27 @@ namespace TwoTrails
 
 
 
-        private void ViewUserActivity()
+        private void OpenDataEditorTab()
+        {
+
+        }
+
+        private void OpenProjectTab()
+        {
+
+        }
+
+        private void OpenMapTab()
+        {
+
+        }
+
+        private void DetachMapTab()
+        {
+
+        }
+
+        private void ViewUserActivityTab()
         {
 
         }

@@ -886,6 +886,18 @@ namespace TwoTrails.Core
                 return _PointsMap[pointCN];
             throw new Exception("Point Not Found");
         }
+
+        public bool HasOriginalPoint(String pointCN)
+        {
+            return _PointsMapOrig.ContainsKey(pointCN);
+        }
+
+        public TtPoint GetOriginalPoint(String pointCN)
+        {
+            if (_PointsMapOrig.ContainsKey(pointCN))
+                return _PointsMapOrig[pointCN];
+            throw new Exception("Point Not Found");
+        }
         
         public List<TtPoint> GetPoints(string polyCN = null)
         {
@@ -1005,7 +1017,7 @@ namespace TwoTrails.Core
         /// Adds multiple points
         /// </summary>
         /// <param name="points"></param>
-        public void AddPoints(List<TtPoint> addPoints)
+        public void AddPoints(IEnumerable<TtPoint> addPoints)
         {
             lock (locker)
             {
@@ -1106,7 +1118,7 @@ namespace TwoTrails.Core
         /// Repalces points in polygon(s) which new points
         /// </summary>
         /// <param name="replacePoints">Points to replace with</param>
-        public void ReplacePoints(List<TtPoint> replacePoints)
+        public void ReplacePoints(IEnumerable<TtPoint> replacePoints)
         {
             lock (locker)
             {
@@ -1194,7 +1206,7 @@ namespace TwoTrails.Core
         /// Deletes Points in polygons
         /// </summary>
         /// <param name="points"></param>
-        public void DeletePoints(List<TtPoint> points)
+        public void DeletePoints(IEnumerable<TtPoint> points)
         {
             //TODO
         }

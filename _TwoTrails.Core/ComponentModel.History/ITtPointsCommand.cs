@@ -5,6 +5,8 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public abstract class ITtPointsCommand : ITtCommand
     {
+        public bool RequireRefresh { get; protected set; } = true;
+
         protected List<TtPoint> Points;
 
         public ITtPointsCommand(IEnumerable<TtPoint> points)

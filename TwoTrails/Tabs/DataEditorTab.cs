@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using TwoTrails.Controls;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails
 {
@@ -21,7 +22,7 @@ namespace TwoTrails
         {
             DataStyles = new DataStyleModel(Project);
 
-            Tab.Content = new ProjectControl(Project.DataEditor, DataStyles);
+            Tab.Content = new DataEditorControl(Project.DataEditor, DataStyles);
         }
     }
 }

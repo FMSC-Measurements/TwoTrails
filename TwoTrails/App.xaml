@@ -5,5 +5,19 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <BitmapImage x:Key="ImgOpenInNew" UriSource="res/open_in_new.png" />
+
+        <Style x:Key="styleMiDisableNullCommand" TargetType="{x:Type MenuItem}">
+            <Style.Triggers>
+                <Trigger Property="Command" Value="{x:Null}">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+
+        <SolidColorBrush x:Key="colorPriamry" Color="MediumSeaGreen" />
+        <SolidColorBrush x:Key="colorPriamryLight" Color="DarkSeaGreen" />
+        <SolidColorBrush x:Key="colorPriamryDark" Color="SeaGreen" />
+        <SolidColorBrush x:Key="colorBackground" Color="Gray" />
     </Application.Resources>
 </Application>
