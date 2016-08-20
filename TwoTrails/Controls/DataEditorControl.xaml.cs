@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Threading;
 using TwoTrails.Core.Points;
 using TwoTrails.ViewModels;
@@ -47,11 +50,6 @@ namespace TwoTrails.Controls
         private void AlterRow(DataGridRowEventArgs e)
         {
             e.Row.Style = DataStyles.GetRowStyle(e.Row.Item as TtPoint);
-        }
-
-        private void dgPoints_SelectedItemListChanged(IList items)
-        {
-            //DataEditor.OnSelectionChanged();
         }
     }
 }

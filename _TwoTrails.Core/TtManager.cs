@@ -614,7 +614,7 @@ namespace TwoTrails.Core
         }
 
 
-        protected void AdjustAllTravTypesInPolygon(TtPolygon polygon)
+        public void AdjustAllTravTypesInPolygon(TtPolygon polygon)
         {
             IgnorePointEvents = true;
             
@@ -867,6 +867,21 @@ namespace TwoTrails.Core
             }
         }
 
+        public void ReindexPolys(string polyCN = null)
+        {
+            IEnumerable<TtPolygon> polygons = polyCN != null ? _Polygons : _Polygons.Where(p => p.CN == polyCN);
+
+            foreach (TtPolygon poly in polygons)
+            {
+                List<TtPoint> points = _Points.Where(p => p.PolygonCN == poly.CN).ToList();
+                points.Sort();
+
+                int index = 0;
+                foreach (TtPoint point in points)
+                    point.Index = index++;
+            }
+        }
+
         public void Reset()
         {
             throw new NotImplementedException("Reset");
@@ -929,7 +944,7 @@ namespace TwoTrails.Core
         #endregion
 
 
-        #region Creation, Adding and Deleting
+        #region Creation, Adding Moving, and Deleting
         /// <summary>
         /// Create a new Point with polygon, metadata and group attached
         /// </summary>
@@ -1169,6 +1184,64 @@ namespace TwoTrails.Core
             }
         }
         
+
+        public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex)
+        {
+            lock (locker)
+            {
+                List<string> reindexPolygons = new List<string>();
+                List<TtPoint> targetPoints = _PointsByPoly[targetPolygon.CN];
+                
+                foreach (TtPoint point in points)
+                {
+                    _PointsByPoly[point.PolygonCN].Remove(point);
+                }
+
+                if (insertIndex < 1)
+                {
+                    targetPoints.InsertRange(0, points);
+                }
+                else if (insertIndex < targetPoints.Count)
+                {
+                    targetPoints.InsertRange(insertIndex, points);
+                }
+                else
+                {
+                    targetPoints.AddRange(points);
+                }
+                
+                int index = 0;
+                foreach (TtPoint point in targetPoints)
+                {
+                    if (!reindexPolygons.Contains(point.PolygonCN))
+                        reindexPolygons.Add(point.PolygonCN);
+
+                    point.Polygon = targetPolygon;
+                    point.Index = index++;
+                }
+
+                AdjustAllTravTypesInPolygon(targetPolygon);
+                GeneratePolygonStats(targetPolygon);
+
+                foreach (string ripoly in reindexPolygons)
+                {
+                    if (targetPolygon.CN != ripoly && _PointsByPoly.ContainsKey(ripoly))
+                    {
+                        index = 0;
+                        foreach (TtPoint point in _PointsByPoly[ripoly])
+                        {
+                            point.Index = index++;
+                        }
+
+                        TtPolygon poly = _PolygonsMap[ripoly];
+                        AdjustAllTravTypesInPolygon(poly);
+                        GeneratePolygonStats(poly);
+                    }
+                }
+            }
+        }
+
+
         /// <summary>
         /// Remove a point from a polygon
         /// </summary>

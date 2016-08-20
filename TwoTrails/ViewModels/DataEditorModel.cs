@@ -6,9 +6,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Core;
@@ -75,9 +77,24 @@ namespace TwoTrails.ViewModels
         public IList SelectedPoints
         {
             get { return _SelectedPoints; }
-            set { SetField(ref _SelectedPoints, value); OnSelectionChanged(); }
+            set { SetField(ref _SelectedPoints, value);  OnSelectionChanged(); }
         }
-        
+
+        private bool _SelectionChanged = true;
+        private List<TtPoint> _SortedSelectedPoints;
+        public List<TtPoint> GetSortedSelectedPoints()
+        {
+            if (_SelectionChanged)
+            {
+                _SortedSelectedPoints = _SelectedPoints.Cast<TtPoint>().ToList();
+                _SortedSelectedPoints.Sort();
+                _SelectionChanged = false;
+                return _SortedSelectedPoints;
+            }
+            else
+                return new List<TtPoint>(_SortedSelectedPoints);
+        }
+
         public IList VisiblePoints { get; set; } = new ArrayList();
 
         public bool HasGpsTypes { get; private set; }
@@ -420,11 +437,11 @@ namespace TwoTrails.ViewModels
             };
 
             CopyCellValueCommand = new BindedRelayCommand<DataEditorModel>(
-                x => CopyCellValue(), x => HasSelection,
+                x => CopyCellValue(x as DataGrid), x => HasSelection,
                 this, x => x.HasSelection);
             
             ExportValuesCommand = new BindedRelayCommand<DataEditorModel>(
-                x => ExportValues(), x => HasSelection,
+                x => ExportValues(x as DataGrid), x => HasSelection,
                 this, x => x.HasSelection);
 
             ChangeQuondamParentCommand = new BindedRelayCommand<DataEditorModel>(
@@ -729,6 +746,8 @@ namespace TwoTrails.ViewModels
         {
             if (ignoreSelectionChange)
                 return;
+
+            _SelectionChanged = true;
 
             HasGpsTypes = false;
             HasTravTypes = false;
@@ -1253,7 +1272,7 @@ namespace TwoTrails.ViewModels
         {
             if (MultipleSelections)
             {
-                List<TtPoint> points = SelectedPoints.Cast<TtPoint>().ToList();
+                List<TtPoint> points = GetSortedSelectedPoints();
 
                 List<object> indexes = new List<object>();
                 List<TtPoint> updatedPoints = new List<TtPoint>();
@@ -1313,12 +1332,12 @@ namespace TwoTrails.ViewModels
 
         private void CreateQuondams()
         {
-            //TODO
+            PointLocManipDialog.ShowDialog(Manager, GetSortedSelectedPoints(), true);
         }
 
         private void MovePoints()
         {
-            //TODO
+            PointLocManipDialog.ShowDialog(Manager, GetSortedSelectedPoints(), false);
         }
 
         private void Retrace()
@@ -1337,14 +1356,23 @@ namespace TwoTrails.ViewModels
         }
 
 
-        private void ExportValues()
+        private void ExportValues(DataGrid dataGrid)
         {
-
+            //show savefilediag
+            //export points
         }
 
-        private void CopyCellValue()
+        private void CopyCellValue(DataGrid dataGrid)
         {
+            if (dataGrid != null)
+            {
+                var cellInfo = dataGrid.SelectedCells[dataGrid.CurrentCell.Column.DisplayIndex];
 
+                TextBlock tb = cellInfo.Column.GetCellContent(cellInfo.Item) as TextBlock;
+
+                if (tb != null)
+                    Clipboard.SetText(tb.Text);
+            }
         }
         #endregion
 

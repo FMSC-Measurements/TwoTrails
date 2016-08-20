@@ -14,9 +14,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPolygonCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateQuondamsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtGroupCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtMetadataCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPointCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MovePointsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MultiTtCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPolygonCommand.cs" />
@@ -58,6 +61,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtPolygon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\ITtSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtUserActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PointNamer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PointProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\GpsPoint.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\IManualAccuracy.cs" />

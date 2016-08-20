@@ -70,6 +70,10 @@
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppInfo.cs" />
+    <Compile Include="Dialogs\PointLocManipDialog.xaml.cs">
+      <DependentUpon>PointLocManipDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Utils\Export.cs" />
     <Compile Include="ViewModels\DataEditorModel.cs" />
     <Compile Include="ViewModels\DataStyleModel.cs" />
     <Compile Include="Converters\BindingReflector.cs" />
@@ -110,6 +114,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\NewProjectDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\PointLocManipDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

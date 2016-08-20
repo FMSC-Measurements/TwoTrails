@@ -8,11 +8,19 @@ namespace TwoTrails.Core
 {
     public interface ITtManager
     {
+        TtMetadata DefaultMetadata { get; }
+        TtGroup MainGroup { get; }
+
+        void ReindexPolys(string polyCN = null);
+
         bool PointExists(String pointCN);
         TtPoint GetPoint(String pointCN);
         List<TtPoint> GetPoints(String polyCN = null);
         void AddPoint(TtPoint point);
         void AddPoints(IEnumerable<TtPoint> points);
+        void ReplacePoint(TtPoint point);
+        void ReplacePoints(IEnumerable<TtPoint> replacePoints);
+        void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex);
         void DeletePoint(TtPoint point);
         void DeletePoints(IEnumerable<TtPoint> points);
 

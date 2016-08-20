@@ -11,7 +11,8 @@ namespace TwoTrails.Core
 {
     public class TtHistoryManager : NotifyPropertyChangedEx, ITtManager
     {
-        protected TtManager _Manager;
+        private TtManager _Manager;
+        public TtManager BaseManager { get { return _Manager; } }
 
         public event EventHandler<HistoryEventArgs> HistoryChanged;
         
@@ -26,7 +27,11 @@ namespace TwoTrails.Core
 
         public bool CanUndo { get { return _UndoStack.Count > 0; } }
         public bool CanRedo { get { return _RedoStack.Count > 0; } }
-        
+
+        public TtGroup MainGroup { get { return _Manager.MainGroup; } }
+
+        public TtMetadata DefaultMetadata { get { return _Manager.DefaultMetadata; } }
+
 
         public TtHistoryManager(TtManager manager)
         {
@@ -212,6 +217,22 @@ namespace TwoTrails.Core
         #endregion
 
 
+        public void CreateQuondamLinks(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, bool reverse = false)
+        {
+            AddCommand(new CreateQuondamsCommand(reverse ? points.Reverse() : points, _Manager, targetPolygon, insertIndex));
+        }
+
+        public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex)
+        {
+            AddCommand(new MovePointsCommand(points, _Manager, targetPolygon, insertIndex));
+        }
+
+        public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, bool reverse)
+        {
+            MovePointsToPolygon(reverse? points.Reverse() : points, targetPolygon, insertIndex);
+        }
+
+
         #region Editing
 
         public void EditPoint(TtPoint point, PropertyInfo property, object newValue)
@@ -264,6 +285,21 @@ namespace TwoTrails.Core
             HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, requireRefresh));
             OnPropertyChanged(nameof(CanUndo));
             OnPropertyChanged(nameof(CanRedo));
+        }
+        
+        void ITtManager.ReplacePoint(TtPoint point)
+        {
+            _Manager.ReplacePoint(point);
+        }
+
+        void ITtManager.ReplacePoints(IEnumerable<TtPoint> replacePoints)
+        {
+            _Manager.ReplacePoints(replacePoints);
+        }
+
+        void ITtManager.ReindexPolys(string polyCN = null)
+        {
+            _Manager.ReindexPolys(polyCN);
         }
     }
 

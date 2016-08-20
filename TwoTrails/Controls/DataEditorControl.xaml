@@ -240,21 +240,20 @@
                 ItemsSource="{Binding Points}"
                 AutoGenerateColumns="False"
                 CanUserReorderColumns="True" CanUserResizeColumns="True" 
-                CanUserResizeRows="False" CanUserSortColumns="True"
+                CanUserResizeRows="False" CanUserSortColumns="False"
                 CanUserDeleteRows="False" CanUserAddRows="False"
                 LoadingRow="DataGrid_OnLoadingRow"
                 EnableRowVirtualization="True"
                 EnableColumnVirtualization="True"
                 VirtualizingStackPanel.IsVirtualizing="True"
                 VirtualizingStackPanel.VirtualizationMode="Recycling"
-                SelectedItemListChanged="dgPoints_SelectedItemListChanged"
                 SelectionMode="Extended"
                 SelectionUnit="FullRow"
                 IsReadOnly="True"
                 VisibleItemsList="{Binding VisiblePoints, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
                 SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
 
-                <DataGrid.InputBindings>
+            <DataGrid.InputBindings>
                     <KeyBinding Command="{Binding DeleteCommand}" Key="Delete"/>
                 </DataGrid.InputBindings>
                 
@@ -282,8 +281,10 @@
 
                 <DataGrid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"  />
-                        <MenuItem Header="Export Values" Command="{Binding ExportValuesCommand}"  />
+                        <MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}" />
+                        <MenuItem Header="Export Point Values" Command="{Binding ExportValuesCommand}" 
+                                  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
                         
                         <Separator/>
 
