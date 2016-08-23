@@ -15,6 +15,8 @@ namespace TwoTrails
 
         public override bool IsPointsEditable { get; } = true;
 
+        public override string ToolTip { get { return Project.FilePath; } }
+
         public DataStyleModel DataStyles { get; private set; }
 
 

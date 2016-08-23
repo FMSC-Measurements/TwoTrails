@@ -136,7 +136,7 @@ namespace TwoTrails.ViewModels
 
 
             ViewLogCommand = new RelayCommand(x => MessageBox.Show("log file"));
-            AboutCommand = new RelayCommand(x => new AboutWindow().ShowDialog());
+            AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(_MainWindow));
 
             _Tabs = mainWindow.tabControl;
             _Tabs.SelectionChanged += Tabs_SelectionChanged;

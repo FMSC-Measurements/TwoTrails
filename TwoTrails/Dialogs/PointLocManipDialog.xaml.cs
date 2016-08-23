@@ -75,7 +75,7 @@ namespace TwoTrails.Dialogs
 
                     if (rbActQuondam.IsChecked == true)
                     {
-                        _Manager.CreateQuondamLinks(_Points, targetPoly, index, reverse);
+                        _Manager.CreateQuondamLinks(_Points, targetPoly, index, null, reverse);
                     }
                     else
                     {

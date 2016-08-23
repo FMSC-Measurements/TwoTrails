@@ -26,6 +26,8 @@ namespace TwoTrails
 
         public TtProject Project { get; private set; }
 
+        public virtual String ToolTip { get; protected set; } = String.Empty;
+
         public abstract bool IsDetachable { get; }
 
         public abstract bool IsPointsEditable { get; }
@@ -39,8 +41,8 @@ namespace TwoTrails
 
             this.Tab = new TabItem();
             
-            SaveCommand = new RelayCommand((x) => Project.Save());
-            CloseTabCommand = new RelayCommand((x) => Project.CloseTab(this));
+            SaveCommand = new RelayCommand(x => Project.Save());
+            CloseTabCommand = new RelayCommand(x => Project.CloseTab(this));
 
             Project.PropertyChanged += Project_PropertyChanged;
 

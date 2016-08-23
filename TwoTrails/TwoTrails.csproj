@@ -73,6 +73,9 @@
     <Compile Include="Dialogs\PointLocManipDialog.xaml.cs">
       <DependentUpon>PointLocManipDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\RetraceDialog.xaml.cs">
+      <DependentUpon>RetraceDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\Export.cs" />
     <Compile Include="ViewModels\DataEditorModel.cs" />
     <Compile Include="ViewModels\DataStyleModel.cs" />
@@ -104,6 +107,7 @@
     <Compile Include="Tabs\DataEditorTab.cs" />
     <Compile Include="Tabs\ProjectTab.cs" />
     <Compile Include="Tabs\UserActivityTab.cs" />
+    <Compile Include="ViewModels\RetraceModel.cs" />
     <Compile Include="ViewModels\TtProject.cs" />
     <Compile Include="TtSettings.cs" />
     <Compile Include="ITtTabContent.cs" />
@@ -118,6 +122,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\PointLocManipDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\RetraceDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

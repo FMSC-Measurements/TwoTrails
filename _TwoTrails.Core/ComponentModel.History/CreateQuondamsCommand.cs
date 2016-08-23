@@ -16,7 +16,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private AddTtPointsCommand addPointsCmd;
 
 
-        public CreateQuondamsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex, bool rev = false, bool autoCommit = true) : base(points)
+        public CreateQuondamsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex, bool? bndMode = null, bool autoCommit = true) : base(points)
         {
             this.pointsManager = pointsManager;
 
@@ -48,7 +48,8 @@ namespace TwoTrails.Core.ComponentModel.History
                     ParentPoint = point,
                     Polygon = TargetPolygon,
                     Metadata = pointsManager.DefaultMetadata,
-                    Group = pointsManager.MainGroup
+                    Group = pointsManager.MainGroup,
+                    OnBoundary = (bndMode == null) ? point.OnBoundary : bndMode == true
                 };
 
                 addPoints.Add(qp);

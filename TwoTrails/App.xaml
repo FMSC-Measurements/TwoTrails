@@ -19,5 +19,7 @@
         <SolidColorBrush x:Key="colorPriamryLight" Color="DarkSeaGreen" />
         <SolidColorBrush x:Key="colorPriamryDark" Color="SeaGreen" />
         <SolidColorBrush x:Key="colorBackground" Color="Gray" />
+
+        <SolidColorBrush x:Key="colorSystemBackground" Color="LightGray" />
     </Application.Resources>
 </Application>

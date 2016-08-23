@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPolygonCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateCorridorCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateQuondamsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtGroupCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtMetadataCommand.cs" />

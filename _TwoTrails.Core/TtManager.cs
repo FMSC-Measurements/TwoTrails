@@ -657,6 +657,16 @@ namespace TwoTrails.Core
                 seg.Adjust();
             }
         }
+
+
+        public void RecalculatePolygons()
+        {
+            foreach (TtPolygon poly in _Polygons)
+            {
+                AdjustAllTravTypesInPolygon(poly);
+                UpdatePolygonStats(poly);
+            }
+        }
         #endregion
 
 
@@ -826,7 +836,7 @@ namespace TwoTrails.Core
             point.SetUnAdjLocation(coords.X, coords.Y, point.UnAdjZ);
         }
         
-        protected void UpdatePolygonStats(TtPolygon poly)
+        public void UpdatePolygonStats(TtPolygon poly)
         {
             _PolygonUpdateHandlers[poly.CN].DelayInvoke();
         }
@@ -867,19 +877,30 @@ namespace TwoTrails.Core
             }
         }
 
-        public void ReindexPolys(string polyCN = null)
+        public void ReindexPolygon(TtPolygon polygon)
         {
-            IEnumerable<TtPolygon> polygons = polyCN != null ? _Polygons : _Polygons.Where(p => p.CN == polyCN);
+            List<TtPoint> points = _Points.Where(p => p.PolygonCN == polygon.CN).ToList();
+            points.Sort();
 
-            foreach (TtPolygon poly in polygons)
-            {
-                List<TtPoint> points = _Points.Where(p => p.PolygonCN == poly.CN).ToList();
-                points.Sort();
+            int index = 0;
+            foreach (TtPoint point in points)
+                point.Index = index++;
 
-                int index = 0;
-                foreach (TtPoint point in points)
-                    point.Index = index++;
-            }
+            _PointsByPoly[polygon.CN] = points;
+
+            AdjustAllTravTypesInPolygon(polygon);
+            UpdatePolygonStats(polygon);
+        }
+
+        public void RebuildPolygon(TtPolygon poly)
+        {
+            List<TtPoint> points = _Points.Where(p => p.PolygonCN == poly.CN).ToList();
+            points.Sort();
+
+            _PointsByPoly[poly.CN] = points;
+
+            AdjustAllTravTypesInPolygon(poly);
+            UpdatePolygonStats(poly);
         }
 
         public void Reset()
@@ -1281,7 +1302,28 @@ namespace TwoTrails.Core
         /// <param name="points"></param>
         public void DeletePoints(IEnumerable<TtPoint> points)
         {
-            //TODO
+            lock (locker)
+            {
+                List<TtPolygon> reindexPolys = new List<TtPolygon>();
+
+                foreach (TtPoint point in points)
+                {
+                    if (_PointsMap.ContainsKey(point.CN))
+                    {
+                        DetachPointEvents(point);
+
+                        _PointsByPoly[point.PolygonCN].Remove(point);
+                        _PointsMap.Remove(point.CN);
+                        _Points.Remove(point);
+
+                        if (!reindexPolys.Contains(point.Polygon))
+                            reindexPolys.Add(point.Polygon);
+                    }
+                }
+
+                foreach (TtPolygon polygon in reindexPolys)
+                    ReindexPolygon(polygon);
+            }
         }
         
 

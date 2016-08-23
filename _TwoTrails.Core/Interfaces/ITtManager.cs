@@ -11,7 +11,9 @@ namespace TwoTrails.Core
         TtMetadata DefaultMetadata { get; }
         TtGroup MainGroup { get; }
 
-        void ReindexPolys(string polyCN = null);
+        void ReindexPolygon(TtPolygon polygon);
+        void RebuildPolygon(TtPolygon polygon);
+        void RecalculatePolygons();
 
         bool PointExists(String pointCN);
         TtPoint GetPoint(String pointCN);

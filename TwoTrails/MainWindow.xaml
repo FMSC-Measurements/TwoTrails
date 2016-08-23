@@ -22,9 +22,17 @@
         <KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
     </Window.InputBindings>
-    
-    <DockPanel LastChildFill="True" Background="{StaticResource colorBackground}">
-        <Menu DockPanel.Dock="Top" Height="25" Background="{StaticResource colorBackground}">
+
+    <DockPanel LastChildFill="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <Menu DockPanel.Dock="Top" Height="25">
+            <Menu.Resources>
+                <Style TargetType="MenuItem">
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="Height" Value="25"/>
+                </Style>
+            </Menu.Resources>
             <MenuItem Header="_File">
                 <MenuItem Header="New" Command="{Binding NewCommand}"/>
                 <MenuItem Header="Open" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
@@ -119,19 +127,16 @@
                 <MenuItem Header="About TwoTrails" Command="{Binding AboutCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
             </MenuItem>
         </Menu>
-        <ToolBarPanel Background="{StaticResource colorBackground}" Height="25" VerticalAlignment="Top" Width="Auto" DockPanel.Dock="Top" Margin="0">
+        <!--<ToolBarPanel Background="{StaticResource colorBackground}" Height="25" VerticalAlignment="Top" Width="Auto" DockPanel.Dock="Top" Margin="0">
             
-        </ToolBarPanel>
+        </ToolBarPanel>-->
         <StatusBar Height="25" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="{StaticResource colorPriamryDark}"/>
 
         <TabControl x:Name="tabControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                     Margin="0" Padding="0" Drop="tabControl_Drop" AllowDrop="True"
                     DockPanel.Dock="Top" BorderThickness="0"
-                    Background="{StaticResource colorPriamryLight}">
+                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
             <TabControl.Resources>
-                <!--<Style TargetType="{x:Type TabPanel}">
-                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                </Style>-->
                 <Style TargetType="{x:Type TabItem}">
                     <Setter Property="Template">
                         <Setter.Value>
@@ -139,7 +144,8 @@
                                 <Grid Name="Grid" VerticalAlignment="Bottom" Background="{StaticResource colorBackground}" Margin="-3, 0, 2, 0" HorizontalAlignment="Stretch">
                                     <Border>
                                         <DockPanel Margin="2">
-                                            <TextBlock x:Name="ContentSite" Text="{Binding TabTitle}" DockPanel.Dock="Left"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4,2,8,2"/>
+                                            <TextBlock x:Name="ContentSite" Text="{Binding TabTitle}" DockPanel.Dock="Left"  HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" Margin="4,2,8,2" ToolTip="{Binding ToolTip}"/>
 
                                             <Button Name="btnCloseProject" Visibility="Hidden" DockPanel.Dock="Right" HorizontalAlignment="Right"
                                                             BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"

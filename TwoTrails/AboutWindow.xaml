@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails"
         mc:Ignorable="d"
-        Title="AboutWindow" Height="300" Width="300">
+        Title="AboutWindow" Height="300" Width="300" WindowStartupLocation="CenterOwner">
     <Grid>
         
     </Grid>

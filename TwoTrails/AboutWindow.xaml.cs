@@ -23,5 +23,12 @@ namespace TwoTrails
         {
             InitializeComponent();
         }
+
+        public static bool? ShowDialog(Window window)
+        {
+            AboutWindow about = new AboutWindow();
+            about.Owner = window;
+            return about.ShowDialog();
+        }
     }
 }

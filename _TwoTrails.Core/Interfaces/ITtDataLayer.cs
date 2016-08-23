@@ -119,7 +119,6 @@ namespace TwoTrails.DAL
 
 
         #region Util
-        //TODO Util
         bool RequiresUpgrade { get; }
 
         bool Duplicate(ITtDataLayer dataLayer);

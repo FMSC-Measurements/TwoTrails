@@ -120,12 +120,12 @@ namespace TwoTrails.ViewModels
             DataEditorTab = new DataEditorTab(this);
             
             UndoCommand = new BindedRelayCommand<TtHistoryManager>(
-                (x) => HistoryManager.Undo(), x => HistoryManager.CanUndo, HistoryManager, x => x.CanUndo);
+                x => HistoryManager.Undo(), x => HistoryManager.CanUndo, HistoryManager, x => x.CanUndo);
 
             RedoCommand = new BindedRelayCommand<TtHistoryManager>(
-                (x) => HistoryManager.Redo(), x => HistoryManager.CanRedo, HistoryManager, x => x.CanRedo);
+                x => HistoryManager.Redo(), x => HistoryManager.CanRedo, HistoryManager, x => x.CanRedo);
 
-            DiscardChangesCommand = new RelayCommand((x) => _Manager.Reset());
+            DiscardChangesCommand = new RelayCommand(x => _Manager.Reset());
 
             ViewUserActivityCommand = new RelayCommand(x => ViewUserActivityTab());
         }

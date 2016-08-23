@@ -217,9 +217,14 @@ namespace TwoTrails.Core
         #endregion
 
 
-        public void CreateQuondamLinks(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, bool reverse = false)
+        public void CreateQuondamLinks(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, bool? bndMode = null, bool reverse = false)
         {
-            AddCommand(new CreateQuondamsCommand(reverse ? points.Reverse() : points, _Manager, targetPolygon, insertIndex));
+            AddCommand(new CreateQuondamsCommand(reverse ? points.Reverse() : points, _Manager, targetPolygon, insertIndex, bndMode));
+        }
+
+        public void CreateCorridor(IEnumerable<TtPoint> points, TtPolygon targetPolygon)
+        {
+            AddCommand(new CreateCorridorCommand(points, targetPolygon, _Manager));
         }
 
         public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex)
@@ -287,6 +292,7 @@ namespace TwoTrails.Core
             OnPropertyChanged(nameof(CanRedo));
         }
         
+
         void ITtManager.ReplacePoint(TtPoint point)
         {
             _Manager.ReplacePoint(point);
@@ -297,9 +303,19 @@ namespace TwoTrails.Core
             _Manager.ReplacePoints(replacePoints);
         }
 
-        void ITtManager.ReindexPolys(string polyCN = null)
+        void ITtManager.ReindexPolygon(TtPolygon polygon)
         {
-            _Manager.ReindexPolys(polyCN);
+            _Manager.ReindexPolygon(polygon);
+        }
+
+        void ITtManager.RebuildPolygon(TtPolygon polygon)
+        {
+            _Manager.RebuildPolygon(polygon);
+        }
+
+        public void RecalculatePolygons()
+        {
+            _Manager.RecalculatePolygons();
         }
     }
 

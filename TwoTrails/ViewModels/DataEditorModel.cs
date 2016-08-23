@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Core;
+using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
 
@@ -163,7 +164,7 @@ namespace TwoTrails.ViewModels
             get { return _Polygon; }
             set
             {
-                //TODO
+                Manager.MovePointsToPolygon(SelectedPoints.Cast<TtPoint>(), value, int.MaxValue);
             }
         }
 
@@ -224,10 +225,7 @@ namespace TwoTrails.ViewModels
         public TtMetadata Metadata
         {
             get { return _Metadata; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _Metadata, value, PointProperties.META); }
         }
 
 
@@ -238,10 +236,7 @@ namespace TwoTrails.ViewModels
         public TtGroup Group
         {
             get { return _Group; }
-            set
-            {
-                //TODO
-            }
+            set { EditValue(ref _Group, value, PointProperties.GROUP); }
         }
 
 
@@ -378,10 +373,6 @@ namespace TwoTrails.ViewModels
         public TtPoint ParentPoint
         {
             get { return _ParentPoint; }
-            set
-            {
-                //TODO
-            }
         }
 
         private void EditValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
@@ -400,6 +391,26 @@ namespace TwoTrails.ViewModels
                     {
                         Manager.EditPoint(SelectedPoint, property, newValue);
                     } 
+                }
+            }
+        }
+
+        private void EditValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
+        {
+            if (!origValue.Equals(newValue))
+            {
+                origValue = newValue;
+
+                if (allowNull || newValue != null)
+                {
+                    if (MultipleSelections)
+                    {
+                        Manager.EditPoints(SelectedPoints.Cast<TtPoint>(), property, newValue);
+                    }
+                    else
+                    {
+                        Manager.EditPoint(SelectedPoint, property, newValue);
+                    }
                 }
             }
         }
@@ -931,8 +942,6 @@ namespace TwoTrails.ViewModels
                         }
                     }
 
-                    HasPossibleCorridor = HasGpsTypes && hasSS && !HasQndms && !hasTrav;
-
                     _PID = null;
                     _SamePID = false;
 
@@ -950,6 +959,8 @@ namespace TwoTrails.ViewModels
 
                     _Group = group;
                     _SameGroup = group != null;
+
+                    HasPossibleCorridor = HasGpsTypes && hasSS && !HasQndms && !hasTrav && _SamePolygons;
 
                     if (hasOnbnd ^ hasOffBnd)
                     {
@@ -1321,12 +1332,12 @@ namespace TwoTrails.ViewModels
 
         private void CreatePolygon()
         {
-            //TODO
+            //TODO Create Polygon
         }
 
         private void CreateGroup()
         {
-            //TODO
+            //TODO Create Group
         }
 
 
@@ -1342,17 +1353,17 @@ namespace TwoTrails.ViewModels
 
         private void Retrace()
         {
-            //TODO
+            RetraceDialog.ShowDialog(Manager);
         }
 
         private void CreatePlots()
         {
-            //TODO
+            //TODO Create Plots
         }
 
         private void CreateCorridor()
         {
-            //TODO
+            Manager.CreateCorridor(GetSortedSelectedPoints(), Polygon);
         }
 
 
