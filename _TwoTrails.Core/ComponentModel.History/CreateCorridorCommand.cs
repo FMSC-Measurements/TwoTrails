@@ -15,6 +15,11 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             IEnumerable<TtPoint> ssPoints = points.Where(p => p.OpType == OpType.SideShot);
 
+            TtPoint lastPoint = points.Last();
+            if (lastPoint.OpType == OpType.SideShot)
+                ssPoints = ssPoints.TakeWhile(p => p.CN != lastPoint.CN);
+                
+
             editPoints = new EditTtPointsCommand(ssPoints, PointProperties.BOUNDARY, false, false);
             createQuondams = new CreateQuondamsCommand(ssPoints.Reverse(), pointsManager, targetPolygon, int.MaxValue, true, false);
             

@@ -29,9 +29,7 @@ namespace TwoTrails.ViewModels
                 Set(value, () =>
                 {
                     CurrentEditor = value?.Project.DataEditor;
-
-                    EditorVisible = value is DataEditorTab;
-
+                    
                     OnPropertyChanged(
                         nameof(CurrentProject),
                         nameof(HasOpenedProject),
@@ -48,8 +46,6 @@ namespace TwoTrails.ViewModels
         public TtProject CurrentProject { get { return CurrentTab?.Project; } }
         
         public DataEditorModel CurrentEditor { get; private set; }
-
-        public bool EditorVisible { get; private set; }
 
 
         public bool HasOpenedProject { get { return CurrentTab != null; } }
@@ -91,10 +87,6 @@ namespace TwoTrails.ViewModels
         public ICommand CloseProjectCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
 
-        public ICommand EditProjectCommand { get; private set; }
-        public ICommand EditPolygonsCommand { get; private set; }
-        public ICommand EditGroupsCommand { get; private set; }
-        public ICommand EditMetadataCommand { get; private set; }
         public ICommand ImportCommand { get; private set; }
         public ICommand ExportCommand { get; private set; }
 
@@ -123,11 +115,6 @@ namespace TwoTrails.ViewModels
             SaveCommand = new RelayCommand(x => SaveCurrentProject());
             CloseProjectCommand = new RelayCommand(x => CurrentProject.Close());
             ExitCommand = new RelayCommand(x => Exit());
-
-            EditProjectCommand = new RelayCommand(x => EditProject());
-            EditPolygonsCommand = new RelayCommand(x => EditProject());
-            EditMetadataCommand = new RelayCommand(x => EditProject());
-            EditGroupsCommand = new RelayCommand(x => EditProject());
 
             ImportCommand = new RelayCommand(x => ImportData());
             ExportCommand = new RelayCommand(x => ExportProject());
@@ -220,7 +207,7 @@ namespace TwoTrails.ViewModels
                 {
                     MessageBox.Show("Project is already opened.");
 
-                    SwitchToTab(_Projects[filePath].DataEditorTab);
+                    SwitchToTab(_Projects[filePath].ProjectTab);
                 }
             }
             else
@@ -264,7 +251,7 @@ namespace TwoTrails.ViewModels
 
         private void AddProject(TtProject proj)
         {
-            _Tabs.Items.Add(proj.DataEditorTab.Tab);
+            _Tabs.Items.Add(proj.ProjectTab.Tab);
             _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
 
             _Projects.Add(proj.FilePath, proj);
@@ -388,12 +375,6 @@ namespace TwoTrails.ViewModels
             RecentItemsAvail = miRecent.Items.Count > 0;
         }
 
-
-
-        private void EditProject()
-        {
-
-        }
 
         private void ImportData()
         {

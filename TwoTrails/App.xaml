@@ -2,8 +2,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:TwoTrails"
+             xmlns:cvt="clr-namespace:TwoTrails.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
+        <cvt:NotNullConverter x:Key="NotNullConverter"/>
+
         <BitmapImage x:Key="ImgOpenInNew" UriSource="res/open_in_new.png" />
 
         <Style x:Key="styleMiDisableNullCommand" TargetType="{x:Type MenuItem}">

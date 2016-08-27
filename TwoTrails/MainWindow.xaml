@@ -7,14 +7,14 @@
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
         Title="MainWindow"
-        Width="1000" Height="840"
-        MinWidth="640" MinHeight="480"
+        Width="1000" MinWidth="710"
+        Height="840" MinHeight="540"
         WindowStartupLocation="CenterScreen">
 
-    <Window.Resources>
+    <!--<Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
-    </Window.Resources>
+    </Window.Resources>-->
 
     <Window.InputBindings>
         <KeyBinding Command="{Binding CurrentProject.UndoCommand}" Key="Z" Modifiers="Ctrl"/>
@@ -80,10 +80,11 @@
             </MenuItem>
             
             <MenuItem Header="_Data">
-                <MenuItem Header="Modify Project" Command="{Binding EditProjectCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                <MenuItem Header="Modify Polygons" Command="{Binding EditPolygonsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                <MenuItem Header="Modify Groups" Command="{Binding EditGroupsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                <MenuItem Header="Modify Metadata" Command="{Binding EditMetadataCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Edit Project" Command="{Binding CurrentProject.EditProjectCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Edit Points" Command="{Binding CurrentProject.EditPointsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Edit Polygons" Command="{Binding CurrentProject.EditPolygonsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Edit Groups" Command="{Binding CurrentProject.EditGroupsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <MenuItem Header="Edit Metadata" Command="{Binding CurrentProject.EditMetadataCommand}" IsEnabled="{Binding HasOpenedProject}"/>
 
                 <Separator/>
 
@@ -132,7 +133,7 @@
         </ToolBarPanel>-->
         <StatusBar Height="25" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="{StaticResource colorPriamryDark}"/>
 
-        <TabControl x:Name="tabControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+        <TabControl x:Name="tabControl"
                     Margin="0" Padding="0" Drop="tabControl_Drop" AllowDrop="True"
                     DockPanel.Dock="Top" BorderThickness="0"
                     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
@@ -225,7 +226,7 @@
                     <Setter Property="Height" Value="25" />
                     <Setter Property="Margin" Value="0" />
                     <Setter Property="Padding" Value="0" />
-                    <Setter Property="FontFamily" Value="DokChampa" />
+                    <!--<Setter Property="FontFamily" Value="DokChampa" />-->
                     <Setter Property="FontSize" Value="14" />
                     <Setter Property="Foreground" Value="White"/>
                 </Style>

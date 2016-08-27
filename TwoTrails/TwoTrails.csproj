@@ -48,6 +48,7 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -70,8 +71,17 @@
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppInfo.cs" />
+    <Compile Include="Controls\ProjectEditorControl.xaml.cs">
+      <DependentUpon>ProjectEditorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\M2Converter.cs" />
+    <Compile Include="Converters\MetersToFeetConverter.cs" />
+    <Compile Include="Converters\NotNullConverter.cs" />
     <Compile Include="Dialogs\PointLocManipDialog.xaml.cs">
       <DependentUpon>PointLocManipDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\RenamePointsDialog.xaml.cs">
+      <DependentUpon>RenamePointsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\RetraceDialog.xaml.cs">
       <DependentUpon>RetraceDialog.xaml</DependentUpon>
@@ -104,9 +114,9 @@
       <DependentUpon>ProjectInfoControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="PointSorter.cs" />
-    <Compile Include="Tabs\DataEditorTab.cs" />
     <Compile Include="Tabs\ProjectTab.cs" />
     <Compile Include="Tabs\UserActivityTab.cs" />
+    <Compile Include="ViewModels\ProjectEditorModel.cs" />
     <Compile Include="ViewModels\RetraceModel.cs" />
     <Compile Include="ViewModels\TtProject.cs" />
     <Compile Include="TtSettings.cs" />
@@ -117,11 +127,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\ProjectEditorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\NewProjectDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\PointLocManipDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\RenamePointsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

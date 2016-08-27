@@ -286,7 +286,7 @@ namespace TwoTrails.Core.Points
         {
             OnPropertyChanged(nameof(LinkedPoints));
 
-            if (e.OldItems == null || e.NewItems.Count > 0 ^ e.OldItems.Count < 0)
+            if (e.OldItems == null ^ e.NewItems == null || e.NewItems.Count > 0 ^ e.OldItems.Count < 0)
                 OnPropertyChanged(nameof(HasQuondamLinks));
         }
         
@@ -439,9 +439,9 @@ namespace TwoTrails.Core.Points
             return String.Format("{0} ({1})", PID, OpType);
         }
 
-        public String Description
-        {
-            get { return ToString(); }
-        }
+        //public String Description
+        //{
+        //    get { return ToString(); }
+        //}
     }
 }

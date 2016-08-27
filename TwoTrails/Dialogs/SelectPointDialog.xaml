@@ -5,8 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails.Dialogs"
         mc:Ignorable="d"
-        Title="SelectPointDialog" Height="300" Width="300">
+        ResizeMode="NoResize"
+        Title="Select Point" Height="300" Width="400">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         
+        <ListBox Name="lbPolys" Grid.Column="0" Grid.Row="0" ItemsSource="{Binding Polygons, Mode=OneWay}" SelectionChanged="Polygon_Selected"/>
+        <ListBox Name="lbPoints" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding SelectedPoint}"/>
+
+        <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <Button Grid.Column="0" Width="75" Content="Cancel" Click="Close_Click"/>
+            <Button Grid.Column="2" Width="75" Content="Select" Click="Select_Click"/>
+        </Grid>
     </Grid>
 </Window>

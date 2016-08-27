@@ -30,7 +30,7 @@
         <Style x:Key="styleFieldValue" TargetType="Control">
             <Setter Property="Margin" Value="0,2.5,0,2.5" />
             <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
-            <Setter Property="Height" Value="20"/>
+            <!--<Setter Property="Height" Value="20"/>-->
 
 
             <Style.Triggers>
@@ -145,7 +145,6 @@
 
     <Grid Margin="0" Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="3" MinHeight="3" MaxHeight="3"/>
             <RowDefinition Height="150" MinHeight="100" MaxHeight="300"/>
             <RowDefinition Height="3" MinHeight="3" MaxHeight="3"/>
             <RowDefinition Height="*"/>
@@ -157,10 +156,8 @@
             Source="{Binding Path=Metadata, Mode=OneWay}" />
         <cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcSlpAng}, Path=Metadata}"
             Source="{Binding Path=Metadata, Mode=OneWay}" />
-        
-        <Grid Grid.Row="0" Height="3" Background="Green" HorizontalAlignment="Stretch"/>
 
-        <Grid Grid.Row="1" Background="LightGray" HorizontalAlignment="Stretch">
+        <Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" HorizontalAlignment="Stretch">
             <Grid.Resources>
                 <Style TargetType="TextBlock">
                     <Setter Property="Foreground" Value="Black"/>
@@ -231,9 +228,9 @@
             </Grid>
         </Grid>
 
-        <GridSplitter Grid.Row="2" Background="Gray" Height="3" HorizontalAlignment="Stretch"/>
+        <GridSplitter Grid.Row="1" Background="Gray" Height="3" HorizontalAlignment="Stretch"/>
 
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MinWidth="150"/>
                 <ColumnDefinition Width="3"/>
@@ -294,7 +291,7 @@
                         
                         <Separator/>
 
-                        <MenuItem Header="Rename" Command="{Binding RenameCommand}" />
+                        <MenuItem Header="Rename" Command="{Binding RenamePointsCommand}" />
 
                         <Separator/>
 
@@ -471,6 +468,7 @@
                     <TextBlock Grid.Row="14" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Qndm Link"/>
                     <Button Grid.Row="14" Grid.Column="1" Style="{StaticResource ResourceKey=styleQndmEnable}"
                              cp:ControlProperties.BackgroundEnabled="{Binding SameParentPoint, Converter={StaticResource IBC}}"
+                            Height="20"
                             Content="{Binding ParentPoint.PID}"
                             Command="{Binding ChangeQuondamParentCommand}"/>
 

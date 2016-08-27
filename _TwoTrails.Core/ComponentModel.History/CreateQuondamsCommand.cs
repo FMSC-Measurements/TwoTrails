@@ -45,7 +45,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 {
                     PID = PointNamer.NamePoint(TargetPolygon, prevPoint),
                     Index = index++,
-                    ParentPoint = point,
+                    ParentPoint = point.OpType == OpType.Quondam ? ((QuondamPoint)point).ParentPoint : point,
                     Polygon = TargetPolygon,
                     Metadata = pointsManager.DefaultMetadata,
                     Group = pointsManager.MainGroup,

@@ -26,7 +26,7 @@ namespace TwoTrails
 
         public TtProject Project { get; private set; }
 
-        public virtual String ToolTip { get; protected set; } = String.Empty;
+        public virtual String ToolTip { get { return Project.FilePath; } } 
 
         public abstract bool IsDetachable { get; }
 

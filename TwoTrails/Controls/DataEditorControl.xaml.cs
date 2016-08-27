@@ -16,12 +16,10 @@ namespace TwoTrails.Controls
     /// </summary>
     public partial class DataEditorControl : UserControl
     {
-        private DataEditorModel DataEditor;
         private DataStyleModel DataStyles;
 
         public DataEditorControl(DataEditorModel dataEditor, DataStyleModel dataStyles)
         {
-            DataEditor = dataEditor;
             DataStyles = dataStyles;
 
             InitializeComponent();

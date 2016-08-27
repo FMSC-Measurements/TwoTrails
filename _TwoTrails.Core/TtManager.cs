@@ -1273,6 +1273,9 @@ namespace TwoTrails.Core
             {
                 if (_PointsMap.ContainsKey(point.CN))
                 {
+                    if (point.HasQuondamLinks)
+                        throw new Exception("Point Has Linked Quondams");
+
                     DetachPointEvents(point);
 
                     IList<TtPoint> points = _PointsByPoly[point.PolygonCN];
@@ -1304,6 +1307,9 @@ namespace TwoTrails.Core
         {
             lock (locker)
             {
+                if (points.Any(p => p.HasQuondamLinks))
+                    throw new Exception("Points Have Linked Quondams");
+
                 List<TtPolygon> reindexPolys = new List<TtPolygon>();
 
                 foreach (TtPoint point in points)
@@ -1372,15 +1378,21 @@ namespace TwoTrails.Core
         {
             lock (locker)
             {
-                if (_PointsByPoly[polygon.CN].Count > 0)
-                    throw new Exception("Points dependant on polygon: " + polygon.Name);
+                if (_PointsByPoly[polygon.CN].Any(p => p.HasQuondamLinks))
+                    throw new Exception("Points have links from other polygons: " + polygon.Name);
+
+                foreach (TtPoint point in _PointsByPoly[polygon.CN])
+                {
+                    _PointsMap.Remove(point.CN);
+                    _Points.Remove(point);
+                }
+
+                _PointsByPoly.Remove(polygon.CN);
 
                 _PolygonsMap.Remove(polygon.CN);
                 _Polygons.Remove(polygon);
 
                 DetachPolygonEvents(polygon);
-
-                _PointsByPoly.Remove(polygon.CN);
             }
         }
 

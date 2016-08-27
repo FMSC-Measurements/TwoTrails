@@ -29,17 +29,20 @@ namespace TwoTrails.Core.Points
                 TtPoint oldParent = _ParentPoint;
                 if (SetField(ref _ParentPoint, value))
                 {
-                    ParentPointCN = _ParentPoint.CN;
+                    if (_ParentPoint != null)
+                    {
+                        ParentPointCN = _ParentPoint.CN;
 
-                    _ParentPoint.AddLinkedPoint(this);
-                    _ParentPoint.LocationChanged += ParentPoint_LocationChanged;
+                        _ParentPoint.AddLinkedPoint(this);
+                        _ParentPoint.LocationChanged += ParentPoint_LocationChanged; 
+                    }
 
                     if (oldParent != null)
                     {
                         oldParent.LocationChanged -= ParentPoint_LocationChanged;
                         oldParent.RemoveLinkedPoint(this);
 
-                        if (!oldParent.HasSameAdjLocation(_ParentPoint))
+                        if (_ParentPoint != null && !oldParent.HasSameAdjLocation(_ParentPoint))
                         {
                             OnLocationChanged();
                         }

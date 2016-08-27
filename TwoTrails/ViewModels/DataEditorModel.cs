@@ -604,7 +604,7 @@ namespace TwoTrails.ViewModels
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (TtPolygon polygon in e.NewItems)
+                foreach (TtPolygon polygon in e.OldItems)
                 {
                     for (int i = 0; i < _Polygons.Count; i++)
                     {
@@ -637,7 +637,7 @@ namespace TwoTrails.ViewModels
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (TtMetadata Metadata in e.NewItems)
+                foreach (TtMetadata Metadata in e.OldItems)
                 {
                     for (int i = 0; i < _Metadatas.Count; i++)
                     {
@@ -670,7 +670,7 @@ namespace TwoTrails.ViewModels
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (TtGroup Group in e.NewItems)
+                foreach (TtGroup Group in e.OldItems)
                 {
                     for (int i = 0; i < _Groups.Count; i++)
                     {
@@ -1259,15 +1259,20 @@ namespace TwoTrails.ViewModels
 
                 SelectPointDialog spd = new SelectPointDialog(Manager, hidePoints);
 
-                if (spd.ShowDialog() == true && spd.SelectedPoint != null)
+                if (spd.ShowDialog() == true)
                 {
+                    TtPoint point = spd.SelectedPoint;
+
+                    if (point.OpType == OpType.Quondam)
+                        point = ((QuondamPoint)point).ParentPoint;
+
                     if (MultipleSelections)
                     {
-                        Manager.EditPoints(SelectedPoints.Cast<TtPoint>(), PointProperties.PARENT_POINT, spd.SelectedPoint);
+                        Manager.EditPoints(SelectedPoints.Cast<TtPoint>(), PointProperties.PARENT_POINT, point);
                     }
                     else
                     {
-                        Manager.EditPoint(SelectedPoint, PointProperties.PARENT_POINT, spd.SelectedPoint);
+                        Manager.EditPoint(SelectedPoint, PointProperties.PARENT_POINT, point);
                     }
                 }
             }
@@ -1276,7 +1281,16 @@ namespace TwoTrails.ViewModels
 
         private void RenamePoints()
         {
-
+            RenamePointsDialog dialog = new RenamePointsDialog(Manager);
+            if (dialog.ShowDialog() == true)
+            {
+                Manager.EditPointsMultiValues(
+                    GetSortedSelectedPoints(),
+                    PointProperties.PID,
+                    Enumerable.Range(0, SelectedPoints.Count)
+                        .Select(i => (object)(dialog.StartIndex + dialog.Increment * i))
+                );
+            }
         }
 
         private void ReverseSelection()
@@ -1369,6 +1383,7 @@ namespace TwoTrails.ViewModels
 
         private void ExportValues(DataGrid dataGrid)
         {
+            //TODO Export Values
             //show savefilediag
             //export points
         }
