@@ -32,7 +32,7 @@ namespace TwoTrails.Core
             set { SetField(ref _PointStartIndex, value); }
         }
 
-        protected Int32 _Increment = 1010;
+        protected Int32 _Increment = 10;
         public Int32 Increment
         {
             get { return _Increment; }

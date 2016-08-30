@@ -37,6 +37,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,6 +51,7 @@
     <Compile Include="ComponentModel\CheckedListItem.cs" />
     <Compile Include="ComponentModel\Commands\BindedRelayCommand.cs" />
     <Compile Include="ComponentModel\Commands\RelayCommand.cs" />
+    <Compile Include="ComponentModel\EnumToItemsSource.cs" />
     <Compile Include="ComponentModel\RelayMenuItem.cs" />
     <Compile Include="Controls\DataGridEx.cs" />
     <Compile Include="Convert.cs" />

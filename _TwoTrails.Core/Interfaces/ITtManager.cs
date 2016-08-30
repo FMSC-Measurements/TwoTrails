@@ -10,7 +10,7 @@ namespace TwoTrails.Core
     {
         TtMetadata DefaultMetadata { get; }
         TtGroup MainGroup { get; }
-
+        
         void ReindexPolygon(TtPolygon polygon);
         void RebuildPolygon(TtPolygon polygon);
         void RecalculatePolygons();

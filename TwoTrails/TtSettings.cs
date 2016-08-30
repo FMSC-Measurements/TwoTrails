@@ -12,10 +12,10 @@ namespace TwoTrails
 {
     public class TtSettings : NotifyPropertyChangedEx, ITtSettings
     {
-        private static String DISTRICT = "District";
-        private static String REGION = "Region";
-        private static String RECENT_PROJECTS = "RecentProjects";
-        private static String ADVANCED_MODE = "AdvancedMode";
+        private const String DISTRICT = "District";
+        private const String REGION = "Region";
+        private const String RECENT_PROJECTS = "RecentProjects";
+        private const String ADVANCED_MODE = "AdvancedMode";
 
         public IMetadataSettings MetadataSettings { get; set; }
         public IDeviceSettings DeviceSettings { get; set; }

@@ -37,9 +37,14 @@ namespace TwoTrails.Controls
             tabControl.SelectedIndex = (int)tab;
         }
 
-        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void TextIsInteger(object sender, TextCompositionEventArgs e)
         {
             e.Handled = string.IsNullOrEmpty(e.Text) ? false : !e.Text.All(char.IsDigit);
+        }
+
+        private void TextIsDouble(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = string.IsNullOrEmpty(e.Text) ? false : e.Text.All(x => char.IsDigit(x) || x == '.');
         }
     }
 

@@ -80,13 +80,13 @@
             </MenuItem>
             
             <MenuItem Header="_Data">
-                <MenuItem Header="Edit Project" Command="{Binding CurrentProject.EditProjectCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                <!--<MenuItem Header="Edit Project" Command="{Binding CurrentProject.EditProjectCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                 <MenuItem Header="Edit Points" Command="{Binding CurrentProject.EditPointsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                 <MenuItem Header="Edit Polygons" Command="{Binding CurrentProject.EditPolygonsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                 <MenuItem Header="Edit Groups" Command="{Binding CurrentProject.EditGroupsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                 <MenuItem Header="Edit Metadata" Command="{Binding CurrentProject.EditMetadataCommand}" IsEnabled="{Binding HasOpenedProject}"/>
 
-                <Separator/>
+                <Separator/>-->
 
                 <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                 <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>

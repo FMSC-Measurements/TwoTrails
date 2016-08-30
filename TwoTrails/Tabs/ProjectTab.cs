@@ -28,7 +28,7 @@ namespace TwoTrails
 
         public ProjectTab(TtProject project) : base(project)
         {
-            _ProjectEditorControl = new ProjectEditorControl(project);
+            _ProjectEditorControl = new ProjectEditorControl(project, ProjectStartupTab.Points);
             Tab.Content = _ProjectEditorControl;
         }
 

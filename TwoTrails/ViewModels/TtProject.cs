@@ -93,6 +93,8 @@ namespace TwoTrails.ViewModels
 
         public ITtDataLayer DAL { get; private set; }
 
+        public ITtSettings Settings { get; private set; }
+
         public TtManager Manager { get; private set; }
         public TtHistoryManager HistoryManager { get; private set; }
 
@@ -114,6 +116,7 @@ namespace TwoTrails.ViewModels
         public TtProject(ITtDataLayer dal, ITtSettings settings, MainWindowModel mainModel)
         {
             DAL = dal;
+            Settings = settings;
 
             _MainModel = mainModel;
 

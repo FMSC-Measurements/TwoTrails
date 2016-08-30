@@ -69,5 +69,89 @@ namespace TwoTrails.Properties {
                 this["AdvancedMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Datum {
+            get {
+                return ((int)(this["Datum"]));
+            }
+            set {
+                this["Datum"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int DecType {
+            get {
+                return ((int)(this["DecType"]));
+            }
+            set {
+                this["DecType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Distance {
+            get {
+                return ((int)(this["Distance"]));
+            }
+            set {
+                this["Distance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int Elevation {
+            get {
+                return ((int)(this["Elevation"]));
+            }
+            set {
+                this["Elevation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double MagDec {
+            get {
+                return ((double)(this["MagDec"]));
+            }
+            set {
+                this["MagDec"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int Slope {
+            get {
+                return ((int)(this["Slope"]));
+            }
+            set {
+                this["Slope"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("13")]
+        public int Zone {
+            get {
+                return ((int)(this["Zone"]));
+            }
+            set {
+                this["Zone"] = value;
+            }
+        }
     }
 }

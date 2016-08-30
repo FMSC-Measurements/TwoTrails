@@ -9,6 +9,7 @@ using FMSC.GeoSpatial.UTM;
 using FMSC.GeoSpatial;
 using TwoTrails.DAL;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace TwoTrails.Core
 {
@@ -830,10 +831,18 @@ namespace TwoTrails.Core
             else //Use reverse location calculation
             {
                 Position position = UTMTools.convertUTMtoLatLonSignedDec(point.UnAdjX, point.UnAdjY, oldZone);
-                coords = UTMTools.convertLatLonToUTM(position);
+                coords = UTMTools.convertLatLonToUTM(position, zone);
             }
 
             point.SetUnAdjLocation(coords.X, coords.Y, point.UnAdjZ);
+        }
+
+        public void ChangePointMetadata(TtPoint point, TtMetadata metadata)
+        {
+            if (point.IsGpsType())
+                ChangeGpsZone(point as GpsPoint, metadata.Zone, point.Metadata.Zone);
+
+            point.Metadata = metadata;
         }
         
         public void UpdatePolygonStats(TtPolygon poly)
@@ -1378,10 +1387,51 @@ namespace TwoTrails.Core
         {
             lock (locker)
             {
-                if (_PointsByPoly[polygon.CN].Any(p => p.HasQuondamLinks))
-                    throw new Exception("Points have links from other polygons: " + polygon.Name);
+                List<TtPoint> points = _PointsByPoly[polygon.CN];
 
-                foreach (TtPoint point in _PointsByPoly[polygon.CN])
+                if (points.Count > 0)
+                {
+                    foreach (TtPoint point in points)
+                    {
+                        if (point.OpType == OpType.Quondam)
+                        {
+                            ((QuondamPoint)point).ParentPoint = null;
+                        }
+                        else if (point.HasQuondamLinks)
+                        {
+                            foreach (string cn in point.LinkedPoints.ToArray())
+                            {
+                                QuondamPoint qp = _PointsMap[cn] as QuondamPoint;
+
+                                if (qp != null)
+                                {
+                                    if (qp.ParentPoint.PolygonCN != polygon.CN)
+                                    {
+                                        GpsPoint gps = new GpsPoint(qp);
+
+                                        if (!string.IsNullOrEmpty(gps.Comment) && string.IsNullOrEmpty(point.Comment))
+                                            gps.Comment = point.Comment;
+
+                                        if (qp.ManualAccuracy != null)
+                                            gps.ManualAccuracy = qp.ManualAccuracy;
+
+                                        qp.ParentPoint = null;
+
+                                        ReplacePoint(gps);
+                                    }
+                                    else
+                                        qp.ParentPoint = null;
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("Detached Quondam Found");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach (TtPoint point in points)
                 {
                     _PointsMap.Remove(point.CN);
                     _Points.Remove(point);
@@ -1406,6 +1456,7 @@ namespace TwoTrails.Core
         {
             return new TtMetadata(_Settings.MetadataSettings.CreateDefaultMetadata())
             {
+                CN = Guid.NewGuid().ToString(),
                 Name = name != null ? name : String.Format("Meta {0}", _MetadataMap.Count + 1)
             };
         }
@@ -1438,8 +1489,24 @@ namespace TwoTrails.Core
         {
             lock (locker)
             {
-                if (_PointsMap.Values.Any(p => p.MetadataCN == metadata.CN))
-                    throw new Exception("Points dependant on metadata: " + metadata.Name);
+                Dictionary<String, TtPolygon> adjustPolygons = new Dictionary<string, TtPolygon>();
+
+                foreach (TtPoint point in _PointsMap.Values.Where(p => p.MetadataCN == metadata.CN))
+                {
+                    if (point.IsGpsType())
+                        ChangeGpsZone(point as GpsPoint, DefaultMetadata.Zone, metadata.Zone);
+
+                    point.Metadata = DefaultMetadata;
+
+                    if (adjustPolygons.ContainsKey(point.PolygonCN))
+                        adjustPolygons.Add(point.PolygonCN, point.Polygon);
+                }
+
+                foreach (TtPolygon polygon in adjustPolygons.Values)
+                {
+                    AdjustAllTravTypesInPolygon(polygon);
+                    UpdatePolygonStats(polygon);
+                }
 
                 _MetadataMap.Remove(metadata.CN);
                 _Metadata.Remove(metadata);
@@ -1487,8 +1554,9 @@ namespace TwoTrails.Core
         {
             lock (locker)
             {
-                if (_PointsMap.Values.Any(p => p.GroupCN == group.CN))
-                    throw new Exception("Points dependant on group: " + group.Name);
+                foreach (TtPoint point in _PointsMap.Values.Where(p => p.GroupCN == group.CN))
+                    point.Group = MainGroup;
+                
                 _GroupsMap.Remove(group.CN);
                 _Groups.Remove(group);
             }
