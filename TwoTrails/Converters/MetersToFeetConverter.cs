@@ -16,7 +16,7 @@ namespace TwoTrails.Converters
             {
                 try
                 {
-                    return ((double)value * 3937d / 1200d).ToString("F3");
+                    return ((double)value * 3937d / 1200d);
                 }
                 catch
                 {
@@ -24,7 +24,7 @@ namespace TwoTrails.Converters
                 }
             }
 
-            return String.Empty;
+            return 0;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -22,8 +22,8 @@ namespace TwoTrails.Converters
 
                     switch (def)
                     {
-                        case AreaDef.Acres: return (val * 0.00024711).ToString("F3");
-                        case AreaDef.HectaAcres: return (val * 0.0001).ToString("F3");
+                        case AreaDef.Acres: return (val * 0.00024711);
+                        case AreaDef.HectaAcres: return (val * 0.0001);
                     }
                 }
                 catch
@@ -32,7 +32,7 @@ namespace TwoTrails.Converters
                 }
             }
 
-            return String.Empty;
+            return 0;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

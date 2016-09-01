@@ -875,13 +875,11 @@ namespace TwoTrails.Core
                         area += (p2.AdjX - p1.AdjX) * (p2.AdjY + p1.AdjY) / 2;
                     }
 
-                    polygon.Perimeter = perim;
-                    polygon.Area = Math.Abs(area);
+                    polygon.Update(perim, Math.Abs(area));
                 }
                 else
                 {
-                    polygon.Perimeter = 0;
-                    polygon.Area = 0;
+                    polygon.Update(0, 0);
                 } 
             }
         }

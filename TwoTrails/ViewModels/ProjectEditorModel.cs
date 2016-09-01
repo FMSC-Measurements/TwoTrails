@@ -4,6 +4,7 @@ using FMSC.Core.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,12 @@ namespace TwoTrails.ViewModels
     {
         private TtProject _Project;
         
+        public TtProjectInfo ProjectInfo { get { return _Project.ProjectInfo; } }
+        public TtManager Manager { get { return _Project.Manager; } }
+
+
+        public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
+        public double TotalPolygonPerimeter { get { return Get<double>(); } set { Set(value); } }
 
         public double PolygonAccuracy { get { return Get<double>(); } set { Set(value); } }
 
@@ -188,10 +195,47 @@ namespace TwoTrails.ViewModels
                 x => x != null && (x as TtGroup).CN != Consts.EmptyGuid,
                 this,
                 x => x.CurrentGroup);
+
+            PolygonShapeChanged(null);
+
+            ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += PolygonCollectionChanged;
         }
 
+        private void PolygonCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (TtPolygon poly in e.NewItems)
+                        poly.PolygonChanged += PolygonShapeChanged;
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (TtPolygon poly in e.OldItems)
+                        poly.PolygonChanged -= PolygonShapeChanged;
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Reset:
+                    foreach (TtPolygon poly in e.NewItems)
+                        poly.PolygonChanged += PolygonShapeChanged;
+                    foreach (TtPolygon poly in e.OldItems)
+                        poly.PolygonChanged -= PolygonShapeChanged;
+                    break;
+            }
+        }
 
-        
+        private void PolygonShapeChanged(TtPolygon polygon)
+        {
+            double area = 0, perim = 0;
+            foreach (TtPolygon poly in Manager.Polygons)
+            {
+                area += poly.Area;
+                perim += poly.Perimeter;
+            }
+
+            TotalPolygonArea = area;
+            TotalPolygonPerimeter = perim;
+        }
+
         private void PolygonChanged(TtPolygon poly)
         {
             PolygonAccuracy = poly != null ? poly.Accuracy : 6d;

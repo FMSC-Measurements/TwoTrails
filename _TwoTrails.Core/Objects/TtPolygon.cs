@@ -10,6 +10,9 @@ namespace TwoTrails.Core
         public event PolygonChangedEvent PolygonAccuracyChanged;
         public event PolygonChangedEvent PreviewPolygonAccuracyChanged;
 
+        public event PolygonChangedEvent PolygonChanged;
+        public event PolygonChangedEvent PreviewPolygonChanged;
+
         #region Properties
         protected String _Name;
         public String Name
@@ -117,6 +120,15 @@ namespace TwoTrails.Core
         {
             PreviewPolygonAccuracyChanged?.Invoke(this);
             PolygonAccuracyChanged?.Invoke(this);
+        }
+
+        public void Update(double perimeter, double area)
+        {
+            Perimeter = perimeter;
+            Area = area;
+
+            PreviewPolygonChanged?.Invoke(this);
+            PolygonChanged?.Invoke(this);
         }
 
 

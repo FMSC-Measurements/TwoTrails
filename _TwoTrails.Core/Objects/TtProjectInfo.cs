@@ -45,5 +45,25 @@ namespace TwoTrails.Core
             CreationDeviceID = info.CreationDeviceID;
             CreationDate = info.CreationDate;
         }
+
+        public override bool Equals(object obj)
+        {
+            TtProjectInfo info = obj as TtProjectInfo;
+
+            return info != null &&
+                info.Name == Name &&
+                info.Description == Description &&
+                info.Region == Region &&
+                info.Forest == Forest &&
+                info.District == District;
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode() ^
+                Region.GetHashCode() ^
+                Forest.GetHashCode() ^
+                District.GetHashCode();
+        }
     }
 }
