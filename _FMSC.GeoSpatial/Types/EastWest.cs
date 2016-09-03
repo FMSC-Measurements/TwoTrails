@@ -21,22 +21,4 @@ namespace FMSC.GeoSpatial
             throw new ArgumentException();
         }
     }
-
-    public static partial class GeoSpatialTypes
-    {
-        public static EastWest ParseEastWest(String value)
-        {
-            switch (value.ToLower())
-            {
-                case "0":
-                case "e":
-                case "east": return EastWest.East;
-                case "1":
-                case "w":
-                case "west": return EastWest.West;
-            }
-
-            throw new Exception("Unknown EastWest");
-        }
-    }
 }

@@ -9,19 +9,34 @@
     <Import_RootNamespace>FMSC.GeoSpatial</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)NMEA\" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DMS.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeoPosition.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GeoTools.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Latitude.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Longitude.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Exceptions\ExcessiveStringException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Exceptions\MissingNmeaDataException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Exceptions\NmeaException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\INmeaBurst.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\NmeaBurst.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\NmeaBurstEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\NmeaIDs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\NmeaParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Satellite.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Sentences\Base\MultiSentence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Sentences\Base\NmeaSentence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Sentences\Base\PositionSentence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Sentences\GGASentence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Sentences\GSASentence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Sentences\GSVSentence.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NMEA\Sentences\RMCSentence.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Position.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\EastWest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\GeoSpatialTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\GnssType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\NorthSouth.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\UomElevation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UTM\UTMCoords.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UTM\UTMTools.cs" />
   </ItemGroup>

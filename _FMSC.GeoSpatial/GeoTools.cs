@@ -1,4 +1,4 @@
-﻿using FMSC.Core;
+﻿using FMSC.GeoSpatial.Types;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,6 +7,13 @@ namespace FMSC.GeoSpatial
 {
     public static class GeoTools
     {
+        public static double ConvertElevation(double elevation, UomElevation to, UomElevation from)
+        {
+            if (to != from)
+                return (to == UomElevation.Meters) ? 1200d / 3937d : 3937d / 1200d;
+            return elevation;
+        }
+
         public static Position getGeoMidPoint(Position position1, Position position2)
         {
             List<Position> arr = new List<Position>();
@@ -103,7 +110,7 @@ namespace FMSC.GeoSpatial
                 y += Math.Cos(lat) * Math.Sin(lon);
                 q += Math.Sin(lat);
 
-                z += Core.Convert.Distance(p.Elevation, Distance.Meters, p.UomElevation);
+                z += ConvertElevation(p.Elevation, UomElevation.Meters, p.UomElevation);
             }
 
             x /= size;
@@ -116,10 +123,10 @@ namespace FMSC.GeoSpatial
             lat = Math.Atan2(q, hyp);
 
             return new GeoPosition(lat * 180.0 / Math.PI, lon * 180.0 / Math.PI,
-                Core.Convert.Distance(z, positions[0].UomElevation, Distance.Meters), positions[0].UomElevation);
+                ConvertElevation(z, positions[0].UomElevation, UomElevation.Meters), positions[0].UomElevation);
         }
 
-        public static GeoPosition getMidPioint(List<Double> lats, List<Double> lons, List<Double> elevations, Distance uomElevation)
+        public static GeoPosition getMidPioint(List<Double> lats, List<Double> lons, List<Double> elevations, UomElevation uomElevation)
         {
             if (lats == null || lats.Count < 1)
             {
@@ -158,7 +165,6 @@ namespace FMSC.GeoSpatial
             lat = Math.Atan2(q, hyp);
 
             return new GeoPosition(lat * 180.0 / Math.PI, lon * 180.0 / Math.PI, z, uomElevation);
-
         }
     }
 }

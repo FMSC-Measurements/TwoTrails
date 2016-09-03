@@ -4,32 +4,12 @@ namespace FMSC.GeoSpatial.UTM
 {
     public static class UTMTools
     {
-        public static UTMCoords convertLatLonToUTM(GeoPosition position)
+        public static UTMCoords convertLatLonToUTM(Position position, int targetUTM = 0)
         {
-            return convertLatLonToUTM(position.Latitude, position.Longitude);
+            return convertLatLonToUTM(position.Latitude, position.Longitude, targetUTM);
         }
-
-        public static UTMCoords convertLatLonToUTM(GeoPosition position, int utmToUsed)
-        {
-            return convertLatLonToUTM(position.Latitude, position.Longitude, utmToUsed);
-        }
-
-        public static UTMCoords convertLatLonToUTM(Position position)
-        {
-            return convertLatLonToUTM(position.Latitude, position.Longitude);
-        }
-
-        public static UTMCoords convertLatLonToUTM(Position position, int utmToUsed)
-        {
-            return convertLatLonToUTM(position.Latitude, position.Longitude, utmToUsed);
-        }
-
-        public static UTMCoords convertLatLonToUTM(Latitude latitude, Longitude longitude)
-        {
-            return convertLatLonSignedDecToUTM(latitude.toSignedDecimal(), longitude.toSignedDecimal(), 0);
-        }
-
-        public static UTMCoords convertLatLonToUTM(Latitude latitude, Longitude longitude, int targetUTM)
+        
+        public static UTMCoords convertLatLonToUTM(Latitude latitude, Longitude longitude, int targetUTM = 0)
         {
             return convertLatLonSignedDecToUTM(latitude.toSignedDecimal(), longitude.toSignedDecimal(), targetUTM);
         }

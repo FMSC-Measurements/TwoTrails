@@ -21,22 +21,4 @@ namespace FMSC.GeoSpatial
             throw new ArgumentException();
         }
     }
-
-    public static partial class GeoSpatialTypes
-    {
-        public static NorthSouth ParseNorthSouth(String value)
-        {
-            switch (value.ToLower())
-            {
-                case "0":
-                case "n":
-                case "north": return NorthSouth.North;
-                case "1":
-                case "s":
-                case "south": return NorthSouth.South;
-            }
-
-            throw new Exception("Unknown NorthSouth");
-        }
-    }
 }
