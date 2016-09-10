@@ -625,6 +625,7 @@ namespace TwoTrails.DAL
 
                         foreach (TtPoint point in points)
                         {
+                            count++;
                             where = String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, point.CN);
 
                             if (count % 50 == 0)
@@ -636,10 +637,11 @@ namespace TwoTrails.DAL
                                     trans.Rollback();
                                     return -1;
                                 }
+
+                                count = 0;
                             }
                             else
                             {
-                                count++;
                                 sb.AppendFormat("{0}{1}", where, count < total ? " or " : "");
                             }
 
@@ -943,7 +945,6 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-
                         foreach (TtPolygon poly in polygons)
                         {
                             count++;
@@ -953,7 +954,7 @@ namespace TwoTrails.DAL
                         }
 
                         string where = sb.ToString();
-
+                        
                         if (!String.IsNullOrEmpty(where) &&
                             database.Delete(TwoTrailsSchema.PolygonSchema.TableName,
                             where, conn, transaction) < 0)
@@ -961,6 +962,8 @@ namespace TwoTrails.DAL
                             transaction.Rollback();
                             return -1;
                         }
+                        else
+                            transaction.Commit();
                     }
                     catch
                     {
@@ -1193,6 +1196,7 @@ namespace TwoTrails.DAL
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, metadata.CN),
                             conn,
                             trans);
+                        trans.Commit();
                     }
                     catch
                     {
@@ -1309,6 +1313,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         database.Insert(TwoTrailsSchema.GroupSchema.TableName, GetGroupValues(group), conn, trans);
+                        trans.Commit();
                     }
                     catch
                     {
@@ -1369,6 +1374,7 @@ namespace TwoTrails.DAL
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, group.CN),
                             conn,
                             trans);
+                        trans.Commit();
                     }
                     catch
                     {
@@ -1442,6 +1448,7 @@ namespace TwoTrails.DAL
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, group.CN),
                             conn,
                             trans);
+                        trans.Commit();
                     }
                     catch
                     {
@@ -1680,6 +1687,8 @@ namespace TwoTrails.DAL
                             },
                             conn,
                             trans);
+
+                        trans.Commit();
                     }
                     catch
                     {
@@ -1787,6 +1796,7 @@ namespace TwoTrails.DAL
                                     break;
                             }
                         }
+                        trans.Commit();
                     }
                     catch
                     {
@@ -1829,6 +1839,8 @@ namespace TwoTrails.DAL
                             case MediaType.Video:
                                 break;
                         }
+
+                        trans.Commit();
                     }
                     catch
                     {
@@ -1965,6 +1977,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         database.Insert(TwoTrailsSchema.PolygonAttrSchema.TableName, GetGraphicOptionValues(option), conn, trans);
+                        trans.Commit();
                     }
                     catch
                     {
@@ -2008,6 +2021,7 @@ namespace TwoTrails.DAL
                             String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, option.CN),
                             conn,
                             trans);
+                        trans.Commit();
                     }
                     catch
                     {
@@ -2037,6 +2051,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         database.Insert(TwoTrailsSchema.ActivitySchema.TableName, GetUserActivityValues(activity), conn, trans);
+                        trans.Commit();
                     }
                     catch
                     {

@@ -145,6 +145,11 @@ namespace TwoTrails.Core
             return _Manager.GetPoints(polyCN);
         }
 
+        public TtPolygon GetPolygon(string polyCN)
+        {
+            return _Manager.GetPolygon(polyCN);
+        }
+
         public List<TtPolygon> GetPolyons()
         {
             return _Manager.GetPolyons();

@@ -18,39 +18,86 @@
         <cvt:MetersToFeetConverter x:Key="M2FConverter"/>
     </UserControl.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+    <Grid Background="{StaticResource colorBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="3" MinHeight="3" MaxHeight="3"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <Grid Grid.Row="0" Height="3" Background="Green" HorizontalAlignment="Stretch"/>
+
+        <Grid Grid.Row="0" Height="3" Background="{StaticResource colorPriamryDark}" HorizontalAlignment="Stretch"/>
 
         <TabControl x:Name="tabControl" Grid.Row="1" Margin="0" Padding="0"
                     TabStripPlacement="Left"
                     BorderThickness="0"
-                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+                    SelectionChanged="tabControl_SelectionChanged">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabItem}">
-                    <!--<Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>-->
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type TabItem}">
+                                <Grid Name="Grid"
+                                      Margin="-2, -2, -1, 1"
+                                      VerticalAlignment="Stretch" HorizontalAlignment="Right"
+                                      Background="{StaticResource colorBackground}">
+                                    <ContentPresenter x:Name="ContentSite" ContentSource="Header" Margin="0" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Grid" Property="Background" Value="SeaGreen"/>
+                                        <Setter TargetName="ContentSite" Property="Margin" Value="0, 0, 0, 0"/>
+                                    </Trigger>
+
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsSelected" Value="False" />
+                                            <Condition Property="IsMouseOver" Value="True" />
+                                        </MultiTrigger.Conditions>
+
+                                        <MultiTrigger.Setters>
+                                            <Setter TargetName="Grid" Property="Background" Value="MediumSeaGreen"/>
+                                        </MultiTrigger.Setters>
+                                    </MultiTrigger>
+
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsSelected" Value="True" />
+                                            <Condition Property="IsMouseOver" Value="False" />
+                                        </MultiTrigger.Conditions>
+
+                                        <MultiTrigger.Setters>
+
+                                        </MultiTrigger.Setters>
+                                    </MultiTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+
                     <Setter Property="HeaderTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <ContentPresenter Content="{TemplateBinding Content}">
-                                    <ContentPresenter.LayoutTransform>
-                                        <RotateTransform Angle="90" />
-                                    </ContentPresenter.LayoutTransform>
-                                </ContentPresenter>
+                                <Grid>
+                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White"
+                                               Margin="4, 8, 4, 8">
+                                        <TextBlock.LayoutTransform>
+                                            <RotateTransform Angle="90" />
+                                        </TextBlock.LayoutTransform>
+                                    </TextBlock>
+                                </Grid>
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>
-                    <Setter Property="Padding" Value="3" />
                 </Style>
             </TabControl.Resources>
-
+            
             <TabItem Header="Project">
-                <Grid Margin="2,0,0,0">
-                    <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="64*"/>
+                        <RowDefinition Height="533*"/>
+                    </Grid.RowDefinitions>
+                    <Border BorderBrush="{StaticResource colorPriamryDark}" BorderThickness="4,0,0,0" Grid.RowSpan="2">
                         <Grid Grid.Column="1" Grid.Row="0" Margin="5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -102,7 +149,7 @@
 
                             <TextBlock Grid.Column="0" Grid.Row="6" Text="District" />
                             <TextBox Grid.Column="0" Grid.Row="7"
-                                 Text="{Binding ProjectInfo.Forest, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Text="{Binding ProjectInfo.District, UpdateSourceTrigger=PropertyChanged}"/>
 
                             <TextBlock Grid.Column="0" Grid.Row="8" Text="Description" />
                             <TextBox Grid.Column="0" Grid.Row="9" Grid.ColumnSpan="3" MinLines="5" MaxLines="5"
@@ -139,7 +186,7 @@
                                     <TextBlock Grid.Column="0" Grid.Row="3" Text="Groups" />
                                     <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Manager.Groups.Count}" TextAlignment="Right" />
 
-                                    
+
                                     <TextBlock Grid.Column="0" Grid.Row="5" Text="Total Area (Ha)" />
                                     <TextBlock Grid.Column="2" Grid.Row="5" Text="{Binding TotalPolygonArea, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres, StringFormat=F2}" TextAlignment="Right" />
 
@@ -152,17 +199,14 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Name="tabPoints" Header="Points">
-                <Grid Margin="2,0,0,0">
-                    <Border BorderBrush="Green" BorderThickness="3,0,0,0">
-                        <ContentControl Name="ccPoints" />
-                    </Border>
-                </Grid>
+            <TabItem Name="tabPoints" Header="Points" FocusManager.FocusedElement="{Binding ccPoints}">
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                    <ContentControl Name="ccPoints" />
+                </Border>
             </TabItem>
 
-            <TabItem Header="Polygons" DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type TabControl}},Path=DataContext}" HorizontalAlignment="Left" Width="24">
-                <Grid Margin="2,0,0,0">
-                    <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+            <TabItem Header="Polygons" DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type TabControl}},Path=DataContext}">
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="200"/>
@@ -341,12 +385,10 @@
                             </Grid>
                         </Grid>
                     </Border>
-                </Grid>
             </TabItem>
 
             <TabItem Header="Metadata">
-                <Grid Margin="2,0,0,0">
-                    <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="200"/>
@@ -412,7 +454,7 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                    
+
                                     <Style TargetType="ComboBox">
                                         <Setter Property="FontSize" Value="20"/>
                                         <Setter Property="IsEnabled" Value="False" />
@@ -454,7 +496,7 @@
                                     <Button Grid.Column="1" Width="75" Command="{Binding MetadataUpdateZoneCommand}" Content="Update"/>
                                 </Grid>
 
-                                
+
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Declination Type" />
                                 <ComboBox Grid.Column="0" Grid.Row="5"
                                           SelectedItem="{Binding CurrentMetadata.DecType}"
@@ -464,8 +506,8 @@
                                 <TextBox Grid.Column="2" Grid.Row="5"
                                           Text="{Binding CurrentMetadata.MagDec}"
                                           PreviewTextInput="TextIsDouble"/>
-                                
-                                
+
+
                                 <TextBlock Grid.Column="0" Grid.Row="6" Text="Distance" />
                                 <ComboBox Grid.Column="0" Grid.Row="7"
                                           SelectedItem="{Binding CurrentMetadata.Distance}"
@@ -487,7 +529,7 @@
                                           SelectedItem="{Binding CurrentMetadata.Datum}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Datum}}"/>
 
-                                
+
                                 <TextBlock Grid.Column="0" Grid.Row="10" Text="Comment" />
                                 <TextBox Grid.Column="0" Grid.Row="11" Grid.ColumnSpan="3" MinLines="5" MaxLines="5"
                                 Text="{Binding CurrentMetadata.Comment, UpdateSourceTrigger=PropertyChanged}" />
@@ -516,117 +558,114 @@
                             </Grid>
                         </Grid>
                     </Border>
-                </Grid>
             </TabItem>
 
             <TabItem Header="Groups">
-                <Grid Margin="2,0,0,0">
-                    <Border BorderBrush="Green" BorderThickness="3,0,0,0">
-                        <Grid>
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ListBox Name="lbGroups" Grid.Column="0" Grid.Row="0" BorderThickness="0"
+                                     ItemsSource="{Binding Groups, Mode=OneWay}"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding GroupChangedCommand}"
+                             CommandParameter="{Binding ElementName=lbGroups, Path=SelectedItem}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Text="{Binding Name}" FontSize="18"/>
+                                        <TextBlock Grid.Row="1" Text="{Binding Description}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Grid Grid.Column="1" Grid.Row="0" Margin="5">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <ListBox Name="lbGroups" Grid.Column="0" Grid.Row="0" BorderThickness="0"
-                                     ItemsSource="{Binding Groups, Mode=OneWay}"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SelectionChanged">
-                                        <i:InvokeCommandAction Command="{Binding GroupChangedCommand}"
-                             CommandParameter="{Binding ElementName=lbGroups, Path=SelectedItem}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-                                            <TextBlock Grid.Row="0" Text="{Binding Name}" FontSize="18"/>
-                                            <TextBlock Grid.Row="1" Text="{Binding Description}"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="FontSize" Value="20"/>
+                                    <Setter Property="IsEnabled" Value="False" />
 
-                            <Grid Grid.Column="1" Grid.Row="0" Margin="5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="20"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=lbGroups, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
 
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="FontSize" Value="20"/>
+                                </Style>
 
-                                <Grid.Resources>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="FontSize" Value="20"/>
-                                        <Setter Property="IsEnabled" Value="False" />
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontSize" Value="20"/>
+                                </Style>
 
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=lbGroups, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
-                                                <Setter Property="IsEnabled" Value="True" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
+                            </Grid.Resources>
 
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="FontSize" Value="20"/>
-                                    </Style>
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
+                            <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentGroup.Name, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="FontSize" Value="20"/>
-                                    </Style>
-
-                                </Grid.Resources>
-
-                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentGroup.Name, UpdateSourceTrigger=PropertyChanged}"/>
-
-                                <TextBlock Grid.Column="2" Grid.Row="0" Text="Group Type" />
-                                <ComboBox Grid.Column="2" Grid.Row="1" IsEnabled="False"
+                            <TextBlock Grid.Column="2" Grid.Row="0" Text="Group Type" />
+                            <ComboBox Grid.Column="2" Grid.Row="1" IsEnabled="False"
                                           SelectedItem="{Binding CurrentGroup.GroupType}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type tt:GroupType}}"/>
 
-                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Description" />
-                                <TextBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" MinLines="5" MaxLines="5"
+                            <TextBlock Grid.Column="0" Grid.Row="2" Text="Description" />
+                            <TextBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" MinLines="5" MaxLines="5"
                                 Text="{Binding CurrentGroup.Description, UpdateSourceTrigger=PropertyChanged}" />
 
 
-                                <Grid Grid.Column="0" Grid.Row="13" Grid.ColumnSpan="3">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0" Grid.Row="13" Grid.ColumnSpan="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-                                    <Grid.Resources>
-                                        <Style TargetType="Button">
-                                            <Setter Property="Height" Value="25"/>
-                                            <Setter Property="Width" Value="75"/>
-                                        </Style>
-                                    </Grid.Resources>
+                                <Grid.Resources>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Height" Value="25"/>
+                                        <Setter Property="Width" Value="75"/>
+                                    </Style>
+                                </Grid.Resources>
 
-                                    <Button Grid.Column="0" Margin="0, 0, 5, 0" Content="Delete"
+                                <Button Grid.Column="0" Margin="0, 0, 5, 0" Content="Delete"
                                     Command="{Binding DeleteGroupCommand}" CommandParameter="{Binding ElementName=lbGroups, Path=SelectedItem}"
                                  IsEnabled="{Binding ElementName=lbGroups, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" />
-                                    <Button Grid.Column="3" Content="New" Command="{Binding NewGroupCommand}" CommandParameter="{Binding ElementName=lbGroups}" />
-                                </Grid>
+                                <Button Grid.Column="3" Content="New" Command="{Binding NewGroupCommand}" CommandParameter="{Binding ElementName=lbGroups}" />
                             </Grid>
                         </Grid>
-                    </Border>
-                </Grid>
+                    </Grid>
+                </Border>
             </TabItem>
         </TabControl>
     </Grid>

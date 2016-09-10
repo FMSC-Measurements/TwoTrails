@@ -596,10 +596,14 @@ namespace TwoTrails.ViewModels
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
+                CheckedListItem<TtPolygon> tmp;
+
                 foreach (TtPolygon polygon in e.NewItems)
                 {
-                    _Polygons.Add(new CheckedListItem<TtPolygon>(polygon, true));
+                    tmp = new CheckedListItem<TtPolygon>(polygon, true);
+                    _Polygons.Add(tmp);
                     _CheckedPolygons.Add(polygon.CN, true);
+                    tmp.ItemCheckedChanged += Polygon_ItemCheckedChanged;
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -629,10 +633,13 @@ namespace TwoTrails.ViewModels
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
+                CheckedListItem<TtMetadata> tmp;
                 foreach (TtMetadata Metadata in e.NewItems)
                 {
-                    _Metadatas.Add(new CheckedListItem<TtMetadata>(Metadata, true));
+                    tmp = new CheckedListItem<TtMetadata>(Metadata, true);
+                    _Metadatas.Add(tmp);
                     _CheckedMetadata.Add(Metadata.CN, true);
+                    tmp.ItemCheckedChanged += Metadata_ItemCheckedChanged;
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -662,10 +669,13 @@ namespace TwoTrails.ViewModels
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
+                CheckedListItem<TtGroup> tmp;
                 foreach (TtGroup Group in e.NewItems)
                 {
-                    _Groups.Add(new CheckedListItem<TtGroup>(Group, true));
+                    tmp = new CheckedListItem<TtGroup>(Group, true);
+                    _Groups.Add(tmp);
                     _CheckedGroups.Add(Group.CN, true);
+                    tmp.ItemCheckedChanged += Group_ItemCheckedChanged;
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -1244,6 +1254,9 @@ namespace TwoTrails.ViewModels
 
             if (!_CheckedOpTypes[point.OpType])
                 return false;
+
+
+            //TODO implement onbnd, and other filters
 
             return true;
         }

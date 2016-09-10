@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,11 +23,30 @@ namespace TwoTrails.ViewModels
             _PolygonStylesAlt = new Dictionary<string, Style>();
 
             foreach (TtPolygon poly in project.HistoryManager.GetPolyons())
-            {
                 CreatePolygonStyle(poly);
+
+            ((INotifyCollectionChanged)project.Manager.Polygons).CollectionChanged += DataStyleModel_CollectionChanged;
+        }
+
+        private void DataStyleModel_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (TtPolygon poly in e.NewItems)
+                {
+                    CreatePolygonStyle(poly);
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (TtPolygon poly in e.OldItems)
+                {
+                    _PolygonStyles.Remove(poly.CN);
+                    _PolygonStylesAlt.Remove(poly.CN);
+                }
             }
         }
-        
+
         private void CreatePolygonStyle(TtPolygon polygon)
         {
             Style style = new Style(typeof(DataGridRow));

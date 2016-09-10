@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
@@ -268,6 +269,7 @@ namespace TwoTrails.ViewModels
         public void SwitchToTab(TtTabModel tab)
         {
             _Tabs.SelectedItem = tab.Tab;
+            tab.Tab.Focus();
         }
 
         public bool CloseProject(TtProject project)
@@ -383,7 +385,7 @@ namespace TwoTrails.ViewModels
 
         private void ExportProject()
         {
-
+            ExportDialog.ShowDialog(CurrentProject, _MainWindow);
         }
 
         private void EditSettings()

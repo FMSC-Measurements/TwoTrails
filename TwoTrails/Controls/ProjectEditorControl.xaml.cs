@@ -46,6 +46,11 @@ namespace TwoTrails.Controls
         {
             e.Handled = string.IsNullOrEmpty(e.Text) ? false : e.Text.All(x => char.IsDigit(x) || x == '.');
         }
+
+        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //TabControl tabs = ((TabControl)sender);
+        }
     }
 
     public enum ProjectStartupTab

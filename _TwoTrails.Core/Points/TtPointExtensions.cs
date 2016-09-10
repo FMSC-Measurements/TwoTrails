@@ -24,7 +24,7 @@ namespace TwoTrails.Core.Points
 
         public static bool IsBndPoint(this TtPoint point)
         {
-            return point.OnBoundary && point.OpType != OpType.Quondam;
+            return point.OnBoundary;
         }
 
         public static bool IsNavPoint(this TtPoint point)

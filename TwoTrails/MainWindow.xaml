@@ -11,11 +11,6 @@
         Height="840" MinHeight="550"
         WindowStartupLocation="CenterScreen">
 
-    <!--<Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
-    </Window.Resources>-->
-
     <Window.InputBindings>
         <KeyBinding Command="{Binding CurrentProject.UndoCommand}" Key="Z" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding CurrentProject.RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
@@ -23,214 +18,211 @@
         <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
     </Window.InputBindings>
 
-    <DockPanel LastChildFill="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-        <Menu DockPanel.Dock="Top" Height="25">
-            <Menu.Resources>
-                <Style TargetType="MenuItem">
-                    <Setter Property="FontSize" Value="14"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="Foreground" Value="Black"/>
-                    <Setter Property="Height" Value="25"/>
-                </Style>
-            </Menu.Resources>
-            <MenuItem Header="_File">
-                <MenuItem Header="New" Command="{Binding NewCommand}"/>
-                <MenuItem Header="Open" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
-                
-                <Separator/>
+    <Grid>
+        <Grid x:Name="gridExport" Width="100" Height="100" VerticalAlignment="Top"
+              Background="Black" Panel.ZIndex="2" Margin="0, -150, 0, 0">
+        </Grid>
+        
+        <DockPanel LastChildFill="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Menu DockPanel.Dock="Top" Height="25">
+                <Menu.Resources>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Setter Property="Height" Value="25"/>
+                    </Style>
+                </Menu.Resources>
+                <MenuItem Header="_File">
+                    <MenuItem Header="New" Command="{Binding NewCommand}"/>
+                    <MenuItem Header="Open" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
 
-                <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}" InputGestureText="Ctrl+S"
+                    <Separator/>
+
+                    <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}" InputGestureText="Ctrl+S"
                           IsEnabled="{Binding Path=HasOpenedProject}"/>
-                
-                <Separator/>
-                
-                <MenuItem Header="Close Project" Command="{Binding CloseProjectCommand}" CommandParameter="{Binding CurrentProject}"
+
+                    <Separator/>
+
+                    <MenuItem Header="Close Project" Command="{Binding CloseProjectCommand}" CommandParameter="{Binding CurrentProject}"
                           IsEnabled="{Binding Path=HasOpenedProject}"/>
-                <MenuItem Header="Recent Projects" Name="miRecent" IsEnabled="{Binding Path=RecentItemsAvail}" />
-                
-                <Separator/>
-                
-                <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
-            </MenuItem>
-            
-            <MenuItem Header="_Edit">
-                <MenuItem Header="Undo" Command="{Binding CurrentProject.UndoCommand}" InputGestureText="Ctrl+Z"
+                    <MenuItem Header="Recent Projects" Name="miRecent" IsEnabled="{Binding Path=RecentItemsAvail}" />
+
+                    <Separator/>
+
+                    <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
+                </MenuItem>
+
+                <MenuItem Header="_Edit">
+                    <MenuItem Header="Undo" Command="{Binding CurrentProject.UndoCommand}" InputGestureText="Ctrl+Z"
                           Style="{StaticResource styleMiDisableNullCommand}"/>
-                <MenuItem Header="Redo" Command="{Binding CurrentProject.RedoCommand}" InputGestureText="Ctrl+Shift+Z"
+                    <MenuItem Header="Redo" Command="{Binding CurrentProject.RedoCommand}" InputGestureText="Ctrl+Shift+Z"
                           Style="{StaticResource styleMiDisableNullCommand}"/>
 
-                <Separator/>
-                
-                <MenuItem Header="Rename Points" Command="{Binding CurrentEditor.RenamePointsCommand}"
-                          Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
-                <MenuItem Header="Reverse Points" Command="{Binding CurrentEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
-                          Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
-                
-                <Separator/>
+                    <Separator/>
 
-                <MenuItem Header="Reset Point" Command="{Binding CurrentEditor.ResetPointCommand}" InputGestureText="Ctrl+R"
+                    <MenuItem Header="Rename Points" Command="{Binding CurrentEditor.RenamePointsCommand}"
                           Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
-                <MenuItem Header="Discard Changes" Command="{Binding Project.DiscardChangesCommand}"
+                    <MenuItem Header="Reverse Points" Command="{Binding CurrentEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
                           Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
 
-                <Separator/>
+                    <Separator/>
 
-                <MenuItem Header="Delete" Command="{Binding CurrentEditor.DeleteCommand}" InputGestureText="Del"
+                    <MenuItem Header="Reset Point" Command="{Binding CurrentEditor.ResetPointCommand}" InputGestureText="Ctrl+R"
+                          Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                    <MenuItem Header="Discard Changes" Command="{Binding Project.DiscardChangesCommand}"
+                          Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+
+                    <Separator/>
+
+                    <MenuItem Header="Delete" Command="{Binding CurrentEditor.DeleteCommand}" InputGestureText="Del"
                           Style="{StaticResource styleMiDisableNullCommand}"/>
-            </MenuItem>
-            
-            <MenuItem Header="_Data">
-                <!--<MenuItem Header="Edit Project" Command="{Binding CurrentProject.EditProjectCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                <MenuItem Header="Edit Points" Command="{Binding CurrentProject.EditPointsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                <MenuItem Header="Edit Polygons" Command="{Binding CurrentProject.EditPolygonsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                <MenuItem Header="Edit Groups" Command="{Binding CurrentProject.EditGroupsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                <MenuItem Header="Edit Metadata" Command="{Binding CurrentProject.EditMetadataCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                </MenuItem>
 
-                <Separator/>-->
+                <MenuItem Header="_Data">
+                    <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                    <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
 
-                <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-
-                <Separator/>
+                    <!--<Separator/>
 
                 <MenuItem Header="Create Polygon" Command="{Binding CurrentEditor.CreatePolygonCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                <MenuItem Header="Create Group" Command="{Binding CurrentEditor.CreateGroupCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-            </MenuItem>
-            
-            <MenuItem Header="_Tools">
-                <MenuItem Header="Create Quondams" Command="{Binding CurrentEditor.CreateQuondamsCommand}"
+                <MenuItem Header="Create Group" Command="{Binding CurrentEditor.CreateGroupCommand}" IsEnabled="{Binding HasOpenedProject}"/>-->
+                </MenuItem>
+
+                <MenuItem Header="_Tools">
+                    <MenuItem Header="Create Quondams" Command="{Binding CurrentEditor.CreateQuondamsCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
-                <MenuItem Header="Move Points" Command="{Binding CurrentEditor.MovePointsCommand}"
+                    <MenuItem Header="Move Points" Command="{Binding CurrentEditor.MovePointsCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
-                <MenuItem Header="Retrace Points" Command="{Binding CurrentEditor.RetraceCommand}"
+                    <MenuItem Header="Retrace Points" Command="{Binding CurrentEditor.RetraceCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
 
-                <Separator/>
+                    <Separator/>
 
-                <MenuItem Header="Create Plots" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
+                    <MenuItem Header="Create Plots" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
                           Style="{StaticResource styleMiDisableNullCommand}"/>
-                <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
+                    <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
                           Style="{StaticResource styleMiDisableNullCommand}"/>
 
-                <Separator/>
+                    <Separator/>
 
-                <MenuItem Header="Settings" Command="{Binding SettingsCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
-            </MenuItem>
+                    <MenuItem Header="Settings" Command="{Binding SettingsCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
+                </MenuItem>
 
-            <MenuItem Header="_Help">
-                <MenuItem Header="View Error Log" Command="{Binding ViewLogCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
-                <MenuItem Header="View User Activity" Command="{Binding CurrentProject.ViewUserActivityCommand}"
+                <MenuItem Header="_Help">
+                    <MenuItem Header="View Error Log" Command="{Binding ViewLogCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
+                    <MenuItem Header="View User Activity" Command="{Binding CurrentProject.ViewUserActivityCommand}"
                           Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource ResourceKey=BoolToVis}}"
                           Style="{StaticResource styleMiDisableNullCommand}"/>
 
-                <Separator/>
+                    <Separator/>
 
-                <MenuItem Header="About TwoTrails" Command="{Binding AboutCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
-            </MenuItem>
-        </Menu>
-        <!--<ToolBarPanel Background="{StaticResource colorBackground}" Height="25" VerticalAlignment="Top" Width="Auto" DockPanel.Dock="Top" Margin="0">
+                    <MenuItem Header="About TwoTrails" Command="{Binding AboutCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
+                </MenuItem>
+            </Menu>
             
-        </ToolBarPanel>-->
-        <StatusBar Height="25" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="{StaticResource colorPriamryDark}"/>
+            <StatusBar Height="25" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="{StaticResource colorPriamryDark}"/>
 
-        <TabControl x:Name="tabControl"
+            <TabControl x:Name="tabControl"
                     Margin="0" Padding="0" Drop="tabControl_Drop" AllowDrop="True"
                     DockPanel.Dock="Top" BorderThickness="0"
                     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-            <TabControl.Resources>
-                <Style TargetType="{x:Type TabItem}">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type TabItem}">
-                                <Grid Name="Grid" VerticalAlignment="Bottom" Background="{StaticResource colorBackground}" Margin="-3, 0, 2, 0" HorizontalAlignment="Stretch">
-                                    <Border>
-                                        <DockPanel Margin="2">
-                                            <TextBlock x:Name="ContentSite" Text="{Binding TabTitle}" DockPanel.Dock="Left"  HorizontalAlignment="Center"
+
+                <TabControl.Resources>
+                    <Style TargetType="{x:Type TabItem}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type TabItem}">
+                                    <Grid Name="Grid" VerticalAlignment="Bottom" Background="{StaticResource colorBackground}" Margin="-3, 0, 2, 0" HorizontalAlignment="Stretch">
+                                        <Border>
+                                            <DockPanel Margin="2">
+                                                <TextBlock x:Name="ContentSite" Text="{Binding TabTitle}" DockPanel.Dock="Left"  HorizontalAlignment="Center"
                                                        VerticalAlignment="Center" Margin="4,2,8,2" ToolTip="{Binding ToolTip}"/>
 
-                                            <Button Name="btnCloseProject" Visibility="Hidden" DockPanel.Dock="Right" HorizontalAlignment="Right"
+                                                <Button Name="btnCloseProject" Visibility="Hidden" DockPanel.Dock="Right" HorizontalAlignment="Right"
                                                             BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                                             Command="{Binding CloseTabCommand}" CommandParameter="{Binding CurrentTab}">
-                                                <TextBlock Name="lblClose" Foreground="White" Padding="0" Margin="0" Width="15" Height="15"
+                                                    <TextBlock Name="lblClose" Foreground="White" Padding="0" Margin="0" Width="15" Height="15"
                                                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextAlignment="Center" Text="X">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
-                                                            <Style.Triggers>
-                                                                <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter Property="Background" Value="{StaticResource colorPriamry}" />
-                                                                </Trigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
-                                            </Button>
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter Property="Background" Value="{StaticResource colorPriamry}" />
+                                                                    </Trigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Button>
 
-                                            <Button Name="btnOpenInWindow" Visibility="Collapsed" DockPanel.Dock="Right" HorizontalAlignment="Right"
+                                                <Button Name="btnOpenInWindow" Visibility="Collapsed" DockPanel.Dock="Right" HorizontalAlignment="Right"
                                                             BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                                                <Image Source="{StaticResource ImgOpenInNew}" Width="15" Height="15" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2"/>
-                                            </Button>
-                                        </DockPanel>
-                                    </Border>
-                                </Grid>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Grid" Property="Background" Value="SeaGreen"/>
-                                    </Trigger>
+                                                    <Image Source="{StaticResource ImgOpenInNew}" Width="15" Height="15" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2"/>
+                                                </Button>
+                                            </DockPanel>
+                                        </Border>
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Grid" Property="Background" Value="SeaGreen"/>
+                                        </Trigger>
 
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="btnCloseProject" Property="Visibility" Value="Visible"/>
-                                    </Trigger>
-
-                                    <DataTrigger Binding="{Binding IsDetachable}" Value="True">
-                                        <Setter TargetName="btnOpenInWindow" Property="Visibility" Value="Visible"/>
-                                    </DataTrigger>
-
-                                    <MultiTrigger>
-                                        <MultiTrigger.Conditions>
-                                            <Condition Property="IsSelected" Value="False" />
-                                            <Condition Property="IsMouseOver" Value="True" />
-                                        </MultiTrigger.Conditions>
-
-                                        <MultiTrigger.Setters>
-                                            <Setter TargetName="Grid" Property="Background" Value="MediumSeaGreen"/>
-                                        </MultiTrigger.Setters>
-                                    </MultiTrigger>
-
-                                    <MultiTrigger>
-                                        <MultiTrigger.Conditions>
-                                            <Condition Property="IsSelected" Value="True" />
-                                            <Condition Property="IsMouseOver" Value="False" />
-                                        </MultiTrigger.Conditions>
-
-                                        <MultiTrigger.Setters>
+                                        <Trigger Property="IsMouseOver" Value="True">
                                             <Setter TargetName="btnCloseProject" Property="Visibility" Value="Visible"/>
-                                        </MultiTrigger.Setters>
-                                    </MultiTrigger>
-                                </ControlTemplate.Triggers>
+                                        </Trigger>
+
+                                        <DataTrigger Binding="{Binding IsDetachable}" Value="True">
+                                            <Setter TargetName="btnOpenInWindow" Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="False" />
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                            </MultiTrigger.Conditions>
+
+                                            <MultiTrigger.Setters>
+                                                <Setter TargetName="Grid" Property="Background" Value="MediumSeaGreen"/>
+                                            </MultiTrigger.Setters>
+                                        </MultiTrigger>
+
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="True" />
+                                                <Condition Property="IsMouseOver" Value="False" />
+                                            </MultiTrigger.Conditions>
+
+                                            <MultiTrigger.Setters>
+                                                <Setter TargetName="btnCloseProject" Property="Visibility" Value="Visible"/>
+                                            </MultiTrigger.Setters>
+                                        </MultiTrigger>
+                                    </ControlTemplate.Triggers>
 
 
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
 
-                    <Setter Property="HeaderTemplate">
-                        <Setter.Value>
-                            <DataTemplate>
-                                <Grid Margin="0">
-                                    <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center"/>
-                                </Grid>
-                            </DataTemplate>
-                        </Setter.Value>
-                    </Setter>
+                        <Setter Property="HeaderTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <Grid Margin="0">
+                                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
 
-                    <Setter Property="Height" Value="25" />
-                    <Setter Property="Margin" Value="0" />
-                    <Setter Property="Padding" Value="0" />
-                    <!--<Setter Property="FontFamily" Value="DokChampa" />-->
-                    <Setter Property="FontSize" Value="14" />
-                    <Setter Property="Foreground" Value="White"/>
-                </Style>
-            </TabControl.Resources>
-        </TabControl>
-    </DockPanel>
+                        <Setter Property="Height" Value="25" />
+                        <Setter Property="Margin" Value="0" />
+                        <Setter Property="Padding" Value="0" />
+                        <!--<Setter Property="FontFamily" Value="DokChampa" />-->
+                        <Setter Property="FontSize" Value="14" />
+                        <Setter Property="Foreground" Value="White"/>
+                    </Style>
+                </TabControl.Resources>
+            </TabControl>
+        </DockPanel>
+    </Grid>
 </Window>

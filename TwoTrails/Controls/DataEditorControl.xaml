@@ -11,6 +11,7 @@
              xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
              xmlns:cc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
              mc:Ignorable="d" 
+             FocusManager.FocusedElement="{Binding ElementName=dgPoints}"
              d:DesignHeight="600" d:DesignWidth="800">
 
     <UserControl.Resources>
@@ -256,7 +257,7 @@
                 VisibleItemsList="{Binding VisiblePoints, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
                 SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
 
-            <DataGrid.InputBindings>
+                <DataGrid.InputBindings>
                     <KeyBinding Command="{Binding DeleteCommand}" Key="Delete"/>
                 </DataGrid.InputBindings>
                 
@@ -300,7 +301,7 @@
 
                         <Separator/>
 
-                        <MenuItem Header="Reset" Command="{Binding ResetCommand}" />
+                        <MenuItem Header="Reset" Command="{Binding ResetPointCommand}" />
 
                         <Separator/>
 

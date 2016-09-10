@@ -26,6 +26,7 @@ namespace TwoTrails.Core
         void DeletePoint(TtPoint point);
         void DeletePoints(IEnumerable<TtPoint> points);
 
+        TtPolygon GetPolygon(string polyCN);
         List<TtPolygon> GetPolyons();
         void AddPolygon(TtPolygon polygon);
         void DeletePolygon(TtPolygon polygon);

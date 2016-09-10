@@ -14,6 +14,8 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public DeleteTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, bool autoCommit = true) : base(points)
         {
+            this.pointsManager = pointsManager;
+
             if (points.Any(p => p.HasQuondamLinks))
             {
                 HashSet<string> deletedCNs = new HashSet<string>(points.Select(p => p.CN));

@@ -955,6 +955,14 @@ namespace TwoTrails.Core
             
         }
 
+
+        public TtPolygon GetPolygon(string polyCN)
+        {
+            if (_PolygonsMap.ContainsKey(polyCN))
+                return _PolygonsMap[polyCN];
+            throw new Exception("Polygon Not Found");
+        }
+
         public List<TtPolygon> GetPolyons()
         {
             return _PolygonsMap.Values.ToList();
@@ -1074,6 +1082,7 @@ namespace TwoTrails.Core
                 IList<TtPoint> points = null;
 
                 List<String> polysToAdjustTravsIn = new List<string>();
+                List<string> polysToAdjust = new List<string>();
 
                 foreach (TtPoint point in addPoints)
                 {
@@ -1118,12 +1127,18 @@ namespace TwoTrails.Core
                     _Points.Add(point);
                     _PointsMap.Add(point.CN, point);
                     lastPoint = point;
+
+                    if (!polysToAdjust.Contains(point.PolygonCN))
+                        polysToAdjust.Add(point.PolygonCN);
                 }
 
                 foreach (string polyCN in polysToAdjustTravsIn)
                 {
                     AdjustAllTravTypesInPolygon(_PolygonsMap[polyCN]);
                 }
+
+                foreach (string cn in polysToAdjust)
+                    _PolygonUpdateHandlers[cn].DelayInvoke();
             }
         }
         
@@ -1152,7 +1167,7 @@ namespace TwoTrails.Core
                 _PointsMap[point.CN] = point;
                 _Points.Add(point);
 
-                AttachPointEvents(point);
+                AttachPoint(point);
 
                 AdjustAroundPoint(point, points);
             }
@@ -1263,7 +1278,7 @@ namespace TwoTrails.Core
 
                         TtPolygon poly = _PolygonsMap[ripoly];
                         AdjustAllTravTypesInPolygon(poly);
-                        GeneratePolygonStats(poly);
+                        _PolygonUpdateHandlers[poly.CN].DelayInvoke();
                     }
                 }
             }
@@ -1435,12 +1450,12 @@ namespace TwoTrails.Core
                     _Points.Remove(point);
                 }
 
+                DetachPolygonEvents(polygon);
+
                 _PointsByPoly.Remove(polygon.CN);
 
                 _PolygonsMap.Remove(polygon.CN);
                 _Polygons.Remove(polygon);
-
-                DetachPolygonEvents(polygon);
             }
         }
 

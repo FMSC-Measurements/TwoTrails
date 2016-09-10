@@ -2,6 +2,8 @@
 using FMSC.Core.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,12 +18,9 @@ namespace TwoTrails.ViewModels
     public class TtProject : NotifyPropertyChangedEx
     {
         public String FilePath { get { return DAL.FilePath; } }
-
-        public ICommand OpenDataEditor { get; }
-        public ICommand OpenProject { get; }
-        public ICommand OpenUserActivity { get; }
-        public ICommand OpenMap { get; }
-        public ICommand OpenMapWindow { get; }
+        
+        public ICommand OpenMapCommand { get; }
+        public ICommand OpenMapWindowCommand { get; }
         public ICommand ViewUserActivityCommand { get; set; }
 
         public ICommand EditProjectCommand { get; }
@@ -66,7 +65,8 @@ namespace TwoTrails.ViewModels
 
 
 
-        public TtProjectInfo ProjectInfo { get; private set; }
+        private TtProjectInfo _ProjectInfo;
+        public TtProjectInfo ProjectInfo { get; }
         
         public String ProjectName
         {
@@ -76,7 +76,7 @@ namespace TwoTrails.ViewModels
         
         public bool RequiresSave
         {
-            get { return Get<bool>() || DataChanged; }
+            get { return Get<bool>() || DataChanged || ProjectChanged; }
             private set { Set(value); }
         }
 
@@ -90,13 +90,19 @@ namespace TwoTrails.ViewModels
             private set { Set(value, () => OnPropertyChanged(nameof(RequiresSave))); }
         }
 
+        public bool ProjectChanged
+        {
+            get { return Get<bool>(); }
+            private set { Set(value, () => OnPropertyChanged(nameof(RequiresSave))); }
+        }
 
-        public ITtDataLayer DAL { get; private set; }
+
+        public ITtDataLayer DAL { get; }
 
         public ITtSettings Settings { get; private set; }
 
-        public TtManager Manager { get; private set; }
-        public TtHistoryManager HistoryManager { get; private set; }
+        public TtManager Manager { get; }
+        public TtHistoryManager HistoryManager { get; }
 
         private DataEditorModel _DataEditor;
         public DataEditorModel DataEditor
@@ -121,6 +127,13 @@ namespace TwoTrails.ViewModels
             _MainModel = mainModel;
 
             ProjectInfo = dal.GetProjectInfo();
+            _ProjectInfo = new TtProjectInfo(ProjectInfo);
+
+            ProjectInfo.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
+            {
+                ProjectChanged = !_ProjectInfo.Equals(ProjectInfo);
+            };
+
             ProjectName = ProjectInfo.Name;
 
             RequiresSave = false;
@@ -160,12 +173,19 @@ namespace TwoTrails.ViewModels
             {
                 try
                 {
+                    if (ProjectChanged)
+                    {
+                        DAL.UpdateProjectInfo(ProjectInfo);
+                        _ProjectInfo = new TtProjectInfo(ProjectInfo);
+                        ProjectName = ProjectInfo.Name;
+                    }
+
                     Manager.Save();
-                    RequiresSave = DataChanged = false;
+                    RequiresSave = DataChanged = ProjectChanged = false;
                 }
                 catch (Exception ex)
                 {
-                    //Unable to save
+                    Trace.WriteLine(ex.Message, "TtProject:Save");
                 }
             }
         }

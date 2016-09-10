@@ -45,9 +45,11 @@ namespace TwoTrails.ViewModels
                         old.PropertyChanged -= Polygon_PropertyChanged;
                     }
 
-                    _BackupPoly = new TtPolygon(value);
-
-                    _CurrentPolygon.PropertyChanged += Polygon_PropertyChanged;
+                    if (value != null)
+                    {
+                        _BackupPoly = new TtPolygon(value);
+                        _CurrentPolygon.PropertyChanged += Polygon_PropertyChanged;
+                    }
                 });
 
             }
@@ -197,6 +199,9 @@ namespace TwoTrails.ViewModels
                 x => x.CurrentGroup);
 
             PolygonShapeChanged(null);
+
+            foreach (TtPolygon poly in Manager.Polygons)
+                poly.PolygonChanged += PolygonShapeChanged;
 
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += PolygonCollectionChanged;
         }
