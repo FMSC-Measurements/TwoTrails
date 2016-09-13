@@ -158,77 +158,84 @@
         <cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcSlpAng}, Path=Metadata}"
             Source="{Binding Path=Metadata, Mode=OneWay}" />
 
-        <Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" HorizontalAlignment="Stretch">
-            <Grid.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Property="Foreground" Value="Black"/>
-                </Style>
-            </Grid.Resources>
-            
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" MinWidth="100" MaxWidth="250"/>
-                <ColumnDefinition Width="125"/>
-                <ColumnDefinition Width="170" MinWidth="100" MaxWidth="250"/>
-                <ColumnDefinition Width="150" MinWidth="100" MaxWidth="250"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" HorizontalAlignment="Stretch">
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="Black"/>
+                    </Style>
+                </Grid.Resources>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" MinWidth="100" MaxWidth="250"/>
+                    <ColumnDefinition Width="125"/>
+                    <ColumnDefinition Width="170" MinWidth="100" MaxWidth="250"/>
+                    <ColumnDefinition Width="150" MinWidth="100" MaxWidth="250"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-
-            <TextBlock Text="Polygons" Grid.Column="0" Grid.Row="0" TextAlignment="Center"/>
-
-            <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Polygons}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Viewbox Margin="-1">
-                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}"/>
-                        </Viewbox>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
 
-            <TextBlock Text="OpTypes" Grid.Column="1" Grid.Row="0" TextAlignment="Center"/>
+                <TextBlock Text="Polygons" Grid.Column="0" Grid.Row="0" TextAlignment="Center"/>
 
-            <ListBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding OpTypes}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item}" Margin="2"/>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-
-
-            <TextBlock Text="Groups" Grid.Column="2" Grid.Row="0" TextAlignment="Center"/>
-
-            <ListBox Grid.Column="2" Grid.Row="1" ItemsSource="{Binding Groups}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Polygons}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Viewbox Margin="-1">
+                                <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}"/>
+                            </Viewbox>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
 
-            <TextBlock Text="Metadata" Grid.Column="3" Grid.Row="0" TextAlignment="Center"/>
+                <TextBlock Text="OpTypes" Grid.Column="1" Grid.Row="0" TextAlignment="Center"/>
 
-            <ListBox Grid.Column="3" Grid.Row="1" ItemsSource="{Binding Metadatas}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                <ListBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding OpTypes}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item}" Margin="2"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
-            <Grid Grid.Column="4" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="2">
-                
+
+                <TextBlock Text="Groups" Grid.Column="2" Grid.Row="0" TextAlignment="Center"/>
+
+                <ListBox Grid.Column="2" Grid.Row="1" ItemsSource="{Binding Groups}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+
+                <TextBlock Text="Metadata" Grid.Column="3" Grid.Row="0" TextAlignment="Center"/>
+
+                <ListBox Grid.Column="3" Grid.Row="1" ItemsSource="{Binding Metadatas}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Grid Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="1" Grid.RowSpan="2" Margin="5, 0, 5, 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <CheckBox Content="On Boundary" Grid.Row="0" IsThreeState="True" IsChecked="{Binding IsOnBnd}" Command="{Binding RefreshPoints}" />
+                    <CheckBox Content="Has Links" Grid.Row="1" IsThreeState="True" IsChecked="{Binding HasLinks}" Command="{Binding RefreshPoints}" />
+                </Grid>
             </Grid>
-        </Grid>
-
+        </ScrollViewer>
         <GridSplitter Grid.Row="1" Background="Gray" Height="3" HorizontalAlignment="Stretch"/>
 
         <Grid Grid.Row="2">

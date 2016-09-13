@@ -24,10 +24,8 @@ namespace TwoTrails.Controls
         public ProjectEditorControl(TtProject project, ProjectStartupTab tab = ProjectStartupTab.Project)
         {
             this.DataContext = new ProjectEditorModel(project);
-            
-            InitializeComponent();
 
-            ccPoints.Content = new DataEditorControl(project.DataEditor, new DataStyleModel(project));
+            InitializeComponent();
 
             SwitchToTab(tab);
         }
@@ -45,11 +43,6 @@ namespace TwoTrails.Controls
         private void TextIsDouble(object sender, TextCompositionEventArgs e)
         {
             e.Handled = string.IsNullOrEmpty(e.Text) ? false : e.Text.All(x => char.IsDigit(x) || x == '.');
-        }
-
-        private void tabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //TabControl tabs = ((TabControl)sender);
         }
     }
 

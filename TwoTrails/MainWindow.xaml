@@ -120,13 +120,30 @@
                     <MenuItem Header="About TwoTrails" Command="{Binding AboutCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                 </MenuItem>
             </Menu>
-            
-            <StatusBar Height="25" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="{StaticResource colorPriamryDark}"/>
+
+            <StatusBar Height="25" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="{StaticResource colorPriamryDark}">
+                <StatusBar.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="FontSize" Value="16"/>
+                        <Setter Property="Foreground" Value="White"/>
+                    </Style>
+                </StatusBar.Resources>
+                
+                <StatusBarItem>
+                    <TextBlock Name="sbiStatus" Text="Status"/>
+                </StatusBarItem>
+
+                <StatusBarItem HorizontalAlignment="Right">
+                    <TextBlock Name="sbiInfo" Text="Info"/>
+                </StatusBarItem>
+            </StatusBar>
 
             <TabControl x:Name="tabControl"
                     Margin="0" Padding="0" Drop="tabControl_Drop" AllowDrop="True"
                     DockPanel.Dock="Top" BorderThickness="0"
                     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                <!--SelectionChanged="{Binding Tabs_SelectionChanged}">-->
 
                 <TabControl.Resources>
                     <Style TargetType="{x:Type TabItem}">

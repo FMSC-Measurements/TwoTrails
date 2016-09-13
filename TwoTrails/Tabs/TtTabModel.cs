@@ -2,6 +2,7 @@
 using FMSC.Core.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,8 @@ namespace TwoTrails
                 Project.ProjectName,
                 Project.RequiresSave ? "*" : String.Empty); }
         }
+
+        public virtual String TabInfo { get { return String.Empty; } }
 
         public TtProject Project { get; private set; }
 
@@ -49,7 +52,7 @@ namespace TwoTrails
             Tab.DataContext = this;
         }
 
-        private void Project_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Project_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "ProjectName" || e.PropertyName == "RequiresSave")
             {

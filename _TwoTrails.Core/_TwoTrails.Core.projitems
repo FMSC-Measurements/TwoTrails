@@ -37,6 +37,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtPolygonCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consts.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HaidLogic.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IAccuracy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtDataLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtManager.cs" />
@@ -47,6 +48,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtPanorama.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtPhotoShpere.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataActivityType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\HaidSummary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\IDeviceSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\IMetadataSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\IPointSegment.cs" />

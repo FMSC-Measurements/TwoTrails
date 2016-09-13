@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 
@@ -23,6 +24,9 @@ namespace TwoTrails.ViewModels
         
         public TtProjectInfo ProjectInfo { get { return _Project.ProjectInfo; } }
         public TtManager Manager { get { return _Project.Manager; } }
+
+
+        public DataEditorControl DataController { get; }
 
 
         public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
@@ -155,6 +159,8 @@ namespace TwoTrails.ViewModels
         public ProjectEditorModel(TtProject project)
         {
             _Project = project;
+
+            DataController = new DataEditorControl(project.DataEditor, new DataStyleModel(project));
 
             CurrentPolygon = null;
             CurrentMetadata = null;

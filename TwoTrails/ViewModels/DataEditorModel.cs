@@ -23,6 +23,8 @@ namespace TwoTrails.ViewModels
     public class DataEditorModel : NotifyPropertyChangedEx
     {
         #region Commands
+        public ICommand RefreshPoints { get; }
+
         public ICommand ChangeQuondamParentCommand { get; }
         public ICommand RenamePointsCommand { get; }
         public ICommand ReverseSelectedCommand { get; }
@@ -416,7 +418,7 @@ namespace TwoTrails.ViewModels
         }
         #endregion
 
-        #region TtObjects
+        #region Filters
         Dictionary<string, bool> _CheckedPolygons = new Dictionary<string, bool>();
         Dictionary<string, bool> _CheckedMetadata = new Dictionary<string, bool>();
         Dictionary<string, bool> _CheckedGroups = new Dictionary<string, bool>();
@@ -434,6 +436,9 @@ namespace TwoTrails.ViewModels
 
         private List<CheckedListItem<string>> _OpTypes = new List<CheckedListItem<string>>();
         public ReadOnlyCollection<CheckedListItem<String>> OpTypes { get; private set; }
+
+        public bool? IsOnBnd { get { return Get<bool?>(); } set { Set(value); } }
+        public bool? HasLinks { get { return Get<bool?>(); } set { Set(value); } }
         #endregion
 
 
@@ -446,6 +451,8 @@ namespace TwoTrails.ViewModels
                     Points.Refresh();
                 OnSelectionChanged();
             };
+
+            RefreshPoints = new RelayCommand(x => Points.Refresh());
 
             CopyCellValueCommand = new BindedRelayCommand<DataEditorModel>(
                 x => CopyCellValue(x as DataGrid), x => HasSelection,
@@ -582,6 +589,8 @@ namespace TwoTrails.ViewModels
             Metadatas = new ReadOnlyObservableCollection<CheckedListItem<TtMetadata>>(_Metadatas);
             OpTypes = new ReadOnlyCollection<CheckedListItem<string>>(_OpTypes);
 
+            IsOnBnd = null;
+            HasLinks = null;
 
             Points = CollectionViewSource.GetDefaultView(Manager.Points) as ListCollectionView;
             
@@ -1255,8 +1264,11 @@ namespace TwoTrails.ViewModels
             if (!_CheckedOpTypes[point.OpType])
                 return false;
 
+            if (IsOnBnd != null && (bool)IsOnBnd != point.OnBoundary)
+                return false;
 
-            //TODO implement onbnd, and other filters
+            if (HasLinks != null && (bool)HasLinks != point.HasQuondamLinks)
+                return false;
 
             return true;
         }

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using TwoTrails.Controls;
@@ -22,15 +23,32 @@ namespace TwoTrails.ViewModels
     public class MainWindowModel : NotifyPropertyChangedEx
     {
         private Dictionary<String, TtProject> _Projects = new Dictionary<String, TtProject>();
-        
+
+        private Binding sbiInfoBinding;
         public TtTabModel CurrentTab
         {
             get { return Get<TtTabModel>(); }
             set {
+                
                 Set(value, () =>
                 {
                     CurrentEditor = value?.Project.DataEditor;
-                    
+
+                    if (sbiInfoBinding != null && value == null)
+                    {
+                        BindingOperations.ClearBinding(_MainWindow.sbiInfo, TextBlock.TextProperty);
+                        sbiInfoBinding = null;
+                    }
+                    else if (value != null)
+                    {
+                        sbiInfoBinding = new Binding();
+                        sbiInfoBinding.Source = value;
+                        sbiInfoBinding.Path = new PropertyPath(nameof(value.TabInfo));
+                        sbiInfoBinding.Mode = BindingMode.OneWay;
+                        sbiInfoBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+                        BindingOperations.SetBinding(_MainWindow.sbiInfo, TextBlock.TextProperty, sbiInfoBinding);
+                    }
+
                     OnPropertyChanged(
                         nameof(CurrentProject),
                         nameof(HasOpenedProject),

@@ -29,8 +29,7 @@
         <TabControl x:Name="tabControl" Grid.Row="1" Margin="0" Padding="0"
                     TabStripPlacement="Left"
                     BorderThickness="0"
-                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-                    SelectionChanged="tabControl_SelectionChanged">
+                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabItem}">
                     <Setter Property="Template">
@@ -199,9 +198,9 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Name="tabPoints" Header="Points" FocusManager.FocusedElement="{Binding ccPoints}">
+            <TabItem Header="Points">
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
-                    <ContentControl Name="ccPoints" />
+                    <ContentControl Content="{Binding DataController}"/>
                 </Border>
             </TabItem>
 
