@@ -1,6 +1,7 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core.ComponentModel;
 using FMSC.Core.ComponentModel.Commands;
+using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ using TwoTrails.Core;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
+using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
 {
@@ -30,9 +32,6 @@ namespace TwoTrails.ViewModels
         public ICommand ReverseSelectedCommand { get; }
         public ICommand ResetPointCommand { get; }
         public ICommand DeleteCommand { get; }
-
-        public ICommand CreatePolygonCommand { get; }
-        public ICommand CreateGroupCommand { get; }
 
         public ICommand CreateQuondamsCommand { get; }
         public ICommand MovePointsCommand { get; }
@@ -463,8 +462,8 @@ namespace TwoTrails.ViewModels
                 this, x => x.HasSelection);
 
             ChangeQuondamParentCommand = new BindedRelayCommand<DataEditorModel>(
-                x => ChangeQuondamParent(), x => OnlyQuondams,
-                this, x => x.OnlyQuondams);
+                x => ChangeQuondamParent(), x => OnlyQuondams && !MultipleSelections,
+                this, x => new { x.OnlyQuondams, x.MultipleSelections });
             
             RenamePointsCommand = new BindedRelayCommand<DataEditorModel>(
                 x => RenamePoints(), x => MultipleSelections,
@@ -481,12 +480,6 @@ namespace TwoTrails.ViewModels
             DeleteCommand = new BindedRelayCommand<DataEditorModel>(
                 x => DeletePoint(), x => HasSelection,
                 this, x => x.HasSelection);
-
-            CreatePolygonCommand = new RelayCommand(
-                x => CreatePolygon(), x => true);
-
-            CreateGroupCommand = new RelayCommand(
-                x => CreateGroup(), x => true);
 
             CreateQuondamsCommand = new BindedRelayCommand<DataEditorModel>(
                 x => CreateQuondams(), x => HasSelection,
@@ -1367,18 +1360,7 @@ namespace TwoTrails.ViewModels
         {
             Manager.DeletePoints(SelectedPoints.Cast<TtPoint>());
         }
-
-
-        private void CreatePolygon()
-        {
-            //TODO Create Polygon
-        }
-
-        private void CreateGroup()
-        {
-            //TODO Create Group
-        }
-
+        
 
         private void CreateQuondams()
         {
@@ -1397,7 +1379,7 @@ namespace TwoTrails.ViewModels
 
         private void CreatePlots()
         {
-            //TODO Create Plots
+            CreatePlotsDialog.ShowDialog(Manager);
         }
 
         private void CreateCorridor()
@@ -1408,9 +1390,18 @@ namespace TwoTrails.ViewModels
 
         private void ExportValues(DataGrid dataGrid)
         {
-            //TODO Export Values
-            //show savefilediag
-            //export points
+            if (HasSelection)
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.FileName = "SelectedPoints";
+                sfd.DefaultExt = ".csv";
+                sfd.Filter = "CSV Document (*.csv)|*.csv|All Types (*.*)|*.*";
+
+                if (sfd.ShowDialog() == true)
+                {
+                    Export.Points(GetSortedSelectedPoints(), sfd.FileName);
+                }
+            }
         }
 
         private void CopyCellValue(DataGrid dataGrid)

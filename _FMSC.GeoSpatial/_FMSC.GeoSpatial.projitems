@@ -38,6 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Types\NorthSouth.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\UomElevation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UTM\UTMCoords.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UTM\UtmExtent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UTM\UTMTools.cs" />
   </ItemGroup>
 </Project>

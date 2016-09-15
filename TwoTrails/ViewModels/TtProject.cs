@@ -110,7 +110,7 @@ namespace TwoTrails.ViewModels
             get { return _DataEditor ?? (_DataEditor = new DataEditorModel(this)); }
         }
 
-        private MainWindowModel _MainModel;
+        public MainWindowModel MainModel { get; private set; }
 
 
         public void ProjectUpdated()
@@ -124,7 +124,7 @@ namespace TwoTrails.ViewModels
             DAL = dal;
             Settings = settings;
 
-            _MainModel = mainModel;
+            MainModel = mainModel;
 
             ProjectInfo = dal.GetProjectInfo();
             _ProjectInfo = new TtProjectInfo(ProjectInfo);
@@ -192,16 +192,16 @@ namespace TwoTrails.ViewModels
 
         public void Close()
         {
-            if (_MainModel.CloseProject(this))
+            if (MainModel.CloseProject(this))
             {
                 if (ProjectTab != null)
-                    _MainModel.CloseTab(ProjectTab);
+                    MainModel.CloseTab(ProjectTab);
 
                 if (MapTab != null)
-                    _MainModel.CloseTab(MapTab);
+                    MainModel.CloseTab(MapTab);
                 
                 if (UserActivityTab != null)
-                    _MainModel.CloseTab(UserActivityTab);
+                    MainModel.CloseTab(UserActivityTab);
 
                 MapWindow?.Close();
             }
@@ -224,7 +224,7 @@ namespace TwoTrails.ViewModels
                     }
                     else
                     {
-                        _MainModel.CloseTab(tab);
+                        MainModel.CloseTab(tab);
                     }
 
                     ProjectTab = null;
@@ -254,11 +254,11 @@ namespace TwoTrails.ViewModels
             if (ProjectTab == null)
             {
                 ProjectTab = new ProjectTab(this);
-                _MainModel.AddTab(ProjectTab);
+                MainModel.AddTab(ProjectTab);
             }
             else
             {
-                _MainModel.SwitchToTab(ProjectTab);
+                MainModel.SwitchToTab(ProjectTab);
             }
 
             ProjectTab.SwitchToTab(tab);

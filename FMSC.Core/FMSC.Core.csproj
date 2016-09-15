@@ -55,11 +55,13 @@
     <Compile Include="ComponentModel\RelayMenuItem.cs" />
     <Compile Include="Controls\DataGridEx.cs" />
     <Compile Include="Convert.cs" />
+    <Compile Include="LinqExtensions.cs" />
     <Compile Include="Math.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types\Datum.cs" />
     <Compile Include="Types\DeclinationType.cs" />
     <Compile Include="Types\Distance.cs" />
+    <Compile Include="Types\SampleType.cs" />
     <Compile Include="Types\Slope.cs" />
     <Compile Include="TypeTools.cs" />
     <Compile Include="Utilities\DelayActionHandler.cs" />

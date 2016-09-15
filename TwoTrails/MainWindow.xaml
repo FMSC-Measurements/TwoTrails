@@ -82,11 +82,6 @@
                 <MenuItem Header="_Data">
                     <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-
-                    <!--<Separator/>
-
-                <MenuItem Header="Create Polygon" Command="{Binding CurrentEditor.CreatePolygonCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                <MenuItem Header="Create Group" Command="{Binding CurrentEditor.CreateGroupCommand}" IsEnabled="{Binding HasOpenedProject}"/>-->
                 </MenuItem>
 
                 <MenuItem Header="_Tools">

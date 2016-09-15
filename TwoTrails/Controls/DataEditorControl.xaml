@@ -30,15 +30,11 @@
 
         <Style x:Key="styleFieldValue" TargetType="Control">
             <Setter Property="Margin" Value="0,2.5,0,2.5" />
+            <Setter Property="Height" Value="25"/>
             <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
-            <!--<Setter Property="Height" Value="20"/>-->
-
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
 
             <Style.Triggers>
-                <!--<Trigger Property="cp:ControlProperties.BackgroundEnabled" Value="True">
-                    <Setter Property="Background" Value="LightGreen"/>
-                </Trigger>-->
-
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
                         <Condition Property="IsEnabled" Value="True"/>
@@ -74,7 +70,7 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="styleTextButtonValue" TargetType="Button" BasedOn="{StaticResource styleFieldValue}">
+        <!--<Style x:Key="styleTextButtonValue" TargetType="Button" BasedOn="{StaticResource styleFieldValue}">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -87,7 +83,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
+        </Style>-->
 
         <Style x:Key="styleXYZEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
             <Setter Property="IsEnabled" Value="False" />
@@ -122,7 +118,7 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="styleQndmEnable" TargetType="Button" BasedOn="{StaticResource ResourceKey=styleTextButtonValue}">
+        <!--<Style x:Key="styleQndmEnable" TargetType="Button" BasedOn="{StaticResource ResourceKey=styleTextButtonValue}">
             <Setter Property="IsEnabled" Value="False" />
             <Setter Property="cp:ControlProperties.BackgroundEnabled" Value="False" />
 
@@ -131,7 +127,7 @@
                     <Setter Property="IsEnabled" Value="True" />
                 </DataTrigger>
             </Style.Triggers>
-        </Style>
+        </Style>-->
     </UserControl.Resources>
 
     <UserControl.InputBindings>
@@ -474,9 +470,9 @@
                              LostFocus="TextBox_UpdateBinding"/>
 
                     <TextBlock Grid.Row="14" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Qndm Link"/>
-                    <Button Grid.Row="14" Grid.Column="1" Style="{StaticResource ResourceKey=styleQndmEnable}"
+                    <Button Grid.Row="14" Grid.Column="1" Margin="0, 2.5, 0, 2.5" VerticalContentAlignment="Center"
                              cp:ControlProperties.BackgroundEnabled="{Binding SameParentPoint, Converter={StaticResource IBC}}"
-                            Height="20"
+                            Height="25"
                             Content="{Binding ParentPoint.PID}"
                             Command="{Binding ChangeQuondamParentCommand}"/>
 

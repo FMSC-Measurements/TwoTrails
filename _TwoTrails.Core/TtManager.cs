@@ -912,8 +912,7 @@ namespace TwoTrails.Core
 
         public void Reset()
         {
-            //TODO reset
-            throw new NotImplementedException("Reset");
+            Load();
         }
         #endregion
 
