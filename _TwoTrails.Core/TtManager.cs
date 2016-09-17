@@ -1278,7 +1278,7 @@ namespace TwoTrails.Core
 
                         TtPolygon poly = _PolygonsMap[ripoly];
                         AdjustAllTravTypesInPolygon(poly);
-                        _PolygonUpdateHandlers[poly.CN].DelayInvoke();
+                        UpdatePolygonStats(poly);
                     }
                 }
             }

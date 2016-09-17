@@ -300,7 +300,14 @@ namespace TwoTrails.Utils
 
         public static void Summary(ITtManager manager, String fileName)
         {
-            //TODO
+            using (StreamWriter sw = new StreamWriter(fileName))
+            {
+                foreach (TtPolygon poly in manager.GetPolyons())
+                {
+                    sw.WriteLine(String.Format("{0}{1}{2}", poly.Name, Environment.NewLine, string.Join("", Enumerable.Range(0, poly.Name.Length).Select(x => "-"))));
+                    sw.WriteLine(HaidLogic.GenerateSummary(manager, poly).SummaryText);
+                }
+            }
         }
 
 

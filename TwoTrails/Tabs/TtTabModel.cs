@@ -33,8 +33,8 @@ namespace TwoTrails
 
         public abstract bool IsDetachable { get; }
 
-        public abstract bool IsPointsEditable { get; }
-        
+        public bool IsEditingPoints { get { return Get<bool>(); } protected set { Set(value); } }
+
         public ICommand CloseTabCommand { get; }
         public ICommand SaveCommand { get; }
         
@@ -50,6 +50,8 @@ namespace TwoTrails
             Project.PropertyChanged += Project_PropertyChanged;
 
             Tab.DataContext = this;
+
+            IsEditingPoints = false;
         }
 
         private void Project_PropertyChanged(object sender, PropertyChangedEventArgs e)

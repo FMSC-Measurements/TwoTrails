@@ -1,10 +1,12 @@
-﻿using FMSC.GeoSpatial;
+﻿using FMSC.Core;
+using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Utils
@@ -12,7 +14,7 @@ namespace TwoTrails.Utils
     public static class TtUtils
     {
 
-        public static UtmExtent GetBoundaries(IEnumerable<TtPoint> points, bool adjusted = true)
+        public static UtmExtent GetExtents(IEnumerable<TtPoint> points, bool adjusted = true)
         {
             if (!points.Any())
                 throw new ArgumentException("Points contains no points");
@@ -57,6 +59,45 @@ namespace TwoTrails.Utils
                 else
                     return new UTMCoords(point.UnAdjX, point.UnAdjY, targetZone);
             }
+        }
+
+
+        public static Point GetFarthestCorner(double pX, double pY, double top, double bottom, double left, double right)
+        {
+            Point fp;
+
+            double dist, temp;
+
+            dist = MathEx.Distance(pX, pY, left, top);
+            fp = new Point(left, top);
+
+            temp = MathEx.Distance(pX, pY, right, top);
+
+            if (temp > dist)
+            {
+                dist = temp;
+                fp.X = right;
+                fp.Y = top;
+            }
+
+            temp = MathEx.Distance(pX, pY, left, bottom);
+
+            if (temp > dist)
+            {
+                dist = temp;
+                fp.X = left;
+                fp.Y = bottom;
+            }
+
+            temp = MathEx.Distance(pX, pY, right, bottom);
+
+            if (temp > dist)
+            {
+                fp.X = right;
+                fp.Y = bottom;
+            }
+
+            return fp;
         }
     }
 }

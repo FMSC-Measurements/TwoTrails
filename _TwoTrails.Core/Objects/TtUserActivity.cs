@@ -7,6 +7,20 @@ namespace TwoTrails.Core
         public String DeviceName { get; private set; }
         public DateTime Date { get; private set; }
         public DataActivityType Activity { get; private set; }
+        
+        public bool ProjectModified { get { return Activity.HasFlag(DataActivityType.ModifiedProject); } }
+        public bool PointsInserted { get { return Activity.HasFlag(DataActivityType.InsertedPoints); } }
+        public bool PointsModified { get { return Activity.HasFlag(DataActivityType.ModifiedPoints); } }
+        public bool PointsDeleted { get { return Activity.HasFlag(DataActivityType.DeletedPoints); } }
+        public bool PolygonsInserted { get { return Activity.HasFlag(DataActivityType.InsertedPolygons); } }
+        public bool PolygonsModified { get { return Activity.HasFlag(DataActivityType.ModifiedPolygons); } }
+        public bool PolygonsDeleted { get { return Activity.HasFlag(DataActivityType.DeletedPolygons); } }
+        public bool MetadataInserted { get { return Activity.HasFlag(DataActivityType.InsertedMetadata); } }
+        public bool MetadataModified { get { return Activity.HasFlag(DataActivityType.ModifiedMetadata); } }
+        public bool MetadataDeleted { get { return Activity.HasFlag(DataActivityType.DeletedMetadata); } }
+        public bool GroupsInserted { get { return Activity.HasFlag(DataActivityType.InsertedGroups); } }
+        public bool GroupsModified { get { return Activity.HasFlag(DataActivityType.ModifiedGroups); } }
+        public bool GroupsDeleted { get { return Activity.HasFlag(DataActivityType.DeletedGroups); } }
 
         public TtUserActivity(String userName, String deviceName) :
             this(userName, deviceName, DateTime.Now, DataActivityType.Opened)

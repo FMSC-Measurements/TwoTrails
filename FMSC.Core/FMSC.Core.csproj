@@ -55,7 +55,6 @@
     <Compile Include="ComponentModel\RelayMenuItem.cs" />
     <Compile Include="Controls\DataGridEx.cs" />
     <Compile Include="Convert.cs" />
-    <Compile Include="LinqExtensions.cs" />
     <Compile Include="Math.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types\Datum.cs" />

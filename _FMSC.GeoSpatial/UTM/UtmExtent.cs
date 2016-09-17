@@ -28,8 +28,8 @@ namespace FMSC.GeoSpatial.UTM
 
         public UtmExtent(double north, double east, double south, double west, int zone)
         {
-            this.NorthEast = new UTMCoords(north, east, zone);
-            this.SouthWest = new UTMCoords(south, west, zone);
+            this.NorthEast = new UTMCoords(east, north, zone);
+            this.SouthWest = new UTMCoords(west, south, zone);
             this.Zone = zone;
         }
 
@@ -60,6 +60,12 @@ namespace FMSC.GeoSpatial.UTM
                 ypos.Add(position.Y);
             }
 
+            public void Include(IEnumerable<UTMCoords> coords)
+            {
+                foreach (UTMCoords c in coords)
+                    Include(c);
+            }
+
             public void Include(UtmExtent extent)
             {
                 if (extent.NorthEast.Zone != zone || extent.SouthWest.Zone != zone)
@@ -69,6 +75,12 @@ namespace FMSC.GeoSpatial.UTM
                 xpos.Add(extent.West);
                 ypos.Add(extent.North);
                 ypos.Add(extent.South);
+            }
+
+            public void Include(IEnumerable<UtmExtent> extents)
+            {
+                foreach (UtmExtent e in extents)
+                    Include(e);
             }
 
             public UtmExtent Build()

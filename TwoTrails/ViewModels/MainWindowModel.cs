@@ -127,7 +127,6 @@ namespace TwoTrails.ViewModels
             Settings = new TtSettings(new DeviceSettings(), new MetadataSettings());
 
 
-
             NewCommand = new RelayCommand(x => CreateProject());
             OpenCommand = new RelayCommand(x => OpenProject());
             OpenProjectCommand = new RelayCommand(x => OpenProject(x as string));

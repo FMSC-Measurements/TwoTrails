@@ -18,6 +18,21 @@
         <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
     </Window.InputBindings>
 
+    <Window.Resources>
+
+        <Style x:Key="styleMiPointEdit" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource styleMiDisableNullCommand}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CurrentTab}" Value="{x:Null}">
+                    <Setter Property="IsEnabled" Value="False"/>
+                </DataTrigger>
+                
+                <DataTrigger Binding="{Binding CurrentTab.IsEditingPoints}" Value="False">
+                    <Setter Property="IsEnabled" Value="False"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
     <Grid>
         <Grid x:Name="gridExport" Width="100" Height="100" VerticalAlignment="Top"
               Background="Black" Panel.ZIndex="2" Margin="0, -150, 0, 0">
@@ -55,28 +70,28 @@
 
                 <MenuItem Header="_Edit">
                     <MenuItem Header="Undo" Command="{Binding CurrentProject.UndoCommand}" InputGestureText="Ctrl+Z"
-                          Style="{StaticResource styleMiDisableNullCommand}"/>
+                          Style="{StaticResource styleMiPointEdit}"/>
                     <MenuItem Header="Redo" Command="{Binding CurrentProject.RedoCommand}" InputGestureText="Ctrl+Shift+Z"
-                          Style="{StaticResource styleMiDisableNullCommand}"/>
+                          Style="{StaticResource styleMiPointEdit}"/>
 
                     <Separator/>
 
                     <MenuItem Header="Rename Points" Command="{Binding CurrentEditor.RenamePointsCommand}"
-                          Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                          Style="{StaticResource styleMiPointEdit}"/>
                     <MenuItem Header="Reverse Points" Command="{Binding CurrentEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
-                          Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                          Style="{StaticResource styleMiPointEdit}"/>
 
                     <Separator/>
 
                     <MenuItem Header="Reset Point" Command="{Binding CurrentEditor.ResetPointCommand}" InputGestureText="Ctrl+R"
-                          Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                          Style="{StaticResource ResourceKey=styleMiPointEdit}"/>
                     <MenuItem Header="Discard Changes" Command="{Binding Project.DiscardChangesCommand}"
                           Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
 
                     <Separator/>
 
                     <MenuItem Header="Delete" Command="{Binding CurrentEditor.DeleteCommand}" InputGestureText="Del"
-                          Style="{StaticResource styleMiDisableNullCommand}"/>
+                          Style="{StaticResource styleMiPointEdit}"/>
                 </MenuItem>
 
                 <MenuItem Header="_Data">
@@ -86,9 +101,9 @@
 
                 <MenuItem Header="_Tools">
                     <MenuItem Header="Create Quondams" Command="{Binding CurrentEditor.CreateQuondamsCommand}"
-                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                        Style="{StaticResource ResourceKey=styleMiPointEdit}"/>
                     <MenuItem Header="Move Points" Command="{Binding CurrentEditor.MovePointsCommand}"
-                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                        Style="{StaticResource ResourceKey=styleMiPointEdit}"/>
                     <MenuItem Header="Retrace Points" Command="{Binding CurrentEditor.RetraceCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
 
@@ -97,7 +112,7 @@
                     <MenuItem Header="Create Plots" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
                           Style="{StaticResource styleMiDisableNullCommand}"/>
                     <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
-                          Style="{StaticResource styleMiDisableNullCommand}"/>
+                          Style="{StaticResource styleMiPointEdit}"/>
 
                     <Separator/>
 
@@ -107,7 +122,7 @@
                 <MenuItem Header="_Help">
                     <MenuItem Header="View Error Log" Command="{Binding ViewLogCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                     <MenuItem Header="View User Activity" Command="{Binding CurrentProject.ViewUserActivityCommand}"
-                          Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource ResourceKey=BoolToVis}}"
+                    Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource ResourceKey=BoolToVis}}"
                           Style="{StaticResource styleMiDisableNullCommand}"/>
 
                     <Separator/>

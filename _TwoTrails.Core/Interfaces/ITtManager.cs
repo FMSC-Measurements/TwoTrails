@@ -39,10 +39,13 @@ namespace TwoTrails.Core
         void AddGroup(TtGroup group);
         void DeleteGroup(TtGroup group);
 
+
+        //TODO Media
         //List<TtImage> GetImages(String pointCN);
         //void InsertMedia(TtMedia media);
         //void DeleteMedia(TtMedia media);
 
+        //TODO PolyGraphicOptions
         //List<PolygonGraphicOptions> GetPolygonGraphicOptions();
         //void InsertPolygonGraphicOption(PolygonGraphicOptions option);
         //void DeletePolygonGraphicOption(PolygonGraphicOptions option);

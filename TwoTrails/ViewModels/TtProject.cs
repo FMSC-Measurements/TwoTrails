@@ -43,27 +43,7 @@ namespace TwoTrails.ViewModels
         public bool MapTabIsOpen { get { return MapTab != null; } }
         public bool UserActivityTabIsOpen { get { return UserActivityTab != null; } }
         public bool MapWindowIsOpen { get { return MapWindow != null; } }
-
-        private bool MultipleProjectViews
-        {
-            get
-            {
-                int views = 0;
-
-                if (ProjectTab != null)
-                    views++;
-
-                if (MapTab != null)
-                    views++;
-
-                if (MapWindow != null)
-                    views++;
-
-                return views > 1;
-            }
-        }
-
-
+        
 
         private TtProjectInfo _ProjectInfo;
         public TtProjectInfo ProjectInfo { get; }
@@ -209,33 +189,21 @@ namespace TwoTrails.ViewModels
 
         public void CloseTab(TtTabModel tab)
         {
-            if (!MultipleProjectViews)
+            if (tab is ProjectTab)
             {
                 //warn closing project
                 Close();
             }
             else
             {
-                if (tab is ProjectTab)
+                if (tab is MapTab)
                 {
-                    if (RequiresSave)
-                    {
-                        //warn closing editor
-                    }
-                    else
-                    {
-                        MainModel.CloseTab(tab);
-                    }
-
-                    ProjectTab = null;
-                }
-                else if (tab is MapTab)
-                {
-
+                    MainModel.CloseTab(tab);
                     MapTab = null;
                 }
                 else if (tab is UserActivityTab)
                 {
+                    MainModel.CloseTab(tab);
                     UserActivityTab = null;
                 }
             }
@@ -276,7 +244,15 @@ namespace TwoTrails.ViewModels
 
         private void ViewUserActivityTab()
         {
-
+            if (UserActivityTab == null)
+            {
+                UserActivityTab = new UserActivityTab(this);
+                MainModel.AddTab(UserActivityTab);
+            }
+            else
+            {
+                MainModel.SwitchToTab(UserActivityTab);
+            }
         }
     }
 }

@@ -11,6 +11,9 @@ using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.Core.Media;
 using FMSC.Core;
+using FMSC.GeoSpatial;
+using FMSC.GeoSpatial.Types;
+using FMSC.GeoSpatial.NMEA.Sentences;
 
 namespace TwoTrails.DAL
 {
@@ -1517,32 +1520,264 @@ namespace TwoTrails.DAL
         #region TTNmea
         public List<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
-            throw new NotImplementedException();
+            List<TtNmeaBurst> bursts = new List<TtNmeaBurst>();
+
+            String query = String.Format(@"select {0} from {1}{2}",
+                TwoTrailsSchema.TtNmeaSchema.SelectItems,
+                TwoTrailsSchema.TtNmeaSchema.TableName,
+                pointCN != null ?
+                String.Format(" where {0} = '{1}'",
+                        TwoTrailsSchema.TtNmeaSchema.PointCN,
+                        pointCN) :
+                String.Empty
+            );
+
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                {
+                    if (dr != null)
+                    {
+                        Func<string, List<int>> ParseIds = s =>
+                        {
+                            List<int> ids = new List<int>();
+                            if (s != null)
+                            {
+                                foreach (string prn in s.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    ids.Add(Int32.Parse(prn));
+                                }
+                            }
+
+                            return ids;
+                        };
+
+                        while (dr.Read())
+                        {
+                            bursts.Add(new TtNmeaBurst(
+                                dr.GetString(0),
+                                DateTime.ParseExact(dr.GetString(3), DATE_FORMAT, CultureInfo.InvariantCulture),
+                                dr.GetString(1),
+                                dr.GetBoolean(2),
+                                new GeoPosition(
+                                    dr.GetDouble(5), (NorthSouth)dr.GetInt32(6),
+                                    dr.GetDouble(7), (EastWest)dr.GetInt32(8),
+                                    dr.GetDouble(9), (UomElevation)dr.GetInt32(10)
+                                ),
+                                DateTime.ParseExact(dr.GetString(4), DATE_FORMAT, CultureInfo.InvariantCulture),
+                                dr.GetDouble(22),
+                                dr.GetDouble(23),
+                                dr.GetDouble(11), (EastWest)dr.GetInt32(12),
+                                (Mode)dr.GetInt32(15), (Fix)dr.GetInt32(13),
+                                ParseIds(dr.GetStringN(27)),
+                                dr.GetDouble(16),
+                                dr.GetDouble(17),
+                                dr.GetDouble(18),
+                                (GpsFixType)dr.GetInt32(14),
+                                dr.GetInt32(25),
+                                dr.GetDouble(19),
+                                dr.GetDouble(20), (UomElevation)dr.GetInt32(21),
+                                dr.GetInt32(26)
+                            ));
+                        }
+
+                        dr.Close();
+                    }
+
+                    conn.Close();
+                }
+            }
+
+            return bursts;
         }
 
         public bool InsertNmeaBurst(TtNmeaBurst burst)
         {
-            throw new NotImplementedException();
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        database.Insert(TwoTrailsSchema.TtNmeaSchema.TableName, GetNmeaValues(burst), conn, trans);
+                        trans.Commit();
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        return false;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+
+            return true;
         }
 
-        public bool InsertNmeaBursts(IEnumerable<TtNmeaBurst> bursts)
+        public int InsertNmeaBursts(IEnumerable<TtNmeaBurst> bursts)
         {
-            throw new NotImplementedException();
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        foreach (TtNmeaBurst burst in bursts)
+                        {
+                            database.Insert(TwoTrailsSchema.TtNmeaSchema.TableName, GetNmeaValues(burst), conn, trans);
+                        }
+
+                        trans.Commit();
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        return -1;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+
+            return bursts.Count();
         }
 
         public bool UpdateNmeaBurst(TtNmeaBurst burst)
         {
-            throw new NotImplementedException();
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        database.Update(TwoTrailsSchema.PolygonSchema.TableName,
+                            new Dictionary<string, object>()
+                            {
+                                [TwoTrailsSchema.TtNmeaSchema.Used] = burst.IsUsed
+                            },
+                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, burst.CN),
+                            conn,
+                            trans);
+
+                        trans.Commit();
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        return false;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+
+            return true;
         }
 
         public int UpdateNmeaBursts(IEnumerable<TtNmeaBurst> bursts)
         {
-            throw new NotImplementedException();
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        foreach (TtNmeaBurst burst in bursts)
+                        {
+                            database.Update(TwoTrailsSchema.PolygonSchema.TableName,
+                                new Dictionary<string, object>()
+                                {
+                                    [TwoTrailsSchema.TtNmeaSchema.Used] = burst.IsUsed
+                                },
+                                String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, burst.CN),
+                                conn,
+                                trans);
+                        }
+
+                        trans.Commit();
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        return -1;
+                    }
+                }
+            }
+
+            return bursts.Count();
         }
 
-        public void DeleteNmeaBursts(string pointCN)
+        public int DeleteNmeaBursts(string pointCN)
         {
-            throw new NotImplementedException();
+            int res = -1;
+
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        res = database.Delete(TwoTrailsSchema.TtNmeaSchema.TableName,
+                            String.Format("{0} = '{1}'", TwoTrailsSchema.TtNmeaSchema.PointCN, pointCN),
+                            conn,
+                            trans);
+
+                        trans.Commit();
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+
+            return res;
+        }
+
+
+        private Dictionary<string, object> GetNmeaValues(TtNmeaBurst burst)
+        {
+            return new Dictionary<string, object>()
+            {
+                [TwoTrailsSchema.SharedSchema.CN] = burst.CN,
+                [TwoTrailsSchema.TtNmeaSchema.Used] = burst.IsUsed,
+                [TwoTrailsSchema.TtNmeaSchema.TimeCreated] = burst.TimeCreated.ToString(DATE_FORMAT),
+                [TwoTrailsSchema.TtNmeaSchema.FixTime] = burst.FixTime.ToString(DATE_FORMAT),
+                [TwoTrailsSchema.TtNmeaSchema.Latitude] = burst.Latitude,
+                [TwoTrailsSchema.TtNmeaSchema.LatDir] = (int)burst.LarDir,
+                [TwoTrailsSchema.TtNmeaSchema.Longitude] = burst.Longitude,
+                [TwoTrailsSchema.TtNmeaSchema.LonDir] = (int)burst.LonDir,
+                [TwoTrailsSchema.TtNmeaSchema.Elevation] = burst.Elevation,
+                [TwoTrailsSchema.TtNmeaSchema.ElevUom] = (int)burst.UomElevation,
+                [TwoTrailsSchema.TtNmeaSchema.MagVar] = burst.MagVar,
+                [TwoTrailsSchema.TtNmeaSchema.MagDir] = burst.MagVarDir,
+                [TwoTrailsSchema.TtNmeaSchema.Fix] = (int)burst.Fix,
+                [TwoTrailsSchema.TtNmeaSchema.FixQuality] = (int)burst.FixQuality,
+                [TwoTrailsSchema.TtNmeaSchema.Mode] = (int)burst.Mode,
+                [TwoTrailsSchema.TtNmeaSchema.PDOP] = burst.PDOP,
+                [TwoTrailsSchema.TtNmeaSchema.HDOP] = burst.HDOP,
+                [TwoTrailsSchema.TtNmeaSchema.VDOP] = burst.VDOP,
+                [TwoTrailsSchema.TtNmeaSchema.HorizDilution] = burst.HorizDultion,
+                [TwoTrailsSchema.TtNmeaSchema.GeiodHeight] = burst.GeoidHeight,
+                [TwoTrailsSchema.TtNmeaSchema.GeiodHeightUom] = (int)burst.GeoUom,
+                [TwoTrailsSchema.TtNmeaSchema.GroundSpeed] = burst.GroundSpeed,
+                [TwoTrailsSchema.TtNmeaSchema.TrackAngle] = burst.TrackAngle,
+                [TwoTrailsSchema.TtNmeaSchema.SatellitesUsedCount] = burst.UsedSatelliteIDsCount,
+                [TwoTrailsSchema.TtNmeaSchema.SatellitesTrackedCount] = burst.TrackedSatellitesCount,
+                [TwoTrailsSchema.TtNmeaSchema.SatellitesInViewCount] = burst.SatellitesInViewCount,
+                [TwoTrailsSchema.TtNmeaSchema.UsedSatPRNS] = burst.UsedSatelliteIDsString
+            };
         }
         #endregion
 

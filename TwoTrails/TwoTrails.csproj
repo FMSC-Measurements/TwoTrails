@@ -74,6 +74,9 @@
     <Compile Include="Controls\ProjectEditorControl.xaml.cs">
       <DependentUpon>ProjectEditorControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\UserActivityControl.xaml.cs">
+      <DependentUpon>UserActivityControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\M2Converter.cs" />
     <Compile Include="Converters\MetersToFeetConverter.cs" />
     <Compile Include="Converters\NotNullConverter.cs" />
@@ -136,6 +139,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\ProjectEditorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\UserActivityControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

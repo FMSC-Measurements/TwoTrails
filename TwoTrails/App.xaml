@@ -18,8 +18,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-
-
+        
         <SolidColorBrush x:Key="colorPriamry" Color="MediumSeaGreen" />
         <SolidColorBrush x:Key="colorPriamryLight" Color="DarkSeaGreen" />
         <SolidColorBrush x:Key="colorPriamryDark" Color="SeaGreen" />

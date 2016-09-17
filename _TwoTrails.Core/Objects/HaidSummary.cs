@@ -39,7 +39,7 @@ namespace TwoTrails.Core
 
             List<TtPoint> allPoints = manager.GetPoints(polygon.CN);
 
-            if (allPoints.Count < 1)
+            if (allPoints.Count > 2)
             {
                 IEnumerable<TtPoint> points = allPoints.Where(p => p.IsBndPoint());
                 if (points.Count() > 2)
@@ -70,7 +70,7 @@ namespace TwoTrails.Core
 
                     if (polygon.Area > Consts.MINIMUM_POINT_ACCURACY)
                     {
-                        sb.AppendFormat("The polygon area is: {0:0.00} Ha ({1:0} ac).%s",
+                        sb.AppendFormat("The polygon area is: {0:0.00} Ha ({1:0} ac).{2}",
                             Math.Round(polygon.AreaHectaAcres, 2),
                             Math.Round(polygon.AreaAcres, 0),
                             Environment.NewLine);
@@ -116,13 +116,13 @@ namespace TwoTrails.Core
                 else
                 {
                     Result = HaidResult.InsufficientPoints;
-                    SummaryText = "Polygon has Insufficient Points";
+                    SummaryText = "Polygon has Insufficient Points\n\n";
                 }
             }
             else
             {
                 Result = HaidResult.Empty;
-                SummaryText = "Polygon has Insufficient Points";
+                SummaryText = "Polygon has Insufficient Points\n\n";
             }
         }
         

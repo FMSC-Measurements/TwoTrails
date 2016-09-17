@@ -75,12 +75,12 @@ namespace TwoTrails.DAL
         List<TtNmeaBurst> GetNmeaBursts(String pointCN = null);
 
         bool InsertNmeaBurst(TtNmeaBurst burst);
-        bool InsertNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
+        int InsertNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
         
         bool UpdateNmeaBurst(TtNmeaBurst burst);
         int UpdateNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
 
-        void DeleteNmeaBursts(String pointCN);
+        int DeleteNmeaBursts(String pointCN);
         #endregion
 
 

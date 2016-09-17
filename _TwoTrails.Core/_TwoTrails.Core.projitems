@@ -39,8 +39,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Consts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HaidLogic.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IAccuracy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IDeviceSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMetadataSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IPointSegment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtDataLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\MediaType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\PictureType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtMedia.cs" />
@@ -49,9 +53,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtPhotoShpere.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataActivityType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\HaidSummary.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\IDeviceSettings.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\IMetadataSettings.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\IPointSegment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\PolygonGraphicOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtProjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\SideShotSegment.cs" />
@@ -62,7 +63,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtNmeaBurst.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtPolygon.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\ITtSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtUserActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PointNamer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PointProperties.cs" />
@@ -76,6 +76,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Points\TtPointExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\WalkPoint.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\WayPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PolygonCalculator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TtHistoryManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TtManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\GroupType.cs" />

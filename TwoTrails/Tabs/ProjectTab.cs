@@ -17,8 +17,6 @@ namespace TwoTrails
 
         public override bool IsDetachable { get; } = false;
 
-        public override bool IsPointsEditable { get; } = false;
-
         public override string TabTitle
         {
             get
@@ -63,7 +61,9 @@ namespace TwoTrails
 
             _ProjectEditorControl.tabControl.SelectionChanged += (object sender, SelectionChangedEventArgs e) =>
             {
+                IsEditingPoints = _ProjectEditorControl.tabControl.SelectedIndex == 1;
                 OnPropertyChanged(nameof(TabInfo));
+
             };
 
             Project.DataEditor.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>

@@ -1,4 +1,5 @@
-﻿using CSUtil.ComponentModel;
+﻿using CSUtil;
+using CSUtil.ComponentModel;
 using FMSC.Core;
 using FMSC.Core.ComponentModel.Commands;
 using FMSC.GeoSpatial.UTM;
@@ -18,6 +19,9 @@ namespace TwoTrails.ViewModels
 {
     public class CreatePlotsModel : NotifyPropertyChangedEx
     {
+        //TODO Implement async creations with progress indicator
+
+
         private ITtManager _Manager;
 
         public ICommand GenerateCommand { get; }
@@ -69,10 +73,13 @@ namespace TwoTrails.ViewModels
             if (Polygons.Count > 0)
                 SelectedPolygon = Polygons[0];
 
+            GridX = GridY = 100;
+
             SamplePoints = false;
             SampleTypeItem = SampleType.Percent;
 
             BoundaryBuffer = false;
+            BufferAmount = 10;
 
             SelectedPoint = null;
 
@@ -88,7 +95,7 @@ namespace TwoTrails.ViewModels
                 return;
             }
 
-            if (Tilt < 45 || Tilt > 45)
+            if (Tilt < -45 || Tilt > 45)
             {
                 MessageBox.Show("Y Axis Tilt must be between -45° and +45°");
                 return;
@@ -116,7 +123,7 @@ namespace TwoTrails.ViewModels
 
             try
             {
-                polygons.First(p => p.Name == gPolyName);
+                poly = polygons.First(p => p.Name == gPolyName);
             }
             catch
             {
@@ -158,20 +165,126 @@ namespace TwoTrails.ViewModels
 
             IEnumerable<TtPoint> points = _Manager.GetPoints(SelectedPolygon.CN).Where(p => p.IsBndPoint());
 
-            int zone = points.First().Metadata.Zone;
+            TtMetadata defMeta = points.First().Metadata;
 
-            UtmExtent extent = TtUtils.GetBoundaries(points);
+            IEnumerable<UTMCoords> coords = points.Select(p => TtUtils.GetCoords(p, defMeta.Zone));
+
+            UtmExtent.Builder builder = new UtmExtent.Builder(defMeta.Zone);
+            builder.Include(coords);
+            UtmExtent extent = builder.Build();
 
             Random rand = new Random();
             UTMCoords startCoords = SelectedPoint != null ?
-                TtUtils.GetCoords(SelectedPoint, zone) :
+                TtUtils.GetCoords(SelectedPoint, defMeta.Zone) :
                 new UTMCoords(
                     (rand.NextDouble() * (extent.East - extent.West) + extent.West),
                     (rand.NextDouble() * (extent.North - extent.South) + extent.South),
-                    zone
+                    defMeta.Zone
                 );
+            
+            PolygonCalculator calc = new PolygonCalculator(coords.Select(c => new Point(c.X, c.Y)));
+            PolygonCalculator.Boundaries bnds = calc.PointBoundaries;
+
+            Point farCorner = TtUtils.GetFarthestCorner(
+                startCoords.X, startCoords.Y,
+                bnds.TopLeft.Y, bnds.BottomRight.Y,
+                bnds.TopLeft.X, bnds.BottomRight.X);
+
+            double dist = MathEx.Distance(startCoords.X, startCoords.Y, farCorner.X, farCorner.Y);
+
+            int ptAmtY = (int)(Math.Floor(dist / gridY) + 1);
+            int ptAmtX = (int)(Math.Floor(dist / gridX) + 1);
+
+            double farLeft, farRight, farTop, farBottom;
+
+            PolygonCalculator inBnds = new PolygonCalculator(new Point[]
+            {
+                bnds.TopLeft,
+                new Point(bnds.BottomRight.X, bnds.TopLeft.Y),
+                bnds.BottomRight,
+                new Point(bnds.TopLeft.X, bnds.BottomRight.Y)
+            });
+
+            farLeft = startCoords.X - (ptAmtX * gridX);
+            farRight = startCoords.X + (ptAmtX * gridX);
+            farTop = startCoords.Y + (ptAmtY * gridY);
+            farBottom = startCoords.Y - (ptAmtY * gridY);
+            
+            int i = 0;
+            double j = farLeft;
+            double k = farTop;
+
+            List<Point> addPoints = new List<Point>();
+            Point tmp;
+
+            while (j <= farRight)
+            {
+                while (k >= farBottom)
+                {
+                    tmp = angle != 0 ? MathEx.RotatePoint(j, k, angle, startCoords.X, startCoords.Y) : new Point(j, k);
+                    
+                    if (calc.IsPointInPolygon(tmp.X, tmp.Y))
+                        addPoints.Add(tmp);
+
+                    k -= gridY;
+                }
+                j += gridX;
+                k = farTop;
+            }
+
+            if (BoundaryBuffer == true)
+            {
+                double ba = FMSC.Core.Convert.Distance(BufferAmount, Distance.Meters, UomDistance);
+
+                for (i = addPoints.Count - 1; i > -1; i--)
+                {
+                    Point p = addPoints[i];
+                    foreach (UTMCoords coord in coords)
+                    {
+                        if (MathEx.Distance(p.X, p.Y, coord.X, coord.Y) < ba)
+                            addPoints.RemoveAt(i);
+                    }
+                }
+            }
+
+            if (SamplePoints == true)
+            {
+                int maxPoints = SampleTypeItem == SampleType.Percent ?
+                    (int)((SampleAmount / 100.0) * addPoints.Count) : SampleAmount;
+
+                while (maxPoints < addPoints.Count)
+                {
+                    addPoints.RemoveAt(rand.Next(addPoints.Count - 1));
+                }
+            }
 
 
+            List<TtPoint> wayPoints = new List<TtPoint>();
+            i = 0;
+            WayPoint curr, prev = null;
+
+            foreach (Point p in addPoints)
+            {
+                curr = new WayPoint()
+                {
+                    UnAdjX = p.X,
+                    UnAdjY = p.Y,
+                    Polygon = poly,
+                    Group = _Manager.MainGroup,
+                    Metadata = defMeta,
+                    Index = i,
+                    Comment = "Generated Point",
+                    PID = PointNamer.NamePoint(poly, prev)
+                };
+
+                wayPoints.Add(curr);
+                prev = curr;
+                j++;
+            }
+
+            _Manager.AddPoints(wayPoints);
+
+            MessageBox.Show(String.Format("{0} WayPoints Created", addPoints.Count));
         }
     }
 }

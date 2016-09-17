@@ -13,9 +13,6 @@ namespace TwoTrails
     {
         public override bool IsDetachable { get; } = true;
 
-        public override bool IsPointsEditable { get; } = true;
-
-
         public override string TabTitle
         {
             get { return String.Format("(Map){0}", base.TabTitle); }
