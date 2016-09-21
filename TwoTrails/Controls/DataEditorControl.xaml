@@ -376,8 +376,14 @@
                                 cp:ControlProperties.BackgroundEnabled="{Binding SamePolygon, Converter={StaticResource IBC}}"
                                 ItemsSource="{Binding Manager.Polygons, Mode=OneWay}"
                                 DisplayMemberPath="Name"
-                                SelectedItem="{Binding Polygon}"
-                                IsEnabled="{Binding Path=SamePolygon}"/>
+                                SelectedItem="{Binding Polygon}">
+                        <ComboBox.IsEnabled>
+                            <MultiBinding Converter="{StaticResource NullOrBool}">
+                                <Binding Path="SamePolygon"/>
+                                <Binding Path="HasSelection"/>
+                            </MultiBinding>
+                        </ComboBox.IsEnabled>
+                    </ComboBox>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Index"/>
                     <TextBox Grid.Row="2" Grid.Column="1" IsEnabled="False"
@@ -406,19 +412,22 @@
                                 cp:ControlProperties.BackgroundEnabled="{Binding SameMetadata, Converter={StaticResource IBC}}"
                                 ItemsSource="{Binding Manager.Metadata, Mode=OneWay}"
                                 DisplayMemberPath="Name"
-                                SelectedItem="{Binding Metadata}"/>
+                                SelectedItem="{Binding Metadata}"
+                                IsEnabled="{Binding HasSelection}"/>
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Group"/>
                     <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
                                 cp:ControlProperties.BackgroundEnabled="{Binding SameGroup, Converter={StaticResource IBC}}"
                                 ItemsSource="{Binding Manager.Groups, Mode=OneWay}"
                                 DisplayMemberPath="Name"
-                                SelectedItem="{Binding Group}"/>
+                                SelectedItem="{Binding Group}"
+                                IsEnabled="{Binding HasSelection}"/>
 
                     <CheckBox Grid.Row="5" Grid.Column="1" Content="OnBound"
                               Style="{StaticResource ResourceKey=styleFieldValue}"
-                             cp:ControlProperties.BackgroundEnabled="{Binding SameOnBound, Converter={StaticResource IBC}}"
-                              IsChecked="{Binding OnBoundary}"/>
+                              cp:ControlProperties.BackgroundEnabled="{Binding SameOnBound, Converter={StaticResource IBC}}"
+                              IsChecked="{Binding OnBoundary}"
+                              IsEnabled="{Binding HasSelection}"/>
 
                     <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjX"/>
                     <TextBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ResourceKey=styleXYZEnable}"
@@ -483,7 +492,9 @@
                              cp:ControlProperties.BackgroundEnabled="{Binding SameComment, Converter={StaticResource IBC}}"
                              MinHeight="75"
                              Height="Auto"
-                             LostFocus="TextBox_UpdateBinding"/>
+                             VerticalContentAlignment="Top"
+                             LostFocus="TextBox_UpdateBinding"
+                             IsEnabled="{Binding HasSelection}"/>
                 </Grid>
             </ScrollViewer>
         </Grid>

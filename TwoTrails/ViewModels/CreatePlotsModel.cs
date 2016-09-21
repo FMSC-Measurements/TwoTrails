@@ -168,9 +168,18 @@ namespace TwoTrails.ViewModels
             TtMetadata defMeta = points.First().Metadata;
 
             IEnumerable<UTMCoords> coords = points.Select(p => TtUtils.GetCoords(p, defMeta.Zone));
+            List<Point> utmPoints = points
+                .Select(p =>
+                {
+                    UTMCoords c = TtUtils.GetCoords(p, defMeta.Zone);
+                    return new Point(c.X, c.Y);
+                }).ToList();
+
+            if (utmPoints[0] != utmPoints[utmPoints.Count - 1])
+                utmPoints.Add(utmPoints[0]);
 
             UtmExtent.Builder builder = new UtmExtent.Builder(defMeta.Zone);
-            builder.Include(coords);
+            builder.Include(utmPoints);
             UtmExtent extent = builder.Build();
 
             Random rand = new Random();
@@ -182,7 +191,7 @@ namespace TwoTrails.ViewModels
                     defMeta.Zone
                 );
             
-            PolygonCalculator calc = new PolygonCalculator(coords.Select(c => new Point(c.X, c.Y)));
+            PolygonCalculator calc = new PolygonCalculator(utmPoints);
             PolygonCalculator.Boundaries bnds = calc.PointBoundaries;
 
             Point farCorner = TtUtils.GetFarthestCorner(
@@ -235,15 +244,19 @@ namespace TwoTrails.ViewModels
             if (BoundaryBuffer == true)
             {
                 double ba = FMSC.Core.Convert.Distance(BufferAmount, Distance.Meters, UomDistance);
-
+                
                 for (i = addPoints.Count - 1; i > -1; i--)
                 {
                     Point p = addPoints[i];
-                    foreach (UTMCoords coord in coords)
+                    for (int m = 0; m < utmPoints.Count - 1; m++)
                     {
-                        if (MathEx.Distance(p.X, p.Y, coord.X, coord.Y) < ba)
+                        if (MathEx.LineToPointDistance2D(utmPoints[m], utmPoints[m + 1], p) < ba)
+                        {
                             addPoints.RemoveAt(i);
+                            break;
+                        }
                     }
+                    
                 }
             }
 

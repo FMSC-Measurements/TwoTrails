@@ -22,9 +22,13 @@ namespace TwoTrails.Converters
                         if (values[i] is bool)
                         {
                             r &= (bool)values[i];
+
+                            if (!r)
+                                return r;
                         }
                         else
                             return false;
+
                     }
 
                     return r;

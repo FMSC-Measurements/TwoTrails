@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows;
 
 namespace FMSC.GeoSpatial.UTM
 {
@@ -49,6 +50,18 @@ namespace FMSC.GeoSpatial.UTM
             {
                 xpos.Add(x);
                 ypos.Add(y);
+            }
+
+            public void Include(Point point)
+            {
+                xpos.Add(point.X);
+                ypos.Add(point.Y);
+            }
+
+            public void Include(IEnumerable<Point> points)
+            {
+                foreach (Point p in points)
+                    Include(p);
             }
 
             public void Include(UTMCoords position)

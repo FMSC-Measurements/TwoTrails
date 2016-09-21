@@ -156,8 +156,8 @@ namespace TwoTrails.ViewModels
         }
 
 
-        private bool _SamePolygons = true;
-        public bool SamePolygon { get { return _SamePolygons; } }
+        private bool _SamePolygon = true;
+        public bool SamePolygon { get { return _SamePolygon; } }
 
         private TtPolygon _Polygon;
         public TtPolygon Polygon
@@ -964,7 +964,7 @@ namespace TwoTrails.ViewModels
                     _SameComment = sameCmt;
 
                     _Polygon = poly;
-                    _SamePolygons = poly != null;
+                    _SamePolygon = poly != null;
 
                     _Metadata = meta;
                     _SameMetadata = meta != null;
@@ -972,7 +972,7 @@ namespace TwoTrails.ViewModels
                     _Group = group;
                     _SameGroup = group != null;
 
-                    HasPossibleCorridor = HasGpsTypes && hasSS && !HasQndms && !hasTrav && _SamePolygons;
+                    HasPossibleCorridor = HasGpsTypes && hasSS && !HasQndms && !hasTrav && _SamePolygon;
 
                     if (hasOnbnd ^ hasOffBnd)
                     {
@@ -1052,7 +1052,7 @@ namespace TwoTrails.ViewModels
                     _SameComment = true;
 
                     _Polygon = SelectedPoint.Polygon;
-                    _SamePolygons = true;
+                    _SamePolygon = true;
 
                     _Metadata = SelectedPoint.Metadata;
                     _SameMetadata = true;
@@ -1152,7 +1152,7 @@ namespace TwoTrails.ViewModels
                 _SameComment = true;
 
                 _Polygon = null;
-                _SamePolygons = true;
+                _SamePolygon = true;
 
                 _Metadata = null;
                 _SameMetadata = true;
