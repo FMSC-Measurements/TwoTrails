@@ -32,7 +32,7 @@ namespace TwoTrails.Dialogs
 
             InitializeComponent();
 
-            cboPoly.ItemsSource = manager.GetPolyons();
+            cboPoly.ItemsSource = manager.GetPolygons();
 
             if (target != null)
             {

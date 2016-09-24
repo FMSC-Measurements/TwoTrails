@@ -97,6 +97,7 @@
     </Compile>
     <Compile Include="TtWindow.cs" />
     <Compile Include="Utils\Export.cs" />
+    <Compile Include="Utils\TtKmlGenerator.cs" />
     <Compile Include="Utils\TtUtils.cs" />
     <Compile Include="ViewModels\CreatePlotsModel.cs" />
     <Compile Include="ViewModels\DataEditorModel.cs" />

@@ -19,7 +19,6 @@
     </Window.InputBindings>
 
     <Window.Resources>
-
         <Style x:Key="styleMiPointEdit" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource styleMiDisableNullCommand}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding CurrentTab}" Value="{x:Null}">
@@ -32,12 +31,8 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
-    
+
     <Grid>
-        <Grid x:Name="gridExport" Width="100" Height="100" VerticalAlignment="Top"
-              Background="Black" Panel.ZIndex="2" Margin="0, -150, 0, 0">
-        </Grid>
-        
         <DockPanel LastChildFill="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
             <Menu DockPanel.Dock="Top" Height="25">
                 <Menu.Resources>
@@ -141,11 +136,11 @@
                 </StatusBar.Resources>
                 
                 <StatusBarItem>
-                    <TextBlock Name="sbiStatus" Text="Status"/>
+                    <TextBlock Name="sbiStatus"/>
                 </StatusBarItem>
 
                 <StatusBarItem HorizontalAlignment="Right">
-                    <TextBlock Name="sbiInfo" Text="Info"/>
+                    <TextBlock Name="sbiInfo"/>
                 </StatusBarItem>
             </StatusBar>
 

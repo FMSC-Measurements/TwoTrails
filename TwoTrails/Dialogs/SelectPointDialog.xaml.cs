@@ -35,7 +35,7 @@ namespace TwoTrails.Dialogs
             _HidePoints = hidePoints.Select(p => p.CN);
 
             InitializeComponent();
-            lbPolys.ItemsSource = manager.GetPolyons();
+            lbPolys.ItemsSource = manager.GetPolygons();
         }
 
         private void Polygon_Selected(object sender, RoutedEventArgs e)

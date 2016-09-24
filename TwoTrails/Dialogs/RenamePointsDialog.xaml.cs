@@ -28,7 +28,7 @@ namespace TwoTrails.Dialogs
             InitializeComponent();
             this.DataContext = this;
 
-            cbPolys.ItemsSource = manager.GetPolyons();
+            cbPolys.ItemsSource = manager.GetPolygons();
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)

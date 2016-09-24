@@ -64,7 +64,30 @@
     <Compile Include="Types\Slope.cs" />
     <Compile Include="TypeTools.cs" />
     <Compile Include="Utilities\DelayActionHandler.cs" />
+    <Compile Include="Xml\GPX\BaseTrack.cs" />
+    <Compile Include="Xml\GPX\Document.cs" />
+    <Compile Include="Xml\GPX\GpxWriter.cs" />
+    <Compile Include="Xml\GPX\Metadata.cs" />
+    <Compile Include="Xml\GPX\Point.cs" />
+    <Compile Include="Xml\GPX\Route.cs" />
+    <Compile Include="Xml\GPX\Track.cs" />
+    <Compile Include="Xml\GPX\TrackSegment.cs" />
+    <Compile Include="Xml\KML\Color.cs" />
+    <Compile Include="Xml\KML\Coordinates.cs" />
+    <Compile Include="Xml\KML\ExtendedData.cs" />
+    <Compile Include="Xml\KML\Folder.cs" />
+    <Compile Include="Xml\KML\KmlDocument.cs" />
+    <Compile Include="Xml\KML\KmlEnums.cs" />
+    <Compile Include="Xml\KML\KmlWriter.cs" />
+    <Compile Include="Xml\KML\Placemark.cs" />
+    <Compile Include="Xml\KML\Point.cs" />
+    <Compile Include="Xml\KML\Polygon.cs" />
+    <Compile Include="Xml\KML\Properties.cs" />
+    <Compile Include="Xml\KML\Style.cs" />
+    <Compile Include="Xml\KML\StyleMap.cs" />
+    <Compile Include="Xml\KML\View.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

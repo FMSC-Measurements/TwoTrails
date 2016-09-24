@@ -37,7 +37,7 @@ namespace TwoTrails.ViewModels
             _Manager = manager;
 
             AfterPoints = new List<TtPoint>();
-            Polygons = manager.GetPolyons();
+            Polygons = manager.GetPolygons();
 
             Retraces = new ObservableCollection<Retrace>();
             Retraces.Add(new Retrace(this, _Manager));
@@ -169,7 +169,7 @@ namespace TwoTrails.ViewModels
         {
             _Manager = manager;
             PointFrom = PointTo = null;
-            Polygons = manager.GetPolyons();
+            Polygons = manager.GetPolygons();
             DirInc = true;
         }
 

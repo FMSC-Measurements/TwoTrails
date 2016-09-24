@@ -22,7 +22,7 @@ namespace TwoTrails.ViewModels
             _PolygonStyles = new Dictionary<string, Style>();
             _PolygonStylesAlt = new Dictionary<string, Style>();
 
-            foreach (TtPolygon poly in project.HistoryManager.GetPolyons())
+            foreach (TtPolygon poly in project.HistoryManager.GetPolygons())
                 CreatePolygonStyle(poly);
 
             ((INotifyCollectionChanged)project.Manager.Polygons).CollectionChanged += DataStyleModel_CollectionChanged;

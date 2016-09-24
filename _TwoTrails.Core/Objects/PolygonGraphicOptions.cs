@@ -140,9 +140,72 @@ namespace TwoTrails.Core
             this._UnAdjWidth = UnAdjWidth;
         }
 
+
         private void OnColorChange(GraphicCode code, int value)
         {
             ColorChanged?.Invoke(this, code, value);
+        }
+
+
+        public static string ToStringRGBA(int color)
+        {
+            return String.Format("{0:X2}{1:X2}{2:X2}{3:X2}",
+                GetRed(color),
+                GetGreen(color),
+                GetBlue(color),
+                GetAlpha(color));
+        }
+
+        public static int GetRed(int color)
+        {
+            return color % 256;
+        }
+
+        public static int GetGreen(int color)
+        {
+            return (color / 256) % 256;
+        }
+
+        public static int GetBlue(int color)
+        {
+            return (color / 65536) % 256;
+        }
+
+        public static int GetAlpha(int color)
+        {
+            return (color / 16777216) % 256;
+        }
+
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            PolygonGraphicOptions opts = obj as PolygonGraphicOptions;
+
+            return opts != null &&
+                AdjBndColor == opts.AdjBndColor &&
+                UnAdjBndColor == opts.UnAdjBndColor &&
+                AdjNavColor == opts.AdjNavColor &&
+                UnAdjNavColor == opts.UnAdjNavColor &&
+                AdjPtsColor == opts.AdjPtsColor &&
+                UnAdjPtsColor == opts.UnAdjPtsColor &&
+                WayPtsColor == opts.WayPtsColor &&
+                AdjWidth == opts.AdjWidth &&
+                UnAdjWidth == opts.UnAdjWidth;
+        }
+
+        public static bool operator ==(PolygonGraphicOptions a, PolygonGraphicOptions b)
+        {
+            return !(a != null ^ b != null) || (a != null && b != null && a.Equals(b));
+        }
+
+        public static bool operator !=(PolygonGraphicOptions a, PolygonGraphicOptions b)
+        {
+            return !a.Equals(b);
         }
     }
 }

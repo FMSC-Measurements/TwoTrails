@@ -160,7 +160,7 @@ namespace TwoTrails.Utils
 
         public static void Polygons(ITtManager manager, String fileName)
         {
-            Polygons(manager.GetPolyons(), fileName);
+            Polygons(manager.GetPolygons(), fileName);
         }
 
         public static void Polygons(IEnumerable<TtPolygon> polygons, String fileName)
@@ -302,7 +302,7 @@ namespace TwoTrails.Utils
         {
             using (StreamWriter sw = new StreamWriter(fileName))
             {
-                foreach (TtPolygon poly in manager.GetPolyons())
+                foreach (TtPolygon poly in manager.GetPolygons())
                 {
                     sw.WriteLine(String.Format("{0}{1}{2}", poly.Name, Environment.NewLine, string.Join("", Enumerable.Range(0, poly.Name.Length).Select(x => "-"))));
                     sw.WriteLine(HaidLogic.GenerateSummary(manager, poly).SummaryText);
@@ -326,6 +326,11 @@ namespace TwoTrails.Utils
         public static void KMZ(TtProject project, String fileName)
         {
             //TODO
+        }
+
+        public static void KMZ(IEnumerable<TtProject> projects, String fileName)
+        {
+
         }
 
         public static void Shapes(TtProject project, String folderPath)

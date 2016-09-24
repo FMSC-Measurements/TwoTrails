@@ -150,9 +150,9 @@ namespace TwoTrails.Core
             return _Manager.GetPolygon(polyCN);
         }
 
-        public List<TtPolygon> GetPolyons()
+        public List<TtPolygon> GetPolygons()
         {
-            return _Manager.GetPolyons();
+            return _Manager.GetPolygons();
         }
 
         public List<TtMetadata> GetMetadata()
@@ -321,6 +321,15 @@ namespace TwoTrails.Core
         public void RecalculatePolygons()
         {
             _Manager.RecalculatePolygons();
+        }
+
+        
+
+
+        public List<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        {
+            //TODO GetPolygonGraphicOptions
+            throw new NotImplementedException();
         }
     }
 

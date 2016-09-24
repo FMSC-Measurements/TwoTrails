@@ -27,7 +27,7 @@ namespace TwoTrails.Core
         void DeletePoints(IEnumerable<TtPoint> points);
 
         TtPolygon GetPolygon(string polyCN);
-        List<TtPolygon> GetPolyons();
+        List<TtPolygon> GetPolygons();
         void AddPolygon(TtPolygon polygon);
         void DeletePolygon(TtPolygon polygon);
 
@@ -44,10 +44,8 @@ namespace TwoTrails.Core
         //List<TtImage> GetImages(String pointCN);
         //void InsertMedia(TtMedia media);
         //void DeleteMedia(TtMedia media);
+        
 
-        //TODO PolyGraphicOptions
-        //List<PolygonGraphicOptions> GetPolygonGraphicOptions();
-        //void InsertPolygonGraphicOption(PolygonGraphicOptions option);
-        //void DeletePolygonGraphicOption(PolygonGraphicOptions option);
+        List<PolygonGraphicOptions> GetPolygonGraphicOptions();
     }
 }

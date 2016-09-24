@@ -963,7 +963,7 @@ namespace TwoTrails.Core
             throw new Exception("Polygon Not Found");
         }
 
-        public List<TtPolygon> GetPolyons()
+        public List<TtPolygon> GetPolygons()
         {
             return _PolygonsMap.Values.ToList();
         }
@@ -1575,5 +1575,12 @@ namespace TwoTrails.Core
             }
         }
         #endregion
+
+
+        public List<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        {
+            //TODO GetPolygonGraphicOptions
+            throw new NotImplementedException();
+        }
     }
 }

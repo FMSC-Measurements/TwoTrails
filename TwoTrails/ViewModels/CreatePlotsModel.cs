@@ -66,7 +66,7 @@ namespace TwoTrails.ViewModels
             _Manager = manager;
 
             Polygons = new ObservableCollection<TtPolygon>(
-                manager.GetPolyons().Where(p => manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint())));
+                manager.GetPolygons().Where(p => manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint())));
 
             UomDistance = Distance.FeetTenths;
 
@@ -116,7 +116,7 @@ namespace TwoTrails.ViewModels
                 return;
             }
 
-            List<TtPolygon> polygons = _Manager.GetPolyons();
+            List<TtPolygon> polygons = _Manager.GetPolygons();
             string gPolyName = String.Format("{0}_Plts", SelectedPolygon.Name);
 
             TtPolygon poly = null;
