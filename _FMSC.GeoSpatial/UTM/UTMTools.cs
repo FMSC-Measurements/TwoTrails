@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 
 namespace FMSC.GeoSpatial.UTM
 {
@@ -89,6 +90,12 @@ namespace FMSC.GeoSpatial.UTM
 
         public static Position convertUTMtoLatLonSignedDec(double utmX, double utmY, int utmZone)
         {
+            Point point = convertUTMtoLatLonSignedDecAsPoint(utmX, utmY, utmZone);
+            return new Position(point.Y, point.X);
+        }
+
+        public static Point convertUTMtoLatLonSignedDecAsPoint(double utmX, double utmY, int utmZone)
+        {
             //boolean isNorthHemisphere = true; // utmZone[utmZone.Length - 1] >= 'N';
 
             double diflat = 0;// -0.00066286966871111111111111111111111111;
@@ -128,7 +135,7 @@ namespace FMSC.GeoSpatial.UTM
                     (3.0 / 2.0) * e2cuadrada * Math.Sin(lat) * Math.Cos(lat) * (tao - lat)) *
                     (tao - lat)) * (180.0 / Math.PI)) + diflat;
 
-            return new Position(latitude, longitude);
+            return new Point(longitude, latitude);
         }
     }
 }

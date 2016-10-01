@@ -41,6 +41,10 @@ namespace TwoTrails.Core.Points
             return false;
         }
         
+        public static bool IsMiscPoint(this TtPoint point)
+        {
+            return point.OpType == OpType.SideShot && !point.OnBoundary;
+        }
 
         public static bool HasSameUnAdjLocation(this TtPoint point, TtPoint otherPoint)
         {

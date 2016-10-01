@@ -40,6 +40,10 @@
     <Reference Include="CSUtilSlim">
       <HintPath>..\libs\CSUtilSlim.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Maps.MapControl.WPF, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Maps.MapControl.WPF.1.0.0.3\lib\net40-Client\Microsoft.Maps.MapControl.WPF.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.102.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
@@ -47,6 +51,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
@@ -71,6 +77,9 @@
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppInfo.cs" />
+    <Compile Include="Controls\MapControl.xaml.cs">
+      <DependentUpon>MapControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ProjectEditorControl.xaml.cs">
       <DependentUpon>ProjectEditorControl.xaml</DependentUpon>
     </Compile>
@@ -95,6 +104,12 @@
     <Compile Include="Dialogs\RetraceDialog.xaml.cs">
       <DependentUpon>RetraceDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\MapManager.cs" />
+    <Compile Include="Mapping\MapPath.cs" />
+    <Compile Include="Mapping\MapPoint.cs" />
+    <Compile Include="Mapping\MapPolygon.cs" />
+    <Compile Include="Mapping\MapPolygonManager.cs" />
+    <Compile Include="Mapping\MapShape.cs" />
     <Compile Include="TtWindow.cs" />
     <Compile Include="Utils\Export.cs" />
     <Compile Include="Utils\TtKmlGenerator.cs" />
@@ -130,12 +145,17 @@
     <Compile Include="PointSorter.cs" />
     <Compile Include="Tabs\ProjectTab.cs" />
     <Compile Include="Tabs\UserActivityTab.cs" />
+    <Compile Include="ViewModels\MapControlViewModel.cs" />
     <Compile Include="ViewModels\ProjectEditorModel.cs" />
     <Compile Include="ViewModels\RetraceModel.cs" />
     <Compile Include="ViewModels\TtProject.cs" />
     <Compile Include="TtSettings.cs" />
     <Compile Include="Tabs\TtTabModel.cs" />
     <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MapControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

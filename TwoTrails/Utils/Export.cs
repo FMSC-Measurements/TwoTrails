@@ -9,6 +9,8 @@ using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using CSUtil;
 using TwoTrails.ViewModels;
+using FMSC.Core.Xml.KML;
+using System.IO.Compression;
 
 namespace TwoTrails.Utils
 {
@@ -29,8 +31,8 @@ namespace TwoTrails.Utils
             Polygons(project.Manager, Path.Combine(folderPath, "Polygons.csv"));
             Metadata(project.Manager, Path.Combine(folderPath, "Metadata.csv"));
             Groups(project.Manager, Path.Combine(folderPath, "Groups.csv"));
-            GPX(project, Path.Combine(folderPath, String.Format("{0}.gpx", project.ProjectName)));
-            KMZ(project, Path.Combine(folderPath, String.Format("{0}.kmz", project.ProjectName)));
+            GPX(project, Path.Combine(folderPath, String.Format("{0}.gpx", project.ProjectName.Trim())));
+            KMZ(project, Path.Combine(folderPath, String.Format("{0}.kmz", project.ProjectName.Trim())));
             Shapes(project, folderPath);
         }
 
@@ -325,7 +327,20 @@ namespace TwoTrails.Utils
 
         public static void KMZ(TtProject project, String fileName)
         {
-            //TODO
+            KmlDocument doc = TtKmlGenerator.Generate(project.Manager, project.ProjectName.Trim(), project.ProjectInfo.Description);
+            
+            string kmlName = String.Format("{0}.kml", project.ProjectName.Trim());
+            string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);
+
+            KmlWriter.WriteKmlFile(kmlFile, doc);
+
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+
+            using (ZipArchive kmzFile = ZipFile.Open(fileName, ZipArchiveMode.Create))
+                kmzFile.CreateEntryFromFile(kmlFile, kmlName);
+
+            File.Delete(kmlFile);
         }
 
         public static void KMZ(IEnumerable<TtProject> projects, String fileName)

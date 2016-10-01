@@ -77,6 +77,9 @@ namespace FMSC.Core.Xml.KML
             G = (color / 256) % 256;
             B = (color / 65536) % 256;
             A = (color / 16777216) % 256;
+
+            if (A == 0)
+                A = 255;
         }
 
         public Color(string color)

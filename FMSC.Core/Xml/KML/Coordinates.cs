@@ -18,6 +18,16 @@ namespace FMSC.Core.Xml.KML
             Longitude = lon;
             Altitude = alt;
         }
+
+        public static bool operator==(Coordinates c1, Coordinates c2)
+        {
+            return c1.Latitude == c2.Latitude && c1.Longitude == c2.Longitude && c1.Altitude == c2.Altitude;
+        }
+
+        public static bool operator !=(Coordinates c1, Coordinates c2)
+        {
+            return c1.Latitude != c2.Latitude || c1.Longitude != c2.Longitude || c1.Altitude != c2.Altitude;
+        }
     }
 
     public class CoordinalExtent

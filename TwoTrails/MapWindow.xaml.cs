@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using TwoTrails.Controls;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails
@@ -20,8 +8,11 @@ namespace TwoTrails
     /// </summary>
     public partial class MapWindow : TtWindow
     {
+        MapControl MapControl { get; }
+
         public MapWindow(TtProject project)
         {
+            MapControl = new MapControl(project.Manager);
             InitializeComponent();
         }
     }

@@ -186,7 +186,7 @@ namespace TwoTrails.Core
         {
             PolygonGraphicOptions opts = obj as PolygonGraphicOptions;
 
-            return opts != null &&
+            return object.ReferenceEquals(opts, null) &&
                 AdjBndColor == opts.AdjBndColor &&
                 UnAdjBndColor == opts.UnAdjBndColor &&
                 AdjNavColor == opts.AdjNavColor &&
@@ -200,12 +200,37 @@ namespace TwoTrails.Core
 
         public static bool operator ==(PolygonGraphicOptions a, PolygonGraphicOptions b)
         {
-            return !(a != null ^ b != null) || (a != null && b != null && a.Equals(b));
+            if (object.ReferenceEquals(a, null) ^ object.ReferenceEquals(b, null))
+                return false;
+
+            if (object.ReferenceEquals(a, null))
+                return true;
+
+            return a.AdjBndColor == b.AdjBndColor &&
+                a.UnAdjBndColor == b.UnAdjBndColor &&
+                a.AdjNavColor == b.AdjNavColor &&
+                a.UnAdjNavColor == b.UnAdjNavColor &&
+                a.AdjPtsColor == b.AdjPtsColor &&
+                a.UnAdjPtsColor == b.UnAdjPtsColor &&
+                a.WayPtsColor == b.WayPtsColor &&
+                a.AdjWidth == b.AdjWidth &&
+                a.UnAdjWidth == b.UnAdjWidth;
         }
 
         public static bool operator !=(PolygonGraphicOptions a, PolygonGraphicOptions b)
         {
-            return !a.Equals(b);
+            if (object.ReferenceEquals(a, null) ^ object.ReferenceEquals(b, null) || object.ReferenceEquals(a, null))
+                return true;
+
+            return a.AdjBndColor != b.AdjBndColor ||
+                a.UnAdjBndColor != b.UnAdjBndColor ||
+                a.AdjNavColor != b.AdjNavColor ||
+                a.UnAdjNavColor != b.UnAdjNavColor ||
+                a.AdjPtsColor != b.AdjPtsColor ||
+                a.UnAdjPtsColor != b.UnAdjPtsColor ||
+                a.WayPtsColor != b.WayPtsColor ||
+                a.AdjWidth != b.AdjWidth ||
+                a.UnAdjWidth != b.UnAdjWidth;
         }
     }
 }

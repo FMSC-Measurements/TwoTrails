@@ -15,16 +15,13 @@ namespace FMSC.Core.Xml.KML
         public Coordinates? Coordinates { get; set; }
         public double? Heading { get; set; }
         public double? Tilt { get; set; }
-        public double Range { get; set; }
+        public double Range { get; set; } = 1000;
         public AltitudeMode? AltMode { get; set; }
 
 
-        public View()
-        {
-            Range = 1000;
-        }
+        public View() { }
 
-        public View(Coordinates coordinates, double heading, double tilt, double range)
+        public View(Coordinates coordinates, double? heading = null, double? tilt = null, double range = 1000)
         {
             Coordinates = coordinates;
             Heading = heading;

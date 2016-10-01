@@ -36,7 +36,7 @@ namespace TwoTrails.Utils
             {
                 GpsPoint gps = point as GpsPoint;
 
-                if (!adjusted && gps != null && gps.HasLatLon)
+                if (gps != null && gps.HasLatLon)
                 {
                     return UTMTools.convertLatLonSignedDecToUTM((double)gps.Latitude, (double)gps.Longitude, targetZone);
                 }
@@ -58,6 +58,24 @@ namespace TwoTrails.Utils
                     return new UTMCoords(point.AdjX, point.AdjY, targetZone);
                 else
                     return new UTMCoords(point.UnAdjX, point.UnAdjY, targetZone);
+            }
+        }
+
+        public static Point GetLatLon(TtPoint point, bool adjusted = true)
+        {
+            GpsPoint gps = point as GpsPoint;
+            if (gps != null && gps.HasLatLon)
+            {
+                return new Point((double)gps.Longitude, (double)gps.Latitude);
+            }
+            else
+            {
+                if (point.Metadata == null)
+                    throw new Exception("Missing Metadata");
+
+                return adjusted ?
+                    UTMTools.convertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone) :
+                    UTMTools.convertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
             }
         }
 
@@ -98,6 +116,27 @@ namespace TwoTrails.Utils
             }
 
             return fp;
+        }
+
+
+        public static TimeSpan GetPolyCreationPeriod(IList<TtPoint> points)
+        {
+            if (points.Count < 1)
+                throw new Exception("No Points");
+
+            DateTime start = points[0].TimeCreated;
+            DateTime end = start;
+
+            foreach (TtPoint p in points)
+            {
+                if (p.TimeCreated < start)
+                    start = p.TimeCreated;
+
+                if (p.TimeCreated > end)
+                    end = p.TimeCreated;
+            }
+
+            return new TimeSpan((end - start).Ticks);
         }
     }
 }

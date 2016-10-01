@@ -1,4 +1,6 @@
-﻿using FMSC.Core.Xml.KML;
+﻿using FMSC.Core;
+using FMSC.Core.Xml.KML;
+using FMSC.GeoSpatial;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,12 @@ namespace TwoTrails.Utils
     {
         const int AdjLineSize = 5;
         const int UnAdjLineSize = 7;
-        
+
+        public static KmlDocument Generate(ITtManager manager, string name, string description = null)
+        {
+            return Generate(new ITtManager[] { manager }, name, description);
+        }
+
         public static KmlDocument Generate(IEnumerable<ITtManager> managers, string name, string description = null)
         {
             KmlDocument doc = new KmlDocument(name, description ?? String.Empty);
@@ -32,15 +39,25 @@ namespace TwoTrails.Utils
 
                 foreach (TtPolygon poly in manager.GetPolygons())
                 {
-                    PolygonGraphicOptions pgo = pgos.FirstOrDefault(p => p.CN == poly.CN);
-                    PolygonStyle style = pgo != null ? polyStyles.FirstOrDefault(ps => ps.Key == pgo) : null;
+                    //todo fix colors
+                    PolygonGraphicOptions pgo = null;// pgos.FirstOrDefault(p => p.CN == poly.CN);
+
+                    PolygonStyle style = null;// (pgo != null && polyStyles.Count > 0) ? polyStyles.FirstOrDefault(ps => ps.Key == pgo) : null;
 
                     //Get/Generate Polygon Style
                     if (style == null)
                     {
                         if (pgo == null)
                         {
-                            //pgo = default
+                            pgo = new PolygonGraphicOptions(Consts.EmptyGuid,
+                                16007990,
+                                12000284,
+                                4149685,
+                                1713022,
+                                10233776,
+                                4854924,
+                                15094016,
+                                AdjLineSize, UnAdjLineSize);
                         }
 
                         style = new PolygonStyle(pgo,
@@ -53,7 +70,6 @@ namespace TwoTrails.Utils
 
                         polyStyles.Add(style);
                     }
-
 
                     List<TtPoint> points = manager.GetPoints(poly.CN);
 
@@ -183,7 +199,259 @@ namespace TwoTrails.Utils
 
 
                     #region Add Placemarks
+                    foreach (TtPoint point in points)
+                    {
+                        #region Create Placemarks
+                        System.Windows.Point pos = TtUtils.GetLatLon(point);
+                        Coordinates adjCoords = new Coordinates(pos.Y, pos.X);
 
+                        Coordinates unadjCoords;
+
+                        if (point.IsGpsAtBase())
+                            unadjCoords = adjCoords;
+                        else
+                        {
+                            pos = TtUtils.GetLatLon(point, false);
+                            unadjCoords = new Coordinates(pos.Y, pos.X);
+                        }
+
+                        string snippit = String.Format("Point Operation: {0}", point.OpType);
+
+                        Placemark adjPm = new Placemark(point.PID.ToString(),
+                            String.Format("Point Operation: {0}<br><div>\t     Adjusted<br>UtmX: {1}<br>UtmY: {2}</div><br>{3}",
+                            point.OpType, point.AdjX, point.AdjY, point.Comment))
+                        {
+                            View = new View()
+                            {
+                                TimeStamp = point.TimeCreated,
+                                Coordinates = adjCoords,
+                                Tilt = 15,
+                                AltMode = AltitudeMode.ClampToGround,
+                                Range = 150
+                            },
+                            Properties = new FMSC.Core.Xml.KML.Properties()
+                            {
+                                Snippit = snippit
+                            },
+                            StyleUrl = style.AdjBndStyle.StyleUrl,
+                            Open = false,
+                            Visibility = true
+                        };
+
+                        adjPm.Points.Add(new Point(adjCoords));
+
+
+                        Placemark unadjPm = new Placemark(point.PID.ToString(),
+                            String.Format("Point Operation: {0}<br><div>\t     Unadjusted<br>UtmX: {1}<br>UtmY: {2}</div><br>{3}",
+                            point.OpType, point.UnAdjX, point.UnAdjY, point.Comment))
+                        {
+                            View = new View()
+                            {
+                                TimeStamp = point.TimeCreated,
+                                Coordinates = adjCoords,
+                                Tilt = 15,
+                                AltMode = AltitudeMode.ClampToGround,
+                                Range = 150
+                            },
+                            Properties = new FMSC.Core.Xml.KML.Properties()
+                            {
+                                Snippit = snippit
+                            },
+                            StyleUrl = style.AdjBndStyle.StyleUrl,
+                            Open = false,
+                            Visibility = false
+                        };
+
+                        adjPm.Points.Add(new Point(unadjCoords));
+                        #endregion
+
+                        #region Add Placemarks to Lists
+                        if (point.IsBndPoint())
+                        {
+                            AdjBoundPointList.Add(adjCoords);
+                            UnAdjBoundPointList.Add(unadjCoords);
+                            fAdjBoundPoints.Placemarks.Add(adjPm);
+                            fUnAdjBoundPoints.Placemarks.Add(unadjPm);
+                        }
+
+                        if (point.IsNavPoint())
+                        {
+                            adjPm = new Placemark(adjPm);
+                            adjPm.StyleUrl = string.Copy(style.AdjNavStyle.StyleUrl);
+                            adjPm.Visibility = false;
+
+                            unadjPm = new Placemark(unadjPm);
+                            unadjPm.StyleUrl = string.Copy(style.UnAdjNavStyle.StyleUrl);
+
+                            AdjNavPointList.Add(adjCoords);
+                            UnAdjNavPointList.Add(unadjCoords);
+                            fAdjNavPoints.Placemarks.Add(adjPm);
+                            fUnAdjNavPoints.Placemarks.Add(unadjPm);
+                        }
+
+                        if (point.OpType == OpType.WayPoint)
+                        {
+                            unadjPm = new Placemark(unadjPm);
+                            unadjPm.StyleUrl = style.WayPtsStyle.StyleUrl;
+                            fWayPoints.Placemarks.Add(unadjPm);
+                        }
+                        #endregion
+                    }
+
+                    #region Create Poly Placemarks
+                    if (AdjBoundPointList.Count > 2 && AdjBoundPointList[0] != AdjBoundPointList[AdjBoundPointList.Count - 1])
+                        AdjBoundPointList.Add(AdjBoundPointList[0]);
+
+                    if (UnAdjBoundPointList.Count > 2 && UnAdjBoundPointList[0] != UnAdjBoundPointList[UnAdjBoundPointList.Count - 1])
+                        UnAdjBoundPointList.Add(UnAdjBoundPointList[0]);
+
+                    AdjBoundPoly.OuterBoundary = AdjBoundPointList;
+                    UnAdjBoundPoly.OuterBoundary = UnAdjBoundPointList;
+
+                    AdjNavPoly.OuterBoundary = AdjNavPointList;
+                    UnAdjNavPoly.OuterBoundary = UnAdjNavPointList;
+
+                    TimeSpan pointTimespan = points.Count > 0 ? TtUtils.GetPolyCreationPeriod(points) : new TimeSpan();
+
+                    CoordinalExtent adjExtent = AdjBoundPoly.GetOuterDimensions();
+                    CoordinalExtent unadjExtent = UnAdjBoundPoly.GetOuterDimensions();
+
+                    double adjRange = 1000;
+                    double unAdjRange = 1000;
+
+                    if (adjExtent != null)
+                    {
+                        double height = MathEx.Distance(0, adjExtent.North, 0, adjExtent.South);
+                        double width = MathEx.Distance(adjExtent.East, 0, adjExtent.West, 0);
+
+                        adjRange = (width > height ? width : height) * 1.1;
+                    }
+
+                    if (unadjExtent != null)
+                    {
+                        double height = MathEx.Distance(0, unadjExtent.North, 0, unadjExtent.South);
+                        double width = MathEx.Distance(unadjExtent.East, 0, unadjExtent.West, 0);
+
+                        unAdjRange = (width > height ? width : height) * 1.1;
+                    }
+
+                    //AdjBoundPlacemark
+                    Placemark AdjBoundPlacemark = new Placemark("AdjBoundPoly", "Adjusted Boundary Polygon")
+                    {
+                        View = AdjBoundPoly.HasOuterBoundary ? new View()
+                        {
+                            AltMode = AltitudeMode.ClampToGround,
+                            Coordinates = AdjBoundPoly.GetOBAveragedCoords(),
+                            Range = adjRange,
+                            Tilt = 5,
+                            TimeSpan = pointTimespan
+                        } : null,
+                        Properties = new FMSC.Core.Xml.KML.Properties()
+                        {
+                            Snippit = poly.Description
+                        },
+                        Open = false,
+                        Visibility = true,
+                        StyleUrl = style.AdjBndStyle.StyleUrl
+                    };
+
+                    AdjBoundPlacemark.Polygons.Add(AdjBoundPoly);
+
+                    //UnAdjBoundPlacemark
+                    Placemark UnAdjBoundPlacemark = new Placemark("UnAdjBoundPoly", "UnAdjusted Boundary Polygon")
+                    {
+                        View = UnAdjBoundPoly.HasOuterBoundary ? new View()
+                        {
+                            AltMode = AltitudeMode.ClampToGround,
+                            Coordinates = UnAdjBoundPoly.GetOBAveragedCoords(),
+                            Range = unAdjRange,
+                            Tilt = 5,
+                            TimeSpan = pointTimespan
+                        } : null,
+                        Properties = new FMSC.Core.Xml.KML.Properties()
+                        {
+                            Snippit = poly.Description
+                        },
+                        Open = false,
+                        Visibility = false,
+                        StyleUrl = style.UnAdjBndStyle.StyleUrl
+                    };
+
+                    UnAdjBoundPlacemark.Polygons.Add(UnAdjBoundPoly);
+
+                    //AdjNavPlacemark
+                    Placemark AdjNavPlacemark = new Placemark("AdjNavPoly", "Adjusted Navigation Path")
+                    {
+                        View = AdjNavPoly.HasOuterBoundary ? new View()
+                        {
+                            AltMode = AltitudeMode.ClampToGround,
+                            Coordinates = AdjNavPoly.GetOBAveragedCoords(),
+                            Range = adjRange,
+                            Tilt = 5,
+                            TimeSpan = pointTimespan
+                        } : null,
+                        Properties = new FMSC.Core.Xml.KML.Properties()
+                        {
+                            Snippit = poly.Description
+                        },
+                        Open = false,
+                        Visibility = false,
+                        StyleUrl = style.AdjNavStyle.StyleUrl
+                    };
+
+                    AdjNavPlacemark.Polygons.Add(AdjNavPoly);
+
+                    //UnAdjNavPlacemark
+                    Placemark UnAdjNavPlacemark = new Placemark("UnAdjNavPoly", "UnAdjusted Navigation Path")
+                    {
+                        View = UnAdjNavPoly.HasOuterBoundary ? new View()
+                        {
+                            AltMode = AltitudeMode.ClampToGround,
+                            Coordinates = UnAdjNavPoly.GetOBAveragedCoords(),
+                            Range = unAdjRange,
+                            Tilt = 5,
+                            TimeSpan = pointTimespan
+                        } : null,
+                        Properties = new FMSC.Core.Xml.KML.Properties()
+                        {
+                            Snippit = poly.Description
+                        },
+                        Open = false,
+                        Visibility = false,
+                        StyleUrl = style.UnAdjNavStyle.StyleUrl
+                    };
+
+                    UnAdjNavPlacemark.Polygons.Add(UnAdjNavPoly);
+
+                    //add placemarks
+                    fAdjBound.Placemarks.Add(AdjBoundPlacemark);
+                    fUnAdjBound.Placemarks.Add(UnAdjBoundPlacemark);
+                    fAdjNav.Placemarks.Add(AdjNavPlacemark);
+                    fUnAdjNav.Placemarks.Add(UnAdjNavPlacemark);
+
+                    #endregion
+                    #endregion
+                    
+
+                    #region Add Folders To eachother
+                    //added point folders to bound/nav/misc folders
+                    fAdjBound.SubFolders.Add(fAdjBoundPoints);
+                    fUnAdjBound.SubFolders.Add(fUnAdjBoundPoints);
+                    fAdjNav.SubFolders.Add(fAdjNavPoints);
+                    fUnAdjNav.SubFolders.Add(fUnAdjNavPoints);
+                    fMiscPoints.SubFolders.Add(fAdjMiscPoints);
+                    fMiscPoints.SubFolders.Add(fUnAdjMiscPoints);
+
+                    //add bound/nav/misc/way folders to root polygon folder
+                    polyFolder.SubFolders.Add(fAdjBound);
+                    polyFolder.SubFolders.Add(fUnAdjBound);
+                    polyFolder.SubFolders.Add(fAdjNav);
+                    polyFolder.SubFolders.Add(fUnAdjNav);
+                    polyFolder.SubFolders.Add(fMiscPoints);
+                    polyFolder.SubFolders.Add(fWayPoints);
+
+                    //add polygon root to KmlDoc
+                    doc.SubFolders.Add(polyFolder);
                     #endregion
                 }
             }

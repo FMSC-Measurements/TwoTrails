@@ -69,7 +69,7 @@ namespace TwoTrails.ViewModels
             {
                 if (Directory.Exists(FolderLocation))
                 {
-                    string path = Path.Combine(FolderLocation, project.ProjectName).Trim();
+                    string path = Path.Combine(FolderLocation, project.ProjectName.Trim()).Trim();
 
                     try
                     {
@@ -98,12 +98,12 @@ namespace TwoTrails.ViewModels
                                 Export.Summary(project.Manager, Path.Combine(path, "Summary.txt"));
 
                             if (ExportGPX)
-                                Export.GPX(project, Path.Combine(path, String.Format("{0}.gpx", project.ProjectName)));
+                                Export.GPX(project, Path.Combine(path, String.Format("{0}.gpx", project.ProjectName.Trim())));
 
-                            if (ExportPoints)
-                                Export.KMZ(project, Path.Combine(path, String.Format("{0}.kmz", project.ProjectName)));
+                            if (ExportKMZ)
+                                Export.KMZ(project, Path.Combine(path, String.Format("{0}.kmz", project.ProjectName.Trim())));
 
-                            if (ExportPoints)
+                            if (ExportShapes)
                                 Export.Shapes(project, Path.Combine(path));
                         }
 

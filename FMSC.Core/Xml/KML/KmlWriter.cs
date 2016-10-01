@@ -28,7 +28,7 @@ namespace FMSC.Core.Xml.KML
         #endregion
 
         
-        public KmlWriter(string filename) : base(filename, null)
+        public KmlWriter(string filename) : base(filename, Encoding.UTF8)
         {
             _FileName = filename;
             Formatting = Formatting.Indented;
@@ -150,16 +150,27 @@ namespace FMSC.Core.Xml.KML
 
                     if (pm.Polygons != null && pm.Polygons.Count > 0)
                     {
-                        v.Coordinates = pm.Polygons[0].GetAveragedCoords();
-                        v.AltMode = pm.Polygons[0].AltMode;
+                        Polygon poly = pm.Polygons[0];
+
+                        if (poly.HasOuterBoundary)
+                        {
+                            v.Coordinates = poly.GetOBAveragedCoords();
+                            v.AltMode = poly.AltMode;
+                            WriteView(v);
+                        }
+                        else if (poly.HasInnerBoundary)
+                        {
+                            v.Coordinates = poly.GetIBAveragedCoords();
+                            v.AltMode = poly.AltMode;
+                            WriteView(v);
+                        }
                     }
                     else if (pm.Points != null && pm.Points.Count > 0)
                     {
                         v.Coordinates = pm.Points[0].Coordinates;
                         v.AltMode = pm.Points[0]._AltMode;
+                        WriteView(v);
                     }
-
-                    WriteView(v);
                 }
 
                 if (pm.StyleUrl != null && pm.StyleUrl != "")
@@ -615,10 +626,14 @@ namespace FMSC.Core.Xml.KML
 
             if (v.Coordinates != null)
             {
-                WriteElementString("longitude", v.Coordinates.Value.Longitude.ToString());
-                WriteElementString("latitude", v.Coordinates.Value.Latitude.ToString());
-                if (v.Coordinates.Value.Altitude != null)
-                    WriteElementString("altitude", v.Coordinates.Value.Altitude.ToString());
+                Coordinates coords = (Coordinates)v.Coordinates;
+                if (coords.Latitude != 0 || coords.Longitude != 0)
+                {
+                    WriteElementString("longitude", coords.Longitude.ToString());
+                    WriteElementString("latitude", coords.Latitude.ToString());
+                    if (v.Coordinates.Value.Altitude != null)
+                        WriteElementString("altitude", coords.Altitude.ToString());
+                }
             }
 
             WriteElementString("range", v.Range.ToString());
@@ -734,6 +749,19 @@ namespace FMSC.Core.Xml.KML
             return String.Format("{0}-{1}-{2}T{3}:{4}:{5}Z", dt.Year.ToString("D4"), dt.Month.ToString("D2"), dt.Day.ToString("D2"), dt.Hour.ToString("D2"), dt.Minute.ToString("D2"), dt.Second.ToString("D2"));
         }
         #endregion
+
+
+        public static void WriteKmlFile(string filePath, KmlDocument doc)
+        {
+            using (KmlWriter kw = new KmlWriter(filePath))
+            {
+                kw.WriteStartDocument();
+                kw.WriteStartKml();
+                kw.WriteKmlDocument(doc);
+                kw.WriteEndKml();
+                kw.WriteEndDocument();
+            }
+        }
     }
 
 }

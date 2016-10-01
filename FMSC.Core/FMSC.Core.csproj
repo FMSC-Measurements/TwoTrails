@@ -47,6 +47,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\ObservableConvertedCollection.cs" />
     <Compile Include="ComponentModel\BindableMenuItem.cs" />
     <Compile Include="ComponentModel\CheckedListItem.cs" />
     <Compile Include="ComponentModel\Commands\BindedRelayCommand.cs" />

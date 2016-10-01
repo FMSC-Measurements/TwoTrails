@@ -15,6 +15,9 @@ namespace FMSC.Core.Xml.KML
         public List<Coordinates> InnerBoundary { get; set; }
         public bool IsPath { get; set; }
 
+        public bool HasOuterBoundary { get { return OuterBoundary.Count > 0; } }
+        public bool HasInnerBoundary { get { return InnerBoundary.Count > 0; } }
+
         private AltitudeMode? _AltMode;
         public AltitudeMode? AltMode
         {
@@ -50,7 +53,7 @@ namespace FMSC.Core.Xml.KML
         }
 
 
-        public Coordinates GetAveragedCoords()
+        public Coordinates GetOBAveragedCoords()
         {
             Coordinates c = new Coordinates();
             double lat = 0, lon = 0;
@@ -65,12 +68,34 @@ namespace FMSC.Core.Xml.KML
 
             if (count > 0)
             {
-                lat /= count;
-                lon /= count;
+                c.Longitude = lon / count;
+                c.Latitude = lat / count;
             }
 
-            c.Longitude = lon;
-            c.Latitude = lat;
+            c.Altitude = 1000;
+
+            return c;
+        }
+
+        public Coordinates GetIBAveragedCoords()
+        {
+            Coordinates c = new Coordinates();
+            double lat = 0, lon = 0;
+            int count = 0;
+
+            foreach (Coordinates coord in InnerBoundary)
+            {
+                lat += coord.Latitude;
+                lon += coord.Longitude;
+                count++;
+            }
+
+            if (count > 0)
+            {
+                c.Longitude = lon / count;
+                c.Latitude = lat / count;
+            }
+
             c.Altitude = 1000;
 
             return c;

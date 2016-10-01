@@ -286,7 +286,7 @@ namespace TwoTrails.Core.Points
         {
             OnPropertyChanged(nameof(LinkedPoints));
 
-            if (e.OldItems == null ^ e.NewItems == null || e.NewItems.Count > 0 ^ e.OldItems.Count < 0)
+            if (e.OldItems == null ^ e.NewItems == null || e.NewItems != null && e.NewItems.Count > 0 ^ e.OldItems.Count < 0)
                 OnPropertyChanged(nameof(HasQuondamLinks));
         }
         

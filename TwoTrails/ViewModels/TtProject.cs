@@ -138,6 +138,8 @@ namespace TwoTrails.ViewModels
             EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Metadata));
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Groups));
 
+            OpenMapWindowCommand = new RelayCommand(x => OpenMapTab());
+
             ProjectTab = new ProjectTab(this);
         }
 
@@ -234,7 +236,8 @@ namespace TwoTrails.ViewModels
 
         private void OpenMapTab()
         {
-
+            MapWindow m = new MapWindow(this);
+            m.Show();
         }
 
         private void DetachMapTab()
