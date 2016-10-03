@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Maps.MapControl.WPF;
+using Microsoft.Maps.MapControl.WPF.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TwoTrails.Core;
+using TwoTrails.Mapping;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.Controls
@@ -22,10 +25,23 @@ namespace TwoTrails.Controls
     /// </summary>
     public partial class MapControl : UserControl
     {
-        public MapControl(TtManager manager)
+        public static readonly DependencyProperty ManagerProperty =
+                DependencyProperty.Register(nameof(Manager), typeof(TtManager), typeof(MapControl));
+
+        public TtManager Manager { get; set; }
+
+        public MapControl()
         {
-            this.DataContext = new MapControlViewModel(map, manager);
             InitializeComponent();
+
+            this.Loaded += MapControl_Loaded;
+        }
+
+        private void MapControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Manager = (TtManager)this.GetValue(ManagerProperty);
+
+            MapManager mm = new MapManager(map, Manager.Points, Manager.Polygons);
         }
     }
 }

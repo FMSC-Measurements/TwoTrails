@@ -126,14 +126,20 @@ namespace FMSC.Core.Collections
                     }
                     else
                     {
-                        _EditableCollection.Insert(e.NewStartingIndex, _Converter((TIn)e.NewItems[0]));
+                        TIn i = (TIn)e.NewItems[0];
+                        TOut o = _Converter(i);
+                        _ConvertedLookup.Add(i, o);
+                        _EditableCollection.Insert(e.NewStartingIndex, o);
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (TIn ti in e.OldItems)
                     {
-                        _EditableCollection.Remove(_ConvertedLookup[ti]);
-                        _ConvertedLookup.Remove(ti);
+                        if (_ConvertedLookup.ContainsKey(ti))
+                        {
+                            _EditableCollection.Remove(_ConvertedLookup[ti]);
+                            _ConvertedLookup.Remove(ti);
+                        }
                     }
                     break;
                 case NotifyCollectionChangedAction.Replace:

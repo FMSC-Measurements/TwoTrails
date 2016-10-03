@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
@@ -174,19 +175,41 @@ namespace TwoTrails.ViewModels
 
         public void Close()
         {
-            if (MainModel.CloseProject(this))
+            if (RequiresSave)
             {
-                if (ProjectTab != null)
-                    MainModel.CloseTab(ProjectTab);
+                MessageBoxResult result = MessageBox.Show("Would you like to save before closing this project?",
+                                             String.Empty,
+                                             MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
 
-                if (MapTab != null)
-                    MainModel.CloseTab(MapTab);
-                
-                if (UserActivityTab != null)
-                    MainModel.CloseTab(UserActivityTab);
-
-                MapWindow?.Close();
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        Save();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }
             }
+
+            CloseViews();
+            MainModel.RemoveProject(this);
+        }
+
+        private void CloseViews()
+        {
+            if (ProjectTab != null)
+                MainModel.CloseTab(ProjectTab);
+
+            if (MapTab != null)
+                MainModel.CloseTab(MapTab);
+
+            if (UserActivityTab != null)
+                MainModel.CloseTab(UserActivityTab);
+
+            MapWindow?.Close();
         }
 
         public void CloseTab(TtTabModel tab)
@@ -236,8 +259,8 @@ namespace TwoTrails.ViewModels
 
         private void OpenMapTab()
         {
-            MapWindow m = new MapWindow(this);
-            m.Show();
+            MapWindow = new MapWindow(this);
+            MapWindow.Show();
         }
 
         private void DetachMapTab()

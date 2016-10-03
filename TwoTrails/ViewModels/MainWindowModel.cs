@@ -91,7 +91,7 @@ namespace TwoTrails.ViewModels
         private bool exiting = false;
         public bool CanExit
         {
-            get { return exiting || !HasUnsavedProjects || Exit(false); }
+            get { return exiting || Exit(false); }
         }
 
 
@@ -289,38 +289,10 @@ namespace TwoTrails.ViewModels
             tab.Tab.Focus();
         }
 
-        public bool CloseProject(TtProject project)
+        public void RemoveProject(TtProject project)
         {
             if (project != null)
-            {
-                if (project.RequiresSave)
-                {
-                    MessageBoxResult result = MessageBox.Show("Would you like to save before closing this project?",
-                                                 String.Empty,
-                                                 MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
-
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        try
-                        {
-                            project.Save();
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                            return false;
-                        }
-                    }
-                    else if (result == MessageBoxResult.Cancel)
-                        return false;
-                }
-
                 _Projects.Remove(project.FilePath);
-
-                return true;
-            }
-
-            return false;
         }
 
 
@@ -334,12 +306,12 @@ namespace TwoTrails.ViewModels
 
         private bool Exit(bool closeWindow = true)
         {
-            IEnumerable<TtProject> openProjects = _Projects.Values.Where(p => p.RequiresSave);
+            IEnumerable<TtProject> unsavedProjects = _Projects.Values.Where(p => p.RequiresSave);
 
-            if (openProjects.Any())
+            if (unsavedProjects.Any())
             {
                 MessageBoxResult result = MessageBox.Show(
-                        openProjects.Count() > 1 ?
+                        unsavedProjects.Count() > 1 ?
                             "You have open projects. Would you like to save them before closing?" :
                             "You have an open project. Would you like to save it before closing?",
                         String.Empty,
@@ -349,9 +321,10 @@ namespace TwoTrails.ViewModels
                 {
                     try
                     {
-                        foreach (TtProject proj in openProjects)
+                        foreach (TtProject proj in unsavedProjects.ToList())
                         {
-                            CloseProject(proj);
+                            proj.Save();
+                            proj.Close();
                         }
                     }
                     catch (Exception ex)
@@ -362,6 +335,13 @@ namespace TwoTrails.ViewModels
                 }
                 else if (result == MessageBoxResult.Cancel)
                     return false;
+            }
+            else
+            {
+                foreach (TtProject proj in _Projects.Values.ToList())
+                {
+                    proj.Close();
+                }
             }
 
             exiting = true;

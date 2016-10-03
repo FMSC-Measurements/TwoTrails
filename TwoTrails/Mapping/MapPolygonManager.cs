@@ -12,8 +12,6 @@ namespace TwoTrails.Mapping
 {
     public class MapPolygonManager : NotifyPropertyChangedEx
     {
-        //private ObservableCollection<MapPoint> _Points;
-        //public ReadOnlyObservableCollection<MapPoint> Points;
         public ObservableConvertedCollection<MapPoint, TtPoint> Points { get; }
 
         private MapPolygon _AdjBnd, _UnAdjBnd;
@@ -27,7 +25,7 @@ namespace TwoTrails.Mapping
         private object locker = new object();
 
         #region Visibility
-        private bool _Visible;
+        private bool _Visible = true;
         public bool Visible
         {
             get { return _Visible; }
@@ -210,17 +208,42 @@ namespace TwoTrails.Mapping
         {
             polygon.PolygonChanged += Polygon_PolygonChanged;
 
-            //_Points = new ObservableCollection<MapPoint>(points.Select(p => new MapPoint(map, p)));
-            //Points = new ReadOnlyObservableCollection<MapPoint>(_Points);
-
             AdjBoundary = new MapPolygon(map, polygon, new List<Location>());
             UnAdjBoundary = new MapPolygon(map, polygon, new List<Location>());
             AdjNavigation = new MapPath(map, polygon, new List<Location>());
             UnAdjNavigation = new MapPath(map, polygon, new List<Location>());
             
             Points = new ObservableConvertedCollection<MapPoint, TtPoint>(points, (p) => new MapPoint(map, p));
+
+            ((INotifyCollectionChanged)Points).CollectionChanged += MapPolygonManager_CollectionChanged;
         }
 
+        private void MapPolygonManager_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (MapPoint p in e.NewItems)
+                    {
+                        p.AdjBndVisible = true;
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (MapPoint p in e.OldItems)
+                    {
+                        p.Detach();
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    break;
+                default:
+                    break;
+            }
+        }
 
         private void Polygon_PolygonChanged(TtPolygon polygon)
         {

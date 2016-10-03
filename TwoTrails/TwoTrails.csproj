@@ -248,6 +248,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="TwoTrails.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

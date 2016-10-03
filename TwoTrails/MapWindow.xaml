@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:TwoTrails"
         xmlns:ctrls="clr-namespace:TwoTrails.Controls"
         mc:Ignorable="d"
-        Title="MapWindow" Height="300" Width="300">
+        Title="MapWindow" Height="500" Width="700">
     <Grid>
-        <ContentControl Content="{Binding MapControl}"/>
+        <ctrls:MapControl Manager="{Binding Project.Manager}" />
     </Grid>
 </local:TtWindow>

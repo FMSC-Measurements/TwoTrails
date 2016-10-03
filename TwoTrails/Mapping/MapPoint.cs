@@ -67,7 +67,7 @@ namespace TwoTrails.Mapping
 
 
         #region Visibility
-        private bool _Visible;
+        private bool _Visible = true;
         public bool Visible
         {
             get { return _Visible; }

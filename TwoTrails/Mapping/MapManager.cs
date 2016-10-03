@@ -23,17 +23,28 @@ namespace TwoTrails.Mapping
         {
             _Map = map;
             _Points = points;
-
+            
             foreach (TtPolygon poly in polygons)
             {
                 ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Points.Where(p => p.PolygonCN == poly.CN));
                 _PointsByPolys.Add(poly.CN, ocPoints);
-                _PolygonManagers.Add(poly.CN, new MapPolygonManager(_Map, poly, ocPoints));
+
+                MapPolygonManager mpm = new MapPolygonManager(_Map, poly, ocPoints);
+                _PolygonManagers.Add(poly.CN, mpm);
+
+                if (poly.Name.StartsWith("PointLocationWcover2"))
+                {
+                    mpm.AdjBndPointsVisible = true;
+                    mpm.AdjBndVisible = true;
+                }
             }
 
 
             ((INotifyCollectionChanged)_Points).CollectionChanged += Points_CollectionChanged;
             ((INotifyCollectionChanged)polygons).CollectionChanged += Polygons_CollectionChanged;
+
+
+            //hook into all points to see if they change polygons
         }
 
         private void Polygons_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

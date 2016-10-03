@@ -1,4 +1,5 @@
 ﻿using TwoTrails.Controls;
+using TwoTrails.Mapping;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails
@@ -8,11 +9,12 @@ namespace TwoTrails
     /// </summary>
     public partial class MapWindow : TtWindow
     {
-        MapControl MapControl { get; }
+        public TtProject Project { get; set; }
 
         public MapWindow(TtProject project)
         {
-            MapControl = new MapControl(project.Manager);
+            this.Project = project;
+            this.DataContext = this;
             InitializeComponent();
         }
     }
