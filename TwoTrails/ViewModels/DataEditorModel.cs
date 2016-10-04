@@ -1358,7 +1358,10 @@ namespace TwoTrails.ViewModels
 
         private void DeletePoint()
         {
-            Manager.DeletePoints(SelectedPoints.Cast<TtPoint>());
+            if (MultipleSelections)
+                Manager.DeletePoints(SelectedPoints.Cast<TtPoint>());
+            else
+                Manager.DeletePoint(SelectedPoints.Cast<TtPoint>().First());
         }
         
 

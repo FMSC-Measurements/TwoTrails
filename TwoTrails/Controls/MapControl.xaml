@@ -6,8 +6,37 @@
              xmlns:local="clr-namespace:TwoTrails.Controls"
              xmlns:map="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="500">
-    <Grid>
-        <map:Map x:Name="map" CredentialsProvider="KEY"/>
+             d:DesignHeight="500" d:DesignWidth="800">
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" MinWidth="150" MaxWidth="300" />
+            <ColumnDefinition Width="3" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="40" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Polygons" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button Grid.Column="1">Collapse Icon</Button>
+            </Grid>
+            
+            <ListView Grid.Row="1">
+
+            </ListView>
+        </Grid>
+
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Gray"/>
+
+        <map:Map Grid.Column="2" x:Name="map"/>
     </Grid>
 </UserControl>

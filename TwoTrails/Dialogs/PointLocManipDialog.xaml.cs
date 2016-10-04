@@ -58,7 +58,7 @@ namespace TwoTrails.Dialogs
 
         private void btnCommitClick(object sender, RoutedEventArgs e)
         {
-            if (cboPoly.SelectedIndex > 0)
+            if (cboPoly.SelectedIndex > -1)
             {
                 if (rbInsAft.IsChecked == true && cboPolyPoints.SelectedIndex < 0)
                 {

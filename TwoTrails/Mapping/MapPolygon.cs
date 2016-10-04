@@ -19,5 +19,10 @@ namespace TwoTrails.Mapping
         {
 
         }
+
+        public override void Detach()
+        {
+
+        }
     }
 }

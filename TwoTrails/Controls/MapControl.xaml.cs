@@ -2,6 +2,7 @@
 using Microsoft.Maps.MapControl.WPF.Core;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,20 +29,25 @@ namespace TwoTrails.Controls
         public static readonly DependencyProperty ManagerProperty =
                 DependencyProperty.Register(nameof(Manager), typeof(TtManager), typeof(MapControl));
 
-        public TtManager Manager { get; set; }
+        public TtManager Manager
+        {
+            get { return (TtManager)this.GetValue(ManagerProperty); }
+            set { this.SetValue(ManagerProperty, value); }
+        }
+
+        private MapManager MapManager { get; set; }
 
         public MapControl()
         {
             InitializeComponent();
+            map.CredentialsProvider = new ApplicationIdCredentialsProvider(APIKeys.BING_MAPS_API_KEY);
 
             this.Loaded += MapControl_Loaded;
         }
 
         private void MapControl_Loaded(object sender, RoutedEventArgs e)
         {
-            Manager = (TtManager)this.GetValue(ManagerProperty);
-
-            MapManager mm = new MapManager(map, Manager.Points, Manager.Polygons);
+            MapManager = new MapManager(map, Manager);
         }
     }
 }

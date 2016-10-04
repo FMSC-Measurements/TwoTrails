@@ -25,7 +25,7 @@ namespace TwoTrails.Mapping
         private object locker = new object();
 
         #region Visibility
-        private bool _Visible = true;
+        private bool _Visible;
         public bool Visible
         {
             get { return _Visible; }
@@ -201,47 +201,79 @@ namespace TwoTrails.Mapping
                 }
             }
         }
+
+        
+        private bool _WayPointsVisible;
+        public bool WayPointsVisible
+        {
+            get { return _WayPointsVisible; }
+            set
+            {
+                lock (locker)
+                {
+                    SetField(ref _WayPointsVisible, value, () =>
+                    {
+                        foreach (MapPoint p in Points)
+                            p.WayPointVisible = _WayPointsVisible;
+                    });
+                }
+            }
+        }
         #endregion
 
 
-        public MapPolygonManager(Map map, TtPolygon polygon, ObservableCollection<TtPoint> points)
+        public MapPolygonManager(Map map, TtPolygon polygon, ObservableCollection<TtPoint> points) :
+            this(map, polygon, points, true, true, true, false, false, false, false, false, false, false, false, false)
+        { }
+
+        public MapPolygonManager(Map map, TtPolygon polygon, ObservableCollection<TtPoint> points,
+            bool vis, bool adjBndVis, bool adjBndPtsVis, bool unadjBndVis, bool unadjBndPtsVis,
+            bool adjNavVis, bool adjNavPtsVis, bool unadjNavVis, bool unadjNavPtsVis,
+            bool adjMiscPtsVis, bool unadjMiscPtsVis, bool wayPtsVis)
         {
+            _Visible = vis;
+            _AdjBndVisible = adjBndVis;
+            _AdjBndPointsVisible = adjBndPtsVis;
+            _UnAdjBndVisible = unadjBndVis;
+            _UnAdjBndPointsVisible = unadjBndPtsVis;
+
+            _AdjNavVisible = adjNavVis;
+            _AdjNavPointsVisible = adjNavPtsVis;
+            _UnAdjNavVisible = unadjNavVis;
+            _UnAdjNavPointsVisible = unadjNavPtsVis;
+
+            _AdjMiscPointsVisible = adjMiscPtsVis;
+            _UnAdjMiscPointsVisible = unadjMiscPtsVis;
+
+            _WayPointsVisible = wayPtsVis;
+
+
             polygon.PolygonChanged += Polygon_PolygonChanged;
 
             AdjBoundary = new MapPolygon(map, polygon, new List<Location>());
             UnAdjBoundary = new MapPolygon(map, polygon, new List<Location>());
             AdjNavigation = new MapPath(map, polygon, new List<Location>());
             UnAdjNavigation = new MapPath(map, polygon, new List<Location>());
-            
-            Points = new ObservableConvertedCollection<MapPoint, TtPoint>(points, (p) => new MapPoint(map, p));
+
+            Points = new ObservableConvertedCollection<MapPoint, TtPoint>(
+                points,
+                p => new MapPoint(map, p, Visible, _AdjBndPointsVisible, _UnAdjBndPointsVisible,
+                        _AdjNavPointsVisible, _UnAdjNavPointsVisible, _AdjMiscPointsVisible, _UnAdjMiscPointsVisible,
+                        _WayPointsVisible)
+                );
 
             ((INotifyCollectionChanged)Points).CollectionChanged += MapPolygonManager_CollectionChanged;
         }
 
         private void MapPolygonManager_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action)
+            lock (locker)
             {
-                case NotifyCollectionChangedAction.Add:
-                    foreach (MapPoint p in e.NewItems)
-                    {
-                        p.AdjBndVisible = true;
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Remove:
+                if (e.Action == NotifyCollectionChangedAction.Remove)
+                {
                     foreach (MapPoint p in e.OldItems)
-                    {
                         p.Detach();
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    break;
-                case NotifyCollectionChangedAction.Move:
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    break;
-                default:
-                    break;
+                }
             }
         }
 
@@ -276,16 +308,19 @@ namespace TwoTrails.Mapping
                 UnAdjNavigation.UpdateShape(unadjNavLocs); 
             }
         }
-
-
-        public void Attach(Map map)
-        {
-            //TODO attach all shapes and points
-        }
-
+        
         public void Detach()
         {
-            //TODO detach all shapes and points
+            AdjBoundary.Detach();
+            UnAdjBoundary.Detach();
+
+            AdjNavigation.Detach();
+            UnAdjNavigation.Detach();
+
+            foreach (MapPoint p in Points)
+            {
+                p.Detach();
+            }
         }
     }
 }

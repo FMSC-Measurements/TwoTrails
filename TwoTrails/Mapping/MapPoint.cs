@@ -12,6 +12,7 @@ using System.Windows.Input;
 using CSUtil.ComponentModel;
 using System.Windows.Media;
 using System.ComponentModel;
+using TwoTrails.Core;
 
 namespace TwoTrails.Mapping
 {
@@ -40,6 +41,7 @@ namespace TwoTrails.Mapping
 
         public Color AdjColor { get; }
         public Color UnAdjColor { get; }
+        public Color WayPointColor { get; }
 
         private object locker = new object();
 
@@ -121,6 +123,13 @@ namespace TwoTrails.Mapping
         }
 
 
+        private bool _WayPointVisible;
+        public bool WayPointVisible
+        {
+            get { return _WayPointVisible; }
+            set { SetField(ref _WayPointVisible, value, UpdateVisibility); }
+        }
+
         private void UpdateVisibility()
         {
             lock (locker)
@@ -136,7 +145,8 @@ namespace TwoTrails.Mapping
                     UnAdjPushpin.Visibility =
                         ((UnAdjBndVisible && _Point.IsBndPoint()) ||
                         (UnAdjNavVisible && IsNavPoint) ||
-                        (UnAdjMiscVisible && _Point.IsMiscPoint())) ?
+                        (UnAdjMiscVisible && _Point.IsMiscPoint())) ||
+                        (WayPointVisible && _Point.OpType == OpType.WayPoint) ?
                         Visibility.Visible : Visibility.Collapsed;
                 }
                 else
@@ -164,7 +174,27 @@ namespace TwoTrails.Mapping
             point.LocationChanged += UpdateLocation;
             UpdateLocation(point);
 
-            Attach(map);
+            _Map = map;
+
+            _Map.Children.Add(AdjPushpin);
+            _Map.Children.Add(UnAdjPushpin);
+        }
+
+        public MapPoint(Map map, TtPoint point, bool visible,
+            bool adjBndVis, bool unadjBndVis, bool adjNavVis,
+            bool unadjNavVis, bool adjMiscVis, bool unadjMiscVis,
+            bool wayVis) : this(map, point)
+        {
+            _Visible = visible;
+            _AdjBndVisible = adjBndVis;
+            _UnAdjBndVisible = unadjBndVis;
+            _AdjNavVisible = adjNavVis;
+            _UnAdjNavVisible = unadjNavVis;
+            _AdjMiscVisible = adjMiscVis;
+            _UnAdjNavVisible = unadjMiscVis;
+            _WayPointVisible = wayVis;
+
+            UpdateVisibility();
         }
 
         private void Point_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -218,18 +248,7 @@ namespace TwoTrails.Mapping
                 UnAdjPointSelected?.Invoke(this);
         }
 
-
-
-        public void Attach(Map map)
-        {
-            Detach();
-
-            _Map = map;
-
-            _Map.Children.Add(AdjPushpin);
-            _Map.Children.Add(UnAdjPushpin);
-        }
-
+        
         public void Detach()
         {
             if (_Map != null)
@@ -237,6 +256,11 @@ namespace TwoTrails.Mapping
                 _Map.Children.Remove(AdjPushpin);
                 _Map.Children.Remove(UnAdjPushpin);
             }
+        }
+
+        public override string ToString()
+        {
+            return String.Format("Point {0}", _Point.PID);
         }
     }
 }

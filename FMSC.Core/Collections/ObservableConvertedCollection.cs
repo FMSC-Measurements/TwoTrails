@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +35,8 @@ namespace FMSC.Core.Collections
         private Dictionary<TIn, TOut> _ConvertedLookup;
         private ReadOnlyObservableCollection<TOut> _ReadOnlyCollection;
         private Func<TIn, TOut> _Converter;
+
+        private object locker = new object();
 
         #region Properties
         public int Count { get { return _ReadOnlyCollection.Count; } }
@@ -109,57 +112,63 @@ namespace FMSC.Core.Collections
 
         private void Source_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            switch (e.Action)
+            lock (locker)
             {
-                case NotifyCollectionChangedAction.Add:
-                    if (e.NewItems.Count > 1)
-                    {
-                        int index = e.NewStartingIndex;
-
-                        foreach (TIn i in e.NewItems)
+                switch (e.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        if (e.NewItems.Count > 1)
                         {
+                            int index = e.NewStartingIndex;
+
+                            foreach (TIn i in e.NewItems)
+                            {
+                                TOut o = _Converter(i);
+                                _ConvertedLookup.Add(i, o);
+                                _EditableCollection.Insert(index, o);
+                                index++;
+                            }
+                        }
+                        else
+                        {
+                            TIn i = (TIn)e.NewItems[0];
                             TOut o = _Converter(i);
-                            _ConvertedLookup.Add(i, o);
-                            _EditableCollection.Insert(index, o);
-                            index++;
+                            if (!_ConvertedLookup.ContainsKey(i))
+                            {
+                                _ConvertedLookup.Add(i, o);
+                                _EditableCollection.Insert(e.NewStartingIndex, o);
+                            }
                         }
-                    }
-                    else
-                    {
-                        TIn i = (TIn)e.NewItems[0];
-                        TOut o = _Converter(i);
-                        _ConvertedLookup.Add(i, o);
-                        _EditableCollection.Insert(e.NewStartingIndex, o);
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    foreach (TIn ti in e.OldItems)
-                    {
-                        if (_ConvertedLookup.ContainsKey(ti))
+                        break;
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (TIn ti in e.OldItems)
                         {
-                            _EditableCollection.Remove(_ConvertedLookup[ti]);
-                            _ConvertedLookup.Remove(ti);
+                            if (_ConvertedLookup.ContainsKey(ti))
+                            {
+                                _EditableCollection.Remove(_ConvertedLookup[ti]);
+                                _ConvertedLookup.Remove(ti);
+                            }
                         }
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Replace:
-                    TIn ni = (TIn)e.NewItems[0];
-                    TIn oi = (TIn)e.OldItems[0];
-                    
-                    _ConvertedLookup.Remove(oi);
+                        break;
+                    case NotifyCollectionChangedAction.Replace:
+                        TIn ni = (TIn)e.NewItems[0];
+                        TIn oi = (TIn)e.OldItems[0];
 
-                    TOut nci = _Converter(ni);
-                    _ConvertedLookup.Add(ni, nci);
+                        _ConvertedLookup.Remove(oi);
 
-                    _EditableCollection[e.NewStartingIndex] = nci;
-                    break;
-                case NotifyCollectionChangedAction.Move:
-                    break;
-                case NotifyCollectionChangedAction.Reset:
-                    _EditableCollection.Clear();
-                    break;
-                default:
-                    break;
+                        TOut nci = _Converter(ni);
+                        _ConvertedLookup.Add(ni, nci);
+
+                        _EditableCollection[e.NewStartingIndex] = nci;
+                        break;
+                    case NotifyCollectionChangedAction.Move:
+                        break;
+                    case NotifyCollectionChangedAction.Reset:
+                        _EditableCollection.Clear();
+                        break;
+                    default:
+                        break;
+                } 
             }
         }
 

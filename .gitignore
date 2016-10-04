@@ -22,4 +22,5 @@ packages/
 *obj/
 *bin/
 *TestResults/
-TwoTrails/TwoTrails.config
+TwoTrails/ApiKeys.cs
+DvlErrLog.txt

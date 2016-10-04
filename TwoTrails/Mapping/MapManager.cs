@@ -16,32 +16,28 @@ namespace TwoTrails.Mapping
         Dictionary<string, Collection<TtPoint>> _PointsByPolys = new Dictionary<string, Collection<TtPoint>>();
         Dictionary<string, MapPolygonManager> _PolygonManagers = new Dictionary<string, MapPolygonManager>();
         ReadOnlyObservableCollection<TtPoint> _Points;
+        ReadOnlyObservableCollection<TtPolygon> _Polygons;
         Map _Map;
 
 
-        public MapManager(Map map, ReadOnlyObservableCollection<TtPoint> points, ReadOnlyObservableCollection<TtPolygon> polygons)
+        public MapManager(Map map, TtManager manager)
         {
             _Map = map;
-            _Points = points;
+            _Polygons = manager.Polygons;
+            _Points = manager.Points;
             
-            foreach (TtPolygon poly in polygons)
+            foreach (TtPolygon poly in _Polygons)
             {
                 ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Points.Where(p => p.PolygonCN == poly.CN));
                 _PointsByPolys.Add(poly.CN, ocPoints);
 
                 MapPolygonManager mpm = new MapPolygonManager(_Map, poly, ocPoints);
                 _PolygonManagers.Add(poly.CN, mpm);
-
-                if (poly.Name.StartsWith("PointLocationWcover2"))
-                {
-                    mpm.AdjBndPointsVisible = true;
-                    mpm.AdjBndVisible = true;
-                }
             }
 
 
             ((INotifyCollectionChanged)_Points).CollectionChanged += Points_CollectionChanged;
-            ((INotifyCollectionChanged)polygons).CollectionChanged += Polygons_CollectionChanged;
+            ((INotifyCollectionChanged)_Polygons).CollectionChanged += Polygons_CollectionChanged;
 
 
             //hook into all points to see if they change polygons

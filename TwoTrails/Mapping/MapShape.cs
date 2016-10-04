@@ -13,17 +13,21 @@ namespace TwoTrails.Mapping
 {
     public abstract class MapShape
     {
-
         public abstract bool Visible { get; set; }
+
+        protected Map Map { get; }
+
 
         public MapShape(Map map, TtPolygon polygon, IList<Location> points)
         {
-
+            this.Map = map;
         }
 
         public void UpdateShape(IList<Location> points)
         {
 
         }
+
+        public abstract void Detach();
     }
 }

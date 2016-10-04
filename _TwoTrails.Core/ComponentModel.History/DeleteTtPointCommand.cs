@@ -10,7 +10,6 @@ namespace TwoTrails.Core.ComponentModel.History
 
         private List<Tuple<QuondamPoint, TtPoint>> _ConvertedPoints = null;
 
-
         public DeleteTtPointCommand(TtPoint point, TtManager pointsManager, bool autoCommit = true) : base(point)
         {
             this.pointsManager = pointsManager;
@@ -39,9 +38,10 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             if (_ConvertedPoints != null)
             {
-                foreach (Tuple<QuondamPoint, TtPoint> pair in _ConvertedPoints)
+                foreach (Tuple<QuondamPoint, TtPoint> tuple in _ConvertedPoints)
                 {
-                    pointsManager.ReplacePoint(pair.Item1);
+                    pointsManager.ReplacePoint(tuple.Item2);
+                    Point.RemoveLinkedPoint(tuple.Item1);
                 }
             }
 
@@ -52,9 +52,10 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             if (_ConvertedPoints != null)
             {
-                foreach (Tuple<QuondamPoint, TtPoint> pair in _ConvertedPoints)
+                foreach (Tuple<QuondamPoint, TtPoint> tuple in _ConvertedPoints)
                 {
-                    pointsManager.ReplacePoint(pair.Item2);
+                    pointsManager.ReplacePoint(tuple.Item1);
+                    Point.AddLinkedPoint(tuple.Item1);
                 }
             }
 

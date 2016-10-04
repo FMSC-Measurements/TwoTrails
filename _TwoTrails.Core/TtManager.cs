@@ -28,7 +28,8 @@ namespace TwoTrails.Core
         private Dictionary<String, TtMetadata> _MetadataMap, _MetadataMapOrig;
         private Dictionary<String, TtGroup> _GroupsMap, _GroupsMapOrig;
         private Dictionary<String, DelayActionHandler> _PolygonUpdateHandlers;
-        
+        private Dictionary<String, DelayActionHandler> _PolygonAdjusterHandlers;
+
         private ObservableCollection<TtPoint> _Points;
         private ObservableCollection<TtPolygon> _Polygons;
         private ObservableCollection<TtMetadata> _Metadata;
@@ -1084,7 +1085,7 @@ namespace TwoTrails.Core
                 List<String> polysToAdjustTravsIn = new List<string>();
                 List<string> polysToAdjust = new List<string>();
 
-                foreach (TtPoint point in addPoints)
+                foreach (TtPoint point in addPoints.OrderBy(p => p.Index))
                 {
                     if (lastPoint == null || lastPoint.PolygonCN != point.PolygonCN)
                     {
@@ -1414,7 +1415,10 @@ namespace TwoTrails.Core
                         {
                             foreach (string cn in point.LinkedPoints.ToArray())
                             {
-                                QuondamPoint qp = _PointsMap[cn] as QuondamPoint;
+                                QuondamPoint qp = null;
+
+                                if (_PointsMap.ContainsKey(cn))
+                                    qp = _PointsMap[cn] as QuondamPoint;
 
                                 if (qp != null)
                                 {

@@ -9,7 +9,7 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         private TtManager pointsManager;
 
-        private List<Tuple<QuondamPoint, TtPoint>> _ConvertedPoints = null;
+        private List<Tuple<TtPoint, QuondamPoint, TtPoint>> _ConvertedPoints = null;
 
 
         public DeleteTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, bool autoCommit = true) : base(points)
@@ -19,7 +19,7 @@ namespace TwoTrails.Core.ComponentModel.History
             if (points.Any(p => p.HasQuondamLinks))
             {
                 HashSet<string> deletedCNs = new HashSet<string>(points.Select(p => p.CN));
-                _ConvertedPoints = new List<Tuple<QuondamPoint, TtPoint>>();
+                _ConvertedPoints = new List<Tuple<TtPoint, QuondamPoint, TtPoint>>();
 
                 foreach (TtPoint point in points.Where(p => p.HasQuondamLinks))
                 {
@@ -30,7 +30,7 @@ namespace TwoTrails.Core.ComponentModel.History
                         {
                             child = pointsManager.GetPoint(ccn) as QuondamPoint;
 
-                            _ConvertedPoints.Add(Tuple.Create(child, child.ConvertQuondam()));
+                            _ConvertedPoints.Add(Tuple.Create(point, child, child.ConvertQuondam()));
                         }
                     }
                 } 
@@ -44,9 +44,10 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             if (_ConvertedPoints != null)
             {
-                foreach (Tuple<QuondamPoint, TtPoint> pair in _ConvertedPoints)
+                foreach (Tuple<TtPoint, QuondamPoint, TtPoint> tuple in _ConvertedPoints)
                 {
-                    pointsManager.ReplacePoint(pair.Item1);
+                    pointsManager.ReplacePoint(tuple.Item3);
+                    tuple.Item1.RemoveLinkedPoint(tuple.Item2);
                 }
             }
 
@@ -57,9 +58,10 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             if (_ConvertedPoints != null)
             {
-                foreach (Tuple<QuondamPoint, TtPoint> pair in _ConvertedPoints)
+                foreach (Tuple<TtPoint, QuondamPoint, TtPoint> tuple in _ConvertedPoints)
                 {
-                    pointsManager.ReplacePoint(pair.Item2);
+                    pointsManager.ReplacePoint(tuple.Item2);
+                    tuple.Item1.AddLinkedPoint(tuple.Item2);
                 }
             }
 
