@@ -162,6 +162,7 @@ namespace FMSC.Core.Collections
                         _EditableCollection[e.NewStartingIndex] = nci;
                         break;
                     case NotifyCollectionChangedAction.Move:
+                        _EditableCollection.Move(e.OldStartingIndex, e.NewStartingIndex);
                         break;
                     case NotifyCollectionChangedAction.Reset:
                         _EditableCollection.Clear();

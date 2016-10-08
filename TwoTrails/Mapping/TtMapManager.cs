@@ -11,16 +11,16 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.Mapping
 {
-    public class MapManager
+    public class TtMapManager
     {
-        Dictionary<string, Collection<TtPoint>> _PointsByPolys = new Dictionary<string, Collection<TtPoint>>();
-        Dictionary<string, MapPolygonManager> _PolygonManagers = new Dictionary<string, MapPolygonManager>();
+        Dictionary<string, ObservableCollection<TtPoint>> _PointsByPolys = new Dictionary<string, ObservableCollection<TtPoint>>();
+        Dictionary<string, TtMapPolygonManager> _PolygonManagers = new Dictionary<string, TtMapPolygonManager>();
         ReadOnlyObservableCollection<TtPoint> _Points;
         ReadOnlyObservableCollection<TtPolygon> _Polygons;
         Map _Map;
 
 
-        public MapManager(Map map, TtManager manager)
+        public TtMapManager(Map map, TtManager manager)
         {
             _Map = map;
             _Polygons = manager.Polygons;
@@ -31,7 +31,7 @@ namespace TwoTrails.Mapping
                 ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Points.Where(p => p.PolygonCN == poly.CN));
                 _PointsByPolys.Add(poly.CN, ocPoints);
 
-                MapPolygonManager mpm = new MapPolygonManager(_Map, poly, ocPoints);
+                TtMapPolygonManager mpm = new TtMapPolygonManager(_Map, poly, ocPoints);
                 _PolygonManagers.Add(poly.CN, mpm);
             }
 
@@ -54,7 +54,7 @@ namespace TwoTrails.Mapping
                     {
                         ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Points.Where(p => p.PolygonCN == poly.CN));
                         _PointsByPolys.Add(poly.CN, ocPoints);
-                        _PolygonManagers.Add(poly.CN, new MapPolygonManager(_Map, poly, ocPoints));
+                        _PolygonManagers.Add(poly.CN, new TtMapPolygonManager(_Map, poly, ocPoints));
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:

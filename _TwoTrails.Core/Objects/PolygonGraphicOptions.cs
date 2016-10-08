@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Media;
 
 namespace TwoTrails.Core
 {
-    public delegate void OnColorChangeEvent(PolygonGraphicOptions pgo, GraphicCode code, int value);
+    public delegate void OnColorChangeEvent(PolygonGraphicOptions pgo, GraphicCode code, Color color);
 
     public enum GraphicCode
     {
@@ -21,8 +22,8 @@ namespace TwoTrails.Core
     {
         public event OnColorChangeEvent ColorChanged;
 
-        private int _AdjBndColor;
-        public int AdjBndColor
+        private Color _AdjBndColor;
+        public Color AdjBndColor
         {
             get { return _AdjBndColor; }
             set
@@ -31,8 +32,8 @@ namespace TwoTrails.Core
             }
         }
 
-        private int _UnAdjBndColor;
-        public int UnAdjBndColor
+        private Color _UnAdjBndColor;
+        public Color UnAdjBndColor
         {
             get { return _UnAdjBndColor; }
             set
@@ -41,8 +42,8 @@ namespace TwoTrails.Core
             }
         }
 
-        private int _AdjNavColor;
-        public int AdjNavColor
+        private Color _AdjNavColor;
+        public Color AdjNavColor
         {
             get { return _AdjNavColor; }
             set
@@ -51,8 +52,8 @@ namespace TwoTrails.Core
             }
         }
 
-        private int _UnAdjNavColor;
-        public int UnAdjNavColor
+        private Color _UnAdjNavColor;
+        public Color UnAdjNavColor
         {
             get { return _UnAdjNavColor; }
             set
@@ -61,8 +62,8 @@ namespace TwoTrails.Core
             }
         }
 
-        private int _AdjPtsColor;
-        public int AdjPtsColor
+        private Color _AdjPtsColor;
+        public Color AdjPtsColor
         {
             get { return _AdjPtsColor; }
             set
@@ -71,8 +72,8 @@ namespace TwoTrails.Core
             }
         }
 
-        private int _UnAdjPtsColor;
-        public int UnAdjPtsColor
+        private Color _UnAdjPtsColor;
+        public Color UnAdjPtsColor
         {
             get { return _UnAdjPtsColor; }
             set
@@ -81,8 +82,8 @@ namespace TwoTrails.Core
             }
         }
 
-        private int _WayPtsColor;
-        public int WayPtsColor
+        private Color _WayPtsColor;
+        public Color WayPtsColor
         {
             get { return _WayPtsColor; }
             set
@@ -125,25 +126,25 @@ namespace TwoTrails.Core
             this._UnAdjWidth = options.UnAdjWidth;
         }
 
-        public PolygonGraphicOptions(String cn, int AdjBndColor, int UnAdjBndColor, int AdjNavColor, int UnAdjNavColor,
-                                     int AdjPtsColor, int UnAdjPtsColor, int WayPtsColor,
-                                     float AdjWidth, float UnAdjWidth) : base(cn)
+        public PolygonGraphicOptions(String cn, int adjBndColor, int unAdjBndColor, int adjNavColor, int unAdjNavColor,
+                                     int adjPtsColor, int unAdjPtsColor, int wayPtsColor,
+                                     float adjWidth, float unAdjWidth) : base(cn)
         {
-            this._AdjBndColor = AdjBndColor;
-            this._UnAdjBndColor = UnAdjBndColor;
-            this._AdjNavColor = AdjNavColor;
-            this._UnAdjNavColor = UnAdjNavColor;
-            this._AdjPtsColor = AdjPtsColor;
-            this._UnAdjPtsColor = UnAdjPtsColor;
-            this._WayPtsColor = WayPtsColor;
-            this._AdjWidth = AdjWidth;
-            this._UnAdjWidth = UnAdjWidth;
+            this._AdjBndColor = GetColor(adjBndColor);
+            this._UnAdjBndColor = GetColor(unAdjBndColor);
+            this._AdjNavColor = GetColor(adjNavColor);
+            this._UnAdjNavColor = GetColor(unAdjNavColor);
+            this._AdjPtsColor = GetColor(adjPtsColor);
+            this._UnAdjPtsColor = GetColor(unAdjPtsColor);
+            this._WayPtsColor = GetColor(wayPtsColor);
+            this._AdjWidth = adjWidth;
+            this._UnAdjWidth = unAdjWidth;
         }
 
 
-        private void OnColorChange(GraphicCode code, int value)
+        private void OnColorChange(GraphicCode code, Color color)
         {
-            ColorChanged?.Invoke(this, code, value);
+            ColorChanged?.Invoke(this, code, color);
         }
 
 
@@ -156,24 +157,29 @@ namespace TwoTrails.Core
                 GetAlpha(color));
         }
 
-        public static int GetRed(int color)
+        public static Color GetColor(int argb)
         {
-            return color % 256;
+            return Color.FromArgb(GetAlpha(argb), GetRed(argb), GetGreen(argb), GetBlue(argb));
         }
 
-        public static int GetGreen(int color)
+        public static byte GetRed(int color)
         {
-            return (color / 256) % 256;
+            return (byte)(color % 256);
         }
 
-        public static int GetBlue(int color)
+        public static byte GetGreen(int color)
         {
-            return (color / 65536) % 256;
+            return (byte)((color / 256) % 256);
         }
 
-        public static int GetAlpha(int color)
+        public static byte GetBlue(int color)
         {
-            return (color / 16777216) % 256;
+            return (byte)((color / 65536) % 256);
+        }
+
+        public static byte GetAlpha(int color)
+        {
+            return (byte)((color / 16777216) % 256);
         }
 
 

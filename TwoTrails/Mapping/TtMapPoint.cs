@@ -16,9 +16,9 @@ using TwoTrails.Core;
 
 namespace TwoTrails.Mapping
 {
-    public delegate void MapPointEvent(MapPoint point);
+    public delegate void MapPointEvent(TtMapPoint point);
 
-    public class MapPoint : NotifyPropertyChangedEx
+    public class TtMapPoint : NotifyPropertyChangedEx
     {
         public event MapPointEvent LocationChanged;
         public event MapPointEvent AdjPointSelected;
@@ -37,12 +37,7 @@ namespace TwoTrails.Mapping
         public bool IsMiscPoint { get { return _Point.IsMiscPoint(); } }
 
         private Map _Map;
-
-
-        public Color AdjColor { get; }
-        public Color UnAdjColor { get; }
-        public Color WayPointColor { get; }
-
+        
         private object locker = new object();
 
         private bool _Editing;
@@ -62,10 +57,55 @@ namespace TwoTrails.Mapping
                         {
                             Opacity = _Editing ? 0.7d : 1
                         };
-                    } 
+                    }
                 }
             }
         }
+
+
+        #region Color
+        private Color _AdjColor;
+        public Color AdjColor
+        {
+            get { return _AdjColor; }
+            set { SetField(ref _AdjColor, value, UpdateColor); }
+        }
+
+
+        private Color _UnAdjColor;
+        public Color UnAdjColor
+        {
+            get { return _UnAdjColor; }
+            set { SetField(ref _UnAdjColor, value, UpdateColor); }
+        }
+
+
+        private Color _WayPointColor;
+        public Color WayPointColor
+        {
+            get { return _WayPointColor; }
+            set { SetField(ref _WayPointColor, value, UpdateColor); }
+        }
+
+        private void UpdateColor()
+        {
+            if (_Point.OpType == OpType.WayPoint)
+            {
+                UnAdjPushpin.Background = new SolidColorBrush(WayPointColor)
+                {
+                    Opacity = _Editing ? 0.7d : 1
+                };
+            }
+            else
+            {
+                AdjPushpin.Background = new SolidColorBrush(AdjColor);
+                UnAdjPushpin.Background = new SolidColorBrush(UnAdjColor)
+                {
+                    Opacity = _Editing ? 0.7d : 1
+                };
+            }
+        }
+        #endregion
 
 
         #region Visibility
@@ -159,7 +199,7 @@ namespace TwoTrails.Mapping
         #endregion
 
 
-        public MapPoint(Map map, TtPoint point)
+        public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo)
         {
             _Point = point;
 
@@ -169,6 +209,27 @@ namespace TwoTrails.Mapping
             AdjPushpin.MouseLeftButtonDown += AdjPushpin_MouseLeftButtonDown;
             UnAdjPushpin.MouseLeftButtonDown += UnAdjPushpin_MouseLeftButtonDown;
 
+            AdjColor = pgo.AdjPtsColor;
+            UnAdjColor = pgo.UnAdjPtsColor;
+            WayPointColor = pgo.WayPtsColor;
+
+            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, Color color) =>
+            {
+                switch (code)
+                {
+                    case GraphicCode.ADJPTS_COLOR:
+                        AdjColor = color;
+                        break;
+                    case GraphicCode.UNADJPTS_COLOR:
+                        UnAdjColor = color;
+                        break;
+                    case GraphicCode.WAYPTS_COLOR:
+                        WayPointColor = color;
+                        break;
+                    default:
+                        break;
+                }
+            };
 
             point.PropertyChanged += Point_PropertyChanged;
             point.LocationChanged += UpdateLocation;
@@ -180,10 +241,10 @@ namespace TwoTrails.Mapping
             _Map.Children.Add(UnAdjPushpin);
         }
 
-        public MapPoint(Map map, TtPoint point, bool visible,
+        public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo, bool visible,
             bool adjBndVis, bool unadjBndVis, bool adjNavVis,
             bool unadjNavVis, bool adjMiscVis, bool unadjMiscVis,
-            bool wayVis) : this(map, point)
+            bool wayVis) : this(map, point, pgo)
         {
             _Visible = visible;
             _AdjBndVisible = adjBndVis;
@@ -196,6 +257,7 @@ namespace TwoTrails.Mapping
 
             UpdateVisibility();
         }
+
 
         private void Point_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

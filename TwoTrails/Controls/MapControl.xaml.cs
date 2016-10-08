@@ -35,7 +35,7 @@ namespace TwoTrails.Controls
             set { this.SetValue(ManagerProperty, value); }
         }
 
-        private MapManager MapManager { get; set; }
+        private TtMapManager MapManager { get; set; }
 
         public MapControl()
         {
@@ -47,7 +47,7 @@ namespace TwoTrails.Controls
 
         private void MapControl_Loaded(object sender, RoutedEventArgs e)
         {
-            MapManager = new MapManager(map, Manager);
+            MapManager = new TtMapManager(map, Manager);
         }
     }
 }

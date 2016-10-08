@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.DAL;
@@ -27,8 +28,8 @@ namespace TwoTrails.Utils
             KmlDocument doc = new KmlDocument(name, description ?? String.Empty);
 
             List<PolygonStyle> polyStyles = new List<PolygonStyle>();
-            Dictionary<int, Tuple<Style, Style>> styles = new Dictionary<int, Tuple<Style, Style>>();
-            Dictionary<int, StyleMap> styleMaps = new Dictionary<int, StyleMap>();
+            Dictionary<Color, Tuple<Style, Style>> styles = new Dictionary<Color, Tuple<Style, Style>>();
+            Dictionary<Color, StyleMap> styleMaps = new Dictionary<Color, StyleMap>();
             
             List<PolygonGraphicOptions> pgos = new List<PolygonGraphicOptions>();
 
@@ -464,7 +465,7 @@ namespace TwoTrails.Utils
         }
 
 
-        private static StyleMap GetStyle(Dictionary<int, StyleMap> styleMaps, Dictionary<int, Tuple<Style, Style>> styles, int color, bool adjsuted)
+        private static StyleMap GetStyle(Dictionary<Color, StyleMap> styleMaps, Dictionary<Color, Tuple<Style, Style>> styles, Color color, bool adjsuted)
         {
             if (styleMaps.ContainsKey(color))
             {
@@ -472,7 +473,7 @@ namespace TwoTrails.Utils
             }
             else
             {
-                Color c = new Color(color);
+                KmlColor c = new KmlColor(color.R, color.G, color.B, color.A);
                 Style s = new Style(String.Format("style_{0}", styles.Count));
                 s.SetColorsILP(c);
                 s.IconScale = 1;
@@ -486,7 +487,7 @@ namespace TwoTrails.Utils
 
                 Style hs = new Style(String.Format("styleH_{0}", styles.Count), s);
                 hs.IconScale = 1.1;
-                hs.IconColor = new Color(255, 255, 255, 255);
+                hs.IconColor = new KmlColor(255, 255, 255, 255);
 
                 Tuple<Style, Style> sp = Tuple.Create(s, hs);
                 styles.Add(color, sp);

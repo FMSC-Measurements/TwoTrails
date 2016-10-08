@@ -73,7 +73,7 @@
     <Compile Include="Xml\GPX\Route.cs" />
     <Compile Include="Xml\GPX\Track.cs" />
     <Compile Include="Xml\GPX\TrackSegment.cs" />
-    <Compile Include="Xml\KML\Color.cs" />
+    <Compile Include="Xml\KML\KmlColor.cs" />
     <Compile Include="Xml\KML\Coordinates.cs" />
     <Compile Include="Xml\KML\ExtendedData.cs" />
     <Compile Include="Xml\KML\Folder.cs" />

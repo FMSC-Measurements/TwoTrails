@@ -105,12 +105,12 @@
     <Compile Include="Dialogs\RetraceDialog.xaml.cs">
       <DependentUpon>RetraceDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Mapping\MapManager.cs" />
-    <Compile Include="Mapping\MapPath.cs" />
-    <Compile Include="Mapping\MapPoint.cs" />
-    <Compile Include="Mapping\MapPolygon.cs" />
-    <Compile Include="Mapping\MapPolygonManager.cs" />
-    <Compile Include="Mapping\MapShape.cs" />
+    <Compile Include="Mapping\TtMapManager.cs" />
+    <Compile Include="Mapping\TtMapPath.cs" />
+    <Compile Include="Mapping\TtMapPoint.cs" />
+    <Compile Include="Mapping\TtMapPolygon.cs" />
+    <Compile Include="Mapping\TtMapPolygonManager.cs" />
+    <Compile Include="Mapping\TtMapShape.cs" />
     <Compile Include="TtWindow.cs" />
     <Compile Include="Utils\Export.cs" />
     <Compile Include="Utils\TtKmlGenerator.cs" />

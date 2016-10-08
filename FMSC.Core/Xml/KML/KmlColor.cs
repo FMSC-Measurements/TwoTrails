@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FMSC.Core.Xml.KML
 {
-    public class Color
+    public class KmlColor
     {
         private int _r = 0;
         public int R
@@ -69,9 +69,9 @@ namespace FMSC.Core.Xml.KML
         }
 
 
-        public Color() { }
+        public KmlColor() { }
 
-        public Color (int color)
+        public KmlColor (int color)
         {
             R = color % 256;
             G = (color / 256) % 256;
@@ -82,12 +82,12 @@ namespace FMSC.Core.Xml.KML
                 A = 255;
         }
 
-        public Color(string color)
+        public KmlColor(string color)
         {
             SetColorFromStringRGBA(color);
         }
 
-        public Color(Color color)
+        public KmlColor(KmlColor color)
         {
             A = color.A;
             R = color.R;
@@ -95,7 +95,7 @@ namespace FMSC.Core.Xml.KML
             B = color.B;
         }
 
-        public Color(int r, int g, int b, int a)
+        public KmlColor(int r, int g, int b, int a)
         {
             R = r;
             G = g;
