@@ -37,6 +37,7 @@ namespace TwoTrails
 
         public ICommand CloseTabCommand { get; }
         public ICommand SaveCommand { get; }
+        public virtual ICommand OpenInWinndowCommand { get; } = null;
         
         public TtTabModel(TtProject project) : base()
         {

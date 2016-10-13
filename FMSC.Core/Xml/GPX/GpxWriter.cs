@@ -302,5 +302,18 @@ namespace FMSC.Core.Xml.GPX
             if (!String.IsNullOrEmpty(extenstions))
                 WriteElementString("extensions", extenstions);
         }
+
+
+        public static void WriteGpxFile(string filePath, GpxDocument doc)
+        {
+            using (GpxWriter gw = new GpxWriter(filePath))
+            {
+                gw.WriteStartDocument();
+                gw.WriteStartGpx();
+                gw.WriteGpxDocument(doc);
+                gw.WriteEndGpx();
+                gw.WriteEndDocument();
+            }
+        }
     }
 }

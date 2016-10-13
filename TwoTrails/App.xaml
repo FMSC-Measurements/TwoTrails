@@ -10,6 +10,7 @@
         <cvt:NotNullConverter x:Key="NotNullConverter"/>
 
         <BitmapImage x:Key="ImgOpenInNew" UriSource="res/open_in_new.png" />
+        <BitmapImage x:Key="ImgClose" UriSource="res/close.png" />
 
         <Style x:Key="styleMiDisableNullCommand" TargetType="{x:Type MenuItem}">
             <Style.Triggers>
@@ -18,8 +19,9 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
+
         <SolidColorBrush x:Key="colorPriamry" Color="MediumSeaGreen" />
+        <SolidColorBrush x:Key="colorPriamryLighter" Color="PaleGreen" />
         <SolidColorBrush x:Key="colorPriamryLight" Color="DarkSeaGreen" />
         <SolidColorBrush x:Key="colorPriamryDark" Color="SeaGreen" />
         <SolidColorBrush x:Key="colorBackground" Color="DimGray" />

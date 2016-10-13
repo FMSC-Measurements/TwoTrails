@@ -57,7 +57,8 @@ namespace TwoTrails.ViewModels
             set { SetField(ref _Points, value); }
         }
 
-        public TtHistoryManager Manager { get; private set; }
+        public TtProject Project { get; }
+        public TtHistoryManager Manager { get; }
 
 
         public bool IsAdvancedMode { get { return Get<bool>(); } set { Set(value); } }
@@ -443,6 +444,7 @@ namespace TwoTrails.ViewModels
 
         public DataEditorModel(TtProject project)
         {
+            Project = project;
             Manager = project.HistoryManager;
             Manager.HistoryChanged += (s, e) =>
             {
@@ -1276,6 +1278,7 @@ namespace TwoTrails.ViewModels
                 List<TtPoint> hidePoints = new List<TtPoint>(SelectedPoints.Cast<TtPoint>());
 
                 SelectPointDialog spd = new SelectPointDialog(Manager, hidePoints);
+                spd.Owner = Project.MainModel.MainWindow;
 
                 if (spd.ShowDialog() == true)
                 {
@@ -1300,6 +1303,7 @@ namespace TwoTrails.ViewModels
         private void RenamePoints()
         {
             RenamePointsDialog dialog = new RenamePointsDialog(Manager);
+            dialog.Owner = Project.MainModel.MainWindow;
             if (dialog.ShowDialog() == true)
             {
                 Manager.EditPointsMultiValues(
@@ -1367,22 +1371,22 @@ namespace TwoTrails.ViewModels
 
         private void CreateQuondams()
         {
-            PointLocManipDialog.ShowDialog(Manager, GetSortedSelectedPoints(), true);
+            PointLocManipDialog.ShowDialog(Manager, GetSortedSelectedPoints(), true, false, null, Project.MainModel.MainWindow);
         }
 
         private void MovePoints()
         {
-            PointLocManipDialog.ShowDialog(Manager, GetSortedSelectedPoints(), false);
+            PointLocManipDialog.ShowDialog(Manager, GetSortedSelectedPoints(), false, false, null, Project.MainModel.MainWindow);
         }
 
         private void Retrace()
         {
-            RetraceDialog.ShowDialog(Manager);
+            RetraceDialog.ShowDialog(Manager, Project.MainModel.MainWindow);
         }
 
         private void CreatePlots()
         {
-            CreatePlotsDialog.ShowDialog(Manager);
+            CreatePlotsDialog.ShowDialog(Manager, Project.MainModel.MainWindow);
         }
 
         private void CreateCorridor()

@@ -18,8 +18,7 @@ namespace TwoTrails.ViewModels
 {
     public class TtProject : NotifyPropertyChangedEx
     {
-        public String FilePath { get { return DAL.FilePath; } }
-        
+        #region Commands
         public ICommand OpenMapCommand { get; }
         public ICommand OpenMapWindowCommand { get; }
         public ICommand ViewUserActivityCommand { get; set; }
@@ -34,7 +33,11 @@ namespace TwoTrails.ViewModels
         public ICommand RedoCommand { get; set; }
 
         public ICommand DiscardChangesCommand { get; }
-        
+        #endregion
+
+        #region Properties
+        public String FilePath { get { return DAL.FilePath; } }
+
         public ProjectTab ProjectTab { get; private set; }
         private MapTab MapTab { get; set; }
         private UserActivityTab UserActivityTab { get; set; }
@@ -92,12 +95,7 @@ namespace TwoTrails.ViewModels
         }
 
         public MainWindowModel MainModel { get; private set; }
-
-
-        public void ProjectUpdated()
-        {
-            DataChanged |= true;
-        }
+        #endregion
 
 
         public TtProject(ITtDataLayer dal, ITtSettings settings, MainWindowModel mainModel)
@@ -139,7 +137,8 @@ namespace TwoTrails.ViewModels
             EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Metadata));
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Groups));
 
-            OpenMapWindowCommand = new RelayCommand(x => OpenMapTab());
+            OpenMapCommand = new RelayCommand(x => OpenMapTab());
+            OpenMapWindowCommand = new RelayCommand(x => OpenMapWindow());
 
             ProjectTab = new ProjectTab(this);
         }
@@ -149,6 +148,11 @@ namespace TwoTrails.ViewModels
             Set(HistoryManager.CanUndo || DataChanged, nameof(RequiresSave));
         }
 
+
+        public void ProjectUpdated()
+        {
+            DataChanged |= true;
+        }
 
         public void Save()
         {
@@ -233,15 +237,7 @@ namespace TwoTrails.ViewModels
                 }
             }
         }
-
-        public void CloseWindow(TtWindow window)
-        {
-            if (window is MapWindow)
-            {
-
-            }
-        }
-
+        
         private void OpenProjectTab(ProjectStartupTab tab = ProjectStartupTab.Project)
         {
             if (ProjectTab == null)
@@ -259,7 +255,42 @@ namespace TwoTrails.ViewModels
 
         private void OpenMapTab()
         {
-            MapWindow = new MapWindow(this);
+            if (MapTab == null)
+            {
+                if (MapWindow != null)
+                {
+                    MapTab = new MapTab(this, MapWindow);
+                    MapWindow.Close();
+                    MapWindow = null;
+                }
+                else
+                {
+                    MapTab = new MapTab(this);
+                }
+
+                MainModel.AddTab(MapTab);
+            }
+
+            MainModel.SwitchToTab(MapTab);
+        }
+
+        private void OpenMapWindow()
+        {
+            if (MapWindow == null)
+            {
+
+                if (MapTab != null)
+                {
+                    MapWindow = new MapWindow(this, MapTab.MapControl);
+                    CloseTab(MapTab);
+                }
+                else
+                {
+                    MapWindow = new MapWindow(this);
+                }
+            }
+
+            MapWindow.Owner = MainModel.MainWindow;
             MapWindow.Show();
         }
 

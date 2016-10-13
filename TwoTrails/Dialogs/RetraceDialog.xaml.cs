@@ -30,12 +30,6 @@ namespace TwoTrails.Dialogs
             InitializeComponent();
         }
 
-
-        public static bool? ShowDialog(TtHistoryManager manager)
-        {
-            return new RetraceDialog(manager).ShowDialog();
-        }
-
         private void Add_Click(object sender, RoutedEventArgs e)
         {
             model.AddRetrace(((sender as Button).DataContext as Retrace));
@@ -55,6 +49,15 @@ namespace TwoTrails.Dialogs
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+
+        public static bool? ShowDialog(TtHistoryManager manager, Window owner = null)
+        {
+            RetraceDialog diag = new RetraceDialog(manager);
+            if (owner != null)
+                diag.Owner = owner;
+            return diag.ShowDialog();
         }
     }
 }

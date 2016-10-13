@@ -20,18 +20,24 @@ namespace TwoTrails.Mapping
 
 
         private bool _Visible;
-        public override bool Visible { get { return _Visible; } set { SetField(ref _Visible, value); } }
+        public override bool Visible
+        {
+            get { return _Visible; }
+            set { SetField(ref _Visible, value, () => MapPolygon.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed); }
+        }
 
         public bool IsEditing { get; set; }
 
-        public TtMapPolygon(Map map, TtPolygon polygon, LocationCollection locations, PolygonGraphicOptions pgo, bool adjusted) : base(map, polygon, locations, pgo)
+        public TtMapPolygon(Map map, TtPolygon polygon, LocationCollection locations, PolygonGraphicOptions pgo, bool adjusted, bool visible) : base(map, polygon, locations, pgo)
         {
             _Polygon = polygon;
+            _Visible = visible;
 
             MapPolygon.Stroke = new SolidColorBrush(pgo.AdjBndColor);
-            MapPolygon.Visibility = Visibility.Collapsed;
+            MapPolygon.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed;
 
-            MapPolygon.StrokeThickness = adjusted ? pgo.AdjWidth : pgo.UnAdjWidth;
+            MapPolygon.StrokeThickness = adjusted ?
+                pgo.AdjWidth : pgo.UnAdjWidth;
 
             MapPolygon.Locations = locations;
 
@@ -60,6 +66,5 @@ namespace TwoTrails.Mapping
         {
             Map.Children.Remove(MapPolygon);
         }
-
     }
 }

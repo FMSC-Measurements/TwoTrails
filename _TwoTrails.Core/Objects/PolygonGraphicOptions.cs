@@ -148,13 +148,13 @@ namespace TwoTrails.Core
         }
 
 
-        public static string ToStringRGBA(int color)
+        public static string ToStringARGB(int color)
         {
             return String.Format("{0:X2}{1:X2}{2:X2}{3:X2}",
+                GetAlpha(color),
                 GetRed(color),
                 GetGreen(color),
-                GetBlue(color),
-                GetAlpha(color));
+                GetBlue(color));
         }
 
         public static Color GetColor(int argb)
@@ -162,24 +162,24 @@ namespace TwoTrails.Core
             return Color.FromArgb(GetAlpha(argb), GetRed(argb), GetGreen(argb), GetBlue(argb));
         }
 
+        public static byte GetAlpha(int color)
+        {
+            return (byte)((color >> 24) & 255);
+        }
+
         public static byte GetRed(int color)
         {
-            return (byte)(color % 256);
+            return (byte)((color >> 16) & 255);
         }
 
         public static byte GetGreen(int color)
         {
-            return (byte)((color / 256) % 256);
+            return (byte)((color >> 8) & 255);
         }
 
         public static byte GetBlue(int color)
         {
-            return (byte)((color / 65536) % 256);
-        }
-
-        public static byte GetAlpha(int color)
-        {
-            return (byte)((color / 16777216) % 256);
+            return (byte)(color & 255);
         }
 
 

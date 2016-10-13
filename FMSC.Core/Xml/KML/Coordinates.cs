@@ -19,6 +19,13 @@ namespace FMSC.Core.Xml.KML
             Altitude = alt;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is Coordinates)
+                return this == (Coordinates)obj;
+            return false;
+        }
+
         public static bool operator==(Coordinates c1, Coordinates c2)
         {
             return c1.Latitude == c2.Latitude && c1.Longitude == c2.Longitude && c1.Altitude == c2.Altitude;

@@ -111,8 +111,10 @@
     <Compile Include="Mapping\TtMapPolygon.cs" />
     <Compile Include="Mapping\TtMapPolygonManager.cs" />
     <Compile Include="Mapping\TtMapShape.cs" />
+    <Compile Include="TtPolygonGraphicSettings.cs" />
     <Compile Include="TtWindow.cs" />
     <Compile Include="Utils\Export.cs" />
+    <Compile Include="Utils\TtGpxGenerator.cs" />
     <Compile Include="Utils\TtKmlGenerator.cs" />
     <Compile Include="Utils\TtUtils.cs" />
     <Compile Include="ViewModels\CreatePlotsModel.cs" />
@@ -267,6 +269,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Commands\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="res\close.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets')" />

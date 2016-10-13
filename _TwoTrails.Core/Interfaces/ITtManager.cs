@@ -40,12 +40,18 @@ namespace TwoTrails.Core
         void DeleteGroup(TtGroup group);
 
 
+        List<TtNmeaBurst> GetNmeaBursts(string pointCN = null);
+        void AddNmeaBurst(TtNmeaBurst burst);
+        void AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
+        void DeleteNmeaBursts(string pointCN);
+
         //TODO Media
         //List<TtImage> GetImages(String pointCN);
         //void InsertMedia(TtMedia media);
         //void DeleteMedia(TtMedia media);
-        
 
+
+        PolygonGraphicOptions GetPolygonGraphicOption(string polyCN);
         List<PolygonGraphicOptions> GetPolygonGraphicOptions();
     }
 }

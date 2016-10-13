@@ -9,13 +9,22 @@ namespace TwoTrails
     /// </summary>
     public partial class MapWindow : TtWindow
     {
-        public TtProject Project { get; set; }
+        public MapControl MapControl { get; private set; }
 
         public MapWindow(TtProject project)
         {
-            this.Project = project;
-            this.DataContext = this;
             InitializeComponent();
+
+            MapControl = new MapControl(project.Manager);
+            cc.Content = MapControl;
+        }
+
+        public MapWindow(TtProject project, MapControl mapControl)
+        {
+            InitializeComponent();
+
+            MapControl = mapControl;
+            cc.Content = MapControl;
         }
     }
 }

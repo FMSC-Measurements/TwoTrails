@@ -101,12 +101,6 @@ namespace TwoTrails.Dialogs
             }
         }
 
-        public static bool? ShowDialog(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null)
-        {
-            PointLocManipDialog plmd = new PointLocManipDialog(manager, points, quondam, reverse, target);
-            return plmd.ShowDialog();
-        }
-
         private void rbActMove_Checked(object sender, RoutedEventArgs e)
         {
             if (rbActMove.IsChecked == true)
@@ -117,6 +111,15 @@ namespace TwoTrails.Dialogs
         {
             if (rbActQuondam.IsChecked == true)
                 this.Title = "Quondam Points";
+        }
+
+
+        public static bool? ShowDialog(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null, Window owner = null)
+        {
+            PointLocManipDialog plmd = new PointLocManipDialog(manager, points, quondam, reverse, target);
+            if (owner != null)
+                plmd.Owner = owner;
+            return plmd.ShowDialog();
         }
     }
 }

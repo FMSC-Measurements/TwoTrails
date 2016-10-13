@@ -33,9 +33,11 @@ namespace TwoTrails.Dialogs
         }
 
 
-        public static bool? ShowDialog(ITtManager manager)
+        public static bool? ShowDialog(ITtManager manager, Window owner = null)
         {
             CreatePlotsDialog dialog = new CreatePlotsDialog(manager);
+            if (owner != null)
+                dialog.Owner = owner;
             return dialog.ShowDialog();
         }
     }

@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails"
         xmlns:ctrls="clr-namespace:TwoTrails.Controls"
+        WindowStartupLocation="CenterOwner"
         mc:Ignorable="d"
-        Title="MapWindow" Height="500" Width="700">
+        Title="MapWindow" Height="800" Width="1000">
     <Grid>
-        <ctrls:MapControl Manager="{Binding Project.Manager}" />
+        <ContentControl x:Name="cc"/>
     </Grid>
 </local:TtWindow>

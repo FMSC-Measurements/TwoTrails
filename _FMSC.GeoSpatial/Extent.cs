@@ -29,38 +29,46 @@ namespace FMSC.GeoSpatial
 
         public class Builder
         {
-            List<Position> positions = new List<Position>();
+            List<double> lats = new List<double>();
+            List<double> lons = new List<double>();
+
+
+            public void Include(double latitude, double longitude)
+            {
+                lats.Add(latitude);
+                lons.Add(longitude);
+            }
 
             public void Include(Position position)
             {
-                positions.Add(position);
+                lats.Add(position.Latitude.toSignedDecimal());
+                lons.Add(position.Longitude.toSignedDecimal());
             }
 
             public void Include(Extent extent)
             {
-                positions.Add(extent.NorthEast);
-                positions.Add(extent.SouthWest);
+                Include(extent.NorthEast);
+                Include(extent.SouthWest);
             }
 
             public Extent Build()
             {
                 double north = -90, south = 90, east = -180, west = 180;
-                double lat, lon;
 
-                if (positions.Count < 1)
+                if (lats.Count < 1)
                     throw new Exception("No positions");
 
-                foreach (Position pos in positions)
+                foreach (double lat in lats)
                 {
-                    lat = pos.Latitude.toSignedDecimal();
-                    lon = pos.Longitude.toSignedDecimal();
-
                     if (lat > north)
                         north = lat;
 
                     if (lat < south)
                         south = lat;
+                }
 
+                foreach (double lon in lons)
+                {
                     if (lon > east)
                         east = lon;
 

@@ -19,6 +19,7 @@ namespace TwoTrails
 
         public IMetadataSettings MetadataSettings { get; set; }
         public IDeviceSettings DeviceSettings { get; set; }
+        public IPolygonGraphicSettings PolygonGraphicSettings { get; set; }
 
         public String UserName { get { return Environment.UserName; } }
 
@@ -64,10 +65,11 @@ namespace TwoTrails
         }
         
 
-        public TtSettings(IDeviceSettings deviceSettings, IMetadataSettings metadataSettings)
+        public TtSettings(IDeviceSettings deviceSettings, IMetadataSettings metadataSettings, IPolygonGraphicSettings polyGraphicSettings)
         {
             DeviceSettings = deviceSettings;
             MetadataSettings = metadataSettings;
+            PolygonGraphicSettings = polyGraphicSettings;
 
 #if DEBUG
             _IsAdvancedMode = true;
@@ -93,8 +95,6 @@ namespace TwoTrails
             return new TtProjectInfo("Unamed Project", String.Empty, Region, String.Empty, District,
                 version, version, TwoTrailsSchema.SchemaVersion, DeviceName, DateTime.Now);
         }
-
-
 
 
         private StringCollection _RecentProjects;

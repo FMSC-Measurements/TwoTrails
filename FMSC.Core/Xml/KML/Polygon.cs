@@ -15,8 +15,8 @@ namespace FMSC.Core.Xml.KML
         public List<Coordinates> InnerBoundary { get; set; }
         public bool IsPath { get; set; }
 
-        public bool HasOuterBoundary { get { return OuterBoundary.Count > 0; } }
-        public bool HasInnerBoundary { get { return InnerBoundary.Count > 0; } }
+        public bool HasOuterBoundary { get { return OuterBoundary != null && OuterBoundary.Count > 0; } }
+        public bool HasInnerBoundary { get { return InnerBoundary != null && InnerBoundary.Count > 0; } }
 
         private AltitudeMode? _AltMode;
         public AltitudeMode? AltMode

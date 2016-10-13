@@ -8,6 +8,7 @@ namespace TwoTrails.Core
     {
         IMetadataSettings MetadataSettings { get; }
         IDeviceSettings DeviceSettings { get; }
+        IPolygonGraphicSettings PolygonGraphicSettings { get; }
 
         String UserName { get; }
         String DeviceName { get; }

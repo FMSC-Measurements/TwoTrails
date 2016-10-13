@@ -1556,7 +1556,7 @@ namespace TwoTrails.DAL
                         {
                             bursts.Add(new TtNmeaBurst(
                                 dr.GetString(0),
-                                DateTime.ParseExact(dr.GetString(3), DATE_FORMAT, CultureInfo.InvariantCulture),
+                                ParseTime(dr.GetString(3)),
                                 dr.GetString(1),
                                 dr.GetBoolean(2),
                                 new GeoPosition(
@@ -1564,7 +1564,7 @@ namespace TwoTrails.DAL
                                     dr.GetDouble(7), (EastWest)dr.GetInt32(8),
                                     dr.GetDouble(9), (UomElevation)dr.GetInt32(10)
                                 ),
-                                DateTime.ParseExact(dr.GetString(4), DATE_FORMAT, CultureInfo.InvariantCulture),
+                                ParseTime(dr.GetString(4)),
                                 dr.GetDouble(22),
                                 dr.GetDouble(23),
                                 dr.GetDouble(11), (EastWest)dr.GetInt32(12),
@@ -1755,7 +1755,7 @@ namespace TwoTrails.DAL
                 [TwoTrailsSchema.TtNmeaSchema.TimeCreated] = burst.TimeCreated.ToString(DATE_FORMAT),
                 [TwoTrailsSchema.TtNmeaSchema.FixTime] = burst.FixTime.ToString(DATE_FORMAT),
                 [TwoTrailsSchema.TtNmeaSchema.Latitude] = burst.Latitude,
-                [TwoTrailsSchema.TtNmeaSchema.LatDir] = (int)burst.LarDir,
+                [TwoTrailsSchema.TtNmeaSchema.LatDir] = (int)burst.LatDir,
                 [TwoTrailsSchema.TtNmeaSchema.Longitude] = burst.Longitude,
                 [TwoTrailsSchema.TtNmeaSchema.LonDir] = (int)burst.LonDir,
                 [TwoTrailsSchema.TtNmeaSchema.Elevation] = burst.Elevation,
@@ -2183,11 +2183,11 @@ namespace TwoTrails.DAL
                             cn = dr.GetString(0);
                             adjbnd = dr.GetInt32(1);
                             unadjbnd = dr.GetInt32(2);
-                            adjnav = dr.GetInt32(2);
-                            unadjnav = dr.GetInt32(2);
-                            adjpts = dr.GetInt32(2);
-                            unadjpts = dr.GetInt32(2);
-                            waypts = dr.GetInt32(2);
+                            adjnav = dr.GetInt32(3);
+                            unadjnav = dr.GetInt32(4);
+                            adjpts = dr.GetInt32(5);
+                            unadjpts = dr.GetInt32(6);
+                            waypts = dr.GetInt32(7);
 
                             pgos.Add(new PolygonGraphicOptions(cn, adjbnd, unadjbnd, adjnav, unadjnav,
                                 adjpts, unadjpts, waypts, 0, 0));

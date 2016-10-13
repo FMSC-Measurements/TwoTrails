@@ -35,7 +35,7 @@ namespace TwoTrails.Controls
             set { this.SetValue(ManagerProperty, value); }
         }
 
-        private TtMapManager MapManager { get; set; }
+        public TtMapManager MapManager { get; private set; }
 
         public MapControl()
         {
@@ -45,9 +45,20 @@ namespace TwoTrails.Controls
             this.Loaded += MapControl_Loaded;
         }
 
+        public MapControl(TtManager manager) : this()
+        {
+            Manager = manager;
+        }
+
         private void MapControl_Loaded(object sender, RoutedEventArgs e)
         {
-            MapManager = new TtMapManager(map, Manager);
+            if (Manager != null)
+            {
+                if (MapManager == null)
+                    MapManager = new TtMapManager(map, Manager);
+
+                lvPolygons.ItemsSource = MapManager.PolygonManagers; 
+            }
         }
     }
 }

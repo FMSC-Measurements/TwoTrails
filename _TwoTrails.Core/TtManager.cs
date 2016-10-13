@@ -27,8 +27,8 @@ namespace TwoTrails.Core
         private Dictionary<String, TtPolygon> _PolygonsMap, _PolygonsMapOrig;
         private Dictionary<String, TtMetadata> _MetadataMap, _MetadataMapOrig;
         private Dictionary<String, TtGroup> _GroupsMap, _GroupsMapOrig;
+        private Dictionary<String, PolygonGraphicOptions> _PolyGraphicOpts, _PolyGraphicOptsOrig;
         private Dictionary<String, DelayActionHandler> _PolygonUpdateHandlers;
-        private Dictionary<String, DelayActionHandler> _PolygonAdjusterHandlers;
 
         private ObservableCollection<TtPoint> _Points;
         private ObservableCollection<TtPolygon> _Polygons;
@@ -67,12 +67,24 @@ namespace TwoTrails.Core
             _PointsMap = new Dictionary<string, TtPoint>();
             _PointsMapOrig = new Dictionary<string, TtPoint>();
             _PointsByPoly = new Dictionary<string, List<TtPoint>>();
+
             _PolygonsMap = new Dictionary<string, TtPolygon>();
             _PolygonsMapOrig = new Dictionary<string, TtPolygon>();
+
             _MetadataMap = new Dictionary<string, TtMetadata>();
             _MetadataMapOrig = new Dictionary<string, TtMetadata>();
+
             _GroupsMap = _DAL.GetGroups().ToDictionary(g => g.CN, g => g);
             _GroupsMapOrig = _GroupsMap.Values.ToDictionary(g => g.CN, g => new TtGroup(g));
+
+            _PolyGraphicOpts = _DAL.GetPolygonGraphicOptions().Select(
+                p => {
+                    p.AdjWidth = _Settings.PolygonGraphicSettings.AdjWidth;
+                    p.UnAdjWidth = _Settings.PolygonGraphicSettings.UnAdjWidth;
+                    return p;
+                }).ToDictionary(p => p.CN, p => p);
+            _PolyGraphicOptsOrig = _PolyGraphicOpts.Values.ToDictionary(p => p.CN, p => new PolygonGraphicOptions(p.CN, p));
+
             _PolygonUpdateHandlers = new Dictionary<string, DelayActionHandler>();
 
             MainGroup = null;
@@ -1581,10 +1593,42 @@ namespace TwoTrails.Core
         #endregion
 
 
+        public PolygonGraphicOptions GetPolygonGraphicOption(string polyCN)
+        {
+            if (_PolyGraphicOpts.ContainsKey(polyCN))
+                return _PolyGraphicOpts[polyCN];
+            else
+            {
+                PolygonGraphicOptions pgo = _Settings.PolygonGraphicSettings.CreatePolygonGraphicOptions(polyCN);
+                _PolyGraphicOpts.Add(polyCN, pgo);
+                return pgo;
+            }
+        }
+
         public List<PolygonGraphicOptions> GetPolygonGraphicOptions()
         {
-            //TODO GetPolygonGraphicOptions
-            throw new NotImplementedException();
+            return _PolyGraphicOpts.Values.ToList();
+        }
+
+
+        public List<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
+        {
+            return _DAL.GetNmeaBursts(pointCN);
+        }
+
+        public void AddNmeaBurst(TtNmeaBurst burst)
+        {
+            _DAL.InsertNmeaBurst(burst);
+        }
+
+        public void AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts)
+        {
+            _DAL.InsertNmeaBursts(bursts);
+        }
+
+        public void DeleteNmeaBursts(string pointCN)
+        {
+            _DAL.DeleteNmeaBursts(pointCN);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace TwoTrails.Mapping
         private bool _Visible;
         public override bool Visible { get { return _Visible; } set { SetField(ref _Visible, value); } }
 
-        public TtMapPath(Map map, TtPolygon polygon, LocationCollection locations, PolygonGraphicOptions pgo, bool adjusted) : base(map, polygon, locations, pgo)
+        public TtMapPath(Map map, TtPolygon polygon, LocationCollection locations, PolygonGraphicOptions pgo, bool adjusted, bool visible) : base(map, polygon, locations, pgo)
         {
 
         }

@@ -24,6 +24,8 @@ namespace TwoTrails.Mapping
 
         private object locker = new object();
 
+        public TtPolygon Polygon { get; }
+
         #region Visibility
         private bool _Visible;
         public bool Visible
@@ -34,10 +36,25 @@ namespace TwoTrails.Mapping
                 lock (locker)
                 {
                     SetField(ref _Visible, value, () =>
-                            {
-                                foreach (TtMapPoint p in Points)
-                                    p.Visible = _Visible;
-                            }); 
+                    {
+                        foreach (TtMapPoint p in Points)
+                            p.Visible = _Visible;
+
+                        if (_Visible)
+                        {
+                            AdjBoundary.Visible = _AdjBndVisible;
+                            UnAdjBoundary.Visible = _UnAdjBndVisible;
+                            AdjNavigation.Visible = _AdjNavVisible;
+                            UnAdjNavigation.Visible = _UnAdjNavVisible;
+                        }
+                        else
+                        {
+                            AdjBoundary.Visible = false;
+                            UnAdjBoundary.Visible = false;
+                            AdjNavigation.Visible = false;
+                            UnAdjNavigation.Visible = false;
+                        }
+                    }); 
                 }
             }
         }
@@ -51,7 +68,7 @@ namespace TwoTrails.Mapping
             {
                 lock (locker)
                 {
-                    SetField(ref _AdjBndVisible, value, () => { AdjBoundary.Visible = value; }); 
+                    SetField(ref _AdjBndVisible, value, () => { AdjBoundary.Visible = value && _Visible; }); 
                 }
             }
         }
@@ -227,7 +244,6 @@ namespace TwoTrails.Mapping
         #endregion
 
 
-
         public TtMapPolygonManager(Map map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo) :
             this(map, polygon, points, pgo, true, true, true, false, false, false, false, false, false, false, false, false)
         { }
@@ -237,6 +253,7 @@ namespace TwoTrails.Mapping
             bool adjNavVis, bool adjNavPtsVis, bool unadjNavVis, bool unadjNavPtsVis,
             bool adjMiscPtsVis, bool unadjMiscPtsVis, bool wayPtsVis)
         {
+            Polygon = polygon;
             Graphics = pgo;
 
             _Visible = vis;
@@ -256,12 +273,12 @@ namespace TwoTrails.Mapping
             _WayPointsVisible = wayPtsVis;
 
 
-            polygon.PolygonChanged += Polygon_PolygonChanged;
+            polygon.PolygonChanged += UpdatePolygonShape;
 
-            AdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, true);
-            UnAdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, false);
-            AdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, true);
-            UnAdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, false);
+            AdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, true, _AdjBndVisible);
+            UnAdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, false, _UnAdjBndVisible);
+            AdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, true, _AdjNavVisible);
+            UnAdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, false, _UnAdjNavVisible);
 
             Points = new ObservableConvertedCollection<TtMapPoint, TtPoint>(
                 points,
@@ -269,6 +286,8 @@ namespace TwoTrails.Mapping
                         _AdjNavPointsVisible, _UnAdjNavPointsVisible, _AdjMiscPointsVisible, _UnAdjMiscPointsVisible,
                         _WayPointsVisible)
                 );
+
+            UpdatePolygonShape(polygon);
 
             ((INotifyCollectionChanged)Points).CollectionChanged += MapPolygonManager_CollectionChanged;
         }
@@ -285,7 +304,7 @@ namespace TwoTrails.Mapping
             }
         }
 
-        private void Polygon_PolygonChanged(TtPolygon polygon)
+        private void UpdatePolygonShape(TtPolygon polygon)
         {
             lock (locker)
             {
@@ -309,11 +328,11 @@ namespace TwoTrails.Mapping
                     }
                 }
 
-                AdjBoundary.UpdateShape(adjBndLocs);
-                UnAdjBoundary.UpdateShape(unadjBndLocs);
+                AdjBoundary.UpdateLocations(adjBndLocs);
+                UnAdjBoundary.UpdateLocations(unadjBndLocs);
 
-                AdjNavigation.UpdateShape(adjNavLocs);
-                UnAdjNavigation.UpdateShape(unadjNavLocs); 
+                AdjNavigation.UpdateLocations(adjNavLocs);
+                UnAdjNavigation.UpdateLocations(unadjNavLocs); 
             }
         }
         

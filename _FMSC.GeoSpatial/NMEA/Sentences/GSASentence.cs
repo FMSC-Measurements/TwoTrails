@@ -82,7 +82,7 @@ namespace FMSC.GeoSpatial.NMEA.Sentences
         Manual = 1
     }
 
-    internal static class ModeExtensions
+    public static class ModeExtensions
     {
         public static Mode Parse(String str)
         {
@@ -117,7 +117,7 @@ namespace FMSC.GeoSpatial.NMEA.Sentences
         _3D = 2
     }
 
-    internal static class FixExtensions
+    public static class FixExtensions
     {
         public static Fix Parse(String str)
         {

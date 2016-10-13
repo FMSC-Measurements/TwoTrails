@@ -7,6 +7,7 @@ using System.Windows;
 using System.IO;
 using TwoTrails.Core;
 using Microsoft.Win32;
+using System.ComponentModel;
 
 namespace TwoTrails.Dialogs
 {
@@ -29,7 +30,7 @@ namespace TwoTrails.Dialogs
             ProjectInfo.PropertyChanged += ProjectInfo_PropertyChanged;
         }
 
-        private void ProjectInfo_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void ProjectInfo_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("Name", StringComparison.InvariantCultureIgnoreCase))
             {

@@ -30,6 +30,17 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="styleTabButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+        </Style>
+        
+        <Style x:Key="styleTabButtonBorderStyle" TargetType="Border">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource colorPriamry}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -92,7 +103,7 @@
                 <MenuItem Header="_Data">
                     <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                    <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapWindowCommand}" IsEnabled="True"/>
+                    <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapCommand}" IsEnabled="True"/>
                 </MenuItem>
 
                 <MenuItem Header="_Tools">
@@ -163,25 +174,19 @@
                                                        VerticalAlignment="Center" Margin="4,2,8,2" ToolTip="{Binding ToolTip}"/>
 
                                                 <Button Name="btnCloseProject" Visibility="Hidden" DockPanel.Dock="Right" HorizontalAlignment="Right"
-                                                            BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                            BorderThickness="0" Style="{StaticResource styleTabButtonStyle}"
                                                             Command="{Binding CloseTabCommand}" CommandParameter="{Binding CurrentTab}">
-                                                    <TextBlock Name="lblClose" Foreground="White" Padding="0" Margin="0" Width="15" Height="15"
-                                                                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextAlignment="Center" Text="X">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock">
-                                                                <Style.Triggers>
-                                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                                        <Setter Property="Background" Value="{StaticResource colorPriamry}" />
-                                                                    </Trigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
+                                                    <Border Style="{StaticResource styleTabButtonBorderStyle}">
+                                                        <Image Source="{StaticResource ImgClose}" Width="15" Height="15" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2"/>
+                                                    </Border>
                                                 </Button>
 
                                                 <Button Name="btnOpenInWindow" Visibility="Collapsed" DockPanel.Dock="Right" HorizontalAlignment="Right"
-                                                            BorderThickness="0" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                                                    <Image Source="{StaticResource ImgOpenInNew}" Width="15" Height="15" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2"/>
+                                                            BorderThickness="0" Style="{StaticResource styleTabButtonStyle}"
+                                                            Command="{Binding OpenInWinndowCommand}" CommandParameter="{Binding CurrentTab}">
+                                                    <Border Style="{StaticResource styleTabButtonBorderStyle}">
+                                                        <Image Source="{StaticResource ImgOpenInNew}" Width="15" Height="15" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2"/>
+                                                    </Border>
                                                 </Button>
                                             </DockPanel>
                                         </Border>

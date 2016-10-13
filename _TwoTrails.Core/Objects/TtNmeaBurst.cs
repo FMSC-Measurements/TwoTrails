@@ -29,7 +29,7 @@ namespace TwoTrails.Core
         public bool HasPosition { get { return Position != null; } }
 
         public double Latitude { get { return _Position.Latitude.toSignedDecimal(); } }
-        public NorthSouth LarDir { get { return _Position.Latitude.Hemisphere; } }
+        public NorthSouth LatDir { get { return _Position.Latitude.Hemisphere; } }
 
         public double Longitude { get { return _Position.Longitude.toSignedDecimal(); } }
         public EastWest LonDir { get { return _Position.Longitude.Hemisphere; } }

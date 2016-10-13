@@ -40,10 +40,9 @@ namespace TwoTrails.Utils
 
                 foreach (TtPolygon poly in manager.GetPolygons())
                 {
-                    //todo fix colors
-                    PolygonGraphicOptions pgo = null;// pgos.FirstOrDefault(p => p.CN == poly.CN);
+                    PolygonGraphicOptions pgo = pgos.FirstOrDefault(p => p.CN == poly.CN);
 
-                    PolygonStyle style = null;// (pgo != null && polyStyles.Count > 0) ? polyStyles.FirstOrDefault(ps => ps.Key == pgo) : null;
+                    PolygonStyle style = (pgo != null && polyStyles.Count > 0) ? polyStyles.FirstOrDefault(ps => ps.Key == pgo) : null;
 
                     //Get/Generate Polygon Style
                     if (style == null)
@@ -51,13 +50,13 @@ namespace TwoTrails.Utils
                         if (pgo == null)
                         {
                             pgo = new PolygonGraphicOptions(Consts.EmptyGuid,
-                                16007990,
-                                12000284,
-                                4149685,
-                                1713022,
-                                10233776,
-                                4854924,
-                                15094016,
+                                -769226,
+                                -15064194,
+                                -12627531,
+                                -15064194,
+                                -6543440,
+                                -11922292,
+                                -1683200,
                                 AdjLineSize, UnAdjLineSize);
                         }
 
@@ -502,7 +501,7 @@ namespace TwoTrails.Utils
         }
 
 
-        public class PolygonStyle
+        private class PolygonStyle
         {
             public PolygonGraphicOptions Key { get; }
 

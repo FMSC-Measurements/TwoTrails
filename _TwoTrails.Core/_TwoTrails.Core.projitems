@@ -42,6 +42,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IDeviceSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMetadataSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IPointSegment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IPolygonGraphicSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtDataLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtSettings.cs" />

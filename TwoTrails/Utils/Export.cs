@@ -11,6 +11,9 @@ using CSUtil;
 using TwoTrails.ViewModels;
 using FMSC.Core.Xml.KML;
 using System.IO.Compression;
+using FMSC.GeoSpatial.Types;
+using FMSC.GeoSpatial.NMEA.Sentences;
+using FMSC.Core.Xml.GPX;
 
 namespace TwoTrails.Utils
 {
@@ -31,6 +34,7 @@ namespace TwoTrails.Utils
             Polygons(project.Manager, Path.Combine(folderPath, "Polygons.csv"));
             Metadata(project.Manager, Path.Combine(folderPath, "Metadata.csv"));
             Groups(project.Manager, Path.Combine(folderPath, "Groups.csv"));
+            TtNmea(project.Manager, Path.Combine(folderPath, "NmeaBursts.csv"));
             GPX(project, Path.Combine(folderPath, String.Format("{0}.gpx", project.ProjectName.Trim())));
             KMZ(project, Path.Combine(folderPath, String.Format("{0}.kmz", project.ProjectName.Trim())));
             Shapes(project, folderPath);
@@ -312,17 +316,84 @@ namespace TwoTrails.Utils
             }
         }
 
+        public static void TtNmea(ITtManager manager, String fileName)
+        {
+            TtNmea(manager.GetNmeaBursts(), fileName);
+        }
 
         public static void TtNmea(IEnumerable<TtNmeaBurst> bursts, String fileName)
         {
-            //TODO
+            using (StreamWriter sw = new StreamWriter(fileName))
+            {
+                #region Columns
+                StringBuilder sb = new StringBuilder();
+                sb.Append("PointCN,");
+                sb.Append("IsUsed,");
+
+                sb.Append("BurstTime,");
+                sb.Append("FixTime,");
+
+                sb.Append("Latitude,");
+                sb.Append("Longitude,");
+                sb.Append("Elevation,");
+                sb.Append("ElveUom,");
+
+                sb.Append("MagVar,");
+                sb.Append("MagVarDir,");
+
+                sb.Append("TrackAngle,");
+                sb.Append("GroundSpeed,");
+                
+                sb.Append("Fix,");
+                sb.Append("FixType,");
+                sb.Append("Mode,");
+
+                sb.Append("TrackedSatellitesCount,");
+                sb.Append("SatellitesInViewCount,");
+                sb.Append("UsedSatellites,");
+                sb.Append("UsedSatellitesCount,");
+
+                sb.Append("HDOP,");
+                sb.Append("PDOP,");
+                sb.Append("VDOP,");
+
+                sb.Append("CN");
+                sw.WriteLine(sb.ToString());
+                #endregion
+
+                foreach (TtNmeaBurst burst in bursts)
+                {
+                    sb = new StringBuilder();
+                    sb.AppendFormat("{0},{1},", burst.PointCN, burst.IsUsed);
+                    sb.AppendFormat("{0},{1},", burst.TimeCreated.ToString(DateTimeFormat), burst.FixTime.ToString(DateTimeFormat));
+
+                    sb.AppendFormat("{0},{1},", burst.Latitude, burst.Longitude);
+                    sb.AppendFormat("{0},{1},", burst.Elevation, burst.UomElevation.ToStringAbv());
+
+                    sb.AppendFormat("{0},{1},", burst.MagVar, burst.MagVarDir);
+                    sb.AppendFormat("{0},{1},", burst.TrackAngle, burst.GroundSpeed);
+
+                    sb.AppendFormat("{0},{1},{2},", burst.Fix.ToStringF(), burst.FixQuality.ToStringF(), burst.Mode.ToStringF());
+
+                    sb.AppendFormat("{0},{1},", burst.TrackedSatellitesCount, burst.SatellitesInViewCount);
+                    sb.AppendFormat("{0},{1},", burst.UsedSatelliteIDsString, burst.UsedSatelliteIDsCount);
+
+                    sb.AppendFormat("{0},{1},{2},", burst.HDOP, burst.PDOP, burst.VDOP);
+
+                    sb.AppendFormat("{0}", burst.CN);
+
+                    sw.WriteLine(sb.ToString());
+                }
+
+                sw.Flush();
+            }
         }
 
 
 
         public static void GPX(TtProject project, String fileName)
         {
-            //TODO
+            GpxWriter.WriteGpxFile(fileName, TtGpxGenerator.Generate(project.Manager, project.ProjectName.Trim(), project.ProjectInfo.Description));
         }
 
         public static void KMZ(TtProject project, String fileName)
@@ -345,7 +416,20 @@ namespace TwoTrails.Utils
 
         public static void KMZ(IEnumerable<TtProject> projects, String fileName)
         {
+            KmlDocument doc = TtKmlGenerator.Generate(projects.Select(p => p.Manager), "MultiProject");
 
+            string kmlName = "multiproject.kml";
+            string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);
+
+            KmlWriter.WriteKmlFile(kmlFile, doc);
+
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+
+            using (ZipArchive kmzFile = ZipFile.Open(fileName, ZipArchiveMode.Create))
+                kmzFile.CreateEntryFromFile(kmlFile, kmlName);
+
+            File.Delete(kmlFile);
         }
 
         public static void Shapes(TtProject project, String folderPath)

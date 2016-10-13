@@ -272,9 +272,8 @@ namespace TwoTrails.Mapping
             GpsPoint gps = point as GpsPoint;
             if (gps != null && gps.HasLatLon)
             {
-                AdjLocation = new Location((double)gps.Longitude, (double)gps.Latitude);
-                AdjPushpin.Location = AdjLocation;
-                UnAdjPushpin.Location = UnAdjLocation = AdjLocation;
+                AdjPushpin.Location = AdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
+                UnAdjPushpin.Location = UnAdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
             }
             else
             {
@@ -293,6 +292,9 @@ namespace TwoTrails.Mapping
                     UnAdjPushpin.Location = UnAdjLocation;
                 }
             }
+
+            AdjPushpin.ToolTip = String.Format("{0}: {1:F2}, {2:F2}", _Point.PID, AdjLocation.Latitude, AdjLocation.Longitude);
+            UnAdjPushpin.ToolTip = String.Format("{0}: {1}, {2}", _Point.PID, UnAdjLocation.Latitude, UnAdjLocation.Longitude);
 
             LocationChanged?.Invoke(this);
         }

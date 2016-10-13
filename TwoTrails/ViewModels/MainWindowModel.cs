@@ -36,7 +36,7 @@ namespace TwoTrails.ViewModels
 
                     if (sbiInfoBinding != null && value == null)
                     {
-                        BindingOperations.ClearBinding(_MainWindow.sbiInfo, TextBlock.TextProperty);
+                        BindingOperations.ClearBinding(MainWindow.sbiInfo, TextBlock.TextProperty);
                         sbiInfoBinding = null;
                     }
                     else if (value != null)
@@ -46,7 +46,7 @@ namespace TwoTrails.ViewModels
                         sbiInfoBinding.Path = new PropertyPath(nameof(value.TabInfo));
                         sbiInfoBinding.Mode = BindingMode.OneWay;
                         sbiInfoBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
-                        BindingOperations.SetBinding(_MainWindow.sbiInfo, TextBlock.TextProperty, sbiInfoBinding);
+                        BindingOperations.SetBinding(MainWindow.sbiInfo, TextBlock.TextProperty, sbiInfoBinding);
                     }
 
                     OnPropertyChanged(
@@ -56,7 +56,7 @@ namespace TwoTrails.ViewModels
                         nameof(CurrentEditor)
                         );
 
-                    _MainWindow.Title = String.Format("{0}TwoTrails",
+                    MainWindow.Title = String.Format("{0}TwoTrails",
                         value != null ? String.Format("{0} - ", value.Project.ProjectName) : null);
                 });
             }
@@ -117,14 +117,14 @@ namespace TwoTrails.ViewModels
 
 
         private TabControl _Tabs;
-        private MainWindow _MainWindow;
+        public MainWindow MainWindow { get; }
 
 
         public MainWindowModel(MainWindow mainWindow)
         {
-            _MainWindow = mainWindow;
+            MainWindow = mainWindow;
 
-            Settings = new TtSettings(new DeviceSettings(), new MetadataSettings());
+            Settings = new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings());
 
 
             NewCommand = new RelayCommand(x => CreateProject());
@@ -141,7 +141,7 @@ namespace TwoTrails.ViewModels
 
 
             ViewLogCommand = new RelayCommand(x => MessageBox.Show("log file"));
-            AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(_MainWindow));
+            AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(MainWindow));
 
             _Tabs = mainWindow.tabControl;
             _Tabs.SelectionChanged += Tabs_SelectionChanged;
@@ -242,7 +242,7 @@ namespace TwoTrails.ViewModels
 
         public void CreateProject()
         {
-            NewProjectDialog dialog = new NewProjectDialog(_MainWindow, Settings.CreateProjectInfo(AppInfo.Version));
+            NewProjectDialog dialog = new NewProjectDialog(MainWindow, Settings.CreateProjectInfo(AppInfo.Version));
 
             if (dialog.ShowDialog() == true)
             {
@@ -347,7 +347,7 @@ namespace TwoTrails.ViewModels
             exiting = true;
 
             if (closeWindow)
-                _MainWindow.Close();
+                MainWindow.Close();
 
             return true;
         }
@@ -356,7 +356,7 @@ namespace TwoTrails.ViewModels
 
         private void UpdateRecentProjectMenu()
         {
-            MenuItem miRecent = _MainWindow.miRecent, item;
+            MenuItem miRecent = MainWindow.miRecent, item;
 
             miRecent.Items.Clear();
 
@@ -382,7 +382,7 @@ namespace TwoTrails.ViewModels
 
         private void ExportProject()
         {
-            ExportDialog.ShowDialog(CurrentProject, _MainWindow);
+            ExportDialog.ShowDialog(CurrentProject, MainWindow);
         }
 
         private void EditSettings()

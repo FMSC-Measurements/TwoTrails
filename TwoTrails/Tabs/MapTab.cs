@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMSC.Core.ComponentModel.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,14 +14,29 @@ namespace TwoTrails
     {
         public override bool IsDetachable { get; } = true;
 
+        public override ICommand OpenInWinndowCommand { get; }
+
+        public MapControl MapControl { get; set; }
+
         public override string TabTitle
         {
-            get { return String.Format("(Map){0}", base.TabTitle); }
+            get { return String.Format("{0}(Map)", base.TabTitle); }
         }
 
         public MapTab(TtProject project) : base(project)
         {
+            MapControl = new MapControl(project.Manager);
+            Tab.Content = MapControl;
 
+            OpenInWinndowCommand = Project.OpenMapWindowCommand;
+        }
+
+        public MapTab(TtProject project, MapWindow mapWindow) : base(project)
+        {
+            MapControl = mapWindow.MapControl;
+            Tab.Content = MapControl;
+
+            OpenInWinndowCommand = Project.OpenMapWindowCommand;
         }
     }
 }

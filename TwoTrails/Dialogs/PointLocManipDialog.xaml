@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Move Points" Height="200" Width="300"
         ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterOwner">
 
     <Window.Resources>
         <Style TargetType="RadioButton">

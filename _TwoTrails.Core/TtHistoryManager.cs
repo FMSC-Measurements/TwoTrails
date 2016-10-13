@@ -323,13 +323,38 @@ namespace TwoTrails.Core
             _Manager.RecalculatePolygons();
         }
 
-        
 
+
+
+        public PolygonGraphicOptions GetPolygonGraphicOption(string polyCN)
+        {
+            return _Manager.GetPolygonGraphicOption(polyCN);
+        }
 
         public List<PolygonGraphicOptions> GetPolygonGraphicOptions()
         {
-            //TODO GetPolygonGraphicOptions
-            throw new NotImplementedException();
+            return _Manager.GetPolygonGraphicOptions();
+        }
+
+
+        List<TtNmeaBurst> ITtManager.GetNmeaBursts(string pointCN = null)
+        {
+            return _Manager.GetNmeaBursts(pointCN);
+        }
+
+        void ITtManager.AddNmeaBurst(TtNmeaBurst burst)
+        {
+            _Manager.AddNmeaBurst(burst);
+        }
+
+        void ITtManager.AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts)
+        {
+            _Manager.AddNmeaBursts(bursts);
+        }
+
+        void ITtManager.DeleteNmeaBursts(string pointCN)
+        {
+            _Manager.DeleteNmeaBursts(pointCN);
         }
     }
 
