@@ -40,8 +40,44 @@
     <Reference Include="CSUtilSlim">
       <HintPath>..\libs\CSUtilSlim.dll</HintPath>
     </Reference>
+    <Reference Include="GeoAPI, Version=1.7.4.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeoAPI.1.7.4\lib\net45\GeoAPI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Maps.MapControl.WPF, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Maps.MapControl.WPF.1.0.0.3\lib\net40-Client\Microsoft.Maps.MapControl.WPF.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.1.14\lib\net45\NetTopologySuite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.GeoTools, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.GeoTools.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.MsSqlSpatial, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.MsSqlSpatial.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.PostGis, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.PostGis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.ShapeFile, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.ShapeFile.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.ShapeFile.Extended, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.ShapeFile.Extended.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PowerCollections, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2573bf8a1bdddcd5, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.1.14\lib\net45\PowerCollections.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -105,6 +141,7 @@
     <Compile Include="Dialogs\RetraceDialog.xaml.cs">
       <DependentUpon>RetraceDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\MapExtensions.cs" />
     <Compile Include="Mapping\TtMapManager.cs" />
     <Compile Include="Mapping\TtMapPath.cs" />
     <Compile Include="Mapping\TtMapPoint.cs" />
@@ -112,10 +149,12 @@
     <Compile Include="Mapping\TtMapPolygonManager.cs" />
     <Compile Include="Mapping\TtMapShape.cs" />
     <Compile Include="TtPolygonGraphicSettings.cs" />
+    <Compile Include="TtTextWriterTraceListener.cs" />
     <Compile Include="TtWindow.cs" />
     <Compile Include="Utils\Export.cs" />
     <Compile Include="Utils\TtGpxGenerator.cs" />
     <Compile Include="Utils\TtKmlGenerator.cs" />
+    <Compile Include="Utils\TtShapeFileGenerator.cs" />
     <Compile Include="Utils\TtUtils.cs" />
     <Compile Include="ViewModels\CreatePlotsModel.cs" />
     <Compile Include="ViewModels\DataEditorModel.cs" />
@@ -267,11 +306,25 @@
   <ItemGroup>
     <Resource Include="res\open_in_new.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commands\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="res\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="res\ic_unadjusted_polygon_black_36dp.png" />
+    <Resource Include="res\ic_unadjusted_polygon_pts_black_36dp.png" />
+    <Resource Include="res\ic_unadjusted_polygon_pts_white_36dp.png" />
+    <Resource Include="res\ic_unadjusted_polygon_white_36dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="res\ic_polygon_black_36dp.png" />
+    <Resource Include="res\ic_polygon_pts_black_36dp.png" />
+    <Resource Include="res\ic_polygon_pts_white_36dp.png" />
+    <Resource Include="res\ic_polygon_white_36dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="res\ic_ttpoint_way_black.png" />
+    <Resource Include="res\ic_ttpoint_way_white.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.102.0\build\net46\System.Data.SQLite.Core.targets')" />

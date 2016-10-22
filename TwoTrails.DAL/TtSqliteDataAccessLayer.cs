@@ -1870,10 +1870,10 @@ namespace TwoTrails.DAL
                         database.Insert(TwoTrailsSchema.ProjectInfoSchema.TableName,
                             new Dictionary<string, object>()
                             {
-                                [TwoTrailsSchema.ProjectInfoSchema.Name] = info.Name,
-                                [TwoTrailsSchema.ProjectInfoSchema.District] = info.District,
-                                [TwoTrailsSchema.ProjectInfoSchema.Forest] = info.Forest,
-                                [TwoTrailsSchema.ProjectInfoSchema.Region] = info.Region,
+                                [TwoTrailsSchema.ProjectInfoSchema.Name] = info.Name.Trim(),
+                                [TwoTrailsSchema.ProjectInfoSchema.District] = info.District.Trim(),
+                                [TwoTrailsSchema.ProjectInfoSchema.Forest] = info.Forest.Trim(),
+                                [TwoTrailsSchema.ProjectInfoSchema.Region] = info.Region.Trim(),
                                 [TwoTrailsSchema.ProjectInfoSchema.DeviceID] = info.CreationDeviceID,
                                 [TwoTrailsSchema.ProjectInfoSchema.Created] = info.CreationDate,
                                 [TwoTrailsSchema.ProjectInfoSchema.Description] = info.Description,

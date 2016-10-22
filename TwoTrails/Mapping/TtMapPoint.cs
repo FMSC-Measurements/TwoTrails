@@ -17,12 +17,17 @@ using TwoTrails.Core;
 namespace TwoTrails.Mapping
 {
     public delegate void MapPointEvent(TtMapPoint point);
+    public delegate void MapPointSelectedEvent(TtMapPoint point, bool adjusted);
 
     public class TtMapPoint : NotifyPropertyChangedEx
     {
         public event MapPointEvent LocationChanged;
-        public event MapPointEvent AdjPointSelected;
-        public event MapPointEvent UnAdjPointSelected;
+        public event MapPointSelectedEvent PointSelected;
+        public event PointIndexChangedEvent PointIndexChanged
+        {
+            add { Point.PointIndexChanged += value; }
+            remove { Point.PointIndexChanged -= value; }
+        }
 
         public Pushpin AdjPushpin { get; } = new Pushpin();
         public Pushpin UnAdjPushpin { get; } = new Pushpin();
@@ -31,10 +36,11 @@ namespace TwoTrails.Mapping
         public Location AdjLocation { get { return _AdjLoc; } private set { SetField(ref _AdjLoc, value); } }
         public Location UnAdjLocation { get { return _UnAdjLoc; } private set { SetField(ref _UnAdjLoc, value); } }
 
-        private TtPoint _Point { get; }
-        public bool IsBndPoint { get { return _Point.IsBndPoint(); } }
+        public TtPoint Point { get; }
+        public bool IsBndPoint { get { return Point.IsBndPoint(); } }
         public bool IsNavPoint { get; }
-        public bool IsMiscPoint { get { return _Point.IsMiscPoint(); } }
+        public bool IsMiscPoint { get { return Point.IsMiscPoint(); } }
+        public int Index { get { return Point.Index; } }
 
         private Map _Map;
         
@@ -89,7 +95,7 @@ namespace TwoTrails.Mapping
 
         private void UpdateColor()
         {
-            if (_Point.OpType == OpType.WayPoint)
+            if (Point.OpType == OpType.WayPoint)
             {
                 UnAdjPushpin.Background = new SolidColorBrush(WayPointColor)
                 {
@@ -177,16 +183,16 @@ namespace TwoTrails.Mapping
                 if (_Visible)
                 {
                     AdjPushpin.Visibility =
-                        ((AdjBndVisible && _Point.IsBndPoint()) ||
+                        ((AdjBndVisible && Point.IsBndPoint()) ||
                         (AdjNavVisible && IsNavPoint) ||
-                        (AdjMiscVisible && _Point.IsMiscPoint())) ?
+                        (AdjMiscVisible && Point.IsMiscPoint())) ?
                         Visibility.Visible : Visibility.Collapsed;
 
                     UnAdjPushpin.Visibility =
-                        ((UnAdjBndVisible && _Point.IsBndPoint()) ||
+                        ((UnAdjBndVisible && Point.IsBndPoint()) ||
                         (UnAdjNavVisible && IsNavPoint) ||
-                        (UnAdjMiscVisible && _Point.IsMiscPoint())) ||
-                        (WayPointVisible && _Point.OpType == OpType.WayPoint) ?
+                        (UnAdjMiscVisible && Point.IsMiscPoint())) ||
+                        (WayPointVisible && Point.OpType == OpType.WayPoint) ?
                         Visibility.Visible : Visibility.Collapsed;
                 }
                 else
@@ -201,7 +207,7 @@ namespace TwoTrails.Mapping
 
         public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo)
         {
-            _Point = point;
+            Point = point;
 
             AdjPushpin.Visibility = Visibility.Collapsed;
             UnAdjPushpin.Visibility = Visibility.Collapsed;
@@ -212,6 +218,8 @@ namespace TwoTrails.Mapping
             AdjColor = pgo.AdjPtsColor;
             UnAdjColor = pgo.UnAdjPtsColor;
             WayPointColor = pgo.WayPtsColor;
+
+            IsNavPoint = point.IsNavPoint();
 
             pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, Color color) =>
             {
@@ -280,6 +288,7 @@ namespace TwoTrails.Mapping
                 if (point.Metadata == null)
                 {
                     Debug.WriteLine(String.Format("Point {0} has no Metadata. ({1})", point.PID, point.CN));
+                    return;
                 }
                 else
                 {
@@ -293,8 +302,8 @@ namespace TwoTrails.Mapping
                 }
             }
 
-            AdjPushpin.ToolTip = String.Format("{0}: {1:F2}, {2:F2}", _Point.PID, AdjLocation.Latitude, AdjLocation.Longitude);
-            UnAdjPushpin.ToolTip = String.Format("{0}: {1}, {2}", _Point.PID, UnAdjLocation.Latitude, UnAdjLocation.Longitude);
+            AdjPushpin.ToolTip = String.Format("{0}: {1:F3}, {2:F3}", Point.PID, AdjLocation.Latitude, AdjLocation.Longitude);
+            UnAdjPushpin.ToolTip = String.Format("{0}: {1:F3}, {2:F3}", Point.PID, UnAdjLocation.Latitude, UnAdjLocation.Longitude);
 
             LocationChanged?.Invoke(this);
         }
@@ -303,13 +312,13 @@ namespace TwoTrails.Mapping
 
         private void AdjPushpin_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            AdjPointSelected?.Invoke(this);
+            PointSelected?.Invoke(this, true);
         }
 
         private void UnAdjPushpin_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (!_Editing)
-                UnAdjPointSelected?.Invoke(this);
+                PointSelected?.Invoke(this, false);
         }
 
         
@@ -324,7 +333,7 @@ namespace TwoTrails.Mapping
 
         public override string ToString()
         {
-            return String.Format("Point {0}", _Point.PID);
+            return String.Format("Point {0}", Point.PID);
         }
     }
 }

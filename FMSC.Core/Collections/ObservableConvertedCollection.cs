@@ -252,7 +252,10 @@ namespace FMSC.Core.Collections
 
         void ICollection<TOut>.CopyTo(TOut[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            for (int i = arrayIndex; i < Count; i++)
+            {
+                array[i] = _EditableCollection[i];
+            }
         }
 
         bool ICollection<TOut>.Remove(TOut item)

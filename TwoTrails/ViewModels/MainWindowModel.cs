@@ -3,6 +3,7 @@ using FMSC.Core.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -137,10 +138,10 @@ namespace TwoTrails.ViewModels
             ImportCommand = new RelayCommand(x => ImportData());
             ExportCommand = new RelayCommand(x => ExportProject());
 
-            SettingsCommand = new RelayCommand(x => EditSettings());
+            SettingsCommand = new RelayCommand(x => OpenSettings());
 
 
-            ViewLogCommand = new RelayCommand(x => MessageBox.Show("log file"));
+            ViewLogCommand = new RelayCommand(x => Process.Start(App.LOG_FILE_PATH));
             AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(MainWindow));
 
             _Tabs = mainWindow.tabControl;
@@ -206,9 +207,11 @@ namespace TwoTrails.ViewModels
                     try
                     {
                         TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
+                        Trace.WriteLine(String.Format("DAL Opened ({1}): {0}", dal.FilePath, dal.GetDataVersion()));
 
                         if (dal.RequiresUpgrade)
                         {
+                            Trace.WriteLine("DAL Requires Upgrade");
                             //ask to upgrade
                         }
                         else
@@ -218,7 +221,7 @@ namespace TwoTrails.ViewModels
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(ex.Message);
+                        Trace.WriteLine(ex.Message, "MWM:OpenProject");
                     }
                 }
                 else
@@ -250,6 +253,7 @@ namespace TwoTrails.ViewModels
 
                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
                 TtProject proj = new TtProject(dal, Settings, this);
+                Trace.WriteLine(String.Format("Project Created ({1}): {0}", dal.FilePath, dal.GetDataVersion()));
 
                 AddProject(proj);
 
@@ -329,6 +333,7 @@ namespace TwoTrails.ViewModels
                     }
                     catch (Exception ex)
                     {
+                        Trace.WriteLine(ex.Message, "MWM:Exit");
                         MessageBox.Show(ex.Message);
                         return false;
                     }
@@ -385,9 +390,9 @@ namespace TwoTrails.ViewModels
             ExportDialog.ShowDialog(CurrentProject, MainWindow);
         }
 
-        private void EditSettings()
+        private void OpenSettings()
         {
-
+            //TODO settings
         }
     }
 }

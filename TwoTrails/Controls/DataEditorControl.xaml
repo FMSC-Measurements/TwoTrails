@@ -386,7 +386,7 @@
                     </ComboBox>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Index"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" IsEnabled="False"
+                    <TextBox Grid.Row="2" Grid.Column="1"
                              Text="{Binding Index, Delay=250, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              cp:ControlProperties.BackgroundEnabled="{Binding SameIndex, Converter={StaticResource IBC}}"
                              LostFocus="TextBox_UpdateBinding">
@@ -396,10 +396,18 @@
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
                                             <Condition Binding="{Binding MultipleSelections}" Value="False"/>
-                                            <Condition Binding="{Binding IsAdvancedMode}" Value="True"/>
+                                            <Condition Binding="{Binding Project.Settings.IsAdvancedMode}" Value="True"/>
                                         </MultiDataTrigger.Conditions>
                                         <MultiDataTrigger.Setters>
                                             <Setter Property="IsEnabled" Value="True"/>
+                                        </MultiDataTrigger.Setters>
+                                    </MultiDataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding MultipleSelections}" Value="True"/>
+                                        </MultiDataTrigger.Conditions>
+                                        <MultiDataTrigger.Setters>
+                                            <Setter Property="IsEnabled" Value="False"/>
                                         </MultiDataTrigger.Setters>
                                     </MultiDataTrigger>
                                 </Style.Triggers>

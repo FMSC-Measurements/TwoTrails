@@ -14,10 +14,9 @@ namespace TwoTrails.Mapping
 {
     public class TtMapPolygon : TtMapShape
     {
-        TtPolygon _Polygon { get; }
+        private TtPolygon _Polygon { get; }
 
-        MapPolygon MapPolygon { get; } = new MapPolygon();
-
+        private MapPolygon MapPolygon { get; } = new MapPolygon();
 
         private bool _Visible;
         public override bool Visible
@@ -59,7 +58,11 @@ namespace TwoTrails.Mapping
 
         protected override void UpdateShape(LocationCollection locations)
         {
-            MapPolygon.Locations = locations;
+            Application.Current.Dispatcher.Invoke(() => {
+                MapPolygon.Locations = locations;
+
+                Map.Refresh();
+            });
         }
 
         public override void Detach()

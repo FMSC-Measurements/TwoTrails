@@ -245,6 +245,7 @@ namespace TwoTrails.Core
             }
 
             point.LocationChanged += Point_LocationChanged;
+            point.OnBoundaryChanged += Point_OnBoundaryChanged;
         }
 
         protected void DetachPointEvents(TtPoint point)
@@ -510,6 +511,17 @@ namespace TwoTrails.Core
             }
         }
 
+        private void Point_OnBoundaryChanged(TtPoint point)
+        {
+            if (!IgnorePointEvents)
+            {
+                lock (locker)
+                {
+                    //AdjustAroundPoint(point, _PointsByPoly[point.PolygonCN]);
+                    _PolygonUpdateHandlers[point.PolygonCN].DelayInvoke();
+                }
+            }
+        }
 
         private void Point_LocationChanged(TtPoint point)
         {
@@ -897,25 +909,16 @@ namespace TwoTrails.Core
             }
         }
 
-        public void ReindexPolygon(TtPolygon polygon)
+        public void RebuildPolygon(TtPolygon poly, bool reindex = false)
         {
-            List<TtPoint> points = _Points.Where(p => p.PolygonCN == polygon.CN).ToList();
-            points.Sort();
+            List<TtPoint> points = _Points.Where(p => p.PolygonCN == poly.CN).OrderBy(p => p.Index).ToList();
 
-            int index = 0;
-            foreach (TtPoint point in points)
-                point.Index = index++;
-
-            _PointsByPoly[polygon.CN] = points;
-
-            AdjustAllTravTypesInPolygon(polygon);
-            UpdatePolygonStats(polygon);
-        }
-
-        public void RebuildPolygon(TtPolygon poly)
-        {
-            List<TtPoint> points = _Points.Where(p => p.PolygonCN == poly.CN).ToList();
-            points.Sort();
+            if (reindex)
+            {
+                int index = 0;
+                foreach (TtPoint point in points)
+                    point.Index = index++;
+            }
 
             _PointsByPoly[poly.CN] = points;
 
@@ -1178,9 +1181,10 @@ namespace TwoTrails.Core
 
                 points[point.Index] = point;
                 _PointsMap[point.CN] = point;
-                _Points.Add(point);
 
                 AttachPoint(point);
+
+                _Points.Add(point);
 
                 AdjustAroundPoint(point, points);
             }
@@ -1363,7 +1367,7 @@ namespace TwoTrails.Core
                 }
 
                 foreach (TtPolygon polygon in reindexPolys)
-                    ReindexPolygon(polygon);
+                    RebuildPolygon(polygon, true);
             }
         }
         

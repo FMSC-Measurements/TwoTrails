@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMSC.GeoSpatial.UTM;
+using System;
 
 namespace TwoTrails.Core.Points
 {
@@ -145,12 +146,14 @@ namespace TwoTrails.Core.Points
             SetUnAdjLocation(point.UnAdjX, point.UnAdjY, point.UnAdjZ);
         }
 
-        public void SetUnAdjLocation(double lat, double lon, int zone)
+        public void SetUnAdjLocation(double lat, double lon, int zone, double elev = 0)
         {
-            //UTM utm = calcutm
-
             Latitude = lat;
             Longitude = lon;
+
+            UTMCoords coords = UTMTools.convertLatLonSignedDecToUTM(lat, lon, zone);
+
+            SetUnAdjLocation(coords.X, coords.Y, elev);
         }
 
 

@@ -61,8 +61,6 @@ namespace TwoTrails.ViewModels
         public TtHistoryManager Manager { get; }
 
 
-        public bool IsAdvancedMode { get { return Get<bool>(); } set { Set(value); } }
-
         public bool HasSelection
         {
             get { return SelectedPoints != null && SelectedPoints.Count > 0; }
@@ -178,7 +176,7 @@ namespace TwoTrails.ViewModels
         public int? Index
         {
             get { return _Index; }
-            set { EditValue(ref _Index, value, PointProperties.INDEX); }
+            set { EditValue(ref _Index, value, PointProperties.INDEX); Manager.RebuildPolygon(SelectedPoint.Polygon); }
         }
 
 

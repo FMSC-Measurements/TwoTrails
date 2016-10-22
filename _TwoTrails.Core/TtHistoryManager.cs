@@ -307,15 +307,10 @@ namespace TwoTrails.Core
         {
             _Manager.ReplacePoints(replacePoints);
         }
-
-        void ITtManager.ReindexPolygon(TtPolygon polygon)
+        
+        public void RebuildPolygon(TtPolygon polygon, bool reindex = false)
         {
-            _Manager.ReindexPolygon(polygon);
-        }
-
-        void ITtManager.RebuildPolygon(TtPolygon polygon)
-        {
-            _Manager.RebuildPolygon(polygon);
+            _Manager.RebuildPolygon(polygon, reindex);
         }
 
         public void RecalculatePolygons()

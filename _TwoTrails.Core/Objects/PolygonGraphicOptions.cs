@@ -32,6 +32,12 @@ namespace TwoTrails.Core
             }
         }
 
+        public SolidColorBrush AdjBndBrush
+        {
+            get { return new SolidColorBrush(_AdjBndColor); }
+        }
+
+
         private Color _UnAdjBndColor;
         public Color UnAdjBndColor
         {
@@ -41,6 +47,12 @@ namespace TwoTrails.Core
                 SetField(ref _UnAdjBndColor, value, () => { OnColorChange(GraphicCode.UNADJBND_COLOR, value); });
             }
         }
+
+        public SolidColorBrush UnAdjBndBrush
+        {
+            get { return new SolidColorBrush(_UnAdjBndColor); }
+        }
+
 
         private Color _AdjNavColor;
         public Color AdjNavColor
@@ -52,6 +64,12 @@ namespace TwoTrails.Core
             }
         }
 
+        public SolidColorBrush AdjNavBrush
+        {
+            get { return new SolidColorBrush(_AdjNavColor); }
+        }
+
+
         private Color _UnAdjNavColor;
         public Color UnAdjNavColor
         {
@@ -61,6 +79,12 @@ namespace TwoTrails.Core
                 SetField(ref _UnAdjNavColor, value, () => { OnColorChange(GraphicCode.UNADJNAV_COLOR, value); });
             }
         }
+
+        public SolidColorBrush UnAdjNavBrush
+        {
+            get { return new SolidColorBrush(_UnAdjNavColor); }
+        }
+
 
         private Color _AdjPtsColor;
         public Color AdjPtsColor
@@ -72,6 +96,12 @@ namespace TwoTrails.Core
             }
         }
 
+        public SolidColorBrush AdjPtsBrush
+        {
+            get { return new SolidColorBrush(_AdjPtsColor); }
+        }
+
+
         private Color _UnAdjPtsColor;
         public Color UnAdjPtsColor
         {
@@ -82,6 +112,12 @@ namespace TwoTrails.Core
             }
         }
 
+        public SolidColorBrush UnAdjPtsBrush
+        {
+            get { return new SolidColorBrush(_UnAdjPtsColor); }
+        }
+
+
         private Color _WayPtsColor;
         public Color WayPtsColor
         {
@@ -91,6 +127,12 @@ namespace TwoTrails.Core
                 SetField(ref _WayPtsColor, value, () => { OnColorChange(GraphicCode.WAYPTS_COLOR, value); });
             }
         }
+
+        public SolidColorBrush WayPtsBrush
+        {
+            get { return new SolidColorBrush(_WayPtsColor); }
+        }
+
 
         private float _AdjWidth;
         public float AdjWidth
@@ -145,6 +187,31 @@ namespace TwoTrails.Core
         private void OnColorChange(GraphicCode code, Color color)
         {
             ColorChanged?.Invoke(this, code, color);
+
+            switch (code)
+            {
+                case GraphicCode.ADJBND_COLOR:
+                    OnPropertyChanged(nameof(AdjBndBrush));
+                    break;
+                case GraphicCode.ADJNAV_COLOR:
+                    OnPropertyChanged(nameof(AdjNavBrush));
+                    break;
+                case GraphicCode.ADJPTS_COLOR:
+                    OnPropertyChanged(nameof(AdjPtsBrush));
+                    break;
+                case GraphicCode.UNADJBND_COLOR:
+                    OnPropertyChanged(nameof(UnAdjBndBrush));
+                    break;
+                case GraphicCode.UNADJNAV_COLOR:
+                    OnPropertyChanged(nameof(UnAdjNavBrush));
+                    break;
+                case GraphicCode.UNADJPTS_COLOR:
+                    OnPropertyChanged(nameof(UnAdjPtsBrush));
+                    break;
+                case GraphicCode.WAYPTS_COLOR:
+                    OnPropertyChanged(nameof(WayPtsBrush));
+                    break;
+            }
         }
 
 

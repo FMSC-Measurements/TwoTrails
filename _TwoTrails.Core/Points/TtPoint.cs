@@ -7,18 +7,23 @@ using System.ComponentModel;
 namespace TwoTrails.Core.Points
 {
     public delegate void PointChangedEvent(TtPoint point);
+    public delegate void PointPolygonChangedEvent(TtPoint point, TtPolygon newPolygon, TtPolygon oldPolygon);
+    public delegate void PointIndexChangedEvent(TtPoint point, int newIndex, int oldIndex);
 
     public abstract class TtPoint : TtObject, IAccuracy, IComparable<TtPoint>, IComparer<TtPoint>
     {
         public event PointChangedEvent LocationChanged;
         public event PointChangedEvent PreviewLocationChanged;
+        public event PointChangedEvent OnBoundaryChanged;
+        public event PointPolygonChangedEvent PointPolygonChanged;
+        public event PointIndexChangedEvent PointIndexChanged;
 
         #region Properties
         private Int32 _Index;
         public Int32 Index
         {
             get { return _Index; }
-            set { SetField(ref _Index, value); }
+            set { int oldIndex = _Index; SetField(ref _Index, value, () => PointIndexChanged?.Invoke(this, value, oldIndex)); }
         }
 
         private Int32 _PID;
@@ -61,6 +66,11 @@ namespace TwoTrails.Core.Points
                         PolygonCN = value.CN;
 
                         _Polygon.PreviewPolygonAccuracyChanged += Polygon_PreviewPolygonAccuracyChanged; 
+                    }
+
+                    if (oldPoly != null && value != null)
+                    {
+                        PointPolygonChanged.Invoke(this, value, oldPoly);
                     }
                 }
             }
@@ -118,7 +128,7 @@ namespace TwoTrails.Core.Points
         public bool OnBoundary
         {
             get { return _OnBoundary; }
-            set { SetField(ref _OnBoundary, value); }
+            set { SetField(ref _OnBoundary, value, () => OnBoundaryChanged?.Invoke(this)); }
         }
 
 
@@ -438,10 +448,5 @@ namespace TwoTrails.Core.Points
         {
             return String.Format("{0} ({1})", PID, OpType);
         }
-
-        //public String Description
-        //{
-        //    get { return ToString(); }
-        //}
     }
 }

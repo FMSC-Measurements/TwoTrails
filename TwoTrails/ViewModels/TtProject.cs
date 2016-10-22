@@ -54,8 +54,7 @@ namespace TwoTrails.ViewModels
         
         public String ProjectName
         {
-            get { return Get<String>(); }
-            private set { Set(value); }
+            get { return _ProjectInfo.Name; }
         }
         
         public bool RequiresSave
@@ -83,7 +82,7 @@ namespace TwoTrails.ViewModels
 
         public ITtDataLayer DAL { get; }
 
-        public ITtSettings Settings { get; private set; }
+        public TtSettings Settings { get; private set; }
 
         public TtManager Manager { get; }
         public TtHistoryManager HistoryManager { get; }
@@ -98,7 +97,7 @@ namespace TwoTrails.ViewModels
         #endregion
 
 
-        public TtProject(ITtDataLayer dal, ITtSettings settings, MainWindowModel mainModel)
+        public TtProject(ITtDataLayer dal, TtSettings settings, MainWindowModel mainModel)
         {
             DAL = dal;
             Settings = settings;
@@ -112,8 +111,6 @@ namespace TwoTrails.ViewModels
             {
                 ProjectChanged = !_ProjectInfo.Equals(ProjectInfo);
             };
-
-            ProjectName = ProjectInfo.Name;
 
             RequiresSave = false;
 
@@ -162,9 +159,9 @@ namespace TwoTrails.ViewModels
                 {
                     if (ProjectChanged)
                     {
+                        ProjectInfo.Name = ProjectInfo.Name.Trim();
                         DAL.UpdateProjectInfo(ProjectInfo);
                         _ProjectInfo = new TtProjectInfo(ProjectInfo);
-                        ProjectName = ProjectInfo.Name;
                     }
 
                     Manager.Save();

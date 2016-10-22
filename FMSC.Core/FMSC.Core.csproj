@@ -53,8 +53,12 @@
     <Compile Include="ComponentModel\Commands\BindedRelayCommand.cs" />
     <Compile Include="ComponentModel\Commands\RelayCommand.cs" />
     <Compile Include="ComponentModel\EnumToItemsSource.cs" />
+    <Compile Include="ComponentModel\PropertyWatcher.cs" />
     <Compile Include="ComponentModel\RelayMenuItem.cs" />
     <Compile Include="Controls\DataGridEx.cs" />
+    <Compile Include="Controls\FlipCheckBox.xaml.cs">
+      <DependentUpon>FlipCheckBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Convert.cs" />
     <Compile Include="Math.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -88,7 +92,12 @@
     <Compile Include="Xml\KML\StyleMap.cs" />
     <Compile Include="Xml\KML\View.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Page Include="Controls\FlipCheckBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

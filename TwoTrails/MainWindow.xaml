@@ -127,10 +127,10 @@
                 </MenuItem>
 
                 <MenuItem Header="_Help">
-                    <MenuItem Header="View Error Log" Command="{Binding ViewLogCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
+                    <MenuItem Header="View Log File" Command="{Binding ViewLogCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                     <MenuItem Header="View User Activity" Command="{Binding CurrentProject.ViewUserActivityCommand}"
-                    Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource ResourceKey=BoolToVis}}"
-                          Style="{StaticResource styleMiDisableNullCommand}"/>
+                        Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource ResourceKey=BoolToVis}}"
+                              Style="{StaticResource styleMiDisableNullCommand}"/>
 
                     <Separator/>
 

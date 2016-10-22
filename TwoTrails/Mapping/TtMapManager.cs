@@ -1,4 +1,5 @@
-﻿using FMSC.GeoSpatial;
+﻿using FMSC.Core.Utilities;
+using FMSC.GeoSpatial;
 using Microsoft.Maps.MapControl.WPF;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 
@@ -21,9 +23,14 @@ namespace TwoTrails.Mapping
         private ReadOnlyObservableCollection<TtPolygon> _Polygons;
         private Map _Map;
 
+        private TtPoint _LastPoint;
+        private List<TtPoint> _SelectedPoints { get; } =  new List<TtPoint>();
+
         public ObservableCollection<TtMapPolygonManager> PolygonManagers { get; } = new ObservableCollection<TtMapPolygonManager>();
 
         private TtManager _Manager;
+
+
 
 
         public TtMapManager(Map map, TtManager manager)
@@ -35,12 +42,7 @@ namespace TwoTrails.Mapping
             
             foreach (TtPolygon poly in _Polygons)
             {
-                ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Points.Where(p => p.PolygonCN == poly.CN));
-                _PointsByPolys.Add(poly.CN, ocPoints);
-
-                TtMapPolygonManager mpm = new TtMapPolygonManager(_Map, poly, ocPoints, _Manager.GetPolygonGraphicOption(poly.CN));
-                _PolygonManagers.Add(poly.CN, mpm);
-                PolygonManagers.Add(mpm);
+                CreateMapPolygon(poly);
             }
 
 
@@ -54,33 +56,115 @@ namespace TwoTrails.Mapping
                     map.SetView(locs, new Thickness(10), 0);
             }
 
-            //TODO hook into all points to see if they change polygons
+            foreach (TtPoint point in _Points)
+            {
+                point.PointPolygonChanged += Point_PolygonChanged;
+            }
         }
+
+        private void CreateMapPolygon(TtPolygon polygon)
+        {
+            ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Points.Where(p => p.PolygonCN == polygon.CN));
+            _PointsByPolys.Add(polygon.CN, ocPoints);
+
+            TtMapPolygonManager mpm = new TtMapPolygonManager(_Map, polygon, ocPoints, _Manager.GetPolygonGraphicOption(polygon.CN));
+            _PolygonManagers.Add(polygon.CN, mpm);
+            PolygonManagers.Add(mpm);
+
+            mpm.PointSelected += PointSelected;
+        }
+
+        private void PointSelected(TtMapPoint mapPoint, Boolean adjusted)
+        {
+            TtPoint point = mapPoint.Point;
+
+            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+            {
+                _SelectedPoints.Clear();
+                IList<TtPoint> points = _PointsByPolys[point.PolygonCN];
+
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    if (_LastPoint.Index < point.Index)
+                    {
+                        for (int i = point.Index; i < points.Count; i++)
+                        {
+                            _SelectedPoints.Add(points[i]);
+                        }
+
+                        for (int i = 0; i <= _LastPoint.Index; i++)
+                        {
+                            _SelectedPoints.Add(points[i]);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = _LastPoint.Index; i <= point.Index; i++)
+                        {
+                            _SelectedPoints.Add(points[i]);
+                        }
+                    }
+                }
+                else
+                {
+                    if (_LastPoint.Index < point.Index)
+                    {
+                        for (int i = _LastPoint.Index; i <= point.Index; i++)
+                        {
+                            _SelectedPoints.Add(points[i]);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = point.Index; i < points.Count; i++)
+                        {
+                            _SelectedPoints.Add(points[i]);
+                        }
+
+                        for (int i = 0; i <= _LastPoint.Index; i++)
+                        {
+                            _SelectedPoints.Add(points[i]);
+                        }
+                    }
+                }
+            }
+            else if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                _SelectedPoints.Add(point);
+            }
+            else
+            {
+                _SelectedPoints.Clear();
+                _SelectedPoints.Add(point);
+            }
+            
+            _LastPoint = point;
+        }
+
+        private void RemoveMapPolygon(TtPolygon polygon)
+        {
+            TtMapPolygonManager mpm = _PolygonManagers[polygon.CN];
+            mpm.Detach();
+            PolygonManagers.Remove(mpm);
+            _PolygonManagers.Remove(polygon.CN);
+            _PointsByPolys.Remove(polygon.CN);
+        }
+
 
         private void Polygons_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            //add or remove points from the polygons
-
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
                     foreach (TtPolygon poly in e.NewItems)
                     {
-                        ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Points.Where(p => p.PolygonCN == poly.CN));
-                        _PointsByPolys.Add(poly.CN, ocPoints);
-                        TtMapPolygonManager mpm = new TtMapPolygonManager(_Map, poly, ocPoints, _Manager.GetPolygonGraphicOption(poly.CN));
-                        _PolygonManagers.Add(poly.CN, mpm);
-                        PolygonManagers.Add(mpm);
+                        CreateMapPolygon(poly);
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (TtPolygon p in e.OldItems)
+                    foreach (TtPolygon poly in e.OldItems)
                     {
-                        TtMapPolygonManager mpm = _PolygonManagers[p.CN];
-                        mpm.Detach();
-                        PolygonManagers.Remove(mpm);
-                        _PolygonManagers.Remove(p.CN);
-                        _PointsByPolys.Remove(p.CN);
+                        RemoveMapPolygon(poly);
                     }
                     break;
                 case NotifyCollectionChangedAction.Replace:
@@ -96,8 +180,6 @@ namespace TwoTrails.Mapping
 
         private void Points_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            //add or remove points from the polygons
-
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -121,6 +203,12 @@ namespace TwoTrails.Mapping
                 default:
                     break;
             }
+        }
+
+        private void Point_PolygonChanged(TtPoint point, TtPolygon newPolygon, TtPolygon oldPolygon)
+        {
+            _PointsByPolys[oldPolygon.CN].Remove(point);
+            _PointsByPolys[newPolygon.CN].Insert(point.Index, point);
         }
     }
 }

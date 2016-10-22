@@ -7,12 +7,16 @@ using System;
 using System.Collections.Generic;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using System.Linq;
+using FMSC.Core.Utilities;
 
 namespace TwoTrails.Mapping
 {
     public class TtMapPolygonManager : NotifyPropertyChangedEx
     {
-        public ObservableConvertedCollection<TtMapPoint, TtPoint> Points { get; }
+        public event MapPointSelectedEvent PointSelected;
+
+        public ObservableConvertedCollection<TtMapPoint, TtPoint> Points { get; set; }
 
         private TtMapPolygon _AdjBnd, _UnAdjBnd;
         public TtMapPolygon AdjBoundary { get { return _AdjBnd; } private set { SetField(ref _AdjBnd, value); } }
@@ -25,6 +29,9 @@ namespace TwoTrails.Mapping
         private object locker = new object();
 
         public TtPolygon Polygon { get; }
+
+        private Map Map { get; }
+
 
         #region Visibility
         private bool _Visible;
@@ -99,7 +106,7 @@ namespace TwoTrails.Mapping
             {
                 lock (locker)
                 {
-                    SetField(ref _UnAdjBndVisible, value, () => { UnAdjBoundary.Visible = value; }); 
+                    SetField(ref _UnAdjBndVisible, value, () => { UnAdjBoundary.Visible = value && _Visible; }); 
                 }
             }
         }
@@ -240,7 +247,7 @@ namespace TwoTrails.Mapping
 
 
         #region Color
-        private PolygonGraphicOptions Graphics { get; }
+        public PolygonGraphicOptions Graphics { get; }
         #endregion
 
 
@@ -253,6 +260,7 @@ namespace TwoTrails.Mapping
             bool adjNavVis, bool adjNavPtsVis, bool unadjNavVis, bool unadjNavPtsVis,
             bool adjMiscPtsVis, bool unadjMiscPtsVis, bool wayPtsVis)
         {
+            Map = map;
             Polygon = polygon;
             Graphics = pgo;
 
@@ -289,19 +297,54 @@ namespace TwoTrails.Mapping
 
             UpdatePolygonShape(polygon);
 
-            ((INotifyCollectionChanged)Points).CollectionChanged += MapPolygonManager_CollectionChanged;
+            ((INotifyCollectionChanged)Points).CollectionChanged += Points_CollectionChanged;
+
+            foreach (TtMapPoint p in Points)
+            {
+                p.PointSelected += MapPointSelected;
+            }
         }
 
-        private void MapPolygonManager_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+
+        private void Points_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             lock (locker)
             {
-                if (e.Action == NotifyCollectionChangedAction.Remove)
+                switch (e.Action)
                 {
-                    foreach (TtMapPoint p in e.OldItems)
-                        p.Detach();
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (TtMapPoint p in e.NewItems)
+                        {
+                            p.PointSelected += MapPointSelected;
+                        }
+                        break;
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (TtMapPoint p in e.OldItems)
+                        {
+                            p.Detach();
+                            p.PointSelected -= MapPointSelected;
+                        }
+                        break;
+                    case NotifyCollectionChangedAction.Replace:
+                        break;
+                    case NotifyCollectionChangedAction.Move:
+                        break;
+                    case NotifyCollectionChangedAction.Reset:
+                        foreach (TtMapPoint p in Points)
+                        {
+                            p.Detach();
+                            p.PointSelected -= MapPointSelected;
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
+        }
+
+        private void MapPointSelected(TtMapPoint point, Boolean adjusted)
+        {
+            PointSelected?.Invoke(point, adjusted);
         }
 
         private void UpdatePolygonShape(TtPolygon polygon)
@@ -313,7 +356,7 @@ namespace TwoTrails.Mapping
                 LocationCollection adjNavLocs = new LocationCollection();
                 LocationCollection unadjNavLocs = new LocationCollection();
 
-                foreach (TtMapPoint p in Points)
+                foreach (TtMapPoint p in Points.OrderBy(p => p.Index))
                 {
                     if (p.IsBndPoint)
                     {

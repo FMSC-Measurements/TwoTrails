@@ -434,7 +434,12 @@ namespace TwoTrails.Utils
 
         public static void Shapes(TtProject project, String folderPath)
         {
-            //TODO
+            string shapeFolderPath = Path.Combine(folderPath, project.ProjectName);
+
+            foreach (TtPolygon poly in project.Manager.Polygons)
+            {
+                TtShapeFileGenerator.WritePolygon(project.Manager, poly, shapeFolderPath);
+            }
         }
 
 
