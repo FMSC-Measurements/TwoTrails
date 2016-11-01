@@ -13,6 +13,7 @@ using CSUtil.ComponentModel;
 using System.Windows.Media;
 using System.ComponentModel;
 using TwoTrails.Core;
+using System.Windows.Controls;
 
 namespace TwoTrails.Mapping
 {
@@ -23,11 +24,6 @@ namespace TwoTrails.Mapping
     {
         public event MapPointEvent LocationChanged;
         public event MapPointSelectedEvent PointSelected;
-        public event PointIndexChangedEvent PointIndexChanged
-        {
-            add { Point.PointIndexChanged += value; }
-            remove { Point.PointIndexChanged -= value; }
-        }
 
         public Pushpin AdjPushpin { get; } = new Pushpin();
         public Pushpin UnAdjPushpin { get; } = new Pushpin();
@@ -215,6 +211,16 @@ namespace TwoTrails.Mapping
             AdjPushpin.MouseLeftButtonDown += AdjPushpin_MouseLeftButtonDown;
             UnAdjPushpin.MouseLeftButtonDown += UnAdjPushpin_MouseLeftButtonDown;
 
+            AdjPushpin.ToolTipOpening += LoadAdjToolTip;
+            UnAdjPushpin.ToolTipOpening += LoadUnAdjToolTip;
+
+            AdjPushpin.ToolTip = String.Empty;
+            UnAdjPushpin.ToolTip = String.Empty;
+
+            ToolTipService.SetShowDuration(AdjPushpin, 60000);
+            ToolTipService.SetShowDuration(UnAdjPushpin, 60000);
+
+
             AdjColor = pgo.AdjPtsColor;
             UnAdjColor = pgo.UnAdjPtsColor;
             WayPointColor = pgo.WayPtsColor;
@@ -245,8 +251,8 @@ namespace TwoTrails.Mapping
 
             _Map = map;
 
-            _Map.Children.Add(AdjPushpin);
             _Map.Children.Add(UnAdjPushpin);
+            _Map.Children.Add(AdjPushpin);
         }
 
         public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo, bool visible,
@@ -302,13 +308,20 @@ namespace TwoTrails.Mapping
                 }
             }
 
-            AdjPushpin.ToolTip = String.Format("{0}: {1:F3}, {2:F3}", Point.PID, AdjLocation.Latitude, AdjLocation.Longitude);
-            UnAdjPushpin.ToolTip = String.Format("{0}: {1:F3}, {2:F3}", Point.PID, UnAdjLocation.Latitude, UnAdjLocation.Longitude);
-
             LocationChanged?.Invoke(this);
         }
 
+        private void LoadUnAdjToolTip(Object sender, ToolTipEventArgs e)
+        {
+            if (UnAdjPushpin.ToolTip is string)
+                UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
+        }
 
+        private void LoadAdjToolTip(Object sender, ToolTipEventArgs e)
+        {
+            if (AdjPushpin.ToolTip is string)
+                AdjPushpin.ToolTip = new PointInfoBox(this, true);
+        }
 
         private void AdjPushpin_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

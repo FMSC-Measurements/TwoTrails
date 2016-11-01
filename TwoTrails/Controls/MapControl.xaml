@@ -22,7 +22,17 @@
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-        
+
+        <Style TargetType="ToolTip">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolTip">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </UserControl.Resources>
     <Grid Background="White">
         <Grid.ColumnDefinitions>
@@ -250,6 +260,6 @@
 
         <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Gray"/>
 
-        <map:Map Grid.Column="2" x:Name="map"/>
+        <map:Map Grid.Column="2" x:Name="map" Mode="Aerial"/>
     </Grid>
 </UserControl>

@@ -119,12 +119,12 @@ namespace TwoTrails.Utils
         }
 
 
-        public static TimeSpan GetPolyCreationPeriod(IList<TtPoint> points)
+        public static TimeSpan GetPolyCreationPeriod(IEnumerable<TtPoint> points)
         {
-            if (points.Count < 1)
+            if (!points.Any())
                 throw new Exception("No Points");
 
-            DateTime start = points[0].TimeCreated;
+            DateTime start = points.First().TimeCreated;
             DateTime end = start;
 
             foreach (TtPoint p in points)

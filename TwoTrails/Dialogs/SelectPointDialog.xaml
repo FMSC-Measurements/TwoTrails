@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails.Dialogs"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Title="Select Point" Height="300" Width="400">
     <Grid>

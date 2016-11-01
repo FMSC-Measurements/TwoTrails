@@ -43,6 +43,8 @@ namespace TwoTrails.Controls
             map.CredentialsProvider = new ApplicationIdCredentialsProvider(APIKeys.BING_MAPS_API_KEY);
 
             this.Loaded += MapControl_Loaded;
+
+            map.Mode = new AerialMode();
         }
 
         public MapControl(TtManager manager) : this()

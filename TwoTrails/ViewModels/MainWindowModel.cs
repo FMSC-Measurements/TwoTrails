@@ -392,7 +392,7 @@ namespace TwoTrails.ViewModels
 
         private void OpenSettings()
         {
-            //TODO settings
+            SettingsWindow.ShowDialog(Settings, MainWindow);
         }
     }
 }

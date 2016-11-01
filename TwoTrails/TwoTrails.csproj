@@ -142,16 +142,23 @@
       <DependentUpon>RetraceDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Mapping\MapExtensions.cs" />
+    <Compile Include="Mapping\PointInfoBox.xaml.cs">
+      <DependentUpon>PointInfoBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Mapping\TtMapManager.cs" />
     <Compile Include="Mapping\TtMapPath.cs" />
     <Compile Include="Mapping\TtMapPoint.cs" />
     <Compile Include="Mapping\TtMapPolygon.cs" />
     <Compile Include="Mapping\TtMapPolygonManager.cs" />
     <Compile Include="Mapping\TtMapShape.cs" />
+    <Compile Include="SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TtPolygonGraphicSettings.cs" />
     <Compile Include="TtTextWriterTraceListener.cs" />
     <Compile Include="TtWindow.cs" />
     <Compile Include="Utils\Export.cs" />
+    <Compile Include="Utils\Import.cs" />
     <Compile Include="Utils\TtGpxGenerator.cs" />
     <Compile Include="Utils\TtKmlGenerator.cs" />
     <Compile Include="Utils\TtShapeFileGenerator.cs" />
@@ -236,6 +243,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Mapping\PointInfoBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MapWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -257,6 +268,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Controls\ProjectInfoControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

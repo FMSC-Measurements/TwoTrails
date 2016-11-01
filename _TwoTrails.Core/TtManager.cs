@@ -525,11 +525,12 @@ namespace TwoTrails.Core
 
         private void Point_LocationChanged(TtPoint point)
         {
-            if (!IgnorePointEvents && point.IsGpsAtBase())
+            if (!IgnorePointEvents)
             {
                 lock (locker)
                 {
-                    AdjustAroundGpsPoint(point);
+                    if (point.IsGpsAtBase())
+                        AdjustAroundGpsPoint(point);
 
                     UpdatePolygonStats(point.Polygon); 
                 }
