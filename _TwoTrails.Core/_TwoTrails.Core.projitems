@@ -43,6 +43,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMetadataSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IPointSegment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IPolygonGraphicSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IReadOnlyTtDataLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtDataLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtSettings.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Points\WalkPoint.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\WayPoint.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PolygonCalculator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TtCoreUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TtHistoryManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TtManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\GroupType.cs" />

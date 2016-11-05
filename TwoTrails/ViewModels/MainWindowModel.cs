@@ -382,7 +382,7 @@ namespace TwoTrails.ViewModels
 
         private void ImportData()
         {
-
+            ImportDialog.ShowDialog(CurrentProject, MainWindow);
         }
 
         private void ExportProject()

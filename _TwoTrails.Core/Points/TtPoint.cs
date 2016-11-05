@@ -347,6 +347,10 @@ namespace TwoTrails.Core.Points
             _LinkedPoints.Remove(point.CN);
         }
 
+        public void ClearLinks()
+        {
+            _LinkedPoints.Clear();
+        }
 
 
         public void SetUnAdjLocation(double x, double y, double z)

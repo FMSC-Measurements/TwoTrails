@@ -447,7 +447,7 @@ namespace TwoTrails.Utils
         private static string Scrub(this string text)
         {
             if (text != null)
-                return text.Replace("\\", "\\\\").Replace("\"", "\\\"");
+                return text.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace(",", ";");
             return String.Empty;
         }   
 

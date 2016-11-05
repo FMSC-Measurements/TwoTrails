@@ -19,8 +19,6 @@ namespace TwoTrails.DAL
 {
     public class TtSqliteDataAccessLayer : ITtDataLayer
     {
-        private static String DATE_FORMAT = "M/d/yyyy h:mm:ss.SSS";
-
         public String FilePath { get; }
 
         private SQLiteDatabase database;
@@ -162,7 +160,7 @@ namespace TwoTrails.DAL
                             comment = dr.GetStringN(6);
                             op = (OpType)dr.GetInt32(7);
                             metacn = dr.GetString(8);
-                            time = ParseTime(dr.GetString(9));
+                            time = TtCoreUtils.ParseTime(dr.GetString(9));
 
                             adjx = dr.GetDouble(10);
                             adjy = dr.GetDouble(11);
@@ -513,7 +511,7 @@ namespace TwoTrails.DAL
                 [TwoTrailsSchema.PointSchema.Comment] = point.Comment,
                 [TwoTrailsSchema.PointSchema.Operation] = (int)point.OpType,
                 [TwoTrailsSchema.PointSchema.MetadataCN] = point.MetadataCN,
-                [TwoTrailsSchema.PointSchema.CreationTime] = point.TimeCreated.ToString(DATE_FORMAT),
+                [TwoTrailsSchema.PointSchema.CreationTime] = point.TimeCreated.ToString(Consts.DATE_FORMAT),
                 [TwoTrailsSchema.PointSchema.AdjX] = point.AdjX,
                 [TwoTrailsSchema.PointSchema.AdjY] = point.AdjY,
                 [TwoTrailsSchema.PointSchema.AdjZ] = point.AdjZ,
@@ -747,7 +745,7 @@ namespace TwoTrails.DAL
                             acc = dr.GetDouble(3);
                             inc = dr.GetInt32(4);
                             psi = dr.GetInt32(5);
-                            time = ParseTime(dr.GetString(6));
+                            time = TtCoreUtils.ParseTime(dr.GetString(6));
                             area = dr.GetDouble(7);
                             perim = dr.GetDouble(8);
 
@@ -1556,7 +1554,7 @@ namespace TwoTrails.DAL
                         {
                             bursts.Add(new TtNmeaBurst(
                                 dr.GetString(0),
-                                ParseTime(dr.GetString(3)),
+                                TtCoreUtils.ParseTime(dr.GetString(3)),
                                 dr.GetString(1),
                                 dr.GetBoolean(2),
                                 new GeoPosition(
@@ -1564,7 +1562,7 @@ namespace TwoTrails.DAL
                                     dr.GetDouble(7), (EastWest)dr.GetInt32(8),
                                     dr.GetDouble(9), (UomElevation)dr.GetInt32(10)
                                 ),
-                                ParseTime(dr.GetString(4)),
+                                TtCoreUtils.ParseTime(dr.GetString(4)),
                                 dr.GetDouble(22),
                                 dr.GetDouble(23),
                                 dr.GetDouble(11), (EastWest)dr.GetInt32(12),
@@ -1752,8 +1750,8 @@ namespace TwoTrails.DAL
             {
                 [TwoTrailsSchema.SharedSchema.CN] = burst.CN,
                 [TwoTrailsSchema.TtNmeaSchema.Used] = burst.IsUsed,
-                [TwoTrailsSchema.TtNmeaSchema.TimeCreated] = burst.TimeCreated.ToString(DATE_FORMAT),
-                [TwoTrailsSchema.TtNmeaSchema.FixTime] = burst.FixTime.ToString(DATE_FORMAT),
+                [TwoTrailsSchema.TtNmeaSchema.TimeCreated] = burst.TimeCreated.ToString(Consts.DATE_FORMAT),
+                [TwoTrailsSchema.TtNmeaSchema.FixTime] = burst.FixTime.ToString(Consts.DATE_FORMAT),
                 [TwoTrailsSchema.TtNmeaSchema.Latitude] = burst.Latitude,
                 [TwoTrailsSchema.TtNmeaSchema.LatDir] = (int)burst.LatDir,
                 [TwoTrailsSchema.TtNmeaSchema.Longitude] = burst.Longitude,
@@ -1809,7 +1807,7 @@ namespace TwoTrails.DAL
                             forest = dr.GetString(2);
                             region = dr.GetString(3);
                             deviceID = dr.GetString(4);
-                            date = ParseTime(dr.GetString(5));
+                            date = TtCoreUtils.ParseTime(dr.GetString(5));
                             desc = dr.GetString(6);
                             dbVersion = new Version(dr.GetString(7));
                             version = dr.GetString(8);
@@ -1976,7 +1974,7 @@ namespace TwoTrails.DAL
                             mt = (MediaType)dr.GetInt32(2);
                             name = dr.GetString(3);
                             file = dr.GetStringN(4);
-                            date = ParseTime(dr.GetString(5));
+                            date = TtCoreUtils.ParseTime(dr.GetString(5));
                             cmt = dr.GetStringN(6);
 
                             pt = (PictureType)dr.GetInt32(7);
@@ -2101,7 +2099,7 @@ namespace TwoTrails.DAL
                 [TwoTrailsSchema.MediaSchema.Name] = media.Name,
                 [TwoTrailsSchema.MediaSchema.FilePath] = media.FilePath,
                 [TwoTrailsSchema.MediaSchema.Comment] = media.Comment,
-                [TwoTrailsSchema.MediaSchema.CreationTime] = media.TimeCreated.ToString(DATE_FORMAT),
+                [TwoTrailsSchema.MediaSchema.CreationTime] = media.TimeCreated.ToString(Consts.DATE_FORMAT),
                 [TwoTrailsSchema.MediaSchema.MediaType] = (int)media.MediaType,
                 [TwoTrailsSchema.MediaSchema.PointCN] = media.PointCN
             };
@@ -2334,7 +2332,7 @@ namespace TwoTrails.DAL
                         {
                             username = dr.GetString(0);
                             devicename = dr.GetString(1);
-                            date = ParseTime(dr.GetString(2));
+                            date = TtCoreUtils.ParseTime(dr.GetString(2));
                             dat = (DataActivityType)dr.GetInt32(3);
 
                             activity.Add(new TtUserActivity(username, devicename, date, dat));
@@ -2358,19 +2356,6 @@ namespace TwoTrails.DAL
         public bool Clean()
         {
             throw new NotImplementedException();
-        }
-
-
-        private DateTime ParseTime(String value)
-        {
-            try
-            {
-                return DateTime.Parse(value);
-            }
-            catch
-            {
-                return DateTime.ParseExact(value, DATE_FORMAT, CultureInfo.InvariantCulture);
-            }
         }
         #endregion
     }

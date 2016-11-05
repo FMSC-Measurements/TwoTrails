@@ -6,12 +6,11 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.DAL
 {
-    public interface ITtDataLayer
+    public interface ITtDataLayer : IReadOnlyTtDataLayer
     {
         String FilePath { get; }
 
         #region Points
-        List<TtPoint> GetPoints(String polyCN = null);
         List<TtPoint> GetPointsUnlinked(String polyCN = null);
 
         bool InsertPoint(TtPoint point);
@@ -28,10 +27,6 @@ namespace TwoTrails.DAL
 
 
         #region Polygons
-        bool HasPolygons();
-
-        List<TtPolygon> GetPolygons();
-
         bool InsertPolygon(TtPolygon polygon);
         int InsertPolygons(IEnumerable<TtPolygon> polygons);
 
@@ -44,8 +39,6 @@ namespace TwoTrails.DAL
 
 
         #region Metadata
-        List<TtMetadata> GetMetadata();
-
         bool InsertMetadata(TtMetadata metadata);
         int InsertMetadata(IEnumerable<TtMetadata> metadata);
 
@@ -58,8 +51,6 @@ namespace TwoTrails.DAL
 
 
         #region Groups
-        List<TtGroup> GetGroups();
-
         bool InsertGroup(TtGroup group);
         int InsertGroups(IEnumerable<TtGroup> groups);
 
@@ -72,8 +63,6 @@ namespace TwoTrails.DAL
 
 
         #region TTNmeaBurst
-        List<TtNmeaBurst> GetNmeaBursts(String pointCN = null);
-
         bool InsertNmeaBurst(TtNmeaBurst burst);
         int InsertNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
         
@@ -85,7 +74,6 @@ namespace TwoTrails.DAL
 
 
         #region Project
-        TtProjectInfo GetProjectInfo();
         Version GetDataVersion();
         bool InsertProjectInfo(TtProjectInfo properties);
         bool UpdateProjectInfo(TtProjectInfo properties);
@@ -93,8 +81,6 @@ namespace TwoTrails.DAL
 
 
         #region Polygon Attributes
-        List<PolygonGraphicOptions> GetPolygonGraphicOptions();
-
         bool InsertPolygonGraphicOption(PolygonGraphicOptions option);
 
         bool DeletePolygonGraphicOption(PolygonGraphicOptions option);
@@ -102,8 +88,6 @@ namespace TwoTrails.DAL
 
 
         #region Media
-        List<TtImage> GetPictures(String pointCN);
-
         bool InsertMedia(TtMedia media);
 
         bool UpdateMedia(TtMedia media);
@@ -114,13 +98,10 @@ namespace TwoTrails.DAL
 
         #region Activity
         void InsertActivity(TtUserActivity activity);
-        List<TtUserActivity> GetUserActivity();
         #endregion
 
 
         #region Util
-        bool RequiresUpgrade { get; }
-
         bool Duplicate(ITtDataLayer dataLayer);
 
         bool Clean();

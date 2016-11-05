@@ -22,6 +22,9 @@ namespace FMSC.Core
                 case "degrees": return Slope.Degrees;
             }
 
+            if (value.Length > 2 && value.Contains(" "))
+                return ParseSlope(value.Split(' ')[0]);
+
             throw new Exception("Unknown Slope Type");
         }
     }

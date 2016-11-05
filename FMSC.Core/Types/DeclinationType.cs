@@ -22,6 +22,9 @@ namespace FMSC.Core
                 case "deedrot": return DeclinationType.DeedRot;
             }
 
+            if (value.Length > 2 && value.Contains(" "))
+                return ParseDeclinationType(value.Split(' ')[0]);
+
             throw new Exception("Unknown DeclinationType");
         }
     }

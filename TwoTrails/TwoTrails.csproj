@@ -132,6 +132,9 @@
     <Compile Include="Dialogs\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ImportDialog.xaml.cs">
+      <DependentUpon>ImportDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\PointLocManipDialog.xaml.cs">
       <DependentUpon>PointLocManipDialog.xaml</DependentUpon>
     </Compile>
@@ -178,6 +181,7 @@
       <DependentUpon>SelectPointDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\ExportProjectModel.cs" />
+    <Compile Include="ViewModels\ImportModel.cs" />
     <Compile Include="ViewModels\MainWindowModel.cs" />
     <Compile Include="Tabs\MapTab.cs" />
     <Compile Include="MapWindow.xaml.cs">
@@ -220,6 +224,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ExportDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ImportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

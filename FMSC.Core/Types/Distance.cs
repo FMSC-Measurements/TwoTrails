@@ -48,6 +48,9 @@ namespace FMSC.Core
                 case "yards": return Distance.Yards;
             }
 
+            if (value.Length > 2 && value.Contains(" "))
+                return ParseDistance(value.Split(' ')[0]);
+
             throw new Exception("Unknown Distance Type");
         }
     }
