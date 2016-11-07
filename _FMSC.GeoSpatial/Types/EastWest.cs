@@ -20,5 +20,25 @@ namespace FMSC.GeoSpatial
 
             throw new ArgumentException();
         }
+
+        public static EastWest Parse(string value)
+        {
+            switch (value.ToLower())
+            {
+                case "0":
+                case "e":
+                case "east": return EastWest.East;
+                case "1":
+                case "w":
+                case "west": return EastWest.West;
+            }
+
+            string[] split = value.Split(' ');
+            if (split.Length > 1)
+                return Parse(split[0]);
+
+            throw new Exception("Unknown EastWest");
+        }
     }
+
 }

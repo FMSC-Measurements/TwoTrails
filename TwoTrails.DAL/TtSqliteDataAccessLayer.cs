@@ -714,7 +714,25 @@ namespace TwoTrails.DAL
         #region Get Polygons
         public bool HasPolygons()
         {
-            throw new NotImplementedException();
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = database.ExecuteReader(String.Format("select count(*) from {0}", TwoTrailsSchema.PolygonSchema.TableName), conn))
+                {
+                    if (dr != null)
+                    {
+                        if (dr.Read())
+                        {
+                            return dr.GetInt32(0) > 0;
+                        }
+
+                        dr.Close();
+                    }
+                }
+
+                conn.Close();
+            }
+
+            throw new Exception("Unable to get polygon count.");
         }
 
         public List<TtPolygon> GetPolygons()

@@ -68,7 +68,7 @@ namespace TwoTrails.Core
 
                     StringBuilder sb = new StringBuilder();
 
-                    if (polygon.Area > Consts.MINIMUM_POINT_ACCURACY)
+                    if (polygon.Area > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
                         sb.AppendFormat("The polygon area is: {0:0.00} Ha ({1:0} ac).{2}",
                             Math.Round(polygon.AreaHectaAcres, 2),
@@ -81,7 +81,7 @@ namespace TwoTrails.Core
                             Environment.NewLine);
                     }
 
-                    if (TotalGpsError > Consts.MINIMUM_POINT_ACCURACY)
+                    if (TotalGpsError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
                         sb.AppendFormat("GPS Contribution: {0:0.00} Ha ({1:0.00} ac){2}",
                             Math.Round(FMSC.Core.Convert.MetersSquaredToHa(TotalGpsError), 2),
@@ -93,7 +93,7 @@ namespace TwoTrails.Core
                             Environment.NewLine);
                     }
 
-                    if (TotalTraverseError > Consts.MINIMUM_POINT_ACCURACY)
+                    if (TotalTraverseError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
                         sb.AppendFormat("Traverse Contribution: {0:0.00} Ha ({0:1.00} ac){2}",
                             Math.Round(FMSC.Core.Convert.MetersSquaredToHa(TotalTraverseError), 2),
@@ -256,7 +256,7 @@ namespace TwoTrails.Core
         {
             double closeError = MathEx.Distance(_LastTtPoint.UnAdjX, _LastTtPoint.UnAdjY, point.UnAdjX, point.UnAdjY);
 
-            double travError = closeError < Consts.MINIMUM_POINT_ACCURACY ? Double.PositiveInfinity : travLength / closeError;
+            double travError = closeError < Consts.MINIMUM_POINT_DIGIT_ACCURACY ? Double.PositiveInfinity : travLength / closeError;
 
             sbPoints.AppendFormat("   Traverse Total Segments: {0}{1}", travSegments, Environment.NewLine);
             sbPoints.AppendFormat("   Traverse Total Distance: {0:0.##} feet.{1}", Math.Round(FMSC.Core.Convert.ToFeetTenths(travLength, Distance.Meters), 2), Environment.NewLine);
