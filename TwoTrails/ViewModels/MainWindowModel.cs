@@ -204,24 +204,45 @@ namespace TwoTrails.ViewModels
             {
                 if (!_Projects.Keys.Contains(filePath, StringComparer.InvariantCultureIgnoreCase))
                 {
-                    try
+                    if (filePath.EndsWith(".tt"))
                     {
-                        TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
-                        Trace.WriteLine(String.Format("DAL Opened ({1}): {0}", dal.FilePath, dal.GetDataVersion()));
+                        try
+                        {
+                            TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
+                            Trace.WriteLine(String.Format("DAL Opened ({1}): {0}", dal.FilePath, dal.GetDataVersion()));
 
-                        if (dal.RequiresUpgrade)
-                        {
-                            Trace.WriteLine("DAL Requires Upgrade");
-                            //ask to upgrade
+                            if (dal.RequiresUpgrade)
+                            {
+                                Trace.WriteLine("DAL Requires Upgrade");
+                                //ask to upgrade
+                            }
+                            else
+                            {
+                                AddProject(new TtProject(dal, Settings, this));
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            AddProject(new TtProject(dal, Settings, this));
+                            Trace.WriteLine(ex.Message, "MWM:OpenProject");
                         }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Trace.WriteLine(ex.Message, "MWM:OpenProject");
+                        if (filePath.EndsWith(".tt2"))
+                        {
+                            TtV2SqliteDataAccessLayer dal = new TtV2SqliteDataAccessLayer(filePath);
+
+                            TtProjectInfo info = dal.GetProjectInfo();
+
+                            if (dal.RequiresUpgrade)
+                            {
+                                MessageBox.Show("This is file is too old to upgrade. Please Upgrade it with TwoTrails V2 before upgrading it here.", "Too old to upgrade.", MessageBoxButton.OK, MessageBoxImage.Stop);
+                            }
+                            else
+                            {
+                                //todo upgrade .tt2 files
+                            }
+                        }
                     }
                 }
                 else

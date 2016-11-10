@@ -42,7 +42,7 @@ namespace TwoTrails
 
             if (files != null && files.Length > 0)
             {
-                foreach (string file in files.Where(f => f.EndsWith(".tt")))
+                foreach (string file in files)
                 {
                     MainModel.OpenProject(file);
                 }

@@ -113,6 +113,9 @@ namespace TwoTrails.Core.Points
             _Elevation = elev;
             _ManualAccuracy = manacc;
             _RMSEr = rmser;
+
+            if (_AdjX != _UnAdjX || _AdjY != _UnAdjY || _AdjZ != _UnAdjZ)
+                SetUnAdjLocation(_UnAdjX, _UnAdjY, _UnAdjZ);
         }
 
         private void CopyGpsValues(GpsPoint point)

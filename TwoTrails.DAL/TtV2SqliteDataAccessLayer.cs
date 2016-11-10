@@ -1,6 +1,7 @@
 ﻿using CSUtil.Databases;
 using FMSC.Core;
 using FMSC.GeoSpatial;
+using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.GeoSpatial.Types;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,16 @@ namespace TwoTrails.DAL
     {
         public String FilePath { get; }
 
-        public Boolean RequiresUpgrade { get { return GetDataVersion() < TwoTrailsV2Schema.RequiredSchemaVersion; } }
+        private Version _Version;
+        public Boolean RequiresUpgrade
+        {
+            get
+            {
+                if (_Version == null)
+                    _Version = GetDataVersion();
+                return _Version < TwoTrailsV2Schema.RequiredSchemaVersion;
+            }
+        }
 
         private SQLiteDatabase database;
 
@@ -38,8 +48,6 @@ namespace TwoTrails.DAL
 
         public Version GetDataVersion()
         {
-            CheckVersion();
-
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
                 using (SQLiteDataReader dr = database.ExecuteReader(
@@ -428,7 +436,7 @@ namespace TwoTrails.DAL
 
                         while (dr.Read())
                         {
-
+                            //todo clean up
                             string cn = dr.GetString(0);
                             string pointcn = dr.GetString(1);
                             bool used = dr.GetBoolean(2);
@@ -440,34 +448,57 @@ namespace TwoTrails.DAL
                             double elev = dr.GetDouble(8);
                             UomElevation elevType = UomElevationExtensions.Parse(dr.GetString(9));
 
-                            //todo finish get nmea
+                            double magVar = dr.GetDouble(10);
+                            EastWest magVarDir = EastWestExtentions.Parse(dr.GetString(11));
 
-                            //bursts.Add(new TtNmeaBurst(
-                            //    cn,
-                            //    time,
-                            //    pointCN,
-                            //    used,
-                            //    //time
-                            //    new GeoPosition(
-                            //        lat, latdir,
-                            //        lon, londir,
-                            //        elev, elevType
-                            //    ),
-                            //    time,
-                            //    dr.GetDouble(22),
-                            //    dr.GetDouble(23),
-                            //    dr.GetDouble(11), (EastWest)dr.GetInt32(12),
-                            //    (Mode)dr.GetInt32(15), (Fix)dr.GetInt32(13),
-                            //    ParseIds(dr.GetStringN(27)),
-                            //    dr.GetDouble(16),
-                            //    dr.GetDouble(17),
-                            //    dr.GetDouble(18),
-                            //    (GpsFixType)dr.GetInt32(14),
-                            //    dr.GetInt32(25),
-                            //    dr.GetDouble(19),
-                            //    dr.GetDouble(20), (UomElevation)dr.GetInt32(21),
-                            //    dr.GetInt32(26)
-                            //));
+                            GpsFixType fixType = (GpsFixType)(dr.GetInt32N(12)??0);
+                            Fix fix = (Fix)(dr.GetInt32(13) - 1);
+                            Mode mode = (Mode)dr.GetInt32(14);
+
+                            double pdop = dr.GetDouble(15);
+                            double hdop = dr.GetDouble(16);
+                            double vdop = dr.GetDouble(17);
+
+                            double geoidHeight = dr.GetDouble(18);
+                            double horizDo = dr.GetDouble(19);
+                            UomElevation geoidType = UomElevationExtensions.Parse(dr.GetString(20));
+
+                            double speed = dr.GetDouble(21);
+                            double trackAngle = dr.GetDouble(22);
+
+                            int satsUsed = dr.GetInt32(23);
+                            int satCount = dr.GetInt32(24);
+
+                            string prns = dr.GetString(25);
+
+                            bursts.Add(new TtNmeaBurst(
+                                cn,
+                                time,
+                                pointCN,
+                                used,
+                                new GeoPosition(
+                                    lat, latdir,
+                                    lon, londir,
+                                    elev, elevType
+                                ),
+                                time,
+                                speed,
+                                trackAngle,
+                                magVar,
+                                magVarDir,
+                                mode,
+                                fix,
+                                ParseIds(prns),
+                                pdop,
+                                hdop,
+                                vdop,
+                                fixType,
+                                0,
+                                horizDo,
+                                geoidHeight,
+                                geoidType,
+                                satCount
+                            ));
                         }
 
                         dr.Close();
@@ -485,7 +516,47 @@ namespace TwoTrails.DAL
         {
             CheckVersion();
 
-            throw new NotImplementedException();
+            String query = String.Format("SELECT {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7} from {8}",
+                TwoTrailsV2Schema.ProjectInfoSchema.ID,
+                TwoTrailsV2Schema.ProjectInfoSchema.Description,
+                TwoTrailsV2Schema.ProjectInfoSchema.Region,
+                TwoTrailsV2Schema.ProjectInfoSchema.Forest,
+                TwoTrailsV2Schema.ProjectInfoSchema.District,
+                TwoTrailsV2Schema.ProjectInfoSchema.TtVersion,
+                TwoTrailsV2Schema.ProjectInfoSchema.DeviceID,
+                TwoTrailsV2Schema.ProjectInfoSchema.Year,
+                TwoTrailsV2Schema.ProjectInfoSchema.TableName);
+
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                {
+                    if (dr != null)
+                    {
+                        if (dr.Read())
+                        {
+                            string year = dr.GetStringN(7);
+                            return new TtProjectInfo(
+                                dr.GetStringN(0),
+                                dr.GetStringN(1),
+                                dr.GetStringN(2),
+                                dr.GetStringN(3),
+                                dr.GetStringN(4),
+                                dr.GetStringN(5),
+                                dr.GetStringN(5),
+                                GetDataVersion(),
+                                dr.GetString(6),
+                                new DateTime(year != null ? int.Parse(year) : DateTime.Now.Year, 1, 1));
+                        }
+
+                        dr.Close();
+                    }
+                }
+
+                conn.Close();
+            }
+
+            throw new Exception("No Project Information");
         }
 
 
