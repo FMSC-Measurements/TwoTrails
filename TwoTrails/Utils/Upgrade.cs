@@ -11,50 +11,61 @@ namespace TwoTrails.Utils
 {
     public static class Upgrade
     {
-        public static void DAL(ITtDataLayer cDal, ITtSettings settings, TtV2SqliteDataAccessLayer dal)
+        public static void DAL(ITtDataLayer ndal, ITtSettings settings, TtV2SqliteDataAccessLayer odal)
         {
             TtUserActivity activity = new TtUserActivity("Upgrader", settings.DeviceName);
-
-            List<TtMetadata> meta = dal.GetMetadata();
+            
+            List<TtMetadata> meta = odal.GetMetadata();
             if (meta.Any())
             {
-                cDal.InsertMetadata(meta);
+                ndal.InsertMetadata(meta);
                 activity.UpdateActivity(DataActivityType.InsertedMetadata);
             }
 
-            List<TtGroup> groups = dal.GetGroups();
+            List<TtGroup> groups = odal.GetGroups();
             if (groups.Any())
             {
-                cDal.InsertGroups(groups);
+                ndal.InsertGroups(groups);
                 activity.UpdateActivity(DataActivityType.InsertedGroups);
             }
 
-            List<TtPolygon> polys = dal.GetPolygons();
+            DateTime time = ndal.GetProjectInfo().CreationDate;
+            IEnumerable<TtPolygon> polys = odal.GetPolygons().Select(
+                    poly => {
+                        time = time.AddHours(1);
+                        poly.TimeCreated = time;
+
+                        return poly;
+                    });
+
             if (polys.Any())
             {
-                cDal.InsertPolygons(polys);
+                ndal.InsertPolygons(polys);
                 activity.UpdateActivity(DataActivityType.InsertedPolygons);
+
+                List<TtPoint> points = new List<TtPoint>();
+
+                foreach (TtPolygon poly in polys)
+                {
+                    points.AddRange(odal.GetPointsUnlinked(poly.CN));
+                }
+
+                if (points.Any())
+                {
+                    ndal.InsertPoints(points);
+                    activity.UpdateActivity(DataActivityType.InsertedPoints);
+                }
             }
 
-            List<TtPoint> points = dal.GetPoints();
-            if (points.Any())
-            {
-                cDal.InsertPoints(points);
-                activity.UpdateActivity(DataActivityType.InsertedPoints);
-            }
-
-            List<TtNmeaBurst> nmea = dal.GetNmeaBursts();
+            List<TtNmeaBurst> nmea = odal.GetNmeaBursts();
             if (nmea.Any())
             {
-                cDal.InsertNmeaBursts(nmea);
+                ndal.InsertNmeaBursts(nmea);
             }
 
-            cDal.UpdateProjectInfo(dal.GetProjectInfo());
-            activity.UpdateActivity(DataActivityType.ModifiedProject);
+            ndal.InsertActivity(activity);
 
-            cDal.InsertActivity(activity);
-
-            TtManager manger = new TtManager(cDal, settings);
+            TtManager manger = new TtManager(ndal, settings);
 
             manger.RecalculatePolygons();
             manger.Save();

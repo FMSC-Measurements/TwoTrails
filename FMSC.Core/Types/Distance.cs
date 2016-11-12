@@ -33,7 +33,9 @@ namespace FMSC.Core
             switch (value.ToLower())
             {
                 case "0":
+                case "ft":
                 case "ftt":
+                case "feet":
                 case "feettenths": return Distance.FeetTenths;
                 case "1":
                 case "m":

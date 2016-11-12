@@ -27,16 +27,29 @@ namespace TwoTrails.DAL
 
         private TtProjectInfo _ProjectInfo;
 
+        private ParseOptions _Options;
+        private bool parsed;
+        private int hoursInc = 0;
 
 
         public TtCsvDataAccessLayer(ParseOptions options)
         {
-            ParseProject(options.ProjectFile);
-            ParsePolygons(options.PolygonsFile);
-            ParseMetadata(options.MetadataFile);
-            ParseGroups(options.GroupsFile);
-            ParseNmea(options.NmeaFile);
-            ParsePoints(options.PointsFile, options.PointMapping, options.UseAdvParsing);
+            _Options = options;
+        }
+
+        private void Parse()
+        {
+            if (!parsed)
+            {
+                ParseProject(_Options.ProjectFile);
+                ParsePolygons(_Options.PolygonsFile);
+                ParseMetadata(_Options.MetadataFile);
+                ParseGroups(_Options.GroupsFile);
+                ParseNmea(_Options.NmeaFile);
+                ParsePoints(_Options.PointsFile, _Options.PointMapping, _Options.UseAdvParsing);
+
+                parsed = true;
+            }
         }
 
 
@@ -109,14 +122,14 @@ namespace TwoTrails.DAL
             reader.Read();
 
             TtPoint prevPoint = null;
-
+            
             while (reader.Read())
             {
                 TtPoint point;
 
                 if (useAdvParsing)
                 {
-                    OpType op = (OpType)reader.GetField<int>(fOp);
+                    OpType op = TtTypes.ParseOpType(reader.GetField<string>(fOp));
 
                     point = TtCoreUtils.GetPointByType(op);
 
@@ -128,15 +141,15 @@ namespace TwoTrails.DAL
 
                         if (hasLatLon)
                         {
-                            gps.Latitude = reader.GetField<double>(fLat);
-                            gps.Longitude = reader.GetField<double>(fLon);
+                            gps.Latitude = reader.GetField<double?>(fLat);
+                            gps.Longitude = reader.GetField<double?>(fLon);
                         }
 
                         if (hasElevation)
-                            gps.Elevation = reader.GetField<double>(fElev);
+                            gps.Elevation = reader.GetField<double?>(fElev);
 
                         if (hasRMSEr)
-                            gps.RMSEr = reader.GetField<double>(fRmser);
+                            gps.RMSEr = reader.GetField<double?>(fRmser);
 
                     }
                     else if (point.IsTravType())
@@ -202,7 +215,8 @@ namespace TwoTrails.DAL
                             Name = hasPolyNames ?
                                 reader.GetField<string>(fPolyName) :
                                 String.Format("Poly {0}", _Polygons.Count + 1),
-                            PointStartIndex = _Polygons.Count * 1000 + 1010
+                            PointStartIndex = _Polygons.Count * 1000 + 1010,
+                            TimeCreated = _ProjectInfo.CreationDate.AddHours(++hoursInc)
                         };
 
                         _Polygons.Add(cn, poly);
@@ -221,7 +235,8 @@ namespace TwoTrails.DAL
                         TtPolygon poly = new TtPolygon()
                         {
                             Name = reader.GetField<string>(fPolyName),
-                            PointStartIndex = _Polygons.Count * 1000 + 1010
+                            PointStartIndex = _Polygons.Count * 1000 + 1010,
+                            TimeCreated = _ProjectInfo.CreationDate.AddHours(++hoursInc)
                         };
 
                         _Polygons.Add(poly.CN, poly);
@@ -344,7 +359,7 @@ namespace TwoTrails.DAL
 
                 if (hasComment)
                     point.Comment = reader.GetField<string>(fCmt);
-                
+
                 _Points.Add(point.CN, point);
 
                 prevPoint = point;
@@ -401,6 +416,8 @@ namespace TwoTrails.DAL
 
         private void ParseProject(string filePath)
         {
+            filePath = filePath ?? "test.csv";
+
             //TODO Parse Project
             _ProjectInfo = new TtProjectInfo(Path.GetFileName(filePath),
                 String.Empty,
@@ -420,36 +437,50 @@ namespace TwoTrails.DAL
 
         public List<TtPoint> GetPoints(String polyCN = null)
         {
-            return (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p).ToList();
+            Parse();
+
+            return (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index).ToList();
         }
 
         public bool HasPolygons()
         {
+            Parse();
+
             return _Polygons.Count > 0;
         }
 
         public List<TtPolygon> GetPolygons()
         {
+            Parse();
+
             return _Polygons.Values.ToList();
         }
 
         public List<TtMetadata> GetMetadata()
         {
+            Parse();
+
             return _Metadata.Values.ToList();
         }
 
         public List<TtGroup> GetGroups()
         {
+            Parse();
+
             return _Groups.Values.ToList();
         }
 
         public List<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
         {
+            Parse();
+
             return (pointCN == null ? _Nmea.Values : _Nmea.Values.Where(n => n.PointCN == pointCN)).OrderBy(n => n.TimeCreated).ToList();
         }
 
         public TtProjectInfo GetProjectInfo()
         {
+            Parse();
+
             return new TtProjectInfo(_ProjectInfo);
         }
 

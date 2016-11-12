@@ -336,7 +336,7 @@ namespace TwoTrails.Utils
                 sb.Append("Latitude,");
                 sb.Append("Longitude,");
                 sb.Append("Elevation,");
-                sb.Append("ElveUom,");
+                sb.Append("ElevUom,");
 
                 sb.Append("MagVar,");
                 sb.Append("MagVarDir,");

@@ -95,7 +95,7 @@ namespace TwoTrails.DAL
                 TwoTrailsV2Schema.MetaDataSchema.UomElevation,    //11
                 TwoTrailsV2Schema.MetaDataSchema.UomSlope,        //12
                 TwoTrailsV2Schema.MetaDataSchema.UtmZone,         //13
-                TwoTrailsV2Schema.GroupSchema.TableName);
+                TwoTrailsV2Schema.MetaDataSchema.TableName);
 
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
@@ -203,17 +203,22 @@ namespace TwoTrails.DAL
 
         public List<TtPoint> GetPoints(String polyCN = null)
         {
-            return GetPoints(polyCN != null ? String.Format("{0} = '{1}'", TwoTrailsV2Schema.PointSchema.PolyCN, polyCN) : null);
+            return GetTtPoints(polyCN != null ? String.Format("{0} = '{1}'", TwoTrailsV2Schema.PointSchema.PolyCN, polyCN) : null);
         }
 
-        private List<TtPoint> GetPoints(String where = null, int limit = 0)
+        public List<TtPoint> GetPointsUnlinked(String polyCN = null)
+        {
+            return GetTtPoints(polyCN != null ? String.Format("{0} = '{1}'", TwoTrailsV2Schema.PointSchema.PolyCN, polyCN) : null, false);
+        }
+
+        private List<TtPoint> GetTtPoints(String where = null, bool linkPoints = true, int limit = 0)
         {
             CheckVersion();
             {
                 List<TtPoint> points = new List<TtPoint>();
 
                 String query = String.Format(@"select {0}.{1}, {2}, {3}, {4} from {0} left join {5} on {5}.{8} = {0}.{8} 
- left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9}{10} order by {11} asc",
+ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order by {10} asc{11}",
                     TwoTrailsV2Schema.PointSchema.TableName,              //0
                     TwoTrailsV2Schema.PointSchema.SelectItems,            //1
                     TwoTrailsV2Schema.GpsPointSchema.SelectItemsNoCN,     //2
@@ -223,9 +228,9 @@ namespace TwoTrails.DAL
                     TwoTrailsV2Schema.TravPointSchema.TableName,          //6
                     TwoTrailsV2Schema.QuondamPointSchema.TableName,       //7
                     TwoTrailsV2Schema.SharedSchema.CN,                    //8
-                    where != null ? String.Format(" {0}", where) : String.Empty,
-                    limit > 0 ? String.Format(" limit {0}", limit) : String.Empty,
-                    TwoTrailsV2Schema.PointSchema.Order
+                    where != null ? String.Format(" where {0}", where) : String.Empty,
+                    TwoTrailsV2Schema.PointSchema.Order,
+                    limit > 0 ? String.Format(" limit {0}", limit) : String.Empty
                 );
 
                 using (SQLiteConnection conn = database.CreateAndOpenConnection())
@@ -254,9 +259,9 @@ namespace TwoTrails.DAL
                                 pid = dr.GetInt32(2);
                                 polycn = dr.GetString(3);
                                 groupcn = dr.GetString(4);
-                                onbnd = dr.GetBoolean(5);
+                                onbnd = Boolean.Parse(dr.GetString(5));
                                 comment = dr.GetStringN(6);
-                                op = (OpType)dr.GetInt32(7);
+                                op = TtTypes.ParseOpType(dr.GetString(7));
                                 metacn = dr.GetString(8);
                                 time = TtCoreUtils.ParseTime(dr.GetString(9));
 
@@ -333,10 +338,14 @@ namespace TwoTrails.DAL
                                     point = new QuondamPoint(cn, index, pid, time, polycn, metacn, groupcn,
                                                     comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
                                                     Consts.DEFAULT_POINT_ACCURACY, qlinks, pcn, manacc);
-                                    
-                                    QuondamPoint qp = point as QuondamPoint;
-                                    List<TtPoint> pps = GetPoints(String.Format("", qp.ParentPointCN), 1);
-                                    qp.ParentPoint = pps.Any() ? pps.First() : null;
+
+                                    if (linkPoints)
+                                    {
+                                        QuondamPoint qp = point as QuondamPoint;
+                                        List<TtPoint> pps = GetTtPoints(String.Format("{0}.CN = '{1}'",
+                                            TwoTrailsV2Schema.PointSchema.TableName, qp.ParentPointCN), false, 1);
+                                        qp.ParentPoint = pps.Any() ? pps.First() : null; 
+                                    }
                                 }
 
                                 points.Add(point);
@@ -451,9 +460,9 @@ namespace TwoTrails.DAL
                             double magVar = dr.GetDouble(10);
                             EastWest magVarDir = EastWestExtentions.Parse(dr.GetString(11));
 
-                            GpsFixType fixType = (GpsFixType)(dr.GetInt32N(12)??0);
-                            Fix fix = (Fix)(dr.GetInt32(13) - 1);
-                            Mode mode = (Mode)dr.GetInt32(14);
+                            GpsFixType fixType = (GpsFixType)(dr.GetInt32(13)); //original file type had wrong field name
+                            Mode mode = (Mode)(dr.GetInt32N(12) ?? 0);
+                            Fix fix = (Fix)(dr.GetInt32(14) - 1);               //converts from real value
 
                             double pdop = dr.GetDouble(15);
                             double hdop = dr.GetDouble(16);
@@ -474,7 +483,7 @@ namespace TwoTrails.DAL
                             bursts.Add(new TtNmeaBurst(
                                 cn,
                                 time,
-                                pointCN,
+                                pointcn,
                                 used,
                                 new GeoPosition(
                                     lat, latdir,

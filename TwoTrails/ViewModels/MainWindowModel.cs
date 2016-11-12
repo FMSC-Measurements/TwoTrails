@@ -17,6 +17,7 @@ using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
 using TwoTrails.Dialogs;
+using TwoTrails.Utils;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.ViewModels
@@ -230,17 +231,51 @@ namespace TwoTrails.ViewModels
                     {
                         if (filePath.EndsWith(".tt2"))
                         {
-                            TtV2SqliteDataAccessLayer dal = new TtV2SqliteDataAccessLayer(filePath);
+                            TtV2SqliteDataAccessLayer dalv2 = new TtV2SqliteDataAccessLayer(filePath);
 
-                            TtProjectInfo info = dal.GetProjectInfo();
-
-                            if (dal.RequiresUpgrade)
+                            if (dalv2.RequiresUpgrade)
                             {
-                                MessageBox.Show("This is file is too old to upgrade. Please Upgrade it with TwoTrails V2 before upgrading it here.", "Too old to upgrade.", MessageBoxButton.OK, MessageBoxImage.Stop);
+                                MessageBox.Show(@"This TwoTrails V2 file is too old to upgrade. 
+Please Upgrade it with TwoTrails V2 before upgrading it here.", "Too old to upgrade",
+                                    MessageBoxButton.OK, MessageBoxImage.Stop);
                             }
                             else
                             {
-                                //todo upgrade .tt2 files
+                                if (MessageBox.Show(@"This is a TwoTrails V2 file that needs to be upgraded. 
+Would you like to upgrade it now?", "Upgrade TwoTrails file",
+                                    MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
+                                {
+                                    TtProjectInfo oinfo = dalv2.GetProjectInfo();
+                                    TtProjectInfo info = new TtProjectInfo(
+                                        oinfo.Name,
+                                        oinfo.Description,
+                                        oinfo.Region,
+                                        oinfo.Forest,
+                                        oinfo.District,
+                                        AppInfo.Version.ToString(),
+                                        oinfo.CreationVersion,
+                                        TwoTrailsSchema.SchemaVersion,
+                                        oinfo.CreationDeviceID,
+                                        oinfo.CreationDate);
+
+                                    string upgradedFile = Path.Combine(Path.GetDirectoryName(filePath),
+                                        String.Format("{0}.tt", Path.GetFileNameWithoutExtension(filePath)));
+
+                                    if (File.Exists(upgradedFile))
+                                    {
+                                        if (MessageBox.Show(String.Format("File '{0}' already exists. Would you like to overwrite it?", Path.GetFileName(upgradedFile)),
+                                            "Overwrite File", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
+                                        {
+                                            return;
+                                        }
+                                    }
+
+                                    TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(upgradedFile, info);
+
+                                    Upgrade.DAL(dal, Settings, dalv2);
+
+                                    AddProject(new TtProject(dal, Settings, this));
+                                }
                             }
                         }
                     }

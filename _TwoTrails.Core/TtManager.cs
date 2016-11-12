@@ -688,10 +688,23 @@ namespace TwoTrails.Core
 
         public void RecalculatePolygons()
         {
+            RecalculatePolygons(true);
+        }
+
+
+        public void RecalculatePolygons(bool waitForUpdates)
+        {
             foreach (TtPolygon poly in _Polygons)
             {
                 AdjustAllTravTypesInPolygon(poly);
-                UpdatePolygonStats(poly);
+
+                if (waitForUpdates)
+                    UpdatePolygonStats(poly);
+                else
+                {
+                    _PolygonUpdateHandlers[poly.CN].Cancel();
+                    GeneratePolygonStats(poly);
+                }
             }
         }
         #endregion

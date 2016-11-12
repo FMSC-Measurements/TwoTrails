@@ -305,13 +305,13 @@ namespace TwoTrails.DAL
                 TimeCreated + " TEXT, " +
                 FixTime + " TEXT, " +
                 Latitude + " REAL, " +
-                LatDir + " TEXT, " +
+                LatDir + " INTEGER, " +
                 Longitude + " REAL, " +
-                LonDir + " TEXT, " +
+                LonDir + " INTEGER, " +
                 Elevation + " REAL, " +
-                ElevUom + " TEXT, " +
+                ElevUom + " INTEGER, " +
                 MagVar + " REAL, " +
-                MagDir + " TEXT, " +
+                MagDir + " INTEGER, " +
                 Fix + " INTEGER, " +
                 FixQuality + " INTEGER, " +
                 Mode + " INTEGER, " +
@@ -320,7 +320,7 @@ namespace TwoTrails.DAL
                 VDOP + " REAL, " +
                 HorizDilution + " REAL, " +
                 GeiodHeight + " REAL, " +
-                GeiodHeightUom + " TEXT, " +
+                GeiodHeightUom + " INTEGER, " +
                 GroundSpeed + " REAL, " +
                 TrackAngle + " REAL, " +
                 SatellitesUsedCount + " INTEGER, " +

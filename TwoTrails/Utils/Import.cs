@@ -23,7 +23,7 @@ namespace TwoTrails.Utils
             Dictionary<string, TtMetadata> aMeta = new Dictionary<string, TtMetadata>();
             Dictionary<string, TtGroup> aGroups = new Dictionary<string, TtGroup>();
 
-            Dictionary<string, TtPolygon> iPolys = dal.GetPolygons().Where(p => polyCNs.Contains(p.CN)).ToDictionary(p => p.CN, p => p);
+            Dictionary<string, TtPolygon> iPolys = dal.GetPolygons().Where(p => polyCNs == null || polyCNs.Contains(p.CN)).ToDictionary(p => p.CN, p => p);
             Dictionary<string, string> polyMap = new Dictionary<string, string>();
             Dictionary<string, TtMetadata> iMeta = dal.GetMetadata().ToDictionary(m => m.CN, m => m);
             Dictionary<string, string> metaMap = new Dictionary<string, string>();

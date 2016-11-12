@@ -14,6 +14,7 @@ using FMSC.Core;
 using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.NMEA.Sentences;
+using System.Diagnostics;
 
 namespace TwoTrails.DAL
 {
@@ -55,6 +56,7 @@ namespace TwoTrails.DAL
             database.ExecuteNonQuery(TwoTrailsSchema.MediaSchema.CreateTable);
             database.ExecuteNonQuery(TwoTrailsSchema.PolygonAttrSchema.CreateTable);
             database.ExecuteNonQuery(TwoTrailsSchema.PictureSchema.CreateTable);
+            database.ExecuteNonQuery(TwoTrailsSchema.ActivitySchema.CreateTable);
 
             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(database);
             dal.InsertProjectInfo(projectInfo);
@@ -279,8 +281,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertPoints");
                         trans.Rollback();
                         return -1;
                     }
@@ -305,8 +308,9 @@ namespace TwoTrails.DAL
                         InsertBasePoint(point, conn, trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertBasePoint");
                         trans.Rollback();
                         return false;
                     }
@@ -322,16 +326,9 @@ namespace TwoTrails.DAL
 
         private bool InsertBasePoint(TtPoint point, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            try
-            {
-                database.Insert(TwoTrailsSchema.PointSchema.TableName, GetBasePointValues(point), conn, transaction);
+            database.Insert(TwoTrailsSchema.PointSchema.TableName, GetBasePointValues(point), conn, transaction);
 
-                InsertBaseData(point, conn, transaction);
-            }
-            catch
-            {
-                return false;
-            }
+            InsertBaseData(point, conn, transaction);
 
             return true;
         }
@@ -377,8 +374,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdatePoints");
                         trans.Rollback();
                         return -1;
                     }
@@ -404,8 +402,9 @@ namespace TwoTrails.DAL
                         UpdateBasePoint(point, oldPoint, conn, trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdateBasePoint");
                         trans.Rollback();
                         return false;
                     }
@@ -421,69 +420,61 @@ namespace TwoTrails.DAL
 
         private bool UpdateBasePoint(TtPoint point, TtPoint oldPoint, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            try
+            string where = String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, point.CN);
+
+            database.Update(TwoTrailsSchema.PointSchema.TableName,
+                GetBasePointValues(point),
+                where,
+                conn,
+                transaction);
+
+            if (point.OpType != oldPoint.OpType)
             {
-                string where = String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, point.CN);
-
-                database.Update(TwoTrailsSchema.PointSchema.TableName,
-                    GetBasePointValues(point),
-                    where,
-                    conn,
-                    transaction);
-
-                if (point.OpType != oldPoint.OpType)
+                if (oldPoint.IsGpsType())
                 {
-                    if (oldPoint.IsGpsType())
-                    {
-                        database.Delete(TwoTrailsSchema.GpsPointSchema.TableName, where, conn, transaction);
-                    }
-                    else if (oldPoint.IsTravType())
-                    {
-                        database.Delete(TwoTrailsSchema.TravPointSchema.TableName, where, conn, transaction);
-                    }
-                    else
-                    {
-                        database.Delete(TwoTrailsSchema.QuondamPointSchema.TableName, where, conn, transaction);
-                    }
-
-                    InsertBaseData(point, conn, transaction);
+                    database.Delete(TwoTrailsSchema.GpsPointSchema.TableName, where, conn, transaction);
+                }
+                else if (oldPoint.IsTravType())
+                {
+                    database.Delete(TwoTrailsSchema.TravPointSchema.TableName, where, conn, transaction);
                 }
                 else
                 {
-                    switch (point.OpType)
-                    {
-                        case OpType.GPS:
-                        case OpType.Take5:
-                        case OpType.Walk:
-                        case OpType.WayPoint:
-                            database.Update(TwoTrailsSchema.GpsPointSchema.TableName,
-                                GetGpsPointValues(point as GpsPoint),
-                                where,
-                                conn,
-                                transaction);
-                            break;
-                        case OpType.Traverse:
-                        case OpType.SideShot:
-                            database.Update(TwoTrailsSchema.TravPointSchema.TableName,
-                                GetTravPointValues(point as TravPoint),
-                                where,
-                                conn,
-                                transaction);
-                            break;
-                        case OpType.Quondam:
-                            database.Update(TwoTrailsSchema.QuondamPointSchema.TableName,
-                                GetQndmPointValues(point as QuondamPoint),
-                                where,
-                                conn,
-                                transaction);
-                            break;
-                    }
+                    database.Delete(TwoTrailsSchema.QuondamPointSchema.TableName, where, conn, transaction);
                 }
+
+                InsertBaseData(point, conn, transaction);
             }
-            catch (Exception ex)
+            else
             {
-                throw ex;
-                //return false;
+                switch (point.OpType)
+                {
+                    case OpType.GPS:
+                    case OpType.Take5:
+                    case OpType.Walk:
+                    case OpType.WayPoint:
+                        database.Update(TwoTrailsSchema.GpsPointSchema.TableName,
+                            GetGpsPointValues(point as GpsPoint),
+                            where,
+                            conn,
+                            transaction);
+                        break;
+                    case OpType.Traverse:
+                    case OpType.SideShot:
+                        database.Update(TwoTrailsSchema.TravPointSchema.TableName,
+                            GetTravPointValues(point as TravPoint),
+                            where,
+                            conn,
+                            transaction);
+                        break;
+                    case OpType.Quondam:
+                        database.Update(TwoTrailsSchema.QuondamPointSchema.TableName,
+                            GetQndmPointValues(point as QuondamPoint),
+                            where,
+                            conn,
+                            transaction);
+                        break;
+                }
             }
 
             return true;
@@ -498,29 +489,48 @@ namespace TwoTrails.DAL
 
         private Dictionary<string, object> GetBasePointValues(TtPoint point)
         {
-            return new Dictionary<string, object>()
+            Dictionary<string, object> dic = new Dictionary<string, object>()
             {
                 [TwoTrailsSchema.SharedSchema.CN] = point.CN,
                 [TwoTrailsSchema.PointSchema.Index] = point.Index,
                 [TwoTrailsSchema.PointSchema.ID] = point.PID,
-                [TwoTrailsSchema.PointSchema.PolyName] = point.Polygon.Name,
                 [TwoTrailsSchema.PointSchema.PolyCN] = point.PolygonCN,
-                [TwoTrailsSchema.PointSchema.GroupName] = point.Group.Name,
                 [TwoTrailsSchema.PointSchema.GroupCN] = point.GroupCN,
                 [TwoTrailsSchema.PointSchema.OnBoundary] = point.OnBoundary,
                 [TwoTrailsSchema.PointSchema.Comment] = point.Comment,
                 [TwoTrailsSchema.PointSchema.Operation] = (int)point.OpType,
                 [TwoTrailsSchema.PointSchema.MetadataCN] = point.MetadataCN,
                 [TwoTrailsSchema.PointSchema.CreationTime] = point.TimeCreated.ToString(Consts.DATE_FORMAT),
-                [TwoTrailsSchema.PointSchema.AdjX] = point.AdjX,
-                [TwoTrailsSchema.PointSchema.AdjY] = point.AdjY,
-                [TwoTrailsSchema.PointSchema.AdjZ] = point.AdjZ,
-                [TwoTrailsSchema.PointSchema.UnAdjX] = point.UnAdjX,
-                [TwoTrailsSchema.PointSchema.UnAdjY] = point.UnAdjY,
-                [TwoTrailsSchema.PointSchema.UnAdjZ] = point.UnAdjZ,
                 [TwoTrailsSchema.PointSchema.Accuracy] = point.Accuracy,
                 [TwoTrailsSchema.PointSchema.QuondamLinks] = point.LinkedPoints.ToStringContents("_")
             };
+
+            if (point.OpType != OpType.Quondam || (point as QuondamPoint).ParentPoint != null)
+            {
+                dic.Add(TwoTrailsSchema.PointSchema.AdjX, point.AdjX);
+                dic.Add(TwoTrailsSchema.PointSchema.AdjY, point.AdjY);
+                dic.Add(TwoTrailsSchema.PointSchema.AdjZ, point.AdjZ);
+                dic.Add(TwoTrailsSchema.PointSchema.UnAdjX, point.UnAdjX);
+                dic.Add(TwoTrailsSchema.PointSchema.UnAdjY, point.UnAdjY);
+                dic.Add(TwoTrailsSchema.PointSchema.UnAdjZ, point.UnAdjZ);
+            }
+            else
+            {
+                dic.Add(TwoTrailsSchema.PointSchema.AdjX, 0);
+                dic.Add(TwoTrailsSchema.PointSchema.AdjY, 0);
+                dic.Add(TwoTrailsSchema.PointSchema.AdjZ, 0);
+                dic.Add(TwoTrailsSchema.PointSchema.UnAdjX, 0);
+                dic.Add(TwoTrailsSchema.PointSchema.UnAdjY, 0);
+                dic.Add(TwoTrailsSchema.PointSchema.UnAdjZ, 0);
+            }
+
+            if (point.Polygon != null)
+                dic.Add(TwoTrailsSchema.PointSchema.PolyName, point.Polygon.Name);
+
+            if (point.Group != null)
+                dic.Add(TwoTrailsSchema.PointSchema.GroupName, point.Group.Name);
+
+            return dic;
         }
 
         private Dictionary<string, object> GetGpsPointValues(GpsPoint point)
@@ -595,8 +605,9 @@ namespace TwoTrails.DAL
                         else
                             trans.Rollback();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeletePoint");
                         trans.Rollback();
                     }
                     finally
@@ -671,8 +682,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeletePoints");
                         trans.Rollback();
                         return -1;
                     }
@@ -795,8 +807,9 @@ namespace TwoTrails.DAL
                         database.Insert(TwoTrailsSchema.PolygonSchema.TableName, GetPolygonValues(polygon), conn, trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertPolygon");
                         trans.Rollback();
                         return false;
                     }
@@ -825,8 +838,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertPolygons");
                         trans.Rollback();
                         return -1;
                     }
@@ -857,8 +871,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdatePolygon");
                         trans.Rollback();
                         return false;
                     }
@@ -891,8 +906,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdatePolygons");
                         trans.Rollback();
                         return -1;
                     }
@@ -937,8 +953,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeletePolygon");
                         trans.Rollback();
                         return false;
                     }
@@ -984,8 +1001,9 @@ namespace TwoTrails.DAL
                         else
                             transaction.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeletePolygons");
                         transaction.Rollback();
                         return -1;
                     }
@@ -1073,8 +1091,9 @@ namespace TwoTrails.DAL
                         database.Insert(TwoTrailsSchema.MetadataSchema.TableName, GetMetadataValues(metadata), conn, trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertMetadata");
                         trans.Rollback();
                         return false;
                     }
@@ -1103,8 +1122,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertMetadata");
                         trans.Rollback();
                         return -1;
                     }
@@ -1133,8 +1153,9 @@ namespace TwoTrails.DAL
                             conn,
                             trans);
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdateMetadata");
                         trans.Rollback();
                         return false;
                     }
@@ -1167,8 +1188,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdateMetadata");
                         trans.Rollback();
                         return -1;
                     }
@@ -1217,8 +1239,9 @@ namespace TwoTrails.DAL
                             trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeleteMetadata");
                         trans.Rollback();
                         return false;
                     }
@@ -1262,8 +1285,9 @@ namespace TwoTrails.DAL
                             return -1;
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeleteMetadata");
                         trans.Rollback();
                         return -1;
                     }
@@ -1334,8 +1358,9 @@ namespace TwoTrails.DAL
                         database.Insert(TwoTrailsSchema.GroupSchema.TableName, GetGroupValues(group), conn, trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertGroup");
                         trans.Rollback();
                         return false;
                     }
@@ -1364,8 +1389,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertGroups");
                         trans.Rollback();
                         return -1;
                     }
@@ -1395,8 +1421,9 @@ namespace TwoTrails.DAL
                             trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdateGroup");
                         trans.Rollback();
                         return false;
                     }
@@ -1429,8 +1456,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdateGroups");
                         trans.Rollback();
                         return -1;
                     }
@@ -1469,8 +1497,9 @@ namespace TwoTrails.DAL
                             trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeleteGroup");
                         trans.Rollback();
                         return false;
                     }
@@ -1515,8 +1544,9 @@ namespace TwoTrails.DAL
                             return -1;
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeleteGroups");
                         trans.Rollback();
                         return -1;
                     }
@@ -1618,8 +1648,9 @@ namespace TwoTrails.DAL
                         database.Insert(TwoTrailsSchema.TtNmeaSchema.TableName, GetNmeaValues(burst), conn, trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertNmeaBurst");
                         trans.Rollback();
                         return false;
                     }
@@ -1648,8 +1679,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertNmeaBursts");
                         trans.Rollback();
                         return -1;
                     }
@@ -1682,8 +1714,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdateNmeaBurst");
                         trans.Rollback();
                         return false;
                     }
@@ -1719,8 +1752,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdateNmeaBursts");
                         trans.Rollback();
                         return -1;
                     }
@@ -1747,8 +1781,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeleteNmeaBursts");
                         trans.Rollback();
                     }
                     finally
@@ -1767,6 +1802,7 @@ namespace TwoTrails.DAL
             return new Dictionary<string, object>()
             {
                 [TwoTrailsSchema.SharedSchema.CN] = burst.CN,
+                [TwoTrailsSchema.TtNmeaSchema.PointCN] = burst.PointCN,
                 [TwoTrailsSchema.TtNmeaSchema.Used] = burst.IsUsed,
                 [TwoTrailsSchema.TtNmeaSchema.TimeCreated] = burst.TimeCreated.ToString(Consts.DATE_FORMAT),
                 [TwoTrailsSchema.TtNmeaSchema.FixTime] = burst.FixTime.ToString(Consts.DATE_FORMAT),
@@ -1860,7 +1896,7 @@ namespace TwoTrails.DAL
                 {
                     if (dr != null)
                     {
-                        while (dr.Read())
+                        if (dr.Read())
                         {
                             version = new Version(dr.GetString(0));
                         }
@@ -1902,8 +1938,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertProjectInfo");
                         trans.Rollback();
                         return false;
                     }
@@ -1925,7 +1962,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.ProjectInfoSchema.TableName,
+                        database.Update(TwoTrailsSchema.ProjectInfoSchema.TableName,
                             new Dictionary<string, object>()
                             {
                                 [TwoTrailsSchema.ProjectInfoSchema.Name] = info.Name,
@@ -1936,13 +1973,15 @@ namespace TwoTrails.DAL
                                 [TwoTrailsSchema.ProjectInfoSchema.Description] = info.Description,
                                 [TwoTrailsSchema.ProjectInfoSchema.TtVersion] = info.Version.ToString()
                             },
+                            null,
                             conn,
                             trans);
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdateProjectInfo");
                         trans.Rollback();
                         return false;
                     }
@@ -2049,8 +2088,9 @@ namespace TwoTrails.DAL
                         }
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertMedia");
                         trans.Rollback();
                         return false;
                     }
@@ -2093,8 +2133,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:UpdateMedia");
                         trans.Rollback();
                         return false;
                     }
@@ -2155,10 +2196,10 @@ namespace TwoTrails.DAL
                                 conn,
                                 trans);
                         }
-                        
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeleteMedia");
                         trans.Rollback();
                         return false;
                     }
@@ -2230,8 +2271,9 @@ namespace TwoTrails.DAL
                         database.Insert(TwoTrailsSchema.PolygonAttrSchema.TableName, GetGraphicOptionValues(option), conn, trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertPolygonGraphicOption");
                         trans.Rollback();
                         return false;
                     }
@@ -2274,8 +2316,9 @@ namespace TwoTrails.DAL
                             trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:DeletePolygonGraphicOption");
                         trans.Rollback();
                         return false;
                     }
@@ -2304,8 +2347,9 @@ namespace TwoTrails.DAL
                         database.Insert(TwoTrailsSchema.ActivitySchema.TableName, GetUserActivityValues(activity), conn, trans);
                         trans.Commit();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.Message, "DAL:InsertActivity");
                         trans.Rollback();
                     }
                     finally
@@ -2368,11 +2412,13 @@ namespace TwoTrails.DAL
         #region Utils
         public bool Duplicate(ITtDataLayer dataLayer)
         {
+            //todo dup
             throw new NotImplementedException();
         }
 
         public bool Clean()
         {
+            //todo clean dl
             throw new NotImplementedException();
         }
         #endregion
