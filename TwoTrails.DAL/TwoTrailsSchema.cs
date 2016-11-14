@@ -207,6 +207,7 @@ namespace TwoTrails.DAL
             public const String Description = "Description";
             public const String Area = "Area";
             public const String Perimeter = "Perimeter";
+            public const String PerimeterLine = "PerimeterLine";
             public const String IncrementBy = "Increment";
             public const String PointStartIndex = "PointStartIndex";
             public const String TimeCreated = "TimeCreated";
@@ -219,6 +220,7 @@ namespace TwoTrails.DAL
                 Description + " TEXT, " +
                 Area + " REAL, " +
                 Perimeter + " REAL, " +
+                PerimeterLine + " REAL, " +
                 IncrementBy + " INTEGER, " +
                 PointStartIndex + " INTEGER, " +
                 TimeCreated + " TEXT, " +
@@ -234,7 +236,8 @@ namespace TwoTrails.DAL
                 PointStartIndex + ", " +
                 TimeCreated + ", " +
                 Area + ", " +
-                Perimeter;
+                Perimeter + ", " +
+                PerimeterLine;
         }
         #endregion
 

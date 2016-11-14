@@ -179,6 +179,7 @@ namespace TwoTrails.Utils
                 sb.Append("Accuracy,");
                 sb.Append("Area_MtSq,");
                 sb.Append("Perimeter_M,");
+                sb.Append("Line_Perimeter_M,");
                 sb.Append("Description,");
                 sb.Append("CN");
 
@@ -189,7 +190,7 @@ namespace TwoTrails.Utils
                 {
                     sb = new StringBuilder();
                     sb.AppendFormat("{0},{1},", poly.Name.Scrub(), poly.Accuracy);
-                    sb.AppendFormat("{0},{1},", poly.Area, poly.Perimeter);
+                    sb.AppendFormat("{0},{1},{2},", poly.Area, poly.Perimeter, poly.PerimeterLine);
                     sb.AppendFormat("{0},{1}", poly.Description.Scrub(), poly.CN);
 
                     sw.WriteLine(sb.ToString());

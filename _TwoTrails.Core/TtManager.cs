@@ -897,9 +897,9 @@ namespace TwoTrails.Core
 
                 if (points.Count > 2)
                 {
-                    double perim = 0, area = 0;
+                    double perim = 0, linePerim = 0, area = 0;
 
-                    TtPoint p1 = points[0];
+                    TtPoint p1 = points[0], fBndPt = null, lBndPt = null;
                     TtPoint p2 = points[points.Count - 1];
 
                     if (!p1.HasSameAdjLocation(p2))
@@ -910,15 +910,26 @@ namespace TwoTrails.Core
                         p1 = points[i];
                         p2 = points[i + 1];
 
+                        if (p1.OnBoundary)
+                        {
+                            if (fBndPt == null)
+                                fBndPt = p1;
+
+                            lBndPt = p1;
+                        }
+
                         perim += MathEx.Distance(p1.AdjX, p1.AdjY, p2.AdjX, p2.AdjY);
                         area += (p2.AdjX - p1.AdjX) * (p2.AdjY + p1.AdjY) / 2;
                     }
 
-                    polygon.Update(perim, Math.Abs(area));
+                    if (fBndPt != null)
+                        linePerim = perim - MathEx.Distance(fBndPt.AdjX, fBndPt.AdjY, lBndPt.AdjX, lBndPt.AdjY);
+
+                    polygon.Update(Math.Abs(area), perim, linePerim);
                 }
                 else
                 {
-                    polygon.Update(0, 0);
+                    polygon.Update(0, 0, 0);
                 } 
             }
         }

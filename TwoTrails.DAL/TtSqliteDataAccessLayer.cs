@@ -762,25 +762,19 @@ namespace TwoTrails.DAL
                 {
                     if (dr != null)
                     {
-                        string name, desc, cn;
-                        int psi, inc;
-                        DateTime time;
-                        double acc, area, perim;
-
                         while (dr.Read())
                         {
-                            cn = dr.GetString(0);
-                            name = dr.GetString(1);
-                            desc = dr.GetString(2);
-                            acc = dr.GetDouble(3);
-                            inc = dr.GetInt32(4);
-                            psi = dr.GetInt32(5);
-                            time = TtCoreUtils.ParseTime(dr.GetString(6));
-                            area = dr.GetDouble(7);
-                            perim = dr.GetDouble(8);
-
-                            polys.Add(new TtPolygon(cn, name, desc, psi, inc,
-                                time, acc, area, perim));
+                            polys.Add(new TtPolygon(
+                                dr.GetString(0),
+                                dr.GetString(1),
+                                dr.GetString(2),
+                                dr.GetInt32(5),
+                                dr.GetInt32(4),
+                                TtCoreUtils.ParseTime(dr.GetString(6)),
+                                dr.GetDouble(3),
+                                dr.GetDouble(7),
+                                dr.GetDouble(8),
+                                dr.GetDouble(9)));
                         }
 
                         dr.Close();
@@ -931,7 +925,8 @@ namespace TwoTrails.DAL
                 [TwoTrailsSchema.PolygonSchema.PointStartIndex] = poly.PointStartIndex,
                 [TwoTrailsSchema.PolygonSchema.TimeCreated] = poly.TimeCreated,
                 [TwoTrailsSchema.PolygonSchema.Area] = poly.Area,
-                [TwoTrailsSchema.PolygonSchema.Perimeter] = poly.Perimeter
+                [TwoTrailsSchema.PolygonSchema.Perimeter] = poly.Perimeter,
+                [TwoTrailsSchema.PolygonSchema.PerimeterLine] = poly.PerimeterLine
             };
         }
         #endregion

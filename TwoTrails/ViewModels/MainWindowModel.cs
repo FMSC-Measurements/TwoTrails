@@ -278,6 +278,10 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
                                 }
                             }
                         }
+                        else
+                        {
+                            MessageBox.Show("File '{0}' is not a compatible project type.", filePath);
+                        }
                     }
                 }
                 else

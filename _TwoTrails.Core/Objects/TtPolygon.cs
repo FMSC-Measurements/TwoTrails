@@ -86,6 +86,22 @@ namespace TwoTrails.Core
         }
 
         public Double PerimeterFt { get { return Perimeter * 3937d / 1200d; } }
+
+
+        protected Double _PerimeterLine = 0;
+        public Double PerimeterLine
+        {
+            get { return _PerimeterLine; }
+            set
+            {
+                if (SetField(ref _PerimeterLine, value))
+                {
+                    OnPropertyChanged(nameof(PerimeterLineFt));
+                }
+            }
+        }
+
+        public Double PerimeterLineFt { get { return PerimeterLine * 3937d / 1200d; } }
         #endregion
 
 
@@ -104,7 +120,7 @@ namespace TwoTrails.Core
         }
 
         public TtPolygon(string cn, string name, string desc, int psi, int inc, DateTime time,
-            double acc, double area, double perim) : base(cn)
+            double acc, double area, double perim, double perimLine) : base(cn)
         {
             _Name = name;
             _Description = desc;
@@ -114,6 +130,7 @@ namespace TwoTrails.Core
             _Accuracy = acc;
             _Area = area;
             _Perimeter = perim;
+            _PerimeterLine = perimLine;
         }
 
         protected void OnPolygonAccuracyChanged()
@@ -122,10 +139,11 @@ namespace TwoTrails.Core
             PolygonAccuracyChanged?.Invoke(this);
         }
 
-        public void Update(double perimeter, double area)
+        public void Update(double area, double perimeter, double linePerimeter)
         {
-            Perimeter = perimeter;
             Area = area;
+            Perimeter = perimeter;
+            PerimeterLine = linePerimeter;
 
             PreviewPolygonChanged?.Invoke(this);
             PolygonChanged?.Invoke(this);
