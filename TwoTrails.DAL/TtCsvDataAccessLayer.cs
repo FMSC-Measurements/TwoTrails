@@ -516,6 +516,8 @@ namespace TwoTrails.DAL
         private Dictionary<PointTextFieldType, int> _PointMapping { get; } = new Dictionary<PointTextFieldType, int>();
         public ReadOnlyDictionary<PointTextFieldType, int> PointMapping { get; }
 
+        public string[] Fields { get; private set; }
+
         public bool UseAdvParsing { get; set; }
 
         public bool HasMultiplePolygons
@@ -548,10 +550,9 @@ namespace TwoTrails.DAL
             _PointMapping.Clear();
 
             int index = 0;
-            foreach (string header in File.ReadLines(PointsFile)
-                .First()
-                .Split(',')
-                .Select(s => s.ToLower()))
+
+            Fields = File.ReadLines(PointsFile).First().Split(',');
+            foreach (string header in Fields.Select(s => s.ToLower()))
             {
                 switch (header)
                 {
@@ -592,6 +593,7 @@ namespace TwoTrails.DAL
                         break;
                     case "onbnd":
                     case "on bnd":
+                    case "onboundary":
                     case "on boundary":
                     case "boundary":
                     case "bnd":
@@ -632,7 +634,7 @@ namespace TwoTrails.DAL
                     case "elevation (m)":
                         EditPointMap(PointTextFieldType.ELEVATION, index, false);
                         break;
-                    case "rsmer":
+                    case "rmser":
                         EditPointMap(PointTextFieldType.RMSER, index, false);
                         break;
                     case "fwdaz":
@@ -655,6 +657,8 @@ namespace TwoTrails.DAL
                     case "slope distance":
                         EditPointMap(PointTextFieldType.SLOPE_DIST, index, false);
                         break;
+                    case "dist uom":
+                    case "slope dist uom":
                     case "slope d type":
                     case "slope dist type":
                     case "slope distance type":
@@ -665,6 +669,8 @@ namespace TwoTrails.DAL
                     case "slope angle":
                         EditPointMap(PointTextFieldType.SLOPE_ANG, index, false);
                         break;
+                    case "angle uom":
+                    case "slope ang uom":
                     case "slope a type":
                     case "slope ang type":
                     case "slope angle type":

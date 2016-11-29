@@ -9,27 +9,31 @@
         Title="Import Polygons" Height="300" Width="400">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="2.5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBox x:Name="txtFile" Grid.Column="0" HorizontalAlignment="Stretch"
-                     Text="{Binding CurrentFile, UpdateSourceTrigger=PropertyChanged, Delay=500}"/>
-            <Button Content="Browse" Grid.Column="1" Command="{Binding BrowseFileCommand}" Width="50"/>
-        </Grid>
-        
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="0" Drop="Grid_Drop" AllowDrop="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             
+            <Grid Margin="2.5" Name="gdBrowse">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="txtFile" Grid.Column="0" HorizontalAlignment="Stretch" Drop="Grid_Drop" AllowDrop="True"
+                     Text="{Binding CurrentFile, UpdateSourceTrigger=PropertyChanged, Delay=500}"/>
+                <Button Content="Browse" Grid.Column="1" Command="{Binding BrowseFileCommand}" Width="50"/>
+            </Grid>
+
+            <ContentControl Grid.Row="0" Grid.RowSpan="2" Visibility="{Binding HasMainContent}" Content="{Binding MainContent}" />
         </Grid>
 
-        <Grid Grid.Row="2" Margin="2.5">
+        <Grid Grid.Row="1" Margin="2.5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>

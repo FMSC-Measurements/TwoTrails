@@ -445,68 +445,35 @@ namespace TwoTrails.DAL
 
                         while (dr.Read())
                         {
-                            //todo clean up
-                            string cn = dr.GetString(0);
-                            string pointcn = dr.GetString(1);
-                            bool used = dr.GetBoolean(2);
                             DateTime time = TtCoreUtils.ParseTime(dr.GetString(3));
-                            double lat = dr.GetDouble(4);
-                            NorthSouth latdir = NorthSouthExtentions.Parse(dr.GetString(5));
-                            double lon = dr.GetDouble(6);
-                            EastWest londir = EastWestExtentions.Parse(dr.GetString(7));
-                            double elev = dr.GetDouble(8);
-                            UomElevation elevType = UomElevationExtensions.Parse(dr.GetString(9));
-
-                            double magVar = dr.GetDouble(10);
-                            EastWest magVarDir = EastWestExtentions.Parse(dr.GetString(11));
-
-                            GpsFixType fixType = (GpsFixType)(dr.GetInt32(13)); //original file type had wrong field name
-                            Mode mode = (Mode)(dr.GetInt32N(12) ?? 0);
-                            Fix fix = (Fix)(dr.GetInt32(14) - 1);               //converts from real value
-
-                            double pdop = dr.GetDouble(15);
-                            double hdop = dr.GetDouble(16);
-                            double vdop = dr.GetDouble(17);
-
-                            double geoidHeight = dr.GetDouble(18);
-                            double horizDo = dr.GetDouble(19);
-                            UomElevation geoidType = UomElevationExtensions.Parse(dr.GetString(20));
-
-                            double speed = dr.GetDouble(21);
-                            double trackAngle = dr.GetDouble(22);
-
-                            int satsUsed = dr.GetInt32(23);
-                            int satCount = dr.GetInt32(24);
-
-                            string prns = dr.GetString(25);
-
+                            
                             bursts.Add(new TtNmeaBurst(
-                                cn,
+                                dr.GetString(0),
                                 time,
-                                pointcn,
-                                used,
+                                dr.GetString(1),
+                                dr.GetBoolean(2),
                                 new GeoPosition(
-                                    lat, latdir,
-                                    lon, londir,
-                                    elev, elevType
+                                    dr.GetDouble(4), NorthSouthExtentions.Parse(dr.GetString(5)),
+                                    dr.GetDouble(6), EastWestExtentions.Parse(dr.GetString(7)),
+                                    dr.GetDouble(8), UomElevationExtensions.Parse(dr.GetString(9))
                                 ),
                                 time,
-                                speed,
-                                trackAngle,
-                                magVar,
-                                magVarDir,
-                                mode,
-                                fix,
-                                ParseIds(prns),
-                                pdop,
-                                hdop,
-                                vdop,
-                                fixType,
+                                dr.GetDouble(21),
+                                dr.GetDouble(22),
+                                dr.GetDouble(10),
+                                EastWestExtentions.Parse(dr.GetString(11)),
+                                (Mode)(dr.GetInt32N(12) ?? 0),
+                                (Fix)(dr.GetInt32(14) - 1),     //converts from real value
+                                ParseIds(dr.GetString(25)),
+                                dr.GetDouble(15),
+                                dr.GetDouble(16),
+                                dr.GetDouble(17),
+                                (GpsFixType)(dr.GetInt32(13)),  //original file type had wrong field name
                                 0,
-                                horizDo,
-                                geoidHeight,
-                                geoidType,
-                                satCount
+                                dr.GetDouble(19),
+                                dr.GetDouble(18),
+                                UomElevationExtensions.Parse(dr.GetString(20)),
+                                dr.GetInt32(24)
                             ));
                         }
 

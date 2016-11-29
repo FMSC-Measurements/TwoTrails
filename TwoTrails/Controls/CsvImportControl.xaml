@@ -1,0 +1,173 @@
+﻿<UserControl x:Class="TwoTrails.Controls.CsvImportControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TwoTrails.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="400">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.Resources>
+            <Style TargetType="ComboBox">
+                <Setter Property="Margin" Value="5, 2.5, 0, 2.5"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style TargetType="RadioButton">
+                <Setter Property="Margin" Value="5, 5, 5, 0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style TargetType="TextBlock">
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </Grid.Resources>
+
+        <Grid Grid.Row="0" Margin="2.5, 2.5, 2.5, 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Text="Mode:" Grid.Column="0"/>
+
+            <RadioButton Content="Basic" Grid.Column="1" GroupName="mode" IsChecked="{Binding IsBasicMode}"/>
+            <RadioButton Content="Advanced" Grid.Column="2" GroupName="mode" IsChecked="{Binding IsAdvancedMode}"/>
+            <RadioButton Content="Lat/Lon" Grid.Column="3" GroupName="mode" IsChecked="{Binding IsLatLonMode}"/>
+
+            <Button Content="Continue" Grid.Column="5"/>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1">
+            <Grid Margin="2.5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+               Height="Auto" Width="Auto">
+                
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="CN"/>
+                <ComboBox Grid.Column="1" Grid.Row="0" ItemsSource="{Binding Fields}" SelectedIndex="{Binding CN_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Operation"/>
+                <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Fields}" SelectedIndex="{Binding OPTYPE_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="Index"/>
+                <ComboBox Grid.Column="1" Grid.Row="2" ItemsSource="{Binding Fields}" SelectedIndex="{Binding INDEX_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Point ID"/>
+                <ComboBox Grid.Column="1" Grid.Row="3" ItemsSource="{Binding Fields}" SelectedIndex="{Binding PID_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="4" Text="Creation Time"/>
+                <ComboBox Grid.Column="1" Grid.Row="4" ItemsSource="{Binding Fields}" SelectedIndex="{Binding TIME_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="5" Text="Polygon Name"/>
+                <ComboBox Grid.Column="1" Grid.Row="5" ItemsSource="{Binding Fields}" SelectedIndex="{Binding POLY_NAME_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="6" Text="Group Name"/>
+                <ComboBox Grid.Column="1" Grid.Row="6" ItemsSource="{Binding Fields}" SelectedIndex="{Binding GROUP_NAME_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="7" Text="Comment"/>
+                <ComboBox Grid.Column="1" Grid.Row="7" ItemsSource="{Binding Fields}" SelectedIndex="{Binding COMMENT_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="8" Text="Metadata"/>
+                <ComboBox Grid.Column="1" Grid.Row="8" ItemsSource="{Binding Fields}" SelectedIndex="{Binding META_CN_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="9" Text="On Boundary"/>
+                <ComboBox Grid.Column="1" Grid.Row="9" ItemsSource="{Binding Fields}" SelectedIndex="{Binding ONBND_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="10" Text="UnAdj UTM X"/>
+                <ComboBox Grid.Column="1" Grid.Row="10" ItemsSource="{Binding Fields}" SelectedIndex="{Binding UNADJX_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="11" Text="UnAdj UTM Y"/>
+                <ComboBox Grid.Column="1" Grid.Row="11" ItemsSource="{Binding Fields}" SelectedIndex="{Binding UNADJY_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="12" Text="UnAdj Z (M)"/>
+                <ComboBox Grid.Column="1" Grid.Row="12" ItemsSource="{Binding Fields}" SelectedIndex="{Binding UNADJZ_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="13" Text="Manual Accurary (M)"/>
+                <ComboBox Grid.Column="1" Grid.Row="13" ItemsSource="{Binding Fields}" SelectedIndex="{Binding MAN_ACC_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="14" Text="RMSEr"/>
+                <ComboBox Grid.Column="1" Grid.Row="14" ItemsSource="{Binding Fields}" SelectedIndex="{Binding RMSER_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="15" Text="Latitude"/>
+                <ComboBox Grid.Column="1" Grid.Row="15" ItemsSource="{Binding Fields}" SelectedIndex="{Binding LATITUDE_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="16" Text="Longitude"/>
+                <ComboBox Grid.Column="1" Grid.Row="16" ItemsSource="{Binding Fields}" SelectedIndex="{Binding LONGITUDE_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="17" Text="Elevation (M)"/>
+                <ComboBox Grid.Column="1" Grid.Row="17" ItemsSource="{Binding Fields}" SelectedIndex="{Binding ELEVATION_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="18" Text="Forward Azimuth"/>
+                <ComboBox Grid.Column="1" Grid.Row="18" ItemsSource="{Binding Fields}" SelectedIndex="{Binding FWD_AZ_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="19" Text="Backward Azimuth"/>
+                <ComboBox Grid.Column="1" Grid.Row="19" ItemsSource="{Binding Fields}" SelectedIndex="{Binding BK_AZ_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="20" Text="Slope Distance"/>
+                <ComboBox Grid.Column="1" Grid.Row="20" ItemsSource="{Binding Fields}" SelectedIndex="{Binding SLOPE_DIST_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="21" Text="Slope Distance UOM"/>
+                <ComboBox Grid.Column="1" Grid.Row="21" ItemsSource="{Binding Fields}" SelectedIndex="{Binding SLOPE_DIST_TYPE_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="22" Text="Slope Angle"/>
+                <ComboBox Grid.Column="1" Grid.Row="22" ItemsSource="{Binding Fields}" SelectedIndex="{Binding SLOPE_ANG_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="23" Text="Slope Angle UOM"/>
+                <ComboBox Grid.Column="1" Grid.Row="23" ItemsSource="{Binding Fields}" SelectedIndex="{Binding SLOPE_ANG_TYPE_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="24" Text="Quondam Parent CN"/>
+                <ComboBox Grid.Column="1" Grid.Row="24" ItemsSource="{Binding Fields}" SelectedIndex="{Binding PARENT_CN_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="25" Text="Polygon CN"/>
+                <ComboBox Grid.Column="1" Grid.Row="25" ItemsSource="{Binding Fields}" SelectedIndex="{Binding POLY_CN_FIELD}"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="26" Text="Group CN"/>
+                <ComboBox Grid.Column="1" Grid.Row="26" ItemsSource="{Binding Fields}" SelectedIndex="{Binding GROUP_CN_FIELD}"/>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

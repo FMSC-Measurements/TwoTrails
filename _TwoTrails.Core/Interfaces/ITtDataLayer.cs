@@ -102,9 +102,7 @@ namespace TwoTrails.DAL
 
 
         #region Util
-        bool Duplicate(ITtDataLayer dataLayer);
-
-        bool Clean();
+        void Clean();
         #endregion
     }
 }

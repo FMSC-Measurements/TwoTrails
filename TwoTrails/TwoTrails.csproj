@@ -114,6 +114,12 @@
     </Compile>
     <Compile Include="ApiKeys.cs" />
     <Compile Include="AppInfo.cs" />
+    <Compile Include="Controls\CsvImportControl.xaml.cs">
+      <DependentUpon>CsvImportControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ImportControl.xaml.cs">
+      <DependentUpon>ImportControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\MapControl.xaml.cs">
       <DependentUpon>MapControl.xaml</DependentUpon>
     </Compile>
@@ -168,6 +174,7 @@
     <Compile Include="Utils\TtUtils.cs" />
     <Compile Include="Utils\Upgrade.cs" />
     <Compile Include="ViewModels\CreatePlotsModel.cs" />
+    <Compile Include="ViewModels\CsvImportModel.cs" />
     <Compile Include="ViewModels\DataEditorModel.cs" />
     <Compile Include="ViewModels\DataStyleModel.cs" />
     <Compile Include="Converters\BindingReflector.cs" />
@@ -205,6 +212,14 @@
     <Compile Include="TtSettings.cs" />
     <Compile Include="Tabs\TtTabModel.cs" />
     <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\CsvImportControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ImportControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

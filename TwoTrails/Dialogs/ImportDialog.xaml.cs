@@ -21,9 +21,12 @@ namespace TwoTrails.Dialogs
     /// </summary>
     public partial class ImportDialog : Window
     {
+        private ImportModel _ImportModel;
+
         public ImportDialog(ITtManager manager)
         {
-            this.DataContext = new ImportModel(this, manager);
+            _ImportModel = new ImportModel(this, manager);
+            this.DataContext = _ImportModel;
             InitializeComponent();
         }
 
@@ -33,6 +36,16 @@ namespace TwoTrails.Dialogs
             if (owner != null)
                 diag.Owner = owner;
             return diag.ShowDialog();
+        }
+
+        private void Grid_Drop(Object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+            if (files != null && files.Length > 0)
+            {
+                _ImportModel.SetupImport(files.First());
+            }
         }
     }
 }

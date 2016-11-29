@@ -2405,16 +2405,14 @@ namespace TwoTrails.DAL
         #endregion
 
         #region Utils
-        public bool Duplicate(ITtDataLayer dataLayer)
+        public void Clean()
         {
-            //todo dup
-            throw new NotImplementedException();
-        }
+            List<TtPoint> points = GetPoints();
+            Dictionary<string, TtPolygon> polyCNs = GetPolygons().ToDictionary(p => p.CN, p => p);
 
-        public bool Clean()
-        {
-            //todo clean dl
-            throw new NotImplementedException();
+            IEnumerable<TtPoint> delPoints = points.Where(p => !polyCNs.ContainsKey(p.PolygonCN));
+
+            DeletePoints(delPoints);
         }
         #endregion
     }
