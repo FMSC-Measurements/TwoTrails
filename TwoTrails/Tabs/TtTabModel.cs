@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using TwoTrails.Controls;
 using TwoTrails.ViewModels;
 
@@ -59,7 +60,10 @@ namespace TwoTrails
         {
             if (e.PropertyName == "ProjectName" || e.PropertyName == "RequiresSave")
             {
-                Tab.Header = TabTitle;
+                Tab.Dispatcher.Invoke(() =>
+                {
+                    Tab.Header = TabTitle;
+                });
                 OnPropertyChanged(nameof(TabTitle));
             }
         }

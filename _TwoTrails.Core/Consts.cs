@@ -14,6 +14,6 @@ namespace TwoTrails.Core
         public const String FullGuid = "11111111-1111-1111-1111-111111111111";
 
         public const double MINIMUM_POINT_DIGIT_ACCURACY = 0.000001d;
-        public const double DEFAULT_POINT_ACCURACY = 6d;
+        public const double DEFAULT_POINT_ACCURACY = 6.01d;
     }
 }

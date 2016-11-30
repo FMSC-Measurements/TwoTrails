@@ -67,19 +67,21 @@ namespace TwoTrails.Core
 
 
                     StringBuilder sb = new StringBuilder();
+                    
+                    sb.AppendFormat("The polygon area is: {0:0.00} Ha ({1:0.00} ac).{2}",
+                        Math.Round(polygon.AreaHectaAcres, 2),
+                        Math.Round(polygon.AreaAcres, 2),
+                        Environment.NewLine);
 
-                    if (polygon.Area > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
-                    {
-                        sb.AppendFormat("The polygon area is: {0:0.00} Ha ({1:0} ac).{2}",
-                            Math.Round(polygon.AreaHectaAcres, 2),
-                            Math.Round(polygon.AreaAcres, 0),
-                            Environment.NewLine);
+                    sb.AppendFormat("The polygon exterior perimeter is: {0:0.00} M ({1:0} ft).{2}",
+                        Math.Round(polygon.Perimeter, 2),
+                        Math.Round(polygon.PerimeterFt, 0),
+                        Environment.NewLine);
 
-                        sb.AppendFormat("The polygon exterior perimeter is: {0:0.00} M ({1:0} ft).{2}{2}",
-                            Math.Round(polygon.Perimeter, 2),
-                            Math.Round(polygon.PerimeterFt, 0),
-                            Environment.NewLine);
-                    }
+                    sb.AppendFormat("The polyline perimeter is: {0:0.00} M ({1:0} ft).{2}{2}",
+                        Math.Round(polygon.PerimeterLine, 2),
+                        Math.Round(polygon.PerimeterLineFt, 0),
+                        Environment.NewLine);
 
                     if (TotalGpsError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
@@ -95,7 +97,7 @@ namespace TwoTrails.Core
 
                     if (TotalTraverseError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
-                        sb.AppendFormat("Traverse Contribution: {0:0.00} Ha ({0:1.00} ac){2}",
+                        sb.AppendFormat("Traverse Contribution: {0:0.00} Ha ({1:0.00} ac){2}",
                             Math.Round(FMSC.Core.Convert.MetersSquaredToHa(TotalTraverseError), 2),
                             Math.Round(FMSC.Core.Convert.MetersSquaredToAcres(TotalTraverseError), 2),
                             Environment.NewLine);
@@ -151,7 +153,7 @@ namespace TwoTrails.Core
                         if (!fromQndm && showPoints)
                         {
                             sbPoints.AppendFormat("Point {0}: {1} {2}- ", point.PID, point.OnBoundary ? " " : "*", point.OpType);
-                            sbPoints.AppendFormat("Accuracy is {0:0.###} meters.{1}", point.Accuracy, Environment.NewLine);
+                            sbPoints.AppendFormat("Accuracy is {0:0.00#} meters.{1}", point.Accuracy, Environment.NewLine);
                         }
 
                         _LastGpsPoint = point;
@@ -259,9 +261,9 @@ namespace TwoTrails.Core
             double travError = closeError < Consts.MINIMUM_POINT_DIGIT_ACCURACY ? Double.PositiveInfinity : travLength / closeError;
 
             sbPoints.AppendFormat("   Traverse Total Segments: {0}{1}", travSegments, Environment.NewLine);
-            sbPoints.AppendFormat("   Traverse Total Distance: {0:0.##} feet.{1}", Math.Round(FMSC.Core.Convert.ToFeetTenths(travLength, Distance.Meters), 2), Environment.NewLine);
-            sbPoints.AppendFormat("   Traverse Closing Distance: {0:0.##} feet.{1}", Math.Round(FMSC.Core.Convert.ToFeetTenths(closeError, Distance.Meters), 2), Environment.NewLine);
-            sbPoints.AppendFormat("   Traverse Close Error: 1 part in {0:0.##}.{1}",
+            sbPoints.AppendFormat("   Traverse Total Distance: {0:0.00} feet.{1}", Math.Round(FMSC.Core.Convert.ToFeetTenths(travLength, Distance.Meters), 2), Environment.NewLine);
+            sbPoints.AppendFormat("   Traverse Closing Distance: {0:0.00} feet.{1}", Math.Round(FMSC.Core.Convert.ToFeetTenths(closeError, Distance.Meters), 2), Environment.NewLine);
+            sbPoints.AppendFormat("   Traverse Close Error: 1 part in {0:0.00}.{1}",
                     Double.IsPositiveInfinity(travError) ? "∞" : Math.Round(travError, 2).ToString(),
                     Environment.NewLine);
             

@@ -20,7 +20,7 @@ namespace TwoTrails
 
         public override string TabTitle
         {
-            get { return String.Format("{0}(Map)", base.TabTitle); }
+            get { return String.Format("{0} (Map)", base.TabTitle); }
         }
 
         public MapTab(TtProject project) : base(project)

@@ -34,7 +34,7 @@ namespace TwoTrails.Core
 
         public void Add(TtPoint point)
         {
-            _PolyPoints.Add(point);
+            _SegmentPoints.Add(point);
         }
 
         public void Adjust()
@@ -124,14 +124,13 @@ namespace TwoTrails.Core
 
         private void CalculateTraverseUnAdjSegment()
         {
-            TtPoint last;
-            double x = 0, y = 0, z = 0;
+            TtPoint last = _SegmentPoints.First();
 
             foreach (TtPoint point in _SegmentPoints)
             {
                 if (point.OpType == OpType.Traverse)
                 {
-                    (point as TravPoint).Calculate(x, y, z, false);
+                    (point as TravPoint).Calculate(last.UnAdjX, last.UnAdjY, last.UnAdjZ, false);
                 }
 
                 last = point;

@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="MainWindow"
         Width="1000" MinWidth="710"
-        Height="840" MinHeight="550"
+        Height="800" MinHeight="550"
         WindowStartupLocation="CenterScreen">
 
     <Window.InputBindings>

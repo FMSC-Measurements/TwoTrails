@@ -273,8 +273,11 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
                                     TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(upgradedFile, info);
 
                                     Upgrade.DAL(dal, Settings, dalv2);
-
-                                    AddProject(new TtProject(dal, Settings, this));
+                                    
+                                    TtProject proj = new TtProject(dal, Settings, this);
+                                    proj.Manager.RecalculatePolygons(false);
+                                    proj.Save();
+                                    AddProject(proj);
                                 }
                             }
                         }

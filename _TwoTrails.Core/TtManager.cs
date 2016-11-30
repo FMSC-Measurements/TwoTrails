@@ -699,12 +699,12 @@ namespace TwoTrails.Core
                 AdjustAllTravTypesInPolygon(poly);
 
                 if (waitForUpdates)
-                    UpdatePolygonStats(poly);
-                else
                 {
                     _PolygonUpdateHandlers[poly.CN].Cancel();
                     GeneratePolygonStats(poly);
                 }
+                else
+                    UpdatePolygonStats(poly);
             }
         }
         #endregion
@@ -884,9 +884,9 @@ namespace TwoTrails.Core
             point.Metadata = metadata;
         }
         
-        public void UpdatePolygonStats(TtPolygon poly)
+        public void UpdatePolygonStats(TtPolygon polygon)
         {
-            _PolygonUpdateHandlers[poly.CN].DelayInvoke();
+            _PolygonUpdateHandlers[polygon.CN].DelayInvoke();
         }
 
         protected void GeneratePolygonStats(TtPolygon polygon)
@@ -902,8 +902,8 @@ namespace TwoTrails.Core
                     TtPoint p1 = points[0], fBndPt = null, lBndPt = null;
                     TtPoint p2 = points[points.Count - 1];
 
-                    if (!p1.HasSameAdjLocation(p2))
-                        points.Add(p1);
+                    if (p1.OnBoundary)
+                        lBndPt = p1;
 
                     for (int i = 0; i < points.Count - 1; i++)
                     {
@@ -914,16 +914,22 @@ namespace TwoTrails.Core
                         {
                             if (fBndPt == null)
                                 fBndPt = p1;
-
-                            lBndPt = p1;
                         }
+
+                        if (p2.OnBoundary)
+                            lBndPt = p2;
 
                         perim += MathEx.Distance(p1.AdjX, p1.AdjY, p2.AdjX, p2.AdjY);
                         area += (p2.AdjX - p1.AdjX) * (p2.AdjY + p1.AdjY) / 2;
                     }
 
-                    if (fBndPt != null)
-                        linePerim = perim - MathEx.Distance(fBndPt.AdjX, fBndPt.AdjY, lBndPt.AdjX, lBndPt.AdjY);
+                    linePerim = perim;
+
+                    if (!fBndPt.HasSameAdjLocation(lBndPt))
+                    {
+                        perim += MathEx.Distance(fBndPt.AdjX, fBndPt.AdjY, lBndPt.AdjX, lBndPt.AdjY);
+                        area += (lBndPt.AdjX - fBndPt.AdjX) * (lBndPt.AdjY + fBndPt.AdjY) / 2;
+                    }
 
                     polygon.Update(Math.Abs(area), perim, linePerim);
                 }
@@ -1103,6 +1109,7 @@ namespace TwoTrails.Core
                 AttachPointEvents(point);
 
                 AdjustAroundPoint(point, points);
+                UpdatePolygonStats(point.Polygon);
             }
         }
         /// <summary>
@@ -1212,6 +1219,7 @@ namespace TwoTrails.Core
                 _Points.Add(point);
 
                 AdjustAroundPoint(point, points);
+                UpdatePolygonStats(point.Polygon);
             }
         }
         /// <summary>
@@ -1231,7 +1239,7 @@ namespace TwoTrails.Core
                 TtPoint lastPoint = null;
                 IList<TtPoint> points = null;
 
-                List<String> polysToAdjustTravsIn = new List<string>();
+                List<TtPolygon> polysToAdjustTravsIn = new List<TtPolygon>();
 
                 foreach (TtPoint point in replacePoints)
                 {
@@ -1251,20 +1259,21 @@ namespace TwoTrails.Core
 
                     AttachPointEvents(point);
 
-                    if (!polysToAdjustTravsIn.Contains(point.PolygonCN) &&
+                    if (!polysToAdjustTravsIn.Contains(point.Polygon) &&
                         (point.IsTravType() ||
                         point.Index > 0 && points[point.Index - 1].IsTravType() ||
                         point.Index < points.Count - 1 && points[point.Index + 1].IsTravType()))
                     {
-                        polysToAdjustTravsIn.Add(point.PolygonCN);
+                        polysToAdjustTravsIn.Add(point.Polygon);
                     }
 
                     lastPoint = point;
                 }
 
-                foreach (string polyCN in polysToAdjustTravsIn)
+                foreach (TtPolygon poly in polysToAdjustTravsIn)
                 {
-                    AdjustAllTravTypesInPolygon(_PolygonsMap[polyCN]);
+                    AdjustAllTravTypesInPolygon(poly);
+                    UpdatePolygonStats(poly);
                 }
             }
         }
@@ -1348,17 +1357,20 @@ namespace TwoTrails.Core
                     _PointsMap.Remove(point.CN);
                     _Points.Remove(point);
 
-                    if (point.Index < points.Count)
+                    if (point.Index >= points.Count)
                     {
-                        for (int i = point.Index; i < points.Count; i++)
+                        for (int i = 0; i < points.Count; i++)
                         {
                             points[i].Index = i;
                         }
+
+                        point = points.Last();
                     }
 
                     if (points.Count > 0)
                     {
                         AdjustAroundPoint(points[point.Index], points);
+                        UpdatePolygonStats(point.Polygon);
                     }
                 }
             }
