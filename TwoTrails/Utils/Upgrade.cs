@@ -67,7 +67,7 @@ namespace TwoTrails.Utils
 
             TtManager manger = new TtManager(ndal, settings);
 
-            manger.RecalculatePolygons();
+            manger.RecalculatePolygons(false);
             manger.Save();
         }
     }

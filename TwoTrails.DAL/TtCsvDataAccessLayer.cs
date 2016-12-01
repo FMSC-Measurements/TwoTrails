@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using FMSC.Core;
+using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,7 +19,6 @@ namespace TwoTrails.DAL
     {
         public bool RequiresUpgrade { get; } = false;
 
-
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
         private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
         private Dictionary<string, TtMetadata> _Metadata = new Dictionary<string, TtMetadata>();
@@ -27,14 +27,16 @@ namespace TwoTrails.DAL
 
         private TtProjectInfo _ProjectInfo;
 
-        private ParseOptions _Options;
+        private readonly ParseOptions _Options;
+        private readonly int _Zone;
         private bool parsed;
         private int hoursInc = 0;
 
 
-        public TtCsvDataAccessLayer(ParseOptions options)
+        public TtCsvDataAccessLayer(ParseOptions options, int projectZone)
         {
             _Options = options;
+            _Zone = projectZone;
         }
 
         private void Parse()
@@ -46,15 +48,17 @@ namespace TwoTrails.DAL
                 ParseMetadata(_Options.MetadataFile);
                 ParseGroups(_Options.GroupsFile);
                 ParseNmea(_Options.NmeaFile);
-                ParsePoints(_Options.PointsFile, _Options.PointMapping, _Options.UseAdvParsing);
+                ParsePoints(_Options.PointsFile, _Options.PointMapping, _Options.Mode, _Zone);
 
                 parsed = true;
             }
         }
 
 
-        private void ParsePoints(string filePath, IDictionary<PointTextFieldType, int> mapping, bool useAdvParsing)
+        private void ParsePoints(string filePath, IDictionary<PointTextFieldType, int> mapping, ParseMode mode, int zone)
         {
+            bool useAdvParsing = mode == ParseMode.Advanced;
+
             mapping = mapping.Where(x => x.Value > -1).ToDictionary(x => x.Key, x => x.Value);
 
             Dictionary<string, string> polyNameToCN = new Dictionary<string, string>();
@@ -189,12 +193,21 @@ namespace TwoTrails.DAL
                     point = new GpsPoint();
                 }
 
-                //XYZ
-                point.UnAdjX = reader.GetField<double>(fUnAjX);
-                point.UnAdjY = reader.GetField<double>(fUnAjY);
-
-                if (hasUnAdjZ)
-                    point.UnAdjZ = reader.GetField<double>(fUnAjZ);
+                if (mode == ParseMode.LatLon)
+                {
+                    ((GpsPoint)point).SetUnAdjLocation(
+                        reader.GetField<double>(fLat),
+                        reader.GetField<double>(fLon),
+                        zone,
+                        hasUnAdjZ ? reader.GetField<double>(fUnAjZ) : 0);
+                }
+                else
+                {
+                    point.SetUnAdjLocation(
+                        reader.GetField<double>(fUnAjX),
+                        reader.GetField<double>(fUnAjY),
+                        hasUnAdjZ ? reader.GetField<double>(fUnAjZ) : 0);
+                }
 
                 //Time
                 if (hasTime)
@@ -500,7 +513,12 @@ namespace TwoTrails.DAL
         }
     }
 
-
+    public enum ParseMode
+    {
+        Basic,
+        Advanced,
+        LatLon
+    }
 
     public class ParseOptions
     {
@@ -512,13 +530,14 @@ namespace TwoTrails.DAL
         public string NmeaFile { get; }
         public string MediaFile { get; }
         public string UserActivityFile { get; }
+        
 
         private Dictionary<PointTextFieldType, int> _PointMapping { get; } = new Dictionary<PointTextFieldType, int>();
         public ReadOnlyDictionary<PointTextFieldType, int> PointMapping { get; }
 
         public string[] Fields { get; private set; }
 
-        public bool UseAdvParsing { get; set; }
+        public ParseMode Mode { get; set; }
 
         public bool HasMultiplePolygons
         {
@@ -528,6 +547,16 @@ namespace TwoTrails.DAL
                     PointMapping.ContainsKey(PointTextFieldType.POLY_CN);
             }
         }
+
+
+        public bool TravDistanceOverride { get; set; }
+        public Distance TravDistance { get; set; }
+
+
+        public bool TravSlopeOverride { get; set; }
+        public Slope TravSlope { get; set; }
+
+
 
         public ParseOptions(string pointsFile, string projectFile = null, string polysFile = null, string metaFile = null,
             string groupsFile = null, string nmeaFile = null, string mediaFile = null, string activityFile = null)

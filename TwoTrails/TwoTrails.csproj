@@ -114,8 +114,8 @@
     </Compile>
     <Compile Include="ApiKeys.cs" />
     <Compile Include="AppInfo.cs" />
-    <Compile Include="Controls\CsvImportControl.xaml.cs">
-      <DependentUpon>CsvImportControl.xaml</DependentUpon>
+    <Compile Include="Controls\CsvParseControl.xaml.cs">
+      <DependentUpon>CsvParseControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ImportControl.xaml.cs">
       <DependentUpon>ImportControl.xaml</DependentUpon>
@@ -129,6 +129,7 @@
     <Compile Include="Controls\UserActivityControl.xaml.cs">
       <DependentUpon>UserActivityControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\EnumBooleanConverter.cs" />
     <Compile Include="Converters\M2Converter.cs" />
     <Compile Include="Converters\MetersToFeetConverter.cs" />
     <Compile Include="Converters\NotNullConverter.cs" />
@@ -215,7 +216,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\CsvImportControl.xaml">
+    <Page Include="Controls\CsvParseControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

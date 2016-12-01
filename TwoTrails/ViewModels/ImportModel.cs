@@ -97,9 +97,21 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                     break;
                 case ".csv":
                 case ".text":
-                    MainContent = new CsvImportControl(fileName, (d, hasGroups) => MainContent = new ImportControl(d, false, hasGroups, false));
+                    MainContent = new CsvParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
+                    {
+                        //TODO show progress indicator while parsing
+                        //MainContent = new WaitCursorControl; ??
+                        bool hasGroups = dal.GetGroups().Any();
+
+                        //hide progress indicator
+
+                        ImportControl = new ImportControl(dal, false, hasGroups, false);
+                        MainContent = ImportControl;
+                    });
                     break;
                 case ".gpx":
+                    break;
+                case ".shp":
                     break;
                 default:
                     MessageBox.Show("File type not supported.");

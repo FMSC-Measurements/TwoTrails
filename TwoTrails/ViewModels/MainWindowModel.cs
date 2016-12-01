@@ -130,7 +130,7 @@ namespace TwoTrails.ViewModels
 
 
             NewCommand = new RelayCommand(x => CreateProject());
-            OpenCommand = new RelayCommand(x => OpenProject());
+            OpenCommand = new RelayCommand(x => BrowseProject());
             OpenProjectCommand = new RelayCommand(x => OpenProject(x as string));
             SaveCommand = new RelayCommand(x => SaveCurrentProject());
             CloseProjectCommand = new RelayCommand(x => CurrentProject.Close());
@@ -184,12 +184,12 @@ namespace TwoTrails.ViewModels
 
 
 
-        public void OpenProject()
+        public void BrowseProject()
         {
             OpenFileDialog dialog = new OpenFileDialog();
 
             dialog.DefaultExt = ".tt";
-            dialog.Filter = "TwoTrails Files (*.tt)|*.tt";
+            dialog.Filter = "TwoTrails Files (*.tt)|*.tt|TwoTrails V2 Files (*.tt2)|*.tt2";
             
             bool? result = dialog.ShowDialog();
 
@@ -274,10 +274,7 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
 
                                     Upgrade.DAL(dal, Settings, dalv2);
                                     
-                                    TtProject proj = new TtProject(dal, Settings, this);
-                                    proj.Manager.RecalculatePolygons(false);
-                                    proj.Save();
-                                    AddProject(proj);
+                                    AddProject(new TtProject(dal, Settings, this));
                                 }
                             }
                         }

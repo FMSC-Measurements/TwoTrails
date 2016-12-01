@@ -20,14 +20,13 @@ namespace TwoTrails.Controls
     /// <summary>
     /// Interaction logic for CsvImportControl.xaml
     /// </summary>
-    public partial class CsvImportControl : UserControl
+    public partial class CsvParseControl : UserControl
     {
-        public CsvImportControl(string fileName, Action<IReadOnlyTtDataLayer, bool> onSetup)
+        public CsvParseControl(string fileName, int zone, Action<IReadOnlyTtDataLayer> onSetup)
         {
-            DataContext = new CsvImportModel(fileName, onSetup);
+            DataContext = new CsvImportModel(fileName, zone, onSetup);
 
             InitializeComponent();
         }
-        
     }
 }
