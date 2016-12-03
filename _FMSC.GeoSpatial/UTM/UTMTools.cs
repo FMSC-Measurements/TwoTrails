@@ -5,17 +5,17 @@ namespace FMSC.GeoSpatial.UTM
 {
     public static class UTMTools
     {
-        public static UTMCoords convertLatLonToUTM(Position position, int targetUTM = 0)
+        public static UTMCoords ConvertLatLonToUTM(Position position, int targetUTM = 0)
         {
-            return convertLatLonToUTM(position.Latitude, position.Longitude, targetUTM);
+            return ConvertLatLonToUTM(position.Latitude, position.Longitude, targetUTM);
         }
         
-        public static UTMCoords convertLatLonToUTM(Latitude latitude, Longitude longitude, int targetUTM = 0)
+        public static UTMCoords ConvertLatLonToUTM(Latitude latitude, Longitude longitude, int targetUTM = 0)
         {
-            return convertLatLonSignedDecToUTM(latitude.toSignedDecimal(), longitude.toSignedDecimal(), targetUTM);
+            return ConvertLatLonSignedDecToUTM(latitude.toSignedDecimal(), longitude.toSignedDecimal(), targetUTM);
         }
 
-        public static UTMCoords convertLatLonSignedDecToUTM(double latitude, double longitude, int targetUTM)
+        public static UTMCoords ConvertLatLonSignedDecToUTM(double latitude, double longitude, int targetUTM)
         {
             const double deg2rad = Math.PI / 180;
 
@@ -87,14 +87,20 @@ namespace FMSC.GeoSpatial.UTM
             return new UTMCoords(UTMEasting, UTMNorthing, Zone);
         }
 
-
-        public static Position convertUTMtoLatLonSignedDec(double utmX, double utmY, int utmZone)
+        public static UTMCoords ShiftZones(double utmX, double utmY, int targetZone, int oldZone)
         {
-            Point point = convertUTMtoLatLonSignedDecAsPoint(utmX, utmY, utmZone);
+            Point p = ConvertUTMtoLatLonSignedDecAsPoint(utmX, utmY, oldZone);
+            return ConvertLatLonSignedDecToUTM(p.Y, p.X, targetZone);
+        }
+
+
+        public static Position ConvertUTMtoLatLonSignedDec(double utmX, double utmY, int utmZone)
+        {
+            Point point = ConvertUTMtoLatLonSignedDecAsPoint(utmX, utmY, utmZone);
             return new Position(point.Y, point.X);
         }
 
-        public static Point convertUTMtoLatLonSignedDecAsPoint(double utmX, double utmY, int utmZone)
+        public static Point ConvertUTMtoLatLonSignedDecAsPoint(double utmX, double utmY, int utmZone)
         {
             //boolean isNorthHemisphere = true; // utmZone[utmZone.Length - 1] >= 'N';
 

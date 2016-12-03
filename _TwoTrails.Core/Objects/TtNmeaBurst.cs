@@ -148,12 +148,12 @@ namespace TwoTrails.Core
 
         public UTMCoords GetTrueUTM()
         {
-            return UTMTools.convertLatLonToUTM(Position);
+            return UTMTools.ConvertLatLonToUTM(Position);
         }
 
         public UTMCoords GetUTM(int zone)
         {
-            UTMCoords coords = UTMTools.convertLatLonToUTM(Position, zone);
+            UTMCoords coords = UTMTools.ConvertLatLonToUTM(Position, zone);
 
             _X = coords.X;
             _Y = coords.Y;

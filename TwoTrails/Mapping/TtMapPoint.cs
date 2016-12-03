@@ -298,11 +298,11 @@ namespace TwoTrails.Mapping
                 }
                 else
                 {
-                    Point adj = UTMTools.convertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone);
+                    Point adj = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone);
                     AdjLocation = new Location(adj.Y, adj.X);
                     AdjPushpin.Location = AdjLocation;
 
-                    Point unadj = UTMTools.convertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
+                    Point unadj = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
                     UnAdjLocation = new Location(adj.Y, adj.X);
                     UnAdjPushpin.Location = UnAdjLocation;
                 }

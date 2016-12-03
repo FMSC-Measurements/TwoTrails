@@ -36,21 +36,22 @@ namespace TwoTrails.ViewModels
             get { return _ImportControl; }
             set
             {
-                _ImportControl = value;
-                if (_ImportControl != null)
-                    _ImportControl.PolygonSelectionChanged += (Object sender, EventArgs e) =>
-                        OnPropertyChanged(nameof(CanImport));
+                SetField(ref _ImportControl, value, () =>
+                {
+                    if (_ImportControl != null)
+                        _ImportControl.PolygonSelectionChanged += (Object sender, EventArgs e) =>
+                            OnPropertyChanged(nameof(CanImport));
+                    OnPropertyChanged(nameof(CanImport));
+                });
             }
         }
 
-        public bool IsImporting { get { return Get<bool>(); } set { Set(value); } }
+        public bool IsImporting { get { return Get<bool>(); } set { Set(value, () => OnPropertyChanged(nameof(CanImport))); } }
+        public bool IsSettingUp { get { return Get<bool>(); } set { Set(value); } }
 
         public string CurrentFile { get { return Get<string>(); } set { Set(value); } }
 
-        public bool CanImport(string fileName)
-        {
-            return File.Exists(fileName) && ImportControl != null && ImportControl.HasSelectedPolygons && !IsImporting;
-        }
+        public bool CanImport { get { return ImportControl != null && ImportControl.HasSelectedPolygons && !IsImporting; } }
 
 
         public ImportModel(Window window, ITtManager manager)
@@ -63,8 +64,7 @@ namespace TwoTrails.ViewModels
             BrowseFileCommand = new BindedRelayCommand<ImportModel>(x => BrowseFile(), x => !IsImporting,
                 this, m => m.IsImporting);
 
-            ImportCommand = new BindedRelayCommand<ImportModel>(x => ImportData(),
-                x => CanImport(CurrentFile), this, m => new { m.IsImporting, m.MainContent });
+            ImportCommand = new BindedRelayCommand<ImportModel>(x => ImportData(), x => CanImport, this, m => m.CanImport);
 
             CloseCommand = new RelayCommand(x => Close());
         }
@@ -88,15 +88,18 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
             switch (Path.GetExtension(fileName))
             {
                 case ".tt":
+                    IsSettingUp = true;
                     ImportControl = new ImportControl(new TtSqliteDataAccessLayer(fileName), true, true, true);
                     MainContent = ImportControl;
                     break;
                 case ".tt2":
+                    IsSettingUp = true;
                     ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), true, true, true);
                     MainContent = ImportControl;
                     break;
                 case ".csv":
                 case ".text":
+                    IsSettingUp = true;
                     MainContent = new CsvParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
                     {
                         //TODO show progress indicator while parsing
@@ -121,8 +124,12 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
         public void ImportData()
         {
+            IsSettingUp = false;
+            IsImporting = true;
             Import.DAL(_Manager, ImportControl.DAL, ImportControl.SelectedPolygons,
                 ImportControl.IncludeMetadata, ImportControl.IncludeGroups, ImportControl.IncludeNmea);
+            ImportControl = null;
+            IsImporting = false;
         }
 
         private void Close()

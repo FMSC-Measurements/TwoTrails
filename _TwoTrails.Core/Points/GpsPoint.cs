@@ -158,7 +158,7 @@ namespace TwoTrails.Core.Points
             Latitude = lat;
             Longitude = lon;
 
-            UTMCoords coords = UTMTools.convertLatLonSignedDecToUTM(lat, lon, zone);
+            UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(lat, lon, zone);
 
             SetUnAdjLocation(coords.X, coords.Y, elev);
         }

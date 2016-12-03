@@ -6,14 +6,16 @@
         xmlns:local="clr-namespace:TwoTrails.Dialogs"
         WindowStartupLocation="CenterOwner"
         mc:Ignorable="d"
-        Title="Import Polygons" Height="300" Width="400">
+        Title="Import Polygons" Height="300" MinHeight="300" Width="400" MinWidth="350"
+        Drop="Grid_Drop" AllowDrop="{Binding IsSettingUp, Converter={StaticResource InverseBool}}">
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Drop="Grid_Drop" AllowDrop="True">
+        <Grid Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>

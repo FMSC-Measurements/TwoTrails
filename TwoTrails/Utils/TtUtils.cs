@@ -38,18 +38,18 @@ namespace TwoTrails.Utils
 
                 if (gps != null && gps.HasLatLon)
                 {
-                    return UTMTools.convertLatLonSignedDecToUTM((double)gps.Latitude, (double)gps.Longitude, targetZone);
+                    return UTMTools.ConvertLatLonSignedDecToUTM((double)gps.Latitude, (double)gps.Longitude, targetZone);
                 }
                 else //Use reverse location calculation
                 {
                     Position pos;
 
                     if (adjusted)
-                        pos = UTMTools.convertUTMtoLatLonSignedDec(point.AdjX, point.AdjY, point.Metadata.Zone);
+                        pos = UTMTools.ConvertUTMtoLatLonSignedDec(point.AdjX, point.AdjY, point.Metadata.Zone);
                     else
-                        pos = UTMTools.convertUTMtoLatLonSignedDec(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
+                        pos = UTMTools.ConvertUTMtoLatLonSignedDec(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
 
-                    return UTMTools.convertLatLonToUTM(pos, targetZone);
+                    return UTMTools.ConvertLatLonToUTM(pos, targetZone);
                 }
             }
             else
@@ -74,8 +74,8 @@ namespace TwoTrails.Utils
                     throw new Exception("Missing Metadata");
 
                 return adjusted ?
-                    UTMTools.convertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone) :
-                    UTMTools.convertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
+                    UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone) :
+                    UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
             }
         }
 

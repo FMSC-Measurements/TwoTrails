@@ -468,9 +468,9 @@ namespace FMSC.GeoSpatial.NMEA
         public UTMCoords GetUTM(int zone = 0)
         {
             if (Validate(SentenceID.GGA))
-                return UTMTools.convertLatLonToUTM(((PositionSentence)GetSentenceByPriority(SentenceID.GGA)).Position, zone);
+                return UTMTools.ConvertLatLonToUTM(((PositionSentence)GetSentenceByPriority(SentenceID.GGA)).Position, zone);
             else if (Validate(SentenceID.RMC))
-                return UTMTools.convertLatLonToUTM(((PositionSentence)GetSentenceByPriority(SentenceID.RMC)).Position, zone);
+                return UTMTools.ConvertLatLonToUTM(((PositionSentence)GetSentenceByPriority(SentenceID.RMC)).Position, zone);
 
             throw new MissingNmeaDataException("Missing RMC and GGA Sentences");
         }

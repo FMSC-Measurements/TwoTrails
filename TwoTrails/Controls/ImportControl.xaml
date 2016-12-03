@@ -17,7 +17,7 @@
                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <CheckBox>
+                    <CheckBox IsChecked="{Binding IsSelected}">
                         <CheckBox.Content>
                             <Grid>
                                 <Grid.RowDefinitions>

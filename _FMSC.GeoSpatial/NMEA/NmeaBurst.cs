@@ -277,9 +277,9 @@ namespace FMSC.GeoSpatial.NMEA
         public UTMCoords GetUTM(int utmZone = 0)
         {
             if (Validate(gga))
-                return UTMTools.convertLatLonToUTM(gga.Position, utmZone);
+                return UTMTools.ConvertLatLonToUTM(gga.Position, utmZone);
             else if (Validate(rmc))
-                return UTMTools.convertLatLonToUTM(rmc.Position, utmZone);
+                return UTMTools.ConvertLatLonToUTM(rmc.Position, utmZone);
 
             throw new MissingNmeaDataException("Missing RMC and GGA Sentences");
         }

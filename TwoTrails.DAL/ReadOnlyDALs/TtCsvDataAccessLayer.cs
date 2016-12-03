@@ -199,7 +199,7 @@ namespace TwoTrails.DAL
                         reader.GetField<double>(fLat),
                         reader.GetField<double>(fLon),
                         zone,
-                        hasUnAdjZ ? reader.GetField<double>(fUnAjZ) : 0);
+                        hasElevation ? reader.GetField<double?>(fElev) ?? 0 : 0);
                 }
                 else
                 {
@@ -511,13 +511,9 @@ namespace TwoTrails.DAL
         {
             return new List<TtUserActivity>();
         }
-    }
 
-    public enum ParseMode
-    {
-        Basic,
-        Advanced,
-        LatLon
+
+
     }
 
     public class ParseOptions
@@ -530,7 +526,7 @@ namespace TwoTrails.DAL
         public string NmeaFile { get; }
         public string MediaFile { get; }
         public string UserActivityFile { get; }
-        
+
 
         private Dictionary<PointTextFieldType, int> _PointMapping { get; } = new Dictionary<PointTextFieldType, int>();
         public ReadOnlyDictionary<PointTextFieldType, int> PointMapping { get; }
@@ -741,6 +737,13 @@ namespace TwoTrails.DAL
                 _PointMapping[field] = index;
             }
         }
+    }
+
+    public enum ParseMode
+    {
+        Basic,
+        Advanced,
+        LatLon
     }
 
     public enum PointTextFieldType
