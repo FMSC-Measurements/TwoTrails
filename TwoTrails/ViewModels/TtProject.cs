@@ -18,6 +18,8 @@ namespace TwoTrails.ViewModels
 {
     public class TtProject : NotifyPropertyChangedEx
     {
+        public event EventHandler<string> MessagePosted;
+
         #region Commands
         public ICommand OpenMapCommand { get; }
         public ICommand OpenMapWindowCommand { get; }
@@ -165,7 +167,9 @@ namespace TwoTrails.ViewModels
                     }
 
                     Manager.Save();
+                    HistoryManager.ClearHistory();
                     RequiresSave = DataChanged = ProjectChanged = false;
+                    MessagePosted?.Invoke(this, String.Format("Project '{0}' Saved", ProjectName));
                 }
                 catch (Exception ex)
                 {

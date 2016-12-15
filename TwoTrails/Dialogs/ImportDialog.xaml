@@ -7,7 +7,7 @@
         WindowStartupLocation="CenterOwner"
         mc:Ignorable="d"
         Title="Import Polygons" Height="300" MinHeight="300" Width="400" MinWidth="350"
-        Drop="Grid_Drop" AllowDrop="{Binding IsSettingUp, Converter={StaticResource InverseBool}}">
+        Drop="Grid_Drop" AllowDrop="{Binding IsSettingUp, Converter={StaticResource IBC}}">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -32,6 +32,10 @@
                 <Button Content="Browse" Grid.Column="1" Command="{Binding BrowseFileCommand}" Width="50"/>
             </Grid>
 
+            <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Drag File Here" FontSize="24" Foreground="Gray"/>
+
+            
+            
             <ContentControl Grid.Row="0" Grid.RowSpan="2" Visibility="{Binding HasMainContent}" Content="{Binding MainContent}" />
         </Grid>
 
@@ -42,7 +46,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             
-            <Button Content="Cancel" Width="75" Grid.Column="0" Command="{Binding CloseCommand}"/>
+            <Button Content="{Binding CloseText}" Width="75" Grid.Column="0" Command="{Binding CancelCommand}"/>
             <Button Content="Import" Width="75" Grid.Column="2"
                     Command="{Binding ImportCommand}" CommandParameter="{Binding ElementName=txtFile, Path=Text}"/>
         </Grid>

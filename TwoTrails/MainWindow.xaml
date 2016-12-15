@@ -103,7 +103,7 @@
                 <MenuItem Header="_Data">
                     <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                    <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapCommand}" IsEnabled="True"/>
+                    <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                 </MenuItem>
 
                 <MenuItem Header="_Tools">
@@ -148,7 +148,7 @@
                 </StatusBar.Resources>
                 
                 <StatusBarItem>
-                    <TextBlock Name="sbiStatus"/>
+                    <TextBlock Name="sbiMessage" Text="{Binding StatusMessage}"/>
                 </StatusBarItem>
 
                 <StatusBarItem HorizontalAlignment="Right">
@@ -160,7 +160,6 @@
                     Margin="0" Padding="0" Drop="tabControl_Drop" AllowDrop="True"
                     DockPanel.Dock="Top" BorderThickness="0"
                     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                <!--SelectionChanged="{Binding Tabs_SelectionChanged}">-->
 
                 <TabControl.Resources>
                     <Style TargetType="{x:Type TabItem}">
@@ -245,7 +244,6 @@
                         <Setter Property="Height" Value="25" />
                         <Setter Property="Margin" Value="0" />
                         <Setter Property="Padding" Value="0" />
-                        <!--<Setter Property="FontFamily" Value="DokChampa" />-->
                         <Setter Property="FontSize" Value="14" />
                         <Setter Property="Foreground" Value="White"/>
                     </Style>

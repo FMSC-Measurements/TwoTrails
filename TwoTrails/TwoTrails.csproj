@@ -114,6 +114,9 @@
     </Compile>
     <Compile Include="ApiKeys.cs" />
     <Compile Include="AppInfo.cs" />
+    <Compile Include="Controls\GpxParseControl.xaml.cs">
+      <DependentUpon>GpxParseControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\CsvParseControl.xaml.cs">
       <DependentUpon>CsvParseControl.xaml</DependentUpon>
     </Compile>
@@ -130,6 +133,7 @@
       <DependentUpon>UserActivityControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\EnumBooleanConverter.cs" />
+    <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\M2Converter.cs" />
     <Compile Include="Converters\MetersToFeetConverter.cs" />
     <Compile Include="Converters\NotNullConverter.cs" />
@@ -190,6 +194,7 @@
       <DependentUpon>SelectPointDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\ExportProjectModel.cs" />
+    <Compile Include="ViewModels\GpxImportModel.cs" />
     <Compile Include="ViewModels\ImportModel.cs" />
     <Compile Include="ViewModels\MainWindowModel.cs" />
     <Compile Include="Tabs\MapTab.cs" />
@@ -215,6 +220,10 @@
     <Page Include="AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\GpxParseControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\CsvParseControl.xaml">
       <SubType>Designer</SubType>

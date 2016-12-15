@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReadOnlyDALs\ParseMode.cs" />
     <Compile Include="ReadOnlyDALs\TtCsvDataAccessLayer.cs" />
     <Compile Include="ReadOnlyDALs\TtGpxDataAccessLayer.cs" />
     <Compile Include="ReadOnlyDALs\TtShapeFileDataAccessLayer.cs" />

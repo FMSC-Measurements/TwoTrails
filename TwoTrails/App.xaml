@@ -3,13 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:TwoTrails"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
-             xmlns:cswpf="clr-namespace:CSUtil.WPF;assembly=CSUtilSlim"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
         <cvt:NotNullConverter x:Key="NotNullConverter"/>
-        <cswpf:InverseBooleanConverter x:Key="InverseBool"/>
+        <cvt:InverseBooleanConverter x:Key="IBC"/>
 
         <BitmapImage x:Key="ImgOpenInNew" UriSource="res/open_in_new.png" />
         <BitmapImage x:Key="ImgClose" UriSource="res/close.png" />

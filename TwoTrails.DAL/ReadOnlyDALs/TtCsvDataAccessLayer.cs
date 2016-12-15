@@ -30,7 +30,9 @@ namespace TwoTrails.DAL
         private readonly ParseOptions _Options;
         private readonly int _Zone;
         private bool parsed;
-        private int hoursInc = 0;
+        private int secondsInc = 0;
+
+        private static object locker = new object();
 
 
         public TtCsvDataAccessLayer(ParseOptions options, int projectZone)
@@ -39,18 +41,31 @@ namespace TwoTrails.DAL
             _Zone = projectZone;
         }
 
-        private void Parse()
+        public void Parse(bool reparse = false)
         {
-            if (!parsed)
+            lock (locker)
             {
-                ParseProject(_Options.ProjectFile);
-                ParsePolygons(_Options.PolygonsFile);
-                ParseMetadata(_Options.MetadataFile);
-                ParseGroups(_Options.GroupsFile);
-                ParseNmea(_Options.NmeaFile);
-                ParsePoints(_Options.PointsFile, _Options.PointMapping, _Options.Mode, _Zone);
+                if (!parsed || reparse)
+                {
+                    if (reparse)
+                    {
+                        _Points.Clear();
+                        _Polygons.Clear();
+                        _Metadata.Clear();
+                        _Groups.Clear();
+                        _Nmea.Clear();
+                        secondsInc = 0;
+                    }
 
-                parsed = true;
+                    ParseProject(_Options.ProjectFile);
+                    ParsePolygons(_Options.PolygonsFile);
+                    ParseMetadata(_Options.MetadataFile);
+                    ParseGroups(_Options.GroupsFile);
+                    ParseNmea(_Options.NmeaFile);
+                    ParsePoints(_Options.PointsFile, _Options.PointMapping, _Options.Mode, _Zone);
+
+                    parsed = true;
+                } 
             }
         }
 
@@ -229,7 +244,7 @@ namespace TwoTrails.DAL
                                 reader.GetField<string>(fPolyName) :
                                 String.Format("Poly {0}", _Polygons.Count + 1),
                             PointStartIndex = _Polygons.Count * 1000 + 1010,
-                            TimeCreated = _ProjectInfo.CreationDate.AddHours(++hoursInc)
+                            TimeCreated = _ProjectInfo.CreationDate.AddSeconds(secondsInc++)
                         };
 
                         _Polygons.Add(cn, poly);
@@ -249,7 +264,7 @@ namespace TwoTrails.DAL
                         {
                             Name = reader.GetField<string>(fPolyName),
                             PointStartIndex = _Polygons.Count * 1000 + 1010,
-                            TimeCreated = _ProjectInfo.CreationDate.AddHours(++hoursInc)
+                            TimeCreated = _ProjectInfo.CreationDate.AddHours(secondsInc++)
                         };
 
                         _Polygons.Add(poly.CN, poly);
@@ -429,7 +444,7 @@ namespace TwoTrails.DAL
 
         private void ParseProject(string filePath)
         {
-            filePath = filePath ?? "test.csv";
+            filePath = filePath ?? _Options.PointsFile;
 
             //TODO Parse Project
             _ProjectInfo = new TtProjectInfo(Path.GetFileName(filePath),
@@ -514,268 +529,228 @@ namespace TwoTrails.DAL
 
 
 
-    }
-
-    public class ParseOptions
-    {
-        public String PointsFile { get; }
-        public string ProjectFile { get; }
-        public string PolygonsFile { get; }
-        public string MetadataFile { get; }
-        public string GroupsFile { get; }
-        public string NmeaFile { get; }
-        public string MediaFile { get; }
-        public string UserActivityFile { get; }
-
-
-        private Dictionary<PointTextFieldType, int> _PointMapping { get; } = new Dictionary<PointTextFieldType, int>();
-        public ReadOnlyDictionary<PointTextFieldType, int> PointMapping { get; }
-
-        public string[] Fields { get; private set; }
-
-        public ParseMode Mode { get; set; }
-
-        public bool HasMultiplePolygons
+        public class ParseOptions
         {
-            get
+            public String PointsFile { get; }
+            public string ProjectFile { get; }
+            public string PolygonsFile { get; }
+            public string MetadataFile { get; }
+            public string GroupsFile { get; }
+            public string NmeaFile { get; }
+            public string MediaFile { get; }
+            public string UserActivityFile { get; }
+
+
+            private Dictionary<PointTextFieldType, int> _PointMapping { get; } = new Dictionary<PointTextFieldType, int>();
+            public ReadOnlyDictionary<PointTextFieldType, int> PointMapping { get; }
+
+            public string[] Fields { get; private set; }
+
+            public ParseMode Mode { get; set; }
+
+            public bool HasMultiplePolygons
             {
-                return PointMapping.ContainsKey(PointTextFieldType.POLY_NAME) ||
-                    PointMapping.ContainsKey(PointTextFieldType.POLY_CN);
-            }
-        }
-
-
-        public bool TravDistanceOverride { get; set; }
-        public Distance TravDistance { get; set; }
-
-
-        public bool TravSlopeOverride { get; set; }
-        public Slope TravSlope { get; set; }
-
-
-
-        public ParseOptions(string pointsFile, string projectFile = null, string polysFile = null, string metaFile = null,
-            string groupsFile = null, string nmeaFile = null, string mediaFile = null, string activityFile = null)
-        {
-            PointsFile = pointsFile;
-            ProjectFile = projectFile;
-            PolygonsFile = polysFile;
-            MetadataFile = metaFile;
-            GroupsFile = groupsFile;
-            NmeaFile = nmeaFile;
-            MediaFile = mediaFile;
-            activityFile = UserActivityFile;
-
-            ResetPointMap();
-            PointMapping = new ReadOnlyDictionary<PointTextFieldType, int>(_PointMapping);
-        }
-
-        public void ResetPointMap()
-        {
-            _PointMapping.Clear();
-
-            int index = 0;
-
-            Fields = File.ReadLines(PointsFile).First().Split(',');
-            foreach (string header in Fields.Select(s => s.ToLower()))
-            {
-                switch (header)
+                get
                 {
-                    case "point":
-                    case "pid":
-                    case "point id":
-                        EditPointMap(PointTextFieldType.PID, index, false);
-                        break;
-                    case "optype":
-                    case "op":
-                    case "operation":
-                        EditPointMap(PointTextFieldType.OPTYPE, index, false);
-                        break;
-                    case "index":
-                    case "indx":
-                        EditPointMap(PointTextFieldType.INDEX, index, false);
-                        break;
-                    case "polygon":
-                    case "polygon name":
-                    case "poly name":
-                        EditPointMap(PointTextFieldType.POLY_NAME, index, false);
-                        break;
-                    case "group":
-                    case "group name":
-                        EditPointMap(PointTextFieldType.GROUP_NAME, index, false);
-                        break;
-                    case "time":
-                    case "time created":
-                    case "datetime":
-                        EditPointMap(PointTextFieldType.TIME, index, false);
-                        break;
-                    case "meta":
-                    case "metadata":
-                    case "metacn":
-                    case "meta cn":
-                    case "metadata cn":
-                        EditPointMap(PointTextFieldType.META_CN, index, false);
-                        break;
-                    case "onbnd":
-                    case "on bnd":
-                    case "onboundary":
-                    case "on boundary":
-                    case "boundary":
-                    case "bnd":
-                        EditPointMap(PointTextFieldType.ONBND, index, false);
-                        break;
-                    case "x":
-                    case "unadjx":
-                        EditPointMap(PointTextFieldType.UNADJX, index, false);
-                        break;
-                    case "y":
-                    case "unadjy":
-                        EditPointMap(PointTextFieldType.UNADJY, index, false);
-                        break;
-                    case "z":
-                    case "unadjz":
-                        EditPointMap(PointTextFieldType.UNADJZ, index, false);
-                        break;
-                    case "manacc":
-                    case "man acc":
-                    case "manualacc":
-                    case "manual acc":
-                    case "manacc (m)":
-                    case "man acc (m)":
-                        EditPointMap(PointTextFieldType.MAN_ACC, index, false);
-                        break;
-                    case "lat":
-                    case "latitude":
-                        EditPointMap(PointTextFieldType.LATITUDE, index, false);
-                        break;
-                    case "lon":
-                    case "long":
-                    case "longitude":
-                        EditPointMap(PointTextFieldType.LONGITUDE, index, false);
-                        break;
-                    case "elev":
-                    case "elev (m)":
-                    case "elevation":
-                    case "elevation (m)":
-                        EditPointMap(PointTextFieldType.ELEVATION, index, false);
-                        break;
-                    case "rmser":
-                        EditPointMap(PointTextFieldType.RMSER, index, false);
-                        break;
-                    case "fwdaz":
-                    case "fwd az":
-                    case "fwd azimuth":
-                    case "forward az":
-                    case "forward azimuth":
-                        EditPointMap(PointTextFieldType.FWD_AZ, index, false);
-                        break;
-                    case "bkaz":
-                    case "bk az":
-                    case "bk azimuth":
-                    case "back az":
-                    case "back azimuth":
-                    case "backward az":
-                    case "backward azimuth":
-                        EditPointMap(PointTextFieldType.BK_AZ, index, false);
-                        break;
-                    case "slope dist":
-                    case "slope distance":
-                        EditPointMap(PointTextFieldType.SLOPE_DIST, index, false);
-                        break;
-                    case "dist uom":
-                    case "slope dist uom":
-                    case "slope d type":
-                    case "slope dist type":
-                    case "slope distance type":
-                        EditPointMap(PointTextFieldType.SLOPE_DIST_TYPE, index, false);
-                        break;
-                    case "slp ang":
-                    case "slp angle":
-                    case "slope angle":
-                        EditPointMap(PointTextFieldType.SLOPE_ANG, index, false);
-                        break;
-                    case "angle uom":
-                    case "slope ang uom":
-                    case "slope a type":
-                    case "slope ang type":
-                    case "slope angle type":
-                        EditPointMap(PointTextFieldType.SLOPE_ANG_TYPE, index, false);
-                        break;
-                    case "parent":
-                    case "parent cn":
-                        EditPointMap(PointTextFieldType.PARENT_CN, index, false);
-                        break;
-                    case "cmt":
-                    case "comment":
-                        EditPointMap(PointTextFieldType.COMMENT, index, false);
-                        break;
-                    case "cn":
-                    case "point cn":
-                        EditPointMap(PointTextFieldType.CN, index, false);
-                        break;
-                    case "poly cn":
-                    case "polygon cn":
-                        EditPointMap(PointTextFieldType.POLY_CN, index, false);
-                        break;
-                    case "group cn":
-                        EditPointMap(PointTextFieldType.GROUP_CN, index, false);
-                        break;
+                    return PointMapping.ContainsKey(PointTextFieldType.POLY_NAME) ||
+                        PointMapping.ContainsKey(PointTextFieldType.POLY_CN);
                 }
+            }
 
-                index++;
+
+            public bool TravDistanceOverride { get; set; }
+            public Distance TravDistance { get; set; }
+
+
+            public bool TravSlopeOverride { get; set; }
+            public Slope TravSlope { get; set; }
+
+
+
+            public ParseOptions(string pointsFile, string projectFile = null, string polysFile = null, string metaFile = null,
+                string groupsFile = null, string nmeaFile = null, string mediaFile = null, string activityFile = null)
+            {
+                PointsFile = pointsFile;
+                ProjectFile = projectFile;
+                PolygonsFile = polysFile;
+                MetadataFile = metaFile;
+                GroupsFile = groupsFile;
+                NmeaFile = nmeaFile;
+                MediaFile = mediaFile;
+                activityFile = UserActivityFile;
+
+                ResetPointMap();
+                PointMapping = new ReadOnlyDictionary<PointTextFieldType, int>(_PointMapping);
+            }
+
+            public void ResetPointMap()
+            {
+                _PointMapping.Clear();
+
+                int index = 0;
+
+                Fields = File.ReadLines(PointsFile).First().Split(',');
+                foreach (string header in Fields.Select(s => s.ToLower()))
+                {
+                    switch (header)
+                    {
+                        case "point":
+                        case "pid":
+                        case "point id":
+                            EditPointMap(PointTextFieldType.PID, index, false);
+                            break;
+                        case "optype":
+                        case "op":
+                        case "operation":
+                            EditPointMap(PointTextFieldType.OPTYPE, index, false);
+                            break;
+                        case "index":
+                        case "indx":
+                            EditPointMap(PointTextFieldType.INDEX, index, false);
+                            break;
+                        case "polygon":
+                        case "polygon name":
+                        case "poly name":
+                            EditPointMap(PointTextFieldType.POLY_NAME, index, false);
+                            break;
+                        case "group":
+                        case "group name":
+                            EditPointMap(PointTextFieldType.GROUP_NAME, index, false);
+                            break;
+                        case "time":
+                        case "time created":
+                        case "datetime":
+                            EditPointMap(PointTextFieldType.TIME, index, false);
+                            break;
+                        case "meta":
+                        case "metadata":
+                        case "metacn":
+                        case "meta cn":
+                        case "metadata cn":
+                            EditPointMap(PointTextFieldType.META_CN, index, false);
+                            break;
+                        case "onbnd":
+                        case "on bnd":
+                        case "onboundary":
+                        case "on boundary":
+                        case "boundary":
+                        case "bnd":
+                            EditPointMap(PointTextFieldType.ONBND, index, false);
+                            break;
+                        case "x":
+                        case "unadjx":
+                            EditPointMap(PointTextFieldType.UNADJX, index, false);
+                            break;
+                        case "y":
+                        case "unadjy":
+                            EditPointMap(PointTextFieldType.UNADJY, index, false);
+                            break;
+                        case "z":
+                        case "unadjz":
+                            EditPointMap(PointTextFieldType.UNADJZ, index, false);
+                            break;
+                        case "manacc":
+                        case "man acc":
+                        case "manualacc":
+                        case "manual acc":
+                        case "manacc (m)":
+                        case "man acc (m)":
+                            EditPointMap(PointTextFieldType.MAN_ACC, index, false);
+                            break;
+                        case "lat":
+                        case "latitude":
+                            EditPointMap(PointTextFieldType.LATITUDE, index, false);
+                            break;
+                        case "lon":
+                        case "long":
+                        case "longitude":
+                            EditPointMap(PointTextFieldType.LONGITUDE, index, false);
+                            break;
+                        case "elev":
+                        case "elev (m)":
+                        case "elevation":
+                        case "elevation (m)":
+                            EditPointMap(PointTextFieldType.ELEVATION, index, false);
+                            break;
+                        case "rmser":
+                            EditPointMap(PointTextFieldType.RMSER, index, false);
+                            break;
+                        case "fwdaz":
+                        case "fwd az":
+                        case "fwd azimuth":
+                        case "forward az":
+                        case "forward azimuth":
+                            EditPointMap(PointTextFieldType.FWD_AZ, index, false);
+                            break;
+                        case "bkaz":
+                        case "bk az":
+                        case "bk azimuth":
+                        case "back az":
+                        case "back azimuth":
+                        case "backward az":
+                        case "backward azimuth":
+                            EditPointMap(PointTextFieldType.BK_AZ, index, false);
+                            break;
+                        case "slope dist":
+                        case "slope distance":
+                            EditPointMap(PointTextFieldType.SLOPE_DIST, index, false);
+                            break;
+                        case "dist uom":
+                        case "slope dist uom":
+                        case "slope d type":
+                        case "slope dist type":
+                        case "slope distance type":
+                            EditPointMap(PointTextFieldType.SLOPE_DIST_TYPE, index, false);
+                            break;
+                        case "slp ang":
+                        case "slp angle":
+                        case "slope angle":
+                            EditPointMap(PointTextFieldType.SLOPE_ANG, index, false);
+                            break;
+                        case "angle uom":
+                        case "slope ang uom":
+                        case "slope a type":
+                        case "slope ang type":
+                        case "slope angle type":
+                            EditPointMap(PointTextFieldType.SLOPE_ANG_TYPE, index, false);
+                            break;
+                        case "parent":
+                        case "parent cn":
+                            EditPointMap(PointTextFieldType.PARENT_CN, index, false);
+                            break;
+                        case "cmt":
+                        case "comment":
+                            EditPointMap(PointTextFieldType.COMMENT, index, false);
+                            break;
+                        case "cn":
+                        case "point cn":
+                            EditPointMap(PointTextFieldType.CN, index, false);
+                            break;
+                        case "poly cn":
+                        case "polygon cn":
+                            EditPointMap(PointTextFieldType.POLY_CN, index, false);
+                            break;
+                        case "group cn":
+                            EditPointMap(PointTextFieldType.GROUP_CN, index, false);
+                            break;
+                    }
+
+                    index++;
+                }
+            }
+
+            public void EditPointMap(PointTextFieldType field, int index, bool replace = true)
+            {
+                if (!_PointMapping.ContainsKey(field))
+                {
+                    _PointMapping.Add(field, index);
+                }
+                else if (replace)
+                {
+                    _PointMapping[field] = index;
+                }
             }
         }
-
-        public void EditPointMap(PointTextFieldType field, int index, bool replace = true)
-        {
-            if (!_PointMapping.ContainsKey(field))
-            {
-                _PointMapping.Add(field, index);
-            }
-            else if (replace)
-            {
-                _PointMapping[field] = index;
-            }
-        }
     }
 
-    public enum ParseMode
-    {
-        Basic,
-        Advanced,
-        LatLon
-    }
-
-    public enum PointTextFieldType
-    {
-        NO_FIELD = 0,
-        CN = 1,
-        OPTYPE = 2,
-        INDEX = 3,
-        PID = 4,
-        TIME = 5,
-        POLY_NAME = 6,
-        GROUP_NAME = 7,
-        COMMENT = 8,
-        META_CN = 9,
-        ONBND = 10,
-        UNADJX = 11,
-        UNADJY = 12,
-        UNADJZ = 13,
-        ACCURACY = 14,
-        MAN_ACC = 15,
-        RMSER = 16,
-        LATITUDE = 17,
-        LONGITUDE = 18,
-        ELEVATION = 19,
-        FWD_AZ = 20,
-        BK_AZ = 21,
-        SLOPE_DIST = 22,
-        SLOPE_DIST_TYPE = 23,
-        SLOPE_ANG = 24,
-        SLOPE_ANG_TYPE = 25,
-        PARENT_CN = 26,
-        POLY_CN = 27,
-        GROUP_CN = 28
-    }
 }

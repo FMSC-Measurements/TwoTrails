@@ -30,234 +30,260 @@ namespace TwoTrails.DAL
         private readonly ParseOptions _Options;
         private readonly int _Zone;
         private bool parsed;
-        private int hoursInc = 0;
+        private int secondsInc = 0;
+
+        private static object locker = new object();
 
 
         public TtShapeFileDataAccessLayer(ParseOptions options, int projectZone)
         {
             _Options = options;
             _Zone = projectZone;
+
+            string filePath = options.ShapeFiles.First().ShapeFilePath;
+            _ProjectInfo = new TtProjectInfo(Path.GetFileName(filePath),
+                String.Empty,
+                String.Empty,
+                String.Empty,
+                String.Empty,
+                String.Empty,
+                String.Empty,
+                new Version("0.0.0"),
+                String.Empty,
+                File.GetCreationTime(filePath));
         }
 
 
-        private void Parse()
+        public void Parse(bool reparse = false)
         {
-            if (!parsed)
+            lock (locker)
             {
-                GeometryFactory factory;
-                ShapefileDataReader shapeFileDataReader;
-                ArrayList features;
-                Feature feature;
-                AttributesTable attributesTable;
-                string[] keys;
-                Geometry geometry;
-                DbaseFieldDescriptor fldDescriptor;
-                TtPolygon poly;
-
-                GpsPoint gps;
-                int index = 0;
-
-                int totalImports = _Options.TotalImports;
-
-                foreach (ShapeFilePackage file in _Options.ImportingShapeFiles)
+                if (!parsed || reparse)
                 {
-                    factory = new GeometryFactory();
-                    shapeFileDataReader = new ShapefileDataReader(file.ShapeFilePath, factory);
-                    DbaseFileHeader header = shapeFileDataReader.DbaseHeader;
-                    TtPoint lastPoint = null;
-
-                    features = new ArrayList();
-                    while (shapeFileDataReader.Read())
+                    if (reparse)
                     {
-                        feature = new Feature();
-                        attributesTable = new AttributesTable();
-                        keys = new string[header.NumFields];
-                        geometry = (Geometry)shapeFileDataReader.Geometry;
-
-                        for (int i = 0; i < header.NumFields; i++)
-                        {
-                            fldDescriptor = header.Fields[i];
-                            keys[i] = fldDescriptor.Name;
-                            attributesTable.AddAttribute(fldDescriptor.Name, shapeFileDataReader.GetValue(i));
-                        }
-
-                        feature.Geometry = geometry;
-                        feature.Attributes = attributesTable;
-                        features.Add(feature);
+                        _Points.Clear();
+                        _Polygons.Clear();
+                        secondsInc = 0;
                     }
 
-                    bool areAllPoints = true;
-                    foreach (Feature feat in features)
+                    GeometryFactory factory;
+                    ShapefileDataReader shapeFileDataReader;
+                    ArrayList features;
+                    Feature feature;
+                    AttributesTable attributesTable;
+                    string[] keys;
+                    Geometry geometry;
+                    DbaseFieldDescriptor fldDescriptor;
+                    TtPolygon poly;
+
+                    GpsPoint gps;
+                    int index = 0;
+
+                    int totalImports = _Options.TotalImports;
+
+                    foreach (ShapeFilePackage file in _Options.ImportingShapeFiles)
                     {
-                        if (feat.Geometry.GeometryType.ToLower() != "point")
+                        factory = new GeometryFactory();
+                        shapeFileDataReader = new ShapefileDataReader(file.ShapeFilePath, factory);
+                        DbaseFileHeader header = shapeFileDataReader.DbaseHeader;
+                        TtPoint lastPoint = null;
+
+                        features = new ArrayList();
+                        while (shapeFileDataReader.Read())
                         {
-                            areAllPoints = false;
-                            break;
+                            feature = new Feature();
+                            attributesTable = new AttributesTable();
+                            keys = new string[header.NumFields];
+                            geometry = (Geometry)shapeFileDataReader.Geometry;
+
+                            for (int i = 0; i < header.NumFields; i++)
+                            {
+                                fldDescriptor = header.Fields[i];
+                                keys[i] = fldDescriptor.Name;
+                                attributesTable.AddAttribute(fldDescriptor.Name, shapeFileDataReader.GetValue(i));
+                            }
+
+                            feature.Geometry = geometry;
+                            feature.Attributes = attributesTable;
+                            features.Add(feature);
                         }
-                    }
 
-                    //if all features are points
-                    if (areAllPoints)
-                    {
-                        poly = new TtPolygon()
-                        {
-                            PointStartIndex = 1000 * _Polygons.Count + 1010,
-                            Name = file.Name
-                        };
-
-                        index = 0;
-
+                        bool areAllPoints = true;
                         foreach (Feature feat in features)
                         {
-                            //if features is only a point there should only be 1 coord
-                            foreach (Coordinate coord in feat.Geometry.Coordinates)
+                            if (feat.Geometry.GeometryType.ToLower() != "point")
                             {
-                                gps = new GpsPoint()
-                                {
-                                    OnBoundary = true,
-                                    Index = index++,
-                                    MetadataCN = Consts.EmptyGuid,
-                                    PID = PointNamer.NamePoint(poly, lastPoint),
-                                    Polygon = poly
-                                };
-
-                                if (file.Zone != _Zone && _Options.ConvertInvalidZones)
-                                {
-                                    UTMCoords c = UTMTools.ShiftZones(coord.X, coord.Y, _Zone, file.Zone);
-
-                                    gps.UnAdjX = c.X;
-                                    gps.UnAdjY = c.Y;
-                                }
-                                else
-                                {
-                                    gps.UnAdjX = coord.X;
-                                    gps.UnAdjY = coord.Y;
-                                }
-
-                                if (_Options.UseElevation)
-                                {
-                                    if (coord.Z != double.NaN)
-                                    {
-                                        gps.UnAdjZ = _Options.Elevation == UomElevation.Feet ?
-                                            FMSC.Core.Convert.Distance(coord.Z, FMSC.Core.Distance.Meters, FMSC.Core.Distance.FeetTenths) :
-                                            coord.Z;
-                                    }
-                                    else
-                                        gps.UnAdjZ = 0;
-                                }
-                                else
-                                    gps.UnAdjZ = 0;
-                                
-                                _Points.Add(gps.CN, gps);
-                                lastPoint = gps;
+                                areAllPoints = false;
+                                break;
                             }
                         }
 
-                        _Polygons.Add(poly.CN, poly);
-                    }
-                    else //else get points out of each features
-                    {
-                        int fidInc = 0;
-
-                        foreach (Feature feat in features)
+                        //if all features are points
+                        if (areAllPoints)
                         {
-                            lastPoint = null;
-
                             poly = new TtPolygon()
                             {
                                 PointStartIndex = 1000 * _Polygons.Count + 1010,
-                                Name = features.Count < 2 ? file.Name :
-                                    String.Format("{0}-{1}", fidInc++, file.Name)
+                                Name = file.Name,
+                                TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
                             };
-
-                            #region Shape Desc Properties
-                            object[] objs = feat.Attributes.GetValues();
-                            string[] names = feat.Attributes.GetNames();
-                            string objv;
-
-                            for (int i = 0; i < feat.Attributes.Count; i++)
-                            {
-                                if (objs[i] is string)
-                                {
-                                    objv = (string)objs[i];
-
-                                    if (String.IsNullOrWhiteSpace(objv))
-                                        continue;
-
-                                    switch (names[i].ToLower())
-                                    {
-                                        case "description":
-                                        case "comment":
-                                        case "poly":
-                                            if (String.IsNullOrEmpty(poly.Description))
-                                                poly.Description = objv;
-                                            else
-                                                poly.Description = String.Format("{0} | {1}", poly.Description, objv);
-                                            break;
-                                        case "name":
-                                        case "unit":
-                                            poly.Name = objv;
-                                            break;
-                                    }
-                                }
-                            }
-                            #endregion
-
 
                             index = 0;
 
-                            foreach (Coordinate coord in feat.Geometry.Coordinates)
+                            foreach (Feature feat in features)
                             {
-                                gps = new GpsPoint()
+                                //if features is only a point there should only be 1 coord
+                                foreach (Coordinate coord in feat.Geometry.Coordinates)
                                 {
-                                    OnBoundary = true,
-                                    PID = PointNamer.NamePoint(poly, lastPoint),
-                                    Index = index++,
-                                    MetadataCN = Consts.EmptyGuid,
-                                    Polygon = poly
-                                };
-
-                                if (file.Zone != _Zone && _Options.ConvertInvalidZones)
-                                {
-                                    UTMCoords c = UTMTools.ShiftZones(coord.X, coord.Y, _Zone, file.Zone);
-
-                                    gps.UnAdjX = c.X;
-                                    gps.UnAdjY = c.Y;
-                                }
-                                else
-                                {
-                                    gps.UnAdjX = coord.X;
-                                    gps.UnAdjY = coord.Y;
-                                }
-
-                                if (_Options.UseElevation)
-                                {
-                                    if (coord.Z != double.NaN)
+                                    gps = new GpsPoint()
                                     {
-                                        gps.UnAdjZ = _Options.Elevation == UomElevation.Feet ?
-                                            FMSC.Core.Convert.Distance(coord.Z, FMSC.Core.Distance.Meters, FMSC.Core.Distance.FeetTenths) :
-                                            coord.Z;
+                                        OnBoundary = true,
+                                        Index = index++,
+                                        MetadataCN = Consts.EmptyGuid,
+                                        PID = PointNamer.NamePoint(poly, lastPoint),
+                                        Polygon = poly
+                                    };
+
+                                    if (file.Zone != _Zone && _Options.ConvertInvalidZones)
+                                    {
+                                        UTMCoords c = UTMTools.ShiftZones(coord.X, coord.Y, _Zone, file.Zone);
+
+                                        gps.UnAdjX = c.X;
+                                        gps.UnAdjY = c.Y;
+                                    }
+                                    else
+                                    {
+                                        gps.UnAdjX = coord.X;
+                                        gps.UnAdjY = coord.Y;
+                                    }
+
+                                    if (_Options.UseElevation)
+                                    {
+                                        if (coord.Z != double.NaN)
+                                        {
+                                            gps.UnAdjZ = _Options.Elevation == UomElevation.Feet ?
+                                                FMSC.Core.Convert.Distance(coord.Z, FMSC.Core.Distance.Meters, FMSC.Core.Distance.FeetTenths) :
+                                                coord.Z;
+                                        }
+                                        else
+                                            gps.UnAdjZ = 0;
                                     }
                                     else
                                         gps.UnAdjZ = 0;
-                                }
-                                else
-                                    gps.UnAdjZ = 0;
 
-                                _Points.Add(gps.CN, gps);
-                                lastPoint = gps;
+                                    _Points.Add(gps.CN, gps);
+                                    lastPoint = gps;
+                                }
                             }
-                            
+
                             _Polygons.Add(poly.CN, poly);
                         }
+                        else //else get points out of each features
+                        {
+                            int fidInc = 0;
+
+                            foreach (Feature feat in features)
+                            {
+                                lastPoint = null;
+
+                                poly = new TtPolygon()
+                                {
+                                    PointStartIndex = 1000 * _Polygons.Count + 1010,
+                                    Name = features.Count < 2 ? file.Name :
+                                        String.Format("{0}-{1}", fidInc++, file.Name),
+                                    TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
+                                };
+
+                                #region Shape Desc Properties
+                                object[] objs = feat.Attributes.GetValues();
+                                string[] names = feat.Attributes.GetNames();
+                                string objv;
+
+                                for (int i = 0; i < feat.Attributes.Count; i++)
+                                {
+                                    if (objs[i] is string)
+                                    {
+                                        objv = (string)objs[i];
+
+                                        if (String.IsNullOrWhiteSpace(objv))
+                                            continue;
+
+                                        switch (names[i].ToLower())
+                                        {
+                                            case "description":
+                                            case "comment":
+                                            case "poly":
+                                                if (String.IsNullOrEmpty(poly.Description))
+                                                    poly.Description = objv;
+                                                else
+                                                    poly.Description = String.Format("{0} | {1}", poly.Description, objv);
+                                                break;
+                                            case "name":
+                                            case "unit":
+                                                poly.Name = objv;
+                                                break;
+                                        }
+                                    }
+                                }
+                                #endregion
+
+
+                                index = 0;
+
+                                foreach (Coordinate coord in feat.Geometry.Coordinates)
+                                {
+                                    gps = new GpsPoint()
+                                    {
+                                        OnBoundary = true,
+                                        PID = PointNamer.NamePoint(poly, lastPoint),
+                                        Index = index++,
+                                        MetadataCN = Consts.EmptyGuid,
+                                        Polygon = poly
+                                    };
+
+                                    if (file.Zone != _Zone && _Options.ConvertInvalidZones)
+                                    {
+                                        UTMCoords c = UTMTools.ShiftZones(coord.X, coord.Y, _Zone, file.Zone);
+
+                                        gps.UnAdjX = c.X;
+                                        gps.UnAdjY = c.Y;
+                                    }
+                                    else
+                                    {
+                                        gps.UnAdjX = coord.X;
+                                        gps.UnAdjY = coord.Y;
+                                    }
+
+                                    if (_Options.UseElevation)
+                                    {
+                                        if (coord.Z != double.NaN)
+                                        {
+                                            gps.UnAdjZ = _Options.Elevation == UomElevation.Feet ?
+                                                FMSC.Core.Convert.Distance(coord.Z, FMSC.Core.Distance.Meters, FMSC.Core.Distance.FeetTenths) :
+                                                coord.Z;
+                                        }
+                                        else
+                                            gps.UnAdjZ = 0;
+                                    }
+                                    else
+                                        gps.UnAdjZ = 0;
+
+                                    _Points.Add(gps.CN, gps);
+                                    lastPoint = gps;
+                                }
+
+                                _Polygons.Add(poly.CN, poly);
+                            }
+                        }
+
+                        //Close and free up any resources
+                        shapeFileDataReader.Close();
+                        shapeFileDataReader.Dispose();
                     }
 
-                    //Close and free up any resources
-                    shapeFileDataReader.Close();
-                    shapeFileDataReader.Dispose();
-                }
-                
-                parsed = true;
+                    parsed = true;
+                } 
             }
         }
 

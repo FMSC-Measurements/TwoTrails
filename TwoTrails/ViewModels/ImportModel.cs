@@ -3,6 +3,7 @@ using FMSC.Core.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,13 +22,15 @@ namespace TwoTrails.ViewModels
     {
         public ICommand BrowseFileCommand { get; }
         public ICommand ImportCommand { get; }
-        public ICommand CloseCommand { get; }
+        public ICommand CancelCommand { get; }
 
         private Window _Window;
         private ITtManager _Manager;
 
-        public Control MainContent { get { return Get<Control>(); } set { Set(value, () => OnPropertyChanged(nameof(HasMainContent))); } }
+        public Control MainContent { get { return Get<Control>(); } set { Set(value, () => OnPropertyChanged(nameof(HasMainContent), nameof(CloseText))); } }
         public Visibility HasMainContent { get { return MainContent != null ? Visibility.Visible : Visibility.Collapsed; } }
+
+        public string CloseText { get { return MainContent == null ? "Close" : "Cancel"; } }
 
 
         private ImportControl _ImportControl;
@@ -42,6 +45,7 @@ namespace TwoTrails.ViewModels
                         _ImportControl.PolygonSelectionChanged += (Object sender, EventArgs e) =>
                             OnPropertyChanged(nameof(CanImport));
                     OnPropertyChanged(nameof(CanImport));
+                    MainContent = _ImportControl;
                 });
             }
         }
@@ -66,7 +70,7 @@ namespace TwoTrails.ViewModels
 
             ImportCommand = new BindedRelayCommand<ImportModel>(x => ImportData(), x => CanImport, this, m => m.CanImport);
 
-            CloseCommand = new RelayCommand(x => Close());
+            CancelCommand = new RelayCommand(x => Cancel());
         }
 
         private void BrowseFile()
@@ -90,31 +94,56 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                 case ".tt":
                     IsSettingUp = true;
                     ImportControl = new ImportControl(new TtSqliteDataAccessLayer(fileName), true, true, true);
-                    MainContent = ImportControl;
                     break;
                 case ".tt2":
                     IsSettingUp = true;
                     ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), true, true, true);
-                    MainContent = ImportControl;
                     break;
                 case ".csv":
                 case ".text":
                     IsSettingUp = true;
                     MainContent = new CsvParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
                     {
-                        //TODO show progress indicator while parsing
-                        //MainContent = new WaitCursorControl; ??
-                        bool hasGroups = dal.GetGroups().Any();
+                        try
+                        {
+                            //TODO show progress indicator while parsing
+                            //MainContent = new WaitCursorControl; ??
+                            dal.Parse();
+                            //hide progress indicator
 
-                        //hide progress indicator
-
-                        ImportControl = new ImportControl(dal, false, hasGroups, false);
-                        MainContent = ImportControl;
+                            ImportControl = new ImportControl(dal, false, dal.GetGroups().Any(), false);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.Message, "ImportModel:SetupImport:CSV");
+                            MessageBox.Show(String.Format("A parsing error has occured. Please check your fields correctly. See log file for details."),
+                                "Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     });
                     break;
                 case ".gpx":
+                    IsSettingUp = true;
+                    MainContent = new GpxParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
+                    {
+                        try
+                        {
+                            //TODO show progress indicator while parsing
+                            //MainContent = new WaitCursorControl; ??
+                            dal.Parse();
+                            //hide progress indicator
+
+                            ImportControl = new ImportControl(dal, false, false, false);
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.Message, "ImportModel:SetupImport:GPX");
+                            MessageBox.Show(String.Format("A parsing error has occured. Please check your fields correctly. See log file for details."),
+                                "Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    });
                     break;
                 case ".shp":
+                    IsSettingUp = true;
                     break;
                 default:
                     MessageBox.Show("File type not supported.");
@@ -126,15 +155,37 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
         {
             IsSettingUp = false;
             IsImporting = true;
-            Import.DAL(_Manager, ImportControl.DAL, ImportControl.SelectedPolygons,
-                ImportControl.IncludeMetadata, ImportControl.IncludeGroups, ImportControl.IncludeNmea);
-            ImportControl = null;
+
+            try
+            {
+                Import.DAL(_Manager, ImportControl.DAL, ImportControl.SelectedPolygons,
+                        ImportControl.IncludeMetadata, ImportControl.IncludeGroups, ImportControl.IncludeNmea);
+
+                MessageBox.Show(String.Format("{0} Polygons Imported", ImportControl.SelectedPolygons.Count()),
+                    String.Empty, MessageBoxButton.OK, MessageBoxImage.None);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message, "ImportModel:ImportData");
+                MessageBox.Show("Import Failed. See log file for details.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            
             IsImporting = false;
+            ImportControl = null;
         }
 
-        private void Close()
+        private void Cancel()
+
         {
-            _Window.Close();
+            if (MainContent != null)
+            {
+                ImportControl = null;
+                MainContent = null;
+                IsSettingUp = false;
+                IsImporting = false;
+            }
+            else
+                _Window.Close();
         }
     }
 }

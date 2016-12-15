@@ -8,12 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using TwoTrails.DAL;
+using static TwoTrails.DAL.TtCsvDataAccessLayer;
 
 namespace TwoTrails.ViewModels
 {
     public class CsvImportModel : NotifyPropertyChangedEx
     {
-        private Action<IReadOnlyTtDataLayer> OnSetup { get; }
+        private Action<TtCsvDataAccessLayer> OnSetup { get; }
 
         private ParseOptions Options { get; }
         private int Zone { get; }
@@ -51,7 +52,17 @@ namespace TwoTrails.ViewModels
         public int GROUP_CN_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.GROUP_CN, value)); } }
         #endregion
 
-        public ParseMode Mode { get { return Get<ParseMode>(); } set { Set(value, () => OnPropertyChanged(nameof(CanImport))); } }
+        public ParseMode Mode {
+            get { return Get<ParseMode>(); }
+            set
+            {
+                Set(value, () =>
+                {
+                    OnPropertyChanged(nameof(CanImport));
+                    Options.Mode = value;
+                });
+            }
+        }
 
         public ICommand SetupImportCommand { get; }
         
@@ -153,7 +164,7 @@ namespace TwoTrails.ViewModels
 
 
 
-        public CsvImportModel(string fileName, int zone, Action<IReadOnlyTtDataLayer> onSetup)
+        public CsvImportModel(string fileName, int zone, Action<TtCsvDataAccessLayer> onSetup)
         {
             OnSetup = onSetup;
 
@@ -284,9 +295,7 @@ namespace TwoTrails.ViewModels
 
         private void SetupImport()
         {
-            TtCsvDataAccessLayer dal = new TtCsvDataAccessLayer(Options, Zone);
-
-            OnSetup(dal);
+            OnSetup(new TtCsvDataAccessLayer(Options, Zone));
         }
 
 

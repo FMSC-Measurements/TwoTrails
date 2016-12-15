@@ -142,11 +142,11 @@
             
             <TextBlock Text="Mode:" Grid.Column="0"/>
 
-            <RadioButton Content="Basic" Grid.Column="1" GroupName="mode"
+            <RadioButton Content="Basic" Grid.Column="1" GroupName="mode" ToolTip="Imports points as GPS using the UTM of the default zone"
                          IsChecked="{Binding Path=Mode, Converter={StaticResource ebc}, ConverterParameter=dal:ParseMode.Basic}"/>
-            <RadioButton Content="Advanced" Grid.Column="2" GroupName="mode"
+            <RadioButton Content="Advanced" Grid.Column="2" GroupName="mode" ToolTip="Imports points with all operations (requires all point data)"
                          IsChecked="{Binding Path=Mode, Converter={StaticResource ebc}, ConverterParameter=dal:ParseMode.Advanced}"/>
-            <RadioButton Content="Lat/Lon" Grid.Column="3" GroupName="mode"
+            <RadioButton Content="Lat/Lon" Grid.Column="3" GroupName="mode" ToolTip="Imports points as GPS using Latitude and Longitude converted into the default UTM zone"
                          IsChecked="{Binding Path=Mode, Converter={StaticResource ebc}, ConverterParameter=dal:ParseMode.LatLon}"/>
 
             <Button Content="Continue" Grid.Column="5" Command="{Binding SetupImportCommand}"/>

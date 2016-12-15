@@ -127,6 +127,19 @@ namespace TwoTrails.Core
                 OnHistoryChanged(HistoryEventType.Undone, requireRefresh);
             }
         }
+
+        public void ClearHistory()
+        {
+            _RedoStack.Clear();
+            _UndoStack.Clear();
+            OnPropertyChanged(nameof(CanUndo), nameof(CanRedo));
+        }
+
+        private void OnHistoryChanged(HistoryEventType historyEventType, bool requireRefresh)
+        {
+            HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, requireRefresh));
+            OnPropertyChanged(nameof(CanUndo), nameof(CanRedo));
+        }
         #endregion
 
 
@@ -288,14 +301,6 @@ namespace TwoTrails.Core
         }
 
         #endregion
-
-
-        private void OnHistoryChanged(HistoryEventType historyEventType, bool requireRefresh)
-        {
-            HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, requireRefresh));
-            OnPropertyChanged(nameof(CanUndo));
-            OnPropertyChanged(nameof(CanRedo));
-        }
         
 
         void ITtManager.ReplacePoint(TtPoint point)

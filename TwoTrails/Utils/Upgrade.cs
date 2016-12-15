@@ -32,9 +32,7 @@ namespace TwoTrails.Utils
             DateTime time = ndal.GetProjectInfo().CreationDate;
             IEnumerable<TtPolygon> polys = odal.GetPolygons().Select(
                     poly => {
-                        time = time.AddHours(1);
-                        poly.TimeCreated = time;
-
+                        poly.TimeCreated = (time = time.AddHours(1));
                         return poly;
                     });
 

@@ -19,12 +19,14 @@ namespace TwoTrails
         public override void Write(String message)
         {
             base.Write(String.Format("[{0}] {1}", DateTime.Now, message));
+            base.Flush();
         }
 
 
         public override void WriteLine(String message)
         {
             base.WriteLine(String.Format("[{0}] {1}", DateTime.Now, message));
+            base.Flush();
         }
     }
 }

@@ -867,10 +867,9 @@ namespace TwoTrails.Core
             {
                 coords = UTMTools.ConvertLatLonSignedDecToUTM((double)point.Latitude, (double)point.Longitude, zone);
             }
-            else //Use reverse location calculation
+            else
             {
-                Position position = UTMTools.ConvertUTMtoLatLonSignedDec(point.UnAdjX, point.UnAdjY, oldZone);
-                coords = UTMTools.ConvertLatLonToUTM(position, zone);
+                coords = UTMTools.ShiftZones(point.UnAdjX, point.UnAdjY, zone, oldZone);
             }
 
             point.SetUnAdjLocation(coords.X, coords.Y, point.UnAdjZ);

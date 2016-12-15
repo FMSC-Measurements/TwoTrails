@@ -41,16 +41,38 @@ namespace TwoTrails
                             if (poly != null)
                             {
                                 return String.Format("{0} Points in {1}",
-                                    Project.Manager.Points.Where(p => p.PolygonCN == poly.CN).Count(),
-                                    poly.Name);
+                                    Project.Manager.Points.Where(p => p.PolygonCN == poly.CN).Count(), poly.Name);
                             }
 
                             return String.Empty;
                         }
-                    case 0:
+                    case 3:
+                        {
+                            TtMetadata meta = _ProjectEditorControl.lbMetadata.SelectedItem as TtMetadata;
+                            if (meta != null)
+                            {
+                                return String.Format("{0} Points use {1}",
+                                    Project.Manager.Points.Where(p => p.MetadataCN == meta.CN).Count(), meta.Name);
+                            }
+
+                            return String.Empty;
+                        }
+                    case 4:
+                        {
+                            TtGroup group = _ProjectEditorControl.lbGroups.SelectedItem as TtGroup;
+                            if (group != null)
+                            {
+                                return String.Format("{0} Points in {1}",
+                                    Project.Manager.Points.Where(p => p.GroupCN == group.CN).Count(), group.Name);
+                            }
+
+                            return String.Empty;
+                        }
                     default:
-                        return String.Empty;
+                        break;
                 }
+
+                return String.Empty;
             }
         }
 
@@ -63,7 +85,6 @@ namespace TwoTrails
             {
                 IsEditingPoints = _ProjectEditorControl.tabControl.SelectedIndex == 1;
                 OnPropertyChanged(nameof(TabInfo));
-
             };
 
             Project.DataEditor.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>

@@ -8,7 +8,7 @@ using System.Windows.Data;
 
 namespace TwoTrails.Converters
 {
-    class NullOrBoolConverter : IMultiValueConverter
+    public class NullOrBoolConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

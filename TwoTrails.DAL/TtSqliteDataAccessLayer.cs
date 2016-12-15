@@ -77,7 +77,8 @@ namespace TwoTrails.DAL
         public TtPoint GetPoint(String pointCN)
         {
             List<TtPoint> points = GetPoints(
-                String.Format("{0} = '{1}'",
+                String.Format("{0}.{1} = '{2}'",
+                    TwoTrailsSchema.PointSchema.TableName,
                     TwoTrailsSchema.SharedSchema.CN,
                     pointCN),
                 1,
@@ -96,7 +97,9 @@ namespace TwoTrails.DAL
                     String.Format("{0} = '{1}'",
                         TwoTrailsSchema.PointSchema.PolyCN,
                         polyCN) :
-                    null
+                    null,
+                0,
+                true
             );
         }
 

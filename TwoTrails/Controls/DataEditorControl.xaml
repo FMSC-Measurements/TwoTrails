@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:TwoTrails"
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:ctrls="clr-namespace:TwoTrails.Controls"
-             xmlns:csucvt="clr-namespace:CSUtil.WPF;assembly=CSUtilSlim"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
              xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
              xmlns:cc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
@@ -15,7 +14,6 @@
              d:DesignHeight="600" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <csucvt:InverseBooleanConverter x:Key="IBC"/>
         <cvt:MetadataValueConverter x:Key="mdvcElev" MetadataPropertyName="Elevation"/>
         <cvt:MetadataValueConverter x:Key="mdvcSlpDist" MetadataPropertyName="Distance"/>
         <cvt:MetadataValueConverter x:Key="mdvcSlpAng" MetadataPropertyName="SlopeAngle"/>

@@ -5,8 +5,81 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails"
         mc:Ignorable="d"
-        Title="AboutWindow" Height="300" Width="300" WindowStartupLocation="CenterOwner">
+        Title="About TwoTrails" Height="250" Width="350" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"/>
+
+        <Grid Grid.Column="1" Grid.Row="0" Margin="2.5,2.5,2.5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="TwoTrails"/>
+
+            <TextBlock Grid.Row="1" Text="Version"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Version}"/>
+
+            <TextBlock Grid.Row="2" Text="DB Version"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding DBVersion}"/>
+
+            <TextBlock Grid.Row="3" Text="Copyright"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Copyright}"/>
+
+            <TextBlock Grid.Row="4" Text="Group"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+                <Hyperlink NavigateUri="http://www.fs.fed.us/fmsc/" RequestNavigate="Hyperlink_RequestNavigate">
+                    Forest Management Service Center
+                </Hyperlink>
+            </TextBlock>
+            
+            <TextBlock Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right">
+                <Hyperlink NavigateUri="http://www.fs.fed.us/fmsc/measure/" RequestNavigate="Hyperlink_RequestNavigate">
+                    Forest Products Measurement
+                </Hyperlink>
+            </TextBlock>
+
+            <ListBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,2.5,0,0">
+                <ListBox.Items>
+                    <ListBoxItem>
+                        <Hyperlink NavigateUri="https://sqlite.org/" RequestNavigate="Hyperlink_RequestNavigate">
+                            SQLite
+                        </Hyperlink>
+                    </ListBoxItem>
+                    <ListBoxItem>
+                        <Hyperlink NavigateUri="https://github.com/NetTopologySuite/" RequestNavigate="Hyperlink_RequestNavigate">
+                            NetTopologySuite
+                        </Hyperlink>
+                    </ListBoxItem>
+                    <ListBoxItem>
+                        <Hyperlink NavigateUri="https://joshclose.github.io/CsvHelper/" RequestNavigate="Hyperlink_RequestNavigate">
+                            CsvHelper
+                        </Hyperlink>
+                    </ListBoxItem>
+                </ListBox.Items>
+            </ListBox>
+        </Grid>
+        
+        <Button Grid.Column="1" Grid.Row="1" Width="75" Margin="2.5" HorizontalAlignment="Right" Content="OK" Command="{Binding CloseCommand}"/>
     </Grid>
 </Window>

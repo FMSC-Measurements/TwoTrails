@@ -1,5 +1,6 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Utilities;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -63,6 +64,40 @@ namespace TwoTrails.ViewModels
                 });
             }
         }
+
+
+        public string StatusMessage { get { return Get<string>(); } private set { Set(value); } }
+        private DelayActionHandler _EndMessageDelayHandler;
+        private Action _EndMessage;
+        private int _Delay = 5000;
+
+        public void PostMessage(string message, int delay = 5000)
+        {
+            StatusMessage = message;
+
+            if (_EndMessageDelayHandler == null)
+            {
+                _EndMessage = () =>
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        StatusMessage = String.Empty;
+                    });
+                };
+
+                _EndMessageDelayHandler = new DelayActionHandler(_EndMessage, _Delay);
+                _EndMessageDelayHandler.DelayInvoke();
+            }
+            else if (_Delay != delay)
+            {
+                _EndMessageDelayHandler.DelayInvoke(_EndMessage, _Delay);
+            }
+            else
+            {
+                _EndMessageDelayHandler.DelayInvoke();
+            }
+        }
+
 
         public TtProject CurrentProject { get { return CurrentTab?.Project; } }
         
@@ -331,14 +366,30 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
 
 
 
-        private void AddProject(TtProject proj)
+        private void AddProject(TtProject project)
         {
-            _Tabs.Items.Add(proj.ProjectTab.Tab);
+            _Tabs.Items.Add(project.ProjectTab.Tab);
             _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
 
-            _Projects.Add(proj.FilePath, proj);
-            Settings.AddRecentProject(proj.FilePath);
+            _Projects.Add(project.FilePath, project);
+            Settings.AddRecentProject(project.FilePath);
             UpdateRecentProjectMenu();
+
+            project.MessagePosted += Project_MessagePosted;
+        }
+
+        public void RemoveProject(TtProject project)
+        {
+            if (project != null)
+            {
+                _Projects.Remove(project.FilePath);
+                project.MessagePosted -= Project_MessagePosted;
+            }
+        }
+
+        private void Project_MessagePosted(Object sender, String message)
+        {
+            PostMessage(message);
         }
 
         public void AddTab(TtTabModel tabModel)
@@ -346,24 +397,20 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
             _Tabs.Items.Add(tabModel.Tab);
             _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
         }
-        
+
         public void SwitchToTab(TtTabModel tab)
         {
             _Tabs.SelectedItem = tab.Tab;
             tab.Tab.Focus();
         }
 
-        public void RemoveProject(TtProject project)
-        {
-            if (project != null)
-                _Projects.Remove(project.FilePath);
-        }
-
 
         public void CloseTab(TtTabModel tab)
         {
             if (tab != null)
+            {
                 _Tabs.Items.Remove(tab.Tab);
+            }
         }
 
 

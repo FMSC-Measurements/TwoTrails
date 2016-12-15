@@ -20,11 +20,11 @@ namespace TwoTrails.Controls
     /// <summary>
     /// Interaction logic for CsvImportControl.xaml
     /// </summary>
-    public partial class CsvParseControl : UserControl
+    public partial class GpxParseControl : UserControl
     {
-        public CsvParseControl(string fileName, int zone, Action<TtCsvDataAccessLayer> onSetup)
+        public GpxParseControl(string fileName, int zone, Action<TtGpxDataAccessLayer> onSetup)
         {
-            DataContext = new CsvImportModel(fileName, zone, onSetup);
+            DataContext = new GpxImportModel(fileName, zone, onSetup);
 
             InitializeComponent();
         }
