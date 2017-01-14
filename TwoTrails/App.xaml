@@ -1,0 +1,44 @@
+﻿<Application x:Class="TwoTrails.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:TwoTrails"
+             xmlns:cvt="clr-namespace:TwoTrails.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
+        <cvt:NotNullConverter x:Key="NotNullConverter"/>
+        <cvt:InverseBooleanConverter x:Key="IBC"/>
+
+        <BitmapImage x:Key="ImgOpenInNew" UriSource="res/open_in_new.png" />
+        <BitmapImage x:Key="ImgClose" UriSource="res/close.png" />
+
+        <BitmapImage x:Key="ic_polygon_black" UriSource="res/ic_polygon_black_36dp.png" />
+        <BitmapImage x:Key="ic_polygon_pts_black" UriSource="res/ic_polygon_pts_black_36dp.png" />
+        <BitmapImage x:Key="ic_polygon_pts_white" UriSource="res/ic_polygon_pts_white_36dp.png" />
+        <BitmapImage x:Key="ic_polygon_white" UriSource="res/ic_polygon_white_36dp.png" />
+        <BitmapImage x:Key="ic_unadjusted_polygon_black" UriSource="res/ic_unadjusted_polygon_black_36dp.png" />
+        <BitmapImage x:Key="ic_unadjusted_polygon_pts_black" UriSource="res/ic_unadjusted_polygon_pts_black_36dp.png" />
+        <BitmapImage x:Key="ic_unadjusted_polygon_pts_white" UriSource="res/ic_unadjusted_polygon_pts_white_36dp.png" />
+        <BitmapImage x:Key="ic_unadjusted_polygon_white" UriSource="res/ic_unadjusted_polygon_white_36dp.png" />
+        <BitmapImage x:Key="ic_ttpoint_way_black" UriSource="res/ic_ttpoint_way_black.png" />
+        <BitmapImage x:Key="ic_ttpoint_way_white" UriSource="res/ic_ttpoint_way_white.png" />
+
+
+        <Style x:Key="styleMiDisableNullCommand" TargetType="{x:Type MenuItem}">
+            <Style.Triggers>
+                <Trigger Property="Command" Value="{x:Null}">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <SolidColorBrush x:Key="colorPriamry" Color="MediumSeaGreen" />
+        <SolidColorBrush x:Key="colorPriamryLighter" Color="PaleGreen" />
+        <SolidColorBrush x:Key="colorPriamryLight" Color="DarkSeaGreen" />
+        <SolidColorBrush x:Key="colorPriamryDark" Color="SeaGreen" />
+        <SolidColorBrush x:Key="colorBackground" Color="DimGray" />
+
+        <SolidColorBrush x:Key="colorSystemBackground" Color="LightGray" />
+    </Application.Resources>
+</Application>

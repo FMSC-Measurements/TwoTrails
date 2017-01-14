@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>3b159637-9999-4e86-88c5-035a96f5ac72</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>TwoTrails.Core</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtGroupCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtMetadataCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPointCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPointsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPolygonCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateCorridorCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateQuondamsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtGroupCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtMetadataCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPointCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MovePointsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MultiTtCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPointsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPolygonCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPointMultiPropertyCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPointsMultiPropertyCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPointsMultiValueCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPointsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPointCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtGroupCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtMetadataCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtPointCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtPointsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtPolygonCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Consts.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HaidLogic.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IAccuracy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IDeviceSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMetadataSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IPointSegment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IPolygonGraphicSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IReadOnlyTtDataLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtDataLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\MediaType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\PictureType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\TtMedia.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\TtImage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\TtPanorama.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\TtPhotoShpere.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\DataActivityType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\HaidSummary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\PolygonGraphicOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtProjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\SideShotSegment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TraverseSegment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtVersion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtGroup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtMetadata.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtNmeaBurst.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtPolygon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtUserActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PointNamer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PointProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\GpsPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\IManualAccuracy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\QuondamPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\SideShotPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\Take5Point.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\TravPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\TtPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\TtPointExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\WalkPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\WayPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PolygonCalculator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TtCoreUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TtHistoryManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TtManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\GroupType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types\OpType.cs" />
+  </ItemGroup>
+</Project>

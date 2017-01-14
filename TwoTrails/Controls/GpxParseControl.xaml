@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="TwoTrails.Controls.GpxParseControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TwoTrails.Controls"
+             xmlns:cvt="clr-namespace:TwoTrails.Converters"
+             xmlns:dal="clr-namespace:TwoTrails.DAL;assembly=TwoTrails.DAL"
+             xmlns:gtypes="clr-namespace:FMSC.GeoSpatial.Types;assembly=TwoTrails.DAL"
+             xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="400">
+    <Grid Background="White" MinWidth="300">
+        <Grid>
+            <Grid.Resources>
+                <cvt:EnumBooleanConverter x:Key="ebc" />
+                <BooleanToVisibilityConverter x:Key="btv"/>
+            </Grid.Resources>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0" Margin="0,5,5,5" Text="Has Elevation" />
+            <RadioButton Grid.Column="1" Grid.Row="0" Name="rbYes" Margin="0,5,5,5" VerticalAlignment="Center" Content="Yes" GroupName="uom"
+                     IsChecked="{Binding Path=Options.UomElevation, Converter={StaticResource ebc}, ConverterParameter=gtypes:UomElevation.Feet}"/>
+            <RadioButton Grid.Column="2" Grid.Row="0" Content="No" Margin="0,5,5,5" VerticalAlignment="Center" GroupName="uom"
+                     IsChecked="{Binding Path=Options.UomElevation, Converter={StaticResource ebc}, ConverterParameter=.Meters}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,5,5,5" Text="UOM Elevation" VerticalAlignment="Center" />
+            <ComboBox Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Margin="5,0,0,0" VerticalAlignment="Center"
+                  IsEnabled="{Binding IsChecked, ElementName=rbYes}"
+                  ItemsSource="{fmsccm:EnumToItemsSource {x:Type gtypes:UomElevation}}"
+                  SelectedItem="{Binding PathOptions.UomElevation, Mode=OneWayToSource}"
+                  SelectedIndex="0"/>
+
+            <Button Grid.Column="4" Grid.Row="0" Margin="0" Content="Continue" Command="{Binding SetupImportCommand}"/>
+        </Grid>
+    </Grid>
+</UserControl>

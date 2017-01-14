@@ -1,0 +1,107 @@
+﻿<Window x:Class="TwoTrails.Dialogs.PointLocManipDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TwoTrails.Dialogs"
+        mc:Ignorable="d"
+        Title="Move Points" Height="200" Width="300"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+        <Style TargetType="RadioButton">
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <GroupBox Header="Action" Grid.Column="0" Grid.Row="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <RadioButton Content="Move" Grid.Row="0" Name="rbActMove"
+                             ToolTip="Points will be moved from their current polygon into the Target Polygon" Checked="rbActMove_Checked"/>
+                <RadioButton Content="Quondam" Grid.Row="1" Name="rbActQuondam"
+                             ToolTip="Quondams will be created from the points and inserted into the Target Polygon" Checked="rbActQuondam_Checked"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Direction" Grid.Column="0" Grid.Row="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <RadioButton Content="Forward" Grid.Row="0" Name="rbDirForward" ToolTip="Points will be inserted from start to end"/>
+                <RadioButton Content="Reverse" Grid.Row="1" Name="rbDirReverse" ToolTip="Points will be inserted from the end to start"/>
+            </Grid>
+        </GroupBox>
+
+        <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <GroupBox Header="Target Polygon" Grid.Row="0">
+                <ComboBox Name="cboPoly" SelectionChanged="cboPoly_SelectionChanged"/>
+            </GroupBox>
+            
+            <GroupBox Header="Insert Location" Grid.Row="1" VerticalAlignment="Stretch">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <RadioButton Content="End" Grid.Column="0" Grid.Row="0" Name="rbInsEnd" IsChecked="True"/>
+                    <RadioButton Content="Begining" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" Name="rbInsBeg"/>
+                    <RadioButton Content="After Point" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Name="rbInsAft"/>
+
+                    <ComboBox Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2"
+                              Name="cboPolyPoints"
+                              IsEnabled="{Binding ElementName=rbInsAft, Path=IsChecked}"
+                              VerticalAlignment="Top"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Width="75" Click="btnCancelClick">Cancel</Button>
+            <Button Grid.Column="2" Width="75" Click="btnCommitClick">Commit</Button>
+        </Grid>
+    </Grid>
+</Window>
