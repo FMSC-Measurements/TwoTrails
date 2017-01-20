@@ -159,6 +159,8 @@ namespace TwoTrails.ViewModels
 
         public MainWindowModel(MainWindow mainWindow)
         {
+            StatusMessage = String.Empty;
+
             MainWindow = mainWindow;
 
             Settings = new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings());
