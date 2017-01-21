@@ -21,9 +21,9 @@ namespace TwoTrails.Dialogs
     /// </summary>
     public partial class CreatePlotsDialog : Window
     {
-        public CreatePlotsDialog(ITtManager manager)
+        public CreatePlotsDialog(TtProject project)
         {
-            this.DataContext = new CreatePlotsModel(manager, this);
+            this.DataContext = new CreatePlotsModel(project, this);
             InitializeComponent();
         }
 
@@ -33,11 +33,15 @@ namespace TwoTrails.Dialogs
         }
 
 
-        public static bool? ShowDialog(ITtManager manager, Window owner = null)
+        public static bool? ShowDialog(TtProject project, Window owner = null)
         {
-            CreatePlotsDialog dialog = new CreatePlotsDialog(manager);
+            CreatePlotsDialog dialog = new CreatePlotsDialog(project);
+
             if (owner != null)
                 dialog.Owner = owner;
+            else
+                dialog.Owner = project.MainModel.MainWindow;
+
             return dialog.ShowDialog();
         }
     }

@@ -1384,7 +1384,7 @@ namespace TwoTrails.ViewModels
 
         private void CreatePlots()
         {
-            CreatePlotsDialog.ShowDialog(Manager, Project.MainModel.MainWindow);
+            CreatePlotsDialog.ShowDialog(Project);
         }
 
         private void CreateCorridor()

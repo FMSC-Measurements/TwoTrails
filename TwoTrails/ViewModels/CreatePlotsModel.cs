@@ -24,6 +24,8 @@ namespace TwoTrails.ViewModels
 
         private ITtManager _Manager;
 
+        public TtSettings Settings { get; }
+
         public ICommand GenerateCommand { get; }
         public ICommand CloseCommand { get; }
 
@@ -61,12 +63,13 @@ namespace TwoTrails.ViewModels
         public int BufferAmount { get { return Get<int>(); } set { Set(value); } }
 
 
-        public CreatePlotsModel(ITtManager manager, Window window)
+        public CreatePlotsModel(TtProject project, Window window)
         {
-            _Manager = manager;
+            _Manager = project.Manager;
+            Settings = project.Settings;
 
             Polygons = new ObservableCollection<TtPolygon>(
-                manager.GetPolygons().Where(p => manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint())));
+                _Manager.GetPolygons().Where(p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint())));
 
             UomDistance = Distance.FeetTenths;
 

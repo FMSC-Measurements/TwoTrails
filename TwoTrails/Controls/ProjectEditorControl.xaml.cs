@@ -42,7 +42,11 @@ namespace TwoTrails.Controls
 
         private void TextIsDouble(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = string.IsNullOrEmpty(e.Text) ? false : e.Text.All(x => char.IsDigit(x) || x == '.');
+            e.Handled = string.IsNullOrEmpty(e.Text) ? false : !(e.Text.All(x => char.IsDigit(x) || x == '.') &&
+                !(
+                    (sender is TextBox) &&
+                    (((TextBox)sender).Text.Contains(".") && e.Text.Contains(".")))
+                );
         }
     }
 

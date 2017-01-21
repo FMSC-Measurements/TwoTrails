@@ -7,7 +7,7 @@
         xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
         xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
         mc:Ignorable="d"
-        Title="Create Plots" Height="260" Width="300"
+        Title="Create Plots" Height="280" Width="300"
         WindowStartupLocation="CenterScreen">
     <DockPanel>
         <Grid DockPanel.Dock="Bottom" Margin="5">
@@ -39,6 +39,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -134,6 +135,11 @@
                          Text="{Binding BufferAmount}"
                          PreviewTextInput="TextIsInteger"/>
                 </Grid>
+
+                <CheckBox Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2"
+                          Name="cbDelExisting" Content="Delete Existing Plots"
+                          IsChecked="{Binding Settings.DeleteExistingPlots}" VerticalAlignment="Center"/>
+
             </Grid>
 
             <Grid Name="gridStatus" Panel.ZIndex="2" VerticalAlignment="Stretch" Background="White" Visibility="Hidden">

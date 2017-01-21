@@ -16,6 +16,7 @@ namespace TwoTrails
         private const String REGION = "Region";
         private const String RECENT_PROJECTS = "RecentProjects";
         private const String ADVANCED_MODE = "AdvancedMode";
+        private const String DELETE_EXISTING_PLOTS = "DeleteExistingPlots";
 
         public IMetadataSettings MetadataSettings { get; set; }
         public IDeviceSettings DeviceSettings { get; set; }
@@ -51,6 +52,19 @@ namespace TwoTrails
             }
         }
 
+        private bool _DeleteExistingPlots;
+        public bool DeleteExistingPlots
+        {
+            get { return _DeleteExistingPlots; }
+
+            set
+            {
+                SetField(ref _DeleteExistingPlots, value);
+                Properties.Settings.Default[DELETE_EXISTING_PLOTS] = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+
         private bool _IsAdvancedMode;
         public bool IsAdvancedMode
         {
@@ -70,6 +84,9 @@ namespace TwoTrails
             DeviceSettings = deviceSettings;
             MetadataSettings = metadataSettings;
             PolygonGraphicSettings = polyGraphicSettings;
+
+
+            _DeleteExistingPlots = (bool)Properties.Settings.Default[DELETE_EXISTING_PLOTS];
 
 #if DEBUG
             _IsAdvancedMode = true;

@@ -175,7 +175,7 @@ namespace TwoTrails.ViewModels
                 x => UpdatePolygonAcc(),
                 x => CurrentPolygon != null && CurrentPolygon.Accuracy != PolygonAccuracy,
                 this,
-                x => x.PolygonAccuracy);
+                x => new { x.PolygonAccuracy, CurrentPolygon.Accuracy });
 
 
             MetadataChangedCommand = new RelayCommand(x => MetadataChanged(x as TtMetadata));
@@ -249,8 +249,8 @@ namespace TwoTrails.ViewModels
 
         private void PolygonChanged(TtPolygon poly)
         {
-            PolygonAccuracy = poly != null ? poly.Accuracy : 6d;
             CurrentPolygon = poly;
+            PolygonAccuracy = poly != null ? poly.Accuracy : 6d;
         }
 
         private bool PolygonAccuracyChanged(string accStr)

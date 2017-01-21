@@ -645,12 +645,19 @@ namespace TwoTrails.Core
         {
             IgnorePointEvents = true;
             
-            Parallel.ForEach(GetAllTravTypeSegmentsInPolygon(polygon),
-                (seg) => {
-                    if (seg.IsValid)
-                        seg.Adjust();
-                }
-            );
+            foreach (IPointSegment seg in GetAllTravTypeSegmentsInPolygon(polygon))
+            {
+                if (seg.IsValid)
+                    seg.Adjust();
+            }
+
+            //Crashed on some Accuracy updating
+            //Parallel.ForEach(GetAllTravTypeSegmentsInPolygon(polygon),
+            //    (seg) => {
+            //        if (seg.IsValid)
+            //            seg.Adjust();
+            //    }
+            //);
 
             IgnorePointEvents = false;
         }
@@ -901,25 +908,20 @@ namespace TwoTrails.Core
                     TtPoint p1 = points[0], fBndPt = null, lBndPt = null;
                     TtPoint p2 = points[points.Count - 1];
 
-                    if (p1.OnBoundary)
-                        lBndPt = p1;
+                    lBndPt = p1;
 
                     for (int i = 0; i < points.Count - 1; i++)
                     {
                         p1 = points[i];
                         p2 = points[i + 1];
 
-                        if (p1.OnBoundary)
-                        {
-                            if (fBndPt == null)
-                                fBndPt = p1;
-                        }
+                        if (fBndPt == null)
+                            fBndPt = p1;
 
-                        if (p2.OnBoundary)
-                            lBndPt = p2;
+                        lBndPt = p2;
 
                         perim += MathEx.Distance(p1.AdjX, p1.AdjY, p2.AdjX, p2.AdjY);
-                        area += (p2.AdjX - p1.AdjX) * (p2.AdjY + p1.AdjY) / 2;
+                        area += (p2.AdjX - p1.AdjX) * (p2.AdjY + p1.AdjY);
                     }
 
                     linePerim = perim;
@@ -927,10 +929,10 @@ namespace TwoTrails.Core
                     if (!fBndPt.HasSameAdjLocation(lBndPt))
                     {
                         perim += MathEx.Distance(fBndPt.AdjX, fBndPt.AdjY, lBndPt.AdjX, lBndPt.AdjY);
-                        area += (lBndPt.AdjX - fBndPt.AdjX) * (lBndPt.AdjY + fBndPt.AdjY) / 2;
+                        area += (fBndPt.AdjX - lBndPt.AdjX) * (fBndPt.AdjY + lBndPt.AdjY);
                     }
 
-                    polygon.Update(Math.Abs(area), perim, linePerim);
+                    polygon.Update(Math.Abs(area) / 2, perim, linePerim);
                 }
                 else
                 {

@@ -6,5 +6,6 @@ namespace TwoTrails.Core
 {
     public interface IDeviceSettings
     {
+        //TODO Move deleteexistingplots here
     }
 }
