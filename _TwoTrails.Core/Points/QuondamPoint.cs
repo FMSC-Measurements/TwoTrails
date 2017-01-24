@@ -38,7 +38,7 @@ namespace TwoTrails.Core.Points
                         ParentPointCN = _ParentPoint.CN;
 
                         _ParentPoint.AddLinkedPoint(this);
-                        _ParentPoint.LocationChanged += ParentPoint_LocationChanged; 
+                        _ParentPoint.LocationChanged += ParentPoint_LocationChanged;
                     }
 
                     if (oldParent != null)
@@ -105,9 +105,9 @@ namespace TwoTrails.Core.Points
             OnLocationChanged();
         }
 
-        public override void SetAccuracy(double polyAccuracy)
+        public override void SetAccuracy(double accuracy)
         {
-            base.SetAccuracy(ManualAccuracy != null ? (double)ManualAccuracy : polyAccuracy);
+            base.SetAccuracy(ManualAccuracy != null ? (double)ManualAccuracy : accuracy);
         }
 
 

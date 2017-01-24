@@ -247,6 +247,11 @@ namespace TwoTrails.Core
                             sbPoints.AppendFormat("Point {0}: {1} Quondam to Point {2}.{3}", point.PID,
                                 point.OnBoundary ? " " : "*", qp.ParentPoint.PID, Environment.NewLine);
                         }
+
+                        if (point.OnBoundary)
+                        {
+                            _LastTtBndPt = point;
+                        }
                     }
                     break;
             }

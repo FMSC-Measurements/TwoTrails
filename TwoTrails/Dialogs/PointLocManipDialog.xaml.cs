@@ -53,7 +53,7 @@ namespace TwoTrails.Dialogs
 
         private void btnCancelClick(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            this.Close();
         }
 
         private void btnCommitClick(object sender, RoutedEventArgs e)
@@ -120,6 +120,20 @@ namespace TwoTrails.Dialogs
             if (owner != null)
                 plmd.Owner = owner;
             return plmd.ShowDialog();
+        }
+
+        public static void Show(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null, Window owner = null, Action onClose = null)
+        {
+            PointLocManipDialog plmd = new PointLocManipDialog(manager, points, quondam, reverse, target);
+            if (owner != null)
+                plmd.Owner = owner;
+
+            if (onClose != null)
+            {
+                plmd.Closed += (s, e) => onClose();
+            }
+
+            plmd.Show();
         }
     }
 }

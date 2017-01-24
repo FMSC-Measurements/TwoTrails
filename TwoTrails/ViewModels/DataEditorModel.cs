@@ -1192,7 +1192,7 @@ namespace TwoTrails.ViewModels
             }
 
             OnlyTravTypes = HasTravTypes && !HasGpsTypes && !HasQndms;
-            OnlyManAccTypes = !HasTravTypes && HasGpsTypes || HasQndms;
+            OnlyManAccTypes = !HasTravTypes && (HasGpsTypes || HasQndms);
             OnlyGpsTypes = !HasTravTypes && HasGpsTypes && !HasQndms;
             OnlyQuondams = !HasTravTypes && !HasGpsTypes && HasQndms;
 
@@ -1369,22 +1369,26 @@ namespace TwoTrails.ViewModels
 
         private void CreateQuondams()
         {
-            PointLocManipDialog.ShowDialog(Manager, GetSortedSelectedPoints(), true, false, null, Project.MainModel.MainWindow);
+            Project.MainModel.MainWindow.IsEnabled = false;
+            PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), true, false, null, Project.MainModel.MainWindow, () => Project.MainModel.MainWindow.IsEnabled = true);
         }
 
         private void MovePoints()
         {
-            PointLocManipDialog.ShowDialog(Manager, GetSortedSelectedPoints(), false, false, null, Project.MainModel.MainWindow);
+            Project.MainModel.MainWindow.IsEnabled = false;
+            PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), false, false, null, Project.MainModel.MainWindow, () => Project.MainModel.MainWindow.IsEnabled = true);
         }
 
         private void Retrace()
         {
-            RetraceDialog.ShowDialog(Manager, Project.MainModel.MainWindow);
+            Project.MainModel.MainWindow.IsEnabled = false;
+            RetraceDialog.Show(Manager, Project.MainModel.MainWindow, () => Project.MainModel.MainWindow.IsEnabled = true);
         }
 
         private void CreatePlots()
         {
-            CreatePlotsDialog.ShowDialog(Project);
+            Project.MainModel.MainWindow.IsEnabled = false;
+            CreatePlotsDialog.Show(Project, Project.MainModel.MainWindow, () => Project.MainModel.MainWindow.IsEnabled = true);
         }
 
         private void CreateCorridor()

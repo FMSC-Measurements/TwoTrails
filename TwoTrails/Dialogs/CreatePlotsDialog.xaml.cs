@@ -44,5 +44,22 @@ namespace TwoTrails.Dialogs
 
             return dialog.ShowDialog();
         }
+
+        public static void Show(TtProject project, Window owner = null, Action onClose = null)
+        {
+            CreatePlotsDialog dialog = new CreatePlotsDialog(project);
+
+            if (owner != null)
+                dialog.Owner = owner;
+            else
+                dialog.Owner = project.MainModel.MainWindow;
+
+            if (onClose != null)
+            {
+                dialog.Closed += (s, e) => onClose();
+            }
+
+            dialog.Show();
+        }
     }
 }

@@ -71,6 +71,16 @@ namespace TwoTrails.ViewModels
                 {
                     string path = Path.Combine(FolderLocation, project.ProjectName.Trim()).Trim();
 
+                    if (Directory.Exists(path))
+                    {
+                        if(System.Windows.MessageBox.Show("An export already exists, would you like to overwrite the existing file(s)?",
+                            "Overwrite Export", MessageBoxButton.YesNo, MessageBoxImage.Hand)
+                            == MessageBoxResult.No)
+                        {
+                            return;
+                        }
+                    }
+
                     try
                     {
                         if (IsCheckAll == true)

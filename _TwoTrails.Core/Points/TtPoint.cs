@@ -15,6 +15,7 @@ namespace TwoTrails.Core.Points
         public event PointChangedEvent LocationChanged;
         public event PointChangedEvent PreviewLocationChanged;
         public event PointChangedEvent OnBoundaryChanged;
+        public event PointChangedEvent OnAccuracyChanged;
         public event PointPolygonChangedEvent PointPolygonChanged;
         public event PointIndexChangedEvent PointIndexChanged;
 
@@ -180,7 +181,7 @@ namespace TwoTrails.Core.Points
         public Double Accuracy
         {
             get { return _Accuracy; }
-            protected set { SetField(ref _Accuracy, value); }
+            protected set { SetField(ref _Accuracy, value, () => OnAccuracyChanged?.Invoke(this)); }
         }
 
         private ObservableCollection<String> _LinkedPoints = new ObservableCollection<string>();

@@ -233,6 +233,8 @@ namespace TwoTrails.DAL
                     limit > 0 ? String.Format(" limit {0}", limit) : String.Empty
                 );
 
+                Dictionary<string, TtPolygon> polygons = GetPolygons().ToDictionary(p => p.CN, p => p);
+
                 using (SQLiteConnection conn = database.CreateAndOpenConnection())
                 {
                     using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
@@ -347,6 +349,7 @@ namespace TwoTrails.DAL
                                         qp.ParentPoint = pps.Any() ? pps.First() : null; 
                                     }
                                 }
+                                
 
                                 points.Add(point);
                             }

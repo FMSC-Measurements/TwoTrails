@@ -52,6 +52,8 @@ namespace TwoTrails.Core.ComponentModel.History
                     OnBoundary = (bndMode == null) ? point.OnBoundary : bndMode == true
                 };
 
+                qp.SetAccuracy(TargetPolygon.Accuracy);
+
                 addPoints.Add(qp);
 
                 prevPoint = qp;

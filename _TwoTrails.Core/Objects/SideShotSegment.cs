@@ -29,7 +29,8 @@ namespace TwoTrails.Core
             TtPoint basePoint = _SegmentPoints[0];
             for (int i = 1; i < _SegmentPoints.Count; i++)
             {
-                (_SegmentPoints[i] as SideShotPoint).Adjust(basePoint);
+                SideShotPoint ss = _SegmentPoints[i] as SideShotPoint;
+                ss.Adjust(basePoint);
             }
         }
     }

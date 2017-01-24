@@ -291,13 +291,8 @@ namespace TwoTrails.ViewModels
                 }
             }
 
-            MapWindow.Owner = MainModel.MainWindow;
+            //MapWindow.Owner = MainModel.MainWindow;
             MapWindow.Show();
-        }
-
-        private void DetachMapTab()
-        {
-
         }
 
         private void ViewUserActivityTab()

@@ -24,6 +24,7 @@ namespace TwoTrails.Core.Points
         {
             Calculate(point.UnAdjX, point.UnAdjY, point.UnAdjZ, false);
             Calculate(point.AdjX, point.AdjY, point.AdjZ, true);
+            SetAccuracy(point.Accuracy);
         }
     }
 }

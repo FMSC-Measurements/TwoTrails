@@ -244,6 +244,11 @@ namespace TwoTrails.Core
                 ((TravPoint)point).PositionChanged += TravPoint_PositionChanged;
             }
 
+            if (point.IsGpsType())
+            {
+                ((GpsPoint)point).OnAccuracyChanged += Point_LocationChanged;
+            }
+
             point.LocationChanged += Point_LocationChanged;
             point.OnBoundaryChanged += Point_OnBoundaryChanged;
         }
@@ -253,6 +258,11 @@ namespace TwoTrails.Core
             if (point.IsTravType())
             {
                 ((TravPoint)point).PositionChanged -= TravPoint_PositionChanged;
+            }
+
+            if (point.IsGpsType())
+            {
+                ((GpsPoint)point).OnAccuracyChanged -= Point_LocationChanged;
             }
 
             point.LocationChanged -= Point_LocationChanged;
@@ -703,7 +713,16 @@ namespace TwoTrails.Core
         {
             foreach (TtPolygon poly in _Polygons)
             {
+                IgnorePointEvents = true;
+
+                foreach (TtPoint p in _PointsByPoly[poly.CN].Where(p => p.IsGpsType()))
+                {
+                    p.SetAccuracy(poly.Accuracy);
+                }
+
                 AdjustAllTravTypesInPolygon(poly);
+
+                IgnorePointEvents = false;
 
                 if (waitForUpdates)
                 {

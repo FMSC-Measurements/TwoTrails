@@ -143,9 +143,9 @@ namespace TwoTrails.Core.Points
         }
 
 
-        public override void SetAccuracy(double polyAccuracy)
+        public override void SetAccuracy(double accuracy)
         {
-            base.SetAccuracy(ManualAccuracy != null ? (double)ManualAccuracy : polyAccuracy);
+            base.SetAccuracy(ManualAccuracy != null ? (double)ManualAccuracy : accuracy);
         }
 
         public void SetUnAdjLocation(TtPoint point)

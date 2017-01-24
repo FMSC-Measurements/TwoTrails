@@ -45,7 +45,8 @@ namespace TwoTrails.Utils
 
                 foreach (TtPolygon poly in polys)
                 {
-                    points.AddRange(odal.GetPointsUnlinked(poly.CN));
+                    int i = 0;
+                    points.AddRange(odal.GetPointsUnlinked(poly.CN).Select(p => { p.Index = i++; return p; }));
                 }
 
                 if (points.Any())

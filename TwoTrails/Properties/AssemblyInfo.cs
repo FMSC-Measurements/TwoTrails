@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("TwoTrails")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("Fortest Management Service Center")]
 [assembly: AssemblyProduct("TwoTrails")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2016")]
+[assembly: AssemblyCopyright("Copyright © USDA Forest Service 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
