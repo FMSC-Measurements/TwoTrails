@@ -47,17 +47,29 @@ namespace TwoTrails.ViewModels
                     if (old != null)
                     {
                         old.PropertyChanged -= Polygon_PropertyChanged;
+                        old.PolygonChanged -= GeneratePolygonSummary;
                     }
 
                     if (value != null)
                     {
                         _BackupPoly = new TtPolygon(value);
                         _CurrentPolygon.PropertyChanged += Polygon_PropertyChanged;
+                        _CurrentPolygon.PolygonChanged += GeneratePolygonSummary;
+
+                        GeneratePolygonSummary(value);
                     }
                 });
 
             }
         }
+
+        private void GeneratePolygonSummary(TtPolygon polygon)
+        {
+            PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon);
+        }
+
+        public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
+
 
         private void Polygon_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -161,6 +173,7 @@ namespace TwoTrails.ViewModels
             _Project = project;
 
             DataController = new DataEditorControl(project.DataEditor, new DataStyleModel(project));
+            PolygonSummary = null;
 
             CurrentPolygon = null;
             CurrentMetadata = null;

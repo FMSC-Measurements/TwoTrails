@@ -25,6 +25,8 @@ namespace TwoTrails.Core
         public double TotalTraverseError { get; private set; } = 0;
         public double TotalTraverseLength { get; private set; } = 0;
         public int TotalTraverseSegments { get; private set; } = 0;
+        public double GpsAreaError { get; private set; } = 0;
+        public double TraverseAreaError { get; private set; } = 0;
 
         private double travLength = 0;
         private int travSegments = 0;
@@ -90,8 +92,9 @@ namespace TwoTrails.Core
                             Math.Round(FMSC.Core.Convert.MetersSquaredToAcres(TotalGpsError), 2),
                             Environment.NewLine);
 
+                        GpsAreaError = TotalGpsError / polygon.Area * 100.0;
                         sb.AppendFormat("GPS Contribution Ratio of area-error-area to area is: {0:0.00}%.{1}{1}",
-                            Math.Round(TotalGpsError / polygon.Area * 100.0, 2),
+                            Math.Round(GpsAreaError, 2),
                             Environment.NewLine);
                     }
 
@@ -102,8 +105,9 @@ namespace TwoTrails.Core
                             Math.Round(FMSC.Core.Convert.MetersSquaredToAcres(TotalTraverseError), 2),
                             Environment.NewLine);
 
+                        TraverseAreaError = TotalTraverseError / polygon.Area * 100.0;
                         sb.AppendFormat("Traverse Contribution Ratio of area-error-area to area is: {0:0.00}%.{1}{1}",
-                            Math.Round(TotalTraverseError / polygon.Area * 100.0, 2),
+                            Math.Round(TraverseAreaError, 2),
                             Environment.NewLine);
                     }
 
