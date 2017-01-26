@@ -200,6 +200,11 @@ namespace TwoTrails.Core
             AddCommand(new DeleteTtPointsCommand(points, _Manager));
         }
 
+        public void DeletePointsInPolygon(string polyCN)
+        {
+            AddCommand(new DeleteTtPointsCommand(_Manager.GetPoints(polyCN), _Manager));
+        }
+
 
         public void AddPolygon(TtPolygon polygon)
         {

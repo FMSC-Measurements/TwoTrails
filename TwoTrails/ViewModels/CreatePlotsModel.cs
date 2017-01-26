@@ -139,7 +139,7 @@ namespace TwoTrails.ViewModels
                 if (MessageBox.Show(String.Format("Plots '{0}' already exist. Would you like to overwrite the plots?", gPolyName), "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
                     return;
 
-                _Manager.DeletePoints(_Manager.GetPoints(poly.CN));
+                _Manager.DeletePointsInPolygon(poly.CN);
             }
             else
             {

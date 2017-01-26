@@ -1,11 +1,13 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core;
 using FMSC.Core.ComponentModel.Commands;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,7 +67,7 @@ namespace TwoTrails.ViewModels
 
         private void GeneratePolygonSummary(TtPolygon polygon)
         {
-            PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon);
+            PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true);
         }
 
         public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
@@ -84,6 +86,7 @@ namespace TwoTrails.ViewModels
         public ICommand DeletePolygonCommand { get; }
         public ICommand PolygonUpdateAccCommand { get; }
         public ICommand PolygonAccuracyChangedCommand { get; }
+        public ICommand SavePolygonSummary { get; }
         
 
         public int MetadataZone { get { return Get<int>(); } set { Set(value); } }
@@ -173,10 +176,6 @@ namespace TwoTrails.ViewModels
             _Project = project;
 
             DataController = new DataEditorControl(project.DataEditor, new DataStyleModel(project));
-            PolygonSummary = null;
-
-            CurrentPolygon = null;
-            CurrentMetadata = null;
 
             PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtPolygon));
             NewPolygonCommand = new RelayCommand(x => NewPolygon(x as ListBox));
@@ -190,6 +189,9 @@ namespace TwoTrails.ViewModels
                 this,
                 x => new { x.PolygonAccuracy, CurrentPolygon.Accuracy });
 
+            SavePolygonSummary = new BindedRelayCommand<ProjectEditorModel>(
+                x => SavePolygonsummary(),
+                x => CurrentPolygon != null, this, x => x.CurrentPolygon);
 
             MetadataChangedCommand = new RelayCommand(x => MetadataChanged(x as TtMetadata));
             NewMetadataCommand = new RelayCommand(x => NewMetadata(x as ListBox));
@@ -310,6 +312,25 @@ namespace TwoTrails.ViewModels
             }
         }
         
+        private void SavePolygonsummary()
+        {
+            if (CurrentPolygon != null)
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.DefaultExt = "(Text File *.txt)|*.txt";
+                sfd.FileName = String.Format("{0}_Summary", CurrentPolygon.Name);
+                sfd.DefaultExt = ".txt";
+                sfd.OverwritePrompt = true;
+
+                if (sfd.ShowDialog() == true)
+                {
+                    using (StreamWriter sw = new StreamWriter(sfd.FileName))
+                    {
+                        sw.WriteLine(PolygonSummary.SummaryText);
+                    }
+                }
+            }
+        }
 
 
         private void MetadataChanged(TtMetadata meta)

@@ -15,7 +15,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Core;
-using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
@@ -1257,10 +1256,10 @@ namespace TwoTrails.ViewModels
             if (!_CheckedOpTypes[point.OpType])
                 return false;
 
-            if (IsOnBnd != null && (bool)IsOnBnd != point.OnBoundary)
+            if (IsOnBnd != null && IsOnBnd != point.OnBoundary)
                 return false;
 
-            if (HasLinks != null && (bool)HasLinks != point.HasQuondamLinks)
+            if (HasLinks != null && HasLinks != point.HasQuondamLinks)
                 return false;
 
             return true;

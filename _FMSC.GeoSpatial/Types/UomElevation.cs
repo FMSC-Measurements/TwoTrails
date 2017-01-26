@@ -30,6 +30,7 @@ namespace FMSC.GeoSpatial.Types
                 case "0":
                 case "f":
                 case "ft":
+                case "feet_inches":
                 case "feet": return UomElevation.Feet;
                 case "1":
                 case "m":

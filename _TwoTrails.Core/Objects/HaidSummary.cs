@@ -34,7 +34,7 @@ namespace TwoTrails.Core
         public String SummaryText { get; }
 
 
-        public PolygonSummary(ITtManager manager, TtPolygon polygon)
+        public PolygonSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false)
         {
             Polygon = polygon;
             Legs = new ReadOnlyCollection<TtLeg>(_Legs);
@@ -43,13 +43,13 @@ namespace TwoTrails.Core
 
             if (allPoints.Count > 2)
             {
-                IEnumerable<TtPoint> points = allPoints.Where(p => p.IsBndPoint());
+                IEnumerable<TtPoint> points = allPoints;
                 if (points.Count() > 2)
                 {
                     StringBuilder sbPoints = new StringBuilder();
 
                     foreach (TtPoint point in points)
-                        ProcessPoint(sbPoints, point);
+                        ProcessPoint(sbPoints, point, false, showPoints);
 
                     TtPoint sp = points.First();
                     foreach (TtPoint p in points)
@@ -212,7 +212,7 @@ namespace TwoTrails.Core
                                     point.PID, point.OnBoundary ? " " : "*", _LastGpsPoint.PID, Environment.NewLine);
                         }
 
-                        if (_LastTtBndPt != null)
+                        if (_LastTtBndPt != null && point.OnBoundary)
                         {
                             _Legs.Add(new TtLeg(_LastTtBndPt, point));
                         }
@@ -235,7 +235,7 @@ namespace TwoTrails.Core
                             }
                             else
                             {
-                                if (_LastTtBndPt != null)
+                                if (_LastTtBndPt != null && point.OnBoundary)
                                 {
                                     _Legs.Add(new TtLeg(_LastTtBndPt, qp.ParentPoint));
                                 }
@@ -248,8 +248,8 @@ namespace TwoTrails.Core
 
                         if (showPoints)
                         {
-                            sbPoints.AppendFormat("Point {0}: {1} Quondam to Point {2}.{3}", point.PID,
-                                point.OnBoundary ? " " : "*", qp.ParentPoint.PID, Environment.NewLine);
+                            sbPoints.AppendFormat("Point {0}: {1} Quondam to Point {2} ({3}).{4}", point.PID,
+                                point.OnBoundary ? " " : "*", qp.ParentPoint.PID, qp.ParentPoint.OpType, Environment.NewLine);
                         }
 
                         if (point.OnBoundary)

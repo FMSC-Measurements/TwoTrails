@@ -1427,6 +1427,30 @@ namespace TwoTrails.Core
                     RebuildPolygon(polygon, true);
             }
         }
+
+        public void DeletePointsInPolygon(string polyCN)
+        {
+            lock (locker)
+            {
+                if (_PolygonsMap.ContainsKey(polyCN))
+                {
+                    List<TtPoint> points = _PointsByPoly[polyCN];
+
+                    if (points.Any(p => p.HasQuondamLinks))
+                        throw new Exception("Points Have Linked Quondams");
+
+                    foreach (TtPoint point in points)
+                    {
+                        DetachPointEvents(point);
+
+                        _PointsMap.Remove(point.CN);
+                        _Points.Remove(point);
+                    }
+
+                    _PointsByPoly[polyCN].Clear(); 
+                }
+            }
+        }
         
 
         /// <summary>

@@ -11,11 +11,11 @@ namespace TwoTrails.Core
     {
         public static object locker = new object();
 
-        public static PolygonSummary GenerateSummary(ITtManager manager, TtPolygon polygon)
+        public static PolygonSummary GenerateSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false)
         {
             lock (locker)
             {
-                return new PolygonSummary(manager, polygon);
+                return new PolygonSummary(manager, polygon, showPoints);
             }
         }
     }

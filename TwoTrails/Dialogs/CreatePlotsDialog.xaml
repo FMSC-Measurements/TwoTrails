@@ -138,7 +138,7 @@
 
                 <CheckBox Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2"
                           Name="cbDelExisting" Content="Delete Existing Plots"
-                          IsChecked="{Binding Settings.DeleteExistingPlots}" VerticalAlignment="Center"/>
+                          IsChecked="{Binding Settings.DeviceSettings.DeleteExistingPlots}" VerticalAlignment="Center"/>
 
             </Grid>
 

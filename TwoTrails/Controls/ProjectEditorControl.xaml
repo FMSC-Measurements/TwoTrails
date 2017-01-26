@@ -15,7 +15,7 @@
              Background="{StaticResource colorBackground}">
     <UserControl.Resources>
         <cvt:M2Converter x:Key="M2Converter"/>
-        <cvt:MetersToFeetConverter x:Key="M2FConverter"/>
+        <cvt:MetersToFeetConverter x:Key="MtoFConverter"/>
     </UserControl.Resources>
 
     <Grid Background="{StaticResource colorBackground}">
@@ -190,7 +190,7 @@
                                     <TextBlock Grid.Column="2" Grid.Row="5" Text="{Binding TotalPolygonArea, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres, StringFormat=F2}" TextAlignment="Right" />
 
                                     <TextBlock Grid.Column="0" Grid.Row="6" Text="Total Perimeter (Ft)" />
-                                    <TextBlock Grid.Column="2" Grid.Row="6" Text="{Binding TotalPolygonArea, Converter={StaticResource M2FConverter}, StringFormat=F2}" TextAlignment="Right" />
+                                    <TextBlock Grid.Column="2" Grid.Row="6" Text="{Binding TotalPolygonArea, Converter={StaticResource MtoFConverter}, StringFormat=F2}" TextAlignment="Right" />
                                 </Grid>
                             </GroupBox>
                         </Grid>
@@ -404,7 +404,12 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <GroupBox Header="GPS Contribution" Grid.Column="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <GroupBox Header="GPS Contribution" Grid.Column="0" Grid.Row="0">
                                             <Grid Margin="5,0,5,0">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -431,7 +436,7 @@
                                             </Grid>
                                         </GroupBox>
 
-                                        <GroupBox Header="Traverse Contribution" Grid.Column="1">
+                                        <GroupBox Header="Traverse Contribution" Grid.Column="1" Grid.Row="0">
                                             <Grid Margin="5,0,5,0">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -457,8 +462,14 @@
                                                 <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.TraverseAreaError, StringFormat={}{0:F3}%}"/>
                                             </Grid>
                                         </GroupBox>
-                                        
-                                        
+
+                                        <Expander Header="Details" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
+                                            <Grid>
+                                                <TextBox IsReadOnly="True" HorizontalAlignment="Stretch" Text="{Binding PolygonSummary.SummaryText, Mode=OneWay}" TextWrapping="Wrap"/>
+                                                <Button Content="Save Summary" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="2.5" Command="{Binding SavePolygonSummary}"/>
+                                            </Grid>
+                                        </Expander>
+
                                     </Grid>
                                 </GroupBox>
                             </Grid>
