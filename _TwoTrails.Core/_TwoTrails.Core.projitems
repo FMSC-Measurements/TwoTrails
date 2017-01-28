@@ -38,7 +38,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HaidLogic.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IAccuracy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Points\IAccuracy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IDeviceSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMetadataSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IPointSegment.cs" />

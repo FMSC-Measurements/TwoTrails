@@ -47,7 +47,7 @@ namespace TwoTrails.Core
 
         public bool IgnorePointEvents { get; protected set; }
 
-        private static object locker = new object();
+        private object locker = new object();
         
 
         public TtManager(ITtDataLayer dal, ITtSettings settings)
