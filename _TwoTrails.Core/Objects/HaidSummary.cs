@@ -43,7 +43,7 @@ namespace TwoTrails.Core
 
             if (allPoints.Count > 2)
             {
-                IEnumerable<TtPoint> points = allPoints;
+                IEnumerable<TtPoint> points = allPoints;//.Where(p => p.OnBoundary);
                 if (points.Count() > 2)
                 {
                     StringBuilder sbPoints = new StringBuilder();
@@ -64,13 +64,16 @@ namespace TwoTrails.Core
                     if (!sp.HasSameAdjLocation(_LastTtBndPt))
                         _Legs.Add(new TtLeg(_LastTtBndPt, sp));
 
+                    double perim = 0;
                     foreach (TtLeg leg in _Legs.Where(l => l is TtLeg))
+                    {
                         TotalGpsError += leg.Error;
-
+                        perim += leg.LegLength;
+                    }
 
                     StringBuilder sb = new StringBuilder();
                     
-                    sb.AppendFormat("The polygon area is: {0:0.00} Ha ({1:0.00} ac).{2}",
+                    sb.AppendFormat("The polygon area is: {0:0.000} Ha ({1:0.00} ac).{2}",
                         Math.Round(polygon.AreaHectaAcres, 2),
                         Math.Round(polygon.AreaAcres, 2),
                         Environment.NewLine);
@@ -87,7 +90,7 @@ namespace TwoTrails.Core
 
                     if (TotalGpsError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
-                        sb.AppendFormat("GPS Contribution: {0:0.00} Ha ({1:0.00} ac){2}",
+                        sb.AppendFormat("GPS Contribution: {0:0.000} Ha ({1:0.00} ac){2}",
                             Math.Round(FMSC.Core.Convert.MetersSquaredToHa(TotalGpsError), 2),
                             Math.Round(FMSC.Core.Convert.MetersSquaredToAcres(TotalGpsError), 2),
                             Environment.NewLine);
@@ -100,7 +103,7 @@ namespace TwoTrails.Core
 
                     if (TotalTraverseError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
-                        sb.AppendFormat("Traverse Contribution: {0:0.00} Ha ({1:0.00} ac){2}",
+                        sb.AppendFormat("Traverse Contribution: {0:0.000} Ha ({1:0.00} ac){2}",
                             Math.Round(FMSC.Core.Convert.MetersSquaredToHa(TotalTraverseError), 2),
                             Math.Round(FMSC.Core.Convert.MetersSquaredToAcres(TotalTraverseError), 2),
                             Environment.NewLine);
@@ -184,7 +187,7 @@ namespace TwoTrails.Core
                                     travLength = MathEx.Distance(_LastTtPoint.UnAdjX, _LastTtPoint.UnAdjY, point.UnAdjX, point.UnAdjY);
                                     traversing = true;
 
-                                    if (showPoints)
+                                    if (showPoints && !fromQndm)
                                     {
                                         sbPoints.AppendFormat("Traverse Start:{0}", Environment.NewLine);
                                     }
@@ -206,13 +209,13 @@ namespace TwoTrails.Core
                     break;
                 case OpType.SideShot:
                     {
-                        if (showPoints)
+                        if (showPoints && !fromQndm)
                         {
                             sbPoints.AppendFormat("Point {0}: {1} SideShot off Point {2}.{3}",
                                     point.PID, point.OnBoundary ? " " : "*", _LastGpsPoint.PID, Environment.NewLine);
                         }
 
-                        if (_LastTtBndPt != null && point.OnBoundary)
+                        if (_LastTtBndPt != null && point.OnBoundary || fromQndm)
                         {
                             _Legs.Add(new TtLeg(_LastTtBndPt, point));
                         }
@@ -235,7 +238,7 @@ namespace TwoTrails.Core
                             }
                             else
                             {
-                                if (_LastTtBndPt != null && point.OnBoundary)
+                                if (_LastTtBndPt != null)
                                 {
                                     _Legs.Add(new TtLeg(_LastTtBndPt, qp.ParentPoint));
                                 }
@@ -248,8 +251,11 @@ namespace TwoTrails.Core
 
                         if (showPoints)
                         {
-                            sbPoints.AppendFormat("Point {0}: {1} Quondam to Point {2} ({3}).{4}", point.PID,
-                                point.OnBoundary ? " " : "*", qp.ParentPoint.PID, qp.ParentPoint.OpType, Environment.NewLine);
+                            sbPoints.AppendFormat("Point {0}: {1} Quondam to Point {2} ({3}){4}.{5}", point.PID,
+                                point.OnBoundary ? " " : "*", qp.ParentPoint.PID, qp.ParentPoint.OpType,
+                                qp.Polygon.Name != qp.ParentPoint.Polygon.Name ?
+                                    String.Format(" in {0}", qp.ParentPoint.Polygon.Name) : String.Empty,
+                                Environment.NewLine);
                         }
 
                         if (point.OnBoundary)

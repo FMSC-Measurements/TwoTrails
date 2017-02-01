@@ -226,11 +226,9 @@ namespace TwoTrails.ViewModels
             OpenFileDialog dialog = new OpenFileDialog();
 
             dialog.DefaultExt = ".tt";
-            dialog.Filter = "TwoTrails Files (*.tt)|*.tt|TwoTrails V2 Files (*.tt2)|*.tt2";
+            dialog.Filter = "TwoTrails Files (*.tt)|*.tt|TwoTrails V2 Files (*.tt2)|*.tt2|All Files|*.*";
             
-            bool? result = dialog.ShowDialog();
-
-            if (result == true)
+            if (dialog.ShowDialog() == true)
             {
                 OpenProject(dialog.FileName);
             }
