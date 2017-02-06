@@ -34,7 +34,7 @@
             </Grid.ColumnDefinitions>
             
             <Button Grid.Column="0" Width="75" Content="Cancel" Visibility="Collapsed"/>
-            <Button Grid.Column="2" Width="75" Content="Ok"/>
+            <Button Grid.Column="2" Width="75" Content="Ok" Click="Ok_Click"/>
         </Grid>
     </Grid>
 </Window>

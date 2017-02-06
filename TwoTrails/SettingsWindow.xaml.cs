@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMSC.Core.ComponentModel.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,6 +37,11 @@ namespace TwoTrails
                 window.Owner = owner;
 
             return window.ShowDialog();
+        }
+
+        private void Ok_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }
