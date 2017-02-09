@@ -11,8 +11,6 @@ namespace TwoTrails.DAL
         String FilePath { get; }
 
         #region Points
-        List<TtPoint> GetPointsUnlinked(String polyCN = null);
-
         bool InsertPoint(TtPoint point);
         int InsertPoints(IEnumerable<TtPoint> points);
 

@@ -183,12 +183,20 @@ namespace TwoTrails.DAL
             }
         }
 
+        private IEnumerable<TtPoint> LinkPoints(IEnumerable<TtPoint> points)
+        {
+            //TODO Link points
+            return points;
+        }
 
-        public List<TtPoint> GetPoints(String polyCN = null)
+
+        public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
         {
             Parse();
+            
+            IEnumerable<TtPoint> points = (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index);
 
-            return (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index).ToList();
+            return linked ? LinkPoints(points) : points;
         }
 
         public bool HasPolygons()
@@ -198,24 +206,24 @@ namespace TwoTrails.DAL
             return _Polygons.Count > 0;
         }
 
-        public List<TtPolygon> GetPolygons()
+        public IEnumerable<TtPolygon> GetPolygons()
         {
             Parse();
 
-            return _Polygons.Values.ToList();
+            return _Polygons.Values;
         }
 
-        public List<TtMetadata> GetMetadata()
+        public IEnumerable<TtMetadata> GetMetadata()
         {
             return new List<TtMetadata>();
         }
 
-        public List<TtGroup> GetGroups()
+        public IEnumerable<TtGroup> GetGroups()
         {
             return new List<TtGroup>();
         }
 
-        public List<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
         {
             return new List<TtNmeaBurst>();
         }
@@ -227,17 +235,17 @@ namespace TwoTrails.DAL
             return new TtProjectInfo(_ProjectInfo);
         }
 
-        public List<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
         {
             return new List<PolygonGraphicOptions>();
         }
 
-        public List<TtImage> GetPictures(String pointCN)
+        public IEnumerable<TtImage> GetPictures(String pointCN)
         {
             return new List<TtImage>();
         }
 
-        public List<TtUserActivity> GetUserActivity()
+        public IEnumerable<TtUserActivity> GetUserActivity()
         {
             return new List<TtUserActivity>();
         }

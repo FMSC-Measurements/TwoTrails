@@ -9,29 +9,29 @@ namespace TwoTrails.DAL
     public interface IReadOnlyTtDataLayer
     {
         #region Points
-        List<TtPoint> GetPoints(String polyCN = null);
+        IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false);
         #endregion
 
 
         #region Polygons
         bool HasPolygons();
 
-        List<TtPolygon> GetPolygons();
+        IEnumerable<TtPolygon> GetPolygons();
         #endregion
 
 
         #region Metadata
-        List<TtMetadata> GetMetadata();
+        IEnumerable<TtMetadata> GetMetadata();
         #endregion
 
 
         #region Groups
-        List<TtGroup> GetGroups();
+        IEnumerable<TtGroup> GetGroups();
         #endregion
 
 
         #region TTNmeaBurst
-        List<TtNmeaBurst> GetNmeaBursts(String pointCN = null);
+        IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null);
         #endregion
 
 
@@ -41,17 +41,17 @@ namespace TwoTrails.DAL
 
 
         #region Polygon Attributes
-        List<PolygonGraphicOptions> GetPolygonGraphicOptions();
+        IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions();
         #endregion
 
 
         #region Media
-        List<TtImage> GetPictures(String pointCN);
+        IEnumerable<TtImage> GetPictures(String pointCN);
         #endregion
 
 
         #region Activity
-        List<TtUserActivity> GetUserActivity();
+        IEnumerable<TtUserActivity> GetUserActivity();
         #endregion
 
 

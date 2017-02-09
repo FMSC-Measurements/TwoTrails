@@ -34,7 +34,7 @@ namespace TwoTrails.Controls
         public UserActivityControl(ITtDataLayer dal)
         {
             DAL = dal;
-            _Activites = DAL.GetUserActivity();
+            _Activites = DAL.GetUserActivity().ToList();
             Activites = CollectionViewSource.GetDefaultView(_Activites) as ListCollectionView;
 
             this.DataContext = this;

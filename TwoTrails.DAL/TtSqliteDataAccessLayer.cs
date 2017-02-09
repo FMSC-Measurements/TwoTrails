@@ -76,21 +76,17 @@ namespace TwoTrails.DAL
         #region Get Points
         public TtPoint GetPoint(String pointCN)
         {
-            List<TtPoint> points = GetPoints(
+            return GetPoints(
                 String.Format("{0}.{1} = '{2}'",
                     TwoTrailsSchema.PointSchema.TableName,
                     TwoTrailsSchema.SharedSchema.CN,
                     pointCN),
                 1,
                 false
-            );
-
-            if (points.Count > 0)
-                return points[0];
-            return null;
+            ).FirstOrDefault();
         }
 
-        public List<TtPoint> GetPoints(string polyCN = null)
+        public IEnumerable<TtPoint> GetPoints(string polyCN = null, bool linked = false)
         {
             return GetPoints(
                 polyCN != null ?
@@ -99,27 +95,12 @@ namespace TwoTrails.DAL
                         polyCN) :
                     null,
                 0,
-                true
-            );
-        }
-
-        public List<TtPoint> GetPointsUnlinked(string polyCN = null)
-        {
-            return GetPoints(
-                polyCN != null ?
-                    String.Format("{0} = '{1}'",
-                        TwoTrailsSchema.PointSchema.PolyCN,
-                        polyCN) :
-                    null,
-                0,
-                false
+                linked
             );
         }
         
-        protected List<TtPoint> GetPoints(String where, int limit = 0, bool linked = true)
+        protected IEnumerable<TtPoint> GetPoints(String where, int limit = 0, bool linked = true)
         {
-            List<TtPoint> points = new List<TtPoint>();
-
             String query = String.Format(@"select {0}.{1}, {2}, {3}, {4} from {0} left join {5} on {5}.{8} = {0}.{8} 
  left join {6} on {6}.{8} = {0}.{8}  left join {7} on {7}.{8} = {0}.{8}{9} order by {10} asc",
                 TwoTrailsSchema.PointSchema.TableName,              //0
@@ -248,7 +229,7 @@ namespace TwoTrails.DAL
                                 }
                             }
 
-                            points.Add(point);
+                            yield return point;
                         }
 
                         dr.Close();
@@ -257,8 +238,6 @@ namespace TwoTrails.DAL
                     conn.Close();
                 } 
             }
-
-            return points;
         }
         #endregion
 
@@ -750,10 +729,8 @@ namespace TwoTrails.DAL
             throw new Exception("Unable to get polygon count.");
         }
 
-        public List<TtPolygon> GetPolygons()
+        public IEnumerable<TtPolygon> GetPolygons()
         {
-            List<TtPolygon> polys = new List<TtPolygon>();
-
             String query = String.Format(@"select {0} from {1}",
                 TwoTrailsSchema.PolygonSchema.SelectItems,
                 TwoTrailsSchema.PolygonSchema.TableName
@@ -767,7 +744,7 @@ namespace TwoTrails.DAL
                     {
                         while (dr.Read())
                         {
-                            polys.Add(new TtPolygon(
+                            yield return new TtPolygon(
                                 dr.GetString(0),
                                 dr.GetString(1),
                                 dr.GetString(2),
@@ -777,7 +754,7 @@ namespace TwoTrails.DAL
                                 dr.GetDouble(3),
                                 dr.GetDouble(7),
                                 dr.GetDouble(8),
-                                dr.GetDouble(9)));
+                                dr.GetDouble(9));
                         }
 
                         dr.Close();
@@ -786,8 +763,6 @@ namespace TwoTrails.DAL
                     conn.Close();
                 } 
             }
-
-            return polys;
         } 
         #endregion
 
@@ -1020,10 +995,8 @@ namespace TwoTrails.DAL
 
         #region Metadata
         #region Get Metadata
-        public List<TtMetadata> GetMetadata()
+        public IEnumerable<TtMetadata> GetMetadata()
         {
-            List<TtMetadata> metas = new List<TtMetadata>();
-
             String query = String.Format(@"select {0} from {1}",
                 TwoTrailsSchema.MetadataSchema.SelectItems,
                 TwoTrailsSchema.MetadataSchema.TableName
@@ -1060,9 +1033,9 @@ namespace TwoTrails.DAL
                             compass = dr.GetStringN(12);
                             crew = dr.GetStringN(13);
 
-                            metas.Add(new TtMetadata(cn, name, cmt, zone,
+                            yield return new TtMetadata(cn, name, cmt, zone,
                                 decType, magdec, datum, dist,
-                                elev, slope, gps, rf, compass, crew));
+                                elev, slope, gps, rf, compass, crew);
                         }
 
                         dr.Close();
@@ -1071,8 +1044,6 @@ namespace TwoTrails.DAL
                     conn.Close();
                 } 
             }
-
-            return metas;
         }
         #endregion
 
@@ -1304,10 +1275,8 @@ namespace TwoTrails.DAL
 
         #region Groups
         #region Get Groups
-        public List<TtGroup> GetGroups()
+        public IEnumerable<TtGroup> GetGroups()
         {
-            List<TtGroup> groups = new List<TtGroup>();
-
             String query = String.Format(@"select {0} from {1}",
                 TwoTrailsSchema.GroupSchema.SelectItems,
                 TwoTrailsSchema.GroupSchema.TableName
@@ -1329,7 +1298,7 @@ namespace TwoTrails.DAL
                             desc = dr.GetString(2);
                             gt = (GroupType)dr.GetInt32(3);
 
-                            groups.Add(new TtGroup(cn, name, desc, gt));
+                            yield return new TtGroup(cn, name, desc, gt);
                         }
 
                         dr.Close();
@@ -1338,8 +1307,6 @@ namespace TwoTrails.DAL
 
                 conn.Close();
             }
-
-            return groups;
         }
         #endregion
 
@@ -1562,10 +1529,8 @@ namespace TwoTrails.DAL
 
 
         #region TTNmea
-        public List<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
-            List<TtNmeaBurst> bursts = new List<TtNmeaBurst>();
-
             String query = String.Format(@"select {0} from {1}{2}",
                 TwoTrailsSchema.TtNmeaSchema.SelectItems,
                 TwoTrailsSchema.TtNmeaSchema.TableName,
@@ -1598,7 +1563,7 @@ namespace TwoTrails.DAL
 
                         while (dr.Read())
                         {
-                            bursts.Add(new TtNmeaBurst(
+                            yield return new TtNmeaBurst(
                                 dr.GetString(0),
                                 TtCoreUtils.ParseTime(dr.GetString(3)),
                                 dr.GetString(1),
@@ -1622,7 +1587,7 @@ namespace TwoTrails.DAL
                                 dr.GetDouble(19),
                                 dr.GetDouble(20), (UomElevation)dr.GetInt32(21),
                                 dr.GetInt32(26)
-                            ));
+                            );
                         }
 
                         dr.Close();
@@ -1631,8 +1596,6 @@ namespace TwoTrails.DAL
                     conn.Close();
                 }
             }
-
-            return bursts;
         }
 
         public bool InsertNmeaBurst(TtNmeaBurst burst)
@@ -1996,10 +1959,8 @@ namespace TwoTrails.DAL
 
 
         #region TtMedia
-        public List<TtImage> GetPictures(string pointCN)
+        public IEnumerable<TtImage> GetPictures(string pointCN)
         {
-            List<TtImage> images = new List<TtImage>();
-
             String query = String.Format(@"select {1}.{0}, {2} from {1} left join {3} on {1}.{4} = {3}.{4}",
                 TwoTrailsSchema.MediaSchema.SelectItems,
                 TwoTrailsSchema.MediaSchema.TableName,
@@ -2052,7 +2013,7 @@ namespace TwoTrails.DAL
                                     throw new Exception("Unknown Image Type");
                             }
 
-                            images.Add(image);
+                            yield return image;
                         }
 
                         dr.Close();
@@ -2061,8 +2022,6 @@ namespace TwoTrails.DAL
 
                 conn.Close();
             }
-
-            return images;
         }
 
         public bool InsertMedia(TtMedia media)
@@ -2214,10 +2173,8 @@ namespace TwoTrails.DAL
 
 
         #region Polygon Attrs
-        public List<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
         {
-            List<PolygonGraphicOptions> pgos = new List<PolygonGraphicOptions>();
-
             String query = String.Format(@"select {0} from {1}",
                 TwoTrailsSchema.PolygonAttrSchema.SelectItems,
                 TwoTrailsSchema.PolygonAttrSchema.TableName
@@ -2244,8 +2201,8 @@ namespace TwoTrails.DAL
                             unadjpts = dr.GetInt32(6);
                             waypts = dr.GetInt32(7);
 
-                            pgos.Add(new PolygonGraphicOptions(cn, adjbnd, unadjbnd, adjnav, unadjnav,
-                                adjpts, unadjpts, waypts, 0, 0));
+                            yield return new PolygonGraphicOptions(cn, adjbnd, unadjbnd, adjnav, unadjnav,
+                                adjpts, unadjpts, waypts, 0, 0);
                         }
 
                         dr.Close();
@@ -2254,8 +2211,6 @@ namespace TwoTrails.DAL
 
                 conn.Close();
             }
-
-            return pgos;
         }
 
         public bool InsertPolygonGraphicOption(PolygonGraphicOptions option)
@@ -2369,10 +2324,8 @@ namespace TwoTrails.DAL
             };
         }
 
-        public List<TtUserActivity> GetUserActivity()
+        public IEnumerable<TtUserActivity> GetUserActivity()
         {
-            List<TtUserActivity> activity = new List<TtUserActivity>();
-
             String query = String.Format(@"select {0} from {1}",
                 TwoTrailsSchema.ActivitySchema.SelectItems,
                 TwoTrailsSchema.ActivitySchema.TableName
@@ -2395,14 +2348,12 @@ namespace TwoTrails.DAL
                             date = TtCoreUtils.ParseTime(dr.GetString(2));
                             dat = (DataActivityType)dr.GetInt32(3);
 
-                            activity.Add(new TtUserActivity(username, devicename, date, dat));
+                            yield return new TtUserActivity(username, devicename, date, dat);
                         }
 
                         dr.Close();
                     }
                 }
-
-                return activity;
             }
         }
         #endregion
@@ -2410,10 +2361,9 @@ namespace TwoTrails.DAL
         #region Utils
         public void Clean()
         {
-            List<TtPoint> points = GetPoints();
             Dictionary<string, TtPolygon> polyCNs = GetPolygons().ToDictionary(p => p.CN, p => p);
 
-            IEnumerable<TtPoint> delPoints = points.Where(p => !polyCNs.ContainsKey(p.PolygonCN));
+            IEnumerable<TtPoint> delPoints = GetPoints().Where(p => !polyCNs.ContainsKey(p.PolygonCN));
 
             DeletePoints(delPoints);
         }

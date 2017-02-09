@@ -124,7 +124,7 @@ namespace TwoTrails.Core
                 _PolygonsMap.Add(poly.CN, poly);
                 _PolygonsMapOrig.Add(poly.CN, new TtPolygon(poly));
                 
-                _PointsByPoly.Add(poly.CN, new List<TtPoint>(_DAL.GetPointsUnlinked(poly.CN)));
+                _PointsByPoly.Add(poly.CN, _DAL.GetPoints(poly.CN).ToList());
                 
                 AttachPolygonEvents(poly);
             }
@@ -1698,7 +1698,7 @@ namespace TwoTrails.Core
 
         public List<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
-            return _DAL.GetNmeaBursts(pointCN);
+            return _DAL.GetNmeaBursts(pointCN).ToList();
         }
 
         public void AddNmeaBurst(TtNmeaBurst burst)

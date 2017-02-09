@@ -74,11 +74,9 @@ namespace TwoTrails.DAL
         }
 
 
-        public List<TtMetadata> GetMetadata()
+        public IEnumerable<TtMetadata> GetMetadata()
         {
             CheckVersion();
-            
-            List<TtMetadata> metas = new List<TtMetadata>();
 
             String query = String.Format("SELECT {0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} from {14} ",
                 TwoTrailsV2Schema.MetaDataSchema.CN, //0
@@ -130,7 +128,7 @@ namespace TwoTrails.DAL
                             md.Elevation = Types.ParseDistance(reader.GetString(11));
                             md.Slope = Types.ParseSlope(reader.GetString(12));
                             md.Zone = reader.GetInt32(13);
-                            metas.Add(md);
+                            yield return md;
                         }
                     }
 
@@ -139,15 +137,11 @@ namespace TwoTrails.DAL
 
                 conn.Close();
             }
-
-            return metas;
         }
 
-        public List<TtPolygon> GetPolygons()
+        public IEnumerable<TtPolygon> GetPolygons()
         {
             CheckVersion();
-
-            List<TtPolygon> polys = new List<TtPolygon>();
             
             string query = String.Format("SELECT {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7} from {8} ",
                 TwoTrailsV2Schema.SharedSchema.CN,
@@ -186,7 +180,7 @@ namespace TwoTrails.DAL
                             if (!reader.IsDBNull(7))
                                 poly.PointStartIndex = reader.GetInt32(7);
 
-                            polys.Add(poly);
+                            yield return poly;
                         }
 
                         reader.Close();
@@ -195,28 +189,19 @@ namespace TwoTrails.DAL
 
                 conn.Close();
             }
-
-            return polys;
         }
 
+        
 
-
-        public List<TtPoint> GetPoints(String polyCN = null)
+        public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
         {
-            return GetTtPoints(polyCN != null ? String.Format("{0} = '{1}'", TwoTrailsV2Schema.PointSchema.PolyCN, polyCN) : null);
+            return GetTtPoints(polyCN != null ? String.Format("{0} = '{1}'", TwoTrailsV2Schema.PointSchema.PolyCN, polyCN) : null, linked);
         }
 
-        public List<TtPoint> GetPointsUnlinked(String polyCN = null)
-        {
-            return GetTtPoints(polyCN != null ? String.Format("{0} = '{1}'", TwoTrailsV2Schema.PointSchema.PolyCN, polyCN) : null, false);
-        }
-
-        private List<TtPoint> GetTtPoints(String where = null, bool linkPoints = true, int limit = 0)
+        private IEnumerable<TtPoint> GetTtPoints(String where = null, bool linkPoints = true, int limit = 0)
         {
             CheckVersion();
             {
-                List<TtPoint> points = new List<TtPoint>();
-
                 String query = String.Format(@"select {0}.{1}, {2}, {3}, {4} from {0} left join {5} on {5}.{8} = {0}.{8} 
  left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order by {10} asc{11}",
                     TwoTrailsV2Schema.PointSchema.TableName,              //0
@@ -344,14 +329,11 @@ namespace TwoTrails.DAL
                                     if (linkPoints)
                                     {
                                         QuondamPoint qp = point as QuondamPoint;
-                                        List<TtPoint> pps = GetTtPoints(String.Format("{0}.CN = '{1}'",
-                                            TwoTrailsV2Schema.PointSchema.TableName, qp.ParentPointCN), false, 1);
-                                        qp.ParentPoint = pps.Any() ? pps.First() : null; 
+                                        qp.ParentPoint = GetPoints(qp.ParentPointCN).FirstOrDefault();
                                     }
                                 }
                                 
-
-                                points.Add(point);
+                                yield return point;
                             }
 
                             dr.Close();
@@ -360,17 +342,13 @@ namespace TwoTrails.DAL
                         conn.Close();
                     }
                 }
-
-                return points;
             }
         }
 
 
-        public List<TtGroup> GetGroups()
+        public IEnumerable<TtGroup> GetGroups()
         {
             CheckVersion();
-
-            List<TtGroup> groups = new List<TtGroup>();
 
             String query = String.Format("SELECT {0}, {1}, {2}, {3} from {4} ",
                 TwoTrailsV2Schema.GroupSchema.CN,
@@ -396,7 +374,7 @@ namespace TwoTrails.DAL
                             if (!dr.IsDBNull(3))
                                 group.GroupType = (GroupType)Enum.Parse(typeof(GroupType), dr.GetString(3), true);
 
-                            groups.Add(group);
+                            yield return group;
                         }
 
                         dr.Close();
@@ -405,16 +383,12 @@ namespace TwoTrails.DAL
 
                 conn.Close();
             }
-
-            return groups;
         }
 
 
-        public List<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
         {
             CheckVersion();
-
-            List<TtNmeaBurst> bursts = new List<TtNmeaBurst>();
 
             String query = String.Format(@"select {0} from {1}{2}",
                 TwoTrailsV2Schema.TtNmeaSchema.SelectItems,
@@ -450,7 +424,7 @@ namespace TwoTrails.DAL
                         {
                             DateTime time = TtCoreUtils.ParseTime(dr.GetString(3));
                             
-                            bursts.Add(new TtNmeaBurst(
+                            yield return new TtNmeaBurst(
                                 dr.GetString(0),
                                 time,
                                 dr.GetString(1),
@@ -477,7 +451,7 @@ namespace TwoTrails.DAL
                                 dr.GetDouble(18),
                                 UomElevationExtensions.Parse(dr.GetString(20)),
                                 dr.GetInt32(24)
-                            ));
+                            );
                         }
 
                         dr.Close();
@@ -486,8 +460,6 @@ namespace TwoTrails.DAL
                     conn.Close();
                 }
             }
-
-            return bursts;
         }
 
 
@@ -539,19 +511,19 @@ namespace TwoTrails.DAL
         }
 
 
-        public List<TtImage> GetPictures(String pointCN)
+        public IEnumerable<TtImage> GetPictures(String pointCN)
         {
             return new List<TtImage>();
         }
 
 
-        public List<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
         {
             return new List<PolygonGraphicOptions>();
         }
 
 
-        public List<TtUserActivity> GetUserActivity()
+        public IEnumerable<TtUserActivity> GetUserActivity()
         {
             return new List<TtUserActivity>();
         }
