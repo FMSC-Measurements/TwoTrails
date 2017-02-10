@@ -339,7 +339,7 @@ namespace TwoTrails.Core
         }
 
 
-        List<TtNmeaBurst> ITtManager.GetNmeaBursts(string pointCN = null)
+        List<TtNmeaBurst> ITtManager.GetNmeaBursts(string pointCN)
         {
             return BaseManager.GetNmeaBursts(pointCN);
         }
