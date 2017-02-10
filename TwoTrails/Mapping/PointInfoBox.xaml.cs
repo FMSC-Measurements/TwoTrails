@@ -30,7 +30,7 @@ namespace TwoTrails.Mapping
 
 
         public Double Latitude { get { return Adjusted ? Point.AdjLocation.Latitude : Point.UnAdjLocation.Latitude; } }
-        public Double Longitude { get { return Adjusted ? Point.AdjLocation.Latitude : Point.UnAdjLocation.Longitude; } }
+        public Double Longitude { get { return Adjusted ? Point.AdjLocation.Longitude : Point.UnAdjLocation.Longitude; } }
 
         
         public Double UtmX { get { return Adjusted ? Point.Point.AdjX : Point.Point.UnAdjX; } }

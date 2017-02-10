@@ -151,7 +151,7 @@ namespace TwoTrails.Core
                             {
                                 CloseTraverse(sbPoints, point);
                             }
-                            else if (_LastTtPoint != null)
+                            else if (_LastTtBndPt != null)
                                 _Legs.Add(new TtLeg(_LastTtBndPt, point));
 
                             _LastTtBndPt = point;

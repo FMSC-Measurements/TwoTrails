@@ -1,6 +1,7 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core;
 using FMSC.Core.ComponentModel.Commands;
+using FMSC.GeoSpatial.MTDC;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -85,6 +86,7 @@ namespace TwoTrails.ViewModels
         public ICommand NewPolygonCommand { get; }
         public ICommand DeletePolygonCommand { get; }
         public ICommand PolygonUpdateAccCommand { get; }
+        public ICommand PolygonMtdcLookupCommand { get; }
         public ICommand PolygonAccuracyChangedCommand { get; }
         public ICommand SavePolygonSummary { get; }
         
@@ -189,6 +191,12 @@ namespace TwoTrails.ViewModels
                 this,
                 x => new { x.PolygonAccuracy, CurrentPolygon.Accuracy });
 
+            PolygonMtdcLookupCommand = new BindedRelayCommand<ProjectEditorModel>(
+                x => MtdcLookup(),
+                x => CurrentPolygon != null,
+                this,
+                x => x.CurrentPolygon);
+
             SavePolygonSummary = new BindedRelayCommand<ProjectEditorModel>(
                 x => SavePolygonsummary(),
                 x => CurrentPolygon != null, this, x => x.CurrentPolygon);
@@ -288,6 +296,16 @@ namespace TwoTrails.ViewModels
         {
             CurrentPolygon.Accuracy = PolygonAccuracy;
             OnPropertyChanged(nameof(PolygonAccuracy));
+        }
+
+        private void MtdcLookup()
+        {
+            if (SessionData.GpsAccuracyReport == null)
+            {
+                //todo check if file is 24ho, if is or no file, try and get new version
+            }
+
+            //show report dialog
         }
 
         private void NewPolygon(ListBox listBox)
@@ -403,6 +421,9 @@ namespace TwoTrails.ViewModels
                 }
             }
         }
+
+
+        //TODO add extra metadata info
 
 
         private void GroupChanged(TtGroup group)

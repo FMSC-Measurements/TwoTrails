@@ -679,7 +679,7 @@ namespace TwoTrails.Core
 
         private void AdjustTraverseFromAfterStart(TtPoint point, IList<TtPoint> points)
         {
-            if (point.Index < points.Count - 1 || point.OpType == OpType.GPS) // make sure traverse isnt at end
+            if (point.Index < points.Count - 1 || point.IsGpsAtBase()) // make sure traverse isnt at end
             {
                 for (int i = point.Index - 1; i > 0; i--)
                 {

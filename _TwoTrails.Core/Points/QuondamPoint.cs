@@ -51,6 +51,10 @@ namespace TwoTrails.Core.Points
                             OnLocationChanged();
                         }
                     }
+                    else
+                    {
+                        OnLocationChanged();
+                    }
                 }
             }
         }

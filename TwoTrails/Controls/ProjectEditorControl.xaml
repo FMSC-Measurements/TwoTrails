@@ -298,6 +298,7 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
 
                                     <TextBox Grid.Column="0"
@@ -312,6 +313,7 @@
                                         </i:Interaction.Triggers>
                                     </TextBox>
                                     <Button Grid.Column="1" Width="75" Command="{Binding PolygonUpdateAccCommand}" Content="Update"/>
+                                    <Button Grid.Column="2" Width="100" Command="{Binding PolygonMtdcLookupCommand}" Content="MTDC Lookup"/>
                                 </Grid>
 
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Start Index" />
@@ -649,6 +651,8 @@
                                 <TextBlock Grid.Column="0" Grid.Row="10" Text="Comment" />
                                 <TextBox Grid.Column="0" Grid.Row="11" Grid.ColumnSpan="3" MinLines="3" MaxLines="5"
                                 Text="{Binding CurrentMetadata.Comment, UpdateSourceTrigger=PropertyChanged}" />
+                                
+                                <!-- TODO add extra metadata info-->
                             </Grid>
                         </ScrollViewer>
 

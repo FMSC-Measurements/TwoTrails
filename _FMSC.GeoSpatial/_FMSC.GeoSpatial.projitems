@@ -15,6 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)GeoTools.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Latitude.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Longitude.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MTDC\GpsAccuracyReport.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NMEA\Exceptions\ExcessiveStringException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NMEA\Exceptions\MissingNmeaDataException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NMEA\Exceptions\NmeaException.cs" />
