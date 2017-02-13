@@ -18,6 +18,7 @@ using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Dialogs;
 
 namespace TwoTrails.ViewModels
 {
@@ -300,12 +301,22 @@ namespace TwoTrails.ViewModels
 
         private void MtdcLookup()
         {
-            if (SessionData.GpsAccuracyReport == null)
+            GpsReportStatus status = SessionData.HasGpsAccReport();
+            if (status != GpsReportStatus.CantGetReport)
             {
-                //todo check if file is 24ho, if is or no file, try and get new version
-            }
+                MtdcDataDialog dialog = new MtdcDataDialog(SessionData.GpsAccuracyReport, true, true,
+                    SessionData.MakeID, SessionData.ModelID);
+                dialog.Owner = _Project.MainModel.MainWindow;
 
-            //show report dialog
+                if (dialog.ShowDialog() == true)
+                {
+                    PolygonAccuracy = dialog.Accuracy;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Unable to retrieve MTDC data.", "", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void NewPolygon(ListBox listBox)

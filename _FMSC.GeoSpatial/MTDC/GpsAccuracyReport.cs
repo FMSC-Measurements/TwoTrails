@@ -11,6 +11,8 @@ namespace FMSC.GeoSpatial.MTDC
 {
     public class GpsAccuracyReport
     {
+        public const string GpsTestsUrl = @"https://www.fs.fed.us/database/gps/mtdcrept/accuracy/gpsTests.xml";
+
         public ReadOnlyCollection<Manufacturer> Manufacturers { get; }
 
         public GpsAccuracyReport(string data)
@@ -24,12 +26,17 @@ namespace FMSC.GeoSpatial.MTDC
 
         public static GpsAccuracyReport Retrieve()
         {
-            string url = @"https://www.fs.fed.us/database/gps/mtdcrept/accuracy/gpsTests.xml";
             byte[] data;
             using (WebClient webClient = new WebClient())
-                data = webClient.DownloadData(url);
+                data = webClient.DownloadData(GpsTestsUrl);
 
             return new GpsAccuracyReport(Encoding.GetEncoding("Windows-1252").GetString(data));
+        }
+
+        public static void DownloadGpsTests(string fileName)
+        {
+            using (WebClient webClient = new WebClient())
+                webClient.DownloadFile(GpsTestsUrl, fileName);
         }
 
         public static GpsAccuracyReport Load(string file)

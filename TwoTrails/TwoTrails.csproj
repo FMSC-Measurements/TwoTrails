@@ -151,6 +151,9 @@
     <Compile Include="Dialogs\ImportDialog.xaml.cs">
       <DependentUpon>ImportDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\MtdcDataDialog.xaml.cs">
+      <DependentUpon>MtdcDataDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\PointLocManipDialog.xaml.cs">
       <DependentUpon>PointLocManipDialog.xaml</DependentUpon>
     </Compile>
@@ -218,6 +221,7 @@
     <Compile Include="PointSorter.cs" />
     <Compile Include="Tabs\ProjectTab.cs" />
     <Compile Include="Tabs\UserActivityTab.cs" />
+    <Compile Include="ViewModels\MtdcDataModel.cs" />
     <Compile Include="ViewModels\ProjectEditorModel.cs" />
     <Compile Include="ViewModels\RetraceModel.cs" />
     <Compile Include="ViewModels\TtProject.cs" />
@@ -260,6 +264,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ImportDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\MtdcDataDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
