@@ -254,7 +254,7 @@ namespace TwoTrails.Core
                             sbPoints.AppendFormat("Point {0}: {1} Quondam to Point {2} ({3}){4}.{5}", point.PID,
                                 point.OnBoundary ? " " : "*", qp.ParentPoint.PID, qp.ParentPoint.OpType,
                                 qp.Polygon.Name != qp.ParentPoint.Polygon.Name ?
-                                    String.Format(" in {0}", qp.ParentPoint.Polygon.Name) : String.Empty,
+                                    $" in {qp.ParentPoint.Polygon.Name}" : String.Empty,
                                 Environment.NewLine);
                         }
 

@@ -241,8 +241,7 @@ namespace TwoTrails.DAL
                         {
                             CN = cn,
                             Name = hasPolyNames ?
-                                reader.GetField<string>(fPolyName) :
-                                String.Format("Poly {0}", _Polygons.Count + 1),
+                                reader.GetField<string>(fPolyName) : $"Poly {_Polygons.Count + 1}",
                             PointStartIndex = _Polygons.Count * 1000 + 1010,
                             TimeCreated = _ProjectInfo.CreationDate.AddSeconds(secondsInc++)
                         };
@@ -303,7 +302,7 @@ namespace TwoTrails.DAL
                             CN = cn,
                             Name = hasGroupNames ?
                                 reader.GetField<string>(fGroupName) :
-                                String.Format("Group {0}", _Groups.Count + 1)
+                                $"Group {_Groups.Count + 1}"
                         };
 
                         _Groups.Add(cn, group);

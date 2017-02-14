@@ -81,7 +81,7 @@ namespace FMSC.GeoSpatial.NMEA
 
         public static String ToStringCode(this TalkerID talkerID)
         {
-            return talkerID == TalkerID.Unknown ? "$??" : String.Format("${0}", talkerID);
+            return talkerID == TalkerID.Unknown ? "$??" : $"${talkerID}";
         }
 
         public static TalkerID ParseTalkerID(string value)

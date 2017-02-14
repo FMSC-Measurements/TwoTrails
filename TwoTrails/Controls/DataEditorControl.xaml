@@ -273,14 +273,14 @@
                     <DataGridTextColumn Header="OpType" IsReadOnly="True" Binding="{Binding OpType}"/>
                     <DataGridTextColumn Header="Polygon" IsReadOnly="True" Binding="{Binding Polygon.Name}" Width="100"/>
                     <DataGridTextColumn Header="OnBound" IsReadOnly="True" Binding="{Binding OnBoundary}"/>
-                    <DataGridTextColumn Header="AdjX" IsReadOnly="True" Binding="{Binding AdjX}"/>
-                    <DataGridTextColumn Header="AdjY" IsReadOnly="True" Binding="{Binding AdjY}"/>
-                    <DataGridTextColumn Header="AdjZ (M)" IsReadOnly="True" Binding="{Binding AdjZ}"/>
-                    <DataGridTextColumn Header="Acc (M)" IsReadOnly="True" Binding="{Binding Accuracy}"/>
-                    <DataGridTextColumn Header="UnAdjX" IsReadOnly="True" Binding="{Binding UnAdjX}" Visibility="Collapsed"/>
-                    <DataGridTextColumn Header="UnAdjY" IsReadOnly="True" Binding="{Binding UnAdjY}" Visibility="Collapsed"/>
-                    <DataGridTextColumn Header="UnAdjZ (M)" IsReadOnly="True" Binding="{Binding UnAdjZ}" Visibility="Collapsed"/>
-                    <DataGridTextColumn Header="QndmLink" IsReadOnly="True" Binding="{Binding HasQuondamLinks}"/>
+                    <DataGridTextColumn Header="AdjX" IsReadOnly="True" Binding="{Binding AdjX, StringFormat={}{0:0.###}}"/>
+                    <DataGridTextColumn Header="AdjY" IsReadOnly="True" Binding="{Binding AdjY, StringFormat={}{0:0.###}}"/>
+                    <DataGridTextColumn Header="AdjZ (M)" IsReadOnly="True" Binding="{Binding AdjZ, StringFormat={}{0:0.###}}"/>
+                    <DataGridTextColumn Header="Acc (M)" IsReadOnly="True" Binding="{Binding Accuracy, StringFormat={}{0:0.###}}"/>
+                    <DataGridTextColumn Header="UnAdjX" IsReadOnly="True" Binding="{Binding UnAdjX, StringFormat={}{0:0.###}}" Visibility="Collapsed"/>
+                    <DataGridTextColumn Header="UnAdjY" IsReadOnly="True" Binding="{Binding UnAdjY, StringFormat={}{0:0.###}}" Visibility="Collapsed"/>
+                    <DataGridTextColumn Header="UnAdjZ (M)" IsReadOnly="True" Binding="{Binding UnAdjZ, StringFormat={}{0:0.###}}" Visibility="Collapsed"/>
+                    <DataGridTextColumn Header="QndmLink" IsReadOnly="True" Binding="{Binding HasQuondamLinks,StringFormat=F3}"/>
                     <DataGridTextColumn Header="Comment" IsReadOnly="True" Binding="{Binding Comment}" Visibility="Collapsed"/>
                 </DataGrid.Columns>
 

@@ -191,7 +191,7 @@ namespace TwoTrails.DAL
                                 {
                                     PointStartIndex = 1000 * _Polygons.Count + 1010,
                                     Name = features.Count < 2 ? file.Name :
-                                        String.Format("{0}-{1}", fidInc++, file.Name),
+                                        $"{fidInc++}-{file.Name}",
                                     TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
                                 };
 
@@ -217,7 +217,7 @@ namespace TwoTrails.DAL
                                                 if (String.IsNullOrEmpty(poly.Description))
                                                     poly.Description = objv;
                                                 else
-                                                    poly.Description = String.Format("{0} | {1}", poly.Description, objv);
+                                                    poly.Description = $"{poly.Description} | {objv}";
                                                 break;
                                             case "name":
                                             case "unit":
@@ -363,11 +363,11 @@ namespace TwoTrails.DAL
             string basename = Path.GetFileNameWithoutExtension(file);
             string path = Path.GetDirectoryName(file);
 
-            if (File.Exists(Path.Combine(path, String.Format("{0}.shx", basename))) &&
-                File.Exists(Path.Combine(path, String.Format("{0}.prj", basename))) &&
-                File.Exists(Path.Combine(path, String.Format("{0}.dbf", basename))))
+            if (File.Exists(Path.Combine(path, $"{basename}.shx")) &&
+                File.Exists(Path.Combine(path, $"{basename}.prj")) &&
+                File.Exists(Path.Combine(path, $"{basename}.dbf")))
             {
-                int zone = GetShapeFileUtmZone(Path.Combine(path, String.Format("{0}.prj", basename)));
+                int zone = GetShapeFileUtmZone(Path.Combine(path, $"{basename}.prj"));
 
                 if (zone < 0)
                 {
@@ -487,9 +487,9 @@ namespace TwoTrails.DAL
                     Name = Path.GetFileNameWithoutExtension(file);
                     string path = Path.GetDirectoryName(file);
 
-                    ShxFilePath = Path.Combine(path, String.Format("{0}.shx", Name));
-                    PrjFilePath = Path.Combine(path, String.Format("{0}.prj", Name));
-                    DbfFilePath = Path.Combine(path, String.Format("{0}.dbf", Name));
+                    ShxFilePath = Path.Combine(path, $"{Name}.shx");
+                    PrjFilePath = Path.Combine(path, $"{Name}.prj");
+                    DbfFilePath = Path.Combine(path, $"{Name}.dbf");
 
                     if (File.Exists(PrjFilePath) && File.Exists(ShxFilePath) && File.Exists(DbfFilePath))
                     {

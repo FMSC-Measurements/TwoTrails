@@ -42,5 +42,29 @@ namespace TwoTrails.Dialogs
                 diag.Owner = owner;
             return diag.ShowDialog();
         }
+
+        private void DataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+            if (e.AddedCells.Count > 0)
+            {
+                DataGridCellInfo cell = e.AddedCells[0];
+                if (cell.Column.DisplayIndex > 4 && cell.Column.DisplayIndex < 8)
+                {
+                    Test test = cell.Item as Test;
+
+                    if (test != null)
+                    {
+                        if (cell.Column.DisplayIndex == 5 && test.OpenAcc != null)
+                            _Model.Accuracy = (double)test.OpenAcc;
+                        else if (cell.Column.DisplayIndex == 6 && test.MedAcc != null)
+                            _Model.Accuracy = (double)test.MedAcc;
+                        else if (cell.Column.DisplayIndex == 7 && test.HeavyAcc != null)
+                            _Model.Accuracy = (double)test.HeavyAcc;
+                        else
+                            _Model.Accuracy = 0;
+                    }
+                }
+            }
+        }
     }
 }

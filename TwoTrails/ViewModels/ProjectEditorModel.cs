@@ -310,7 +310,9 @@ namespace TwoTrails.ViewModels
 
                 if (dialog.ShowDialog() == true)
                 {
+                    CurrentPolygon.Accuracy = dialog.Accuracy;
                     PolygonAccuracy = dialog.Accuracy;
+                    OnPropertyChanged(nameof(PolygonAccuracy));
                 }
             }
             else

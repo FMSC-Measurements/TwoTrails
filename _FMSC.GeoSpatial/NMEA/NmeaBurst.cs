@@ -428,16 +428,12 @@ namespace FMSC.GeoSpatial.NMEA
         {
             if (IsValid)
             {
-                return String.Format("[{0}] Valid: True | Lat: {1} | Lon: {2} | Elev: {3}",
-                        FixTime, Latitude, Latitude, Elevation);
+                return $"[{FixTime}] Valid: True | Lat: {Latitude} | Lon: {Latitude} | Elev: {Elevation}";
             }
             else
             {
-                return String.Format("[{0}] Valid: False |{1} rmc: {2} | gga: {3} | gsa: {4} | gsv: {5}",
-                        DateTime.Now,
-                        HasPosition ? String.Format(" (Lat: {0} | Lon: {1} | Elev: {2}) |", Latitude, Latitude, Elevation) :
-                                "No Position |",
-                        Validate(SentenceID.RMC), Validate(SentenceID.GGA), Validate(SentenceID.GSA), Validate(SentenceID.GSV));
+                return $@"[{DateTime.Now}] Valid: False | {(HasPosition ? $"(Lat: {Latitude} | Lon: {Latitude} | Elev: {Elevation}) |" : "No Position | ")} 
+rmc: {Validate(SentenceID.RMC)} | gga: {Validate(SentenceID.GGA)} | gsa: {Validate(SentenceID.GSA)} | gsv: {Validate(SentenceID.GSV)}";
             }
         }
     }

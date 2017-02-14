@@ -66,6 +66,10 @@ namespace TwoTrails
                 });
                 OnPropertyChanged(nameof(TabTitle));
             }
+            else if (e.PropertyName == "DAL")
+            {
+                OnPropertyChanged(nameof(ToolTip));
+            }
         }
     }
 }

@@ -89,9 +89,9 @@ namespace FMSC.GeoSpatial.MTDC
         public SBASType SBAS { get; }
         public bool ExternalAntenna { get; }
         public bool PostProcessed { get; }
-        public double OpenAcc { get; }
-        public double MedAcc { get; }
-        public double HeavyAcc { get; }
+        public double? OpenAcc { get; }
+        public double? MedAcc { get; }
+        public double? HeavyAcc { get; }
 
         public Test(XElement elem)
         {
@@ -126,7 +126,7 @@ namespace FMSC.GeoSpatial.MTDC
             switch (type.ToLower())
             {
                 case "none": return SBASType.None;
-                case "wass": return SBASType.WASS;
+                case "waas": return SBASType.WAAS;
             }
 
             return SBASType.Unknown;
@@ -154,6 +154,6 @@ namespace FMSC.GeoSpatial.MTDC
     {
         Unknown = 0,
         None = 1,
-        WASS = 2
+        WAAS = 2
     }
 }

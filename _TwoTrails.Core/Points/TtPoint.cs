@@ -450,7 +450,7 @@ namespace TwoTrails.Core.Points
 
         public override string ToString()
         {
-            return String.Format("{0} ({1})", PID, OpType);
+            return $"{PID} ({OpType})";
         }
     }
 }

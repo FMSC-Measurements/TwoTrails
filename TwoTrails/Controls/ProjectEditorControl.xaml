@@ -313,7 +313,7 @@
                                         </i:Interaction.Triggers>
                                     </TextBox>
                                     <Button Grid.Column="1" Width="75" Command="{Binding PolygonUpdateAccCommand}" Content="Update"/>
-                                    <Button Visibility="Collapsed" Grid.Column="2" Width="100" Command="{Binding PolygonMtdcLookupCommand}" Content="MTDC Lookup"/>
+                                    <Button Visibility="Visible" Grid.Column="2" Width="100" Command="{Binding PolygonMtdcLookupCommand}" Content="MTDC Lookup"/>
                                 </Grid>
 
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Start Index" />

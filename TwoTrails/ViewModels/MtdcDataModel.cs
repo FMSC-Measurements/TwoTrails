@@ -16,11 +16,12 @@ namespace TwoTrails.ViewModels
     {
         public GpsAccuracyReport Report { get; }
 
-        public double Accuracy { get { return Get<double>(); } private set { Set(value); } }
+        public double Accuracy { get { return Get<double>(); } set { Set(value); } }
         
         public bool CanSelectValue { get; }
 
         public ICommand OkCommand { get; }
+        public ICommand CancelCommand { get; }
 
         
 
@@ -33,6 +34,8 @@ namespace TwoTrails.ViewModels
             OkCommand = new BindedRelayCommand<MtdcDataModel>(
                 x => { window.DialogResult = true; window.Close(); },
                 x => Accuracy > 0, this, x => x.Accuracy);
+
+            CancelCommand = new RelayCommand(x => window.Close());
         }
     }
 }

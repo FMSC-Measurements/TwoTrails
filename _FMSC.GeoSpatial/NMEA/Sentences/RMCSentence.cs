@@ -39,7 +39,7 @@ namespace FMSC.GeoSpatial.NMEA.Sentences
                     try
                     {
                         FixTime = DateTime.ParseExact(
-                            String.Format("{0} {1}", tokens[1], tokens[9]),
+                            $"{tokens[1]} {tokens[9]}",
                             RMCTimeFormatters, CultureInfo.InvariantCulture,
                             DateTimeStyles.None);
 

@@ -89,7 +89,7 @@ namespace TwoTrails.DAL
                                                     inPoly = true;
                                                     poly = new TtPolygon()
                                                     {
-                                                        Name = String.Format("Poly {0}", _Polygons.Count),
+                                                        Name = $"Poly {_Polygons.Count}",
                                                         PointStartIndex = _Polygons.Count * 1000 + 10,
                                                         TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
                                                     };

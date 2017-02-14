@@ -62,6 +62,9 @@
 
                     <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}" InputGestureText="Ctrl+S"
                           IsEnabled="{Binding Path=HasOpenedProject}"/>
+                    
+                    <MenuItem Header="Save As" Command="{Binding SaveAsCommand}" CommandParameter="{Binding CurrentProject}" InputGestureText="Ctrl+Alt+S"
+                          IsEnabled="{Binding Path=HasOpenedProject}"/>
 
                     <Separator/>
 
@@ -107,6 +110,11 @@
                 </MenuItem>
 
                 <MenuItem Header="_Tools">
+                    <MenuItem Header="Readjust All Polygons" Command="{Binding CurrentProject.ReadjustAllPolygonsCommand}"
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+
+                    <Separator/>
+                    
                     <MenuItem Header="Create Quondams" Command="{Binding CurrentEditor.CreateQuondamsCommand}"
                         Style="{StaticResource ResourceKey=styleMiPointEdit}"/>
                     <MenuItem Header="Move Points" Command="{Binding CurrentEditor.MovePointsCommand}"

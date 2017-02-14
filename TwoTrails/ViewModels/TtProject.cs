@@ -31,6 +31,8 @@ namespace TwoTrails.ViewModels
         public ICommand EditGroupsCommand { get; }
         public ICommand EditMetadataCommand { get; }
 
+        public ICommand ReadjustAllPolygonsCommand { get; }
+
         public ICommand UndoCommand { get; set; }
         public ICommand RedoCommand { get; set; }
 
@@ -82,7 +84,7 @@ namespace TwoTrails.ViewModels
         }
 
 
-        public ITtDataLayer DAL { get; }
+        public ITtDataLayer DAL { get; private set; }
 
         public TtSettings Settings { get; private set; }
 
@@ -135,6 +137,8 @@ namespace TwoTrails.ViewModels
             EditPolygonsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Polygons));
             EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Metadata));
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Groups));
+            
+            ReadjustAllPolygonsCommand = new RelayCommand(x => { HistoryManager.RecalculatePolygons(); ProjectUpdated(); });
 
             OpenMapCommand = new RelayCommand(x => OpenMapTab());
             OpenMapWindowCommand = new RelayCommand(x => OpenMapWindow());
@@ -176,6 +180,14 @@ namespace TwoTrails.ViewModels
                     Trace.WriteLine(ex.Message, "TtProject:Save");
                 }
             }
+        }
+
+        public void ReplaceDAL(ITtDataLayer dal)
+        {
+            DAL = dal;
+            Manager.ReplaceDAL(DAL);
+            OnPropertyChanged(nameof(DAL));
+            OnPropertyChanged(nameof(FilePath));
         }
 
         public void Close()

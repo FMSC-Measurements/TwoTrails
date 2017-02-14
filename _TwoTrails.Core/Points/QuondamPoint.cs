@@ -117,8 +117,7 @@ namespace TwoTrails.Core.Points
 
         public override string ToString()
         {
-            return String.Format("{0}{1}", base.ToString(),
-                ParentPoint != null ? String.Format(": {0}", ParentPoint.ToString()) : String.Empty);
+            return $"{base.ToString()}{(ParentPoint != null ? $": {ParentPoint.ToString()}" : String.Empty)}";
         }
 
 

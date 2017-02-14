@@ -77,10 +77,7 @@ namespace TwoTrails.DAL
         public TtPoint GetPoint(String pointCN)
         {
             return GetPoints(
-                String.Format("{0}.{1} = '{2}'",
-                    TwoTrailsSchema.PointSchema.TableName,
-                    TwoTrailsSchema.SharedSchema.CN,
-                    pointCN),
+                $"{TwoTrailsSchema.PointSchema.TableName}.{TwoTrailsSchema.SharedSchema.CN} = '{pointCN}'",
                 1,
                 false
             ).FirstOrDefault();
@@ -90,9 +87,7 @@ namespace TwoTrails.DAL
         {
             return GetPoints(
                 polyCN != null ?
-                    String.Format("{0} = '{1}'",
-                        TwoTrailsSchema.PointSchema.PolyCN,
-                        polyCN) :
+                    $"{TwoTrailsSchema.PointSchema.PolyCN} = '{polyCN}'" :
                     null,
                 0,
                 linked
@@ -112,7 +107,7 @@ namespace TwoTrails.DAL
                 TwoTrailsSchema.TravPointSchema.TableName,          //6
                 TwoTrailsSchema.QuondamPointSchema.TableName,       //7
                 TwoTrailsSchema.SharedSchema.CN,                    //8
-                where != null ? String.Format(" where {0}", where) : String.Empty,
+                where != null ? $" where {where}" : String.Empty,
                 TwoTrailsSchema.PointSchema.Index
             );
 
@@ -402,7 +397,7 @@ namespace TwoTrails.DAL
 
         private bool UpdateBasePoint(TtPoint point, TtPoint oldPoint, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            string where = String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, point.CN);
+            string where = $"{TwoTrailsSchema.SharedSchema.CN} = '{point.CN}'";
 
             database.Update(TwoTrailsSchema.PointSchema.TableName,
                 GetBasePointValues(point),
@@ -561,7 +556,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        String where = String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, point.CN);
+                        String where = $"{TwoTrailsSchema.SharedSchema.CN} = '{point.CN}'";
                         if (DeleteBasePoints(where, conn, trans))
                         {
                             switch (point.OpType)
@@ -620,7 +615,7 @@ namespace TwoTrails.DAL
                         foreach (TtPoint point in points)
                         {
                             count++;
-                            where = String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, point.CN);
+                            where = $"{TwoTrailsSchema.SharedSchema.CN} = '{point.CN}'";
 
                             if (count % 50 == 0)
                             {
@@ -636,7 +631,7 @@ namespace TwoTrails.DAL
                             }
                             else
                             {
-                                sb.AppendFormat("{0}{1}", where, count < total ? " or " : "");
+                                sb.Append($"{where}{(count < total ? " or " : String.Empty)}");
                             }
 
                             switch (point.OpType)
@@ -710,7 +705,7 @@ namespace TwoTrails.DAL
         {
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(String.Format("select count(*) from {0}", TwoTrailsSchema.PolygonSchema.TableName), conn))
+                using (SQLiteDataReader dr = database.ExecuteReader($"select count(*) from {TwoTrailsSchema.PolygonSchema.TableName}", conn))
                 {
                     if (dr != null)
                     {
@@ -731,10 +726,7 @@ namespace TwoTrails.DAL
 
         public IEnumerable<TtPolygon> GetPolygons()
         {
-            String query = String.Format(@"select {0} from {1}",
-                TwoTrailsSchema.PolygonSchema.SelectItems,
-                TwoTrailsSchema.PolygonSchema.TableName
-            );
+            String query = String.Format($"select {TwoTrailsSchema.PolygonSchema.SelectItems} from {TwoTrailsSchema.PolygonSchema.TableName}");
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
@@ -837,7 +829,7 @@ namespace TwoTrails.DAL
                     {
                         database.Update(TwoTrailsSchema.PolygonSchema.TableName,
                             GetPolygonValues(polygon),
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, polygon.CN),
+                            $"{TwoTrailsSchema.SharedSchema.CN} = '{polygon.CN}'",
                             conn,
                             trans);
 
@@ -871,7 +863,7 @@ namespace TwoTrails.DAL
                         {
                             database.Update(TwoTrailsSchema.PolygonSchema.TableName,
                                 GetPolygonValues(poly),
-                                String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, poly.CN),
+                                $"{TwoTrailsSchema.SharedSchema.CN} = '{poly.CN}'",
                                 conn,
                                 trans);
                         }
@@ -920,7 +912,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         database.Delete(TwoTrailsSchema.PolygonSchema.TableName,
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, polygon.CN),
+                            $"{TwoTrailsSchema.SharedSchema.CN} = '{polygon.CN}'",
                             conn,
                             trans);
 
@@ -957,9 +949,7 @@ namespace TwoTrails.DAL
                         foreach (TtPolygon poly in polygons)
                         {
                             count++;
-                            sb.AppendFormat("{0}{1}",
-                                String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, poly.CN),
-                                count < total ? " or " : "");
+                            sb.Append($"{TwoTrailsSchema.SharedSchema.CN} = '{poly.CN}'{(count < total ? " or " : String.Empty)}");
                         }
 
                         string where = sb.ToString();

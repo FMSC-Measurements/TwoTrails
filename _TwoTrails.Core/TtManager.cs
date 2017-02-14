@@ -60,6 +60,10 @@ namespace TwoTrails.Core
             Load();
         }
 
+        public void ReplaceDAL(ITtDataLayer dal)
+        {
+            _DAL = dal;
+        }
 
         #region Load & Attaching
         private void Load()
@@ -1464,7 +1468,7 @@ namespace TwoTrails.Core
             int num = _PolygonsMap.Count + 1;
             return new TtPolygon()
             {
-                Name = name != null ? name : String.Format("Poly {0}", num),
+                Name = name != null ? name : $"Poly {num}",
                 PointStartIndex = pointStartIndex > 0 ? pointStartIndex : num * 1000 + 10
             };
         }
@@ -1571,7 +1575,7 @@ namespace TwoTrails.Core
             return new TtMetadata(_Settings.MetadataSettings.CreateDefaultMetadata())
             {
                 CN = Guid.NewGuid().ToString(),
-                Name = name != null ? name : String.Format("Meta {0}", _MetadataMap.Count + 1)
+                Name = name ?? $"Meta {_MetadataMap.Count + 1}"
             };
         }
         
@@ -1637,9 +1641,7 @@ namespace TwoTrails.Core
         /// <returns>New Group</returns>
         public TtGroup CreateGroup(GroupType groupType = GroupType.General)
         {
-            return new TtGroup(groupType != GroupType.General ?
-                String.Format("{0}_{1}", groupType, Guid.NewGuid().ToString().Substring(0, 8)) :
-                String.Format("Group ", _GroupsMap.Count + 1));
+            return new TtGroup($"{(groupType != GroupType.General ? $"{groupType}" : "Group")}_{Guid.NewGuid().ToString().Substring(0, 8)}");
         }
        
         /// <summary>

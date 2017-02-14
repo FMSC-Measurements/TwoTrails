@@ -140,6 +140,7 @@ namespace TwoTrails.ViewModels
         public ICommand OpenCommand { get; private set; }
         public ICommand OpenProjectCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
+        public ICommand SaveAsCommand { get; private set; }
         public ICommand CloseProjectCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
 
@@ -170,6 +171,7 @@ namespace TwoTrails.ViewModels
             OpenCommand = new RelayCommand(x => BrowseProject());
             OpenProjectCommand = new RelayCommand(x => OpenProject(x as string));
             SaveCommand = new RelayCommand(x => SaveCurrentProject());
+            SaveAsCommand = new RelayCommand(x => SaveCurrentProject(true));
             CloseProjectCommand = new RelayCommand(x => CurrentProject.Close());
             ExitCommand = new RelayCommand(x => Exit());
 
@@ -359,9 +361,36 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
 
 
 
-        public void SaveCurrentProject()
+        public void SaveCurrentProject(bool rename = false)
         {
-            CurrentProject.Save();
+            if (rename)
+            {
+                SaveFileDialog dialog = new SaveFileDialog();
+                dialog.DefaultExt = ".tt";
+                dialog.Filter = "TwoTrails Files (*.tt)|*.tt";
+
+                if (dialog.ShowDialog() == true)
+                {
+                    TtProject project = CurrentProject;
+                    string nFile = dialog.FileName, oFile = project.DAL.FilePath;
+
+                    File.Copy(oFile, nFile, true);
+
+                    TtSqliteDataAccessLayer nDal = new TtSqliteDataAccessLayer(nFile);
+                    Trace.WriteLine($"Project Copied: {nFile} from {oFile}");
+
+                    project.ReplaceDAL(nDal);
+
+                    _Projects.Remove(oFile);
+                    _Projects.Add(nFile, project);
+
+                    project.Save();
+                }
+            }
+            else
+            {
+                CurrentProject.Save();
+            }
         }
 
 

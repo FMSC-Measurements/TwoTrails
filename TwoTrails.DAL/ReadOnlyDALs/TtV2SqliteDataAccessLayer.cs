@@ -51,10 +51,7 @@ namespace TwoTrails.DAL
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
                 using (SQLiteDataReader dr = database.ExecuteReader(
-                    String.Format("select {0} from {1}",
-                        TwoTrailsV2Schema.ProjectInfoSchema.TtDbSchemaVersion,
-                        TwoTrailsV2Schema.ProjectInfoSchema.TableName
-                    ), conn))
+                    $"select {TwoTrailsV2Schema.ProjectInfoSchema.TtDbSchemaVersion} from {TwoTrailsV2Schema.ProjectInfoSchema.TableName}", conn))
                 {
                     if (dr != null)
                     {
@@ -195,7 +192,7 @@ namespace TwoTrails.DAL
 
         public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
         {
-            return GetTtPoints(polyCN != null ? String.Format("{0} = '{1}'", TwoTrailsV2Schema.PointSchema.PolyCN, polyCN) : null, linked);
+            return GetTtPoints(polyCN != null ? $"{TwoTrailsV2Schema.PointSchema.PolyCN} = '{polyCN}'" : null, linked);
         }
 
         private IEnumerable<TtPoint> GetTtPoints(String where = null, bool linkPoints = true, int limit = 0)
@@ -213,9 +210,9 @@ namespace TwoTrails.DAL
                     TwoTrailsV2Schema.TravPointSchema.TableName,          //6
                     TwoTrailsV2Schema.QuondamPointSchema.TableName,       //7
                     TwoTrailsV2Schema.SharedSchema.CN,                    //8
-                    where != null ? String.Format(" where {0}", where) : String.Empty,
+                    where != null ? $" where {where}" : String.Empty,
                     TwoTrailsV2Schema.PointSchema.Order,
-                    limit > 0 ? String.Format(" limit {0}", limit) : String.Empty
+                    limit > 0 ? $" limit {limit}" : String.Empty
                 );
 
                 Dictionary<string, TtPolygon> polygons = GetPolygons().ToDictionary(p => p.CN, p => p);
@@ -393,11 +390,7 @@ namespace TwoTrails.DAL
             String query = String.Format(@"select {0} from {1}{2}",
                 TwoTrailsV2Schema.TtNmeaSchema.SelectItems,
                 TwoTrailsV2Schema.TtNmeaSchema.TableName,
-                pointCN != null ?
-                String.Format(" where {0} = '{1}'",
-                        TwoTrailsV2Schema.TtNmeaSchema.PointCN,
-                        pointCN) :
-                String.Empty
+                pointCN != null ? $" where {TwoTrailsV2Schema.TtNmeaSchema.PointCN} = '{pointCN}'" : String.Empty
             );
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
@@ -535,7 +528,7 @@ namespace TwoTrails.DAL
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(String.Format("select count(*) from {0}", TwoTrailsV2Schema.PolygonSchema.TableName), conn))
+                using (SQLiteDataReader dr = database.ExecuteReader($"select count(*) from {TwoTrailsV2Schema.PolygonSchema.TableName}", conn))
                 {
                     if (dr != null)
                     {
