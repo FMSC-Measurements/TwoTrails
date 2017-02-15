@@ -63,8 +63,8 @@ namespace TwoTrails.Dialogs
                 {
                     String fileName = txtName.Text;
 
-                    if (!fileName.EndsWith(".tt"))
-                        fileName = fileName + ".tt";
+                    if (!fileName.EndsWith(Consts.FILE_EXTENSION))
+                        fileName = $"fileName{Consts.FILE_EXTENSION}";
 
                     if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0)
                     {
@@ -72,7 +72,7 @@ namespace TwoTrails.Dialogs
                         
                         if (File.Exists(FilePath))
                         {
-                            if (MessageBox.Show(String.Format("{0} already exists. Would you like to overwrite it?", fileName), "File Exists",
+                            if (MessageBox.Show($"{fileName} already exists. Would you like to overwrite it?", "File Exists",
                                 MessageBoxButton.YesNo, MessageBoxImage.Warning)  == MessageBoxResult.Yes)
                             {
                                 DialogResult = true;

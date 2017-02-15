@@ -333,7 +333,7 @@ namespace TwoTrails.ViewModels
         {
             if (CurrentPolygon != null)
             {
-                if (MessageBox.Show(String.Format("Confirm Delete Polygon '{0}'", CurrentPolygon.Name), "Delete Polygon",
+                if (MessageBox.Show($"Confirm Delete Polygon '{CurrentPolygon.Name}'", "Delete Polygon",
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
                     _Project.Manager.DeletePolygon(CurrentPolygon);
@@ -349,7 +349,7 @@ namespace TwoTrails.ViewModels
             {
                 SaveFileDialog sfd = new SaveFileDialog();
                 sfd.DefaultExt = "(Text File *.txt)|*.txt";
-                sfd.FileName = String.Format("{0}_Summary", CurrentPolygon.Name);
+                sfd.FileName = $"{CurrentPolygon.Name}_Summary";
                 sfd.DefaultExt = ".txt";
                 sfd.OverwritePrompt = true;
 
@@ -413,7 +413,7 @@ namespace TwoTrails.ViewModels
         {
             if (CurrentMetadata != null && CurrentMetadata.CN != Consts.EmptyGuid)
             {
-                if (MessageBox.Show(String.Format("Confirm Delete Metadata '{0}'", CurrentMetadata.Name), "Delete Metadata",
+                if (MessageBox.Show($"Confirm Delete Metadata '{CurrentMetadata.Name}'", "Delete Metadata",
                 MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
                     ITtManager manager = _Project.Manager;
@@ -456,7 +456,7 @@ namespace TwoTrails.ViewModels
         {
             if (CurrentGroup != null && CurrentGroup.CN != Consts.EmptyGuid)
             {
-                if (MessageBox.Show(String.Format("Confirm Delete Group '{0}'", CurrentGroup.Name), "Delete Group",
+                if (MessageBox.Show($"Confirm Delete Group '{CurrentGroup.Name}'", "Delete Group",
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
                     _Project.Manager.DeleteGroup(CurrentGroup);

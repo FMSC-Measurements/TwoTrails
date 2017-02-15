@@ -59,6 +59,9 @@
     <Compile Include="Controls\FlipCheckBox.xaml.cs">
       <DependentUpon>FlipCheckBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ProgressControl.xaml.cs">
+      <DependentUpon>ProgressControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Convert.cs" />
     <Compile Include="Math.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -94,6 +97,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\FlipCheckBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ProgressControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

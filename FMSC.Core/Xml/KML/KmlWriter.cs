@@ -259,8 +259,8 @@ namespace FMSC.Core.Xml.KML
                         foreach (Coordinates c in poly.OuterBoundary)
                         {
                             StringBuilder sb = new StringBuilder();
-                            sb.Append(String.Format("{0},{1}", c.Longitude, c.Latitude));
-                            sb.Append(c.Altitude != null ? String.Format(",{0} ", c.Altitude) : " ");
+                            sb.Append($"{c.Longitude},{c.Latitude}");
+                            sb.Append(c.Altitude != null ? $",{c.Altitude} " : " ");
                             WriteValue(sb.ToString());
                         }
 
@@ -277,8 +277,8 @@ namespace FMSC.Core.Xml.KML
                             foreach (Coordinates c in poly.InnerBoundary)
                             {
                                 StringBuilder sb = new StringBuilder();
-                                sb.Append(String.Format("{0},{1}", c.Longitude, c.Latitude));
-                                sb.Append(c.Altitude != null ? String.Format(",{0} ", c.Altitude) : " ");
+                                sb.Append($"{c.Longitude},{c.Latitude}");
+                                sb.Append(c.Altitude != null ? $",{c.Altitude} " : " ");
                                 WriteValue(sb.ToString());
                             }
 
@@ -294,8 +294,8 @@ namespace FMSC.Core.Xml.KML
                         foreach (Coordinates c in poly.OuterBoundary)
                         {
                             StringBuilder sb = new StringBuilder();
-                            sb.Append(String.Format("{0},{1}", c.Longitude, c.Latitude));
-                            sb.Append(c.Altitude != null ? String.Format(",{0} ", c.Altitude) : " ");
+                            sb.Append($"{c.Longitude},{c.Latitude}");
+                            sb.Append(c.Altitude != null ? $",{c.Altitude} " : " ");
                             WriteValue(sb.ToString());
                         }
 
@@ -337,8 +337,8 @@ namespace FMSC.Core.Xml.KML
 
                     WriteStartElement("coordinates");
                     StringBuilder sb = new StringBuilder();
-                    sb.Append(String.Format("{0},{1}", point.Coordinates.Longitude, point.Coordinates.Latitude));
-                    sb.Append(point.Coordinates.Altitude != null ? String.Format(",{0} ", point.Coordinates.Altitude) : " ");
+                    sb.Append($"{point.Coordinates.Longitude},{point.Coordinates.Latitude}");
+                    sb.Append(point.Coordinates.Altitude != null ? $",{point.Coordinates.Altitude} " : " ");
                     WriteValue(sb.ToString());
                     WriteEndElement();
 
@@ -746,7 +746,8 @@ namespace FMSC.Core.Xml.KML
 
         private string ConvertToKmlDateTime(DateTime dt)
         {
-            return String.Format("{0}-{1}-{2}T{3}:{4}:{5}Z", dt.Year.ToString("D4"), dt.Month.ToString("D2"), dt.Day.ToString("D2"), dt.Hour.ToString("D2"), dt.Minute.ToString("D2"), dt.Second.ToString("D2"));
+            return $@"{dt.Year.ToString("D4")}-{dt.Month.ToString("D2")}-{dt.Day.ToString("D2")}T
+{dt.Hour.ToString("D2")}:{dt.Minute.ToString("D2")}:{dt.Second.ToString("D2")}Z";
         }
         #endregion
 

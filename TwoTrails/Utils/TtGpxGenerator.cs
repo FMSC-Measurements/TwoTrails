@@ -54,7 +54,7 @@ namespace TwoTrails.Utils
                                 Name = point.PID.ToString(),
                                 Time = point.TimeCreated,
                                 Comment = point.Comment,
-                                Description = String.Format("Point Operation: {0}<br>UtmX: {1}<br>UtmY: {2}", point.OpType, point.AdjX, point.AdjY)
+                                Description = $"Point Operation: {point.OpType}<br>UtmX: {point.AdjX}<br>UtmY: {point.AdjY}"
                             };
 
                             System.Windows.Point unadj = TtUtils.GetLatLon(point, true);
@@ -63,7 +63,7 @@ namespace TwoTrails.Utils
                                 Name = point.PID.ToString(),
                                 Time = point.TimeCreated,
                                 Comment = point.Comment,
-                                Description = String.Format("Point Operation: {0}<br>UtmX: {1}<br>UtmY: {2}", point.OpType, point.UnAdjX, point.UnAdjY)
+                                Description = $"Point Operation: {point.OpType}<br>UtmX: {point.UnAdjX}<br>UtmY: {point.UnAdjY}"
                             };
 
                             #region Add points to lists

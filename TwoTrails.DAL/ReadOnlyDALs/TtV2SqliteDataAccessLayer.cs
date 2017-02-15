@@ -387,11 +387,8 @@ namespace TwoTrails.DAL
         {
             CheckVersion();
 
-            String query = String.Format(@"select {0} from {1}{2}",
-                TwoTrailsV2Schema.TtNmeaSchema.SelectItems,
-                TwoTrailsV2Schema.TtNmeaSchema.TableName,
-                pointCN != null ? $" where {TwoTrailsV2Schema.TtNmeaSchema.PointCN} = '{pointCN}'" : String.Empty
-            );
+            String query = $@"select {TwoTrailsV2Schema.TtNmeaSchema.SelectItems} from {TwoTrailsV2Schema.TtNmeaSchema.TableName}
+{(pointCN != null ? $" where {TwoTrailsV2Schema.TtNmeaSchema.PointCN} = '{pointCN}'" : String.Empty)}";
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {

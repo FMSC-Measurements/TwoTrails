@@ -21,9 +21,7 @@ namespace TwoTrails
 
         public virtual String TabTitle
         {
-            get { return String.Format("{0}{1}",
-                Project.ProjectName,
-                Project.RequiresSave ? "*" : String.Empty); }
+            get { return $"{Project.ProjectName}{(Project.RequiresSave ? "*" : String.Empty)}"; }
         }
 
         public virtual String TabInfo { get { return String.Empty; } }

@@ -138,12 +138,12 @@ namespace FMSC.Core.Xml.KML
 
         public string ToStringRGBA()
         {
-            return String.Format("{0:X2}{1:X2}{2:X2}{3:X2}", R, G, B, A);
+            return $"{R:X2}{G:X2}{B:X2}{A:X2}";
         }
 
         public string ToStringABGR()
         {
-            return String.Format("{0:X2}{1:X2}{2:X2}{3:X2}", A, B, G, R);
+            return $"{A:X2}{B:X2}{G:X2}{R:X2}";
         }
 
         /// <returns>ABGR format</returns>

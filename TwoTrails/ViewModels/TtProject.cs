@@ -173,7 +173,7 @@ namespace TwoTrails.ViewModels
                     Manager.Save();
                     HistoryManager.ClearHistory();
                     RequiresSave = DataChanged = ProjectChanged = false;
-                    MessagePosted?.Invoke(this, String.Format("Project '{0}' Saved", ProjectName));
+                    MessagePosted?.Invoke(this, $"Project '{ProjectName}' Saved");
                 }
                 catch (Exception ex)
                 {

@@ -134,6 +134,9 @@
     <Compile Include="Controls\ProjectEditorControl.xaml.cs">
       <DependentUpon>ProjectEditorControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TtProgressControl.xaml.cs">
+      <DependentUpon>TtProgressControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\UserActivityControl.xaml.cs">
       <DependentUpon>UserActivityControl.xaml</DependentUpon>
     </Compile>
@@ -248,6 +251,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\ProjectEditorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TtProgressControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -108,8 +108,7 @@ namespace TwoTrails.ViewModels
                 (SampleTypeItem == SampleType.Percent && SampleAmount < 1 || SampleAmount > 100) ||
                 (SampleTypeItem == SampleType.Points && SampleAmount < 1))
             {
-                MessageBox.Show(String.Format("The Sample Amount must ",
-                    SampleTypeItem == SampleType.Percent ? "be between 1% and 100%." : "be greate than 1 point."));
+                MessageBox.Show($"The Sample Amount must be {(SampleTypeItem == SampleType.Percent ? "between 1% and 100%." : "greater than 1 point.")}");
                 return;
             }
 
@@ -120,7 +119,7 @@ namespace TwoTrails.ViewModels
             }
 
             List<TtPolygon> polygons = _Manager.GetPolygons();
-            string gPolyName = String.Format("{0}_Plts", SelectedPolygon.Name);
+            string gPolyName = $"{SelectedPolygon.Name}_Plts";
 
             TtPolygon poly = null;
 
@@ -136,7 +135,7 @@ namespace TwoTrails.ViewModels
 
             if (poly != null)
             {
-                if (MessageBox.Show(String.Format("Plots '{0}' already exist. Would you like to overwrite the plots?", gPolyName), "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to overwrite the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
                     return;
 
                 _Manager.DeletePointsInPolygon(poly.CN);
@@ -163,8 +162,7 @@ namespace TwoTrails.ViewModels
 
             double angle = Tilt * -1;
 
-            poly.Description = String.Format("Angle: {0}°, Grid({3}) X:{1} Y:{2}, Created from Polygon: {4}",
-                        Tilt, GridX, GridY, UomDistance.ToStringAbv(), SelectedPolygon.Name);
+            poly.Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon: {SelectedPolygon.Name}";
 
             IEnumerable<TtPoint> points = _Manager.GetPoints(SelectedPolygon.CN).Where(p => p.IsBndPoint());
 
@@ -300,7 +298,7 @@ namespace TwoTrails.ViewModels
 
             _Manager.AddPoints(wayPoints);
 
-            MessageBox.Show(String.Format("{0} WayPoints Created", addPoints.Count));
+            MessageBox.Show($"{addPoints.Count} WayPoints Created");
         }
     }
 }

@@ -35,8 +35,8 @@ namespace TwoTrails.Utils
             Metadata(project.Manager, Path.Combine(folderPath, "Metadata.csv"));
             Groups(project.Manager, Path.Combine(folderPath, "Groups.csv"));
             TtNmea(project.Manager, Path.Combine(folderPath, "NmeaBursts.csv"));
-            GPX(project, Path.Combine(folderPath, String.Format("{0}.gpx", project.ProjectName.Trim())));
-            KMZ(project, Path.Combine(folderPath, String.Format("{0}.kmz", project.ProjectName.Trim())));
+            GPX(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.gpx"));
+            KMZ(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.kmz"));
             Shapes(project, folderPath);
         }
 
@@ -108,23 +108,23 @@ namespace TwoTrails.Utils
                 foreach (TtPoint point in points)
                 {
                     sb = new StringBuilder();
-                    sb.AppendFormat("{0},{1},", point.PID, point.CN);
-                    sb.AppendFormat("{0},{1},", point.OpType, point.Index);
+                    sb.Append($"{point.PID},{point.CN},");
+                    sb.Append($"{point.OpType},{point.Index},");
 
-                    sb.AppendFormat("{0},{1},", point.Polygon.Scrub(), point.TimeCreated.ToString(DateTimeFormat));
-                    sb.AppendFormat("{0},{1},", point.Metadata.Scrub(), point.Group.Scrub());
+                    sb.Append($"{point.Polygon.Scrub()},{point.TimeCreated.ToString(DateTimeFormat)},");
+                    sb.Append($"{point.Metadata.Scrub()},{point.Group.Scrub()},");
 
-                    sb.AppendFormat("{0},", point.OnBoundary);
+                    sb.Append($"{point.OnBoundary},");
                     
-                    sb.AppendFormat("{0},{1},{2},", point.AdjX, point.AdjY, point.AdjZ);
-                    sb.AppendFormat("{0},{1},{2},", point.UnAdjX, point.UnAdjY, point.UnAdjZ);
+                    sb.Append($"{point.AdjX},{point.AdjY},{point.AdjZ},");
+                    sb.Append($"{point.UnAdjX},{point.UnAdjY},{point.UnAdjZ},");
 
-                    sb.AppendFormat("{0},", (point.IsGpsType() || point.OpType == OpType.Quondam) ? ((IManualAccuracy)point).ManualAccuracy : null);
+                    sb.Append($"{((point.IsGpsType() || point.OpType == OpType.Quondam) ? ((IManualAccuracy)point).ManualAccuracy : null)},");
 
                     if (point.IsGpsType())
                     {
                         GpsPoint gps = point as GpsPoint;
-                        sb.AppendFormat("{0},{1},{2},{3},", gps.Latitude, gps.Longitude, gps.Elevation, gps.RMSEr);
+                        sb.Append($"{gps.Latitude},{gps.Longitude},{gps.Elevation},{gps.RMSEr},");
                     }
                     else
                         sb.Append(",,,,");
@@ -132,10 +132,10 @@ namespace TwoTrails.Utils
                     if (point.IsTravType())
                     {
                         TravPoint trav = point as TravPoint;
-                        sb.AppendFormat("{0},{1},", trav.FwdAzimuth, trav.BkAzimuth);
-                        sb.AppendFormat("{0},", FMSC.Core.Convert.Distance(trav.HorizontalDistance, trav.Metadata.Distance, Distance.Meters));
-                        sb.AppendFormat("{0},{1},", FMSC.Core.Convert.Distance(trav.SlopeDistance, trav.Metadata.Distance, Distance.Meters), trav.Metadata.Distance);
-                        sb.AppendFormat("{0},{1},", FMSC.Core.Convert.Angle(trav.SlopeAngle, trav.Metadata.Slope, Slope.Degrees), trav.Metadata.Slope);
+                        sb.Append($"{trav.FwdAzimuth},{trav.BkAzimuth},");
+                        sb.Append($"{FMSC.Core.Convert.Distance(trav.HorizontalDistance, trav.Metadata.Distance, Distance.Meters)},");
+                        sb.Append($"{FMSC.Core.Convert.Distance(trav.SlopeDistance, trav.Metadata.Distance, Distance.Meters)},{trav.Metadata.Distance},");
+                        sb.Append($"{FMSC.Core.Convert.Angle(trav.SlopeAngle, trav.Metadata.Slope, Slope.Degrees)},{trav.Metadata.Slope},");
                     }
                     else
                         sb.Append(",,,,,,,");
@@ -143,17 +143,17 @@ namespace TwoTrails.Utils
                     if (point.OpType == OpType.Quondam)
                     {
                         QuondamPoint qp = point as QuondamPoint;
-                        sb.AppendFormat("{0},{1},", qp.ParentPoint, qp.ParentPointCN);
+                        sb.Append($"{qp.ParentPoint},{qp.ParentPointCN},");
                     }
                     else
                         sb.Append(",,");
 
                     if (point.Comment != null)
-                        sb.AppendFormat("\"{0}\",", point.Comment.Scrub());
+                        sb.Append($"\"{point.Comment.Scrub()}\",");
                     else
                         sb.Append(",");
 
-                    sb.AppendFormat("{0},{1},{2},", point.PolygonCN, point.MetadataCN, point.GroupCN);
+                    sb.Append($"{point.PolygonCN},{point.MetadataCN},{point.GroupCN},");
                     sb.Append(point.LinkedPoints.ToStringContents("_"));
 
                     sw.WriteLine(sb.ToString());
@@ -311,7 +311,7 @@ namespace TwoTrails.Utils
             {
                 foreach (TtPolygon poly in manager.GetPolygons())
                 {
-                    sw.WriteLine(String.Format("{0}{1}{2}", poly.Name, Environment.NewLine, string.Join("", Enumerable.Range(0, poly.Name.Length).Select(x => "-"))));
+                    sw.WriteLine($"{poly.Name}{Environment.NewLine}{string.Join("", Enumerable.Range(0, poly.Name.Length).Select(x => "-"))}");
                     sw.WriteLine(HaidLogic.GenerateSummary(manager, poly).SummaryText);
                 }
             }
@@ -401,7 +401,7 @@ namespace TwoTrails.Utils
         {
             KmlDocument doc = TtKmlGenerator.Generate(project.Manager, project.ProjectName.Trim(), project.ProjectInfo.Description);
             
-            string kmlName = String.Format("{0}.kml", project.ProjectName.Trim());
+            string kmlName = $"{project.ProjectName.Trim()}.kml";
             string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);
 
             KmlWriter.WriteKmlFile(kmlFile, doc);

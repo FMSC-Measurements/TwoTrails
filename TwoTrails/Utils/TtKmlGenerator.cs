@@ -215,11 +215,10 @@ namespace TwoTrails.Utils
                             unadjCoords = new Coordinates(pos.Y, pos.X);
                         }
 
-                        string snippit = String.Format("Point Operation: {0}", point.OpType);
+                        string snippit = $"Point Operation: {point.OpType}";
 
                         Placemark adjPm = new Placemark(point.PID.ToString(),
-                            String.Format("Point Operation: {0}<br><div>\t     Adjusted<br>UtmX: {1}<br>UtmY: {2}</div><br>{3}",
-                            point.OpType, point.AdjX, point.AdjY, point.Comment))
+                            $"Point Operation: {point.OpType}<br><div>\t     Adjusted<br>UtmX: {point.AdjX}<br>UtmY: {point.AdjY}</div><br>{point.Comment}")
                         {
                             View = new View()
                             {
@@ -242,8 +241,7 @@ namespace TwoTrails.Utils
 
 
                         Placemark unadjPm = new Placemark(point.PID.ToString(),
-                            String.Format("Point Operation: {0}<br><div>\t     Unadjusted<br>UtmX: {1}<br>UtmY: {2}</div><br>{3}",
-                            point.OpType, point.UnAdjX, point.UnAdjY, point.Comment))
+                            $"Point Operation: {point.OpType}<br><div>\t     Unadjusted<br>UtmX: {point.UnAdjX}<br>UtmY: {point.UnAdjY}</div><br>{point.Comment}")
                         {
                             View = new View()
                             {
@@ -473,7 +471,7 @@ namespace TwoTrails.Utils
             else
             {
                 KmlColor c = new KmlColor(color.R, color.G, color.B, color.A);
-                Style s = new Style(String.Format("style_{0}", styles.Count));
+                Style s = new Style($"style_{styles.Count}");
                 s.SetColorsILP(c);
                 s.IconScale = 1;
                 s.IconColor = c;
@@ -484,7 +482,7 @@ namespace TwoTrails.Utils
                 s.PolygonOutline = true;
                 s.BalloonDisplayMode = DisplayMode.Default;
 
-                Style hs = new Style(String.Format("styleH_{0}", styles.Count), s);
+                Style hs = new Style($"styleH_{styles.Count}", s);
                 hs.IconScale = 1.1;
                 hs.IconColor = new KmlColor(255, 255, 255, 255);
 
@@ -492,7 +490,7 @@ namespace TwoTrails.Utils
                 styles.Add(color, sp);
 
 
-                StyleMap map = new StyleMap(String.Format("styleMap_{0}", styleMaps.Count), s.StyleUrl, hs.StyleUrl);
+                StyleMap map = new StyleMap($"styleMap_{styleMaps.Count}", s.StyleUrl, hs.StyleUrl);
 
                 styleMaps.Add(color, map);
 

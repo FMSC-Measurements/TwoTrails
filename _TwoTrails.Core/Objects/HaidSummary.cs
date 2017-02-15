@@ -159,8 +159,8 @@ namespace TwoTrails.Core
 
                         if (!fromQndm && showPoints)
                         {
-                            sbPoints.AppendFormat("Point {0}: {1} {2}- ", point.PID, point.OnBoundary ? " " : "*", point.OpType);
-                            sbPoints.AppendFormat("Accuracy is {0:0.00#} meters.{1}", point.Accuracy, Environment.NewLine);
+                            sbPoints.Append($"Point {point.PID}: {(point.OnBoundary ? " " : "*")} {point.OpType}- ");
+                            sbPoints.Append($"Accuracy is {point.Accuracy:0.00#} meters.{Environment.NewLine}");
                         }
 
                         _LastGpsPoint = point;
@@ -189,7 +189,7 @@ namespace TwoTrails.Core
 
                                     if (showPoints && !fromQndm)
                                     {
-                                        sbPoints.AppendFormat("Traverse Start:{0}", Environment.NewLine);
+                                        sbPoints.Append($"Traverse Start:{Environment.NewLine}");
                                     }
 
                                     if (_LastTtBndPt != null)
@@ -211,8 +211,7 @@ namespace TwoTrails.Core
                     {
                         if (showPoints && !fromQndm)
                         {
-                            sbPoints.AppendFormat("Point {0}: {1} SideShot off Point {2}.{3}",
-                                    point.PID, point.OnBoundary ? " " : "*", _LastGpsPoint.PID, Environment.NewLine);
+                            sbPoints.Append($"Point {point.PID}: {(point.OnBoundary ? " " : "*")} SideShot off Point {_LastGpsPoint.PID}.{Environment.NewLine}");
                         }
 
                         if (_LastTtBndPt != null && point.OnBoundary || fromQndm)
@@ -275,12 +274,10 @@ namespace TwoTrails.Core
 
             double travError = closeError < Consts.MINIMUM_POINT_DIGIT_ACCURACY ? Double.PositiveInfinity : travLength / closeError;
 
-            sbPoints.AppendFormat("   Traverse Total Segments: {0}{1}", travSegments, Environment.NewLine);
-            sbPoints.AppendFormat("   Traverse Total Distance: {0:0.00} feet.{1}", Math.Round(FMSC.Core.Convert.ToFeetTenths(travLength, Distance.Meters), 2), Environment.NewLine);
-            sbPoints.AppendFormat("   Traverse Closing Distance: {0:0.00} feet.{1}", Math.Round(FMSC.Core.Convert.ToFeetTenths(closeError, Distance.Meters), 2), Environment.NewLine);
-            sbPoints.AppendFormat("   Traverse Close Error: 1 part in {0:0.00}.{1}",
-                    Double.IsPositiveInfinity(travError) ? "∞" : Math.Round(travError, 2).ToString(),
-                    Environment.NewLine);
+            sbPoints.Append($"   Traverse Total Segments: {travSegments}{Environment.NewLine}");
+            sbPoints.Append($"   Traverse Total Distance: {Math.Round(FMSC.Core.Convert.ToFeetTenths(travLength, Distance.Meters), 2):0.00} feet.{Environment.NewLine}");
+            sbPoints.Append($"   Traverse Closing Distance: {Math.Round(FMSC.Core.Convert.ToFeetTenths(closeError, Distance.Meters), 2):0.00} feet.{Environment.NewLine}");
+            sbPoints.Append($"   Traverse Close Error: 1 part in {(Double.IsPositiveInfinity(travError) ? "∞" : Math.Round(travError, 2).ToString("0.00"))}.{Environment.NewLine}");
             
             TotalTraverseError += (travLength * closeError / 2);
 

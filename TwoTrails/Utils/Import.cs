@@ -33,7 +33,7 @@ namespace TwoTrails.Utils
 
             foreach (TtPolygon poly in iPolys.Values)
             {
-                poly.Name = String.Format("{0} (Import)", poly.Name);
+                poly.Name = $"{poly.Name} (Import)";
 
                 if (polygons.ContainsKey(poly.CN))
                 {
@@ -57,7 +57,7 @@ namespace TwoTrails.Utils
 
                         if (meta != metadata[metaCN])
                         {
-                            meta.Name = String.Format("{0} (Import)", meta.Name);
+                            meta.Name = $"{meta.Name} (Import)";
                             meta.CN = Guid.NewGuid().ToString();
                             metaMap.Add(metaCN, meta.CN);
                             aMeta.Add(meta.CN, meta);
@@ -81,7 +81,7 @@ namespace TwoTrails.Utils
 
                         if (group != groups[groupCN])
                         {
-                            group.Name = String.Format("{0} (Import)", group.Name);
+                            group.Name = $"{group.Name} (Import)";
                             group.CN = Guid.NewGuid().ToString();
                             groupMap.Add(groupCN, group.CN);
                             aGroups.Add(group.CN, group);

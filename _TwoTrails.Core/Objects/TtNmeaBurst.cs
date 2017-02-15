@@ -61,7 +61,7 @@ namespace TwoTrails.Core
                         StringBuilder sb = new StringBuilder();
 
                         foreach (int prn in UsedSatelliteIDs)
-                            sb.AppendFormat("{0}_", prn);
+                            sb.Append($"{prn}_");
 
                         _UsedSatelliteIDsString = sb.ToString();
                     }

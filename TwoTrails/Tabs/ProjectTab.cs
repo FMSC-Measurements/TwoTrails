@@ -21,9 +21,7 @@ namespace TwoTrails
         {
             get
             {
-                return String.Format("{0}{1}",
-                  Project.ProjectName,
-                  Project.RequiresSave ? "*" : String.Empty);
+                return $"{Project.ProjectName}{(Project.RequiresSave ? "*" : String.Empty)}";
             }
         }
 
@@ -34,14 +32,13 @@ namespace TwoTrails
                 switch (_ProjectEditorControl.tabControl.SelectedIndex)
                 {
                     case 1:
-                        return String.Format("{1}/{0}", Project.DataEditor.Points.Count, Project.DataEditor.SelectedPoints.Count);
+                        return $"{Project.DataEditor.Points.Count}/{Project.DataEditor.SelectedPoints.Count}";
                     case 2:
                         {
                             TtPolygon poly = _ProjectEditorControl.lbPolys.SelectedItem as TtPolygon;
                             if (poly != null)
                             {
-                                return String.Format("{0} Points in {1}",
-                                    Project.Manager.Points.Where(p => p.PolygonCN == poly.CN).Count(), poly.Name);
+                                return $"{Project.Manager.Points.Where(p => p.PolygonCN == poly.CN).Count()} Points in {poly.Name}";
                             }
 
                             return String.Empty;
@@ -51,8 +48,7 @@ namespace TwoTrails
                             TtMetadata meta = _ProjectEditorControl.lbMetadata.SelectedItem as TtMetadata;
                             if (meta != null)
                             {
-                                return String.Format("{0} Points use {1}",
-                                    Project.Manager.Points.Where(p => p.MetadataCN == meta.CN).Count(), meta.Name);
+                                return $"{Project.Manager.Points.Where(p => p.MetadataCN == meta.CN).Count()} Points use {meta.Name}";
                             }
 
                             return String.Empty;
@@ -62,8 +58,7 @@ namespace TwoTrails
                             TtGroup group = _ProjectEditorControl.lbGroups.SelectedItem as TtGroup;
                             if (group != null)
                             {
-                                return String.Format("{0} Points in {1}",
-                                    Project.Manager.Points.Where(p => p.GroupCN == group.CN).Count(), group.Name);
+                                return $"{Project.Manager.Points.Where(p => p.GroupCN == group.CN).Count()} Points in {group.Name}";
                             }
 
                             return String.Empty;

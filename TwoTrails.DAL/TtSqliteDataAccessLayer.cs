@@ -726,7 +726,7 @@ namespace TwoTrails.DAL
 
         public IEnumerable<TtPolygon> GetPolygons()
         {
-            String query = String.Format($"select {TwoTrailsSchema.PolygonSchema.SelectItems} from {TwoTrailsSchema.PolygonSchema.TableName}");
+            String query = $"select {TwoTrailsSchema.PolygonSchema.SelectItems} from {TwoTrailsSchema.PolygonSchema.TableName}";
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
@@ -987,10 +987,7 @@ namespace TwoTrails.DAL
         #region Get Metadata
         public IEnumerable<TtMetadata> GetMetadata()
         {
-            String query = String.Format(@"select {0} from {1}",
-                TwoTrailsSchema.MetadataSchema.SelectItems,
-                TwoTrailsSchema.MetadataSchema.TableName
-            );
+            String query = $@"select {TwoTrailsSchema.MetadataSchema.SelectItems} from {TwoTrailsSchema.MetadataSchema.TableName}";
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
@@ -1108,7 +1105,7 @@ namespace TwoTrails.DAL
                     {
                         database.Update(TwoTrailsSchema.MetadataSchema.TableName,
                             GetMetadataValues(metadata),
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, metadata.CN),
+                            $"{TwoTrailsSchema.SharedSchema.CN} = '{metadata.CN}'",
                             conn,
                             trans);
                     }
@@ -1140,7 +1137,7 @@ namespace TwoTrails.DAL
                         {
                             database.Update(TwoTrailsSchema.MetadataSchema.TableName,
                                 GetMetadataValues(meta),
-                                String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, meta.CN),
+                                $"{TwoTrailsSchema.SharedSchema.CN} = '{meta.CN}'",
                                 conn,
                                 trans);
                         }
@@ -1193,7 +1190,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         database.Delete(TwoTrailsSchema.MetadataSchema.TableName,
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, metadata.CN),
+                            $"{TwoTrailsSchema.SharedSchema.CN} = '{metadata.CN}'",
                             conn,
                             trans);
                         trans.Commit();
@@ -1229,9 +1226,7 @@ namespace TwoTrails.DAL
                         foreach (TtMetadata meta in metadata)
                         {
                             count++;
-                            sb.AppendFormat("{0}{1}",
-                                String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, meta.CN),
-                                count < total ? " or " : "");
+                            sb.Append($"{TwoTrailsSchema.SharedSchema.CN} = '{meta.CN}' {(count < total ? " or " : String.Empty)}");
                         }
 
                         string where = sb.ToString();
@@ -1267,10 +1262,7 @@ namespace TwoTrails.DAL
         #region Get Groups
         public IEnumerable<TtGroup> GetGroups()
         {
-            String query = String.Format(@"select {0} from {1}",
-                TwoTrailsSchema.GroupSchema.SelectItems,
-                TwoTrailsSchema.GroupSchema.TableName
-            );
+            String query = $"select {TwoTrailsSchema.GroupSchema.SelectItems} from {TwoTrailsSchema.GroupSchema.TableName}";
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
@@ -1371,7 +1363,7 @@ namespace TwoTrails.DAL
                     {
                         database.Update(TwoTrailsSchema.GroupSchema.TableName,
                             GetGroupValues(group),
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, group.CN),
+                            $"{TwoTrailsSchema.SharedSchema.CN} = '{group.CN}'",
                             conn,
                             trans);
                         trans.Commit();
@@ -1404,7 +1396,7 @@ namespace TwoTrails.DAL
                         {
                             database.Update(TwoTrailsSchema.GroupSchema.TableName,
                                 GetGroupValues(group),
-                                String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, group.CN),
+                                $"{TwoTrailsSchema.SharedSchema.CN} = '{group.CN}'",
                                 conn,
                                 trans);
                         }
@@ -1447,7 +1439,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         database.Delete(TwoTrailsSchema.GroupSchema.TableName,
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, group.CN),
+                            $"{TwoTrailsSchema.SharedSchema.CN} = '{group.CN}'",
                             conn,
                             trans);
                         trans.Commit();
@@ -1484,9 +1476,7 @@ namespace TwoTrails.DAL
                         foreach (TtGroup group in groups)
                         {
                             count++;
-                            sb.AppendFormat("{0}{1}",
-                                String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, group.CN),
-                                count < total ? " or " : "");
+                            sb.Append($"{TwoTrailsSchema.SharedSchema.CN} = '{group.CN}' {(count < total ? " or " : String.Empty)}");
                         }
 
                         string where = sb.ToString();
@@ -1521,15 +1511,8 @@ namespace TwoTrails.DAL
         #region TTNmea
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
-            String query = String.Format(@"select {0} from {1}{2}",
-                TwoTrailsSchema.TtNmeaSchema.SelectItems,
-                TwoTrailsSchema.TtNmeaSchema.TableName,
-                pointCN != null ?
-                String.Format(" where {0} = '{1}'",
-                        TwoTrailsSchema.TtNmeaSchema.PointCN,
-                        pointCN) :
-                String.Empty
-            );
+            String query = $@"select {TwoTrailsSchema.TtNmeaSchema.SelectItems} from {TwoTrailsSchema.TtNmeaSchema.TableName}
+{(pointCN != null ? $" where {TwoTrailsSchema.TtNmeaSchema.PointCN} = '{pointCN}'" : String.Empty)}"; ;
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
@@ -1659,7 +1642,7 @@ namespace TwoTrails.DAL
                             {
                                 [TwoTrailsSchema.TtNmeaSchema.Used] = burst.IsUsed
                             },
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, burst.CN),
+                            $"{TwoTrailsSchema.SharedSchema.CN} = '{burst.CN}'",
                             conn,
                             trans);
 
@@ -1696,7 +1679,7 @@ namespace TwoTrails.DAL
                                 {
                                     [TwoTrailsSchema.TtNmeaSchema.Used] = burst.IsUsed
                                 },
-                                String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, burst.CN),
+                                $"{TwoTrailsSchema.SharedSchema.CN} = '{burst.CN}'",
                                 conn,
                                 trans);
                         }
@@ -1726,7 +1709,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         res = database.Delete(TwoTrailsSchema.TtNmeaSchema.TableName,
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.TtNmeaSchema.PointCN, pointCN),
+                            $"{TwoTrailsSchema.TtNmeaSchema.PointCN} = '{pointCN}'",
                             conn,
                             trans);
 
@@ -1788,10 +1771,7 @@ namespace TwoTrails.DAL
         #region Project
         public TtProjectInfo GetProjectInfo()
         {
-            String query = String.Format(@"select {0} from {1} limit 1",
-                   TwoTrailsSchema.ProjectInfoSchema.SelectItems,
-                   TwoTrailsSchema.ProjectInfoSchema.TableName
-               );
+            String query = $"select {TwoTrailsSchema.ProjectInfoSchema.SelectItems} from {TwoTrailsSchema.ProjectInfoSchema.TableName} limit 1";
 
             TtProjectInfo info = null;
 
@@ -1834,10 +1814,7 @@ namespace TwoTrails.DAL
 
         public Version GetDataVersion()
         {
-            String query = String.Format(@"select {0} from {1} limit 1",
-                   TwoTrailsSchema.ProjectInfoSchema.TtDbSchemaVersion,
-                   TwoTrailsSchema.ProjectInfoSchema.TableName
-               );
+            String query = $"select {TwoTrailsSchema.ProjectInfoSchema.TtDbSchemaVersion} from {TwoTrailsSchema.ProjectInfoSchema.TableName} limit 1";
 
             Version version = null;
 
@@ -2061,7 +2038,7 @@ namespace TwoTrails.DAL
                     {
                         database.Update(TwoTrailsSchema.MediaSchema.TableName,
                             GetMediaValues(media),
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, media.CN),
+                            $"{TwoTrailsSchema.SharedSchema.CN} = '{media.CN}'",
                             conn,
                             trans);
 
@@ -2070,7 +2047,7 @@ namespace TwoTrails.DAL
                             case MediaType.Picture:
                                 database.Update(TwoTrailsSchema.PictureSchema.TableName,
                                     GetImageValues(media as TtImage),
-                                    String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, media.CN),
+                                    $"{TwoTrailsSchema.SharedSchema.CN} = '{media.CN}'",
                                     conn,
                                     trans);
                                 break;
@@ -2132,14 +2109,14 @@ namespace TwoTrails.DAL
                     try
                     {
                         database.Delete(TwoTrailsSchema.MediaSchema.TableName,
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, media.CN),
+                            $"{TwoTrailsSchema.SharedSchema.CN} = '{media.CN}'",
                             conn,
                             trans);
 
                         if (media.MediaType == MediaType.Picture)
                         {
                             database.Delete(TwoTrailsSchema.PictureSchema.TableName,
-                                String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, media.CN),
+                                $"{TwoTrailsSchema.SharedSchema.CN} = '{media.CN}'",
                                 conn,
                                 trans);
                         }
@@ -2165,10 +2142,7 @@ namespace TwoTrails.DAL
         #region Polygon Attrs
         public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
         {
-            String query = String.Format(@"select {0} from {1}",
-                TwoTrailsSchema.PolygonAttrSchema.SelectItems,
-                TwoTrailsSchema.PolygonAttrSchema.TableName
-            );
+            String query = $"select {TwoTrailsSchema.PolygonAttrSchema.SelectItems} from {TwoTrailsSchema.PolygonAttrSchema.TableName}";
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
@@ -2254,7 +2228,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         database.Delete(TwoTrailsSchema.PolygonAttrSchema.TableName,
-                            String.Format("{0} = '{1}'", TwoTrailsSchema.SharedSchema.CN, option.CN),
+                            $"{TwoTrailsSchema.SharedSchema.CN} = '{option.CN}'",
                             conn,
                             trans);
                         trans.Commit();
@@ -2316,10 +2290,7 @@ namespace TwoTrails.DAL
 
         public IEnumerable<TtUserActivity> GetUserActivity()
         {
-            String query = String.Format(@"select {0} from {1}",
-                TwoTrailsSchema.ActivitySchema.SelectItems,
-                TwoTrailsSchema.ActivitySchema.TableName
-            );
+            String query = $"select {TwoTrailsSchema.ActivitySchema.SelectItems} from {TwoTrailsSchema.ActivitySchema.TableName}";
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {

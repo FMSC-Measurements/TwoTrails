@@ -300,7 +300,7 @@ namespace TwoTrails.Utils
             
             if (fileName != null && fileName.Length > 0)
             {
-                using (TextWriter tw = new StreamWriter(fileName + ".prj", false))
+                using (TextWriter tw = new StreamWriter($"{fileName}.prj", false))
                 {
                     tw.WriteLine(_Projection);
                 }

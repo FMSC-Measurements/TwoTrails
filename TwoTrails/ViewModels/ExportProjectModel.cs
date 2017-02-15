@@ -108,10 +108,10 @@ namespace TwoTrails.ViewModels
                                 Export.Summary(project.Manager, Path.Combine(path, "Summary.txt"));
 
                             if (ExportGPX)
-                                Export.GPX(project, Path.Combine(path, String.Format("{0}.gpx", project.ProjectName.Trim())));
+                                Export.GPX(project, Path.Combine(path, $"{project.ProjectName.Trim()}.gpx"));
 
                             if (ExportKMZ)
-                                Export.KMZ(project, Path.Combine(path, String.Format("{0}.kmz", project.ProjectName.Trim())));
+                                Export.KMZ(project, Path.Combine(path, $"{project.ProjectName.Trim()}.kmz"));
 
                             if (ExportShapes)
                                 Export.Shapes(project, Path.Combine(path));

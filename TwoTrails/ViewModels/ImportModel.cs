@@ -1,5 +1,6 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Controls;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -77,7 +79,8 @@ namespace TwoTrails.ViewModels
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = false;
-            ofd.Filter = @"Importable Files|*.tt; *.tt2; *.csv; *.txt; *.shp; *.gpx|TwoTrails files (*.tt;*.tt2)|*.tt; *.tt2|
+            ofd.Filter = $@"Importable Files|*{Consts.FILE_EXTENSION}; *{Consts.FILE_EXTENSION_V2}; *.csv; *.txt; *.shp; *.gpx|
+TwoTrails files (*{Consts.FILE_EXTENSION};*{Consts.FILE_EXTENSION_V2})|*{Consts.FILE_EXTENSION}; *{Consts.FILE_EXTENSION_V2}|
 CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX Files (*.gpx)|*.gpx|All Files (*.*)|*.*";
 
             if (ofd.ShowDialog() == true)
@@ -91,32 +94,40 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
         {
             switch (Path.GetExtension(fileName))
             {
-                case ".tt":
+                case Consts.FILE_EXTENSION:
                     IsSettingUp = true;
                     ImportControl = new ImportControl(new TtSqliteDataAccessLayer(fileName), true, true, true);
                     break;
-                case ".tt2":
+                case Consts.FILE_EXTENSION_V2:
                     IsSettingUp = true;
                     ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), true, true, true);
                     break;
                 case ".csv":
-                case ".text":
+                case ".txt":
                     IsSettingUp = true;
                     MainContent = new CsvParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
                     {
                         try
                         {
-                            //TODO show progress indicator while parsing
-                            //MainContent = new WaitCursorControl; ??
-                            dal.Parse();
-                            //hide progress indicator
+                            MainContent = new TtProgressControl();
 
-                            ImportControl = new ImportControl(dal, false, dal.GetGroups().Any(), false);
+                            Task.Run(() =>
+                            {
+                                dal.Parse();
+
+
+                                Thread.Sleep(2000);
+
+                                MainContent.Dispatcher.Invoke(() =>
+                                {
+                                    ImportControl = new ImportControl(dal, false, dal.GetGroups().Any(), false);
+                                });
+                            });
                         }
                         catch (Exception ex)
                         {
                             Trace.WriteLine(ex.Message, "ImportModel:SetupImport:CSV");
-                            MessageBox.Show(String.Format("A parsing error has occured. Please check your fields correctly. See log file for details."),
+                            MessageBox.Show("A parsing error has occured. Please check your fields correctly. See log file for details.",
                                 "Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     });
@@ -137,7 +148,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                         catch (Exception ex)
                         {
                             Trace.WriteLine(ex.Message, "ImportModel:SetupImport:GPX");
-                            MessageBox.Show(String.Format("A parsing error has occured. Please check your fields correctly. See log file for details."),
+                            MessageBox.Show("A parsing error has occured. Please check your fields correctly. See log file for details.",
                                 "Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     });
@@ -161,7 +172,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                 Import.DAL(_Manager, ImportControl.DAL, ImportControl.SelectedPolygons,
                         ImportControl.IncludeMetadata, ImportControl.IncludeGroups, ImportControl.IncludeNmea);
 
-                MessageBox.Show(String.Format("{0} Polygons Imported", ImportControl.SelectedPolygons.Count()),
+                MessageBox.Show($"{ImportControl.SelectedPolygons.Count()} Polygons Imported",
                     String.Empty, MessageBoxButton.OK, MessageBoxImage.None);
             }
             catch (Exception ex)

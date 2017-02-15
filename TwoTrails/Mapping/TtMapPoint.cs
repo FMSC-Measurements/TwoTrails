@@ -293,7 +293,7 @@ namespace TwoTrails.Mapping
             {
                 if (point.Metadata == null)
                 {
-                    Debug.WriteLine(String.Format("Point {0} has no Metadata. ({1})", point.PID, point.CN));
+                    Debug.WriteLine($"Point {point.PID} has no Metadata. ({point.CN})");
                     return;
                 }
                 else
@@ -346,7 +346,7 @@ namespace TwoTrails.Mapping
 
         public override string ToString()
         {
-            return String.Format("Point {0}", Point.PID);
+            return $"Point {Point.PID}";
         }
     }
 }

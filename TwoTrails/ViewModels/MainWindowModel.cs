@@ -59,8 +59,7 @@ namespace TwoTrails.ViewModels
                         nameof(CurrentEditor)
                         );
 
-                    MainWindow.Title = String.Format("{0}TwoTrails",
-                        value != null ? String.Format("{0} - ", value.Project.ProjectName) : null);
+                    MainWindow.Title = $"{(value != null ? $"{value.Project.ProjectName} - " : String.Empty)}TwoTrails";
                 });
             }
         }
@@ -205,7 +204,7 @@ namespace TwoTrails.ViewModels
         {
             foreach (String file in args.Select(f => f.Trim('"')))
             {
-                if (file.EndsWith(".tt"))
+                if (file.EndsWith(Consts.FILE_EXTENSION))
                     OpenProject(file);
             }
         }
@@ -227,8 +226,8 @@ namespace TwoTrails.ViewModels
         {
             OpenFileDialog dialog = new OpenFileDialog();
 
-            dialog.DefaultExt = ".tt";
-            dialog.Filter = "TwoTrails Files (*.tt)|*.tt|TwoTrails V2 Files (*.tt2)|*.tt2|All Files|*.*";
+            dialog.DefaultExt = Consts.FILE_EXTENSION;
+            dialog.Filter = $"{Consts.FILE_EXTENSION_FILTER}|{Consts.FILE_EXTENSION_FILTER_V2}|All Files|*.*";
             
             if (dialog.ShowDialog() == true)
             {
@@ -242,12 +241,12 @@ namespace TwoTrails.ViewModels
             {
                 if (!_Projects.Keys.Contains(filePath, StringComparer.InvariantCultureIgnoreCase))
                 {
-                    if (filePath.EndsWith(".tt"))
+                    if (filePath.EndsWith(Consts.FILE_EXTENSION))
                     {
                         try
                         {
                             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
-                            Trace.WriteLine(String.Format("DAL Opened ({1}): {0}", dal.FilePath, dal.GetDataVersion()));
+                            Trace.WriteLine($"DAL Opened ({dal.FilePath}): {dal.GetDataVersion()}");
 
                             if (dal.RequiresUpgrade)
                             {
@@ -266,7 +265,7 @@ namespace TwoTrails.ViewModels
                     }
                     else
                     {
-                        if (filePath.EndsWith(".tt2"))
+                        if (filePath.EndsWith(Consts.FILE_EXTENSION_V2))
                         {
                             TtV2SqliteDataAccessLayer dalv2 = new TtV2SqliteDataAccessLayer(filePath);
 
@@ -295,12 +294,11 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
                                         oinfo.CreationDeviceID,
                                         oinfo.CreationDate);
 
-                                    string upgradedFile = Path.Combine(Path.GetDirectoryName(filePath),
-                                        String.Format("{0}.tt", Path.GetFileNameWithoutExtension(filePath)));
+                                    string upgradedFile = Path.Combine(Path.GetDirectoryName(filePath), $"{Path.GetFileNameWithoutExtension(filePath)}{Consts.FILE_EXTENSION}");
 
                                     if (File.Exists(upgradedFile))
                                     {
-                                        if (MessageBox.Show(String.Format("File '{0}' already exists. Would you like to overwrite it?", Path.GetFileName(upgradedFile)),
+                                        if (MessageBox.Show($"File '{Path.GetFileName(upgradedFile)}' already exists. Would you like to overwrite it?",
                                             "Overwrite File", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
                                         {
                                             return;
@@ -317,7 +315,7 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
                         }
                         else
                         {
-                            MessageBox.Show("File '{0}' is not a compatible project type.", filePath);
+                            MessageBox.Show($"File '{filePath}' is not a compatible project type.");
                         }
                     }
                 }
@@ -350,7 +348,7 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
 
                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
                 TtProject proj = new TtProject(dal, Settings, this);
-                Trace.WriteLine(String.Format("Project Created ({1}): {0}", dal.FilePath, dal.GetDataVersion()));
+                Trace.WriteLine($"Project Created ({dal.GetDataVersion()}): {dal.FilePath}");
 
                 AddProject(proj);
 
@@ -366,8 +364,8 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
             if (rename)
             {
                 SaveFileDialog dialog = new SaveFileDialog();
-                dialog.DefaultExt = ".tt";
-                dialog.Filter = "TwoTrails Files (*.tt)|*.tt";
+                dialog.DefaultExt = Consts.FILE_EXTENSION;
+                dialog.Filter = Consts.FILE_EXTENSION_FILTER;
 
                 if (dialog.ShowDialog() == true)
                 {
