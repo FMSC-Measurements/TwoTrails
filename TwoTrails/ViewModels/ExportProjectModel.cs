@@ -89,6 +89,8 @@ namespace TwoTrails.ViewModels
                         }
                         else
                         {
+                            Export.CheckCreateFolder(path);
+
                             if (ExportPoints)
                                 Export.Points(project.Manager, Path.Combine(path, "Points.csv"));
 

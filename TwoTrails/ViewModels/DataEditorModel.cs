@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -1407,6 +1408,7 @@ namespace TwoTrails.ViewModels
 
                 if (sfd.ShowDialog() == true)
                 {
+                    Export.CheckCreateFolder(Path.GetDirectoryName(sfd.FileName));
                     Export.Points(GetSortedSelectedPoints(), sfd.FileName);
                 }
             }

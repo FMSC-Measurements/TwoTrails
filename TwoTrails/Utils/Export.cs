@@ -40,6 +40,12 @@ namespace TwoTrails.Utils
             Shapes(project, folderPath);
         }
 
+        public static void CheckCreateFolder(string folderPath)
+        {
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+        }
+
 
         public static void Points(ITtManager manager, String fileName)
         {

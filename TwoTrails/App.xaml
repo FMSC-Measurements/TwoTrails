@@ -40,5 +40,46 @@
         <SolidColorBrush x:Key="colorBackground" Color="DimGray" />
 
         <SolidColorBrush x:Key="colorSystemBackground" Color="LightGray" />
+
+
+        <x:Array x:Key="arrGps" Type="sys:String" 
+            xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <sys:String>Juniper Allegro 2</sys:String>
+            <sys:String>Juniper Allegro MX</sys:String>
+            <sys:String>Juniper Archer 2</sys:String>
+            <sys:String>Juniper Mesa</sys:String>
+            <sys:String>QStar XT</sys:String>
+            <sys:String>Trimble Geo 7X</sys:String>
+            <sys:String>Trimble Geo 6000</sys:String>
+            <sys:String>Trimble Juno 3B</sys:String>
+            <sys:String>Trimble Juno 5B</sys:String>
+            <sys:String>Trimble Juno SB</sys:String>
+            <sys:String>Trimble Nomad</sys:String>
+            <sys:String>Trimble R1</sys:String>
+            <sys:String>Trimble XT</sys:String>
+            <sys:String>Trimble XM</sys:String>
+            <sys:String>Trimble Yuma</sys:String>
+            <sys:String>Trimble Yuma 2</sys:String>
+        </x:Array>
+        
+        <x:Array x:Key="arrRangeFinder" Type="sys:String" 
+            xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <sys:String>Impulse 100</sys:String>
+            <sys:String>Impulse 200</sys:String>
+            <sys:String>Impulse Other</sys:String>
+            <sys:String>TruPulse 200</sys:String>
+            <sys:String>TruPulse 360</sys:String>
+            <sys:String>TruPulse Other</sys:String>
+            <sys:String>Logger Tape</sys:String>
+            <sys:String>Nylon Tape</sys:String>
+            <sys:String>Chains</sys:String>
+        </x:Array>
+
+        <x:Array x:Key="arrCompass" Type="sys:String" 
+            xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <sys:String>Silva</sys:String>
+            <sys:String>Suunto</sys:String>
+            <sys:String>Other</sys:String>
+        </x:Array>
     </Application.Resources>
 </Application>

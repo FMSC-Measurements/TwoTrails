@@ -114,10 +114,6 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                             Task.Run(() =>
                             {
                                 dal.Parse();
-
-
-                                Thread.Sleep(2000);
-
                                 MainContent.Dispatcher.Invoke(() =>
                                 {
                                     ImportControl = new ImportControl(dal, false, dal.GetGroups().Any(), false);
@@ -138,12 +134,16 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                     {
                         try
                         {
-                            //TODO show progress indicator while parsing
-                            //MainContent = new WaitCursorControl; ??
-                            dal.Parse();
-                            //hide progress indicator
+                            MainContent = new TtProgressControl();
 
-                            ImportControl = new ImportControl(dal, false, false, false);
+                            Task.Run(() =>
+                            {
+                                dal.Parse();
+                                MainContent.Dispatcher.Invoke(() =>
+                                {
+                                    ImportControl = new ImportControl(dal, false, false, false);
+                                });
+                            });
                         }
                         catch (Exception ex)
                         {

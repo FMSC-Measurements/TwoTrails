@@ -559,6 +559,10 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
                                 <Grid.Resources>
@@ -647,12 +651,26 @@
                                           SelectedItem="{Binding CurrentMetadata.Datum}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Datum}}"/>
 
+                                <TextBlock Grid.Column="0" Grid.Row="10" Text="GPS Reciever" />
+                                <ComboBox Grid.Column="0" Grid.Row="11" IsEditable="True"
+                                          ItemsSource="{StaticResource arrGps}" Text="{Binding CurrentMetadata.GpsReceiver}" />
 
-                                <TextBlock Grid.Column="0" Grid.Row="10" Text="Comment" />
-                                <TextBox Grid.Column="0" Grid.Row="11" Grid.ColumnSpan="3" MinLines="3" MaxLines="5"
+                                <TextBlock Grid.Column="2" Grid.Row="10" Text="Range Finder" />
+                                <ComboBox Grid.Column="2" Grid.Row="11" IsEditable="True" Text="{Binding CurrentMetadata.RangeFinder}"
+                                          ItemsSource="{StaticResource arrRangeFinder}"/>
+
+
+                                <TextBlock Grid.Column="0" Grid.Row="12" Text="Compass" />
+                                <ComboBox Grid.Column="0" Grid.Row="13" IsEditable="True" Text="{Binding CurrentMetadata.Compass}"
+                                          ItemsSource="{StaticResource arrCompass}"/>
+
+                                <TextBlock Grid.Column="2" Grid.Row="12" Text="Crew" />
+                                <TextBox Grid.Column="2" Grid.Row="13" Text="{Binding CurrentMetadata.Crew, UpdateSourceTrigger=PropertyChanged}" />
+
+
+                                <TextBlock Grid.Column="0" Grid.Row="14" Text="Comment" />
+                                <TextBox Grid.Column="0" Grid.Row="15" Grid.ColumnSpan="3" MinLines="3" MaxLines="5"
                                 Text="{Binding CurrentMetadata.Comment, UpdateSourceTrigger=PropertyChanged}" />
-                                
-                                <!-- TODO add extra metadata info-->
                             </Grid>
                         </ScrollViewer>
 
@@ -755,16 +773,17 @@
                                 </Grid.Resources>
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentGroup.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentGroup.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding GroupFieldIsEditable}"/>
 
                                 <TextBlock Grid.Column="2" Grid.Row="0" Text="Group Type" />
                                 <ComboBox Grid.Column="2" Grid.Row="1"
                                           SelectedItem="{Binding CurrentGroup.GroupType}"
-                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type tt:GroupType}}"/>
+                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type tt:GroupType}}"
+                                          IsEnabled="{Binding GroupFieldIsEditable}"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Description" />
                                 <TextBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" MinLines="3" MaxLines="5"
-                                Text="{Binding CurrentGroup.Description, UpdateSourceTrigger=PropertyChanged}" />
+                                Text="{Binding CurrentGroup.Description, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding GroupFieldIsEditable}"/>
                             </Grid>
                         </ScrollViewer>
 

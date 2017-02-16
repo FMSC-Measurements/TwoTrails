@@ -25,7 +25,7 @@ namespace TwoTrails.ViewModels
     public class ProjectEditorModel : NotifyPropertyChangedEx
     {
         private TtProject _Project;
-        
+
         public TtProjectInfo ProjectInfo { get { return _Project.ProjectInfo; } }
         public TtManager Manager { get { return _Project.Manager; } }
 
@@ -90,7 +90,7 @@ namespace TwoTrails.ViewModels
         public ICommand PolygonMtdcLookupCommand { get; }
         public ICommand PolygonAccuracyChangedCommand { get; }
         public ICommand SavePolygonSummary { get; }
-        
+
 
         public int MetadataZone { get { return Get<int>(); } set { Set(value); } }
 
@@ -151,10 +151,14 @@ namespace TwoTrails.ViewModels
                     _BackupGroup = new TtGroup(value);
 
                     _CurrentGroup.PropertyChanged += Group_PropertyChanged;
+
+                    GroupFieldIsEditable = value.CN != Consts.EmptyGuid;
                 });
 
             }
         }
+
+        public bool GroupFieldIsEditable { get { return Get<bool>(); } set { Set(value); } }
 
         private void Group_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -434,9 +438,6 @@ namespace TwoTrails.ViewModels
                 }
             }
         }
-
-
-        //TODO add extra metadata info
 
 
         private void GroupChanged(TtGroup group)
