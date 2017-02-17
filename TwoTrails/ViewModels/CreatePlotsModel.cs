@@ -62,6 +62,8 @@ namespace TwoTrails.ViewModels
         public bool? BoundaryBuffer { get { return Get<bool?>(); } set { Set(value); } }
         public int BufferAmount { get { return Get<int>(); } set { Set(value); } }
 
+        public bool IsGenerating { get { return Get<bool>(); } set { Set(value); } }
+
 
         public CreatePlotsModel(TtProject project, Window window)
         {
@@ -157,6 +159,8 @@ namespace TwoTrails.ViewModels
 
         private void GeneratePoints(TtPolygon poly)
         {
+            IsGenerating = true;
+
             double gridX = FMSC.Core.Convert.Distance(GridX, Distance.Meters, UomDistance);
             double gridY = FMSC.Core.Convert.Distance(GridY, Distance.Meters, UomDistance);
 
@@ -299,6 +303,8 @@ namespace TwoTrails.ViewModels
             _Manager.AddPoints(wayPoints);
 
             MessageBox.Show($"{addPoints.Count} WayPoints Created");
+
+            IsGenerating = false;
         }
     }
 }

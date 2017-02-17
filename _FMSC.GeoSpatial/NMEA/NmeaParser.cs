@@ -52,6 +52,8 @@ namespace FMSC.GeoSpatial.NMEA
                     if (sentence != null &&
                         (!sentence.IsMultiString || ((MultiSentence)sentence).HasAllMessages))
                             NmeaReceived?.Invoke(sentence);
+
+                    usedNmea = true;
                 }
             }
             catch (ExcessiveStringException e)
@@ -59,7 +61,7 @@ namespace FMSC.GeoSpatial.NMEA
                 Debug.WriteLine(e.Message, "NmeaParser:Parse");
             }
 
-            if (burst != null && burst.IsFull)
+            if (burst.IsFull)
             {
                 BurstReceived?.Invoke(burst);
                 burst = null;
