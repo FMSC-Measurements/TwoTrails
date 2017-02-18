@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
@@ -154,13 +153,12 @@ namespace TwoTrails.ViewModels
                 _Manager.AddPolygon(poly);
             }
 
+            IsGenerating = true;
             GeneratePoints(poly);
         }
 
         private void GeneratePoints(TtPolygon poly)
         {
-            IsGenerating = true;
-
             double gridX = FMSC.Core.Convert.Distance(GridX, Distance.Meters, UomDistance);
             double gridY = FMSC.Core.Convert.Distance(GridY, Distance.Meters, UomDistance);
 
@@ -303,7 +301,6 @@ namespace TwoTrails.ViewModels
             _Manager.AddPoints(wayPoints);
 
             MessageBox.Show($"{addPoints.Count} WayPoints Created");
-
             IsGenerating = false;
         }
     }
