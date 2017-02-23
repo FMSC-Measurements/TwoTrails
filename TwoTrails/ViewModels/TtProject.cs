@@ -85,6 +85,7 @@ namespace TwoTrails.ViewModels
 
 
         public ITtDataLayer DAL { get; private set; }
+        public ITtMediaLayer MAL { get; private set; }
 
         public TtSettings Settings { get; private set; }
 
@@ -101,9 +102,10 @@ namespace TwoTrails.ViewModels
         #endregion
 
 
-        public TtProject(ITtDataLayer dal, TtSettings settings, MainWindowModel mainModel)
+        public TtProject(ITtDataLayer dal, ITtMediaLayer mal, TtSettings settings, MainWindowModel mainModel)
         {
             DAL = dal;
+            MAL = mal;
             Settings = settings;
 
             MainModel = mainModel;
@@ -118,7 +120,7 @@ namespace TwoTrails.ViewModels
 
             RequiresSave = false;
 
-            Manager = new TtManager(dal, settings);
+            Manager = new TtManager(dal, mal, settings);
             HistoryManager = new TtHistoryManager(Manager);
             HistoryManager.HistoryChanged += Manager_HistoryChanged;
             

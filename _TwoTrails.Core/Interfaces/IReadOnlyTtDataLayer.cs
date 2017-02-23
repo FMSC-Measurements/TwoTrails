@@ -45,11 +45,6 @@ namespace TwoTrails.DAL
         #endregion
 
 
-        #region Media
-        IEnumerable<TtImage> GetPictures(String pointCN);
-        #endregion
-
-
         #region Activity
         IEnumerable<TtUserActivity> GetUserActivity();
         #endregion

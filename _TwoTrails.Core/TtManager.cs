@@ -10,6 +10,7 @@ using FMSC.GeoSpatial;
 using TwoTrails.DAL;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using TwoTrails.Core.Media;
 
 namespace TwoTrails.Core
 {
@@ -19,6 +20,7 @@ namespace TwoTrails.Core
 
         private ITtSettings _Settings;
         private ITtDataLayer _DAL;
+        private ITtMediaLayer _MAL;
 
         private TtUserActivity _Activity;
 
@@ -50,9 +52,10 @@ namespace TwoTrails.Core
         private object locker = new object();
         
 
-        public TtManager(ITtDataLayer dal, ITtSettings settings)
+        public TtManager(ITtDataLayer dal, ITtMediaLayer mal, ITtSettings settings)
         {
             _DAL = dal;
+            _MAL = mal;
             _Settings = settings;
 
             _Activity = new TtUserActivity(_Settings.UserName, _Settings.DeviceName);
@@ -63,6 +66,11 @@ namespace TwoTrails.Core
         public void ReplaceDAL(ITtDataLayer dal)
         {
             _DAL = dal;
+        }
+
+        public void ReplaceMAL(ITtMediaLayer mal)
+        {
+            _MAL = mal;
         }
 
         #region Load & Attaching
@@ -1716,6 +1724,23 @@ namespace TwoTrails.Core
         public void DeleteNmeaBursts(string pointCN)
         {
             _DAL.DeleteNmeaBursts(pointCN);
+        }
+
+
+
+        public List<TtImage> GetImages(string pointCN)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void InsertMedia(TtMedia media)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteMedia(TtMedia media)
+        {
+            throw new NotImplementedException();
         }
     }
 }

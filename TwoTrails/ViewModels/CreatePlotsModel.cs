@@ -18,9 +18,6 @@ namespace TwoTrails.ViewModels
 {
     public class CreatePlotsModel : NotifyPropertyChangedEx
     {
-        //TODO Implement async creations with progress indicator
-
-
         private ITtManager _Manager;
 
         public TtSettings Settings { get; }

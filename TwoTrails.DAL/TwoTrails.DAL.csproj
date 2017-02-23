@@ -99,6 +99,8 @@
     <Compile Include="ReadOnlyDALs\TtGpxDataAccessLayer.cs" />
     <Compile Include="ReadOnlyDALs\TtShapeFileDataAccessLayer.cs" />
     <Compile Include="ReadOnlyDALs\TtV2SqliteDataAccessLayer.cs" />
+    <Compile Include="TtSqliteMediaAccessLayer.cs" />
+    <Compile Include="TwoTrailsMediaSchema.cs" />
     <Compile Include="TwoTrailsSchema.cs" />
     <Compile Include="TtSqliteDataAccessLayer.cs" />
     <Compile Include="TwoTrailsV2Schema.cs" />

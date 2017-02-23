@@ -28,6 +28,7 @@ namespace TwoTrails.ViewModels
 
         public TtProjectInfo ProjectInfo { get { return _Project.ProjectInfo; } }
         public TtManager Manager { get { return _Project.Manager; } }
+        public TtSettings Settings { get { return _Project.Settings; } }
 
 
         public DataEditorControl DataController { get; }

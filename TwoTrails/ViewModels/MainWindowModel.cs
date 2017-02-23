@@ -246,7 +246,15 @@ namespace TwoTrails.ViewModels
                         try
                         {
                             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
+                            TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
+
                             Trace.WriteLine($"DAL Opened ({dal.FilePath}): {dal.GetDataVersion()}");
+
+                            if (mal != null)
+                            {
+                                Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
+                            }
+                            
 
                             if (dal.RequiresUpgrade)
                             {
@@ -255,7 +263,7 @@ namespace TwoTrails.ViewModels
                             }
                             else
                             {
-                                AddProject(new TtProject(dal, Settings, this));
+                                AddProject(new TtProject(dal, mal, Settings, this));
                             }
                         }
                         catch (Exception ex)
@@ -306,10 +314,11 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
                                     }
 
                                     TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(upgradedFile, info);
+                                    TtSqliteMediaAccessLayer mal = GetMalIfExists(upgradedFile);
 
                                     Upgrade.DAL(dal, Settings, dalv2);
                                     
-                                    AddProject(new TtProject(dal, Settings, this));
+                                    AddProject(new TtProject(dal, mal, Settings, this));
                                 }
                             }
                         }
@@ -335,7 +344,16 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
             }
         }
 
+        private TtSqliteMediaAccessLayer GetMalIfExists(string dalFilePath)
+        {
+            string malFilePath = Path.Combine(Path.GetFullPath(dalFilePath),
+                                $"{Path.GetFileNameWithoutExtension(dalFilePath)}{Consts.FILE_EXTENSION_MEDIA}");
 
+            if (File.Exists(malFilePath))
+                return new TtSqliteMediaAccessLayer(malFilePath);
+
+            return null;
+        }
 
 
         public void CreateProject()
@@ -347,7 +365,7 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
                 TtProjectInfo info = dialog.ProjectInfo;
 
                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
-                TtProject proj = new TtProject(dal, Settings, this);
+                TtProject proj = new TtProject(dal, null, Settings, this);
                 Trace.WriteLine($"Project Created ({dal.GetDataVersion()}): {dal.FilePath}");
 
                 AddProject(proj);

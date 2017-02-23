@@ -44,11 +44,10 @@ namespace TwoTrails.Core
         void AddNmeaBurst(TtNmeaBurst burst);
         void AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
         void DeleteNmeaBursts(string pointCN);
-
-        //TODO Media Manager
-        //List<TtImage> GetImages(String pointCN);
-        //void InsertMedia(TtMedia media);
-        //void DeleteMedia(TtMedia media);
+        
+        List<TtImage> GetImages(String pointCN);
+        void InsertMedia(TtMedia media);
+        void DeleteMedia(TtMedia media);
 
 
         PolygonGraphicOptions GetPolygonGraphicOption(string polyCN);

@@ -85,15 +85,6 @@ namespace TwoTrails.DAL
         #endregion
 
 
-        #region Media
-        bool InsertMedia(TtMedia media);
-
-        bool UpdateMedia(TtMedia media);
-
-        bool DeleteMedia(TtMedia media);
-        #endregion
-
-
         #region Activity
         void InsertActivity(TtUserActivity activity);
         #endregion

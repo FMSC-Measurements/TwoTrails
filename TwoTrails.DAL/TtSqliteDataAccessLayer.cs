@@ -22,19 +22,34 @@ namespace TwoTrails.DAL
     {
         public String FilePath { get; }
 
-        private SQLiteDatabase database;
+        private String _MediaFilePath;
+        public String MediaFilePath
+        {
+            get
+            {
+                return _MediaFilePath ??
+                    (_MediaFilePath = Path.Combine(Path.GetFullPath(FilePath),
+                    $"{Path.GetFileNameWithoutExtension(FilePath)}{Consts.FILE_EXTENSION_MEDIA}"));
+            }
+        }
+
+        private SQLiteDatabase _Database;
+        private SQLiteDatabase _MediaDatabase;
 
 
         public TtSqliteDataAccessLayer(String filePath)
         {
             FilePath = filePath;
-            database = new SQLiteDatabase(FilePath);
+            _Database = new SQLiteDatabase(FilePath);
+
+            if (File.Exists(MediaFilePath))
+                _MediaDatabase = new SQLiteDatabase(MediaFilePath);
         }
 
-        public TtSqliteDataAccessLayer(SQLiteDatabase database)
+        private TtSqliteDataAccessLayer(SQLiteDatabase database)
         {
             this.FilePath = database.FileName;
-            this.database = database;
+            this._Database = database;
         }
 
         public static TtSqliteDataAccessLayer Create(string filePath, TtProjectInfo projectInfo)
@@ -53,9 +68,7 @@ namespace TwoTrails.DAL
             database.ExecuteNonQuery(TwoTrailsSchema.QuondamPointSchema.CreateTable);
             database.ExecuteNonQuery(TwoTrailsSchema.ProjectInfoSchema.CreateTable);
             database.ExecuteNonQuery(TwoTrailsSchema.TtNmeaSchema.CreateTable);
-            database.ExecuteNonQuery(TwoTrailsSchema.MediaSchema.CreateTable);
             database.ExecuteNonQuery(TwoTrailsSchema.PolygonAttrSchema.CreateTable);
-            database.ExecuteNonQuery(TwoTrailsSchema.PictureSchema.CreateTable);
             database.ExecuteNonQuery(TwoTrailsSchema.ActivitySchema.CreateTable);
 
             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(database);
@@ -63,7 +76,6 @@ namespace TwoTrails.DAL
 
             return dal;
         }
-
 
         public bool RequiresUpgrade
         {
@@ -111,9 +123,9 @@ namespace TwoTrails.DAL
                 TwoTrailsSchema.PointSchema.Index
             );
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
                 {
                     if (dr != null)
                     {
@@ -245,7 +257,7 @@ namespace TwoTrails.DAL
 
         public int InsertPoints(IEnumerable<TtPoint> points)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -276,7 +288,7 @@ namespace TwoTrails.DAL
 
         private bool InsertBasePoint(TtPoint point)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -303,7 +315,7 @@ namespace TwoTrails.DAL
 
         private bool InsertBasePoint(TtPoint point, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            database.Insert(TwoTrailsSchema.PointSchema.TableName, GetBasePointValues(point), conn, transaction);
+            _Database.Insert(TwoTrailsSchema.PointSchema.TableName, GetBasePointValues(point), conn, transaction);
 
             InsertBaseData(point, conn, transaction);
 
@@ -318,14 +330,14 @@ namespace TwoTrails.DAL
                 case OpType.Take5:
                 case OpType.Walk:
                 case OpType.WayPoint:
-                    database.Insert(TwoTrailsSchema.GpsPointSchema.TableName, GetGpsPointValues(point as GpsPoint), conn, transaction);
+                    _Database.Insert(TwoTrailsSchema.GpsPointSchema.TableName, GetGpsPointValues(point as GpsPoint), conn, transaction);
                     break;
                 case OpType.Traverse:
                 case OpType.SideShot:
-                    database.Insert(TwoTrailsSchema.TravPointSchema.TableName, GetTravPointValues(point as TravPoint), conn, transaction);
+                    _Database.Insert(TwoTrailsSchema.TravPointSchema.TableName, GetTravPointValues(point as TravPoint), conn, transaction);
                     break;
                 case OpType.Quondam:
-                    database.Insert(TwoTrailsSchema.QuondamPointSchema.TableName, GetQndmPointValues(point as QuondamPoint), conn, transaction);
+                    _Database.Insert(TwoTrailsSchema.QuondamPointSchema.TableName, GetQndmPointValues(point as QuondamPoint), conn, transaction);
                     break;
             }
         }
@@ -338,7 +350,7 @@ namespace TwoTrails.DAL
 
         public int UpdatePoints(IEnumerable<Tuple<TtPoint, TtPoint>> points)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -370,7 +382,7 @@ namespace TwoTrails.DAL
 
         private bool UpdateBasePoint(TtPoint point, TtPoint oldPoint)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -399,7 +411,7 @@ namespace TwoTrails.DAL
         {
             string where = $"{TwoTrailsSchema.SharedSchema.CN} = '{point.CN}'";
 
-            database.Update(TwoTrailsSchema.PointSchema.TableName,
+            _Database.Update(TwoTrailsSchema.PointSchema.TableName,
                 GetBasePointValues(point),
                 where,
                 conn,
@@ -409,15 +421,15 @@ namespace TwoTrails.DAL
             {
                 if (oldPoint.IsGpsType())
                 {
-                    database.Delete(TwoTrailsSchema.GpsPointSchema.TableName, where, conn, transaction);
+                    _Database.Delete(TwoTrailsSchema.GpsPointSchema.TableName, where, conn, transaction);
                 }
                 else if (oldPoint.IsTravType())
                 {
-                    database.Delete(TwoTrailsSchema.TravPointSchema.TableName, where, conn, transaction);
+                    _Database.Delete(TwoTrailsSchema.TravPointSchema.TableName, where, conn, transaction);
                 }
                 else
                 {
-                    database.Delete(TwoTrailsSchema.QuondamPointSchema.TableName, where, conn, transaction);
+                    _Database.Delete(TwoTrailsSchema.QuondamPointSchema.TableName, where, conn, transaction);
                 }
 
                 InsertBaseData(point, conn, transaction);
@@ -430,7 +442,7 @@ namespace TwoTrails.DAL
                     case OpType.Take5:
                     case OpType.Walk:
                     case OpType.WayPoint:
-                        database.Update(TwoTrailsSchema.GpsPointSchema.TableName,
+                        _Database.Update(TwoTrailsSchema.GpsPointSchema.TableName,
                             GetGpsPointValues(point as GpsPoint),
                             where,
                             conn,
@@ -438,14 +450,14 @@ namespace TwoTrails.DAL
                         break;
                     case OpType.Traverse:
                     case OpType.SideShot:
-                        database.Update(TwoTrailsSchema.TravPointSchema.TableName,
+                        _Database.Update(TwoTrailsSchema.TravPointSchema.TableName,
                             GetTravPointValues(point as TravPoint),
                             where,
                             conn,
                             transaction);
                         break;
                     case OpType.Quondam:
-                        database.Update(TwoTrailsSchema.QuondamPointSchema.TableName,
+                        _Database.Update(TwoTrailsSchema.QuondamPointSchema.TableName,
                             GetQndmPointValues(point as QuondamPoint),
                             where,
                             conn,
@@ -550,7 +562,7 @@ namespace TwoTrails.DAL
         #region Delete Points
         public bool DeletePoint(TtPoint point)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -605,7 +617,7 @@ namespace TwoTrails.DAL
 
             String where = String.Empty;
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -678,22 +690,22 @@ namespace TwoTrails.DAL
 
         private bool DeleteBasePoints(String where, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            return database.Delete(TwoTrailsSchema.PointSchema.TableName, where, conn, transaction) > 0;
+            return _Database.Delete(TwoTrailsSchema.PointSchema.TableName, where, conn, transaction) > 0;
         }
 
         private void DeleteGpsPointData(String where, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            database.Delete(TwoTrailsSchema.GpsPointSchema.TableName, where, conn, transaction);
+            _Database.Delete(TwoTrailsSchema.GpsPointSchema.TableName, where, conn, transaction);
         }
 
         private void DeleteTravPointData(String where, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            database.Delete(TwoTrailsSchema.TravPointSchema.TableName, where, conn, transaction);
+            _Database.Delete(TwoTrailsSchema.TravPointSchema.TableName, where, conn, transaction);
         }
 
         private void DeleteQndmPointData(String where, SQLiteConnection conn, SQLiteTransaction transaction)
         {
-            database.Delete(TwoTrailsSchema.QuondamPointSchema.TableName, where, conn, transaction);
+            _Database.Delete(TwoTrailsSchema.QuondamPointSchema.TableName, where, conn, transaction);
         }
         #endregion
         #endregion
@@ -703,9 +715,9 @@ namespace TwoTrails.DAL
         #region Get Polygons
         public bool HasPolygons()
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader($"select count(*) from {TwoTrailsSchema.PolygonSchema.TableName}", conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader($"select count(*) from {TwoTrailsSchema.PolygonSchema.TableName}", conn))
                 {
                     if (dr != null)
                     {
@@ -728,9 +740,9 @@ namespace TwoTrails.DAL
         {
             String query = $"select {TwoTrailsSchema.PolygonSchema.SelectItems} from {TwoTrailsSchema.PolygonSchema.TableName}";
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
                 {
                     if (dr != null)
                     {
@@ -762,13 +774,13 @@ namespace TwoTrails.DAL
         #region Insert/Update Polygons
         public bool InsertPolygon(TtPolygon polygon)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.PolygonSchema.TableName, GetPolygonValues(polygon), conn, trans);
+                        _Database.Insert(TwoTrailsSchema.PolygonSchema.TableName, GetPolygonValues(polygon), conn, trans);
                         trans.Commit();
                     }
                     catch (Exception ex)
@@ -789,7 +801,7 @@ namespace TwoTrails.DAL
 
         public int InsertPolygons(IEnumerable<TtPolygon> polygons)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -797,7 +809,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtPolygon poly in polygons)
                         {
-                            database.Insert(TwoTrailsSchema.PolygonSchema.TableName, GetPolygonValues(poly), conn, trans);
+                            _Database.Insert(TwoTrailsSchema.PolygonSchema.TableName, GetPolygonValues(poly), conn, trans);
                         }
 
                         trans.Commit();
@@ -821,13 +833,13 @@ namespace TwoTrails.DAL
 
         public bool UpdatePolygon(TtPolygon polygon)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Update(TwoTrailsSchema.PolygonSchema.TableName,
+                        _Database.Update(TwoTrailsSchema.PolygonSchema.TableName,
                             GetPolygonValues(polygon),
                             $"{TwoTrailsSchema.SharedSchema.CN} = '{polygon.CN}'",
                             conn,
@@ -853,7 +865,7 @@ namespace TwoTrails.DAL
 
         public int UpdatePolygons(IEnumerable<TtPolygon> polygons)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -861,7 +873,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtPolygon poly in polygons)
                         {
-                            database.Update(TwoTrailsSchema.PolygonSchema.TableName,
+                            _Database.Update(TwoTrailsSchema.PolygonSchema.TableName,
                                 GetPolygonValues(poly),
                                 $"{TwoTrailsSchema.SharedSchema.CN} = '{poly.CN}'",
                                 conn,
@@ -905,13 +917,13 @@ namespace TwoTrails.DAL
         #region Delete Polygons
         public bool DeletePolygon(TtPolygon polygon)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Delete(TwoTrailsSchema.PolygonSchema.TableName,
+                        _Database.Delete(TwoTrailsSchema.PolygonSchema.TableName,
                             $"{TwoTrailsSchema.SharedSchema.CN} = '{polygon.CN}'",
                             conn,
                             trans);
@@ -940,7 +952,7 @@ namespace TwoTrails.DAL
             int total = polygons.Count();
             int count = 0;
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction transaction = conn.BeginTransaction())
                 {
@@ -955,7 +967,7 @@ namespace TwoTrails.DAL
                         string where = sb.ToString();
                         
                         if (!String.IsNullOrEmpty(where) &&
-                            database.Delete(TwoTrailsSchema.PolygonSchema.TableName,
+                            _Database.Delete(TwoTrailsSchema.PolygonSchema.TableName,
                             where, conn, transaction) < 0)
                         {
                             transaction.Rollback();
@@ -989,9 +1001,9 @@ namespace TwoTrails.DAL
         {
             String query = $@"select {TwoTrailsSchema.MetadataSchema.SelectItems} from {TwoTrailsSchema.MetadataSchema.TableName}";
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
                 {
                     if (dr != null)
                     {
@@ -1038,13 +1050,13 @@ namespace TwoTrails.DAL
         #region Insert/Update Metadata
         public bool InsertMetadata(TtMetadata metadata)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.MetadataSchema.TableName, GetMetadataValues(metadata), conn, trans);
+                        _Database.Insert(TwoTrailsSchema.MetadataSchema.TableName, GetMetadataValues(metadata), conn, trans);
                         trans.Commit();
                     }
                     catch (Exception ex)
@@ -1065,7 +1077,7 @@ namespace TwoTrails.DAL
 
         public int InsertMetadata(IEnumerable<TtMetadata> metadata)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -1073,7 +1085,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtMetadata meta in metadata)
                         {
-                            database.Insert(TwoTrailsSchema.MetadataSchema.TableName, GetMetadataValues(meta), conn, trans);
+                            _Database.Insert(TwoTrailsSchema.MetadataSchema.TableName, GetMetadataValues(meta), conn, trans);
                         }
 
                         trans.Commit();
@@ -1097,13 +1109,13 @@ namespace TwoTrails.DAL
 
         public bool UpdateMetadata(TtMetadata metadata)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Update(TwoTrailsSchema.MetadataSchema.TableName,
+                        _Database.Update(TwoTrailsSchema.MetadataSchema.TableName,
                             GetMetadataValues(metadata),
                             $"{TwoTrailsSchema.SharedSchema.CN} = '{metadata.CN}'",
                             conn,
@@ -1127,7 +1139,7 @@ namespace TwoTrails.DAL
 
         public int UpdateMetadata(IEnumerable<TtMetadata> metadata)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -1135,7 +1147,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtMetadata meta in metadata)
                         {
-                            database.Update(TwoTrailsSchema.MetadataSchema.TableName,
+                            _Database.Update(TwoTrailsSchema.MetadataSchema.TableName,
                                 GetMetadataValues(meta),
                                 $"{TwoTrailsSchema.SharedSchema.CN} = '{meta.CN}'",
                                 conn,
@@ -1183,13 +1195,13 @@ namespace TwoTrails.DAL
         #region Delete Metadata
         public bool DeleteMetadata(TtMetadata metadata)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Delete(TwoTrailsSchema.MetadataSchema.TableName,
+                        _Database.Delete(TwoTrailsSchema.MetadataSchema.TableName,
                             $"{TwoTrailsSchema.SharedSchema.CN} = '{metadata.CN}'",
                             conn,
                             trans);
@@ -1217,7 +1229,7 @@ namespace TwoTrails.DAL
             int total = metadata.Count();
             int count = 0;
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -1232,7 +1244,7 @@ namespace TwoTrails.DAL
                         string where = sb.ToString();
 
                         if (!String.IsNullOrEmpty(where) &&
-                            database.Delete(TwoTrailsSchema.MetadataSchema.TableName,
+                            _Database.Delete(TwoTrailsSchema.MetadataSchema.TableName,
                             where, conn, trans) < 0)
                         {
                             trans.Rollback();
@@ -1264,9 +1276,9 @@ namespace TwoTrails.DAL
         {
             String query = $"select {TwoTrailsSchema.GroupSchema.SelectItems} from {TwoTrailsSchema.GroupSchema.TableName}";
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
                 {
                     if (dr != null)
                     {
@@ -1296,13 +1308,13 @@ namespace TwoTrails.DAL
         #region Insert/Update Groups
         public bool InsertGroup(TtGroup group)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.GroupSchema.TableName, GetGroupValues(group), conn, trans);
+                        _Database.Insert(TwoTrailsSchema.GroupSchema.TableName, GetGroupValues(group), conn, trans);
                         trans.Commit();
                     }
                     catch (Exception ex)
@@ -1323,7 +1335,7 @@ namespace TwoTrails.DAL
 
         public int InsertGroups(IEnumerable<TtGroup> groups)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -1331,7 +1343,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtGroup group in groups)
                         {
-                            database.Insert(TwoTrailsSchema.GroupSchema.TableName, GetGroupValues(group), conn, trans);
+                            _Database.Insert(TwoTrailsSchema.GroupSchema.TableName, GetGroupValues(group), conn, trans);
                         }
 
                         trans.Commit();
@@ -1355,13 +1367,13 @@ namespace TwoTrails.DAL
 
         public bool UpdateGroup(TtGroup group)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Update(TwoTrailsSchema.GroupSchema.TableName,
+                        _Database.Update(TwoTrailsSchema.GroupSchema.TableName,
                             GetGroupValues(group),
                             $"{TwoTrailsSchema.SharedSchema.CN} = '{group.CN}'",
                             conn,
@@ -1386,7 +1398,7 @@ namespace TwoTrails.DAL
 
         public int UpdateGroups(IEnumerable<TtGroup> groups)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -1394,7 +1406,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtGroup group in groups)
                         {
-                            database.Update(TwoTrailsSchema.GroupSchema.TableName,
+                            _Database.Update(TwoTrailsSchema.GroupSchema.TableName,
                                 GetGroupValues(group),
                                 $"{TwoTrailsSchema.SharedSchema.CN} = '{group.CN}'",
                                 conn,
@@ -1432,13 +1444,13 @@ namespace TwoTrails.DAL
         #region Delete Groups
         public bool DeleteGroup(TtGroup group)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Delete(TwoTrailsSchema.GroupSchema.TableName,
+                        _Database.Delete(TwoTrailsSchema.GroupSchema.TableName,
                             $"{TwoTrailsSchema.SharedSchema.CN} = '{group.CN}'",
                             conn,
                             trans);
@@ -1466,7 +1478,7 @@ namespace TwoTrails.DAL
             int total = groups.Count();
             int count = 0;
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -1482,7 +1494,7 @@ namespace TwoTrails.DAL
                         string where = sb.ToString();
 
                         if (!String.IsNullOrEmpty(where) &&
-                            database.Delete(TwoTrailsSchema.GroupSchema.TableName,
+                            _Database.Delete(TwoTrailsSchema.GroupSchema.TableName,
                             where, conn, trans) < 0)
                         {
                             trans.Rollback();
@@ -1514,9 +1526,9 @@ namespace TwoTrails.DAL
             String query = $@"select {TwoTrailsSchema.TtNmeaSchema.SelectItems} from {TwoTrailsSchema.TtNmeaSchema.TableName}
 {(pointCN != null ? $" where {TwoTrailsSchema.TtNmeaSchema.PointCN} = '{pointCN}'" : String.Empty)}"; ;
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
                 {
                     if (dr != null)
                     {
@@ -1573,13 +1585,13 @@ namespace TwoTrails.DAL
 
         public bool InsertNmeaBurst(TtNmeaBurst burst)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.TtNmeaSchema.TableName, GetNmeaValues(burst), conn, trans);
+                        _Database.Insert(TwoTrailsSchema.TtNmeaSchema.TableName, GetNmeaValues(burst), conn, trans);
                         trans.Commit();
                     }
                     catch (Exception ex)
@@ -1600,7 +1612,7 @@ namespace TwoTrails.DAL
 
         public int InsertNmeaBursts(IEnumerable<TtNmeaBurst> bursts)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -1608,7 +1620,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtNmeaBurst burst in bursts)
                         {
-                            database.Insert(TwoTrailsSchema.TtNmeaSchema.TableName, GetNmeaValues(burst), conn, trans);
+                            _Database.Insert(TwoTrailsSchema.TtNmeaSchema.TableName, GetNmeaValues(burst), conn, trans);
                         }
 
                         trans.Commit();
@@ -1631,13 +1643,13 @@ namespace TwoTrails.DAL
 
         public bool UpdateNmeaBurst(TtNmeaBurst burst)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Update(TwoTrailsSchema.PolygonSchema.TableName,
+                        _Database.Update(TwoTrailsSchema.PolygonSchema.TableName,
                             new Dictionary<string, object>()
                             {
                                 [TwoTrailsSchema.TtNmeaSchema.Used] = burst.IsUsed
@@ -1666,7 +1678,7 @@ namespace TwoTrails.DAL
 
         public int UpdateNmeaBursts(IEnumerable<TtNmeaBurst> bursts)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
@@ -1674,7 +1686,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtNmeaBurst burst in bursts)
                         {
-                            database.Update(TwoTrailsSchema.PolygonSchema.TableName,
+                            _Database.Update(TwoTrailsSchema.PolygonSchema.TableName,
                                 new Dictionary<string, object>()
                                 {
                                     [TwoTrailsSchema.TtNmeaSchema.Used] = burst.IsUsed
@@ -1702,13 +1714,13 @@ namespace TwoTrails.DAL
         {
             int res = -1;
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        res = database.Delete(TwoTrailsSchema.TtNmeaSchema.TableName,
+                        res = _Database.Delete(TwoTrailsSchema.TtNmeaSchema.TableName,
                             $"{TwoTrailsSchema.TtNmeaSchema.PointCN} = '{pointCN}'",
                             conn,
                             trans);
@@ -1775,9 +1787,9 @@ namespace TwoTrails.DAL
 
             TtProjectInfo info = null;
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
                 {
                     if (dr != null)
                     {
@@ -1818,9 +1830,9 @@ namespace TwoTrails.DAL
 
             Version version = null;
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
                 {
                     if (dr != null)
                     {
@@ -1841,13 +1853,13 @@ namespace TwoTrails.DAL
 
         public bool InsertProjectInfo(TtProjectInfo info)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.ProjectInfoSchema.TableName,
+                        _Database.Insert(TwoTrailsSchema.ProjectInfoSchema.TableName,
                             new Dictionary<string, object>()
                             {
                                 [TwoTrailsSchema.ProjectInfoSchema.Name] = info.Name.Trim(),
@@ -1884,13 +1896,13 @@ namespace TwoTrails.DAL
 
         public bool UpdateProjectInfo(TtProjectInfo info)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Update(TwoTrailsSchema.ProjectInfoSchema.TableName,
+                        _Database.Update(TwoTrailsSchema.ProjectInfoSchema.TableName,
                             new Dictionary<string, object>()
                             {
                                 [TwoTrailsSchema.ProjectInfoSchema.Name] = info.Name,
@@ -1925,228 +1937,14 @@ namespace TwoTrails.DAL
         #endregion
 
 
-        #region TtMedia
-        public IEnumerable<TtImage> GetPictures(string pointCN)
-        {
-            String query = String.Format(@"select {1}.{0}, {2} from {1} left join {3} on {1}.{4} = {3}.{4}",
-                TwoTrailsSchema.MediaSchema.SelectItems,
-                TwoTrailsSchema.MediaSchema.TableName,
-                TwoTrailsSchema.PictureSchema.SelectItemsNoCN,
-                TwoTrailsSchema.PictureSchema.TableName,
-                TwoTrailsSchema.SharedSchema.CN
-            );
-
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
-            {
-                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
-                {
-                    if (dr != null)
-                    {
-                        string cn, pcn, name, file, cmt;
-                        MediaType mt;
-                        PictureType pt;
-                        DateTime date;
-                        float? az, pitch, roll;
-
-                        TtImage image = null;
-
-                        while (dr.Read())
-                        {
-                            cn = dr.GetString(0);
-                            pcn = dr.GetString(1);
-                            mt = (MediaType)dr.GetInt32(2);
-                            name = dr.GetString(3);
-                            file = dr.GetStringN(4);
-                            date = TtCoreUtils.ParseTime(dr.GetString(5));
-                            cmt = dr.GetStringN(6);
-
-                            pt = (PictureType)dr.GetInt32(7);
-                            az = dr.GetFloatN(8);
-                            pitch = dr.GetFloatN(9);
-                            roll = dr.GetFloatN(10);
-
-                            switch (pt)
-                            {
-                                case PictureType.Regular:
-                                    image = new TtImage(cn, name, file, cmt, date, pcn, az, pitch, roll);
-                                    break;
-                                case PictureType.Panorama:
-                                    image = new TtPanorama(cn, name, file, cmt, date, pcn, az, pitch, roll);
-                                    break;
-                                case PictureType.PhotoSphere:
-                                    image = new TtPhotoShpere(cn, name, file, cmt, date, pcn, az, pitch, roll);
-                                    break;
-                                default:
-                                    throw new Exception("Unknown Image Type");
-                            }
-
-                            yield return image;
-                        }
-
-                        dr.Close();
-                    }
-                }
-
-                conn.Close();
-            }
-        }
-
-        public bool InsertMedia(TtMedia media)
-        {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
-            {
-                using (SQLiteTransaction trans = conn.BeginTransaction())
-                {
-                    try
-                    {
-                        if (database.Insert(TwoTrailsSchema.MediaSchema.TableName, GetMediaValues(media), conn, trans) > 0)
-                        {
-                            switch (media.MediaType)
-                            {
-                                case MediaType.Picture:
-                                    database.Insert(TwoTrailsSchema.PictureSchema.TableName, GetImageValues(media as TtImage), conn, trans);
-                                    break;
-                                case MediaType.Video:
-                                    break;
-                            }
-                        }
-                        trans.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message, "DAL:InsertMedia");
-                        trans.Rollback();
-                        return false;
-                    }
-                    finally
-                    {
-                        conn.Close();
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        public bool UpdateMedia(TtMedia media)
-        {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
-            {
-                using (SQLiteTransaction trans = conn.BeginTransaction())
-                {
-                    try
-                    {
-                        database.Update(TwoTrailsSchema.MediaSchema.TableName,
-                            GetMediaValues(media),
-                            $"{TwoTrailsSchema.SharedSchema.CN} = '{media.CN}'",
-                            conn,
-                            trans);
-
-                        switch (media.MediaType)
-                        {
-                            case MediaType.Picture:
-                                database.Update(TwoTrailsSchema.PictureSchema.TableName,
-                                    GetImageValues(media as TtImage),
-                                    $"{TwoTrailsSchema.SharedSchema.CN} = '{media.CN}'",
-                                    conn,
-                                    trans);
-                                break;
-                            case MediaType.Video:
-                                break;
-                        }
-
-                        trans.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message, "DAL:UpdateMedia");
-                        trans.Rollback();
-                        return false;
-                    }
-                    finally
-                    {
-                        conn.Close();
-                    }
-                }
-            }
-
-            return true;
-        }
-
-
-        private Dictionary<string, object> GetMediaValues(TtMedia media)
-        {
-            return new Dictionary<string, object>()
-            {
-                [TwoTrailsSchema.SharedSchema.CN] = media.CN,
-                [TwoTrailsSchema.MediaSchema.Name] = media.Name,
-                [TwoTrailsSchema.MediaSchema.FilePath] = media.FilePath,
-                [TwoTrailsSchema.MediaSchema.Comment] = media.Comment,
-                [TwoTrailsSchema.MediaSchema.CreationTime] = media.TimeCreated.ToString(Consts.DATE_FORMAT),
-                [TwoTrailsSchema.MediaSchema.MediaType] = (int)media.MediaType,
-                [TwoTrailsSchema.MediaSchema.PointCN] = media.PointCN
-            };
-        }
-
-        private Dictionary<string, object> GetImageValues(TtImage image)
-        {
-            return new Dictionary<string, object>()
-            {
-                [TwoTrailsSchema.SharedSchema.CN] = image.CN,
-                [TwoTrailsSchema.PictureSchema.PicType] = (int)image.PictureType,
-                [TwoTrailsSchema.PictureSchema.Azimuth] = image.Azimuth,
-                [TwoTrailsSchema.PictureSchema.Pitch] = image.Pitch,
-                [TwoTrailsSchema.PictureSchema.Roll] = image.Roll
-            };
-        }
-
-        public bool DeleteMedia(TtMedia media)
-        {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
-            {
-                using (SQLiteTransaction trans = conn.BeginTransaction())
-                {
-                    try
-                    {
-                        database.Delete(TwoTrailsSchema.MediaSchema.TableName,
-                            $"{TwoTrailsSchema.SharedSchema.CN} = '{media.CN}'",
-                            conn,
-                            trans);
-
-                        if (media.MediaType == MediaType.Picture)
-                        {
-                            database.Delete(TwoTrailsSchema.PictureSchema.TableName,
-                                $"{TwoTrailsSchema.SharedSchema.CN} = '{media.CN}'",
-                                conn,
-                                trans);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message, "DAL:DeleteMedia");
-                        trans.Rollback();
-                        return false;
-                    }
-                    finally
-                    {
-                        conn.Close();
-                    }
-                }
-            }
-
-            return true;
-        }
-        #endregion
-
-
         #region Polygon Attrs
         public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
         {
             String query = $"select {TwoTrailsSchema.PolygonAttrSchema.SelectItems} from {TwoTrailsSchema.PolygonAttrSchema.TableName}";
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
                 {
                     if (dr != null)
                     {
@@ -2179,13 +1977,13 @@ namespace TwoTrails.DAL
 
         public bool InsertPolygonGraphicOption(PolygonGraphicOptions option)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.PolygonAttrSchema.TableName, GetGraphicOptionValues(option), conn, trans);
+                        _Database.Insert(TwoTrailsSchema.PolygonAttrSchema.TableName, GetGraphicOptionValues(option), conn, trans);
                         trans.Commit();
                     }
                     catch (Exception ex)
@@ -2221,13 +2019,13 @@ namespace TwoTrails.DAL
 
         public bool DeletePolygonGraphicOption(PolygonGraphicOptions option)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Delete(TwoTrailsSchema.PolygonAttrSchema.TableName,
+                        _Database.Delete(TwoTrailsSchema.PolygonAttrSchema.TableName,
                             $"{TwoTrailsSchema.SharedSchema.CN} = '{option.CN}'",
                             conn,
                             trans);
@@ -2255,13 +2053,13 @@ namespace TwoTrails.DAL
 
         public void InsertActivity(TtUserActivity activity)
         {
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
                 using (SQLiteTransaction trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        database.Insert(TwoTrailsSchema.ActivitySchema.TableName, GetUserActivityValues(activity), conn, trans);
+                        _Database.Insert(TwoTrailsSchema.ActivitySchema.TableName, GetUserActivityValues(activity), conn, trans);
                         trans.Commit();
                     }
                     catch (Exception ex)
@@ -2292,9 +2090,9 @@ namespace TwoTrails.DAL
         {
             String query = $"select {TwoTrailsSchema.ActivitySchema.SelectItems} from {TwoTrailsSchema.ActivitySchema.TableName}";
 
-            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
                 {
                     if (dr != null)
                     {

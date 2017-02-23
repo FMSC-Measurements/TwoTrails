@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Media;
 
 namespace TwoTrails.Core
 {
@@ -357,6 +358,22 @@ namespace TwoTrails.Core
         void ITtManager.DeleteNmeaBursts(string pointCN)
         {
             BaseManager.DeleteNmeaBursts(pointCN);
+        }
+
+
+        public List<TtImage> GetImages(string pointCN)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void InsertMedia(TtMedia media)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteMedia(TtMedia media)
+        {
+            throw new NotImplementedException();
         }
     }
 

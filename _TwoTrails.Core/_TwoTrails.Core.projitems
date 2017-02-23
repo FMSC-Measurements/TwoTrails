@@ -38,6 +38,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HaidLogic.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IReadOnlyTtMediaLayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtMediaLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\IAccuracy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IDeviceSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMetadataSettings.cs" />
