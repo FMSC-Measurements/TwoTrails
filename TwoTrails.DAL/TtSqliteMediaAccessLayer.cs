@@ -10,6 +10,9 @@ using System.Text;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using System.Diagnostics;
+using System.Windows.Media.Imaging;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace TwoTrails.DAL
 {
@@ -40,7 +43,8 @@ namespace TwoTrails.DAL
             SQLiteDatabase database = new SQLiteDatabase(filePath);
 
             database.ExecuteNonQuery(TwoTrailsMediaSchema.Media.CreateTable);
-            database.ExecuteNonQuery(TwoTrailsMediaSchema.Pictures.CreateTable);
+            database.ExecuteNonQuery(TwoTrailsMediaSchema.Images.CreateTable);
+            database.ExecuteNonQuery(TwoTrailsMediaSchema.Data.CreateTable);
             database.ExecuteNonQuery(TwoTrailsMediaSchema.Info.CreateTable);
 
             database.Insert(TwoTrailsMediaSchema.Info.TableName,
@@ -86,16 +90,18 @@ namespace TwoTrails.DAL
             return version;
         }
 
-        public IEnumerable<TtImage> GetPictures(string pointCN)
+        public IEnumerable<TtImage> GetImages(string pointCN)
         {
             if (_Database != null)
             {
-                String query = String.Format(@"select {1}.{0}, {2} from {1} left join {3} on {1}.{4} = {3}.{4}",
+                String query = String.Format(@"select {1}.{0}, {2} from {1} left join {3} on {1}.{4} = {3}.{4} where {5} = '{6}'",
                     TwoTrailsMediaSchema.Media.SelectItems,
                     TwoTrailsMediaSchema.Media.TableName,
-                    TwoTrailsMediaSchema.Pictures.SelectItemsNoCN,
-                    TwoTrailsMediaSchema.Pictures.TableName,
-                    TwoTrailsSchema.SharedSchema.CN
+                    TwoTrailsMediaSchema.Images.SelectItemsNoCN,
+                    TwoTrailsMediaSchema.Images.TableName,
+                    TwoTrailsSchema.SharedSchema.CN,
+                    TwoTrailsMediaSchema.Media.PointCN,
+                    pointCN
                 );
 
                 using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
@@ -105,8 +111,9 @@ namespace TwoTrails.DAL
                         if (dr != null)
                         {
                             string cn, pcn, name, file, cmt;
+                            bool isExt;
                             MediaType mt;
-                            PictureType pt;
+                            ImageType pt;
                             DateTime date;
                             float? az, pitch, roll;
 
@@ -121,22 +128,23 @@ namespace TwoTrails.DAL
                                 file = dr.GetStringN(4);
                                 date = TtCoreUtils.ParseTime(dr.GetString(5));
                                 cmt = dr.GetStringN(6);
+                                isExt = dr.GetBoolean(7);
 
-                                pt = (PictureType)dr.GetInt32(7);
-                                az = dr.GetFloatN(8);
-                                pitch = dr.GetFloatN(9);
-                                roll = dr.GetFloatN(10);
+                                pt = (ImageType)dr.GetInt32(8);
+                                az = dr.GetFloatN(9);
+                                pitch = dr.GetFloatN(10);
+                                roll = dr.GetFloatN(11);
 
                                 switch (pt)
                                 {
-                                    case PictureType.Regular:
-                                        image = new TtImage(cn, name, file, cmt, date, pcn, az, pitch, roll);
+                                    case ImageType.Regular:
+                                        image = new TtImage(cn, name, file, cmt, date, pcn, isExt, az, pitch, roll);
                                         break;
-                                    case PictureType.Panorama:
-                                        image = new TtPanorama(cn, name, file, cmt, date, pcn, az, pitch, roll);
+                                    case ImageType.Panorama:
+                                        image = new TtPanorama(cn, name, file, cmt, date, pcn, isExt, az, pitch, roll);
                                         break;
-                                    case PictureType.PhotoSphere:
-                                        image = new TtPhotoShpere(cn, name, file, cmt, date, pcn, az, pitch, roll);
+                                    case ImageType.PhotoSphere:
+                                        image = new TtPhotoShpere(cn, name, file, cmt, date, pcn, isExt, az, pitch, roll);
                                         break;
                                     default:
                                         throw new Exception("Unknown Image Type");
@@ -167,7 +175,7 @@ namespace TwoTrails.DAL
                             switch (media.MediaType)
                             {
                                 case MediaType.Picture:
-                                    _Database.Insert(TwoTrailsMediaSchema.Pictures.TableName, GetImageValues(media as TtImage), conn, trans);
+                                    _Database.Insert(TwoTrailsMediaSchema.Images.TableName, GetImageValues(media as TtImage), conn, trans);
                                     break;
                                 case MediaType.Video:
                                     break;
@@ -208,7 +216,7 @@ namespace TwoTrails.DAL
                         switch (media.MediaType)
                         {
                             case MediaType.Picture:
-                                _Database.Update(TwoTrailsMediaSchema.Pictures.TableName,
+                                _Database.Update(TwoTrailsMediaSchema.Images.TableName,
                                     GetImageValues(media as TtImage),
                                     $"{TwoTrailsSchema.SharedSchema.CN} = '{media.CN}'",
                                     conn,
@@ -247,7 +255,8 @@ namespace TwoTrails.DAL
                 [TwoTrailsMediaSchema.Media.Comment] = media.Comment,
                 [TwoTrailsMediaSchema.Media.CreationTime] = media.TimeCreated.ToString(Consts.DATE_FORMAT),
                 [TwoTrailsMediaSchema.Media.MediaType] = (int)media.MediaType,
-                [TwoTrailsMediaSchema.Media.PointCN] = media.PointCN
+                [TwoTrailsMediaSchema.Media.PointCN] = media.PointCN,
+                [TwoTrailsMediaSchema.Media.IsExternal] = media.IsExternal
             };
         }
 
@@ -256,10 +265,20 @@ namespace TwoTrails.DAL
             return new Dictionary<string, object>()
             {
                 [TwoTrailsSchema.SharedSchema.CN] = image.CN,
-                [TwoTrailsMediaSchema.Pictures.PicType] = (int)image.PictureType,
-                [TwoTrailsMediaSchema.Pictures.Azimuth] = image.Azimuth,
-                [TwoTrailsMediaSchema.Pictures.Pitch] = image.Pitch,
-                [TwoTrailsMediaSchema.Pictures.Roll] = image.Roll
+                [TwoTrailsMediaSchema.Images.PicType] = (int)image.PictureType,
+                [TwoTrailsMediaSchema.Images.Azimuth] = image.Azimuth,
+                [TwoTrailsMediaSchema.Images.Pitch] = image.Pitch,
+                [TwoTrailsMediaSchema.Images.Roll] = image.Roll
+            };
+        }
+
+        private Dictionary<string, object> GetDataValues(string cn, string type, byte[] data)
+        {
+            return new Dictionary<string, object>()
+            {
+                [TwoTrailsSchema.SharedSchema.CN] = cn,
+                [TwoTrailsMediaSchema.Data.DataType] = type,
+                [TwoTrailsMediaSchema.Data.BinaryData] = data
             };
         }
 
@@ -280,7 +299,7 @@ namespace TwoTrails.DAL
 
                             if (media.MediaType == MediaType.Picture)
                             {
-                                _Database.Delete(TwoTrailsMediaSchema.Pictures.TableName,
+                                _Database.Delete(TwoTrailsMediaSchema.Images.TableName,
                                     $"{TwoTrailsSchema.SharedSchema.CN} = '{media.CN}'",
                                     conn,
                                     trans);
@@ -304,10 +323,183 @@ namespace TwoTrails.DAL
         }
 
 
+
+        public void SaveImage(TtImage image, BitmapImage data)
+        {
+            byte[] bdata;
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                const int CHUNK_SIZE = 2 * 1024;
+                byte[] buffer = new byte[CHUNK_SIZE];
+                long bytesRead;
+
+                while ((bytesRead = data.StreamSource.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, (int)bytesRead);
+                }
+
+                bdata = ms.ToArray();
+            }
+
+            if (image.IsExternal)
+            {
+                using (FileStream stream = File.Create(image.FilePath))
+                {
+                    stream.Write(bdata, 0, bdata.Length);
+                }
+            }
+            else
+            {
+                if (_Database != null)
+                {
+                    using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                    {
+                        using (SQLiteTransaction trans = conn.BeginTransaction())
+                        {
+                            try
+                            {
+                                _Database.Insert(TwoTrailsMediaSchema.Data.TableName,
+                                    GetDataValues(image.CN, "", bdata),
+                                    conn,
+                                    trans);
+
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine(ex.Message, "DAL:SaveImage");
+                                trans.Rollback();
+                            }
+                            finally
+                            {
+                                conn.Close();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        public BitmapImage LoadImage(TtImage image)
+        {
+            BitmapImage bitmap = new BitmapImage();
+
+            if (image.IsExternal)
+            {
+                if (File.Exists(image.FilePath))
+                {
+                        bitmap.BeginInit();
+                        bitmap.UriSource = new Uri(image.FilePath);
+                        bitmap.EndInit();
+                        return bitmap;
+                }
+                else
+                {
+                    throw new FileNotFoundException(image.FilePath);
+                }
+            }
+            else
+            {
+                if (_Database != null)
+                {
+                    String query = String.Format(@"select {0} from {1} where {2} = '{3}' limit 1",
+                        TwoTrailsMediaSchema.Data.SelectItems,
+                        TwoTrailsMediaSchema.Data.TableName,
+                        TwoTrailsMediaSchema.SharedSchema.CN,
+                        image.CN
+                    );
+
+                    using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                    {
+                        using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
+                        {
+                            if (dr != null)
+                            {
+                                byte[] data = null;
+                                string cn, dataType;
+
+                                while (dr.Read())
+                                {
+                                    cn = dr.GetString(0);
+                                    dataType = dr.GetString(1);
+                                    data = GetBytesEx(dr, 2);
+
+                                    MemoryStream strmImg = new MemoryStream(data);
+
+                                    bitmap.BeginInit();
+                                    bitmap.StreamSource = strmImg;
+                                    bitmap.EndInit();
+                                }
+
+                            }
+
+                            dr.Close();
+                        }
+
+                        conn.Close();
+                    }
+                }
+
+                return bitmap;
+            }
+        }
+
+        public Task<BitmapImage> LoadImageAsync(TtImage image, AsyncCallback callback)
+        {
+            return Task.Run(() => {
+                BitmapImage bi = LoadImage(image);
+
+                callback(new ImageAsyncResult(false, true, bi));
+
+                return bi;
+            });
+        }
+
+
+        public class ImageAsyncResult : IAsyncResult
+        {
+            public bool IsCompleted { get; private set; }
+
+            public WaitHandle AsyncWaitHandle { get; } = null;
+
+            public object AsyncState { get; private set; }
+
+            BitmapImage Image { get { return (BitmapImage)AsyncState; } }
+
+            public bool CompletedSynchronously { get; private set; }
+
+            public  ImageAsyncResult(bool competedSynchronously, bool isCompleted, object image)
+            {
+                IsCompleted = isCompleted;
+                CompletedSynchronously = competedSynchronously;
+                AsyncState = image;
+            }
+        }
+
+
         #region Utils
         public void Clean()
         {
             
+        }
+
+        static byte[] GetBytesEx(SQLiteDataReader reader, int index)
+        {
+            const int CHUNK_SIZE = 2 * 1024;
+            byte[] buffer = new byte[CHUNK_SIZE];
+            long bytesRead;
+            long fieldOffset = 0;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                while ((bytesRead = reader.GetBytes(index, fieldOffset, buffer, 0, buffer.Length)) > 0)
+                {
+                    stream.Write(buffer, 0, (int)bytesRead);
+                    fieldOffset += bytesRead;
+                }
+                return stream.ToArray();
+            }
         }
         #endregion
     }

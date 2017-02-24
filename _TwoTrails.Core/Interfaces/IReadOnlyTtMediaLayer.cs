@@ -9,7 +9,7 @@ namespace TwoTrails.DAL
     public interface IReadOnlyTtMediaLayer
     {
         #region Media
-        IEnumerable<TtImage> GetPictures(String pointCN);
+        IEnumerable<TtImage> GetImages(String pointCN);
         #endregion
     }
 }

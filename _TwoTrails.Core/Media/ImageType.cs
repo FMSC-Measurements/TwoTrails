@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TwoTrails.Core.Media
 {
-    public enum PictureType
+    public enum ImageType
     {
         Regular = 0,
         Panorama = 1,

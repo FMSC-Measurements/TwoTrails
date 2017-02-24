@@ -50,7 +50,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\MediaType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Media\PictureType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Media\ImageType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtMedia.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtImage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtPanorama.cs" />

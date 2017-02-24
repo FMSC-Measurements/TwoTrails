@@ -20,7 +20,7 @@ namespace TwoTrails.Core
         public const String FILE_EXTENSION_FILTER = "TwoTrails Files (*.ttx)|.ttx";
 
         public const String FILE_EXTENSION_MEDIA = ".ttmpx";
-        public const String FILE_EXTENSION_FILTER_MEDIA = "TwoTrails Files (*.ttmpx)|.ttmpx";
+        public const String FILE_EXTENSION_FILTER_MEDIA = "TwoTrails Media Packages (*.ttmpx)|.ttmpx";
 
         public const String FILE_EXTENSION_V2 = ".tt2";
         public const String FILE_EXTENSION_FILTER_V2 = "TwoTrails2 Files (*.tt2)|.tt2";

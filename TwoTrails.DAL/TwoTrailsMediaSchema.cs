@@ -45,6 +45,7 @@ namespace TwoTrails.DAL
             public const String FilePath = "FileName";
             public const String CreationTime = "CreationTime";
             public const String Comment = "Comment";
+            public const String IsExternal = "IsExternal";
 
             public const String CreateTable =
                 "CREATE TABLE " + TableName + " (" +
@@ -55,6 +56,7 @@ namespace TwoTrails.DAL
                 FilePath + " TEXT, " +
                 CreationTime + " TEXT, " +
                 Comment + " TEXT, " +
+                IsExternal + " BOOLEAN NOT NULL, " +
                 "PRIMARY KEY (" + SharedSchema.CN + "));";
 
             public const String SelectItems =
@@ -64,14 +66,37 @@ namespace TwoTrails.DAL
                     Name + ", " +
                     FilePath + ", " +
                     CreationTime + ", " +
-                    Comment;
+                    Comment + ", " +
+                    IsExternal;
         }
         #endregion
-        
-        #region PictureTable
-        public static class Pictures
+
+        #region Media Data Table
+        public static class Data
         {
-            public const String TableName = "PictureData";
+            public const String TableName = "Data";
+
+            public const String DataType = "DataType";
+            public const String BinaryData = "BinaryData";
+
+            public const String CreateTable =
+                "CREATE TABLE " + TableName + " (" +
+                SharedSchema.CN + " TEXT NOT NULL, " +
+                DataType + " TEXT, " +
+                BinaryData + " BLOB, " +
+                "PRIMARY KEY (" + SharedSchema.CN + "));";
+
+            public const String SelectItems =
+                    SharedSchema.CN + ", " +
+                    DataType + ", " +
+                    BinaryData;
+        }
+        #endregion
+
+        #region PictureTable
+        public static class Images
+        {
+            public const String TableName = "Images";
 
             public const String PicType = "Type";
             public const String Azimuth = "Azimuth";
