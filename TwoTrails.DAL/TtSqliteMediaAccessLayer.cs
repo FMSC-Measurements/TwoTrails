@@ -380,8 +380,7 @@ namespace TwoTrails.DAL
                 }
             }
         }
-
-
+        
         public BitmapImage LoadImage(TtImage image)
         {
             BitmapImage bitmap = new BitmapImage();
@@ -424,7 +423,7 @@ namespace TwoTrails.DAL
                                 {
                                     cn = dr.GetString(0);
                                     dataType = dr.GetString(1);
-                                    data = GetBytesEx(dr, 2);
+                                    data = dr.GetBytesEx(2);
 
                                     MemoryStream strmImg = new MemoryStream(data);
 
@@ -483,23 +482,6 @@ namespace TwoTrails.DAL
         public void Clean()
         {
             
-        }
-
-        static byte[] GetBytesEx(SQLiteDataReader reader, int index)
-        {
-            const int CHUNK_SIZE = 2 * 1024;
-            byte[] buffer = new byte[CHUNK_SIZE];
-            long bytesRead;
-            long fieldOffset = 0;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                while ((bytesRead = reader.GetBytes(index, fieldOffset, buffer, 0, buffer.Length)) > 0)
-                {
-                    stream.Write(buffer, 0, (int)bytesRead);
-                    fieldOffset += bytesRead;
-                }
-                return stream.ToArray();
-            }
         }
         #endregion
     }
