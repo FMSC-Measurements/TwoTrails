@@ -185,7 +185,7 @@ namespace TwoTrails.DAL
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message, "DAL:InsertMedia");
+                        Debug.WriteLine(ex.Message, "MAL:InsertMedia");
                         trans.Rollback();
                         return false;
                     }
@@ -230,7 +230,7 @@ namespace TwoTrails.DAL
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message, "DAL:UpdateMedia");
+                        Debug.WriteLine(ex.Message, "MAL:UpdateMedia");
                         trans.Rollback();
                         return false;
                     }
@@ -307,7 +307,7 @@ namespace TwoTrails.DAL
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine(ex.Message, "DAL:DeleteMedia");
+                            Debug.WriteLine(ex.Message, "MAL:DeleteMedia");
                             trans.Rollback();
                             return false;
                         }
@@ -324,7 +324,7 @@ namespace TwoTrails.DAL
 
 
 
-        public void SaveImage(TtImage image, BitmapImage data)
+        public void InsertImageData(TtImage image, BitmapImage data)
         {
             byte[] bdata;
 
@@ -360,7 +360,7 @@ namespace TwoTrails.DAL
                             try
                             {
                                 _Database.Insert(TwoTrailsMediaSchema.Data.TableName,
-                                    GetDataValues(image.CN, "", bdata),
+                                    GetDataValues(image.CN, Path.GetExtension(image.FilePath).Trim('.'), bdata),
                                     conn,
                                     trans);
 
@@ -368,7 +368,7 @@ namespace TwoTrails.DAL
                             }
                             catch (Exception ex)
                             {
-                                Debug.WriteLine(ex.Message, "DAL:SaveImage");
+                                Debug.WriteLine(ex.Message, "MAL:InsertImageData");
                                 trans.Rollback();
                             }
                             finally
