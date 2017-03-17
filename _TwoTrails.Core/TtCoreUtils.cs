@@ -26,9 +26,7 @@ namespace TwoTrails.Core
 
         public static DateTime ParseTime(String value)
         {
-            DateTime time;
-
-            if (!DateTime.TryParse(value, out time))
+            if (!DateTime.TryParse(value, out DateTime time))
             {
                 if (!DateTime.TryParseExact(value, Consts.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out time))
                 {

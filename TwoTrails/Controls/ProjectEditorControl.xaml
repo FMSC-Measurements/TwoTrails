@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:TwoTrails.Controls"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
-             xmlns:ctrl="clr-namespace:TwoTrails.Controls"
+             xmlns:ttl="clr-namespace:TwoTrails"
              xmlns:tt="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
              xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
              xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
@@ -16,6 +16,27 @@
     <UserControl.Resources>
         <cvt:M2Converter x:Key="M2Converter"/>
         <cvt:MetersToFeetConverter x:Key="MtoFConverter"/>
+
+        <DataTemplate DataType="{x:Type ttl:ImageTile}">
+            <Grid Width="250">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown" >
+                        <i:InvokeCommandAction Command="{Binding MediaSelectedCommand}" CommandParameter="{Binding ElementName=imgImage, Path=DataContext}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Image Name="imgImage" Source="{Binding Path=Image}" VerticalAlignment="Center" HorizontalAlignment="Center"
+                       ToolTip="{Binding MediaInfo.FilePath}"/>
+                <Grid VerticalAlignment="Bottom">
+                    <Grid.Background>
+                        <SolidColorBrush Color="Black" Opacity="0.75" />
+                    </Grid.Background>
+                    <TextBlock Text="{Binding Path=MediaInfo.Name}" HorizontalAlignment="Left" 
+                           Foreground="White" Margin="5, 0, 0, 2" TextTrimming="CharacterEllipsis"
+                               Width="{Binding ActualWidth, ElementName=imgImage}"/>
+
+                </Grid>
+            </Grid>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid Background="{StaticResource colorBackground}">
@@ -807,6 +828,71 @@
                                  IsEnabled="{Binding ElementName=lbGroups, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" />
                             <Button Grid.Column="3" Content="New" Command="{Binding NewGroupCommand}" CommandParameter="{Binding ElementName=lbGroups}" />
                         </Grid>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Media">
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <ListBox Name="lbMediaPoints" Grid.Column="0" Grid.Row="0" BorderThickness="0"
+                                     ItemsSource="{Binding MediaInfo, Mode=OneWay}"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding MediaInfoChangedCommand}"
+                             CommandParameter="{Binding ElementName=lbMediaPoints, Path=SelectedItem}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Text="{Binding Title}" FontSize="18"/>
+                                        <TextBlock Grid.Row="1" Text="{Binding TotalMediaCount, StringFormat=Media: {0}}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <ListBox Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" ItemsSource="{Binding Tiles}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0">
+
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                <Grid Margin="2.5">
+                                                    <ContentPresenter />
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
                     </Grid>
                 </Border>
             </TabItem>

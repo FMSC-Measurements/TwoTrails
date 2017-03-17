@@ -758,7 +758,7 @@ namespace TwoTrails.DAL
                                 dr.GetDouble(3),
                                 dr.GetDouble(7),
                                 dr.GetDouble(8),
-                                dr.GetDouble(9));
+                                dr.GetDoubleN(9)??0);
                         }
 
                         dr.Close();

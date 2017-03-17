@@ -17,8 +17,7 @@ namespace TwoTrails.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            double val;
-            if (Double.TryParse(value as string, out val))
+            if (Double.TryParse(value as string, out double val))
                 return val;
 
             return null;

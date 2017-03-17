@@ -17,8 +17,10 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
+using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
+using static TwoTrails.Core.Media.MediaTools;
 
 namespace TwoTrails.ViewModels
 {
@@ -174,9 +176,22 @@ namespace TwoTrails.ViewModels
         public ICommand DeleteGroupCommand { get; }
 
 
+        public ObservableCollection<ImageTile> Tiles { get; }
+
+        private TtMediaInfo _CurrentMediaInfo;
+        public TtMediaInfo CurrentMediaInfo
+        {
+            get { return _CurrentMediaInfo; }
+            private set { SetField(ref _CurrentMediaInfo, value);}
+        }
+
+        public ICommand MediaInfoChangedCommand { get; }
+        public ICommand MediaSelectedCommand { get; }
+
         public ReadOnlyObservableCollection<TtPolygon> Polygons { get { return _Project.Manager.Polygons; } }
         public ReadOnlyObservableCollection<TtMetadata> Metadata { get { return _Project.Manager.Metadata; } }
         public ReadOnlyObservableCollection<TtGroup> Groups { get { return _Project.Manager.Groups; } }
+        public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get { return _Project.Manager.MediaInfo; } }
 
 
         public ProjectEditorModel(TtProject project)
@@ -239,6 +254,11 @@ namespace TwoTrails.ViewModels
                 poly.PolygonChanged += PolygonShapeChanged;
 
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += PolygonCollectionChanged;
+
+
+            Tiles = new ObservableCollection<ImageTile>();
+            MediaInfoChangedCommand = new RelayCommand(x => MediaInfoChanged(x as TtMediaInfo));
+            MediaSelectedCommand = new RelayCommand(x => MediaSelected(x as TtMediaInfo));
         }
 
         private void PolygonCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -286,9 +306,7 @@ namespace TwoTrails.ViewModels
         {
             if (accStr != null)
             {
-                double acc;
-
-                if (double.TryParse(accStr, out acc))
+                if (double.TryParse(accStr, out double acc))
                 {
                     PolygonAccuracy = acc;
                     return true;
@@ -379,9 +397,7 @@ namespace TwoTrails.ViewModels
         {
             if (zoneStr != null)
             {
-                int zone;
-
-                if (int.TryParse(zoneStr, out zone))
+                if (int.TryParse(zoneStr, out int zone))
                 {
                     MetadataZone = zone;
                     return true;
@@ -466,6 +482,39 @@ namespace TwoTrails.ViewModels
                     _Project.ProjectUpdated();
                 }
             }
+        }
+
+
+        private void MediaInfoChanged(TtMediaInfo mediaInfo)
+        {
+            CurrentMediaInfo = mediaInfo;
+
+            Tiles.Clear();
+            
+            foreach (TtImage image in CurrentMediaInfo.Images)
+            {
+                MediaTools.LoadImageAsync(_Project.MAL, image, new AsyncCallback(ImageLoaded));
+            }
+        }
+
+        private void MediaSelected(TtMediaInfo mediaInfo)
+        {
+            MessageBox.Show(mediaInfo.Title);
+        }
+
+        private void ImageLoaded(IAsyncResult res)
+        {
+            ImageAsyncResult iar = res as ImageAsyncResult;
+
+            _Project.MainModel.MainWindow.Dispatcher.Invoke(() =>
+            {
+                Tiles.Add(new ImageTile(iar.ImageInfo, iar.Image));
+                Tiles.Add(new ImageTile(iar.ImageInfo, iar.Image));
+                Tiles.Add(new ImageTile(iar.ImageInfo, iar.Image));
+                Tiles.Add(new ImageTile(iar.ImageInfo, iar.Image));
+                Tiles.Add(new ImageTile(iar.ImageInfo, iar.Image));
+                Tiles.Add(new ImageTile(iar.ImageInfo, iar.Image));
+            });
         }
     }
 }

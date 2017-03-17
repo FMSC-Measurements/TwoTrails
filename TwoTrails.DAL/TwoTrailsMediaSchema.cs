@@ -42,7 +42,7 @@ namespace TwoTrails.DAL
             public const String PointCN = "PointCN";
             public const String MediaType = "MediaType";
             public const String Name = "Name";
-            public const String FilePath = "FileName";
+            public const String FilePath = "FilePath";
             public const String CreationTime = "CreationTime";
             public const String Comment = "Comment";
             public const String IsExternal = "IsExternal";

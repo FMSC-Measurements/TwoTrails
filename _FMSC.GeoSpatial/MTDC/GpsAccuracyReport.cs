@@ -95,12 +95,9 @@ namespace FMSC.GeoSpatial.MTDC
 
         public Test(XElement elem)
         {
-            int tmpI = 0;
-            double tmpD = 0;
-
             ModelID = elem.Element("Model_ID").Value;
 
-            if (int.TryParse(elem.Element("position").Value, out tmpI))
+            if (int.TryParse(elem.Element("position").Value, out int tmpI))
                 Positions = tmpI;
             
             Glonass = ParseBool(elem.Element("glonass").Value);
@@ -111,7 +108,7 @@ namespace FMSC.GeoSpatial.MTDC
 
             PostProcessed = ParseBool(elem.Element("post_proc")?.Value);
             
-            if (double.TryParse(elem.Element("open_accu")?.Value, out tmpD))
+            if (double.TryParse(elem.Element("open_accu")?.Value, out double tmpD))
                 OpenAcc = tmpD;
 
             if (double.TryParse(elem.Element("med_accu")?.Value, out tmpD))

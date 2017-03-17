@@ -11,6 +11,7 @@ using TwoTrails.DAL;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using TwoTrails.Core.Media;
+using System.Windows.Media.Imaging;
 
 namespace TwoTrails.Core
 {
@@ -32,15 +33,19 @@ namespace TwoTrails.Core
         private Dictionary<String, PolygonGraphicOptions> _PolyGraphicOpts, _PolyGraphicOptsOrig;
         private Dictionary<String, DelayActionHandler> _PolygonUpdateHandlers;
 
+        private Dictionary<String, TtMediaInfo> _MediaMap, _MediaMapOrig;
+
         private ObservableCollection<TtPoint> _Points;
         private ObservableCollection<TtPolygon> _Polygons;
         private ObservableCollection<TtMetadata> _Metadata;
         private ObservableCollection<TtGroup> _Groups;
+        private ObservableCollection<TtMediaInfo> _MediaInfo;
 
         public ReadOnlyObservableCollection<TtPoint> Points { get; private set; }
         public ReadOnlyObservableCollection<TtPolygon> Polygons { get; private set; }
         public ReadOnlyObservableCollection<TtMetadata> Metadata { get; private set; }
         public ReadOnlyObservableCollection<TtGroup> Groups { get; private set; }
+        public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get; private set; }
 
 
         public TtGroup MainGroup { get; private set; }
@@ -61,6 +66,7 @@ namespace TwoTrails.Core
             _Activity = new TtUserActivity(_Settings.UserName, _Settings.DeviceName);
 
             Load();
+            LoadMedia();
         }
 
         public void ReplaceDAL(ITtDataLayer dal)
@@ -181,6 +187,41 @@ namespace TwoTrails.Core
 
             _Groups = new ObservableCollection<TtGroup>(_GroupsMap.Values);
             Groups = new ReadOnlyObservableCollection<TtGroup>(_Groups);
+        }
+
+        private void LoadMedia()
+        {
+            if (_MAL != null)
+            {
+                _MediaMap = new Dictionary<string, TtMediaInfo>();
+                _MediaMapOrig = new Dictionary<string, TtMediaInfo>();
+
+                _MediaInfo = new ObservableCollection<TtMediaInfo>();
+                MediaInfo = new ReadOnlyObservableCollection<TtMediaInfo>(_MediaInfo);
+
+                foreach (TtImage img in _MAL.GetImages())
+                {
+                    if (_MediaMap.ContainsKey(img.PointCN))
+                    {
+                        _MediaMap[img.PointCN].AddImage(img);
+                        _MediaMapOrig[img.PointCN].AddImage(img.DeepCopy());
+                    }
+                    else
+                    {
+                        if (_PointsMap.ContainsKey(img.PointCN))
+                        {
+                            TtMediaInfo mi = new TtMediaInfo(_PointsMap[img.PointCN]);
+                            mi.AddImage(img);
+                            _MediaMap.Add(img.PointCN, mi);
+                            _MediaInfo.Add(mi);
+
+                            mi = new TtMediaInfo(_PointsMapOrig[img.PointCN]);
+                            mi.AddImage(img.DeepCopy());
+                            _MediaMapOrig.Add(img.PointCN, mi);
+                        }
+                    }
+                }
+            }
         }
 
         protected void AttachMetadataEvents(TtMetadata meta)
@@ -1728,9 +1769,10 @@ namespace TwoTrails.Core
 
 
 
-        public List<TtImage> GetImages(string pointCN)
+        public List<TtImage> GetImages(string pointCN = null)
         {
-            throw new NotImplementedException();
+            return _MediaMap == null || !_MediaMap.ContainsKey(pointCN) ? new List<TtImage>() :
+                (pointCN == null ? _MediaMap.SelectMany(kvp => kvp.Value.Images) : _MediaMap[pointCN].Images).ToList();
         }
 
         public void InsertMedia(TtMedia media)

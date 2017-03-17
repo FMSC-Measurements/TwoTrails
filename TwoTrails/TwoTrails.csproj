@@ -176,6 +176,7 @@
     <Compile Include="Mapping\TtMapPolygon.cs" />
     <Compile Include="Mapping\TtMapPolygonManager.cs" />
     <Compile Include="Mapping\TtMapShape.cs" />
+    <Compile Include="Objects\ImageTile.cs" />
     <Compile Include="SessionData.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>

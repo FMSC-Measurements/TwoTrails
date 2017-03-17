@@ -346,7 +346,7 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
 
         private TtSqliteMediaAccessLayer GetMalIfExists(string dalFilePath)
         {
-            string malFilePath = Path.Combine(Path.GetFullPath(dalFilePath),
+            string malFilePath = Path.Combine(Path.GetDirectoryName(dalFilePath),
                                 $"{Path.GetFileNameWithoutExtension(dalFilePath)}{Consts.FILE_EXTENSION_MEDIA}");
 
             if (File.Exists(malFilePath))

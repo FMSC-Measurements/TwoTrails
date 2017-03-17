@@ -414,10 +414,8 @@ namespace TwoTrails.DAL
                 if (tmp.Contains("zone"))
                 {
                     tmp = tmp.Substring(tmp.IndexOf("zone") + 5, 2);
-
-                    int zone;
-
-                    if (Int32.TryParse(tmp, out zone))
+                    
+                    if (Int32.TryParse(tmp, out int zone))
                         return zone;
                 }
             }

@@ -90,18 +90,18 @@ namespace TwoTrails.DAL
             return version;
         }
 
-        public IEnumerable<TtImage> GetImages(string pointCN)
+        public IEnumerable<TtImage> GetImages(string pointCN = null)
         {
             if (_Database != null)
             {
-                String query = String.Format(@"select {1}.{0}, {2} from {1} left join {3} on {1}.{4} = {3}.{4} where {5} = '{6}'",
+                String query = String.Format(@"select {1}.{0}, {2} from {1} left join {3} on {1}.{4} = {3}.{4}{5}",
                     TwoTrailsMediaSchema.Media.SelectItems,
                     TwoTrailsMediaSchema.Media.TableName,
                     TwoTrailsMediaSchema.Images.SelectItemsNoCN,
                     TwoTrailsMediaSchema.Images.TableName,
                     TwoTrailsSchema.SharedSchema.CN,
-                    TwoTrailsMediaSchema.Media.PointCN,
-                    pointCN
+                    pointCN != null ? String.Format (" where {0} = '{1}'",
+                        TwoTrailsMediaSchema.Media.PointCN, pointCN) : String.Empty
                 );
 
                 using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
@@ -381,102 +381,54 @@ namespace TwoTrails.DAL
             }
         }
         
-        public BitmapImage LoadImage(TtImage image)
+        public BitmapImage GetImageData(TtImage image)
         {
             BitmapImage bitmap = new BitmapImage();
 
-            if (image.IsExternal)
+            if (_Database != null)
             {
-                if (File.Exists(image.FilePath))
-                {
-                        bitmap.BeginInit();
-                        bitmap.UriSource = new Uri(image.FilePath);
-                        bitmap.EndInit();
-                        return bitmap;
-                }
-                else
-                {
-                    throw new FileNotFoundException(image.FilePath);
-                }
-            }
-            else
-            {
-                if (_Database != null)
-                {
-                    String query = String.Format(@"select {0} from {1} where {2} = '{3}' limit 1",
-                        TwoTrailsMediaSchema.Data.SelectItems,
-                        TwoTrailsMediaSchema.Data.TableName,
-                        TwoTrailsMediaSchema.SharedSchema.CN,
-                        image.CN
-                    );
 
-                    using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                String query = String.Format(@"select {0} from {1} where {2} = '{3}' limit 1",
+                    TwoTrailsMediaSchema.Data.SelectItems,
+                    TwoTrailsMediaSchema.Data.TableName,
+                    TwoTrailsMediaSchema.SharedSchema.CN,
+                    image.CN
+                );
+
+                using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                {
+                    using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
                     {
-                        using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
+                        if (dr != null)
                         {
-                            if (dr != null)
+                            byte[] data = null;
+                            string cn, dataType;
+
+                            while (dr.Read())
                             {
-                                byte[] data = null;
-                                string cn, dataType;
+                                cn = dr.GetString(0);
+                                dataType = dr.GetString(1);
+                                data = dr.GetBytesEx(2);
 
-                                while (dr.Read())
-                                {
-                                    cn = dr.GetString(0);
-                                    dataType = dr.GetString(1);
-                                    data = dr.GetBytesEx(2);
+                                MemoryStream strmImg = new MemoryStream(data);
 
-                                    MemoryStream strmImg = new MemoryStream(data);
-
-                                    bitmap.BeginInit();
-                                    bitmap.StreamSource = strmImg;
-                                    bitmap.EndInit();
-                                }
-
+                                bitmap.BeginInit();
+                                bitmap.StreamSource = strmImg;
+                                bitmap.EndInit();
+                                bitmap.Freeze();
                             }
 
-                            dr.Close();
                         }
 
-                        conn.Close();
+                        dr.Close();
                     }
+
+                    conn.Close();
                 }
-
-                return bitmap;
             }
+
+            return bitmap;
         }
-
-        public Task<BitmapImage> LoadImageAsync(TtImage image, AsyncCallback callback)
-        {
-            return Task.Run(() => {
-                BitmapImage bi = LoadImage(image);
-
-                callback(new ImageAsyncResult(false, true, bi));
-
-                return bi;
-            });
-        }
-
-
-        public class ImageAsyncResult : IAsyncResult
-        {
-            public bool IsCompleted { get; private set; }
-
-            public WaitHandle AsyncWaitHandle { get; } = null;
-
-            public object AsyncState { get; private set; }
-
-            BitmapImage Image { get { return (BitmapImage)AsyncState; } }
-
-            public bool CompletedSynchronously { get; private set; }
-
-            public  ImageAsyncResult(bool competedSynchronously, bool isCompleted, object image)
-            {
-                IsCompleted = isCompleted;
-                CompletedSynchronously = competedSynchronously;
-                AsyncState = image;
-            }
-        }
-
 
         #region Utils
         public void Clean()
