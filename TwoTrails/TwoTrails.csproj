@@ -377,9 +377,11 @@
   <ItemGroup>
     <Resource Include="res\open_in_new.png" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Resource Include="res\close.png" />
+    <Resource Include="res\close_black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="res\close_white.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="res\ic_unadjusted_polygon_black_36dp.png" />

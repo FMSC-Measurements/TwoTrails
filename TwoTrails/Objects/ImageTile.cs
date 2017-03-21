@@ -1,8 +1,10 @@
-﻿using System;
+﻿using FMSC.Core.ComponentModel.Commands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using TwoTrails.Core.Media;
 
@@ -10,14 +12,19 @@ namespace TwoTrails
 {
     public class ImageTile
     {
-        public TtMedia MediaInfo { get; }
+        public ICommand OnClickCommand { get; }
+
+        public TtImage ImageInfo { get; }
 
         public BitmapImage Image { get; private set; }
 
-        public ImageTile(TtMedia mediaInfo, BitmapImage image)
+        public ImageTile(TtImage imageInfo, BitmapImage image, Action<object> action = null)
         {
-            MediaInfo = mediaInfo;
+            ImageInfo = imageInfo;
             Image = image;
+
+            if (action != null)
+                OnClickCommand = new RelayCommand(action);
         }
     }
 }

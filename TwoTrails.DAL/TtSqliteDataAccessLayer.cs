@@ -1766,7 +1766,7 @@ namespace TwoTrails.DAL
                 [TwoTrailsSchema.TtNmeaSchema.PDOP] = burst.PDOP,
                 [TwoTrailsSchema.TtNmeaSchema.HDOP] = burst.HDOP,
                 [TwoTrailsSchema.TtNmeaSchema.VDOP] = burst.VDOP,
-                [TwoTrailsSchema.TtNmeaSchema.HorizDilution] = burst.HorizDultion,
+                [TwoTrailsSchema.TtNmeaSchema.HorizDilution] = burst.HorizDilution,
                 [TwoTrailsSchema.TtNmeaSchema.GeiodHeight] = burst.GeoidHeight,
                 [TwoTrailsSchema.TtNmeaSchema.GeiodHeightUom] = (int)burst.GeoUom,
                 [TwoTrailsSchema.TtNmeaSchema.GroundSpeed] = burst.GroundSpeed,

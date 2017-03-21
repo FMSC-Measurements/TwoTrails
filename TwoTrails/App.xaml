@@ -11,7 +11,8 @@
         <cvt:InverseBooleanConverter x:Key="IBC"/>
 
         <BitmapImage x:Key="ImgOpenInNew" UriSource="res/open_in_new.png" />
-        <BitmapImage x:Key="ImgClose" UriSource="res/close.png" />
+        <BitmapImage x:Key="ImgCloseWhite" UriSource="res/close_white.png" />
+        <BitmapImage x:Key="ImgCloseBlack" UriSource="res/close_black.png" />
 
         <BitmapImage x:Key="ic_polygon_black" UriSource="res/ic_polygon_black_36dp.png" />
         <BitmapImage x:Key="ic_polygon_pts_black" UriSource="res/ic_polygon_pts_black_36dp.png" />

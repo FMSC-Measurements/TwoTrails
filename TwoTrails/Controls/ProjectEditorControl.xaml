@@ -19,21 +19,41 @@
 
         <DataTemplate DataType="{x:Type ttl:ImageTile}">
             <Grid Width="250">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseDown" >
-                        <i:InvokeCommandAction Command="{Binding MediaSelectedCommand}" CommandParameter="{Binding ElementName=imgImage, Path=DataContext}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <Image Name="imgImage" Source="{Binding Path=Image}" VerticalAlignment="Center" HorizontalAlignment="Center"
-                       ToolTip="{Binding MediaInfo.FilePath}"/>
-                <Grid VerticalAlignment="Bottom">
-                    <Grid.Background>
-                        <SolidColorBrush Color="Black" Opacity="0.75" />
-                    </Grid.Background>
-                    <TextBlock Text="{Binding Path=MediaInfo.Name}" HorizontalAlignment="Left" 
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDown">
+                            <i:InvokeCommandAction Command="{Binding OnClickCommand}"
+                             CommandParameter="{Binding ElementName=imgImage, Path=DataContext}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="False">
+                                    <Setter Property="Width" Value="240"/>
+                                    <Setter Property="Margin" Value="5"/>
+                                    <Setter Property="Opacity" Value=".9"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Width" Value="250"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="Opacity" Value="1"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    
+                    <Image Name="imgImage" Source="{Binding Path=Image}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Grid VerticalAlignment="Bottom">
+                        <Grid.Background>
+                            <SolidColorBrush Color="Black" Opacity="0.75" />
+                        </Grid.Background>
+                        <TextBlock Text="{Binding Path=ImageInfo.Name}" HorizontalAlignment="Stretch" TextAlignment="Center"
                            Foreground="White" Margin="5, 0, 0, 2" TextTrimming="CharacterEllipsis"
                                Width="{Binding ActualWidth, ElementName=imgImage}"/>
 
+                    </Grid>
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -869,8 +889,8 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
 
-                        <ListBox Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" ItemsSource="{Binding Tiles}"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0">
+                        <ListBox Name="lstMedia" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" ItemsSource="{Binding Tiles}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
 
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
@@ -878,9 +898,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                                <Grid Margin="2.5">
-                                                    <ContentPresenter />
-                                                </Grid>
+                                                <ContentPresenter />
                                             </ControlTemplate>
                                         </Setter.Value>
                                     </Setter>
@@ -893,6 +911,69 @@
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                         </ListBox>
+
+                        <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+                              Visibility="{Binding MediaViewerVisible, Converter={StaticResource BoolToVis}}">
+                            <Grid.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="2.5"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="2.5"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                            </Grid.Resources>
+                            
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Image Grid.ColumnSpan="6" Source="{Binding ElementName=lstMedia, Path=SelectedItem.Image}" />
+                            
+                            <Image Grid.Column="5" Source="{StaticResource ImgCloseBlack}" Stretch="Fill" Height="35" Width="35" VerticalAlignment="Top" HorizontalAlignment="Right">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction Command="{Binding HideMediaViewerCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Image>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Azimuth:" />
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.Azimuth}" IsReadOnly="True" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Pitch:" />
+                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.Pitch}" IsReadOnly="True" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="4" Text="Roll:" />
+                            <TextBox Grid.Row="1" Grid.Column="5" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.Roll}" IsReadOnly="True" />
+
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Time Created:" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.TimeCreated}" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="2" Text="Is External File:" />
+                            <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.IsExternal}" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="4" Text="Path:" />
+                            <TextBlock Grid.Row="2" Grid.Column="5" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.FilePath}" TextTrimming="WordEllipsis" />
+
+                            <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="6" MinLines="2" IsReadOnly="True" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.Comment}"/>
+                        </Grid>
                     </Grid>
                 </Border>
             </TabItem>

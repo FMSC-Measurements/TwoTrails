@@ -17,7 +17,7 @@ namespace TwoTrails.DAL
 {
     public class TtGpxDataAccessLayer : IReadOnlyTtDataLayer
     {
-        public Boolean RequiresUpgrade { get; } = false;
+        public Boolean RequiresUpgrade => false;
 
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
         private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
@@ -183,10 +183,22 @@ namespace TwoTrails.DAL
             }
         }
 
-        private IEnumerable<TtPoint> LinkPoints(IEnumerable<TtPoint> points)
+        private IEnumerable<TtPoint> GetLinkedPoints(IEnumerable<TtPoint> points)
         {
-            //TODO Link points
-            return points;
+            foreach (TtPoint point in _Points.Values)
+            {
+                if (point.OpType == OpType.Quondam)
+                {
+                    QuondamPoint qp = new QuondamPoint(point);
+
+                    if (_Points.ContainsKey(qp.ParentPointCN))
+                        qp.ParentPoint = _Points[qp.ParentPointCN].DeepCopy();
+
+                    yield return qp;
+                }
+
+                yield return point.DeepCopy();
+            }
         }
 
 
@@ -196,7 +208,7 @@ namespace TwoTrails.DAL
             
             IEnumerable<TtPoint> points = (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index);
 
-            return linked ? LinkPoints(points) : points;
+            return linked ? GetLinkedPoints(points) : points.DeepCopy(); ;
         }
 
         public bool HasPolygons()
@@ -210,7 +222,7 @@ namespace TwoTrails.DAL
         {
             Parse();
 
-            return _Polygons.Values;
+            return _Polygons.Values.DeepCopy();
         }
 
         public IEnumerable<TtMetadata> GetMetadata()
@@ -253,7 +265,6 @@ namespace TwoTrails.DAL
 
         public class ParseOptions
         {
-
             public string FilePath { get; }
             public bool UseElevation { get; set; }
             public UomElevation UomElevation { get; set; }

@@ -38,7 +38,7 @@ namespace TwoTrails.Core
         public UomElevation UomElevation { get { return _Position.UomElevation; } }
 
 
-        public double HorizDultion { get; }
+        public double HorizDilution { get; }
         public double GeoidHeight { get; }
         public UomElevation GeoUom { get; }
 
@@ -89,6 +89,35 @@ namespace TwoTrails.Core
 
 
 
+        public TtNmeaBurst(TtNmeaBurst burst)
+        {
+            TimeCreated = burst.TimeCreated;
+            PointCN = burst.PointCN;
+            IsUsed = burst.IsUsed;
+
+            _Position = new GeoPosition(burst.Position);
+
+            FixTime = burst.FixTime;
+            GroundSpeed = burst.GroundSpeed;
+            TrackAngle = burst.TrackAngle;
+            MagVar = burst.MagVar;
+            MagVarDir = burst.MagVarDir;
+
+            Mode = burst.Mode;
+            Fix = burst.Fix;
+            UsedSatelliteIDs = new List<int>(burst.UsedSatelliteIDs);
+            PDOP = burst.PDOP;
+            HDOP = burst.HDOP;
+            VDOP = burst.VDOP;
+
+            FixQuality = burst.FixQuality;
+            TrackedSatellitesCount = burst.TrackedSatellitesCount;
+            HorizDilution = burst.HorizDilution;
+            GeoidHeight = burst.GeoidHeight;
+            GeoUom = burst.GeoUom;
+
+            SatellitesInViewCount = burst.SatellitesInViewCount;
+        }
 
         public TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
                        GeoPosition position, DateTime fixTime, double groundSpeed, double trackAngle,
@@ -118,7 +147,7 @@ namespace TwoTrails.Core
 
             FixQuality = fixQuality;
             TrackedSatellitesCount = trackedSatellites;
-            HorizDultion = horizDilution;
+            HorizDilution = horizDilution;
             GeoidHeight = geoidHeight;
             GeoUom = geoUom;
 

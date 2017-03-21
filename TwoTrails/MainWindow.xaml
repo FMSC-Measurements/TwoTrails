@@ -184,7 +184,7 @@
                                                             BorderThickness="0" Style="{StaticResource styleTabButtonStyle}"
                                                             Command="{Binding CloseTabCommand}" CommandParameter="{Binding CurrentTab}">
                                                     <Border Style="{StaticResource styleTabButtonBorderStyle}">
-                                                        <Image Source="{StaticResource ImgClose}" Width="15" Height="15" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2"/>
+                                                        <Image Source="{StaticResource ImgCloseWhite}" Width="15" Height="15" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2"/>
                                                     </Border>
                                                 </Button>
 

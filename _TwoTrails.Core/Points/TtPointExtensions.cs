@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace TwoTrails.Core.Points
@@ -76,6 +77,12 @@ namespace TwoTrails.Core.Points
 
             return null;
         }
+
+        public static IEnumerable<TtPoint> DeepCopy(this IEnumerable<TtPoint> points)
+        {
+            return points.Select(p => p.DeepCopy());
+        }
+
 
         public static TtPoint CreatePoint(this OpType opType)
         {

@@ -1777,11 +1777,13 @@ namespace TwoTrails.Core
 
         public void InsertMedia(TtMedia media)
         {
+            //todo add media
             throw new NotImplementedException();
         }
 
         public void DeleteMedia(TtMedia media)
         {
+            //todo delete media
             throw new NotImplementedException();
         }
     }

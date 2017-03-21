@@ -17,7 +17,7 @@ namespace TwoTrails.DAL
 {
     public class TtCsvDataAccessLayer : IReadOnlyTtDataLayer
     {
-        public bool RequiresUpgrade { get; } = false;
+        public bool RequiresUpgrade => false;
 
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
         private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
@@ -411,10 +411,22 @@ namespace TwoTrails.DAL
             }
         }
 
-        private IEnumerable<TtPoint> LinkPoints(IEnumerable<TtPoint> points)
+        private IEnumerable<TtPoint> GetLinkedPoints(IEnumerable<TtPoint> points)
         {
-            //TODO Link points
-            return points;
+            foreach (TtPoint point in _Points.Values)
+            {
+                if (point.OpType == OpType.Quondam)
+                {
+                    QuondamPoint qp = new QuondamPoint(point);
+
+                    if (_Points.ContainsKey(qp.ParentPointCN))
+                        qp.ParentPoint = _Points[qp.ParentPointCN].DeepCopy();
+
+                    yield return qp;
+                }
+
+                yield return point.DeepCopy();
+            }
         }
 
         private int GetFieldColumn(IDictionary<PointTextFieldType, int> map, PointTextFieldType type, bool use)
@@ -462,10 +474,7 @@ namespace TwoTrails.DAL
                 String.Empty,
                 File.GetCreationTime(filePath));
         }
-
-
-
-
+        
 
         public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
         {
@@ -473,7 +482,7 @@ namespace TwoTrails.DAL
 
             IEnumerable<TtPoint> points = (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index);
 
-            return linked ? LinkPoints(points) : points;
+            return linked ? GetLinkedPoints(points) : points.DeepCopy();
         }
 
         public bool HasPolygons()
@@ -487,28 +496,28 @@ namespace TwoTrails.DAL
         {
             Parse();
 
-            return _Polygons.Values;
+            return _Polygons.Values.DeepCopy();
         }
 
         public IEnumerable<TtMetadata> GetMetadata()
         {
             Parse();
 
-            return _Metadata.Values;
+            return _Metadata.Values.DeepCopy();
         }
 
         public IEnumerable<TtGroup> GetGroups()
         {
             Parse();
 
-            return _Groups.Values;
+            return _Groups.Values.DeepCopy();
         }
 
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
         {
             Parse();
 
-            return (pointCN == null ? _Nmea.Values : _Nmea.Values.Where(n => n.PointCN == pointCN)).OrderBy(n => n.TimeCreated);
+            return (pointCN == null ? _Nmea.Values.DeepCopy() : _Nmea.Values.Where(n => n.PointCN == pointCN)).OrderBy(n => n.TimeCreated).DeepCopy();
         }
 
         public TtProjectInfo GetProjectInfo()

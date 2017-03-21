@@ -43,6 +43,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media\MediaTools.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtMediaExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtMediaInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\IAccuracy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IDeviceSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IMetadataSettings.cs" />

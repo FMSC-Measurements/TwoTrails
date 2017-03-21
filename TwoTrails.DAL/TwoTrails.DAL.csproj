@@ -97,6 +97,7 @@
     <Compile Include="ReadOnlyDALs\ParseMode.cs" />
     <Compile Include="ReadOnlyDALs\TtCsvDataAccessLayer.cs" />
     <Compile Include="ReadOnlyDALs\TtGpxDataAccessLayer.cs" />
+    <Compile Include="ReadOnlyDALs\TtKmlDataAccessLayer.cs" />
     <Compile Include="ReadOnlyDALs\TtShapeFileDataAccessLayer.cs" />
     <Compile Include="ReadOnlyDALs\TtV2SqliteDataAccessLayer.cs" />
     <Compile Include="TtSqliteMediaAccessLayer.cs" />
