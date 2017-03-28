@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -78,15 +79,31 @@ namespace TwoTrails.ViewModels
         private void BrowseFile()
         {
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Multiselect = false;
-            ofd.Filter = $@"Importable Files|*{Consts.FILE_EXTENSION}; *{Consts.FILE_EXTENSION_V2}; *.csv; *.txt; *.shp; *.gpx|
+            ofd.Multiselect = true;
+            ofd.Filter = $@"Importable Files|*{Consts.FILE_EXTENSION}; *{Consts.FILE_EXTENSION_V2}; *.csv; *.txt; *.shp; *.gpx; *.kml; *.kmz|
 TwoTrails files (*{Consts.FILE_EXTENSION};*{Consts.FILE_EXTENSION_V2})|*{Consts.FILE_EXTENSION}; *{Consts.FILE_EXTENSION_V2}|
-CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX Files (*.gpx)|*.gpx|All Files (*.*)|*.*";
+CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX Files (*.gpx)|*.gpx|Google Earth Files (*.kml *.kmz)|*.kml; *.kmz|All Files (*.*)|*.*";
 
             if (ofd.ShowDialog() == true)
             {
-                CurrentFile = ofd.FileName;
-                SetupImport(CurrentFile);
+                if (ofd.FileNames.Length > 1)
+                {
+                    foreach (string fn in ofd.FileNames)
+                    {
+                        if (!fn.EndsWith(".shp"))
+                        {
+                            MessageBox.Show("Only Shape Files can be imported in bulk.", "Import Files", MessageBoxButton.OK, MessageBoxImage.Stop);
+                            return;
+                        }
+                    }
+
+                    SetupShapeFiles(ofd.FileNames);
+                }
+                else
+                {
+                    CurrentFile = ofd.FileName;
+                    SetupImport(CurrentFile);
+                }
             }
         }
 
@@ -153,13 +170,58 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                         }
                     });
                     break;
+                case ".kml":
+                case ".kmz":
+                    {
+                        if (fileName.EndsWith(".kmz"))
+                        {
+                            string tempPath = Path.GetTempPath();
+
+                            ZipFile.ExtractToDirectory(fileName, tempPath);
+                            
+                            foreach (string file in Directory.GetFiles(tempPath))
+                            {
+                                if (file.EndsWith(".kml"))
+                                {
+                                    fileName = file;
+                                    break;
+                                }
+                            }
+
+                            if (!fileName.EndsWith(".kml"))
+                            {
+                                MessageBox.Show("Unable to extract KML from KMZ", "KMZ Extract Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
+                        }
+                        
+                        ImportControl = new ImportControl(new TtKmlDataAccessLayer(fileName));
+
+                        IsSettingUp = true;
+                        break;
+                    }
                 case ".shp":
+                    ImportControl = new ImportControl(
+                        new TtShapeFileDataAccessLayer(
+                            new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone)
+                        )
+                    );
                     IsSettingUp = true;
                     break;
                 default:
                     MessageBox.Show("File type not supported.");
                     break;
             }
+        }
+
+        private void SetupShapeFiles(IEnumerable<string> shapefiles)
+        {
+            ImportControl = new ImportControl(
+                        new TtShapeFileDataAccessLayer(
+                            new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone)
+                        )
+                    );
+            IsSettingUp = true;
         }
 
         public void ImportData()

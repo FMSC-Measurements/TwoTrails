@@ -58,7 +58,7 @@ namespace FMSC.Core.Xml.KML
 
                 //kml name
                 WriteStartElement("name");
-                WriteValue(doc.Name != null ? doc.Name : String.Empty);
+                WriteValue(doc.Name ?? String.Empty);
                 WriteEndElement();
 
                 //description
@@ -69,9 +69,7 @@ namespace FMSC.Core.Xml.KML
                 if (doc.Open != null)
                     WriteElementString("open", ConvertBool((bool)doc.Open).ToString());
 
-
-                if (doc.Properties != null)
-                    WriteProperties(doc.Properties);
+                WriteProperties(doc);
 
                 foreach (Style style in doc.Styles)
                     WriteStyle(style);
@@ -79,10 +77,10 @@ namespace FMSC.Core.Xml.KML
                 foreach (StyleMap map in doc.StyleMaps)
                     WriteStyleMap(map);
 
-                foreach (Folder subFolder in doc.SubFolders)
+                foreach (KmlFolder subFolder in doc.SubFolders)
                     WriteKmlFolder(subFolder);
 
-                foreach (Placemark pm in doc.PlaceMarks)
+                foreach (Placemark pm in doc.Placemarks)
                     WritePlacemark(pm);
 
                 //end document
@@ -98,7 +96,7 @@ namespace FMSC.Core.Xml.KML
             }
         }
 
-        public void WriteKmlFolder(Folder folder)
+        public void WriteKmlFolder(KmlFolder folder)
         {
             if (folder != null)
             {
@@ -117,10 +115,9 @@ namespace FMSC.Core.Xml.KML
                 if (folder.Open != null)
                     WriteElementString("open", ConvertBool((bool)folder.Open).ToString());
 
-                if (folder.Properties != null)
-                    WriteProperties(folder.Properties);
+                WriteProperties(folder);
 
-                foreach (Folder subFolder in folder.SubFolders)
+                foreach (KmlFolder subFolder in folder.SubFolders)
                     WriteKmlFolder(subFolder);
 
                 foreach (Placemark pm in folder.Placemarks)
@@ -181,8 +178,7 @@ namespace FMSC.Core.Xml.KML
                 if (pm.Open != null)
                     WriteElementString("open", ConvertBool((bool)pm.Open).ToString());
 
-                if (pm.Properties != null)
-                    WriteProperties(pm.Properties);
+                WriteProperties(pm);
 
 
                 if ((pm.Points.Count + pm.Polygons.Count) > 1)
@@ -193,7 +189,7 @@ namespace FMSC.Core.Xml.KML
                     {
                         WritePolygon(poly);
                     }
-                    foreach (Point point in pm.Points)
+                    foreach (KmlPoint point in pm.Points)
                     {
                         WritePoint(point);
                     }
@@ -210,10 +206,6 @@ namespace FMSC.Core.Xml.KML
                     else if (pm.Points.Count > 0)
                     {
                         WritePoint(pm.Points[0]);
-                    }
-                    else
-                    {
-                        //just point and polys for now
                     }
                 }
 
@@ -312,7 +304,7 @@ namespace FMSC.Core.Xml.KML
             }
         }
 
-        public void WritePoint(Point point)
+        public void WritePoint(KmlPoint point)
         {
             try
             {
@@ -370,7 +362,7 @@ namespace FMSC.Core.Xml.KML
 
                     if (style.IconColor != null)
                         WriteElementString("color", style.IconColor.ToString());
-                    if (style.IconUrl != null && style.IconUrl != "")
+                    if (!String.IsNullOrEmpty(style.IconUrl))
                     {
                         WriteStartElement("Icon");
                         WriteElementString("href", style.IconUrl);
@@ -552,7 +544,7 @@ namespace FMSC.Core.Xml.KML
             }
         }
 
-        public void WriteProperties(Properties prop)
+        public void WriteProperties(KmlProperties prop)
         {
             try
             {
@@ -746,8 +738,7 @@ namespace FMSC.Core.Xml.KML
 
         private string ConvertToKmlDateTime(DateTime dt)
         {
-            return $@"{dt.Year.ToString("D4")}-{dt.Month.ToString("D2")}-{dt.Day.ToString("D2")}T
-{dt.Hour.ToString("D2")}:{dt.Minute.ToString("D2")}:{dt.Second.ToString("D2")}Z";
+            return $@"{dt.Year.ToString("D4")}-{dt.Month.ToString("D2")}-{dt.Day.ToString("D2")}T{dt.Hour.ToString("D2")}:{dt.Minute.ToString("D2")}:{dt.Second.ToString("D2")}Z";
         }
         #endregion
 

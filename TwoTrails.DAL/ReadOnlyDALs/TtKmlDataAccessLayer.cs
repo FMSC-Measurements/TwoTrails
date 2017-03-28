@@ -57,5 +57,11 @@ namespace TwoTrails.DAL
         {
             throw new NotImplementedException();
         }
+
+
+        public TtKmlDataAccessLayer(string fileName)
+        {
+
+        }
     }
 }

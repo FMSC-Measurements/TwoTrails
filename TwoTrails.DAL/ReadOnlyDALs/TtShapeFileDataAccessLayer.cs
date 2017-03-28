@@ -28,17 +28,15 @@ namespace TwoTrails.DAL
         private TtProjectInfo _ProjectInfo;
 
         private readonly ParseOptions _Options;
-        private readonly int _Zone;
         private bool parsed;
         private int secondsInc = 0;
 
         private static object locker = new object();
 
 
-        public TtShapeFileDataAccessLayer(ParseOptions options, int projectZone)
+        public TtShapeFileDataAccessLayer(ParseOptions options)
         {
             _Options = options;
-            _Zone = projectZone;
 
             string filePath = options.ShapeFiles.First().ShapeFilePath;
             _ProjectInfo = new TtProjectInfo(Path.GetFileName(filePath),
@@ -145,9 +143,9 @@ namespace TwoTrails.DAL
                                         Polygon = poly
                                     };
 
-                                    if (file.Zone != _Zone && _Options.ConvertInvalidZones)
+                                    if (file.Zone != _Options.TargetZone && _Options.ConvertInvalidZones)
                                     {
-                                        UTMCoords c = UTMTools.ShiftZones(coord.X, coord.Y, _Zone, file.Zone);
+                                        UTMCoords c = UTMTools.ShiftZones(coord.X, coord.Y, _Options.TargetZone, file.Zone);
 
                                         gps.UnAdjX = c.X;
                                         gps.UnAdjY = c.Y;
@@ -242,9 +240,9 @@ namespace TwoTrails.DAL
                                         Polygon = poly
                                     };
 
-                                    if (file.Zone != _Zone && _Options.ConvertInvalidZones)
+                                    if (file.Zone != _Options.TargetZone && _Options.ConvertInvalidZones)
                                     {
-                                        UTMCoords c = UTMTools.ShiftZones(coord.X, coord.Y, _Zone, file.Zone);
+                                        UTMCoords c = UTMTools.ShiftZones(coord.X, coord.Y, _Options.TargetZone, file.Zone);
 
                                         gps.UnAdjX = c.X;
                                         gps.UnAdjY = c.Y;
@@ -465,15 +463,16 @@ namespace TwoTrails.DAL
                 }
             }
 
+            public int TargetZone { get; }
+
 
             public ParseOptions(string shapeFile, int targetZone) : this(new string[] { shapeFile }, targetZone) { }
 
             public ParseOptions(IEnumerable<string> shapeFiles, int targetZone)
             {
+                TargetZone = targetZone;
                 ShapeFiles = shapeFiles.Select(f => new ShapeFilePackage(f, targetZone));
             }
-
-
         }
 
         public class ShapeFilePackage

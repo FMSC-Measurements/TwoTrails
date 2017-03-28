@@ -83,14 +83,14 @@
     <Compile Include="Xml\KML\KmlColor.cs" />
     <Compile Include="Xml\KML\Coordinates.cs" />
     <Compile Include="Xml\KML\ExtendedData.cs" />
-    <Compile Include="Xml\KML\Folder.cs" />
+    <Compile Include="Xml\KML\KmlFolder.cs" />
     <Compile Include="Xml\KML\KmlDocument.cs" />
     <Compile Include="Xml\KML\KmlEnums.cs" />
     <Compile Include="Xml\KML\KmlWriter.cs" />
     <Compile Include="Xml\KML\Placemark.cs" />
-    <Compile Include="Xml\KML\Point.cs" />
+    <Compile Include="Xml\KML\KmlPoint.cs" />
     <Compile Include="Xml\KML\Polygon.cs" />
-    <Compile Include="Xml\KML\Properties.cs" />
+    <Compile Include="Xml\KML\KmlProperties.cs" />
     <Compile Include="Xml\KML\Style.cs" />
     <Compile Include="Xml\KML\StyleMap.cs" />
     <Compile Include="Xml\KML\View.cs" />

@@ -6,31 +6,26 @@ using System.Threading.Tasks;
 
 namespace FMSC.Core.Xml.KML
 {
-    public class Folder
+    public class KmlFolder : KmlProperties
     {
         #region Properties
-
-        public string Name { get; set; }
-        public string Desctription { get; set; }
-        public string StyleUrl { get; set; }
-        public Properties Properties { get; set; }
-        public bool? Open { get; set; }
-        public bool? Visibility { get; set; }
-
         public string CN { get; }
-        public List<Folder> SubFolders { get; } = new List<Folder>();
+        public List<KmlFolder> SubFolders { get; } = new List<KmlFolder>();
         public List<Placemark> Placemarks { get; } = new List<Placemark>();
         #endregion
 
         
-        public Folder(string name, string desc = null)
+        public KmlFolder(string name = null, string desc = null) : base(name, desc)
         {
-            Name = name;
             CN = Guid.NewGuid().ToString();
-
-            Desctription = desc;
         }
-
+        
+        public KmlFolder(KmlFolder folder) : base(folder)
+        {
+            CN = folder.CN;
+            SubFolders.AddRange(folder.SubFolders);
+            Placemarks.AddRange(folder.Placemarks);
+        }
 
         #region Methods
         
@@ -46,9 +41,9 @@ namespace FMSC.Core.Xml.KML
             }
         }
 
-        public Folder GetFolder(string cn) => SubFolders.FirstOrDefault(f => f.CN == cn);
+        public KmlFolder GetFolder(string cn) => SubFolders.FirstOrDefault(f => f.CN == cn);
 
-        public Folder GetFolderByName(string name) => SubFolders.FirstOrDefault(f => f.Name == name);
+        public KmlFolder GetFolderByName(string name) => SubFolders.FirstOrDefault(f => f.Name == name);
 
         
         public void RemovePlacemark(string cn)

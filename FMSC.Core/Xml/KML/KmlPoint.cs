@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FMSC.Core.Xml.KML
 {
-    public class Point
+    public class KmlPoint
     {
         public string CN { get; }
         public string Name { get; set; }
@@ -34,7 +34,7 @@ namespace FMSC.Core.Xml.KML
         }
 
         
-        public Point(Coordinates coordinates = new Coordinates(), AltitudeMode altMode = AltitudeMode.ClampToGround)
+        public KmlPoint(Coordinates coordinates = new Coordinates(), AltitudeMode altMode = AltitudeMode.ClampToGround)
         {
             CN = Guid.NewGuid().ToString();
             Coordinates = coordinates;
