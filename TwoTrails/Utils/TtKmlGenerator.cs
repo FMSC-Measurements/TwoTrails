@@ -79,19 +79,16 @@ namespace TwoTrails.Utils
 
                         Open = false,
                         Visibility = true,
-                        Properties = new FMSC.Core.Xml.KML.KmlProperties()
+                        Snippit = poly.Description,
+                        ExtendedData = new ExtendedData
                         {
-                            Snippit = poly.Description,
-                            ExtendedData = new ExtendedData
+                            DataItems = new List<ExtendedData.Data>()
                             {
-                                DataItems = new List<ExtendedData.Data>()
-                                {
-                                    new ExtendedData.Data("Accuracy (M)", poly.Accuracy),
-                                    new ExtendedData.Data("Perimeter (M)", poly.Perimeter),
-                                    new ExtendedData.Data("Perimeter (Ft)", poly.PerimeterFt),
-                                    new ExtendedData.Data("Area (Acres)", poly.AreaAcres),
-                                    new ExtendedData.Data("Area (HectaAcres)", poly.AreaHectaAcres)
-                                }
+                                new ExtendedData.Data("Accuracy (M)", poly.Accuracy),
+                                new ExtendedData.Data("Perimeter (M)", poly.Perimeter),
+                                new ExtendedData.Data("Perimeter (Ft)", poly.PerimeterFt),
+                                new ExtendedData.Data("Area (Acres)", poly.AreaAcres),
+                                new ExtendedData.Data("Area (HectaAcres)", poly.AreaHectaAcres)
                             }
                         }
                     };
@@ -228,10 +225,7 @@ namespace TwoTrails.Utils
                                 AltMode = AltitudeMode.ClampToGround,
                                 Range = 150
                             },
-                            Properties = new FMSC.Core.Xml.KML.KmlProperties()
-                            {
-                                Snippit = snippit
-                            },
+                            Snippit = snippit,
                             StyleUrl = style.AdjBndStyle.StyleUrl,
                             Open = false,
                             Visibility = true
@@ -251,16 +245,13 @@ namespace TwoTrails.Utils
                                 AltMode = AltitudeMode.ClampToGround,
                                 Range = 150
                             },
-                            Properties = new FMSC.Core.Xml.KML.KmlProperties()
-                            {
-                                Snippit = snippit
-                            },
+                            Snippit = snippit,
                             StyleUrl = style.AdjBndStyle.StyleUrl,
                             Open = false,
                             Visibility = false
                         };
 
-                        adjPm.Points.Add(new KmlPoint(unadjCoords));
+                        unadjPm.Points.Add(new KmlPoint(unadjCoords));
                         #endregion
 
                         #region Add Placemarks to Lists
@@ -344,10 +335,7 @@ namespace TwoTrails.Utils
                             Tilt = 5,
                             TimeSpan = pointTimespan
                         } : null,
-                        Properties = new FMSC.Core.Xml.KML.KmlProperties()
-                        {
-                            Snippit = poly.Description
-                        },
+                        Snippit = poly.Description,
                         Open = false,
                         Visibility = true,
                         StyleUrl = style.AdjBndStyle.StyleUrl
@@ -366,10 +354,7 @@ namespace TwoTrails.Utils
                             Tilt = 5,
                             TimeSpan = pointTimespan
                         } : null,
-                        Properties = new FMSC.Core.Xml.KML.KmlProperties()
-                        {
-                            Snippit = poly.Description
-                        },
+                        Snippit = poly.Description,
                         Open = false,
                         Visibility = false,
                         StyleUrl = style.UnAdjBndStyle.StyleUrl
@@ -388,10 +373,7 @@ namespace TwoTrails.Utils
                             Tilt = 5,
                             TimeSpan = pointTimespan
                         } : null,
-                        Properties = new FMSC.Core.Xml.KML.KmlProperties()
-                        {
-                            Snippit = poly.Description
-                        },
+                        Snippit = poly.Description,
                         Open = false,
                         Visibility = false,
                         StyleUrl = style.AdjNavStyle.StyleUrl
@@ -410,10 +392,7 @@ namespace TwoTrails.Utils
                             Tilt = 5,
                             TimeSpan = pointTimespan
                         } : null,
-                        Properties = new FMSC.Core.Xml.KML.KmlProperties()
-                        {
-                            Snippit = poly.Description
-                        },
+                        Snippit = poly.Description,
                         Open = false,
                         Visibility = false,
                         StyleUrl = style.UnAdjNavStyle.StyleUrl

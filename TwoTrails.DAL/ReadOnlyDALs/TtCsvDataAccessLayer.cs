@@ -1,14 +1,10 @@
 ﻿using CsvHelper;
 using FMSC.Core;
-using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
@@ -28,17 +24,15 @@ namespace TwoTrails.DAL
         private TtProjectInfo _ProjectInfo;
 
         private readonly ParseOptions _Options;
-        private readonly int _Zone;
         private bool parsed;
         private int secondsInc = 0;
 
         private static object locker = new object();
 
 
-        public TtCsvDataAccessLayer(ParseOptions options, int projectZone)
+        public TtCsvDataAccessLayer(ParseOptions options)
         {
             _Options = options;
-            _Zone = projectZone;
         }
 
         public void Parse(bool reparse = false)
@@ -62,7 +56,7 @@ namespace TwoTrails.DAL
                     ParseMetadata(_Options.MetadataFile);
                     ParseGroups(_Options.GroupsFile);
                     ParseNmea(_Options.NmeaFile);
-                    ParsePoints(_Options.PointsFile, _Options.PointMapping, _Options.Mode, _Zone);
+                    ParsePoints(_Options);
 
                     parsed = true;
                 } 
@@ -70,12 +64,12 @@ namespace TwoTrails.DAL
         }
 
 
-        private void ParsePoints(string filePath, IDictionary<PointTextFieldType, int> mapping, ParseMode mode, int zone)
+        private void ParsePoints(ParseOptions options)
         {
-            bool useAdvParsing = mode == ParseMode.Advanced;
+            bool useAdvParsing = options.Mode == ParseMode.Advanced;
 
-            mapping = mapping.Where(x => x.Value > -1).ToDictionary(x => x.Key, x => x.Value);
-
+            IDictionary<PointTextFieldType, int> mapping = _Options.PointMapping.Where(x => x.Value > -1).ToDictionary(x => x.Key, x => x.Value);
+            
             Dictionary<string, string> polyNameToCN = new Dictionary<string, string>();
             Dictionary<string, string> groupNameToCN = new Dictionary<string, string>();
 
@@ -136,7 +130,7 @@ namespace TwoTrails.DAL
 
             List<Tuple<string, QuondamPoint>> quondams = new List<Tuple<string, QuondamPoint>>();
 
-            CsvReader reader = new CsvReader(new StreamReader(filePath));
+            CsvReader reader = new CsvReader(new StreamReader(_Options.PointsFile));
 
             reader.Read();
 
@@ -208,12 +202,12 @@ namespace TwoTrails.DAL
                     point = new GpsPoint();
                 }
 
-                if (mode == ParseMode.LatLon)
+                if (_Options.Mode == ParseMode.LatLon)
                 {
                     ((GpsPoint)point).SetUnAdjLocation(
                         reader.GetField<double>(fLat),
                         reader.GetField<double>(fLon),
-                        zone,
+                        _Options.TargetZone,
                         hasElevation ? reader.GetField<double?>(fElev) ?? 0 : 0);
                 }
                 else
@@ -555,6 +549,8 @@ namespace TwoTrails.DAL
             public string MediaFile { get; }
             public string UserActivityFile { get; }
 
+            public int TargetZone { get; }
+
 
             private Dictionary<PointTextFieldType, int> _PointMapping { get; } = new Dictionary<PointTextFieldType, int>();
             public ReadOnlyDictionary<PointTextFieldType, int> PointMapping { get; }
@@ -582,10 +578,11 @@ namespace TwoTrails.DAL
 
 
 
-            public ParseOptions(string pointsFile, string projectFile = null, string polysFile = null, string metaFile = null,
+            public ParseOptions(string pointsFile, int targetZone, string projectFile = null, string polysFile = null, string metaFile = null,
                 string groupsFile = null, string nmeaFile = null, string mediaFile = null, string activityFile = null)
             {
                 PointsFile = pointsFile;
+                TargetZone = targetZone;
                 ProjectFile = projectFile;
                 PolygonsFile = polysFile;
                 MetadataFile = metaFile;

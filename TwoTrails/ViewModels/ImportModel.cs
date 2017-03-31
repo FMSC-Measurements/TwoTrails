@@ -173,31 +173,20 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                 case ".kml":
                 case ".kmz":
                     {
-                        if (fileName.EndsWith(".kmz"))
+                        try
                         {
-                            string tempPath = Path.GetTempPath();
+                            ImportControl = new ImportControl(
+                                new TtKmlDataAccessLayer(
+                                    new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true)
+                            ));
 
-                            ZipFile.ExtractToDirectory(fileName, tempPath);
-                            
-                            foreach (string file in Directory.GetFiles(tempPath))
-                            {
-                                if (file.EndsWith(".kml"))
-                                {
-                                    fileName = file;
-                                    break;
-                                }
-                            }
-
-                            if (!fileName.EndsWith(".kml"))
-                            {
-                                MessageBox.Show("Unable to extract KML from KMZ", "KMZ Extract Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                                return;
-                            }
+                            IsSettingUp = true;
                         }
-                        
-                        ImportControl = new ImportControl(new TtKmlDataAccessLayer(fileName));
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Earth File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
 
-                        IsSettingUp = true;
                         break;
                     }
                 case ".shp":

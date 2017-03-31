@@ -13,7 +13,7 @@ namespace FMSC.Core.Xml.KML
         public View View { get; set; }
         
         public List<Polygon> Polygons { get; } = new List<Polygon>();
-        public List<KmlPoint> Points = new List<KmlPoint>();
+        public List<KmlPoint> Points { get; } = new List<KmlPoint>();
         #endregion
         
 

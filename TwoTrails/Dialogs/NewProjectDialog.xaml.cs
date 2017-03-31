@@ -64,7 +64,7 @@ namespace TwoTrails.Dialogs
                     String fileName = txtName.Text;
 
                     if (!fileName.EndsWith(Consts.FILE_EXTENSION))
-                        fileName = $"fileName{Consts.FILE_EXTENSION}";
+                        fileName = $"{fileName}{Consts.FILE_EXTENSION}";
 
                     if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0)
                     {

@@ -16,7 +16,6 @@ namespace TwoTrails.ViewModels
         private Action<TtGpxDataAccessLayer> OnSetup { get; }
 
         public ParseOptions Options { get; }
-        private int Zone { get; }
         public ICommand SetupImportCommand { get; }
 
 
@@ -26,14 +25,13 @@ namespace TwoTrails.ViewModels
 
             SetupImportCommand = new RelayCommand(x => SetupImport());
 
-            Options = new ParseOptions(fileName);
-            Zone = zone;
+            Options = new ParseOptions(fileName, zone);
         }
 
 
         private void SetupImport()
         {
-            OnSetup(new TtGpxDataAccessLayer(Options, Zone));
+            OnSetup(new TtGpxDataAccessLayer(Options));
         }
     }
 }

@@ -38,8 +38,8 @@ namespace FMSC.Core.Xml.KML
         public void WriteStartKml()
         {
             WriteStartElement("kml");
-            WriteAttributeString("xlmns", "http://www.opengis.net/kml/2.2");
-            WriteAttributeString("xlmns:gx", "http://www.google.com/kml/ext/2.2");
+            WriteAttributeString("xmlns", "http://www.opengis.net/kml/2.2");
+            WriteAttributeString("xmlns:gx", "http://www.google.com/kml/ext/2.2");
             _open = true;
         }
 

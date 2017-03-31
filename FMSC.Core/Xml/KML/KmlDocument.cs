@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -93,7 +94,36 @@ namespace FMSC.Core.Xml.KML
         public static KmlDocument Load(String path)
         {
             XmlDocument doc = new XmlDocument();
-            doc.Load(path);
+            
+            if (path.EndsWith(".kmz"))
+            {
+                string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, true);
+
+                Directory.CreateDirectory(tempDir);
+
+                ZipFile.ExtractToDirectory(path, tempDir);
+
+                foreach (string file in Directory.GetFiles(tempDir))
+                {
+                    if (file.EndsWith(".kml"))
+                    {
+                        path = file;
+                        break;
+                    }
+                }
+
+                if (!path.EndsWith(".kml"))
+                    throw new Exception("Unable to extract KML from KMZ");
+
+                doc.Load(path);
+
+                Directory.Delete(tempDir, true);
+            }
+            else
+                doc.Load(path);
 
             return Load(doc);
         }
@@ -106,17 +136,24 @@ namespace FMSC.Core.Xml.KML
             return Load(doc);
         }
 
-        public static KmlDocument Load(XmlDocument doc)
+        public static KmlDocument Load(XmlDocument xmlDocument)
         {
-            KmlFolder folder = ParseFolder(doc);
-            KmlDocument kdoc = new KmlDocument(folder);
+            KmlDocument kdoc = null;
+            XmlNodeList list = xmlDocument.GetElementsByTagName("Document");
 
-            foreach (XmlNode node in doc.ChildNodes)
+            if (list.Count > 0)
             {
-                switch (node.Name.ToLower())
+                XmlNode head = list[0];
+                kdoc = new KmlDocument(ParseFolder(head));
+                
+                foreach (XmlNode node in head)
                 {
-                    case "style": kdoc.Styles.Add(ParseStyle(node)); break;
-                    case "stylemap": kdoc.StyleMaps.Add(ParseStyleMap(node)); break;
+                    string name = node.Name.ToLower();
+                    switch (name)
+                    {
+                        case "style": kdoc.Styles.Add(ParseStyle(node)); break;
+                        case "stylemap": kdoc.StyleMaps.Add(ParseStyleMap(node)); break;
+                    }
                 }
             }
 
@@ -148,10 +185,10 @@ namespace FMSC.Core.Xml.KML
 
             foreach (XmlNode node in xnode.ChildNodes)
             {
-                string name = node.Attributes["name"]?.Value;
+                string name = node.Attributes["name"]?.FirstChild.Value;
                 if (name != null)
                 {
-                    data.AddData(new ExtendedData.Data(name, node.Value));
+                    data.AddData(new ExtendedData.Data(name, node.FirstChild.Value));
                 }
             }
 
@@ -160,7 +197,7 @@ namespace FMSC.Core.Xml.KML
 
         private static Placemark ParsePlacemark(XmlNode xnode)
         {
-            Placemark placemark = new Placemark(xnode.Attributes[ATTR_ID]?.Value);
+            Placemark placemark = new Placemark(xnode.Attributes[ATTR_ID]?.FirstChild.Value);
 
             foreach (XmlNode node in xnode.ChildNodes)
             {
@@ -214,12 +251,14 @@ namespace FMSC.Core.Xml.KML
         private static Polygon ParsePolygon(XmlNode xnode)
 
         {
-            Polygon poly = new Polygon(xnode.Attributes[ATTR_ID]?.Value);
+            Polygon poly = new Polygon(xnode.Attributes[ATTR_ID]?.FirstChild.Value);
             poly.IsPath = xnode.Name.Equals("linestring", StringComparison.InvariantCultureIgnoreCase);
             
             Func<string, List<Coordinates>> parseCoods = (coordsStr) =>
             {
-                string[] coordVals = coordsStr.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                if (coordsStr == null)
+                    return null;
+                string[] coordVals = coordsStr.Split(new char[] { '\n', '\r', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                 List<Coordinates> coords = new List<Coordinates>();
 
@@ -250,19 +289,19 @@ namespace FMSC.Core.Xml.KML
                 switch (node.Name.ToLower())
                 {
                     case "tessellate":
-                        if (Int32.TryParse(node.Value, out int tes))
+                        if (Int32.TryParse(node.FirstChild.Value, out int tes))
                             poly.Tessellate = tes;
                         break;
                     case "extrude":
-                        if (Int32.TryParse(node.Value, out int ext))
+                        if (Int32.TryParse(node.FirstChild.Value, out int ext))
                             poly.Extrude = ext;
                         break;
                     case "altitudeMode":
-                        if (Enum.TryParse(node.Value, out AltitudeMode mode))
+                        if (Enum.TryParse(node.FirstChild.Value, out AltitudeMode mode))
                             poly.AltMode = mode;
                         break;
-                    case "outerboundaryis": poly.OuterBoundary = parseCoods(node.ChildNodes[0].Value); break;
-                    case "innerboundaryis": poly.InnerBoundary = parseCoods(node.ChildNodes[0].Value); break;
+                    case "outerboundaryis": poly.OuterBoundary = parseCoods(node.FirstChild?.FirstChild?.FirstChild?.Value); break;
+                    case "innerboundaryis": poly.InnerBoundary = parseCoods(node.FirstChild?.FirstChild?.FirstChild?.Value); break;
                 }
             }
 
@@ -273,23 +312,23 @@ namespace FMSC.Core.Xml.KML
         {
             KmlPoint point = new KmlPoint();
             if (xnode.Attributes.Count > 0)
-                point.Name = xnode.Attributes[ATTR_ID]?.Value;
+                point.Name = xnode.Attributes[ATTR_ID]?.FirstChild.Value;
 
             foreach (XmlNode node in xnode.ChildNodes)
             {
                 switch (node.Name.ToLower())
                 {
                     case "extrude":
-                        if (Int32.TryParse(node.Value, out int ext))
+                        if (Int32.TryParse(node.FirstChild.Value, out int ext))
                             point.Extrude = ext;
                         break;
                     case "altitudeMode":
-                        if (Enum.TryParse(node.Value, out AltitudeMode mode))
+                        if (Enum.TryParse(node.FirstChild.Value, out AltitudeMode mode))
                             point.AltMode = mode;
                         break;
                     case "coordinates":
                         {
-                            string[] c = node.Value.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                            string[] c = node.FirstChild.Value.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
                             if (c.Length > 0)
                             {
                                 string[] v = c[0].Split(',').Select(y => y.Trim()).ToArray();
@@ -317,7 +356,7 @@ namespace FMSC.Core.Xml.KML
 
         private static Style ParseStyle(XmlNode xnode)
         {
-            Style style = new Style(xnode.Attributes[ATTR_ID]?.Value);
+            Style style = new Style(xnode.Attributes[ATTR_ID]?.FirstChild.Value);
             
             foreach (XmlNode node in xnode.ChildNodes)
             {
@@ -326,26 +365,26 @@ namespace FMSC.Core.Xml.KML
                     #region IconStyle
                     case "iconstyle":
                         {
-                            style.IconID = node.Attributes[ATTR_ID]?.Value;
+                            style.IconID = node.Attributes[ATTR_ID]?.FirstChild.Value;
 
                             foreach (XmlNode inode in node.ChildNodes)
                             {
                                 switch (inode.Name.ToLower())
                                 {
-                                    case VAL_ICON: style.IconUrl = inode.ChildNodes[0]?.Value; break;
-                                    case VAL_COLOR: style.IconColor = new KmlColor(inode.Value, true); break;
-                                    case VAL_COLOR_MODE:style.IconColorMode = (ColorMode)Enum.Parse(typeof(ColorMode), inode.Value, true); break;
-                                    case VAL_SCALE: style.IconScale = double.Parse(inode.Value); break;
-                                    case VAL_HEADING: style.IconHeading = double.Parse(inode.Value); break;
+                                    case VAL_ICON: style.IconUrl = inode.ChildNodes[0]?.FirstChild.Value; break;
+                                    case VAL_COLOR: style.IconColor = new KmlColor(inode.FirstChild.Value, true); break;
+                                    case VAL_COLOR_MODE:style.IconColorMode = (ColorMode)Enum.Parse(typeof(ColorMode), inode.FirstChild.Value, true); break;
+                                    case VAL_SCALE: style.IconScale = double.Parse(inode.FirstChild.Value); break;
+                                    case VAL_HEADING: style.IconHeading = double.Parse(inode.FirstChild.Value); break;
                                     case VAL_HOTSPOT:
                                         {
-                                            if (double.TryParse(inode.Attributes[ATTR_X]?.Value, out double x))
+                                            if (double.TryParse(inode.Attributes[ATTR_X]?.FirstChild.Value, out double x))
                                             {
-                                                if (double.TryParse(inode.Attributes[ATTR_Y]?.Value, out double y))
+                                                if (double.TryParse(inode.Attributes[ATTR_Y]?.FirstChild.Value, out double y))
                                                 {
-                                                    if (Enum.TryParse(inode.Attributes[ATTR_XU]?.Value, out XYUnitType xu))
+                                                    if (Enum.TryParse(inode.Attributes[ATTR_XU]?.FirstChild.Value, out XYUnitType xu))
                                                     {
-                                                        if (Enum.TryParse(inode.Attributes[ATTR_YU]?.Value, out XYUnitType yu))
+                                                        if (Enum.TryParse(inode.Attributes[ATTR_YU]?.FirstChild.Value, out XYUnitType yu))
                                                         {
                                                             style.IconHotSpot = new HotSpot(x, y, xu, yu);
                                                         }
@@ -362,15 +401,15 @@ namespace FMSC.Core.Xml.KML
                     #region LabelStyle
                     case "labelstyle":
                         {
-                            style.LabelID = node.Attributes[ATTR_ID]?.Value;
+                            style.LabelID = node.Attributes[ATTR_ID]?.FirstChild.Value;
 
                             foreach (XmlNode inode in node.ChildNodes)
                             {
                                 switch (inode.Name.ToLower())
                                 {
-                                    case VAL_COLOR: style.LabelColor = new KmlColor(inode.Value, true); break;
-                                    case VAL_COLOR_MODE: style.LabelColorMode = (ColorMode)Enum.Parse(typeof(ColorMode), inode.Value, true); break;
-                                    case VAL_SCALE: style.LabelScale = double.Parse(inode.Value); break;
+                                    case VAL_COLOR: style.LabelColor = new KmlColor(inode.FirstChild.Value, true); break;
+                                    case VAL_COLOR_MODE: style.LabelColorMode = (ColorMode)Enum.Parse(typeof(ColorMode), inode.FirstChild.Value, true); break;
+                                    case VAL_SCALE: style.LabelScale = double.Parse(inode.FirstChild.Value); break;
                                 }
                             }
                         }
@@ -379,19 +418,19 @@ namespace FMSC.Core.Xml.KML
                     #region LineStyle
                     case "linestyle":
                         {
-                            style.LineID = node.Attributes[ATTR_ID]?.Value;
+                            style.LineID = node.Attributes[ATTR_ID]?.FirstChild.Value;
 
                             foreach (XmlNode inode in node.ChildNodes)
                             {
                                 switch (inode.Name.ToLower())
                                 {
-                                    case VAL_COLOR: style.LineColor = new KmlColor(inode.Value, true); break;
-                                    case VAL_COLOR_MODE: style.LineColorMode = (ColorMode)Enum.Parse(typeof(ColorMode), inode.Value, true); break;
-                                    case VAL_WIDTH: style.LineWidth = double.Parse(inode.Value); break;
-                                    case VAL_OUTER_COLOR: style.LineColorMode = (ColorMode)Enum.Parse(typeof(ColorMode), inode.Value, true); break;
-                                    case VAL_OUTER_WIDTH: style.LineOuterWidth = double.Parse(inode.Value); break;
-                                    case VAL_PHYSICAL_WIDTH: style.LinePhysicalWidth = double.Parse(inode.Value); break;
-                                    case VAL_VISIBILITY: style.LineLabelVisibility = bool.Parse(inode.Value); break; 
+                                    case VAL_COLOR: style.LineColor = new KmlColor(inode.FirstChild.Value, true); break;
+                                    case VAL_COLOR_MODE: style.LineColorMode = (ColorMode)Enum.Parse(typeof(ColorMode), inode.FirstChild.Value, true); break;
+                                    case VAL_WIDTH: style.LineWidth = double.Parse(inode.FirstChild.Value); break;
+                                    case VAL_OUTER_COLOR: style.LineColorMode = (ColorMode)Enum.Parse(typeof(ColorMode), inode.FirstChild.Value, true); break;
+                                    case VAL_OUTER_WIDTH: style.LineOuterWidth = double.Parse(inode.FirstChild.Value); break;
+                                    case VAL_PHYSICAL_WIDTH: style.LinePhysicalWidth = double.Parse(inode.FirstChild.Value); break;
+                                    case VAL_VISIBILITY: style.LineLabelVisibility = bool.Parse(inode.FirstChild.Value); break; 
                                 }
                             }
                         }
@@ -400,16 +439,16 @@ namespace FMSC.Core.Xml.KML
                     #region PolygonStyle
                     case "polygonstyle":
                         {
-                            style.PolygonID = node.Attributes[ATTR_ID]?.Value;
+                            style.PolygonID = node.Attributes[ATTR_ID]?.FirstChild.Value;
 
                             foreach (XmlNode inode in node.ChildNodes)
                             {
                                 switch (inode.Name.ToLower())
                                 {
-                                    case VAL_COLOR: style.PolygonColor = new KmlColor(inode.Value, true); break;
-                                    case VAL_COLOR_MODE: style.PolygonColorMode = (ColorMode)Enum.Parse(typeof(ColorMode), inode.Value, true); break;
-                                    case VAL_FILL: style.PolygonFill = bool.Parse(inode.Value); break;
-                                    case VAL_OUTLINE: style.PolygonOutline = bool.Parse(inode.Value); break;
+                                    case VAL_COLOR: style.PolygonColor = new KmlColor(inode.FirstChild.Value, true); break;
+                                    case VAL_COLOR_MODE: style.PolygonColorMode = (ColorMode)Enum.Parse(typeof(ColorMode), inode.FirstChild.Value, true); break;
+                                    case VAL_FILL: style.PolygonFill = bool.Parse(inode.FirstChild.Value); break;
+                                    case VAL_OUTLINE: style.PolygonOutline = bool.Parse(inode.FirstChild.Value); break;
                                 }
                             }
                         }
@@ -418,16 +457,16 @@ namespace FMSC.Core.Xml.KML
                     #region BalloonStyle
                     case "balloonstyle":
                         {
-                            style.BalloonID = node.Attributes[ATTR_ID]?.Value;
+                            style.BalloonID = node.Attributes[ATTR_ID]?.FirstChild.Value;
 
                             foreach (XmlNode inode in node.ChildNodes)
                             {
                                 switch (inode.Name.ToLower())
                                 {
-                                    case VAL_BGCOLOR: style.BalloonBgColor = new KmlColor(inode.Value, true); break;
-                                    case VAL_TEXT_COLOR: style.BalloonTextColor = new KmlColor(inode.Value, true); break;
-                                    case VAL_TEXT: style.BalloonText = inode.Value; break;
-                                    case VAL_DISPLAY_MODE: style.BalloonDisplayMode = (DisplayMode)Enum.Parse(typeof(DisplayMode), inode.Value, true); break;
+                                    case VAL_BGCOLOR: style.BalloonBgColor = new KmlColor(inode.FirstChild.Value, true); break;
+                                    case VAL_TEXT_COLOR: style.BalloonTextColor = new KmlColor(inode.FirstChild.Value, true); break;
+                                    case VAL_TEXT: style.BalloonText = inode.FirstChild.Value; break;
+                                    case VAL_DISPLAY_MODE: style.BalloonDisplayMode = (DisplayMode)Enum.Parse(typeof(DisplayMode), inode.FirstChild.Value, true); break;
                                 }
                             }
                         }
@@ -436,14 +475,14 @@ namespace FMSC.Core.Xml.KML
                     #region ListStyle
                     case "liststyle":
                         {
-                            style.ListID = node.Attributes[ATTR_ID]?.Value;
+                            style.ListID = node.Attributes[ATTR_ID]?.FirstChild.Value;
 
                             foreach (XmlNode inode in node.ChildNodes)
                             {
                                 switch (inode.Name.ToLower())
                                 {
-                                    case VAL_LIST_ITEM_TYPE: style.ListListItemType = (ListItemType)Enum.Parse(typeof(ListItemType), inode.Value, true); break;
-                                    case VAL_BGCOLOR: style.ListBgColor = new KmlColor(inode.Value, true); break;
+                                    case VAL_LIST_ITEM_TYPE: style.ListListItemType = (ListItemType)Enum.Parse(typeof(ListItemType), inode.FirstChild.Value, true); break;
+                                    case VAL_BGCOLOR: style.ListBgColor = new KmlColor(inode.FirstChild.Value, true); break;
 
                                     case VAL_ITEM_ICON:
                                         {
@@ -451,8 +490,8 @@ namespace FMSC.Core.Xml.KML
                                             {
                                                 switch (znode.Name.ToLower())
                                                 {
-                                                    case VAL_STATE: style.ListItemState = (State)Enum.Parse(typeof(State), znode.Value, true); break;
-                                                    case VAL_HREF: style.ListItemIconUrl = znode.ChildNodes[0]?.Value; break;
+                                                    case VAL_STATE: style.ListItemState = (State)Enum.Parse(typeof(State), znode.FirstChild.Value, true); break;
+                                                    case VAL_HREF: style.ListItemIconUrl = znode.ChildNodes[0]?.FirstChild.Value; break;
                                                 }
                                             }
                                             break;
@@ -470,7 +509,7 @@ namespace FMSC.Core.Xml.KML
 
         private static StyleMap ParseStyleMap(XmlNode xnode)
         {
-            StyleMap map = new StyleMap(xnode.Attributes[ATTR_ID]?.Value);
+            StyleMap map = new StyleMap(xnode.Attributes[ATTR_ID]?.FirstChild.Value);
 
             foreach (XmlNode node in xnode.ChildNodes)
             {
@@ -483,8 +522,8 @@ namespace FMSC.Core.Xml.KML
                     {
                         switch (inode.Name.ToLower())
                         {
-                            case "key": isHighlight = inode.Value.ToLower() != "normal"; break;
-                            case "styleurl": url = inode.Value; break;
+                            case "key": isHighlight = inode.FirstChild.Value.ToLower() != "normal"; break;
+                            case "styleurl": url = inode.FirstChild.Value; break;
                         }
                     }
 
@@ -512,44 +551,44 @@ namespace FMSC.Core.Xml.KML
                 {
                     case "latitude":
                         {
-                            if (double.TryParse(node.Value, out double xlat))
+                            if (double.TryParse(node.FirstChild.Value, out double xlat))
                                 lat = xlat;
                             break;
                         }
                     case "longitude":
                         {
-                            if (double.TryParse(node.Value, out double xlon))
+                            if (double.TryParse(node.FirstChild.Value, out double xlon))
                                 lon = xlon;
                             break;
                         }
                     case "altitude":
                         {
-                            if (double.TryParse(node.Value, out double xalt))
+                            if (double.TryParse(node.FirstChild.Value, out double xalt))
                                 alt = xalt;
                             break;
                         }
                     case "heading":
                         {
-                            if (double.TryParse(node.Value, out double head))
+                            if (double.TryParse(node.FirstChild.Value, out double head))
                                 view.Heading = head;
                             break;
                         }
                     case "tilt":
                         {
-                            if (double.TryParse(node.Value, out double tilt))
+                            if (double.TryParse(node.FirstChild.Value, out double tilt))
                                 view.Tilt = tilt;
                             break;
                         }
                     case "range":
                         {
-                            if (double.TryParse(node.Value, out double range))
+                            if (double.TryParse(node.FirstChild.Value, out double range))
                                 view.Range = range;
                             break;
                         }
                     case "altitudemode":
                     case "gx:altitudemode":
                         {
-                            if (Enum.TryParse(node.Value, out AltitudeMode mode))
+                            if (Enum.TryParse(node.FirstChild.Value, out AltitudeMode mode))
                                 view.AltMode = mode;
                             break;
                         }
@@ -562,11 +601,11 @@ namespace FMSC.Core.Xml.KML
                                 name = inode.Name.ToLower();
                                 if (name == "begin")
                                 {
-                                    start = ParseKmlDate(inode.Value);
+                                    start = ParseKmlDate(inode.FirstChild.Value);
                                 }
                                 else if (name == "end")
                                 {
-                                    end = ParseKmlDate(inode.Value);
+                                    end = ParseKmlDate(inode.FirstChild.Value);
                                 }
                             }
 
@@ -577,7 +616,7 @@ namespace FMSC.Core.Xml.KML
                             }
                             break;
                         }
-                    case "gx:timestamp": view.TimeStamp = ParseKmlDate(node.Value); break;
+                    case "gx:timestamp": view.TimeStamp = ParseKmlDate(node.FirstChild.Value); break;
                 } 
             }
 
@@ -591,36 +630,41 @@ namespace FMSC.Core.Xml.KML
         {
             switch (name)
             {
-                case "name": properties.Name = xnode.Value; break;
-                case "description": properties.Desctription = ParseCData(xnode.Value); break;
-                case "styleurl": properties.StyleUrl = xnode.Value; break;
+                case "name": properties.Name = xnode.FirstChild.Value; break;
+                case "description": properties.Desctription = ParseCData(xnode.FirstChild.Value); break;
+                case "styleurl": properties.StyleUrl = xnode.FirstChild.Value; break;
                 case "visibility":
-                    if (Boolean.TryParse(xnode.Value, out bool vis))
+                    if (Boolean.TryParse(xnode.FirstChild.Value, out bool vis))
                         properties.Visibility = vis;
                     break;
                 case "open":
-                    if (Boolean.TryParse(xnode.Value, out bool open))
+                    if (Boolean.TryParse(xnode.FirstChild.Value, out bool open))
                         properties.Open = open;
                     break;
 
-                case "author": properties.Author = xnode.Value; break;
-                case "link": properties.Link = xnode.Value; break;
-                case "address": properties.Address = xnode.Value; break;
+                case "author": properties.Author = xnode.FirstChild.Value; break;
+                case "link": properties.Link = xnode.FirstChild.Value; break;
+                case "address": properties.Address = xnode.FirstChild.Value; break;
                 case "snippit":
                     {
-                        properties.Snippit = xnode.Value;
-                        if (Int32.TryParse(xnode.Attributes["maxLines"]?.Value, out int ml))
+                        properties.Snippit = xnode.FirstChild.Value;
+                        if (Int32.TryParse(xnode.Attributes["maxLines"]?.FirstChild.Value, out int ml))
                             properties.SnippitMaxLines = ml;
                         break;
                     }
-                case "region": properties.Region = xnode.Value; break;
+                case "region": properties.Region = xnode.FirstChild.Value; break;
                 case "extendeddata": properties.ExtendedData = ParseExtendedData(xnode); break;
             }
         }
 
         private static string ParseCData(string text)
         {
-            return text.Remove(text.Length - 3, 3).Remove(0, 9);
+            if (String.IsNullOrWhiteSpace(text))
+                return String.Empty;
+            else if (text.StartsWith("<!"))
+                return text.Remove(text.Length - 3, 3).Remove(0, 9);
+            else
+                return text;
         }
 
         private static DateTime? ParseKmlDate(string kmldate)

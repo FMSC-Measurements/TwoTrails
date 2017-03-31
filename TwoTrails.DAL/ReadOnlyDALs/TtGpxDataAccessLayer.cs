@@ -25,17 +25,15 @@ namespace TwoTrails.DAL
         private TtProjectInfo _ProjectInfo;
 
         private readonly ParseOptions _Options;
-        private readonly int _Zone;
         private bool parsed;
         private int secondsInc = 0;
 
         private static object locker = new object();
 
 
-        public TtGpxDataAccessLayer(ParseOptions options, int projectZone)
+        public TtGpxDataAccessLayer(ParseOptions options)
         {
             _Options = options;
-            _Zone = projectZone;
             _ProjectInfo = new TtProjectInfo(Path.GetFileName(options.FilePath),
                 String.Empty,
                 String.Empty,
@@ -133,7 +131,7 @@ namespace TwoTrails.DAL
                                                     point.Index = index++;
                                                     point.OnBoundary = true;
 
-                                                    UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(lat, lon, _Zone);
+                                                    UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(lat, lon, _Options.TargetZone);
 
                                                     point.SetUnAdjLocation(
                                                         coords.X,
@@ -269,10 +267,12 @@ namespace TwoTrails.DAL
             public bool UseElevation { get; set; }
             public UomElevation UomElevation { get; set; }
 
+            public int TargetZone { get; }
 
-            public ParseOptions(string filePath, bool useElevation = false, UomElevation uomElevation = UomElevation.Feet)
+            public ParseOptions(string filePath, int targetZone, bool useElevation = false, UomElevation uomElevation = UomElevation.Feet)
             {
                 FilePath = filePath;
+                TargetZone = targetZone;
                 UseElevation = useElevation;
                 UomElevation = uomElevation;
             }

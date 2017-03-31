@@ -17,7 +17,6 @@ namespace TwoTrails.ViewModels
         private Action<TtCsvDataAccessLayer> OnSetup { get; }
 
         private ParseOptions Options { get; }
-        private int Zone { get; }
 
         public List<string> Fields { get; }
 
@@ -170,8 +169,7 @@ namespace TwoTrails.ViewModels
 
             SetupImportCommand = new BindedRelayCommand<CsvImportModel>(x => SetupImport(), x => CanImport, this, x => x.CanImport);
 
-            Options = new ParseOptions(fileName);
-            Zone = zone;
+            Options = new ParseOptions(fileName, zone);
 
             Fields = new List<string>();
             Fields.Add("No Field");
@@ -295,7 +293,7 @@ namespace TwoTrails.ViewModels
 
         private void SetupImport()
         {
-            OnSetup(new TtCsvDataAccessLayer(Options, Zone));
+            OnSetup(new TtCsvDataAccessLayer(Options));
         }
 
 

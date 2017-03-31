@@ -70,7 +70,7 @@ namespace TwoTrails.Core.Points
 
                     if (oldPoly != null && value != null)
                     {
-                        PointPolygonChanged.Invoke(this, value, oldPoly);
+                        PointPolygonChanged?.Invoke(this, value, oldPoly);
                     }
                 }
             }
