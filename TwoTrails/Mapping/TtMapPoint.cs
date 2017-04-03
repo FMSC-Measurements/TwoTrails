@@ -293,7 +293,7 @@ namespace TwoTrails.Mapping
             {
                 if (point.Metadata == null)
                 {
-                    Debug.WriteLine($"Point {point.PID} has no Metadata. ({point.CN})");
+                    Trace.WriteLine($"Point {point.PID} has no Metadata. ({point.CN})");
                     return;
                 }
                 else

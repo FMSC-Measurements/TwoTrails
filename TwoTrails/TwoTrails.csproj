@@ -36,6 +36,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\TwoTrailsIcon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CSUtilSlim">
       <HintPath>..\libs\CSUtilSlim.dll</HintPath>
@@ -398,6 +401,9 @@
   <ItemGroup>
     <Resource Include="res\ic_ttpoint_way_black.png" />
     <Resource Include="res\ic_ttpoint_way_white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TwoTrailsIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.103\build\net46\System.Data.SQLite.Core.targets')" />

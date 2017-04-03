@@ -34,7 +34,9 @@ namespace TwoTrails
             _Listener.WriteLine($"TwoTrails Started ({Assembly.GetExecutingAssembly().GetName().Version}|{TwoTrailsSchema.SchemaVersion}D)");
 
             Trace.Listeners.Add(_Listener);
+#if DEBUG
             Debug.Listeners.Add(_Listener);
+#endif
 
             AppDomain.CurrentDomain.UnhandledException += (s, ue) =>
             {
