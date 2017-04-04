@@ -51,6 +51,14 @@ namespace TwoTrails
         {
             _Listener.WriteLine("TwoTrails Exit");
             _Listener.Flush();
+
+            try
+            {
+                if (Directory.Exists(Consts.TEMP_DIR))
+                    Directory.Delete(Consts.TEMP_DIR, true);
+            }
+            catch { }
+
             base.OnExit(e);
         }
     }

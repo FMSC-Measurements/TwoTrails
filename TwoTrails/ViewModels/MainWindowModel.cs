@@ -145,6 +145,7 @@ namespace TwoTrails.ViewModels
 
         public ICommand ImportCommand { get; private set; }
         public ICommand ExportCommand { get; private set; }
+        public ICommand OpenInEarthCommand { get; private set; }
 
         public ICommand SettingsCommand { get; private set; }
         
@@ -176,6 +177,7 @@ namespace TwoTrails.ViewModels
 
             ImportCommand = new RelayCommand(x => ImportData());
             ExportCommand = new RelayCommand(x => ExportProject());
+            OpenInEarthCommand = new RelayCommand(x => OpenInGoogleEarth());
 
             SettingsCommand = new RelayCommand(x => OpenSettings());
 
@@ -540,6 +542,50 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
         private void ExportProject()
         {
             ExportDialog.ShowDialog(CurrentProject, MainWindow);
+        }
+
+        private void OpenInGoogleEarth()
+        {
+            Action createAndOpenKmz = () =>
+            {
+                try
+                {
+                    if (!Directory.Exists(Consts.TEMP_DIR))
+                        Directory.CreateDirectory(Consts.TEMP_DIR);
+
+                    string file = Path.Combine(Consts.TEMP_DIR, $"{Guid.NewGuid().ToString()}.kmz");
+                    Export.KMZ(CurrentProject, file);
+
+                    if (File.Exists(file))
+                        Process.Start(file);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.Message, "MainWindowModel:OpenInGoogleEarth");
+                    MessageBox.Show("An Error launching Google Earth has occured. Please see log file for details.");
+                }
+            };
+
+            try
+            {
+                if (CoreUtils.IsApplictionInstalled("Google Earth") || CoreUtils.IsApplictionInstalled("Google Earth Pro"))
+                {
+                    createAndOpenKmz();
+                }
+                else
+                {
+                    if (MessageBox.Show("Google Earth is not installed. Would you like to install it now?", "Google Earth Not Found",
+                        MessageBoxButton.OKCancel, MessageBoxImage.Hand) == MessageBoxResult.OK)
+                    {
+                        Process.Start("www.google.com/earth/");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message, "MainWindowModel:OpenInGoogleEarth");
+                createAndOpenKmz();
+            }
         }
 
         private void OpenSettings()

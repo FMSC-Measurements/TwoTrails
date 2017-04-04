@@ -107,6 +107,7 @@
                     <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                    <MenuItem Header="Open in Google Earth" Command="{Binding OpenInEarthCommand}" IsEnabled="{Binding HasOpenedProject}" />
                 </MenuItem>
 
                 <MenuItem Header="_Tools">

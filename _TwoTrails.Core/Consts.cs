@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace TwoTrails.Core
     {
         public const String DATE_FORMAT = "M/d/yyyy h:mm:ss.SSS";
 
-        public static readonly String EmptyGuid = "00000000-0000-0000-0000-000000000000";
+        public const String EmptyGuid = "00000000-0000-0000-0000-000000000000";
         public const String FullGuid = "11111111-1111-1111-1111-111111111111";
 
         public const double MINIMUM_POINT_DIGIT_ACCURACY = 0.000001d;
@@ -24,5 +25,8 @@ namespace TwoTrails.Core
 
         public const String FILE_EXTENSION_V2 = ".tt2";
         public const String FILE_EXTENSION_FILTER_V2 = "TwoTrails2 Files (*.tt2)|*.tt2";
+
+        private static String _TEMP_DIR = null;
+        public static String TEMP_DIR { get; } = _TEMP_DIR??(_TEMP_DIR = Path.Combine(Path.GetTempPath(), "TwoTrails\\Temp\\"));
     }
 }
