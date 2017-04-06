@@ -33,6 +33,7 @@ namespace TwoTrails.ViewModels
         public ICommand ResetPointCommand { get; }
         public ICommand DeleteCommand { get; }
 
+        public ICommand CreatePointCommand { get; }
         public ICommand CreateQuondamsCommand { get; }
         public ICommand MovePointsCommand { get; }
         public ICommand RetraceCommand { get; }
@@ -47,6 +48,7 @@ namespace TwoTrails.ViewModels
 
         public ICommand CopyCellValueCommand { get; }
         public ICommand ExportValuesCommand { get; }
+        public ICommand ViewPointDetailsCommand { get; }
         #endregion
 
         #region Properties
@@ -461,6 +463,8 @@ namespace TwoTrails.ViewModels
                 x => ExportValues(x as DataGrid), x => HasSelection,
                 this, x => x.HasSelection);
 
+            ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
+
             ChangeQuondamParentCommand = new BindedRelayCommand<DataEditorModel>(
                 x => ChangeQuondamParent(), x => OnlyQuondams && !MultipleSelections,
                 this, x => new { x.OnlyQuondams, x.MultipleSelections });
@@ -480,6 +484,8 @@ namespace TwoTrails.ViewModels
             DeleteCommand = new BindedRelayCommand<DataEditorModel>(
                 x => DeletePoint(), x => HasSelection,
                 this, x => x.HasSelection);
+
+            CreatePointCommand = new RelayCommand(x => CreateNewPoint());
 
             CreateQuondamsCommand = new BindedRelayCommand<DataEditorModel>(
                 x => CreateQuondams(), x => HasSelection,
@@ -1367,6 +1373,11 @@ namespace TwoTrails.ViewModels
         }
         
 
+        private void CreateNewPoint()
+        {
+            //todo create new point dialog
+        }
+
         private void CreateQuondams()
         {
             Project.MainModel.MainWindow.IsEnabled = false;
@@ -1425,6 +1436,11 @@ namespace TwoTrails.ViewModels
                 if (tb != null)
                     Clipboard.SetText(tb.Text);
             }
+        }
+
+        private void ViewPointDetails()
+        {
+            PointDetailsDialog.ShowDialog(SelectedPoints.Cast<TtPoint>().ToList(), Project.MainModel.MainWindow);
         }
         #endregion
 

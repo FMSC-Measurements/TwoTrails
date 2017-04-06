@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Collections\ObservableConvertedCollection.cs" />
     <Compile Include="ComponentModel\BindableMenuItem.cs" />
+    <Compile Include="ComponentModel\BindingProxy.cs" />
     <Compile Include="ComponentModel\CheckedListItem.cs" />
     <Compile Include="ComponentModel\Commands\BindedRelayCommand.cs" />
     <Compile Include="ComponentModel\Commands\RelayCommand.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Types\SampleType.cs" />
     <Compile Include="Types\Slope.cs" />
     <Compile Include="TypeTools.cs" />
+    <Compile Include="Utilities\CoreUtils.cs" />
     <Compile Include="Utilities\DelayActionHandler.cs" />
     <Compile Include="Xml\GPX\BaseTrack.cs" />
     <Compile Include="Xml\GPX\Document.cs" />

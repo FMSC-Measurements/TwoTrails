@@ -134,6 +134,9 @@
     <Compile Include="Controls\MapControl.xaml.cs">
       <DependentUpon>MapControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PointDetailsControl.xaml.cs">
+      <DependentUpon>PointDetailsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ProjectEditorControl.xaml.cs">
       <DependentUpon>ProjectEditorControl.xaml</DependentUpon>
     </Compile>
@@ -159,6 +162,9 @@
     </Compile>
     <Compile Include="Dialogs\MtdcDataDialog.xaml.cs">
       <DependentUpon>MtdcDataDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\PointDetailsDialog.xaml.cs">
+      <DependentUpon>PointDetailsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\PointLocManipDialog.xaml.cs">
       <DependentUpon>PointLocManipDialog.xaml</DependentUpon>
@@ -254,6 +260,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\PointDetailsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\ProjectEditorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -283,6 +293,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\NewProjectDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\PointDetailsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

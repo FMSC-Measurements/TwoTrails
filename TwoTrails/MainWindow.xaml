@@ -106,8 +106,9 @@
                 <MenuItem Header="_Data">
                     <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                    <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                    <MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Open in Google Earth" Command="{Binding OpenInEarthCommand}" IsEnabled="{Binding HasOpenedProject}" />
+                    <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                 </MenuItem>
 
                 <MenuItem Header="_Tools">
@@ -115,7 +116,8 @@
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
 
                     <Separator/>
-                    
+                    <MenuItem Header="Create New Point" Command="{Binding CurrentEditor.CreatePointCommand}"
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
                     <MenuItem Header="Create Quondams" Command="{Binding CurrentEditor.CreateQuondamsCommand}"
                         Style="{StaticResource ResourceKey=styleMiPointEdit}"/>
                     <MenuItem Header="Move Points" Command="{Binding CurrentEditor.MovePointsCommand}"

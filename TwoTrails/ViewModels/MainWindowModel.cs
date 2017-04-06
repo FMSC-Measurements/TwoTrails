@@ -145,6 +145,7 @@ namespace TwoTrails.ViewModels
 
         public ICommand ImportCommand { get; private set; }
         public ICommand ExportCommand { get; private set; }
+        public ICommand ViewPointDetailsCommand { get; private set; }
         public ICommand OpenInEarthCommand { get; private set; }
 
         public ICommand SettingsCommand { get; private set; }
@@ -177,6 +178,7 @@ namespace TwoTrails.ViewModels
 
             ImportCommand = new RelayCommand(x => ImportData());
             ExportCommand = new RelayCommand(x => ExportProject());
+            ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
             OpenInEarthCommand = new RelayCommand(x => OpenInGoogleEarth());
 
             SettingsCommand = new RelayCommand(x => OpenSettings());
@@ -542,6 +544,11 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
         private void ExportProject()
         {
             ExportDialog.ShowDialog(CurrentProject, MainWindow);
+        }
+
+        private void ViewPointDetails()
+        {
+            PointDetailsDialog.ShowDialog(CurrentProject.Manager.GetPoints(), MainWindow);
         }
 
         private void OpenInGoogleEarth()

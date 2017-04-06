@@ -281,11 +281,14 @@
                     <DataGridTextColumn Header="UnAdjY" IsReadOnly="True" Binding="{Binding UnAdjY, StringFormat={}{0:0.###}}" Visibility="Collapsed"/>
                     <DataGridTextColumn Header="UnAdjZ (M)" IsReadOnly="True" Binding="{Binding UnAdjZ, StringFormat={}{0:0.###}}" Visibility="Collapsed"/>
                     <DataGridTextColumn Header="QndmLink" IsReadOnly="True" Binding="{Binding HasQuondamLinks,StringFormat=F3}"/>
+                    <DataGridTextColumn Header="Created" IsReadOnly="True" Binding="{Binding TimeCreated}" Visibility="Collapsed"/>
                     <DataGridTextColumn Header="Comment" IsReadOnly="True" Binding="{Binding Comment}" Visibility="Collapsed"/>
                 </DataGrid.Columns>
 
                 <DataGrid.ContextMenu>
                     <ContextMenu>
+                        <MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}" />
+
                         <MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
                                   CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}" />
                         <MenuItem Header="Export Point Values" Command="{Binding ExportValuesCommand}" 

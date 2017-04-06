@@ -26,7 +26,7 @@ namespace TwoTrails.Core.Points
             set { SetField(ref _BkAzimuth, AzimuthModule(value), AdjustAzimuth); }
         }
 
-        private Double _Azimuth = -1;
+        private Double _Azimuth = 0;
         public Double Azimuth { get { return _Azimuth; } }
 
 

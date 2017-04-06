@@ -32,7 +32,7 @@ namespace TwoTrails
                 switch (_ProjectEditorControl.tabControl.SelectedIndex)
                 {
                     case 1:
-                        return $"{Project.DataEditor.Points.Count}/{Project.DataEditor.SelectedPoints.Count}";
+                        return $"{Project.DataEditor.SelectedPoints.Count}/{Project.DataEditor.Points.Count}";
                     case 2:
                         {
                             TtPolygon poly = _ProjectEditorControl.lbPolys.SelectedItem as TtPolygon;
