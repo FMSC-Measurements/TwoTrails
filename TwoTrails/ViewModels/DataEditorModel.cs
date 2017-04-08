@@ -1375,7 +1375,7 @@ namespace TwoTrails.ViewModels
 
         private void CreateNewPoint()
         {
-            //todo create new point dialog
+            CreatePointDialog.ShowDialog(Manager, null, Project.MainModel.MainWindow);
         }
 
         private void CreateQuondams()
