@@ -417,7 +417,6 @@ namespace TwoTrails.DAL
                                 bitmap.EndInit();
                                 bitmap.Freeze();
                             }
-
                         }
 
                         dr.Close();

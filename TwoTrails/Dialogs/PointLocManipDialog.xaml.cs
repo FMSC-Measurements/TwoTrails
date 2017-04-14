@@ -53,7 +53,7 @@ namespace TwoTrails.Dialogs
 
         private void btnCancelClick(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void btnCommitClick(object sender, RoutedEventArgs e)
@@ -82,7 +82,7 @@ namespace TwoTrails.Dialogs
                         _Manager.MovePointsToPolygon(_Points, targetPoly, index, reverse);
                     } 
 
-                    this.Close(); 
+                    Close(); 
                 }
             }
             else
