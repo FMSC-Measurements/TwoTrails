@@ -1324,13 +1324,14 @@ namespace TwoTrails.Core
                     TtPoint replacedPoint = _PointsMap[point.CN];
 
                     DetachPointEvents(replacedPoint);
-                    _Points.Add(replacedPoint);
+                    _Points.Remove(replacedPoint);
 
                     points[point.Index] = point;
                     _PointsMap[point.CN] = point;
-                    _Points.Add(point);
 
-                    AttachPointEvents(point);
+                    AttachPoint(point);
+
+                    _Points.Add(point);
 
                     if (!polysToAdjustTravsIn.Contains(point.Polygon) &&
                         (point.IsTravType() ||

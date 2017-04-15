@@ -35,6 +35,7 @@ namespace TwoTrails.ViewModels
 
         public ICommand CreatePointCommand { get; }
         public ICommand CreateQuondamsCommand { get; }
+        public ICommand ConvertQuondamsCommand { get; }
         public ICommand MovePointsCommand { get; }
         public ICommand RetraceCommand { get; }
         public ICommand CreatePlotsCommand { get; }
@@ -490,6 +491,10 @@ namespace TwoTrails.ViewModels
             CreateQuondamsCommand = new BindedRelayCommand<DataEditorModel>(
                 x => CreateQuondams(), x => HasSelection,
                 this, x => x.HasSelection);
+
+            ConvertQuondamsCommand = new BindedRelayCommand<DataEditorModel>(
+                x => ConvertQuondams(), x => OnlyQuondams,
+                this, x => x.OnlyQuondams);
 
             MovePointsCommand = new BindedRelayCommand<DataEditorModel>(
                 x => MovePoints(), x => HasSelection,
@@ -1382,6 +1387,47 @@ namespace TwoTrails.ViewModels
         {
             Project.MainModel.MainWindow.IsEnabled = false;
             PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), true, false, null, Project.MainModel.MainWindow, () => Project.MainModel.MainWindow.IsEnabled = true);
+        }
+
+        private void ConvertQuondams()
+        {
+            Func<QuondamPoint, GpsPoint> convertPoint = (q) =>
+            {
+                GpsPoint gps = new GpsPoint(), tmp;
+
+                gps.SetUnAdjLocation(q.ParentPoint);
+                
+                if (q.ParentPoint.IsGpsType())
+                {
+                    tmp = q.ParentPoint as GpsPoint;
+                    gps.Latitude = tmp.Latitude;
+                    gps.Longitude = tmp.Longitude;
+                    gps.Elevation = tmp.Elevation;
+                }
+
+                if (q.ParentPoint is IManualAccuracy && q.ManualAccuracy == null)
+                    gps.ManualAccuracy = (q.ParentPoint as IManualAccuracy).ManualAccuracy;
+                else
+                    gps.ManualAccuracy = q.ManualAccuracy;
+
+                gps.CN = q.CN;
+                gps.PID = q.PID;
+                gps.Index = q.Index;
+                gps.Polygon = q.Polygon;
+                gps.Metadata = q.Metadata;
+                gps.Group = q.Group;
+                gps.Comment = string.IsNullOrWhiteSpace(q.Comment) ? q.ParentPoint.Comment : q.Comment;
+                gps.OnBoundary = q.OnBoundary;
+                gps.TimeCreated = DateTime.Now;
+                gps.SetAccuracy(q.Polygon.Accuracy);
+
+                return gps;
+            };
+
+            if (MultipleSelections)
+                Manager.ReplacePoints(GetSortedSelectedPoints().Select(p => convertPoint(p as QuondamPoint)));
+            else
+                Manager.ReplacePoint(convertPoint(SelectedPoint as QuondamPoint));
         }
 
         private void MovePoints()

@@ -501,7 +501,7 @@ namespace TwoTrails.ViewModels
                 {
                     MediaTools.LoadImageAsync(_Project.MAL, image, new AsyncCallback(ImageLoaded));
                 }
-                catch (FileNotFoundException ex)
+                catch // (FileNotFoundException ex)
                 {
                     //
                 }

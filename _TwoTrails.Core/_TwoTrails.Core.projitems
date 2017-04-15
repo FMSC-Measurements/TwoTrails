@@ -21,7 +21,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MovePointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MultiTtCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ReplaceTtPointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPolygonCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPointMultiPropertyCommand.cs" />
@@ -35,7 +37,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtPointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtPolygonCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ReplaceTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HaidLogic.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IReadOnlyTtMediaLayer.cs" />

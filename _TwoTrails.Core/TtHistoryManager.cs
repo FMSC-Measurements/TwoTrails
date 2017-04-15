@@ -306,14 +306,15 @@ namespace TwoTrails.Core
         #endregion
         
 
-        void ITtManager.ReplacePoint(TtPoint point)
+        public void ReplacePoint(TtPoint point)
         {
-            BaseManager.ReplacePoint(point);
+
+            AddCommand(new ReplaceTtPointCommand(point, BaseManager));
         }
 
-        void ITtManager.ReplacePoints(IEnumerable<TtPoint> replacePoints)
+        public void ReplacePoints(IEnumerable<TtPoint> points)
         {
-            BaseManager.ReplacePoints(replacePoints);
+            AddCommand(new ReplaceTtPointsCommand(points, BaseManager));
         }
         
         public void RebuildPolygon(TtPolygon polygon, bool reindex = false)

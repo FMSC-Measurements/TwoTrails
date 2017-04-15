@@ -302,6 +302,7 @@
 
                         <MenuItem Header="Move" Command="{Binding MovePointsCommand}" />
                         <MenuItem Header="Quondam" Command="{Binding CreateQuondamsCommand}" />
+                        <MenuItem Header="Convert" Command="{Binding ConvertQuondamsCommand}" ToolTip="Convert Quondams to GPS Points" />
 
                         <Separator/>
 

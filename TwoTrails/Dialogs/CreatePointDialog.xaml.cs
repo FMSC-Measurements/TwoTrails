@@ -93,26 +93,28 @@ namespace TwoTrails.Dialogs
             {
                 if (double.TryParse(txt2.Text, out double b))
                 {
-                    bool elevIsEmpty = String.IsNullOrWhiteSpace(txt3.Text);
-                    if (elevIsEmpty || double.TryParse(txt3.Text, out double c))
+                    double elev = 0;
+                    if (String.IsNullOrWhiteSpace(txt3.Text) || double.TryParse(txt3.Text, out elev))
                     {
                         TtPolygon poly = cboPoly.SelectedItem as TtPolygon;
                         TtMetadata meta = cboMeta.SelectedItem as TtMetadata;
                         TtGroup group = cboGroup.SelectedItem as TtGroup;
 
                         TtPoint prevPoint = null;
+                        int index = 0;
 
                         if (rbInsAft.IsChecked == true)
                         {
-                            prevPoint = cboPolyPoints.Items.GetItemAt(cboPolyPoints.SelectedIndex) as TtPoint;
+                            index = cboPolyPoints.SelectedIndex;
+                            prevPoint = cboPolyPoints.Items.GetItemAt(index) as TtPoint;
+                            index++;
                         }
                         else if (rbInsEnd.IsChecked == true)
                         {
-                            prevPoint = cboPolyPoints.Items.GetItemAt(cboPolyPoints.Items.Count - 1) as TtPoint;
+                            index = cboPolyPoints.Items.Count - 1;
+                            prevPoint = cboPolyPoints.Items.GetItemAt(index) as TtPoint;
+                            index++;
                         }
-
-                        if (elevIsEmpty)
-                            c = 0;
 
                         bool pidIsEmpty = String.IsNullOrWhiteSpace(txt5.Text);
                         int pid = 0;
@@ -147,6 +149,7 @@ namespace TwoTrails.Dialogs
 
                         GpsPoint point = new GpsPoint()
                         {
+                            Index = index,
                             Polygon = poly,
                             Metadata = meta,
                             Group = group,
@@ -156,21 +159,30 @@ namespace TwoTrails.Dialogs
                             ManualAccuracy = manAcc
                         };
 
-                        return;
+                        if (radUTM.IsChecked == true)
+                            point.SetUnAdjLocation(a, b, elev);
+                        else
+                            point.SetUnAdjLocation(a, b, point.Metadata.Zone, elev);
+
+                        point.SetAccuracy(poly.Accuracy);
+
+                        _Manager.AddPoint(point);
+
+                        Close();
                     }
                     else
                     {
-                        MessageBox.Show("Invalid Elevation", "");
+                        MessageBox.Show("Invalid Elevation", String.Empty);
                     }
                 }
                 else
                 {
-                    MessageBox.Show($"Invalid {Txt2Watermark}", "");
+                    MessageBox.Show($"Invalid {Txt2Watermark}", String.Empty);
                 }
             }
             else
             {
-                MessageBox.Show($"Invalid {Txt1Watermark}", "");
+                MessageBox.Show($"Invalid {Txt1Watermark}", String.Empty);
             }
         }
 
