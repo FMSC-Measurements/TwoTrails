@@ -273,6 +273,7 @@ namespace TwoTrails.ViewModels
                         catch (Exception ex)
                         {
                             Trace.WriteLine(ex.Message, "MWM:OpenProject");
+                            MessageBox.Show("There is an issue opening this Project. See log file for details.", "Open Project Error");
                         }
                     }
                     else
@@ -396,10 +397,18 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
 
                     File.Copy(oFile, nFile, true);
 
-                    TtSqliteDataAccessLayer nDal = new TtSqliteDataAccessLayer(nFile);
-                    Trace.WriteLine($"Project Copied: {nFile} from {oFile}");
+                    project.ReplaceDAL(new TtSqliteDataAccessLayer(nFile));
 
-                    project.ReplaceDAL(nDal);
+                    if (project.MAL != null)
+                    {
+                        string nmFile = dialog.FileName.Replace(Consts.FILE_EXTENSION, Consts.FILE_EXTENSION_MEDIA);
+
+                        File.Copy(project.MAL.FilePath, nmFile, true);
+
+                        project.ReplaceMAL(new TtSqliteMediaAccessLayer(nmFile));
+                    }
+
+                    Trace.WriteLine($"Project Copied: {nFile} from {oFile}");
 
                     _Projects.Remove(oFile);
                     _Projects.Add(nFile, project);

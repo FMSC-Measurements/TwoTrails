@@ -192,6 +192,13 @@ namespace TwoTrails.ViewModels
             OnPropertyChanged(nameof(FilePath));
         }
 
+        public void ReplaceMAL(ITtMediaLayer mal)
+        {
+            MAL = mal;
+            Manager.ReplaceMAL(MAL);
+            OnPropertyChanged(nameof(MAL));
+        }
+
         public void Close()
         {
             if (RequiresSave)
