@@ -32,7 +32,7 @@ namespace TwoTrails.Dialogs
 
         public static bool? ShowDialog(TtProject project, Window owner = null)
         {
-            ImportDialog diag = new ImportDialog(project.Manager);
+            ImportDialog diag = new ImportDialog(project.HistoryManager);
             if (owner != null)
                 diag.Owner = owner;
             return diag.ShowDialog();

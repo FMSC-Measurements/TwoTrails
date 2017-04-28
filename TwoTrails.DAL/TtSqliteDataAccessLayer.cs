@@ -905,7 +905,7 @@ namespace TwoTrails.DAL
                 [TwoTrailsSchema.PolygonSchema.Accuracy] = poly.Accuracy,
                 [TwoTrailsSchema.PolygonSchema.IncrementBy] = poly.Increment,
                 [TwoTrailsSchema.PolygonSchema.PointStartIndex] = poly.PointStartIndex,
-                [TwoTrailsSchema.PolygonSchema.TimeCreated] = poly.TimeCreated,
+                [TwoTrailsSchema.PolygonSchema.TimeCreated] = poly.TimeCreated.ToString(Consts.DATE_FORMAT),
                 [TwoTrailsSchema.PolygonSchema.Area] = poly.Area,
                 [TwoTrailsSchema.PolygonSchema.Perimeter] = poly.Perimeter,
                 [TwoTrailsSchema.PolygonSchema.PerimeterLine] = poly.PerimeterLine
@@ -1867,7 +1867,7 @@ namespace TwoTrails.DAL
                                 [TwoTrailsSchema.ProjectInfoSchema.Forest] = info.Forest.Trim(),
                                 [TwoTrailsSchema.ProjectInfoSchema.Region] = info.Region.Trim(),
                                 [TwoTrailsSchema.ProjectInfoSchema.DeviceID] = info.CreationDeviceID,
-                                [TwoTrailsSchema.ProjectInfoSchema.Created] = info.CreationDate,
+                                [TwoTrailsSchema.ProjectInfoSchema.Created] = info.CreationDate.ToString(Consts.DATE_FORMAT),
                                 [TwoTrailsSchema.ProjectInfoSchema.Description] = info.Description,
                                 [TwoTrailsSchema.ProjectInfoSchema.TtDbSchemaVersion] = info.DbVersion.ToString(),
                                 [TwoTrailsSchema.ProjectInfoSchema.TtVersion] = info.Version.ToString(),
