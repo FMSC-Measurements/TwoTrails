@@ -27,6 +27,6 @@ namespace TwoTrails.Core
         public const String FILE_EXTENSION_FILTER_V2 = "TwoTrails2 Files (*.tt2)|*.tt2";
 
         private static String _TEMP_DIR = null;
-        public static String TEMP_DIR { get; } = _TEMP_DIR??(_TEMP_DIR = Path.Combine(Path.GetTempPath(), "TwoTrails\\Temp\\"));
+        public static String TEMP_DIR { get; } = _TEMP_DIR ?? (_TEMP_DIR = Path.Combine(Path.GetTempPath(), "TwoTrails\\Temp\\"));
     }
 }

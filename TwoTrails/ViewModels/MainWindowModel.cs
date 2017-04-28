@@ -273,7 +273,7 @@ namespace TwoTrails.ViewModels
                         catch (Exception ex)
                         {
                             Trace.WriteLine(ex.Message, "MWM:OpenProject");
-                            MessageBox.Show("There is an issue opening this Project. See log file for details.", "Open Project Error");
+                            MessageBox.Show(MainWindow, "There is an issue opening this Project. See log file for details.", "Open Project Error");
                         }
                     }
                     else
@@ -284,13 +284,13 @@ namespace TwoTrails.ViewModels
 
                             if (dalv2.RequiresUpgrade)
                             {
-                                MessageBox.Show(@"This TwoTrails V2 file is too old to upgrade. 
+                                MessageBox.Show(MainWindow, @"This TwoTrails V2 file is too old to upgrade. 
 Please Upgrade it with TwoTrails V2 before upgrading it here.", "Too old to upgrade",
                                     MessageBoxButton.OK, MessageBoxImage.Stop);
                             }
                             else
                             {
-                                if (MessageBox.Show(@"This is a TwoTrails V2 file that needs to be upgraded. 
+                                if (MessageBox.Show(MainWindow, @"This is a TwoTrails V2 file that needs to be upgraded. 
 Would you like to upgrade it now?", "Upgrade TwoTrails file",
                                     MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
                                 {
@@ -311,7 +311,7 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
 
                                     if (File.Exists(upgradedFile))
                                     {
-                                        if (MessageBox.Show($"File '{Path.GetFileName(upgradedFile)}' already exists. Would you like to overwrite it?",
+                                        if (MessageBox.Show(MainWindow, $"File '{Path.GetFileName(upgradedFile)}' already exists. Would you like to overwrite it?",
                                             "Overwrite File", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
                                         {
                                             return;
@@ -329,20 +329,20 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
                         }
                         else
                         {
-                            MessageBox.Show($"File '{filePath}' is not a compatible project type.");
+                            MessageBox.Show(MainWindow, $"File '{filePath}' is not a compatible project type.");
                         }
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Project is already opened.");
+                    MessageBox.Show(MainWindow, "Project is already opened.");
 
                     SwitchToTab(_Projects[filePath].ProjectTab);
                 }
             }
             else
             {
-                MessageBox.Show("File not found");
+                MessageBox.Show(MainWindow, "File not found");
 
                 Settings.RemoveRecentProject(filePath);
                 UpdateRecentProjectMenu();

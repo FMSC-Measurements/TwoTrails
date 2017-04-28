@@ -27,6 +27,8 @@ namespace TwoTrails.Dialogs
             InitializeComponent();
             prjInfoCtrl.SetProjectInfo(ProjectInfo);
 
+            txtLocation.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
             ProjectInfo.PropertyChanged += ProjectInfo_PropertyChanged;
         }
 

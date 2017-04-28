@@ -341,6 +341,10 @@ namespace TwoTrails.DAL
                     else
                         point.MetadataCN = Consts.EmptyGuid;
                 }
+                else
+                {
+                    point.MetadataCN = Consts.EmptyGuid;
+                }
 
 
                 if (hasPIDs)
