@@ -34,6 +34,7 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <DockPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0, 0, 0, 5">
@@ -47,6 +48,7 @@
                 <CheckBox Grid.Column="0" Grid.Row="3" Content="Polygons" IsChecked="{Binding ExportPolygons}" />
                 <CheckBox Grid.Column="0" Grid.Row="4" Content="Metadata" IsChecked="{Binding ExportMetadata}" />
                 <CheckBox Grid.Column="0" Grid.Row="5" Content="Groups" IsChecked="{Binding ExportGroups}" />
+                <CheckBox Grid.Column="0" Grid.Row="6" Content="Media Info" IsChecked="{Binding ExportMediaInfo}" />
 
                 <CheckBox Grid.Column="1" Grid.Row="1" Content="Project" IsChecked="{Binding ExportProject}" />
                 <CheckBox Grid.Column="1" Grid.Row="2" Content="Summary" IsChecked="{Binding ExportSummary}" />

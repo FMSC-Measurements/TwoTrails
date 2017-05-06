@@ -34,6 +34,7 @@ namespace TwoTrails.ViewModels
         public bool ExportGroups { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportSummary { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportProject { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
+        public bool ExportImageInfo { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportKMZ { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportGPX { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportShapes { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
@@ -103,6 +104,9 @@ namespace TwoTrails.ViewModels
                             if (ExportGroups)
                                 Export.Groups(project.Manager, Path.Combine(path, "Groups.csv"));
 
+                            if (ExportImageInfo)
+                                Export.ImageInfo(project.Manager, Path.Combine(path, "ImageInfo.csv"));
+
                             if (ExportProject)
                                 Export.Project(project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));
 
@@ -140,19 +144,20 @@ namespace TwoTrails.ViewModels
         private void CheckAll(bool? isChecked)
         {
             ExportPoints = ExportPolygons = ExportMetadata = ExportGroups =
-            ExportSummary = ExportProject = ExportKMZ = ExportGPX = ExportShapes =
+            ExportSummary = ExportProject = ExportKMZ = ExportGPX = ExportShapes = ExportImageInfo =
                 (isChecked == true);
         }
 
         private void CheckChanged()
         {
             if (ExportPoints && ExportPolygons && ExportMetadata && ExportGroups &&
-                ExportSummary && ExportProject && ExportKMZ && ExportGPX && ExportShapes)
+                ExportSummary && ExportProject && ExportKMZ && ExportGPX && ExportShapes &&
+                ExportImageInfo)
             {
                 IsCheckAll = true; 
             }
             else if (ExportPoints || ExportPolygons || ExportMetadata || ExportGroups ||
-                ExportSummary || ExportProject || ExportKMZ || ExportGPX || ExportShapes)
+                ExportSummary || ExportProject || ExportKMZ || ExportGPX || ExportShapes || ExportImageInfo)
             {
                 IsCheckAll = null;
             }

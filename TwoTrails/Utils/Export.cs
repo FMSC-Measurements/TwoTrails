@@ -14,14 +14,12 @@ using System.IO.Compression;
 using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.Core.Xml.GPX;
+using TwoTrails.Core.Media;
 
 namespace TwoTrails.Utils
 {
     public static class Export
     {
-        private const string DateTimeFormat = "MM/dd/yyyy hh:mm:ss tt";
-
-
         public static void All(TtProject project, String folderPath)
         {
             folderPath = folderPath.Trim();
@@ -35,6 +33,7 @@ namespace TwoTrails.Utils
             Metadata(project.Manager, Path.Combine(folderPath, "Metadata.csv"));
             Groups(project.Manager, Path.Combine(folderPath, "Groups.csv"));
             TtNmea(project.Manager, Path.Combine(folderPath, "NmeaBursts.csv"));
+            ImageInfo(project.Manager, Path.Combine(folderPath, "ImageInfo.csv"));
             GPX(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.gpx"));
             KMZ(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.kmz"));
             Shapes(project, folderPath);
@@ -117,7 +116,7 @@ namespace TwoTrails.Utils
                     sb.Append($"{point.PID},{point.CN},");
                     sb.Append($"{point.OpType},{point.Index},");
 
-                    sb.Append($"{point.Polygon.Scrub()},{point.TimeCreated.ToString(DateTimeFormat)},");
+                    sb.Append($"{point.Polygon.Scrub()},{point.TimeCreated.ToString(Consts.DATE_FORMAT)},");
                     sb.Append($"{point.Metadata.Scrub()},{point.Group.Scrub()},");
 
                     sb.Append($"{point.OnBoundary},");
@@ -323,6 +322,7 @@ namespace TwoTrails.Utils
             }
         }
 
+
         public static void TtNmea(ITtManager manager, String fileName)
         {
             TtNmea(manager.GetNmeaBursts(), fileName);
@@ -372,7 +372,7 @@ namespace TwoTrails.Utils
                 {
                     sb = new StringBuilder();
                     sb.AppendFormat("{0},{1},", burst.PointCN, burst.IsUsed);
-                    sb.AppendFormat("{0},{1},", burst.TimeCreated.ToString(DateTimeFormat), burst.FixTime.ToString(DateTimeFormat));
+                    sb.AppendFormat("{0},{1},", burst.TimeCreated.ToString(Consts.DATE_FORMAT), burst.FixTime.ToString(Consts.DATE_FORMAT));
 
                     sb.AppendFormat("{0},{1},", burst.Latitude, burst.Longitude);
                     sb.AppendFormat("{0},{1},", burst.Elevation, burst.UomElevation.ToStringAbv());
@@ -396,6 +396,47 @@ namespace TwoTrails.Utils
             }
         }
 
+
+        public static void ImageInfo(ITtManager manager, String fileName)
+        {
+            ImageInfo(manager.GetImages(), fileName);
+        }
+
+        public static void ImageInfo(IEnumerable<TtImage> images, String fileName)
+        {
+            using (StreamWriter sw = new StreamWriter(fileName))
+            {
+                #region Columns
+                StringBuilder sb = new StringBuilder();
+                sb.Append("Name,");
+                sb.Append("Creation Time,");
+                sb.Append("IsExternal,");
+                sb.Append("Comment,");
+                sb.Append("Type,");
+                sb.Append("Azimuth,");
+                sb.Append("Pitch,");
+                sb.Append("Roll,");
+                sb.Append("CN,");
+                sb.Append("PointCN");
+
+                sw.WriteLine(sb.ToString());
+                #endregion
+
+                foreach (TtImage img in images)
+                {
+                    sb = new StringBuilder();
+                    sb.AppendFormat("{0},{1},", img.Name.Scrub(), img.TimeCreated.ToString(Consts.DATE_FORMAT));
+                    sb.AppendFormat("{0},{1},", img.IsExternal, img.Comment.Scrub());
+                    sb.AppendFormat("{0},{1},", img.PictureType.ToString(), img.Azimuth?.ToString("F2"));
+                    sb.AppendFormat("{0},{1},", img.Pitch?.ToString("F2"), img.Roll?.ToString("F2"));
+                    sb.AppendFormat("{0},{1}", img.CN, img.PointCN);
+
+                    sw.WriteLine(sb.ToString());
+                }
+
+                sw.Flush();
+            }
+        }
 
 
         public static void GPX(TtProject project, String fileName)

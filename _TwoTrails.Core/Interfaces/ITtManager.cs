@@ -45,7 +45,7 @@ namespace TwoTrails.Core
         void AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
         void DeleteNmeaBursts(string pointCN);
         
-        List<TtImage> GetImages(String pointCN);
+        List<TtImage> GetImages(String pointCN = null);
         void InsertMedia(TtMedia media);
         void DeleteMedia(TtMedia media);
 
