@@ -21,11 +21,12 @@ namespace TwoTrails.Dialogs
     /// <summary>
     /// Interaction logic for CreatePointDialog.xaml
     /// </summary>
-    public partial class CreatePointDialog : Window, INotifyPropertyChanged
+    public partial class CreateGpsPointDialog : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        ITtManager _Manager;
+        private ITtManager _Manager;
+        private OpType _OpType;
         
         public String Txt1Watermark { get { return radUTM.IsChecked == true ? "UTM X" : "Latitude"; } }
         public String Txt2Watermark { get { return radUTM.IsChecked == true ? "UTM Y" : "Longitude"; } }
@@ -33,9 +34,14 @@ namespace TwoTrails.Dialogs
         public String Txt3Watermark { get; private set; }
 
 
-        public CreatePointDialog(ITtManager manager, TtPolygon target = null)
+        public CreateGpsPointDialog(ITtManager manager, TtPolygon target = null, OpType opType = OpType.GPS)
         {
             _Manager = manager;
+
+            if (!opType.IsGpsType())
+                throw new Exception("Invalid GpsType");
+
+            _OpType = opType;
 
             DataContext = this;
             InitializeComponent();
@@ -103,17 +109,20 @@ namespace TwoTrails.Dialogs
                         TtPoint prevPoint = null;
                         int index = 0;
 
-                        if (rbInsAft.IsChecked == true)
+                        if (cboPolyPoints.Items.Count > 0)
                         {
-                            index = cboPolyPoints.SelectedIndex;
-                            prevPoint = cboPolyPoints.Items.GetItemAt(index) as TtPoint;
-                            index++;
-                        }
-                        else if (rbInsEnd.IsChecked == true)
-                        {
-                            index = cboPolyPoints.Items.Count - 1;
-                            prevPoint = cboPolyPoints.Items.GetItemAt(index) as TtPoint;
-                            index++;
+                            if (rbInsAft.IsChecked == true)
+                            {
+                                index = cboPolyPoints.SelectedIndex;
+                                prevPoint = cboPolyPoints.Items.GetItemAt(index) as TtPoint;
+                                index++;
+                            }
+                            else if (rbInsEnd.IsChecked == true)
+                            {
+                                index = cboPolyPoints.Items.Count - 1;
+                                prevPoint = cboPolyPoints.Items.GetItemAt(index) as TtPoint;
+                                index++;
+                            } 
                         }
 
                         bool pidIsEmpty = String.IsNullOrWhiteSpace(txt5.Text);
@@ -159,6 +168,16 @@ namespace TwoTrails.Dialogs
                             ManualAccuracy = manAcc
                         };
 
+                        if (_OpType != OpType.GPS)
+                        {
+                            switch (_OpType)
+                            {
+                                case OpType.Take5: point = new Take5Point(point); break;
+                                case OpType.Walk: point = new WalkPoint(point); break;
+                                case OpType.WayPoint: point = new WayPoint(point); break;
+                            }
+                        }
+
                         if (radUTM.IsChecked == true)
                             point.SetUnAdjLocation(a, b, elev);
                         else
@@ -186,9 +205,9 @@ namespace TwoTrails.Dialogs
             }
         }
 
-        public static bool? ShowDialog(ITtManager manager, TtPolygon target = null, Window owner = null)
+        public static bool? ShowDialog(ITtManager manager, TtPolygon target = null, OpType opType = OpType.GPS, Window owner = null)
         {
-            CreatePointDialog cpd = new CreatePointDialog(manager, target);
+            CreateGpsPointDialog cpd = new CreateGpsPointDialog(manager, target, opType);
             if (owner != null)
                 cpd.Owner = owner;
             return cpd.ShowDialog();

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails"
+        xmlns:core="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
         Title="MainWindow"
@@ -16,6 +17,13 @@
         <KeyBinding Command="{Binding CurrentProject.RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
         <KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding SaveAsCommand}" Key="S" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding CurrentProject.RecalculateAllPolygonsCommand}" Key="R" Modifiers="Ctrl+Shift"/>
+        <KeyBinding Command="{Binding CurrentEditor.CreatePlotsCommand}" Key="P" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding CurrentEditor.CreateCorridorCommand}" Key="C" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding CurrentEditor.RetraceCommand}" Key="R" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding CurrentEditor.MovePointsCommand}" Key="M" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding CurrentEditor.CreateQuondamsCommand}" Key="Q" Modifiers="Ctrl+Alt"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -112,25 +120,33 @@
                 </MenuItem>
 
                 <MenuItem Header="_Tools">
-                    <MenuItem Header="Readjust All Polygons" Command="{Binding CurrentProject.ReadjustAllPolygonsCommand}"
-                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                    <MenuItem Header="Recalculate All Polygons" Command="{Binding CurrentProject.RecalculateAllPolygonsCommand}"
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+Shift+R"/>
 
                     <Separator/>
-                    <MenuItem Header="Create New Point" Command="{Binding CurrentEditor.CreatePointCommand}"
-                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                    <MenuItem Header="Create New Point" IsEnabled="{Binding CurrentEditor.Manager.Polygons.Count}">
+
+                        <MenuItem Header="GPS" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.GPS}"/>
+                        <MenuItem Header="WayPoint" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.WayPoint}"/>
+                        <Separator/>
+                        <MenuItem Header="Traverse" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.Traverse}"/>
+                        <MenuItem Header="SideShot" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.SideShot}"/>
+                        <Separator/>
+                        <MenuItem Header="Quondam" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.Quondam}"/>
+                    </MenuItem>
                     <MenuItem Header="Create Quondams" Command="{Binding CurrentEditor.CreateQuondamsCommand}"
-                        Style="{StaticResource ResourceKey=styleMiPointEdit}"/>
+                        Style="{StaticResource ResourceKey=styleMiPointEdit}" InputGestureText="Ctrl+Alt+Q"/>
                     <MenuItem Header="Move Points" Command="{Binding CurrentEditor.MovePointsCommand}"
-                        Style="{StaticResource ResourceKey=styleMiPointEdit}"/>
+                        Style="{StaticResource ResourceKey=styleMiPointEdit}" InputGestureText="Ctrl+Alt+M"/>
                     <MenuItem Header="Retrace Points" Command="{Binding CurrentEditor.RetraceCommand}"
-                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+Alt+R"/>
 
                     <Separator/>
 
                     <MenuItem Header="Create Plots" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
-                          Style="{StaticResource styleMiDisableNullCommand}"/>
+                          Style="{StaticResource styleMiDisableNullCommand}" InputGestureText="Ctrl+Alt+P"/>
                     <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
-                          Style="{StaticResource styleMiPointEdit}"/>
+                          Style="{StaticResource styleMiPointEdit}" InputGestureText="Ctrl+Alt+C"/>
 
                     <Separator/>
 

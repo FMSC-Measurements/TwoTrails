@@ -1438,7 +1438,8 @@ namespace TwoTrails.Core
                             points[i].Index = i;
                         }
 
-                        point = points.Last();
+                        if (points.Count > 0)
+                            point = points.Last();
                     }
 
                     if (points.Count > 0)

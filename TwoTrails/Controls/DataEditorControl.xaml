@@ -134,7 +134,7 @@
         <KeyBinding Command="{Binding SelectTravCommand}" Key="T" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SelectInverseCommand}" Key="I" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding DeselectCommand}" Key="D" Modifiers="Ctrl"/>
-        <KeyBinding Command="{Binding ReverseSelectedCommand}" Key="R" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding ReverseSelectedCommand}" Key="R" Modifiers="Ctrl"/>
     </UserControl.InputBindings>
 
 

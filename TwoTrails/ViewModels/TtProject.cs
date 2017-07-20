@@ -31,7 +31,7 @@ namespace TwoTrails.ViewModels
         public ICommand EditGroupsCommand { get; }
         public ICommand EditMetadataCommand { get; }
 
-        public ICommand ReadjustAllPolygonsCommand { get; }
+        public ICommand RecalculateAllPolygonsCommand { get; }
 
         public ICommand UndoCommand { get; set; }
         public ICommand RedoCommand { get; set; }
@@ -140,7 +140,7 @@ namespace TwoTrails.ViewModels
             EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Metadata));
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Groups));
             
-            ReadjustAllPolygonsCommand = new RelayCommand(x => { HistoryManager.RecalculatePolygons(); ProjectUpdated(); });
+            RecalculateAllPolygonsCommand = new RelayCommand(x => { HistoryManager.RecalculatePolygons(); ProjectUpdated(); });
 
             OpenMapCommand = new RelayCommand(x => OpenMapTab());
             OpenMapWindowCommand = new RelayCommand(x => OpenMapWindow());

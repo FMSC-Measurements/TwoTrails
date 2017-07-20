@@ -486,7 +486,9 @@ namespace TwoTrails.ViewModels
                 x => DeletePoint(), x => HasSelection,
                 this, x => x.HasSelection);
 
-            CreatePointCommand = new RelayCommand(x => CreateNewPoint());
+            CreatePointCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(x => CreateNewPoint(x != null ? (OpType)x : OpType.GPS),
+                x => Manager.Polygons.Count > 0,
+                Manager.Polygons, x => x.Count);
 
             CreateQuondamsCommand = new BindedRelayCommand<DataEditorModel>(
                 x => CreateQuondams(), x => HasSelection,
@@ -1378,9 +1380,25 @@ namespace TwoTrails.ViewModels
         }
         
 
-        private void CreateNewPoint()
+        private void CreateNewPoint(OpType optype)
         {
-            CreatePointDialog.ShowDialog(Manager, null, Project.MainModel.MainWindow);
+            if (Manager.Polygons.Count > 0)
+            {
+                switch (optype)
+                {
+                    case OpType.GPS:
+                    case OpType.Take5:
+                    case OpType.Walk:
+                    case OpType.WayPoint: CreateGpsPointDialog.ShowDialog(Manager, null, optype, Project.MainModel.MainWindow); break;
+                    case OpType.Traverse:
+                    case OpType.SideShot: break;
+                    case OpType.Quondam: Retrace(); break;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Must create Polygon before creating Points.", "No Polygon in Project");
+            }
         }
 
         private void CreateQuondams()

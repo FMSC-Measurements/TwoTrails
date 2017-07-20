@@ -154,8 +154,8 @@
     <Compile Include="Dialogs\CreatePlotsDialog.xaml.cs">
       <DependentUpon>CreatePlotsDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\CreatePointDialog.xaml.cs">
-      <DependentUpon>CreatePointDialog.xaml</DependentUpon>
+    <Compile Include="Dialogs\CreateGpsPointDialog.xaml.cs">
+      <DependentUpon>CreateGpsPointDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
@@ -283,7 +283,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\CreatePointDialog.xaml">
+    <Page Include="Dialogs\CreateGpsPointDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
