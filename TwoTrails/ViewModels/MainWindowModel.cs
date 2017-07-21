@@ -104,6 +104,7 @@ namespace TwoTrails.ViewModels
 
 
         public bool HasOpenedProject { get { return CurrentTab != null; } }
+        public bool HasPolygons { get { return CurrentEditor != null && CurrentEditor.Manager.Polygons.Count > 0; } }
 
 
         public bool CanSaveCurrentProject

@@ -49,6 +49,18 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="styleHasPolygons" TargetType="MenuItem">
+            <Setter Property="IsEnabled" Value="True"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding HasOpenedProject}" Value="False">
+                    <Setter Property="IsEnabled" Value="False"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding CurrentEditor.Manager.Polygons.Count}" Value="0">
+                    <Setter Property="IsEnabled" Value="False"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -124,7 +136,7 @@
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+Shift+R"/>
 
                     <Separator/>
-                    <MenuItem Header="Create New Point" IsEnabled="{Binding CurrentEditor.Manager.Polygons.Count}">
+                    <MenuItem Header="Create New Point" Style="{StaticResource styleHasPolygons}">
 
                         <MenuItem Header="GPS" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.GPS}"/>
                         <MenuItem Header="WayPoint" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.WayPoint}"/>
