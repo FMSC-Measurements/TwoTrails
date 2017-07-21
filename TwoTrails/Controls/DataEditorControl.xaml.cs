@@ -30,9 +30,7 @@ namespace TwoTrails.Controls
 
         private void TextBox_UpdateBinding(object sender, RoutedEventArgs e)
         {
-            TextBox tb = (sender as TextBox);
-
-            if (tb != null && tb.IsEnabled)
+            if (sender is TextBox tb && tb.IsEnabled)
             {
                 var expression = tb.GetBindingExpression(TextBox.TextProperty);
 

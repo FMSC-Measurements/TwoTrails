@@ -77,10 +77,8 @@ namespace TwoTrails.Controls
             if (grid != null)
             {
                 var cellInfo = grid.SelectedCells[grid.CurrentCell.Column.DisplayIndex];
-
-                TextBlock tb = cellInfo.Column.GetCellContent(cellInfo.Item) as TextBlock;
-
-                if (tb != null)
+                
+                if (cellInfo.Column.GetCellContent(cellInfo.Item) is TextBlock tb)
                     Clipboard.SetText(tb.Text);
             }
         }

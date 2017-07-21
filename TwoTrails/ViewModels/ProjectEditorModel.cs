@@ -515,9 +515,7 @@ namespace TwoTrails.ViewModels
 
         private void ImageLoaded(IAsyncResult res)
         {
-            ImageAsyncResult iar = res as ImageAsyncResult;
-            
-            if (iar != null)
+            if (res is ImageAsyncResult iar)
                 _Project.MainModel.MainWindow.Dispatcher.Invoke(
                     () => Tiles.Add(
                         new ImageTile(iar.ImageInfo, iar.Image, (x) => MediaViewerVisible = true)

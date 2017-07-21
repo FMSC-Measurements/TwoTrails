@@ -173,6 +173,13 @@ namespace FMSC.Core
             return m2 * Meters2ToAcres_Coeff;
         }
 
+        public static double? Angle(double? angle, Slope to, Slope from)
+        {
+            if (angle == null)
+                return null;
+            return Angle((double)angle, to, from);
+        }
+
         public static double Angle(double angle, Slope to, Slope from)
         {
             if (to == from)

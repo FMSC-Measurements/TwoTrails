@@ -72,9 +72,11 @@
                 </Grid>
                 
                 <CheckBox Name="chkBnd" Content="OnBoundary" IsChecked="True" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" ToolTip="On Boundary" />
-                
-                <RadioButton Content="Lat/Lon" Grid.Column="1" Grid.Row="2" GroupName="cboIType" />
-                <RadioButton Name="radUTM" Content="UTM" IsChecked="True" Grid.Column="0" Grid.Row="2" GroupName="cboIType" Checked="radUTM_CheckChanged" Unchecked="radUTM_CheckChanged" />
+
+                <RadioButton Content="Lat/Lon" Grid.Column="1" Grid.Row="2" GroupName="cboIType"
+                             Visibility="{Binding IsGpsType, Converter={StaticResource BoolToVis}}" />
+                <RadioButton Name="radUTM" Content="UTM" IsChecked="True" Grid.Column="0" Grid.Row="2" GroupName="cboIType" Checked="radUTM_CheckChanged" Unchecked="radUTM_CheckChanged"
+                              Visibility="{Binding IsGpsType, Converter={StaticResource BoolToVis}}"/>
 
                 <Grid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" >
                     <TextBlock Name="tbWm1" Text="{Binding Txt1Watermark, Mode=OneWay}"
@@ -92,9 +94,9 @@
                     <TextBox Name="txt3" ToolTip="{Binding Txt3Watermark, Mode=OneWay}"/>
                 </Grid>
                 <Grid Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2" >
-                    <TextBlock Text="Manual Accuracy"
+                    <TextBlock Text="{Binding Txt4Watermark, Mode=OneWay}"
                                Visibility="{Binding ElementName=txt6, Path=Text.IsEmpty, Converter={StaticResource BoolToVis}}"/>
-                    <TextBox Name="txt6" MaxLines="1" ToolTip="Manual Accuracy"/>
+                    <TextBox Name="txt6" MaxLines="1" ToolTip="{Binding Txt4Watermark, Mode=OneWay}"/>
                 </Grid>
                 <Grid Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" >
                     <TextBlock Text="Comment"

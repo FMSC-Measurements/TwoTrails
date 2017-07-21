@@ -734,7 +734,7 @@ namespace TwoTrails.Core
         {
             if (point.Index < points.Count - 1 || point.IsGpsAtBase()) // make sure traverse isnt at end
             {
-                for (int i = point.Index - 1; i > 0; i--)
+                for (int i = point.Index - 1; i > -1; i--)
                 {
                     if (points[i].IsGpsAtBase())
                     {

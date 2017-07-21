@@ -12,25 +12,21 @@ namespace TwoTrails.Converters
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            string parameterString = parameter as string;
-            if (parameterString == null)
-                return DependencyProperty.UnsetValue;
+            if (parameter is string parameterString && Enum.IsDefined(value.GetType(), value))
+            {
+                object parameterValue = Enum.Parse(value.GetType(), GetEnumValueString(parameterString));
 
-            if (Enum.IsDefined(value.GetType(), value) == false)
-                return DependencyProperty.UnsetValue;
-            
-            object parameterValue = Enum.Parse(value.GetType(), GetEnumValueString(parameterString));
+                return parameterValue.Equals(value);
+            }
 
-            return parameterValue.Equals(value);
+            return DependencyProperty.UnsetValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            string parameterString = parameter as string;
-            if (parameterString == null)
-                return DependencyProperty.UnsetValue;
-            
-            return Enum.Parse(targetType, GetEnumValueString(parameterString));
+            if (parameter is string parameterString)
+                return Enum.Parse(targetType, GetEnumValueString(parameterString));
+            return DependencyProperty.UnsetValue;
         }
 
         private string GetEnumValueString(string value)

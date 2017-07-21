@@ -1387,11 +1387,9 @@ namespace TwoTrails.ViewModels
                 switch (optype)
                 {
                     case OpType.GPS:
-                    case OpType.Take5:
-                    case OpType.Walk:
-                    case OpType.WayPoint: CreateGpsPointDialog.ShowDialog(Manager, null, optype, Project.MainModel.MainWindow); break;
                     case OpType.Traverse:
-                    case OpType.SideShot: break;
+                    case OpType.SideShot:
+                    case OpType.WayPoint: CreateGpsPointDialog.ShowDialog(Manager, null, optype, Project.MainModel.MainWindow); break;
                     case OpType.Quondam: Retrace(); break;
                 }
             }

@@ -283,8 +283,7 @@ namespace TwoTrails.Mapping
 
         private void UpdateLocation(TtPoint point)
         {
-            GpsPoint gps = point as GpsPoint;
-            if (gps != null && gps.HasLatLon)
+            if (point is GpsPoint gps && gps.HasLatLon)
             {
                 AdjPushpin.Location = AdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
                 UnAdjPushpin.Location = UnAdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
@@ -303,7 +302,7 @@ namespace TwoTrails.Mapping
                     AdjPushpin.Location = AdjLocation;
 
                     Point unadj = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
-                    UnAdjLocation = new Location(adj.Y, adj.X);
+                    UnAdjLocation = new Location(unadj.Y, unadj.X);
                     UnAdjPushpin.Location = UnAdjLocation;
                 }
             }
