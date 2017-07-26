@@ -29,6 +29,7 @@
                 CanUserDeleteRows="False" CanUserAddRows="False"
                 SelectionMode="Extended"
                 SelectionUnit="FullRow"
-                IsReadOnly="True"/>
+                IsReadOnly="True"
+                AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"/>
     </Grid>
 </UserControl>

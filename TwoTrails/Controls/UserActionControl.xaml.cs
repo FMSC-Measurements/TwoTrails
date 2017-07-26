@@ -24,7 +24,7 @@ namespace TwoTrails.Controls
     /// </summary>
     public partial class UserActivityControl : UserControl
     {
-        private List<TtUserActivity> _Activites;
+        private List<TtUserAction> _Activites;
         public ListCollectionView Activites { get; }
 
         public ICommand RefreshCommand { get; }
@@ -49,6 +49,12 @@ namespace TwoTrails.Controls
             _Activites.Clear();
             _Activites.AddRange(DAL.GetUserActivity());
             Activites.Refresh();
+        }
+
+        private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            if (e.PropertyName == nameof(TtUserAction.Action))
+                e.Cancel = true;
         }
     }
 }

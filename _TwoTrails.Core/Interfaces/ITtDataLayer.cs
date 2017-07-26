@@ -86,7 +86,7 @@ namespace TwoTrails.DAL
 
 
         #region Activity
-        void InsertActivity(TtUserActivity activity);
+        void InsertActivity(TtUserAction activity);
         #endregion
 
 

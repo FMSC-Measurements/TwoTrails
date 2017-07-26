@@ -56,6 +56,7 @@ namespace TwoTrails.Controls
         Points = 1,
         Polygons = 2,
         Metadata = 3,
-        Groups = 4
+        Groups = 4,
+        Media = 5
     }
 }

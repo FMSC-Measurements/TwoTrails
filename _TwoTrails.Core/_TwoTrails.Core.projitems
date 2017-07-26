@@ -61,7 +61,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtImage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtPanorama.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtPhotoShpere.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\DataActivityType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\DataActionType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\HaidSummary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\PolygonGraphicOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtProjectInfo.cs" />
@@ -73,7 +73,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtNmeaBurst.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtPolygon.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtUserActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtUserAction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PointNamer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PointProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\GpsPoint.cs" />

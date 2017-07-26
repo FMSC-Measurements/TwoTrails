@@ -143,8 +143,8 @@
     <Compile Include="Controls\TtProgressControl.xaml.cs">
       <DependentUpon>TtProgressControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\UserActivityControl.xaml.cs">
-      <DependentUpon>UserActivityControl.xaml</DependentUpon>
+    <Compile Include="Controls\UserActionControl.xaml.cs">
+      <DependentUpon>UserActionControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\EnumBooleanConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
@@ -275,7 +275,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\UserActivityControl.xaml">
+    <Page Include="Controls\UserActionControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

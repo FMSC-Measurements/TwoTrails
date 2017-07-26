@@ -45,4 +45,43 @@ namespace TwoTrails.Core.ComponentModel.History
             }
         }
     }
+
+    public class EditTtPointsMultiPropertyCommand<T> : ITtPointsCommand
+    {
+        private List<T> NewValues;
+        private List<T> OldValues = new List<T>();
+        private List<PropertyInfo> Properties;
+
+        public EditTtPointsMultiPropertyCommand(IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, IEnumerable<T> newValues, bool autoCommit = true) : base(points)
+        {
+            RequireRefresh = properties.Any(p => p == PointProperties.INDEX);
+
+            this.Properties = new List<PropertyInfo>(properties);
+            this.NewValues = new List<T>(newValues);
+
+            for (int i = 0; i < Points.Count; i++)
+            {
+                OldValues.Add((T)Properties[i].GetValue(Points[i]));
+            }
+
+            if (autoCommit)
+                Redo();
+        }
+
+        public override void Redo()
+        {
+            for (int i = 0; i < Points.Count; i++)
+            {
+                Properties[i].SetValue(Points[i], NewValues[i]);
+            }
+        }
+
+        public override void Undo()
+        {
+            for (int i = 0; i < Points.Count; i++)
+            {
+                Properties[i].SetValue(Points[i], OldValues[i]);
+            }
+        }
+    }
 }

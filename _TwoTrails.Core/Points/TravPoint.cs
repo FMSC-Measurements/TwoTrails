@@ -71,8 +71,7 @@ namespace TwoTrails.Core.Points
 
         public TravPoint(TtPoint point) : base(point)
         {
-            TravPoint trav = point as TravPoint;
-            if (trav != null)
+            if (point is TravPoint trav)
             {
                 CopyTravValues(trav);
             }

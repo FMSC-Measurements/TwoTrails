@@ -12,7 +12,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private TtPolygon TargetPolygon;
         private int StartIndex;
 
-        private EditTtPointsMultiValueCommand editPointsCmd = null;
+        private EditTtPointsMultiValueCommand<int> editPointsCmd = null;
         private AddTtPointsCommand addPointsCmd;
 
 
@@ -26,7 +26,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
             List<TtPoint> addPoints = new List<TtPoint>();
             List<TtPoint> editedPoints = new List<TtPoint>();
-            List<object> editedIndexes = new List<object>();
+            List<int> editedIndexes = new List<int>();
 
             int index = insertIndex > polyPoints.Count ?
                 polyPoints.Count : 
@@ -71,7 +71,7 @@ namespace TwoTrails.Core.ComponentModel.History
             addPointsCmd = new AddTtPointsCommand(addPoints, pointsManager, false);
 
             if (editedPoints.Count > 0)
-                editPointsCmd = new EditTtPointsMultiValueCommand(editedPoints, PointProperties.INDEX, editedIndexes, false);
+                editPointsCmd = new EditTtPointsMultiValueCommand<int>(editedPoints, PointProperties.INDEX, editedIndexes, false);
 
             if (autoCommit)
                 Redo();

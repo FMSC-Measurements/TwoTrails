@@ -671,7 +671,7 @@ namespace TwoTrails.ViewModels
 
         private void Polygon_ItemCheckedChanged(object sender, EventArgs e)
         {
-            UpdateCheckedItems<TtPolygon>(sender, ref _CheckedPolygons, ref _Polygons);
+            UpdateCheckedItems(sender, ref _CheckedPolygons, ref _Polygons);
         }
 
 
@@ -707,7 +707,7 @@ namespace TwoTrails.ViewModels
 
         private void Metadata_ItemCheckedChanged(object sender, EventArgs e)
         {
-            UpdateCheckedItems<TtMetadata>(sender, ref _CheckedMetadata, ref _Metadatas);
+            UpdateCheckedItems(sender, ref _CheckedMetadata, ref _Metadatas);
         }
         
 
@@ -743,16 +743,14 @@ namespace TwoTrails.ViewModels
 
         private void Group_ItemCheckedChanged(object sender, EventArgs e)
         {
-            UpdateCheckedItems<TtGroup>(sender, ref _CheckedGroups, ref _Groups);
+            UpdateCheckedItems(sender, ref _CheckedGroups, ref _Groups);
         }
 
 
         private void UpdateCheckedItems<T>(object sender, ref Dictionary<string, bool> checkedItems,
             ref ObservableCollection<CheckedListItem<T>> items) where T : TtObject
         {
-            CheckedListItem<T> cp = sender as CheckedListItem<T>;
-
-            if (cp != null)
+            if (sender is CheckedListItem<T> cp)
             {
                 if (cp.Item.CN != Consts.FullGuid)
                 {
@@ -780,9 +778,7 @@ namespace TwoTrails.ViewModels
 
         private void OpType_ItemCheckedChanged(object sender, EventArgs e)
         {
-            CheckedListItem<string> cp = sender as CheckedListItem<string>;
-
-            if (cp != null)
+            if (sender is CheckedListItem<string> cp)
             {
                 if (cp.Item != "All")
                 {
@@ -1320,8 +1316,10 @@ namespace TwoTrails.ViewModels
             {
                 List<TtPoint> hidePoints = new List<TtPoint>(SelectedPoints.Cast<TtPoint>());
 
-                SelectPointDialog spd = new SelectPointDialog(Manager, hidePoints);
-                spd.Owner = Project.MainModel.MainWindow;
+                SelectPointDialog spd = new SelectPointDialog(Manager, hidePoints)
+                {
+                    Owner = Project.MainModel.MainWindow
+                };
 
                 if (spd.ShowDialog() == true)
                 {
@@ -1345,15 +1343,18 @@ namespace TwoTrails.ViewModels
 
         private void RenamePoints()
         {
-            RenamePointsDialog dialog = new RenamePointsDialog(Manager);
-            dialog.Owner = Project.MainModel.MainWindow;
+            RenamePointsDialog dialog = new RenamePointsDialog(Manager)
+            {
+                Owner = Project.MainModel.MainWindow
+            };
+
             if (dialog.ShowDialog() == true)
             {
                 Manager.EditPointsMultiValues(
                     GetSortedSelectedPoints(),
                     PointProperties.PID,
                     Enumerable.Range(0, SelectedPoints.Count)
-                        .Select(i => (object)(dialog.StartIndex + dialog.Increment * i))
+                        .Select(i => (dialog.StartIndex + dialog.Increment * i))
                 );
             }
         }
@@ -1364,7 +1365,7 @@ namespace TwoTrails.ViewModels
             {
                 List<TtPoint> points = GetSortedSelectedPoints();
 
-                List<object> indexes = new List<object>();
+                List<int> indexes = new List<int>();
                 List<TtPoint> updatedPoints = new List<TtPoint>();
                 
                 TtPoint tmpPoint1, tmpPoint2;
@@ -1545,10 +1546,12 @@ namespace TwoTrails.ViewModels
         {
             if (HasSelection)
             {
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.FileName = "SelectedPoints";
-                sfd.DefaultExt = ".csv";
-                sfd.Filter = "CSV Document (*.csv)|*.csv|All Types (*.*)|*.*";
+                SaveFileDialog sfd = new SaveFileDialog()
+                {
+                    FileName = "SelectedPoints",
+                    DefaultExt = ".csv",
+                    Filter = "CSV Document (*.csv)|*.csv|All Types (*.*)|*.*"
+                };
 
                 if (sfd.ShowDialog() == true)
                 {
@@ -1564,9 +1567,7 @@ namespace TwoTrails.ViewModels
             {
                 var cellInfo = dataGrid.SelectedCells[dataGrid.CurrentCell.Column.DisplayIndex];
 
-                TextBlock tb = cellInfo.Column.GetCellContent(cellInfo.Item) as TextBlock;
-
-                if (tb != null)
+                if (cellInfo.Column.GetCellContent(cellInfo.Item) is TextBlock tb)
                     Clipboard.SetText(tb.Text);
             }
         }

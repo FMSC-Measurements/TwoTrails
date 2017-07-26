@@ -359,9 +359,9 @@ namespace TwoTrails.DAL
             return new List<TtImage>();
         }
 
-        public IEnumerable<TtUserActivity> GetUserActivity()
+        public IEnumerable<TtUserAction> GetUserActivity()
         {
-            return new List<TtUserActivity>();
+            return new List<TtUserAction>();
         }
 
 

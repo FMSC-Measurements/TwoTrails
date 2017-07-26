@@ -2051,7 +2051,7 @@ namespace TwoTrails.DAL
 
         #region Activity
 
-        public void InsertActivity(TtUserActivity activity)
+        public void InsertActivity(TtUserAction activity)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -2075,18 +2075,18 @@ namespace TwoTrails.DAL
             }
         }
 
-        private Dictionary<string, object> GetUserActivityValues(TtUserActivity activity)
+        private Dictionary<string, object> GetUserActivityValues(TtUserAction activity)
         {
             return new Dictionary<string, object>()
             {
                 [TwoTrailsSchema.ActivitySchema.UserName] = activity.UserName,
                 [TwoTrailsSchema.ActivitySchema.DeviceName] = activity.DeviceName,
                 [TwoTrailsSchema.ActivitySchema.ActivityDate] = activity.Date,
-                [TwoTrailsSchema.ActivitySchema.DataActivity] = (int)activity.Activity
+                [TwoTrailsSchema.ActivitySchema.DataActivity] = (int)activity.Action
             };
         }
 
-        public IEnumerable<TtUserActivity> GetUserActivity()
+        public IEnumerable<TtUserAction> GetUserActivity()
         {
             String query = $"select {TwoTrailsSchema.ActivitySchema.SelectItems} from {TwoTrailsSchema.ActivitySchema.TableName}";
 
@@ -2098,16 +2098,16 @@ namespace TwoTrails.DAL
                     {
                         string username, devicename;
                         DateTime date;
-                        DataActivityType dat;
+                        DataActionType dat;
 
                         while (dr.Read())
                         {
                             username = dr.GetString(0);
                             devicename = dr.GetString(1);
                             date = TtCoreUtils.ParseTime(dr.GetString(2));
-                            dat = (DataActivityType)dr.GetInt32(3);
+                            dat = (DataActionType)dr.GetInt32(3);
 
-                            yield return new TtUserActivity(username, devicename, date, dat);
+                            yield return new TtUserAction(username, devicename, date, dat);
                         }
 
                         dr.Close();

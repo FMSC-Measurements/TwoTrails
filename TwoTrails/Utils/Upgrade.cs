@@ -13,20 +13,20 @@ namespace TwoTrails.Utils
     {
         public static void DAL(ITtDataLayer ndal, ITtSettings settings, TtV2SqliteDataAccessLayer odal)
         {
-            TtUserActivity activity = new TtUserActivity("Upgrader", settings.DeviceName);
+            TtUserAction activity = new TtUserAction("Upgrader", settings.DeviceName);
             
             List<TtMetadata> meta = odal.GetMetadata().ToList();
             if (meta.Any())
             {
                 ndal.InsertMetadata(meta);
-                activity.UpdateActivity(DataActivityType.InsertedMetadata);
+                activity.UpdateAction(DataActionType.InsertedMetadata);
             }
 
             List<TtGroup> groups = odal.GetGroups().ToList();
             if (groups.Any())
             {
                 ndal.InsertGroups(groups);
-                activity.UpdateActivity(DataActivityType.InsertedGroups);
+                activity.UpdateAction(DataActionType.InsertedGroups);
             }
 
             DateTime time = ndal.GetProjectInfo().CreationDate;
@@ -39,7 +39,7 @@ namespace TwoTrails.Utils
             if (polys.Any())
             {
                 ndal.InsertPolygons(polys);
-                activity.UpdateActivity(DataActivityType.InsertedPolygons);
+                activity.UpdateAction(DataActionType.InsertedPolygons);
 
                 List<TtPoint> points = new List<TtPoint>();
 
@@ -52,7 +52,7 @@ namespace TwoTrails.Utils
                 if (points.Any())
                 {
                     ndal.InsertPoints(points);
-                    activity.UpdateActivity(DataActivityType.InsertedPoints);
+                    activity.UpdateAction(DataActionType.InsertedPoints);
                 }
             }
 

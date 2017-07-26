@@ -46,7 +46,7 @@ namespace TwoTrails.DAL
 
 
         #region Activity
-        IEnumerable<TtUserActivity> GetUserActivity();
+        IEnumerable<TtUserAction> GetUserActivity();
         #endregion
 
 

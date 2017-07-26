@@ -23,7 +23,7 @@ namespace TwoTrails.Core
         private ITtDataLayer _DAL;
         private ITtMediaLayer _MAL;
 
-        private TtUserActivity _Activity;
+        private TtUserAction _Activity;
 
         private Dictionary<String, TtPoint> _PointsMap, _PointsMapOrig;
         private Dictionary<String, List<TtPoint>> _PointsByPoly;
@@ -63,7 +63,7 @@ namespace TwoTrails.Core
             _MAL = mal;
             _Settings = settings;
 
-            _Activity = new TtUserActivity(_Settings.UserName, _Settings.DeviceName);
+            _Activity = new TtUserAction(_Settings.UserName, _Settings.DeviceName);
 
             Load();
             LoadMedia();
@@ -335,11 +335,6 @@ namespace TwoTrails.Core
                     SavePolygons();
                     SavePoints();
 
-                    _PointsMapOrig = _PointsMap.Values.ToDictionary(p => p.CN, p => p.DeepCopy());
-                    _PolygonsMapOrig = _PolygonsMap.Values.ToDictionary(p => p.CN, p => new TtPolygon(p));
-                    _MetadataMapOrig = _MetadataMapOrig.Values.ToDictionary(m => m.CN, m => new TtMetadata(m));
-                    _GroupsMapOrig = _GroupsMap.Values.ToDictionary(g => g.CN, g => new TtGroup(g));
-
                     _DAL.InsertActivity(_Activity);
                     _Activity.Reset();
                 }
@@ -381,20 +376,22 @@ namespace TwoTrails.Core
             if (pointsToAdd.Count > 0)
             {
                 _DAL.InsertPoints(pointsToAdd);
-                _Activity.UpdateActivity(DataActivityType.InsertedPoints);
+                _Activity.UpdateAction(DataActionType.InsertedPoints);
             }
 
             if (pointsToUpdate.Count > 0)
             {
                 _DAL.UpdatePoints(pointsToUpdate);
-                _Activity.UpdateActivity(DataActivityType.ModifiedPoints);
+                _Activity.UpdateAction(DataActionType.ModifiedPoints);
             }
 
             if (pointsToRemove.Any())
             {
                 _DAL.DeletePoints(pointsToRemove);
-                _Activity.UpdateActivity(DataActivityType.DeletedPoints);
+                _Activity.UpdateAction(DataActionType.DeletedPoints);
             }
+
+            _PointsMapOrig = _PointsMap.Values.ToDictionary(p => p.CN, p => p.DeepCopy());
         }
 
         private void SavePolygons()
@@ -422,20 +419,22 @@ namespace TwoTrails.Core
             if (polygonsToAdd.Count > 0)
             {
                 _DAL.InsertPolygons(polygonsToAdd);
-                _Activity.UpdateActivity(DataActivityType.InsertedPolygons);
+                _Activity.UpdateAction(DataActionType.InsertedPolygons);
             }
 
             if (polygonsToUpdate.Count > 0)
             {
                 _DAL.UpdatePolygons(polygonsToUpdate);
-                _Activity.UpdateActivity(DataActivityType.ModifiedPolygons);
+                _Activity.UpdateAction(DataActionType.ModifiedPolygons);
             }
 
             if (polygonsToRemove.Any())
             {
                 _DAL.DeletePolygons(polygonsToRemove);
-                _Activity.UpdateActivity(DataActivityType.DeletedPolygons);
+                _Activity.UpdateAction(DataActionType.DeletedPolygons);
             }
+
+            _PolygonsMapOrig = _PolygonsMap.Values.ToDictionary(p => p.CN, p => new TtPolygon(p));
         }
 
         private void SaveMetadata()
@@ -463,20 +462,22 @@ namespace TwoTrails.Core
             if (metadataToAdd.Count > 0)
             {
                 _DAL.InsertMetadata(metadataToAdd);
-                _Activity.UpdateActivity(DataActivityType.InsertedMetadata);
+                _Activity.UpdateAction(DataActionType.InsertedMetadata);
             }
 
             if (metadataToUpdate.Count > 0)
             {
                 _DAL.UpdateMetadata(metadataToUpdate);
-                _Activity.UpdateActivity(DataActivityType.ModifiedMetadata);
+                _Activity.UpdateAction(DataActionType.ModifiedMetadata);
             }
 
             if (metadataToRemove.Any())
             {
                 _DAL.DeleteMetadata(metadataToRemove);
-                _Activity.UpdateActivity(DataActivityType.DeletedMetadata);
+                _Activity.UpdateAction(DataActionType.DeletedMetadata);
             }
+
+            _MetadataMapOrig = _MetadataMapOrig.Values.ToDictionary(m => m.CN, m => new TtMetadata(m));
         }
 
         private void SaveGroups()
@@ -504,20 +505,22 @@ namespace TwoTrails.Core
             if (groupsToAdd.Count > 0)
             {
                 _DAL.InsertGroups(groupsToAdd);
-                _Activity.UpdateActivity(DataActivityType.InsertedGroups);
+                _Activity.UpdateAction(DataActionType.InsertedGroups);
             }
 
             if (groupsToUpdate.Count > 0)
             {
                 _DAL.UpdateGroups(groupsToUpdate);
-                _Activity.UpdateActivity(DataActivityType.ModifiedGroups);
+                _Activity.UpdateAction(DataActionType.ModifiedGroups);
             }
 
             if (groupsToRemove.Any())
             {
                 _DAL.DeleteGroups(groupsToRemove);
-                _Activity.UpdateActivity(DataActivityType.DeletedGroups);
+                _Activity.UpdateAction(DataActionType.DeletedGroups);
             }
+
+            _GroupsMapOrig = _GroupsMap.Values.ToDictionary(g => g.CN, g => new TtGroup(g));
         }
         #endregion
 
@@ -1139,8 +1142,8 @@ namespace TwoTrails.Core
             }
 
             point.Polygon = polygon;
-            point.Metadata = metadata != null ? metadata : DefaultMetadata;
-            point.Group = group != null ? group : MainGroup;
+            point.Metadata = metadata ?? DefaultMetadata;
+            point.Group = group ?? MainGroup;
 
             return point;
         }
@@ -1519,7 +1522,7 @@ namespace TwoTrails.Core
             int num = _PolygonsMap.Count + 1;
             return new TtPolygon()
             {
-                Name = name != null ? name : $"Poly {num}",
+                Name = name ?? $"Poly {num}",
                 PointStartIndex = pointStartIndex > 0 ? pointStartIndex : num * 1000 + 10
             };
         }
@@ -1787,6 +1790,17 @@ namespace TwoTrails.Core
         {
             //todo delete media
             throw new NotImplementedException();
+        }
+
+
+        public void AddDataAction(DataActionType action)
+        {
+
+        }
+
+        public void RemoveDataAction(DataActionType action)
+        {
+
         }
     }
 }

@@ -6,22 +6,22 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    public class EditTtPointsMultiValueCommand : ITtPointsCommand
+    public class EditTtPointsMultiValueCommand<T> : ITtPointsCommand
     {
-        private List<object> NewValues;
-        private List<object> OldValues = new List<object>();
+        private List<T> NewValues;
+        private List<T> OldValues = new List<T>();
         private PropertyInfo Property;
 
-        public EditTtPointsMultiValueCommand(IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<object> newValues, bool autoCommit = true) : base(points)
+        public EditTtPointsMultiValueCommand(IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<T> newValues, bool autoCommit = true) : base(points)
         {
             RequireRefresh = property == PointProperties.INDEX;
 
             this.Property = property;
-            this.NewValues = new List<object>(newValues);
+            this.NewValues = new List<T>(newValues);
 
             foreach (TtPoint point in points)
             {
-                OldValues.Add(property.GetValue(point));
+                OldValues.Add((T)property.GetValue(point));
             }
 
             if (autoCommit)

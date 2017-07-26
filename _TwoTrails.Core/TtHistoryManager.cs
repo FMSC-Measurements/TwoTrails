@@ -261,9 +261,9 @@ namespace TwoTrails.Core
 
         #region Editing
 
-        public void EditPoint(TtPoint point, PropertyInfo property, object newValue)
+        public void EditPoint<T>(TtPoint point, PropertyInfo property, T newValue)
         {
-            AddCommand(new EditTtPointCommand(point, property, newValue));
+            AddCommand(new EditTtPointCommand<T>(point, property, newValue));
         }
 
         public void EditPoint(TtPoint point, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues)
@@ -272,19 +272,19 @@ namespace TwoTrails.Core
         }
 
 
-        public void EditPoints(IEnumerable<TtPoint> points, PropertyInfo property, object newValue)
+        public void EditPoints<T>(IEnumerable<TtPoint> points, PropertyInfo property, T newValue)
         {
             AddCommand(new EditTtPointsCommand(points, property, newValue));
         }
 
-        public void EditPointsMultiValues(IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<object> newValues)
+        public void EditPointsMultiValues<T>(IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<T> newValues)
         {
-            AddCommand(new EditTtPointsMultiValueCommand(points, property, newValues));
+            AddCommand(new EditTtPointsMultiValueCommand<T>(points, property, newValues));
         }
 
-        public void EditPoints(IEnumerable<TtPoint> points, List<PropertyInfo> properties, object newValue)
+        public void EditPoints<T>(IEnumerable<TtPoint> points, List<PropertyInfo> properties, T newValue)
         {
-            AddCommand(new EditTtPointsMultiPropertyCommand(points, properties, points.Select(p => newValue).Cast<object>()));
+            AddCommand(new EditTtPointsMultiPropertyCommand<T>(points, properties, points.Select(p => newValue)));
         }
 
         public void EditPointsMultiValues(IEnumerable<TtPoint> points, List<PropertyInfo> properties, List<object> newValues)
