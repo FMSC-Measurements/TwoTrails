@@ -35,7 +35,7 @@ namespace TwoTrails.ViewModels
 
         public ICommand CreatePointCommand { get; }
         public ICommand CreateQuondamsCommand { get; }
-        public ICommand ConvertQuondamsCommand { get; }
+        public ICommand ConvertPointsCommand { get; }
         public ICommand MovePointsCommand { get; }
         public ICommand RetraceCommand { get; }
         public ICommand CreatePlotsCommand { get; }
@@ -111,7 +111,38 @@ namespace TwoTrails.ViewModels
         public bool OnlyQuondams { get; private set; }
         public bool HasPossibleCorridor { get; private set; }
 
-        private bool ignoreSelectionChange = false; 
+        private bool ignoreSelectionChange = false;
+
+        private String _ConvertTypeHeader;
+        public String ConvertTypeHeader
+        {
+            get
+            {
+                if (_SelectionChanged)
+                {
+                    if (HasSelection)
+                    {
+                        if (OnlyQuondams)
+                            _ConvertTypeHeader = "Convert to GPS";
+                        else
+                        {
+                            OpType op = GetSortedSelectedPoints().First().OpType;
+
+                            if (op == OpType.SideShot)
+                                _ConvertTypeHeader = "Convert to Traverse";
+                            else if (op == OpType.Traverse)
+                                _ConvertTypeHeader = "Convert to SideShot";
+                            else
+                                _ConvertTypeHeader = "Convert";
+                        }
+                    }
+                    else
+                        _ConvertTypeHeader = "Convert";
+                }
+
+                return _ConvertTypeHeader;
+            }
+        }
         
         
         private void CompareAndSet<T>(ref bool same, ref T oldVal, T newVal)
@@ -494,9 +525,9 @@ namespace TwoTrails.ViewModels
                 x => CreateQuondams(), x => HasSelection,
                 this, x => x.HasSelection);
 
-            ConvertQuondamsCommand = new BindedRelayCommand<DataEditorModel>(
-                x => ConvertQuondams(), x => OnlyQuondams,
-                this, x => x.OnlyQuondams);
+            ConvertPointsCommand = new BindedRelayCommand<DataEditorModel>(
+                x => ConvertPoints(), x => OnlyQuondams || OnlyTravTypes,
+                this, x => new { x.OnlyQuondams, x.OnlyTravTypes });
 
             MovePointsCommand = new BindedRelayCommand<DataEditorModel>(
                 x => MovePoints(), x => HasSelection,
@@ -1219,6 +1250,7 @@ namespace TwoTrails.ViewModels
                     nameof(OnlyManAccTypes),
                     nameof(OnlyQuondams),
                     nameof(HasPossibleCorridor),
+                    nameof(ConvertTypeHeader),
                     nameof(PID),
                     nameof(SamePID),
                     nameof(Index),
@@ -1405,6 +1437,14 @@ namespace TwoTrails.ViewModels
             PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), true, false, null, Project.MainModel.MainWindow, () => Project.MainModel.MainWindow.IsEnabled = true);
         }
 
+        private void ConvertPoints()
+        {
+            if (OnlyQuondams)
+                ConvertQuondams();
+            else if (OnlyTravTypes)
+                ConvertTravTypes();
+        }
+
         private void ConvertQuondams()
         {
             Func<QuondamPoint, GpsPoint> convertPoint = (q) =>
@@ -1444,6 +1484,37 @@ namespace TwoTrails.ViewModels
                 Manager.ReplacePoints(GetSortedSelectedPoints().Select(p => convertPoint(p as QuondamPoint)));
             else
                 Manager.ReplacePoint(convertPoint(SelectedPoint as QuondamPoint));
+        }
+
+        private void ConvertTravTypes()
+        {
+            Func<TtPoint, TtPoint> convertToTrav = (ss) =>
+            {
+                return new TravPoint(ss);
+            };
+
+            Func<TtPoint, TtPoint> convertToSS = (trav) =>
+            {
+                return new SideShotPoint(trav);
+            };
+
+
+            if (MultipleSelections)
+            {
+                List<TtPoint> points = GetSortedSelectedPoints();
+
+                if (points[0].OpType == OpType.Traverse)
+                    Manager.ReplacePoints(points.Where(pt => pt.OpType == OpType.Traverse).Select(p => convertToSS(p)));
+                else
+                    Manager.ReplacePoints(points.Where(pt => pt.OpType == OpType.SideShot).Select(p => convertToTrav(p)));
+            }
+            else
+            {
+                if (SelectedPoint.OpType == OpType.Traverse)
+                    Manager.ReplacePoint(convertToSS(SelectedPoint));
+                else
+                    Manager.ReplacePoint(convertToTrav(SelectedPoint));
+            }
         }
 
         private void MovePoints()

@@ -110,6 +110,8 @@
                     <MenuItem Header="Reverse Points" Command="{Binding CurrentEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
                           Style="{StaticResource styleMiPointEdit}"/>
 
+                    <MenuItem Header="{Binding CurrentEditor.ConvertTypeHeader}" Command="{Binding CurrentEditor.ConvertPointsCommand}" />
+
                     <Separator/>
 
                     <MenuItem Header="Reset Point" Command="{Binding CurrentEditor.ResetPointCommand}" InputGestureText="Ctrl+R"
