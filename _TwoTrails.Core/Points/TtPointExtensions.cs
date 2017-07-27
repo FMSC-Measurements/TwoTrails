@@ -23,6 +23,11 @@ namespace TwoTrails.Core.Points
             return IsGpsType(point) || (point.OpType == OpType.Quondam && ((QuondamPoint)point).ParentPoint.IsGpsType());
         }
 
+        public static bool IsFixedPoint(this TtPoint point)
+        {
+            return IsGpsType(point) || point.OpType == OpType.Quondam;
+        }
+
         public static bool IsBndPoint(this TtPoint point)
         {
             return point.OnBoundary && point.OpType != OpType.WayPoint;

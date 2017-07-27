@@ -208,7 +208,12 @@ namespace TwoTrails.Mapping
         private void Point_PolygonChanged(TtPoint point, TtPolygon newPolygon, TtPolygon oldPolygon)
         {
             _PointsByPolys[oldPolygon.CN].Remove(point);
-            _PointsByPolys[newPolygon.CN].Insert(point.Index, point);
+
+            ObservableCollection<TtPoint> points = _PointsByPolys[newPolygon.CN];
+            if (point.Index < points.Count)
+                points.Insert(point.Index, point);
+            else
+                points.Add(point);
         }
     }
 }
