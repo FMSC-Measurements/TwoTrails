@@ -20,8 +20,8 @@ namespace TwoTrails.Core
             get
             {
                 return _SegmentPoints.Count > 2 &&
-                    _SegmentPoints[0].IsFixedPoint() &&
-                    _SegmentPoints[_SegmentPoints.Count - 1].IsFixedPoint();
+                    _SegmentPoints[0].IsGpsAtBase() &&
+                    _SegmentPoints[_SegmentPoints.Count - 1].IsGpsAtBase();
             }
         }
 

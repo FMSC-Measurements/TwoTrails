@@ -259,8 +259,6 @@ namespace TwoTrails.Dialogs
                                 _Manager.AddPoint(point);
                             }
 
-                            DialogResult = true;
-
                             Close();
                         }
                         else

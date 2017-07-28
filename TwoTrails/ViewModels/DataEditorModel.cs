@@ -1422,12 +1422,7 @@ namespace TwoTrails.ViewModels
                     case OpType.GPS:
                     case OpType.Traverse:
                     case OpType.SideShot:
-                    case OpType.WayPoint:
-                        {
-                            if (CreateGpsPointDialog.ShowDialog(Manager, null, optype, Project.MainModel.MainWindow) == true)
-                                Manager.BaseManager.AddDataAction(DataActionType.ManualPointCreation);
-                            break;
-                        }
+                    case OpType.WayPoint: CreateGpsPointDialog.ShowDialog(Manager, null, optype, Project.MainModel.MainWindow); break;
                     case OpType.Quondam: Retrace(); break;
                 }
             }
@@ -1490,8 +1485,6 @@ namespace TwoTrails.ViewModels
                 Manager.ReplacePoints(GetSortedSelectedPoints().Select(p => convertPoint(p as QuondamPoint)));
             else
                 Manager.ReplacePoint(convertPoint(SelectedPoint as QuondamPoint));
-
-            Manager.BaseManager.AddDataAction(DataActionType.ConvertPoints);
         }
 
         private void ConvertTravTypes()
@@ -1523,8 +1516,6 @@ namespace TwoTrails.ViewModels
                 else
                     Manager.ReplacePoint(convertToTrav(SelectedPoint));
             }
-
-            Manager.BaseManager.AddDataAction(DataActionType.ConvertPoints);
         }
 
         private void MovePoints()
@@ -1536,12 +1527,7 @@ namespace TwoTrails.ViewModels
         private void Retrace()
         {
             Project.MainModel.MainWindow.IsEnabled = false;
-            RetraceDialog.Show(Manager, Project.MainModel.MainWindow, (result) =>
-            {
-                Project.MainModel.MainWindow.IsEnabled = true;
-                if (result == true)
-                    Manager.BaseManager.AddDataAction(DataActionType.RetracePoints);
-            });
+            RetraceDialog.Show(Manager, Project.MainModel.MainWindow, () => Project.MainModel.MainWindow.IsEnabled = true);
         }
 
         private void CreatePlots()

@@ -100,7 +100,7 @@ namespace TwoTrails.Core
             if (CanRedo)
             {
                 ITtCommand command = _RedoStack.Pop();
-                _UndoStack.Push(command);   //AddCommand(command);
+                AddCommand(command);
                 command.Redo();
 
                 OnHistoryChanged(HistoryEventType.Undone, command.RequireRefresh);
@@ -118,7 +118,7 @@ namespace TwoTrails.Core
                 {
                     command = _RedoStack.Pop();
                     requireRefresh |= command.RequireRefresh;
-                    _UndoStack.Push(command);   //AddCommand(command);
+                    AddCommand(command);
                     command.Redo();
                 }
 

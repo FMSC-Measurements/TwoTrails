@@ -595,8 +595,8 @@ namespace TwoTrails.Core
             {
                 lock (locker)
                 {
-                    if (point.IsFixedPoint())
-                        AdjustAroundFixedPoint(point);
+                    if (point.IsGpsAtBase())
+                        AdjustAroundGpsPoint(point);
 
                     UpdatePolygonStats(point.Polygon); 
                 }
@@ -628,9 +628,9 @@ namespace TwoTrails.Core
         #region Adjusting
         protected void AdjustAroundPoint(TtPoint point, IList<TtPoint> points)
         {
-            if (point.IsFixedPoint())
+            if (point.IsGpsAtBase())
             {
-                AdjustAroundFixedPoint(point);
+                AdjustAroundGpsPoint(point);
             }
             else if (point.OpType == OpType.SideShot)
             {
@@ -643,7 +643,7 @@ namespace TwoTrails.Core
         }
 
 
-        protected void AdjustAroundFixedPoint(TtPoint point)
+        protected void AdjustAroundGpsPoint(TtPoint point)
         {
             IList<TtPoint> points = _PointsByPoly[point.PolygonCN];
             TtPoint prev = (point.Index > 0) ? points[point.Index - 1] : null;
@@ -660,7 +660,8 @@ namespace TwoTrails.Core
                 {
                     AdjustTraverseFromStart(point.Index, points);
                 }
-                else if (next.OpType == OpType.SideShot)
+
+                if (next.OpType == OpType.SideShot)
                 {
                     AdjustSideShotsFromBasePoint(point, points);
                 }
@@ -692,7 +693,7 @@ namespace TwoTrails.Core
             {
                 TtPoint prev;
 
-                for (int i = point.Index - 1; i > - 1; i--)
+                for (int i = point.Index - 1; i > 0; i--)
                 {
                     prev = points[i];
 
@@ -734,11 +735,11 @@ namespace TwoTrails.Core
 
         private void AdjustTraverseFromAfterStart(TtPoint point, IList<TtPoint> points)
         {
-            if (point.Index < points.Count - 1 || point.IsFixedPoint()) // make sure traverse isnt at end
+            if (point.Index < points.Count - 1 || point.IsGpsAtBase()) // make sure traverse isnt at end
             {
                 for (int i = point.Index - 1; i > -1; i--)
                 {
-                    if (points[i].IsFixedPoint())
+                    if (points[i].IsGpsAtBase())
                     {
                         AdjustTraverseFromStart(i, points);
                         break;
@@ -800,44 +801,33 @@ namespace TwoTrails.Core
             IList<TtPoint> points = _PointsByPoly[poly.CN];
             if (points.Count > 1)
             {
-                TtPoint startPoint = null;
+                TtPoint gpsBaseType = null;
                 TtPoint lastPoint = points[0];
 
                 foreach (TtPoint point in points)
                 {
-                    switch (point.OpType)
+                    if (point.IsGpsAtBase())
                     {
-                        case OpType.GPS:
-                        case OpType.Take5:
-                        case OpType.Quondam:
-                        case OpType.Walk:
-                        case OpType.WayPoint:
-                            {
-                                startPoint = point;
+                        gpsBaseType = point;
 
-                                if (ssSeg.Count > 0)
-                                {
-                                    segments.Add(ssSeg);
-                                    ssSeg = new SideShotSegment();
-                                }
-                                break;
-                            }
-                        case OpType.Traverse:
-                            {
-                                if (lastPoint.CN == startPoint.CN)
-                                    segments.Add(GetTraverseSegment(startPoint.Index, points)); 
-                                break;
-                            }
-                        case OpType.SideShot:
-                            {
-                                if (ssSeg.Count == 0)
-                                {
-                                    ssSeg.Add(startPoint);
-                                }
+                        if (ssSeg.Count > 0)
+                        {
+                            segments.Add(ssSeg);
+                            ssSeg = new SideShotSegment();
+                        }
+                    }
+                    else if (point.OpType == OpType.SideShot)
+                    {
+                        if (ssSeg.Count == 0)
+                        {
+                            ssSeg.Add(gpsBaseType);
+                        }
 
-                                ssSeg.Add(point);
-                                break;
-                            }
+                        ssSeg.Add(point);
+                    }
+                    else if (point.OpType == OpType.Traverse && lastPoint.IsGpsAtBase())
+                    {
+                        segments.Add(GetTraverseSegment(lastPoint.Index, points));
                     }
 
                     lastPoint = point;
@@ -862,7 +852,7 @@ namespace TwoTrails.Core
 
                 if (tmp.OpType == OpType.Traverse)
                     seg.Add(tmp);
-                else if (tmp.IsFixedPoint())
+                else if (tmp.IsGpsAtBase())
                 {
                     seg.Add(tmp);
                     break;
@@ -882,7 +872,7 @@ namespace TwoTrails.Core
                 TtPoint lastPoint = points[0];
                 foreach (TtPoint point in points)
                 {
-                    if (point.OpType == OpType.Traverse && lastPoint.IsFixedPoint())
+                    if (point.OpType == OpType.Traverse && lastPoint.IsGpsAtBase())
                     {
                         segments.Add(GetTraverseSegment(lastPoint.Index, points));
                     }
@@ -894,7 +884,7 @@ namespace TwoTrails.Core
             return segments;
         }
 
-        protected List<SideShotSegment> GetFixedPointBasedSideShotSegmentsInPolygon(TtPolygon poly)
+        protected List<SideShotSegment> GetAllGpsBasedSideShotSegmentsInPolygon(TtPolygon poly)
         {
             List<SideShotSegment> segments = new List<SideShotSegment>();
             SideShotSegment seg = new SideShotSegment();
@@ -905,7 +895,7 @@ namespace TwoTrails.Core
                 TtPoint lastPoint = null;
                 foreach (TtPoint point in points)
                 {
-                    if (point.IsFixedPoint())
+                    if (point.IsGpsAtBase())
                     {
                         lastPoint = point;
 
@@ -1397,8 +1387,8 @@ namespace TwoTrails.Core
                     if (!reindexPolygons.Contains(point.PolygonCN))
                         reindexPolygons.Add(point.PolygonCN);
 
-                    point.Index = index++;
                     point.Polygon = targetPolygon;
+                    point.Index = index++;
                 }
 
                 AdjustAllTravTypesInPolygon(targetPolygon);
