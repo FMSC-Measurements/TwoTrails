@@ -51,7 +51,7 @@ namespace TwoTrails.Core
                     foreach (TtPoint point in points)
                         ProcessPoint(sbPoints, point, false, showPoints);
 
-                    TtPoint sp = points.First();
+                    TtPoint sp = null;
                     foreach (TtPoint p in points)
                     {
                         if (p.OnBoundary)
@@ -61,7 +61,7 @@ namespace TwoTrails.Core
                         }
                     }
 
-                    if (!sp.HasSameAdjLocation(_LastTtBndPt))
+                    if (sp != null && !sp.HasSameAdjLocation(_LastTtBndPt))
                         _Legs.Add(new TtLeg(_LastTtBndPt, sp));
 
                     double perim = 0;

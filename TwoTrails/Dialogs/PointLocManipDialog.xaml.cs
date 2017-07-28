@@ -27,6 +27,9 @@ namespace TwoTrails.Dialogs
 
         public PointLocManipDialog(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null)
         {
+            if (points == null || points.Count < 1)
+                throw new Exception("No Points");
+
             _Manager = manager;
             _Points = points;
 
@@ -35,10 +38,10 @@ namespace TwoTrails.Dialogs
             cboPoly.ItemsSource = manager.GetPolygons();
 
             if (target != null)
-            {
-                cboPoly.SelectedItem = target;
-                cboPolyPoints.ItemsSource = manager.GetPoints(target.CN);
-            }
+                target = points.First().Polygon;
+
+            cboPoly.SelectedItem = target;
+            cboPolyPoints.ItemsSource = manager.GetPoints(target.CN);
 
             if (quondam)
                 rbActQuondam.IsChecked = true;

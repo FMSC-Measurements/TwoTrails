@@ -6,12 +6,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using TwoTrails.Core.Points;
 using FMSC.GeoSpatial.UTM;
-using FMSC.GeoSpatial;
 using TwoTrails.DAL;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using TwoTrails.Core.Media;
-using System.Windows.Media.Imaging;
 
 namespace TwoTrails.Core
 {
@@ -660,8 +658,7 @@ namespace TwoTrails.Core
                 {
                     AdjustTraverseFromStart(point.Index, points);
                 }
-
-                if (next.OpType == OpType.SideShot)
+                else if (next.OpType == OpType.SideShot)
                 {
                     AdjustSideShotsFromBasePoint(point, points);
                 }
@@ -693,7 +690,7 @@ namespace TwoTrails.Core
             {
                 TtPoint prev;
 
-                for (int i = point.Index - 1; i > 0; i--)
+                for (int i = point.Index - 1; i > -1; i--)
                 {
                     prev = points[i];
 
@@ -801,28 +798,22 @@ namespace TwoTrails.Core
             IList<TtPoint> points = _PointsByPoly[poly.CN];
             if (points.Count > 1)
             {
-                TtPoint gpsBaseType = null;
+                //TtPoint gpsBaseType = null;
                 TtPoint lastPoint = points[0];
 
                 foreach (TtPoint point in points)
                 {
                     if (point.IsGpsAtBase())
                     {
-                        gpsBaseType = point;
-
                         if (ssSeg.Count > 0)
                         {
                             segments.Add(ssSeg);
                             ssSeg = new SideShotSegment();
+                            ssSeg.Add(point);
                         }
                     }
                     else if (point.OpType == OpType.SideShot)
                     {
-                        if (ssSeg.Count == 0)
-                        {
-                            ssSeg.Add(gpsBaseType);
-                        }
-
                         ssSeg.Add(point);
                     }
                     else if (point.OpType == OpType.Traverse && lastPoint.IsGpsAtBase())
@@ -836,6 +827,7 @@ namespace TwoTrails.Core
                 if (ssSeg.Count > 0)
                     segments.Add(ssSeg);
             }
+
             return segments;
         }
 
@@ -1387,8 +1379,8 @@ namespace TwoTrails.Core
                     if (!reindexPolygons.Contains(point.PolygonCN))
                         reindexPolygons.Add(point.PolygonCN);
 
-                    point.Polygon = targetPolygon;
                     point.Index = index++;
+                    point.Polygon = targetPolygon;
                 }
 
                 AdjustAllTravTypesInPolygon(targetPolygon);
