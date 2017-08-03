@@ -22,28 +22,13 @@ namespace TwoTrails.DAL
     {
         public String FilePath { get; }
 
-        private String _MediaFilePath;
-        public String MediaFilePath
-        {
-            get
-            {
-                return _MediaFilePath ??
-                    (_MediaFilePath = Path.Combine(Path.GetFullPath(FilePath),
-                    $"{Path.GetFileNameWithoutExtension(FilePath)}{Consts.FILE_EXTENSION_MEDIA}"));
-            }
-        }
-
         private SQLiteDatabase _Database;
-        private SQLiteDatabase _MediaDatabase;
 
 
         public TtSqliteDataAccessLayer(String filePath)
         {
             FilePath = filePath;
             _Database = new SQLiteDatabase(FilePath);
-
-            if (File.Exists(MediaFilePath))
-                _MediaDatabase = new SQLiteDatabase(MediaFilePath);
         }
 
         private TtSqliteDataAccessLayer(SQLiteDatabase database)

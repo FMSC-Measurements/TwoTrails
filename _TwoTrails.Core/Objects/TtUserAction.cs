@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+
 namespace TwoTrails.Core
 {
     public class TtUserAction
@@ -66,6 +68,24 @@ namespace TwoTrails.Core
         {
             Action = DataActionType.None;
             Date = DateTime.Now;
+        }
+    }
+
+    public class TtUserActionSorter : IComparer
+    {
+        public int Compare(object x, object y)
+        {
+            TtUserAction xa = x as TtUserAction;
+            TtUserAction ya = y as TtUserAction;
+
+            if (xa == null && ya == null)
+                return 0;
+            else if (xa == null)
+                return 1;
+            else if (ya == null)
+                return -1;
+
+            return xa.Date.CompareTo(ya.Date) * -1;
         }
     }
 }

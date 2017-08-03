@@ -36,6 +36,7 @@ namespace TwoTrails.Controls
             DAL = dal;
             _Activites = DAL.GetUserActivity().ToList();
             Activites = CollectionViewSource.GetDefaultView(_Activites) as ListCollectionView;
+            Activites.CustomSort = new TtUserActionSorter();
 
             this.DataContext = this;
 
