@@ -418,7 +418,8 @@ namespace TwoTrails.DAL
         {
             string tmp = File.ReadAllText(file).ToLower();
 
-            if (tmp.Contains("nad"))
+            if (CultureInfo.CurrentCulture.CompareInfo.IndexOf(
+                tmp, "nad_1983", CompareOptions.IgnoreCase) >= 0)
             {
                 tmp = tmp.Substring(tmp.IndexOf("nad"), 21);
                 if (tmp.Contains("zone"))

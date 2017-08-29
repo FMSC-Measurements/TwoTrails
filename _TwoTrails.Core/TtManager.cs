@@ -161,9 +161,8 @@ namespace TwoTrails.Core
 
             foreach (TtPoint point in points.Where(p => p.OpType == OpType.Quondam))
             {
-                if (point.OpType == OpType.Quondam)
+                if (point is QuondamPoint qp)
                 {
-                    QuondamPoint qp = (QuondamPoint)point;
                     qp.ParentPoint = _PointsMap[qp.ParentPointCN];
                 }
 
