@@ -29,7 +29,9 @@ namespace TwoTrails.Utils
             Dictionary<string, string> metaMap = new Dictionary<string, string>();
             Dictionary<string, TtGroup> iGroups = dal.GetGroups().ToDictionary(g => g.CN, g => g);
             Dictionary<string, string> groupMap = new Dictionary<string, string>();
-
+            
+            includeMetadata &= iMeta.Count > 0;
+            includeGroups &= iGroups.Count > 0;
 
             foreach (TtPolygon poly in iPolys.Values)
             {
@@ -49,6 +51,9 @@ namespace TwoTrails.Utils
 
             foreach (string metaCN in aPoints.Values.Select(p => p.MetadataCN).Distinct())
             {
+                if (metaCN == null)
+                    continue;
+
                 if (includeMetadata)
                 {
                     if (metadata.ContainsKey(metaCN))
@@ -73,6 +78,9 @@ namespace TwoTrails.Utils
 
             foreach (string groupCN in aPoints.Values.Select(p => p.GroupCN).Distinct())
             {
+                if (groupCN == null)
+                    continue;
+
                 if (includeGroups)
                 {
                     if (groups.ContainsKey(groupCN))

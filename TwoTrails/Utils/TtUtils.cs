@@ -3,10 +3,12 @@ using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using TwoTrails.Core;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Utils
@@ -137,6 +139,44 @@ namespace TwoTrails.Utils
             }
 
             return new TimeSpan((end - start).Ticks);
+        }
+
+
+
+
+        public static bool IsImportableFileType(String fileName)
+        {
+            switch (Path.GetExtension(fileName))
+            {
+                case Consts.CSV_EXT:
+                case Consts.TEXT_EXT:
+                case Consts.KML_EXT:
+                case Consts.KMZ_EXT:
+                case Consts.GPX_EXT:
+                case Consts.SHAPE_EXT:
+                case Consts.FILE_EXTENSION:
+                case Consts.FILE_EXTENSION_V2:
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static string GetFileTypeName(string fileName)
+        {
+            switch (Path.GetExtension(fileName))
+            {
+                case Consts.CSV_EXT: return "CSV";
+                case Consts.TEXT_EXT: return "Text";
+                case Consts.KML_EXT:
+                case Consts.KMZ_EXT: return "Google Earth";
+                case Consts.GPX_EXT: return "GPX";
+                case Consts.SHAPE_EXT: return "Shape";
+                case Consts.FILE_EXTENSION: return "TwoTrails";
+                case Consts.FILE_EXTENSION_V2: return "TwoTrails V2";
+            }
+
+            return String.Empty;
         }
     }
 }

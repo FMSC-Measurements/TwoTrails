@@ -61,7 +61,7 @@ namespace TwoTrails.ViewModels
         public bool CanImport { get { return ImportControl != null && ImportControl.HasSelectedPolygons && !IsImporting; } }
 
 
-        public ImportModel(Window window, ITtManager manager)
+        public ImportModel(Window window, ITtManager manager, string fileName = null)
         {
             _Window = window;
             _Manager = manager;
@@ -74,6 +74,9 @@ namespace TwoTrails.ViewModels
             ImportCommand = new BindedRelayCommand<ImportModel>(x => ImportData(), x => CanImport, this, m => m.CanImport);
 
             CancelCommand = new RelayCommand(x => Cancel());
+
+            if (fileName != null)
+                SetupImport(fileName);
         }
 
         private void BrowseFile()
@@ -119,8 +122,8 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                     IsSettingUp = true;
                     ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), true, true, true);
                     break;
-                case ".csv":
-                case ".txt":
+                case Consts.CSV_EXT:
+                case Consts.TEXT_EXT:
                     IsSettingUp = true;
                     MainContent = new CsvParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
                     {
@@ -145,7 +148,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                         }
                     });
                     break;
-                case ".gpx":
+                case Consts.GPX_EXT:
                     IsSettingUp = true;
                     MainContent = new GpxParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
                     {
@@ -170,15 +173,15 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                         }
                     });
                     break;
-                case ".kml":
-                case ".kmz":
+                case Consts.KML_EXT:
+                case Consts.KMZ_EXT:
                     {
                         try
                         {
                             ImportControl = new ImportControl(
                                 new TtKmlDataAccessLayer(
                                     new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true)
-                            ));
+                            ), false, false, false);
 
                             IsSettingUp = true;
                         }
@@ -189,11 +192,11 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
                         break;
                     }
-                case ".shp":
+                case Consts.SHAPE_EXT:
                     ImportControl = new ImportControl(
                         new TtShapeFileDataAccessLayer(
                             new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone)
-                        )
+                        ), false, false, false
                     );
                     IsSettingUp = true;
                     break;

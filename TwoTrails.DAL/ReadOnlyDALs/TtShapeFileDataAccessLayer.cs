@@ -158,7 +158,7 @@ namespace TwoTrails.DAL
 
                                     if (_Options.UseElevation)
                                     {
-                                        if (coord.Z != double.NaN)
+                                        if (!double.IsNaN(coord.Z))
                                         {
                                             gps.UnAdjZ = _Options.Elevation == UomElevation.Feet ?
                                                 FMSC.Core.Convert.Distance(coord.Z, FMSC.Core.Distance.Meters, FMSC.Core.Distance.FeetTenths) :
@@ -237,6 +237,7 @@ namespace TwoTrails.DAL
                                         PID = PointNamer.NamePoint(poly, lastPoint),
                                         Index = index++,
                                         MetadataCN = Consts.EmptyGuid,
+                                        GroupCN = Consts.EmptyGuid,
                                         Polygon = poly
                                     };
 
@@ -255,7 +256,7 @@ namespace TwoTrails.DAL
 
                                     if (_Options.UseElevation)
                                     {
-                                        if (coord.Z != double.NaN)
+                                        if (!double.IsNaN(coord.Z))
                                         {
                                             gps.UnAdjZ = _Options.Elevation == UomElevation.Feet ?
                                                 FMSC.Core.Convert.Distance(coord.Z, FMSC.Core.Distance.Meters, FMSC.Core.Distance.FeetTenths) :
