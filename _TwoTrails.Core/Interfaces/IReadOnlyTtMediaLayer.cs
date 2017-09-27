@@ -14,5 +14,7 @@ namespace TwoTrails.DAL
         #endregion
 
         BitmapImage GetImageData(TtImage image);
+
+        byte[] GetRawImageData(TtImage image);
     }
 }

@@ -15,6 +15,8 @@ using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.Core.Xml.GPX;
 using TwoTrails.Core.Media;
+using TwoTrails.DAL;
+using System.Windows.Media.Imaging;
 
 namespace TwoTrails.Utils
 {
@@ -37,6 +39,7 @@ namespace TwoTrails.Utils
             GPX(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.gpx"));
             KMZ(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.kmz"));
             Shapes(project, folderPath);
+            MediaFiles(project, folderPath);
         }
 
         public static void CheckCreateFolder(string folderPath)
@@ -435,6 +438,41 @@ namespace TwoTrails.Utils
                 }
 
                 sw.Flush();
+            }
+        }
+
+
+        public static void MediaFiles(TtProject project, String folderPath)
+        {
+
+            if (project.MAL != null)
+            {
+                ITtMediaLayer mal = project.MAL;
+
+                IEnumerable<TtImage> images = mal.GetImages();
+
+                if (images.Any())
+                {
+                    string folder = Path.Combine(folderPath, "Media");
+
+                    if (!Directory.Exists(folder))
+                        Directory.CreateDirectory(folder);
+
+                    foreach (TtImage img in images)
+                    {
+                        String filePath = Path.Combine(folder, Path.GetFileName(img.FilePath));
+
+                        if (img.IsExternal)
+                        {
+                            if (File.Exists(img.FilePath))
+                                File.Copy(img.FilePath, filePath);
+                        }
+                        else
+                        {
+                            mal.GetImageData(img).SaveImageToFile(filePath);
+                        }
+                    }
+                }
             }
         }
 

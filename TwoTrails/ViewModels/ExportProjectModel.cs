@@ -34,10 +34,11 @@ namespace TwoTrails.ViewModels
         public bool ExportGroups { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportSummary { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportProject { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
-        public bool ExportImageInfo { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
+        public bool ExportMediaInfo { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportKMZ { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportGPX { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportShapes { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
+        public bool ExportMediaFiles { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
 
         public ExportProjectModel(Window window, TtProject project)
         {
@@ -52,6 +53,8 @@ namespace TwoTrails.ViewModels
 
             IsCheckAll = true;
             CheckAll(true);
+
+            ExportMediaFiles = false;
         }
 
         private void BrowseFolder()
@@ -104,8 +107,11 @@ namespace TwoTrails.ViewModels
                             if (ExportGroups)
                                 Export.Groups(project.Manager, Path.Combine(path, "Groups.csv"));
 
-                            if (ExportImageInfo)
+                            if (ExportMediaInfo)
                                 Export.ImageInfo(project.Manager, Path.Combine(path, "ImageInfo.csv"));
+
+                            if (ExportMediaFiles)
+                                Export.MediaFiles(project, path);
 
                             if (ExportProject)
                                 Export.Project(project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));
@@ -127,7 +133,7 @@ namespace TwoTrails.ViewModels
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine(ex.Message);
+                        Trace.WriteLine(ex.Message, "ExportProjectModel");
                         System.Windows.MessageBox.Show("An error has occured. Please see log for details.");
                     }
                 }
@@ -144,7 +150,7 @@ namespace TwoTrails.ViewModels
         private void CheckAll(bool? isChecked)
         {
             ExportPoints = ExportPolygons = ExportMetadata = ExportGroups =
-            ExportSummary = ExportProject = ExportKMZ = ExportGPX = ExportShapes = ExportImageInfo =
+            ExportSummary = ExportProject = ExportKMZ = ExportGPX = ExportShapes = ExportMediaInfo = ExportMediaFiles =
                 (isChecked == true);
         }
 
@@ -152,12 +158,13 @@ namespace TwoTrails.ViewModels
         {
             if (ExportPoints && ExportPolygons && ExportMetadata && ExportGroups &&
                 ExportSummary && ExportProject && ExportKMZ && ExportGPX && ExportShapes &&
-                ExportImageInfo)
+                ExportMediaInfo && ExportMediaFiles)
             {
                 IsCheckAll = true; 
             }
             else if (ExportPoints || ExportPolygons || ExportMetadata || ExportGroups ||
-                ExportSummary || ExportProject || ExportKMZ || ExportGPX || ExportShapes || ExportImageInfo)
+                ExportSummary || ExportProject || ExportKMZ || ExportGPX || ExportShapes ||
+                ExportMediaInfo || ExportMediaFiles)
             {
                 IsCheckAll = null;
             }

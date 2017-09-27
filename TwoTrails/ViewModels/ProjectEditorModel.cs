@@ -506,6 +506,8 @@ namespace TwoTrails.ViewModels
                     //
                 }
             }
+
+            MediaViewerVisible = false;
         }
 
         private void MediaSelected(TtMediaInfo mediaInfo)

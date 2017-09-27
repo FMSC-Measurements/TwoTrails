@@ -385,11 +385,25 @@ namespace TwoTrails.DAL
         {
             BitmapImage bitmap = new BitmapImage();
 
+            byte[] data = GetRawImageData(image);
+
+            if (data != null)
+            {
+                bitmap.BeginInit();
+                bitmap.StreamSource = new MemoryStream(data);
+                bitmap.EndInit();
+                bitmap.Freeze();
+            }
+            
+            return bitmap;
+        }
+
+        public byte[] GetRawImageData(TtImage image)
+        {
             if (_Database != null)
             {
-
                 String query = String.Format(@"select {0} from {1} where {2} = '{3}' limit 1",
-                    TwoTrailsMediaSchema.Data.SelectItems,
+                    TwoTrailsMediaSchema.Data.BinaryData,
                     TwoTrailsMediaSchema.Data.TableName,
                     TwoTrailsMediaSchema.SharedSchema.CN,
                     image.CN
@@ -401,21 +415,9 @@ namespace TwoTrails.DAL
                     {
                         if (dr != null)
                         {
-                            byte[] data = null;
-                            string cn, dataType;
-
-                            while (dr.Read())
+                            if (dr.Read())
                             {
-                                cn = dr.GetString(0);
-                                dataType = dr.GetString(1);
-                                data = dr.GetBytesEx(2);
-
-                                MemoryStream strmImg = new MemoryStream(data);
-
-                                bitmap.BeginInit();
-                                bitmap.StreamSource = strmImg;
-                                bitmap.EndInit();
-                                bitmap.Freeze();
+                                return dr.GetBytesEx(0);
                             }
                         }
 
@@ -426,7 +428,7 @@ namespace TwoTrails.DAL
                 }
             }
 
-            return bitmap;
+            return null;
         }
 
         #region Utils

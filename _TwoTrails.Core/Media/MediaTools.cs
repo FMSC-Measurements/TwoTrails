@@ -47,6 +47,33 @@ namespace TwoTrails.Core.Media
         }
 
 
+        public static void SaveImageToFile(this BitmapImage image, string filePath)
+        {
+            if (image != null)
+            {
+                BitmapEncoder encoder;
+
+                switch (Path.GetExtension(filePath))
+                {
+                    case ".jpg":
+                    case ".jpeg":
+                        encoder = new JpegBitmapEncoder();
+                        break;
+                    default:
+                        encoder = new PngBitmapEncoder();
+                        break;
+                }
+
+                encoder.Frames.Add(BitmapFrame.Create(image));
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    encoder.Save(fileStream);
+                } 
+            }
+        }
+
+
         public class ImageAsyncResult : IAsyncResult
         {
             public bool IsCompleted { get; private set; }

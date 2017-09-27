@@ -55,6 +55,7 @@
                 <CheckBox Grid.Column="1" Grid.Row="3" Content="KMZ" IsChecked="{Binding ExportKMZ}" />
                 <CheckBox Grid.Column="1" Grid.Row="4" Content="GPX" IsChecked="{Binding ExportGPX}" />
                 <CheckBox Grid.Column="1" Grid.Row="5" Content="Shapes" IsChecked="{Binding ExportShapes}" />
+                <CheckBox Grid.Column="1" Grid.Row="6" Content="Media Files" IsChecked="{Binding ExportMediaFiles}" />
             </Grid>
             
             <Grid Name="gridStatus" Panel.ZIndex="2" VerticalAlignment="Stretch" Background="White" Visibility="Collapsed">

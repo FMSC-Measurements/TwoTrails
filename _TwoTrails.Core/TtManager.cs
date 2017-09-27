@@ -1767,7 +1767,7 @@ namespace TwoTrails.Core
 
         public List<TtImage> GetImages(string pointCN = null)
         {
-            return _MediaMap == null || !_MediaMap.ContainsKey(pointCN) ? new List<TtImage>() :
+            return _MediaMap == null ? new List<TtImage>() :
                 (pointCN == null ? _MediaMap.SelectMany(kvp => kvp.Value.Images) : _MediaMap[pointCN].Images).ToList();
         }
 
