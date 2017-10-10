@@ -526,5 +526,47 @@ namespace TwoTrails.DAL
                 DataActivity;
         }
         #endregion
+
+        #region DataDictionary
+        public static class DataDictionarySchema
+        {
+            public const String TableName = "DataDictionary";
+
+            public const String Name = "Name";
+            public const String Order = "Order";
+            public const String FieldType = "FieldType";
+            public const String Flag = "Flag";
+            public const String Values = "Values";
+            public const String DefaultValue = "DefaultValue";
+            public const String DataType = "DataType";
+            
+            public const String CreateTable =
+                "CREATE TABLE " + TableName + " (" +
+                SharedSchema.CN + " TEXT, " +
+                Name + " TEXT, " +
+                Order + " INTEGER, " +
+                FieldType + " INTEGER, " +
+                Flag + " INTEGER, " +
+                Values + " TEXT, " +
+                DefaultValue + " TEXT, " +
+                DataType + " INTEGER" +
+                ");";
+
+
+            public const String SelectItems =
+                SharedSchema.CN + ", " +
+                Name + ", " +
+                Order + ", " +
+                FieldType + ", " +
+                Flag + ", " +
+                Values + ", " +
+                DefaultValue + ", " +
+                DataType;
+
+
+            public const String DataTableName = "DDData";
+            public const String PointCN = "PointCN";
+        }
+        #endregion
     }
 }

@@ -50,6 +50,15 @@ namespace TwoTrails.DAL
         #endregion
 
 
+        #region DataDictionary
+        DataDictionaryTemplate GetDataDictionaryTemplate();
+
+        DataDictionary GetDataDictionary(string pointCN);
+
+        IEnumerable<DataDictionary> GetDataDictionaries();
+        #endregion
+
+
         #region Util
         bool RequiresUpgrade { get; }
         #endregion

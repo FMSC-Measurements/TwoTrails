@@ -24,6 +24,8 @@ namespace TwoTrails.DAL
 
         private SQLiteDatabase _Database;
 
+        private DataDictionaryTemplate _DataDictionaryTemplate;
+
 
         public TtSqliteDataAccessLayer(String filePath)
         {
@@ -55,12 +57,14 @@ namespace TwoTrails.DAL
             database.ExecuteNonQuery(TwoTrailsSchema.TtNmeaSchema.CreateTable);
             database.ExecuteNonQuery(TwoTrailsSchema.PolygonAttrSchema.CreateTable);
             database.ExecuteNonQuery(TwoTrailsSchema.ActivitySchema.CreateTable);
+            database.ExecuteNonQuery(TwoTrailsSchema.DataDictionarySchema.CreateTable);
 
             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(database);
             dal.InsertProjectInfo(projectInfo);
 
             return dal;
         }
+
 
         public bool RequiresUpgrade
         {
@@ -77,7 +81,7 @@ namespace TwoTrails.DAL
                 $"{TwoTrailsSchema.PointSchema.TableName}.{TwoTrailsSchema.SharedSchema.CN} = '{pointCN}'",
                 1,
                 false
-            ).FirstOrDefault();
+            ).First();
         }
 
         public IEnumerable<TtPoint> GetPoints(string polyCN = null, bool linked = false)
@@ -2101,6 +2105,220 @@ namespace TwoTrails.DAL
             }
         }
         #endregion
+
+
+        #region DataDictionary
+        public DataDictionaryTemplate GetDataDictionaryTemplate()
+        {
+            if (_DataDictionaryTemplate == null)
+            {
+                _DataDictionaryTemplate = new DataDictionaryTemplate();
+
+                String query = $"select {TwoTrailsSchema.DataDictionarySchema.SelectItems} from {TwoTrailsSchema.DataDictionarySchema.TableName}";
+
+                using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                {
+                    using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
+                    {
+                        if (dr != null)
+                        {
+                            string cn, name, defaultValue = null;
+                            int order, flag;
+                            FeildType fieldType;
+                            List<string> values = null;
+                            DataType dataType;
+
+                            while (dr.Read())
+                            {
+                                cn = dr.GetString(0);
+                                name = dr.GetString(1);
+                                order = dr.GetInt32(2);
+                                fieldType = (FeildType)dr.GetInt32(3);
+                                flag = dr.GetInt32(4);
+
+                                if (!dr.IsDBNull(5))
+                                    values = dr.GetString(5).Split('\n').ToList();
+
+                                if (!dr.IsDBNull(6))
+                                    defaultValue = dr.GetString(6);
+
+                                dataType = (DataType)dr.GetInt32(7);
+
+                                _DataDictionaryTemplate.AddField(new DataDictionaryField(cn)
+                                {
+                                    Name = name,
+                                    Order = order,
+                                    FeildType = fieldType,
+                                    Flag = flag,
+                                    Values = values,
+                                    DefaultValue = defaultValue,
+                                    DataType = dataType
+                                });
+                            }
+
+                            dr.Close();
+                        }
+                    }
+
+                    conn.Close();
+                }
+            }
+
+            return _DataDictionaryTemplate;
+        }
+
+        public bool CreateDataDictionary(DataDictionaryTemplate template)
+        {
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+            {
+                using (SQLiteTransaction trans = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        _Database.ClearTable(TwoTrailsSchema.DataDictionarySchema.TableName, conn, trans);
+
+                        Dictionary<string, SQLiteDataType> ddFields = new Dictionary<string, SQLiteDataType>();
+                        ddFields.Add(TwoTrailsSchema.DataDictionarySchema.PointCN, SQLiteDataType.TEXT);
+
+                        foreach (DataDictionaryField field in template)
+                        {
+                            InsertDataDictionaryField(field, conn, trans);
+
+
+
+                            ddFields.Add(field.CN, field.DataType == DataType.BOOLEAN ? SQLiteDataType.INTEGER : (SQLiteDataType)(int)field.DataType);
+                        }
+
+                        _Database.CreateTable(TwoTrailsSchema.DataDictionarySchema.DataTableName, ddFields, null, conn, trans);
+
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message, "DAL:UpdateDataDictionaryTemplate");
+                        trans.Rollback();
+                        return false;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+
+            return true;
+        }
+
+
+        protected void InsertDataDictionaryField(DataDictionaryField field, SQLiteConnection conn, SQLiteTransaction transaction)
+        {
+            _Database.Insert(TwoTrailsSchema.DataDictionarySchema.TableName, GetDataDictionaryFieldValues(field), conn, transaction);
+        }
+
+        private Dictionary<string, object> GetDataDictionaryFieldValues(DataDictionaryField field)
+        {
+            return new Dictionary<string, object>()
+            {
+                [TwoTrailsSchema.SharedSchema.CN] = field.CN,
+                [TwoTrailsSchema.DataDictionarySchema.Name] = field.Name,
+                [TwoTrailsSchema.DataDictionarySchema.Order] = field.Order,
+                [TwoTrailsSchema.DataDictionarySchema.FieldType] = (int)field.FeildType,
+                [TwoTrailsSchema.DataDictionarySchema.Flag] = field.Flag,
+                [TwoTrailsSchema.DataDictionarySchema.Values] = field.Values != null && field.Values.Any() ? string.Join(Environment.NewLine, field.Values) : null,
+                [TwoTrailsSchema.DataDictionarySchema.DefaultValue] = field.DefaultValue,
+                [TwoTrailsSchema.DataDictionarySchema.DataType] = field.DataType
+            };
+        }
+        
+        
+        public DataDictionary GetDataDictionary(string pointCN)
+        {
+            return GetDataDictionaries(
+                $"{TwoTrailsSchema.DataDictionarySchema.DataTableName}.{TwoTrailsSchema.DataDictionarySchema.PointCN} = '{pointCN}'"
+            ).First();
+        }
+
+        public IEnumerable<DataDictionary> GetDataDictionaries()
+        {
+            return GetDataDictionaries(null);
+        }
+
+        protected IEnumerable<DataDictionary> GetDataDictionaries(string where)
+        {
+            DataDictionaryTemplate template = GetDataDictionaryTemplate();
+
+            if (template != null)
+            {
+                List<DataDictionaryField> fields = template.ToList();
+
+                String query = $@"select { string.Join(", ", fields.Select(f => f.CN).ToArray()) } from 
+{TwoTrailsSchema.DataDictionarySchema.DataTableName}{( where != null ? $" where { where }" : String.Empty )}";
+
+                using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                {
+                    using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
+                    {
+                        if (dr != null)
+                        {
+                            Dictionary<string, object> dic;
+                            string pointCN = null;
+                            int findex;
+
+                            while (dr.Read())
+                            {
+                                dic = new Dictionary<string, object>();
+                                findex = 1;
+
+                                pointCN = dr.GetString(0);
+
+                                foreach (DataDictionaryField field in fields)
+                                {
+                                    object value = null;
+
+                                    if (!dr.IsDBNull(findex))
+                                    {
+                                        switch (field.DataType)
+                                        {
+                                            case DataType.INTEGER:
+                                                value = dr.GetInt32(findex);
+                                                break;
+                                            case DataType.DECIMAL:
+                                                value = dr.GetDecimal(findex);
+                                                break;
+                                            case DataType.FLOAT:
+                                                value = dr.GetFloat(findex);
+                                                break;
+                                            case DataType.STRING:
+                                                value = dr.GetString(findex);
+                                                break;
+                                            case DataType.BYTE_ARRAY:
+                                                value = dr.GetBytesEx(findex);
+                                                break;
+                                            case DataType.BOOLEAN:
+                                                value = dr.GetBoolean(findex);
+                                                break;
+                                        }
+                                    }
+
+                                    dic.Add(field.CN, value);
+                                    findex++;
+                                }
+
+                                yield return new DataDictionary(pointCN, dic);
+                            }
+
+                            dr.Close();
+                        }
+                    }
+
+                    conn.Close();
+                }
+            }
+
+            throw new Exception("No DataDictionary Template");
+        }
+        #endregion
+
 
         #region Utils
         public void Clean()

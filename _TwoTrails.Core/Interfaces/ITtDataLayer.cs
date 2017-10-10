@@ -90,6 +90,11 @@ namespace TwoTrails.DAL
         #endregion
 
 
+        #region DataDictionary
+        bool CreateDataDictionary(DataDictionaryTemplate template);
+        #endregion
+
+
         #region Util
         void Clean();
         #endregion
