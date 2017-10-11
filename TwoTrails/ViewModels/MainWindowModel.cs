@@ -207,10 +207,28 @@ namespace TwoTrails.ViewModels
 
         private void ParseCommandLineArgs(String[] args)
         {
-            foreach (String file in args.Select(f => f.Trim('"')))
+            if (args[1].ToLower() == "--export-media" && args.Length > 2)
             {
-                if (file.EndsWith(Consts.FILE_EXTENSION))
-                    OpenProject(file);
+                try
+                {
+                    string file = args[2];
+                    if (file.EndsWith(Consts.FILE_EXTENSION_MEDIA) && File.Exists(file))
+                        Export.MediaFiles(new TtSqliteMediaAccessLayer(file), Path.GetDirectoryName(file));
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.Message, "MainWindowModel:ParseCommandLineArgs-ExportMedia");
+                }
+
+                Exit(true);
+            }
+            else
+            {
+                foreach (String file in args.Select(f => f.Trim('"')))
+                {
+                    if (file.EndsWith(Consts.FILE_EXTENSION))
+                        OpenProject(file);
+                }
             }
         }
 

@@ -539,7 +539,11 @@ namespace TwoTrails.DAL
             public const String Values = "Values";
             public const String DefaultValue = "DefaultValue";
             public const String DataType = "DataType";
+
+            public const String DataTableName = "DDData";
+            public const String PointCN = "PointCN";
             
+
             public const String CreateTable =
                 "CREATE TABLE " + TableName + " (" +
                 SharedSchema.CN + " TEXT, " +
@@ -562,10 +566,6 @@ namespace TwoTrails.DAL
                 Values + ", " +
                 DefaultValue + ", " +
                 DataType;
-
-
-            public const String DataTableName = "DDData";
-            public const String PointCN = "PointCN";
         }
         #endregion
     }

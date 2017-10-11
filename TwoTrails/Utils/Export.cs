@@ -38,8 +38,10 @@ namespace TwoTrails.Utils
             ImageInfo(project.Manager, Path.Combine(folderPath, "ImageInfo.csv"));
             GPX(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.gpx"));
             KMZ(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.kmz"));
+
             Shapes(project, folderPath);
-            MediaFiles(project, folderPath);
+            if (project.MAL != null)
+                MediaFiles(project.MAL, folderPath);
         }
 
         public static void CheckCreateFolder(string folderPath)
@@ -442,35 +444,29 @@ namespace TwoTrails.Utils
         }
 
 
-        public static void MediaFiles(TtProject project, String folderPath)
+        public static void MediaFiles(ITtMediaLayer mal, String folderPath)
         {
+            IEnumerable<TtImage> images = mal.GetImages();
 
-            if (project.MAL != null)
+            if (images.Any())
             {
-                ITtMediaLayer mal = project.MAL;
+                string folder = Path.Combine(folderPath, "Media");
 
-                IEnumerable<TtImage> images = mal.GetImages();
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
 
-                if (images.Any())
+                foreach (TtImage img in images)
                 {
-                    string folder = Path.Combine(folderPath, "Media");
+                    String filePath = Path.Combine(folder, Path.GetFileName(img.FilePath));
 
-                    if (!Directory.Exists(folder))
-                        Directory.CreateDirectory(folder);
-
-                    foreach (TtImage img in images)
+                    if (img.IsExternal)
                     {
-                        String filePath = Path.Combine(folder, Path.GetFileName(img.FilePath));
-
-                        if (img.IsExternal)
-                        {
-                            if (File.Exists(img.FilePath))
-                                File.Copy(img.FilePath, filePath);
-                        }
-                        else
-                        {
-                            mal.GetImageData(img).SaveImageToFile(filePath);
-                        }
+                        if (File.Exists(img.FilePath))
+                            File.Copy(img.FilePath, filePath);
+                    }
+                    else
+                    {
+                        mal.GetImageData(img).SaveImageToFile(filePath);
                     }
                 }
             }

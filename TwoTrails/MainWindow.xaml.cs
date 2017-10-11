@@ -33,7 +33,7 @@ namespace TwoTrails
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            e.Cancel = !MainModel.CanExit;
+            e.Cancel = MainModel != null ? !MainModel.CanExit : false;
         }
 
         private void tabControl_Drop(object sender, DragEventArgs e)

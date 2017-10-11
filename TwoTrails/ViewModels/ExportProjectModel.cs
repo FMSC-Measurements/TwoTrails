@@ -110,8 +110,8 @@ namespace TwoTrails.ViewModels
                             if (ExportMediaInfo)
                                 Export.ImageInfo(project.Manager, Path.Combine(path, "ImageInfo.csv"));
 
-                            if (ExportMediaFiles)
-                                Export.MediaFiles(project, path);
+                            if (ExportMediaFiles && project.MAL != null)
+                                Export.MediaFiles(project.MAL, path);
 
                             if (ExportProject)
                                 Export.Project(project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));

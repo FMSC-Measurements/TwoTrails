@@ -519,7 +519,23 @@ namespace TwoTrails.DAL
         }
 
 
-        public Boolean HasPolygons()
+        public DataDictionaryTemplate GetDataDictionaryTemplate()
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataDictionary GetDataDictionary(string pointCN)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DataDictionary> GetDataDictionaries()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public bool HasPolygons()
         {
             CheckVersion();
 

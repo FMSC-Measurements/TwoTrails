@@ -2183,10 +2183,13 @@ namespace TwoTrails.DAL
                         foreach (DataDictionaryField field in template)
                         {
                             InsertDataDictionaryField(field, conn, trans);
-
-
-
+                            
                             ddFields.Add(field.CN, field.DataType == DataType.BOOLEAN ? SQLiteDataType.INTEGER : (SQLiteDataType)(int)field.DataType);
+                        }
+
+                        if (_Database.TableExists(TwoTrailsSchema.DataDictionarySchema.DataTableName))
+                        {
+                            _Database.DropTable(TwoTrailsSchema.DataDictionarySchema.DataTableName, conn, trans);
                         }
 
                         _Database.CreateTable(TwoTrailsSchema.DataDictionarySchema.DataTableName, ddFields, null, conn, trans);
