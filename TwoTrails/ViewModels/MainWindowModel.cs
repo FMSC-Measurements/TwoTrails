@@ -198,7 +198,7 @@ namespace TwoTrails.ViewModels
 
             string[] args = Environment.GetCommandLineArgs();
 
-            if (args != null && args.Length > 0)
+            if (args != null && args.Length > 1)
             {
                 ParseCommandLineArgs(args);
             }
