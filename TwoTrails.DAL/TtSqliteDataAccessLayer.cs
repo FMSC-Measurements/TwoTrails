@@ -57,7 +57,7 @@ namespace TwoTrails.DAL
             database.ExecuteNonQuery(TwoTrailsSchema.TtNmeaSchema.CreateTable);
             database.ExecuteNonQuery(TwoTrailsSchema.PolygonAttrSchema.CreateTable);
             database.ExecuteNonQuery(TwoTrailsSchema.ActivitySchema.CreateTable);
-            database.ExecuteNonQuery(TwoTrailsSchema.DataDictionarySchema.CreateTable);
+            //database.ExecuteNonQuery(TwoTrailsSchema.DataDictionarySchema.CreateTable);
 
             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(database);
             dal.InsertProjectInfo(projectInfo);
