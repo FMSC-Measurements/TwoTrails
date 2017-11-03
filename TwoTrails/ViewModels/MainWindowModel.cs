@@ -291,7 +291,7 @@ namespace TwoTrails.ViewModels
                         }
                         catch (Exception ex)
                         {
-                            Trace.WriteLine(ex.Message, "MWM:OpenProject");
+                            Trace.WriteLine($"{ ex.Message }\n\t{ ex.StackTrace }", "MWM:OpenProject");
                             MessageBox.Show(MainWindow, "There is an issue opening this Project. See log file for details.", "Open Project Error");
                         }
                     }

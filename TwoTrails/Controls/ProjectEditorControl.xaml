@@ -977,6 +977,12 @@
                     </Grid>
                 </Border>
             </TabItem>
+
+            <TabItem Header="Map" Visibility="Collapsed">
+                
+            </TabItem>
+            
+            
         </TabControl>
     </Grid>
 </UserControl>

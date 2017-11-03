@@ -533,38 +533,41 @@ namespace TwoTrails.DAL
             public const String TableName = "DataDictionary";
 
             public const String Name = "Name";
-            public const String Order = "Order";
+            public const String FieldOrder = "FieldOrder";
             public const String FieldType = "FieldType";
             public const String Flag = "Flag";
-            public const String Values = "Values";
+            public const String FieldValues = "FieldValues";
             public const String DefaultValue = "DefaultValue";
+            public const String ValueRequired = "ValueRequired";
             public const String DataType = "DataType";
 
-            public const String DataTableName = "DDData";
+            public const String ExtendDataTableName = "DDData";
             public const String PointCN = "PointCN";
             
 
             public const String CreateTable =
                 "CREATE TABLE " + TableName + " (" +
-                SharedSchema.CN + " TEXT, " +
-                Name + " TEXT, " +
-                Order + " INTEGER, " +
-                FieldType + " INTEGER, " +
+                SharedSchema.CN + " TEXT NOT NULL, " +
+                Name + " TEXT NOT NULL, " +
+                FieldOrder + " INTEGER NOT NULL, " +
+                FieldType + " INTEGER NOT NULL, " +
                 Flag + " INTEGER, " +
-                Values + " TEXT, " +
+                FieldValues + " TEXT, " +
                 DefaultValue + " TEXT, " +
-                DataType + " INTEGER" +
+                ValueRequired + " INTEGER NOT NULL, " +
+                DataType + " INTEGER NOT NULL" +
                 ");";
 
 
             public const String SelectItems =
                 SharedSchema.CN + ", " +
                 Name + ", " +
-                Order + ", " +
+                FieldOrder + ", " +
                 FieldType + ", " +
                 Flag + ", " +
-                Values + ", " +
+                FieldValues + ", " +
                 DefaultValue + ", " +
+                ValueRequired + ", " +
                 DataType;
         }
         #endregion

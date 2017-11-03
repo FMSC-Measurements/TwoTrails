@@ -1,6 +1,7 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core.ComponentModel;
 using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Controls;
 using Microsoft.Win32;
 using System;
 using System.Collections;
@@ -13,6 +14,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Core;
@@ -51,7 +53,7 @@ namespace TwoTrails.ViewModels
         public ICommand ExportValuesCommand { get; }
         public ICommand ViewPointDetailsCommand { get; }
         #endregion
-
+        
         #region Properties
         private ListCollectionView _Points;
         public ListCollectionView Points
@@ -474,6 +476,10 @@ namespace TwoTrails.ViewModels
         #endregion
 
 
+        public ObservableCollection<DataGridColumn> PointColumns { get; private set; } = CreateDefaultColumns();
+
+
+
         public DataEditorModel(TtProject project)
         {
             Project = project;
@@ -554,9 +560,23 @@ namespace TwoTrails.ViewModels
             SelectTravCommand = new RelayCommand(x => SelectTraverse());
 
             SelectInverseCommand = new RelayCommand(x => SelectInverse());
-            
+
             //BindingOperations.EnableCollectionSynchronization(_SelectedPoints, _lock);
 
+
+            #region Setup DataDictionary Columns
+
+            DataDictionaryTemplate ddt = Manager.GetDataDictionaryTemplate();
+
+            if (ddt != null)
+            {
+                foreach (DataDictionaryField ddf in ddt)
+                {
+                    PointColumns.Add(CreateDataGridTextColumn(ddf.Name, $"{ nameof(TtPoint.ExtendedData) }.{ $"[{ ddf.CN }]" }"));
+                } 
+            }
+
+            #endregion
 
             #region Setup Filters
             CheckedListItem<TtPolygon> tmpPoly;
@@ -636,6 +656,56 @@ namespace TwoTrails.ViewModels
             Points.Filter = Filter;
         }
 
+
+        private static ObservableCollection<DataGridColumn> CreateDefaultColumns()
+        {
+            string defaultNumberFormat = "{0:0.###}";
+
+            return new ObservableCollection<DataGridColumn>()
+            {
+                CreateDataGridTextColumn(nameof(TtPoint.Index)),
+                CreateDataGridTextColumn(nameof(TtPoint.PID)),
+                CreateDataGridTextColumn(nameof(TtPoint.OpType)),
+                CreateDataGridTextColumn(nameof(TtPoint.Polygon), "Polygon.Name", 100),
+                CreateDataGridTextColumn("OnBound", nameof(TtPoint.OnBoundary)),
+                CreateDataGridTextColumn(nameof(TtPoint.AdjX), stringFormat: defaultNumberFormat),
+                CreateDataGridTextColumn(nameof(TtPoint.AdjY), stringFormat: defaultNumberFormat),
+                CreateDataGridTextColumn("AdjZ (M)", nameof(TtPoint.AdjY), stringFormat: defaultNumberFormat),
+                CreateDataGridTextColumn("Acc (M)", nameof(TtPoint.Accuracy), stringFormat: defaultNumberFormat),
+                CreateDataGridTextColumn(nameof(TtPoint.UnAdjX), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn(nameof(TtPoint.UnAdjY), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn("UnAdjZ (M)", stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn("QndmLink", nameof(TtPoint.HasQuondamLinks)),
+                CreateDataGridTextColumn("Created", nameof(TtPoint.TimeCreated), visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn(nameof(TtPoint.Comment), visibility: Visibility.Collapsed)
+            };
+        }
+
+        private static DataGridTextColumn CreateDataGridTextColumn(String name, string binding = null,
+            int? width = null, string stringFormat = null, Visibility visibility = Visibility.Visible)
+        {
+            
+            var ctx = new
+            {
+                Name = name,
+                HideColumn = new RelayCommand(x =>
+                {
+                    if (x != null)
+                    {
+
+                    }
+                })
+            };
+
+            return new DataGridTextColumn()
+            {
+                Header = ctx,
+                IsReadOnly = true,
+                Width = width ?? DataGridLength.Auto,
+                Visibility = visibility,
+                Binding = new Binding(binding ?? name) { StringFormat = stringFormat }
+            };
+        }
 
         #region Collections Changed
         private void Polygons_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

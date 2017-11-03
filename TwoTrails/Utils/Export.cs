@@ -443,7 +443,7 @@ namespace TwoTrails.Utils
             }
         }
 
-
+        //todo add option to put media into sub folders with the point name
         public static void MediaFiles(ITtMediaLayer mal, String folderPath)
         {
             IEnumerable<TtImage> images = mal.GetImages();

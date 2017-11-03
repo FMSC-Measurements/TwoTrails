@@ -1,40 +1,75 @@
-﻿using System;
+﻿using CSUtil;
+using CSUtil.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Collections;
 
 namespace TwoTrails.Core
 {
-    public class DataDictionary
+    public class DataDictionary : NotifyPropertyChangedEx, IEqualityComparer<DataDictionary>, IEnumerable<KeyValuePair<string, object>>
     {
         private readonly Dictionary<string, object> _Data;
-
-        public string PointCN { get; }
         
         
-        public DataDictionary(string pointCN, Dictionary<string, object> data = null)
+        public DataDictionary(Dictionary<string, object> data = null)
         {
-            PointCN = pointCN;
             _Data = data ?? new Dictionary<string, object>();
         }
+        
 
-
-        public void Update<T>(string cn, T value)
+        public object this[string cn]
         {
-            if (_Data.ContainsKey(cn))
+            get { return _Data[cn]; }
+            set
             {
-                _Data[cn] = value;
-            }
-            else
-            {
-                _Data.Add(cn, value);
+                if (_Data.ContainsKey(cn))
+                {
+                    if (!_Data[cn].Equals(value))
+                    {
+                        _Data[cn] = value;
+                        OnPropertyChanged(cn);
+                    }
+                }
+                else
+                {
+                    _Data.Add(cn, value);
+                    OnPropertyChanged(cn);
+                }
             }
         }
 
 
-        public T Get<T>(string cn)
+        public override bool Equals(object obj)
         {
-            return (T)_Data[cn];
+            return Equals(this, obj as DataDictionary);
         }
 
+        public bool Equals(DataDictionary x, DataDictionary y)
+        {
+            return _Data.DictionaryEqual(y._Data);
+        }
+
+
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+        {
+            return _Data.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+
+        public int GetHashCode(DataDictionary obj)
+        {
+            return obj.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return _Data.GetHashCode();
+        }
     }
 }

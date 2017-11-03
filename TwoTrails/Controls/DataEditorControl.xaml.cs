@@ -24,9 +24,11 @@ namespace TwoTrails.Controls
             DataStyles = dataStyles;
 
             InitializeComponent();
-
+            
             this.DataContext = dataEditor;
         }
+
+
 
         private void TextBox_UpdateBinding(object sender, RoutedEventArgs e)
         {

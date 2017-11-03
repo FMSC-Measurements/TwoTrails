@@ -50,6 +50,10 @@ namespace TwoTrails.Core
         void DeleteMedia(TtMedia media);
 
 
+        DataDictionaryTemplate GetDataDictionaryTemplate();
+
+
+
         PolygonGraphicOptions GetPolygonGraphicOption(string polyCN);
         List<PolygonGraphicOptions> GetPolygonGraphicOptions();
     }

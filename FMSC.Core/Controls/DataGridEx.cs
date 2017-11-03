@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
@@ -41,6 +42,72 @@ namespace FMSC.Core.Controls
 
         public event EventHandler<NotifyCollectionChangedEventArgs> CollectionUpdated;
 
+
+        public ObservableCollection<DataGridColumn> BindableColumns
+        {
+            get { return (ObservableCollection<DataGridColumn>)GetValue(BindableColumnsProperty); }
+            set { SetValue(BindableColumnsProperty, value); }
+        }
+        
+        public static readonly DependencyProperty BindableColumnsProperty =
+            DependencyProperty.Register("BindableColumns",
+                typeof(ObservableCollection<DataGridColumn>),
+                typeof(DataGridEx),
+                new UIPropertyMetadata(null, BindableColumnsPropertyChanged)
+            );
+
+        private static void BindableColumnsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
+            DataGrid dataGrid = source as DataGrid;
+            ObservableCollection<DataGridColumn> columns = e.NewValue as ObservableCollection<DataGridColumn>;
+
+            dataGrid.Columns.Clear();
+
+            if (columns == null)
+                return;
+
+            foreach (DataGridColumn column in columns)
+                dataGrid.Columns.Add(column);
+
+            columns.CollectionChanged += (sender, e2) =>
+            {
+                NotifyCollectionChangedEventArgs ne = e2 as NotifyCollectionChangedEventArgs;
+                if (ne.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    dataGrid.Columns.Clear();
+                    foreach (DataGridColumn column in ne.NewItems)
+                    {
+                        dataGrid.Columns.Add(column);
+                    }
+                }
+                else if (ne.Action == NotifyCollectionChangedAction.Add)
+                {
+                    foreach (DataGridColumn column in ne.NewItems)
+                    {
+                        dataGrid.Columns.Add(column);
+                    }
+                }
+                else if (ne.Action == NotifyCollectionChangedAction.Move)
+                {
+                    dataGrid.Columns.Move(ne.OldStartingIndex, ne.NewStartingIndex);
+                }
+                else if (ne.Action == NotifyCollectionChangedAction.Remove)
+                {
+                    foreach (DataGridColumn column in ne.OldItems)
+                    {
+                        dataGrid.Columns.Remove(column);
+                    }
+                }
+                else if (ne.Action == NotifyCollectionChangedAction.Replace)
+                {
+                    dataGrid.Columns[ne.NewStartingIndex] = ne.NewItems[0] as DataGridColumn;
+                }
+            };
+        }
+        
+
+
+
         public DataGridEx()
         {
             this.SelectionChanged += DataGridEx_SelectionChanged;
@@ -69,11 +136,14 @@ namespace FMSC.Core.Controls
 
         private void ItemContainerGenerator_ItemsChanged(object sender, System.Windows.Controls.Primitives.ItemsChangedEventArgs e)
         {
+            if (e == null)
+                throw new ArgumentNullException(nameof(e));
+
             this.VisibleItemsList = this.ItemContainerGenerator.Items;
             VisibleItemListChanged?.Invoke(VisibleItemsList);
         }
 
-        private void DataGridEx_SourceUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
+        private void DataGridEx_SourceUpdated(object sender, DataTransferEventArgs e)
         {
             this.VisibleItemsList = this.ItemContainerGenerator.Items;
             VisibleItemListChanged?.Invoke(VisibleItemsList);
@@ -97,5 +167,8 @@ namespace FMSC.Core.Controls
         {
             Sorted?.Invoke(this, new EventArgs());
         }
+
+
+
     }
 }

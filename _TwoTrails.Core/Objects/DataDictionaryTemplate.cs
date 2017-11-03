@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace TwoTrails.Core
 {
@@ -24,11 +25,22 @@ namespace TwoTrails.Core
                 _Fields.Remove(cn);
         }
 
+
+        public DataDictionary CreateDefaultDataDictionary()
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>();
+
+            foreach (DataDictionaryField ddf in this)
+                data.Add(ddf.CN, ddf.GetDefaultValue());
+
+            return new DataDictionary();
+        }
+
         
         public IEnumerator<DataDictionaryField> GetEnumerator()
         {
-            foreach (DataDictionaryField f in _Fields.Values)
-                yield return f;
+            foreach (DataDictionaryField ddf in _Fields.Values.OrderBy(f => f.Order))
+                yield return ddf;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -55,10 +67,50 @@ namespace TwoTrails.Core
 
         public DataType DataType { get; set; }
 
+        public bool ValueRequired { get; set; }
+
 
         public DataDictionaryField(String cn = null)
         {
             CN = cn ?? Guid.NewGuid().ToString();
+        }
+
+
+        public object GetDefaultValue()
+        {
+            if (DefaultValue != null)
+            {
+                switch (DataType)
+                {
+                    case DataType.INTEGER: return Int32.Parse(DefaultValue);
+                    case DataType.DECIMAL: return Decimal.Parse(DefaultValue);
+                    case DataType.FLOAT: return Double.Parse(DefaultValue);
+                    case DataType.STRING: return DefaultValue;
+                    case DataType.BYTE_ARRAY: return Int32.Parse(DefaultValue);
+                    case DataType.BOOLEAN: return Encoding.UTF8.GetBytes(DefaultValue);
+                    default: throw new Exception("Invalid DataType");
+                }
+            }
+            else if (ValueRequired)
+            {
+                switch (DataType)
+                {
+                    case DataType.INTEGER: return 0;
+                    case DataType.DECIMAL: return 0m;
+                    case DataType.FLOAT: return 0d;
+                    case DataType.STRING: return String.Empty;
+                    case DataType.BYTE_ARRAY: return new byte[0];
+                    case DataType.BOOLEAN: return false;
+                    default: throw new Exception("Invalid DataType");
+                }
+            }
+
+            return null;
+        }
+
+        public T GetDefaultValue<T>()
+        {
+            return (T)GetDefaultValue();
         }
     }
 

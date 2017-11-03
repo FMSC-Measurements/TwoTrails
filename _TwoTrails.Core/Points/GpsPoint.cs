@@ -108,9 +108,9 @@ namespace TwoTrails.Core.Points
 
         public GpsPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,
             string comment, bool onbnd, double adjx, double adjy, double adjz, double unadjx, double unadjy, double unadjz,
-            double acc, string qlinks, double? lat, double? lon, double? elev, double? manacc, double? rmser)
+            double acc, string qlinks, double? lat, double? lon, double? elev, double? manacc, double? rmser, DataDictionary extended = null)
             : base(cn, index, pid, time, polycn, metacn, groupcn, comment, onbnd, adjx, adjy, adjz, unadjx,
-            unadjy, unadjz, acc, qlinks)
+            unadjy, unadjz, acc, qlinks, extended)
         {
             _Latitude = lat;
             _Longitude = lon;

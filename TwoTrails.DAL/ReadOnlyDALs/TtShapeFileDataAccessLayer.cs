@@ -371,12 +371,12 @@ namespace TwoTrails.DAL
             throw new NotImplementedException();
         }
 
-        public DataDictionary GetDataDictionary(string pointCN)
+        public DataDictionary GetExtendedDataForPoint(string pointCN)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<DataDictionary> GetDataDictionaries()
+        public IEnumerable<DataDictionary> GetExtendedData()
         {
             throw new NotImplementedException();
         }

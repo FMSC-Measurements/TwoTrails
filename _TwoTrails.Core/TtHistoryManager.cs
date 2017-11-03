@@ -376,6 +376,11 @@ namespace TwoTrails.Core
         {
             throw new NotImplementedException();
         }
+
+        public DataDictionaryTemplate GetDataDictionaryTemplate()
+        {
+            return BaseManager.GetDataDictionaryTemplate();
+        }
     }
 
     public enum HistoryEventType

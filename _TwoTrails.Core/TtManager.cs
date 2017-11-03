@@ -1784,6 +1784,16 @@ namespace TwoTrails.Core
         }
 
 
+        //datadictionary
+
+        public DataDictionaryTemplate GetDataDictionaryTemplate()
+        {
+            return _DAL.GetDataDictionaryTemplate();
+        }
+
+
+
+
         public void AddDataAction(DataActionType action)
         {
 
@@ -1793,5 +1803,9 @@ namespace TwoTrails.Core
         {
 
         }
+
+
+
+
     }
 }

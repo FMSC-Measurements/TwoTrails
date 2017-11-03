@@ -53,9 +53,9 @@ namespace TwoTrails.DAL
         #region DataDictionary
         DataDictionaryTemplate GetDataDictionaryTemplate();
 
-        DataDictionary GetDataDictionary(string pointCN);
+        DataDictionary GetExtendedDataForPoint(string pointCN);
 
-        IEnumerable<DataDictionary> GetDataDictionaries();
+        IEnumerable<DataDictionary> GetExtendedData();
         #endregion
 
 

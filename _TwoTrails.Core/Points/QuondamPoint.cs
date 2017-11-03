@@ -89,9 +89,9 @@ namespace TwoTrails.Core.Points
 
         public QuondamPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,
             string comment, bool onbnd, double adjx, double adjy, double adjz, double unadjx, double unadjy, double unadjz,
-            double acc, string qlinks, string pcn, double? manacc)
+            double acc, string qlinks, string pcn, double? manacc, DataDictionary extended = null)
             : base(cn, index, pid, time, polycn, metacn, groupcn, comment, onbnd, adjx, adjy, adjz, unadjx,
-            unadjy, unadjz, acc, qlinks)
+            unadjy, unadjz, acc, qlinks, extended)
         {
             _ParentPointCN = pcn;
             _ManualAccuracy = manacc;
