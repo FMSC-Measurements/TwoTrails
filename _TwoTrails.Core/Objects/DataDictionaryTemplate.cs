@@ -59,7 +59,7 @@ namespace TwoTrails.Core
 
         public FeildType FeildType { get; set; }
 
-        public int Flag { get; set; }
+        public int Flags { get; set; }
 
         public IList<String> Values { get; set; }
 

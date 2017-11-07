@@ -19,6 +19,7 @@ namespace TwoTrails.Core.Points
 
         public override double UnAdjX
         {
+            get { return _UnAdjX; }
             set
             {
                 if (SetField(ref _UnAdjX, value))
@@ -30,6 +31,7 @@ namespace TwoTrails.Core.Points
 
         public override double UnAdjY
         {
+            get { return _UnAdjY; }
             set
             {
                 if (SetField(ref _UnAdjY, value))
@@ -41,6 +43,7 @@ namespace TwoTrails.Core.Points
 
         public override double UnAdjZ
         {
+            get { return _UnAdjZ; }
             set
             {
                 if (SetField(ref _UnAdjZ, value))

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:vm="clr-namespace:TwoTrails.ViewModels"
+             xmlns:tt="clr-namespace:TwoTrails"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
              xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
              xmlns:cc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
@@ -16,6 +16,7 @@
         <cvt:MetadataValueConverter x:Key="mdvcSlpDist" MetadataPropertyName="Distance"/>
         <cvt:MetadataValueConverter x:Key="mdvcSlpAng" MetadataPropertyName="SlopeAngle"/>
         <cvt:NullableDoubleConverter x:Key="ndblcvtr" />
+        <cvt:DataDictionaryFieldConverter x:Key="ddfcvtr" />
 
         <Style x:Key="styleFieldTitle" TargetType="TextBlock">
             <Setter Property="Margin" Value="0,0,5,0" />
@@ -140,6 +141,9 @@
             </Setter>
         </Style>
 
+
+
+        
     </UserControl.Resources>
 
     <UserControl.InputBindings>
@@ -300,7 +304,7 @@
                                                   Cursor="{TemplateBinding Cursor}">
                                             <ContentPresenter.ContentTemplate>
                                                 <DataTemplate>
-                                                    <TextBlock Text="{Binding}" Foreground="Black" Margin="5, 3, 6, 3"/>
+                                                    <TextBlock Text="{Binding Path=Name}" Foreground="Black" Margin="5, 3, 6, 3"/>
                                                 </DataTemplate>
                                             </ContentPresenter.ContentTemplate>
                                         </ContentPresenter>
@@ -348,25 +352,7 @@
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
 
                 </DataGrid.Resources>
-
-                <!--<DataGrid.Columns>
-                    <DataGridTextColumn Header="Index" IsReadOnly="True" Binding="{Binding Index}"/>
-                    <DataGridTextColumn Header="PID" IsReadOnly="True" Binding="{Binding PID}"/>
-                    <DataGridTextColumn Header="OpType" IsReadOnly="True" Binding="{Binding OpType}"/>
-                    <DataGridTextColumn Header="Polygon" IsReadOnly="True" Binding="{Binding Polygon.Name}" Width="100"/>
-                    <DataGridTextColumn Header="OnBound" IsReadOnly="True" Binding="{Binding OnBoundary}"/>
-                    <DataGridTextColumn Header="AdjX" IsReadOnly="True" Binding="{Binding AdjX, StringFormat={}{0:0.###}}"/>
-                    <DataGridTextColumn Header="AdjY" IsReadOnly="True" Binding="{Binding AdjY, StringFormat={}{0:0.###}}"/>
-                    <DataGridTextColumn Header="AdjZ (M)" IsReadOnly="True" Binding="{Binding AdjZ, StringFormat={}{0:0.###}}"/>
-                    <DataGridTextColumn Header="Acc (M)" IsReadOnly="True" Binding="{Binding Accuracy, StringFormat={}{0:0.###}}"/>
-                    <DataGridTextColumn Header="UnAdjX" IsReadOnly="True" Binding="{Binding UnAdjX, StringFormat={}{0:0.###}}" Visibility="Collapsed"/>
-                    <DataGridTextColumn Header="UnAdjY" IsReadOnly="True" Binding="{Binding UnAdjY, StringFormat={}{0:0.###}}" Visibility="Collapsed"/>
-                    <DataGridTextColumn Header="UnAdjZ (M)" IsReadOnly="True" Binding="{Binding UnAdjZ, StringFormat={}{0:0.###}}" Visibility="Collapsed"/>
-                    <DataGridTextColumn Header="QndmLink" IsReadOnly="True" Binding="{Binding HasQuondamLinks,StringFormat=F3}"/>
-                    <DataGridTextColumn Header="Created" IsReadOnly="True" Binding="{Binding TimeCreated}" Visibility="Collapsed"/>
-                    <DataGridTextColumn Header="Comment" IsReadOnly="True" Binding="{Binding Comment}" Visibility="Collapsed"/>
-                </DataGrid.Columns>-->
-
+                
                 <DataGrid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}" />
@@ -593,8 +579,67 @@
                         </Grid>
                     </Expander>
 
-                    <Expander Header="Extended" IsExpanded="False">
+                    <Expander Header="Extended" IsExpanded="True">
+                        <ItemsControl Margin="5" Grid.IsSharedSizeScope="True">
+                            <ItemsControl.ItemsSource>
+                                <MultiBinding Converter="{StaticResource ddfcvtr}">
+                                    <MultiBinding.Bindings>
+                                        <Binding Path="ExtendedDataFields"/>
+                                        <Binding />
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </ItemsControl.ItemsSource>
+                            
+                            <ItemsControl.Resources>
+                                <DataTemplate DataType="{x:Type tt:TextBoxExtendedDataField}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="Key"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
+                                        <TextBlock Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="{Binding Name}"/>
+                                        <TextBox Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" LostFocus="TextBox_UpdateBinding"
+                                            Text="{Binding Value, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            IsEnabled="{Binding DataEditor.HasSelection}"
+                                            cp:ControlProperties.BackgroundEnabled="{Binding IsValueSame}"/>
+                                    </Grid>
+                                </DataTemplate>
+
+                                <DataTemplate DataType="{x:Type tt:ComboBoxExtendedDataField}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="Key"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="{Binding Name}"/>
+                                        <ComboBox Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                                            ItemsSource="{Binding Values}"
+                                            IsEditable="{Binding IsEditable}"
+                                            IsEnabled="{Binding DataEditor.HasSelection}"
+                                            ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}"
+                                            Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            cp:ControlProperties.BackgroundEnabled="{Binding IsValueSame}"/>
+                                    </Grid>
+                                </DataTemplate>
+
+                                <DataTemplate DataType="{x:Type tt:CheckBoxExtendedDataField}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="Key"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <CheckBox Grid.Column="1" Content="{Binding Name}"
+                                            Style="{StaticResource ResourceKey=styleFieldValue}"
+                                            IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            IsEnabled="{Binding DataEditor.HasSelection}"
+                                            cp:ControlProperties.BackgroundEnabled="{Binding IsValueSame}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.Resources>
+                        </ItemsControl>
                     </Expander>
                 </StackPanel>
             </ScrollViewer>

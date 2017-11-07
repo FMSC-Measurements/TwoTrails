@@ -26,6 +26,7 @@ namespace TwoTrails.Core
         public static readonly PropertyInfo UNADJZ;
         public static readonly PropertyInfo ACCURACY;
         public static readonly PropertyInfo QLINKS;
+        public static readonly PropertyInfo EXTENDED_DATA;
 
         public static readonly PropertyInfo LAT;
         public static readonly PropertyInfo LON;
@@ -39,6 +40,7 @@ namespace TwoTrails.Core
 
         public static readonly PropertyInfo PARENT_POINT;
         public static readonly PropertyInfo MAN_ACC_QP;
+
 
         static PointProperties()
         {
@@ -64,6 +66,7 @@ namespace TwoTrails.Core
             UNADJZ = tt.GetProperty(nameof(TtPoint.UnAdjZ), bf);
             ACCURACY = tt.GetProperty(nameof(TtPoint.Accuracy), bf);
             QLINKS = tt.GetProperty(nameof(TtPoint.LinkedPoints), bf);
+            EXTENDED_DATA = tt.GetProperty(nameof(TtPoint.ExtendedData), bf);
 
             LAT = gps.GetProperty(nameof(GpsPoint.Latitude), bf);
             LON = gps.GetProperty(nameof(GpsPoint.Longitude), bf);

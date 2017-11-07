@@ -535,7 +535,7 @@ namespace TwoTrails.DAL
             public const String Name = "Name";
             public const String FieldOrder = "FieldOrder";
             public const String FieldType = "FieldType";
-            public const String Flag = "Flag";
+            public const String Flags = "Flags";
             public const String FieldValues = "FieldValues";
             public const String DefaultValue = "DefaultValue";
             public const String ValueRequired = "ValueRequired";
@@ -551,7 +551,7 @@ namespace TwoTrails.DAL
                 Name + " TEXT NOT NULL, " +
                 FieldOrder + " INTEGER NOT NULL, " +
                 FieldType + " INTEGER NOT NULL, " +
-                Flag + " INTEGER, " +
+                Flags + " INTEGER, " +
                 FieldValues + " TEXT, " +
                 DefaultValue + " TEXT, " +
                 ValueRequired + " INTEGER NOT NULL, " +
@@ -564,7 +564,7 @@ namespace TwoTrails.DAL
                 Name + ", " +
                 FieldOrder + ", " +
                 FieldType + ", " +
-                Flag + ", " +
+                Flags + ", " +
                 FieldValues + ", " +
                 DefaultValue + ", " +
                 ValueRequired + ", " +

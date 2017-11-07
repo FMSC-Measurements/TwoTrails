@@ -2215,7 +2215,7 @@ namespace TwoTrails.DAL
                         if (dr != null)
                         {
                             string cn, name, defaultValue = null;
-                            int order, flag = 0;
+                            int order, flags = 0;
                             FeildType fieldType;
                             List<string> values = null;
                             DataType dataType;
@@ -2229,10 +2229,10 @@ namespace TwoTrails.DAL
                                 fieldType = (FeildType)dr.GetInt32(3);
 
                                 if (!dr.IsDBNull(4))
-                                    flag = dr.GetInt32(4);
+                                    flags = dr.GetInt32(4);
 
                                 if (!dr.IsDBNull(5))
-                                    values = dr.GetString(5).Split('\n').ToList();
+                                    values = dr.GetString(5).Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
                                 if (!dr.IsDBNull(6))
                                     defaultValue = dr.GetString(6);
@@ -2246,7 +2246,7 @@ namespace TwoTrails.DAL
                                     Name = name,
                                     Order = order,
                                     FeildType = fieldType,
-                                    Flag = flag,
+                                    Flags = flags,
                                     Values = values,
                                     DefaultValue = defaultValue,
                                     DataType = dataType
@@ -2323,8 +2323,8 @@ namespace TwoTrails.DAL
                 [TwoTrailsSchema.DataDictionarySchema.Name] = field.Name,
                 [TwoTrailsSchema.DataDictionarySchema.FieldOrder] = field.Order,
                 [TwoTrailsSchema.DataDictionarySchema.FieldType] = (int)field.FeildType,
-                [TwoTrailsSchema.DataDictionarySchema.Flag] = field.Flag,
-                [TwoTrailsSchema.DataDictionarySchema.FieldValues] = field.Values != null && field.Values.Any() ? string.Join(Environment.NewLine, field.Values) : null,
+                [TwoTrailsSchema.DataDictionarySchema.Flags] = field.Flags,
+                [TwoTrailsSchema.DataDictionarySchema.FieldValues] = field.Values != null && field.Values.Any() ? string.Join("\n", field.Values) : null,
                 [TwoTrailsSchema.DataDictionarySchema.DefaultValue] = field.DefaultValue,
                 [TwoTrailsSchema.DataDictionarySchema.ValueRequired] = field.ValueRequired,
                 [TwoTrailsSchema.DataDictionarySchema.DataType] = field.DataType
