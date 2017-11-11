@@ -17,8 +17,10 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using TwoTrails.Converters;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.CustomProperties;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
 
@@ -26,7 +28,53 @@ namespace TwoTrails.ViewModels
 {
     public class DataEditorModel : NotifyPropertyChangedEx
     {
-
+        #region Vars
+        private readonly string[] SelectionChangedProperties = new string[]
+        {
+            nameof(HasSelection),
+            nameof(SelectedPoint),
+            nameof(SelectedPoints),
+            nameof(MultipleSelections),
+            nameof(OnlyGpsTypes),
+            nameof(OnlyTravTypes),
+            nameof(OnlyManAccTypes),
+            nameof(OnlyQuondams),
+            nameof(HasPossibleCorridor),
+            nameof(ConvertTypeHeader),
+            nameof(PID),
+            nameof(SamePID),
+            nameof(Index),
+            nameof(SameIndex),
+            nameof(Polygon),
+            nameof(SamePolygon),
+            nameof(Metadata),
+            nameof(SameMetadata),
+            nameof(Group),
+            nameof(SameGroup),
+            nameof(OnBoundary),
+            nameof(SameOnBound),
+            nameof(UnAdjX),
+            nameof(SameUnAdjX),
+            nameof(UnAdjY),
+            nameof(SameUnAdjY),
+            nameof(UnAdjZ),
+            nameof(SameUnAdjZ),
+            nameof(ManAcc),
+            nameof(SameManAcc),
+            nameof(FwdAz),
+            nameof(SameFwdAz),
+            nameof(BkAz),
+            nameof(SameBkAz),
+            nameof(SlpAng),
+            nameof(SameSlpAng),
+            nameof(SlpDist),
+            nameof(SameSlpDist),
+            nameof(ParentPoint),
+            nameof(SameParentPoint),
+            nameof(Comment),
+            nameof(SameComment)
+        };
+        #endregion
 
         #region Commands
         public ICommand RefreshPoints { get; }
@@ -115,7 +163,7 @@ namespace TwoTrails.ViewModels
         public bool OnlyQuondams { get; private set; }
         public bool HasPossibleCorridor { get; private set; }
 
-        private bool ignoreSelectionChange = false;
+        private bool ignoreSelectionChange = false, settingFields = false;
 
         private String _ConvertTypeHeader;
         public String ConvertTypeHeader
@@ -147,6 +195,13 @@ namespace TwoTrails.ViewModels
                 return _ConvertTypeHeader;
             }
         }
+
+
+        public ObservableCollection<DataGridColumn> DataColumns { get; private set; }
+
+        public ObservableCollection<DataDictionaryField> ExtendedDataFields { get; private set; }
+
+        public ObservableCollection<Control> VisibleFields { get; private set; }
         
         
         private void CompareAndSet<T>(ref bool same, ref T oldVal, T newVal)
@@ -456,23 +511,18 @@ namespace TwoTrails.ViewModels
 
         #region Point Extended Properties
 
-        private DataDictionary _ExtendedData = new DataDictionary();
+        private DataDictionary _ExtendedData;
         public DataDictionary ExtendedData
         {
             get { return _ExtendedData; }
         }
 
+        private Dictionary<string, bool> _ExtendedDataSame = new Dictionary<string, bool>();
+
         public bool ArePropertyValuesSame(string propertyCN)
         {
-            return false;
+            return _ExtendedDataSame[propertyCN];
         }
-        //public event EventHandler<Tuple<string, object>> PropertyValueChanged;
-
-        //public void SetPropertyValue(string cn, object obj)
-        //{
-        //    _ExtendedData[cn] = obj;
-        //}
-
 
         #endregion
 
@@ -501,10 +551,6 @@ namespace TwoTrails.ViewModels
         #endregion
 
 
-        public ObservableCollection<DataGridColumn> PointColumns { get; private set; } = CreateDefaultColumns();
-
-        public ObservableCollection<DataDictionaryField> ExtendedDataFields { get; private set; }
-
 
         public DataEditorModel(TtProject project)
         {
@@ -517,6 +563,7 @@ namespace TwoTrails.ViewModels
                 OnSelectionChanged();
             };
 
+            #region Init Commands
             RefreshPoints = new RelayCommand(x => Points.Refresh());
 
             CopyCellValueCommand = new BindedRelayCommand<DataEditorModel>(
@@ -586,10 +633,81 @@ namespace TwoTrails.ViewModels
             SelectTravCommand = new RelayCommand(x => SelectTraverse());
 
             SelectInverseCommand = new RelayCommand(x => SelectInverse());
+            #endregion
 
             //BindingOperations.EnableCollectionSynchronization(_SelectedPoints, _lock);
+            
+            #region Setup Columns and Visibility Menu
+            Action<Tuple<DataGridTextColumn, string>> AddColumnAndMenuItem = (tup) =>
+                {
+                    DataColumns.Add(tup.Item1);
+
+                    MenuItem mi = new MenuItem()
+                    {
+                        Header = tup.Item2,
+                        IsCheckable = true,
+                        IsChecked = tup.Item1.Visibility == Visibility.Visible
+                    };
+
+                //Bind model boolean to menu item's check state
+                BindingOperations.SetBinding(mi, MenuItem.IsCheckedProperty, new Binding()
+                    {
+                        Path = new PropertyPath("Visibility"),
+                        Mode = BindingMode.TwoWay,
+                        Source = tup.Item1,
+                        Converter = new VisibilityToBooleanConverter()
+                    });
+
+                //Bind model boolean to column visibility
+                BindingOperations.SetBinding(tup.Item1, DataGridColumn.VisibilityProperty, new Binding()
+                    {
+                        Path = new PropertyPath("IsChecked"),
+                        Mode = BindingMode.OneWay,
+                        Source = mi,
+                        Converter = new BooleanToVisibilityConverter()
+                    });
+
+                    VisibleFields.Add(mi);
+                };
 
 
+            DataColumns = new ObservableCollection<DataGridColumn>();
+
+            VisibleFields = new ObservableCollection<Control>(new Control[] {
+                new MenuItem()
+                {
+                    Header = "Default Fields",
+                    Command = new RelayCommand(x =>
+                    {
+                        foreach (DataGridTextColumn col in DataColumns)
+                            col.Visibility = IsDefaultColumn((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
+                    })
+                },
+                new MenuItem()
+                {
+                    Header = "Extended Fields",
+                    Command = new RelayCommand(x =>
+                    {
+                        foreach (DataGridTextColumn col in DataColumns)
+                            col.Visibility = IsExtendedColumn((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
+                    })
+                },
+                new MenuItem()
+                {
+                    Header = "All Fields",
+                    Command = new RelayCommand(x =>
+                    {
+                        foreach (DataGridTextColumn col in DataColumns)
+                            col.Visibility = Visibility.Visible;
+                    })
+                },
+                new Separator()
+            });
+
+            foreach (Tuple<DataGridTextColumn, string> col in CreateDefaultColumns())
+                AddColumnAndMenuItem(col); 
+            #endregion
+            
             #region Setup DataDictionary Columns
 
             DataDictionaryTemplate ddt = Manager.GetDataDictionaryTemplate();
@@ -598,17 +716,38 @@ namespace TwoTrails.ViewModels
             {
                 ExtendedDataFields = new ObservableCollection<DataDictionaryField>(ddt);
 
+                _ExtendedData = new DataDictionary(ddt);
+                _ExtendedDataSame = ddt.ToDictionary(ddf => ddf.CN, ddf => true);
+
+                if (ExtendedDataFields.Count > 0)
+                    VisibleFields.Add(new Separator());
+
                 foreach (DataDictionaryField ddf in ExtendedDataFields)
-                {
-                    PointColumns.Add(CreateDataGridTextColumn(ddf.Name, $"{ nameof(TtPoint.ExtendedData) }.{ $"[{ ddf.CN }]" }"));
-                }
+                    AddColumnAndMenuItem(CreateDataGridTextColumn(ddf.Name, $"{ nameof(TtPoint.ExtendedData) }.{ $"[{ ddf.CN }]" }"));
             }
             else
+            {
                 ExtendedDataFields = new ObservableCollection<DataDictionaryField>();
+            }
 
             ExtendedData.PropertyChanged += (sender, e) =>
             {
                 OnPropertyChanged(e.PropertyName);
+
+                if (!settingFields)
+                {
+                    //todo grid values not changing
+                    if (MultipleSelections)
+                    {
+                        object val = _ExtendedData[e.PropertyName];
+                        foreach (TtPoint point in SelectedPoints)
+                            point.ExtendedData[e.PropertyName] = val;
+                    }
+                    else
+                    {
+                        SelectedPoint.ExtendedData[e.PropertyName] = _ExtendedData[e.PropertyName];
+                    }
+                }
             };
             #endregion
 
@@ -689,54 +828,6 @@ namespace TwoTrails.ViewModels
 
             Points.Filter = Filter;
         }
-
-
-        private static ObservableCollection<DataGridColumn> CreateDefaultColumns()
-        {
-            string defaultNumberFormat = "{0:0.###}";
-
-            return new ObservableCollection<DataGridColumn>()
-            {
-                CreateDataGridTextColumn(nameof(TtPoint.Index)),
-                CreateDataGridTextColumn(nameof(TtPoint.PID)),
-                CreateDataGridTextColumn(nameof(TtPoint.OpType)),
-                CreateDataGridTextColumn(nameof(TtPoint.Polygon), "Polygon.Name", 100),
-                CreateDataGridTextColumn("OnBound", nameof(TtPoint.OnBoundary)),
-                CreateDataGridTextColumn(nameof(TtPoint.AdjX), stringFormat: defaultNumberFormat),
-                CreateDataGridTextColumn(nameof(TtPoint.AdjY), stringFormat: defaultNumberFormat),
-                CreateDataGridTextColumn("AdjZ (M)", nameof(TtPoint.AdjY), stringFormat: defaultNumberFormat),
-                CreateDataGridTextColumn("Acc (M)", nameof(TtPoint.Accuracy), stringFormat: defaultNumberFormat),
-                CreateDataGridTextColumn(nameof(TtPoint.UnAdjX), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
-                CreateDataGridTextColumn(nameof(TtPoint.UnAdjY), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
-                CreateDataGridTextColumn("UnAdjZ (M)", nameof(TtPoint.UnAdjZ), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
-                CreateDataGridTextColumn("QndmLink", nameof(TtPoint.HasQuondamLinks)),
-                CreateDataGridTextColumn("Created", nameof(TtPoint.TimeCreated), visibility: Visibility.Collapsed),
-                CreateDataGridTextColumn(nameof(TtPoint.Comment), visibility: Visibility.Collapsed)
-            };
-        }
-
-        private static DataGridTextColumn CreateDataGridTextColumn(String name, string binding = null,
-            int? width = null, string stringFormat = null, Visibility visibility = Visibility.Visible)
-        {
-            DataGridTextColumn dataGridTextColumn = new DataGridTextColumn()
-            {
-                IsReadOnly = true,
-                Width = width ?? DataGridLength.Auto,
-                Visibility = visibility,
-                Binding = new Binding(binding ?? name) { StringFormat = stringFormat }
-            };
-
-            dataGridTextColumn.Header = new
-            {
-                Column = dataGridTextColumn,
-                Name = name,
-                HideColumn = new RelayCommand(x => dataGridTextColumn.Visibility = Visibility.Collapsed)
-            };
-
-            return dataGridTextColumn;
-        }
-
-
 
         #region Collections Changed
         private void Polygons_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -911,6 +1002,8 @@ namespace TwoTrails.ViewModels
             if (ignoreSelectionChange)
                 return;
 
+            settingFields = true;
+
             _SelectionChanged = true;
 
             HasGpsTypes = false;
@@ -918,13 +1011,17 @@ namespace TwoTrails.ViewModels
             HasQndms = false;
             HasPossibleCorridor = false;
 
+            bool ddAvailable = _ExtendedData != null;
+
+            if (ddAvailable)
+            {
+                foreach (string id in _ExtendedDataSame.Keys.ToArray())
+                    _ExtendedDataSame[id] = true;
+                _ExtendedData.ClearValues();
+            }
+
             if (HasSelection)
             {
-                DataDictionary dd = (SelectedPoints[0] as TtPoint).ExtendedData;
-
-                foreach (DataDictionaryField ddf in ExtendedDataFields)
-                    _ExtendedData[ddf.CN] = dd[ddf.CN];
-
                 if (MultipleSelections)
                 {
                     TtPoint fpt = SelectedPoints[0] as TtPoint;
@@ -1094,6 +1191,29 @@ namespace TwoTrails.ViewModels
                                     {
                                         qParent = qp.ParentPoint;
                                         fqndm = false;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (ddAvailable)
+                        {
+                            if (point.ExtendedData == null)
+                                throw new Exception($"Point { point.PID } ({ point.CN }) does not have ExtendedData");
+
+                            foreach (string id in _ExtendedDataSame.Keys.ToArray())
+                            {
+                                if (_ExtendedDataSame[id])
+                                {
+                                    object pval = point.ExtendedData[id];
+                                    object oval = _ExtendedData[id];
+
+                                    if (oval == null)
+                                        _ExtendedData[id] = pval;
+                                    else if (!pval.Equals(oval))
+                                    {
+                                        _ExtendedDataSame[id] = false;
+                                        _ExtendedData[id] = null;
                                     }
                                 }
                             }
@@ -1284,6 +1404,12 @@ namespace TwoTrails.ViewModels
 
                     _UnAdjZ = SelectedPoint.UnAdjZ;
                     _SameUnAdjZ = true;
+
+                    if (ddAvailable)
+                    {
+                        foreach (string id in _ExtendedDataSame.Keys)
+                            _ExtendedData[id] = SelectedPoint.ExtendedData[id];
+                    }
                 }
             }
             else
@@ -1335,6 +1461,12 @@ namespace TwoTrails.ViewModels
 
                 _UnAdjZ = null;
                 _SameUnAdjZ = true;
+
+                if (ddAvailable)
+                {
+                    foreach (string id in _ExtendedDataSame.Keys)
+                        _ExtendedData[id] = null;
+                }
             }
 
             OnlyTravTypes = HasTravTypes && !HasGpsTypes && !HasQndms;
@@ -1386,6 +1518,8 @@ namespace TwoTrails.ViewModels
                     nameof(Comment),
                     nameof(SameComment)
                 );
+            
+            settingFields = false;
         }
 
         private bool Filter(object obj)
@@ -1799,5 +1933,100 @@ namespace TwoTrails.ViewModels
             OnSelectionChanged();
         }
         #endregion
+
+
+
+
+        private static Tuple<DataGridTextColumn, string>[] CreateDefaultColumns()
+        {
+            string defaultNumberFormat = "{0:0.###}";
+
+            return new Tuple<DataGridTextColumn, string>[]
+            {
+                CreateDataGridTextColumn(nameof(TtPoint.Index)),
+                CreateDataGridTextColumn(nameof(TtPoint.PID)),
+                CreateDataGridTextColumn(nameof(TtPoint.OpType)),
+                CreateDataGridTextColumn(nameof(TtPoint.Polygon), "Polygon.Name", 100),
+                CreateDataGridTextColumn("OnBound", nameof(TtPoint.OnBoundary)),
+                CreateDataGridTextColumn(nameof(TtPoint.AdjX), stringFormat: defaultNumberFormat),
+                CreateDataGridTextColumn(nameof(TtPoint.AdjY), stringFormat: defaultNumberFormat),
+                CreateDataGridTextColumn("AdjZ (M)", nameof(TtPoint.AdjY), stringFormat: defaultNumberFormat),
+                CreateDataGridTextColumn("Acc (M)", nameof(TtPoint.Accuracy), stringFormat: defaultNumberFormat),
+                CreateDataGridTextColumn(nameof(TtPoint.UnAdjX), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn(nameof(TtPoint.UnAdjY), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn("UnAdjZ (M)", nameof(TtPoint.UnAdjZ), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn("QndmLink", nameof(TtPoint.HasQuondamLinks)),
+                CreateDataGridTextColumn("Created", nameof(TtPoint.TimeCreated), visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn(nameof(TtPoint.Comment), visibility: Visibility.Collapsed)
+            };
+        }
+
+        private static Tuple<DataGridTextColumn, string> CreateDataGridTextColumn(String name, string binding = null,
+            int? width = null, string stringFormat = null, Visibility visibility = Visibility.Visible)
+        {
+            DataGridTextColumn dataGridTextColumn = new DataGridTextColumn()
+            {
+                IsReadOnly = true,
+                Width = width ?? DataGridLength.Auto,
+                Visibility = visibility,
+                Binding = new Binding(binding ?? name) { StringFormat = stringFormat }
+            };
+
+            dataGridTextColumn.Header = new ColumnHeader()
+            {
+                Column = dataGridTextColumn,
+                Name = name,
+                HideColumn = new RelayCommand(x => dataGridTextColumn.Visibility = Visibility.Collapsed)
+            };
+
+            return Tuple.Create(dataGridTextColumn, name);
+        }
+
+
+        private static bool IsDefaultColumn(string columnName)
+        {
+            switch (columnName)
+            {
+                case nameof(TtPoint.Index):
+                case nameof(TtPoint.PID):
+                case nameof(TtPoint.OpType):
+                case nameof(TtPoint.Polygon):
+                case "OnBound":
+                case nameof(TtPoint.AdjX):
+                case nameof(TtPoint.AdjY):
+                case "AdjZ (M)":
+                case "Acc (M)":
+                case "QndmLink":
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsExtendedColumn(string columnName)
+        {
+            if (IsDefaultColumn(columnName))
+                return false;
+
+            switch (columnName)
+            {
+                case nameof(TtPoint.UnAdjX):
+                case nameof(TtPoint.UnAdjY):
+                case "UnAdjZ (M)":
+                case "Created":
+                case nameof(TtPoint.Comment):
+                    return false;
+            }
+
+            return true;
+        }
+
+
+        public class ColumnHeader
+        {
+            public DataGridTextColumn Column { get; set; }
+            public String Name { get; set; }
+            public ICommand HideColumn { get; set; }
+        }
     }
 }

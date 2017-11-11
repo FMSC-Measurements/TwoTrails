@@ -167,6 +167,7 @@
     <Compile Include="Converters\M2Converter.cs" />
     <Compile Include="Converters\MetersToFeetConverter.cs" />
     <Compile Include="Converters\NotNullConverter.cs" />
+    <Compile Include="Converters\VisibilityToBooleanConverter.cs" />
     <Compile Include="Dialogs\CreatePlotsDialog.xaml.cs">
       <DependentUpon>CreatePlotsDialog.xaml</DependentUpon>
     </Compile>

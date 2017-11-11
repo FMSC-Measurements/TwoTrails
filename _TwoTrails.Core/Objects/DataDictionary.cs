@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using System.Linq;
 
 namespace TwoTrails.Core
 {
@@ -17,6 +18,35 @@ namespace TwoTrails.Core
             _Data = data ?? new Dictionary<string, object>();
         }
         
+        public DataDictionary(DataDictionaryTemplate dataDictionaryTemplate) : this()
+        {
+            foreach (DataDictionaryField field in dataDictionaryTemplate)
+                _Data.Add(field.CN, field.GetDefaultValue());
+        }
+
+
+        public void ClearValues()
+        {
+            foreach (string id in _Data.Keys.ToArray())
+                _Data[id] = null;
+        }
+
+        public void UpdateValueWOTrigger(string cn, object value)
+        {
+            if (_Data.ContainsKey(cn))
+            {
+                object oval = _Data[cn];
+
+                if (oval == null || !oval.Equals(value))
+                {
+                    _Data[cn] = value;
+                }
+            }
+            else
+            {
+                _Data.Add(cn, value);
+            }
+        }
 
         public object this[string cn]
         {
@@ -25,7 +55,9 @@ namespace TwoTrails.Core
             {
                 if (_Data.ContainsKey(cn))
                 {
-                    if (!_Data[cn].Equals(value))
+                    object oval = _Data[cn];
+
+                    if (oval == null || !oval.Equals(value))
                     {
                         _Data[cn] = value;
                         OnPropertyChanged(cn);

@@ -275,7 +275,7 @@
                 IsReadOnly="True"
                 VisibleItemsList="{Binding VisiblePoints, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
                 SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                BindableColumns="{Binding PointColumns}">
+                BindableColumns="{Binding DataColumns}">
 
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="{x:Type DataGridColumnHeader}">
@@ -355,6 +355,10 @@
                 
                 <DataGrid.ContextMenu>
                     <ContextMenu>
+                        <MenuItem Header="Columns" ItemsSource="{Binding VisibleFields}"/>
+
+                        <Separator/>
+
                         <MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}" />
 
                         <MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
@@ -602,7 +606,7 @@
                                         <TextBox Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" LostFocus="TextBox_UpdateBinding"
                                             Text="{Binding Value, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                             IsEnabled="{Binding DataEditor.HasSelection}"
-                                            cp:ControlProperties.BackgroundEnabled="{Binding IsValueSame}"/>
+                                            cp:ControlProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}"/>
                                     </Grid>
                                 </DataTemplate>
 
@@ -620,7 +624,7 @@
                                             IsEnabled="{Binding DataEditor.HasSelection}"
                                             ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}"
                                             Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                            cp:ControlProperties.BackgroundEnabled="{Binding IsValueSame}"/>
+                                            cp:ControlProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}"/>
                                     </Grid>
                                 </DataTemplate>
 
@@ -635,7 +639,7 @@
                                             Style="{StaticResource ResourceKey=styleFieldValue}"
                                             IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                             IsEnabled="{Binding DataEditor.HasSelection}"
-                                            cp:ControlProperties.BackgroundEnabled="{Binding IsValueSame}"/>
+                                            cp:ControlProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.Resources>
