@@ -277,6 +277,23 @@
                 SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 BindableColumns="{Binding DataColumns}">
 
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SeaGreen"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkSeaGreen"/>
+
+                    <Style TargetType="DataGridCell">
+                        <Style.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter Property="BorderBrush" Value="SeaGreen" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+                
+                <DataGrid.InputBindings>
+                    <KeyBinding Command="{Binding DeleteCommand}" Key="Delete"/>
+                </DataGrid.InputBindings>
+
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="{x:Type DataGridColumnHeader}">
                         <Setter Property="Background" Value="{DynamicResource NormalBorderBrush}"/>
@@ -342,16 +359,6 @@
                         </Setter>
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
-                
-                <DataGrid.InputBindings>
-                    <KeyBinding Command="{Binding DeleteCommand}" Key="Delete"/>
-                </DataGrid.InputBindings>
-
-                <DataGrid.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="DodgerBlue"/>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
-
-                </DataGrid.Resources>
                 
                 <DataGrid.ContextMenu>
                     <ContextMenu>

@@ -694,6 +694,15 @@ namespace TwoTrails.ViewModels
                 },
                 new MenuItem()
                 {
+                    Header = "Default + Extended Fields",
+                    Command = new RelayCommand(x =>
+                    {
+                        foreach (DataGridTextColumn col in DataColumns)
+                            col.Visibility = IsDefaultOrExtendedColumn((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
+                    })
+                },
+                new MenuItem()
+                {
                     Header = "All Fields",
                     Command = new RelayCommand(x =>
                     {
@@ -732,13 +741,13 @@ namespace TwoTrails.ViewModels
 
             ExtendedData.PropertyChanged += (sender, e) =>
             {
-                OnPropertyChanged(e.PropertyName);
-
                 if (!settingFields)
                 {
                     //todo grid values not changing
                     if (MultipleSelections)
                     {
+                        _ExtendedDataSame[e.PropertyName] = true;
+
                         object val = _ExtendedData[e.PropertyName];
                         foreach (TtPoint point in SelectedPoints)
                             point.ExtendedData[e.PropertyName] = val;
@@ -748,6 +757,8 @@ namespace TwoTrails.ViewModels
                         SelectedPoint.ExtendedData[e.PropertyName] = _ExtendedData[e.PropertyName];
                     }
                 }
+
+                OnPropertyChanged(e.PropertyName);
             };
             #endregion
 
@@ -2007,6 +2018,24 @@ namespace TwoTrails.ViewModels
         {
             if (IsDefaultColumn(columnName))
                 return false;
+
+            switch (columnName)
+            {
+                case nameof(TtPoint.UnAdjX):
+                case nameof(TtPoint.UnAdjY):
+                case "UnAdjZ (M)":
+                case "Created":
+                case nameof(TtPoint.Comment):
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static bool IsDefaultOrExtendedColumn(string columnName)
+        {
+            if (IsDefaultColumn(columnName))
+                return true;
 
             switch (columnName)
             {

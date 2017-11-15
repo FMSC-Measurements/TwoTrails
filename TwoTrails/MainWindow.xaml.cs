@@ -36,7 +36,7 @@ namespace TwoTrails
             e.Cancel = MainModel != null ? !MainModel.CanExit : false;
         }
 
-        private void tabControl_Drop(object sender, DragEventArgs e)
+        private void FilesDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 

@@ -17,6 +17,11 @@ namespace TwoTrails.Core
         {
             _Data = data ?? new Dictionary<string, object>();
         }
+
+        public DataDictionary(DataDictionary dataDictionary)
+        {
+            _Data = dataDictionary.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        }
         
         public DataDictionary(DataDictionaryTemplate dataDictionaryTemplate) : this()
         {

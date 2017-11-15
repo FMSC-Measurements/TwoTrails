@@ -104,8 +104,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite, Version=1.0.105.2, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.105.2\lib\net451\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.106.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.106.0\lib\net451\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
@@ -167,6 +167,7 @@
     <Compile Include="Converters\M2Converter.cs" />
     <Compile Include="Converters\MetersToFeetConverter.cs" />
     <Compile Include="Converters\NotNullConverter.cs" />
+    <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\VisibilityToBooleanConverter.cs" />
     <Compile Include="Dialogs\CreatePlotsDialog.xaml.cs">
       <DependentUpon>CreatePlotsDialog.xaml</DependentUpon>
@@ -417,29 +418,29 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="res\open_in_new.png" />
+    <Resource Include="Resources\open_in_new.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="res\close_black.png" />
+    <Resource Include="Resources\close_black.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="res\close_white.png" />
+    <Resource Include="Resources\close_white.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="res\ic_unadjusted_polygon_black_36dp.png" />
-    <Resource Include="res\ic_unadjusted_polygon_pts_black_36dp.png" />
-    <Resource Include="res\ic_unadjusted_polygon_pts_white_36dp.png" />
-    <Resource Include="res\ic_unadjusted_polygon_white_36dp.png" />
+    <Resource Include="Resources\ic_unadjusted_polygon_black_36dp.png" />
+    <Resource Include="Resources\ic_unadjusted_polygon_pts_black_36dp.png" />
+    <Resource Include="Resources\ic_unadjusted_polygon_pts_white_36dp.png" />
+    <Resource Include="Resources\ic_unadjusted_polygon_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="res\ic_polygon_black_36dp.png" />
-    <Resource Include="res\ic_polygon_pts_black_36dp.png" />
-    <Resource Include="res\ic_polygon_pts_white_36dp.png" />
-    <Resource Include="res\ic_polygon_white_36dp.png" />
+    <Resource Include="Resources\ic_polygon_black_36dp.png" />
+    <Resource Include="Resources\ic_polygon_pts_black_36dp.png" />
+    <Resource Include="Resources\ic_polygon_pts_white_36dp.png" />
+    <Resource Include="Resources\ic_polygon_white_36dp.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="res\ic_ttpoint_way_black.png" />
-    <Resource Include="res\ic_ttpoint_way_white.png" />
+    <Resource Include="Resources\ic_ttpoint_way_black.png" />
+    <Resource Include="Resources\ic_ttpoint_way_white.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\TwoTrailsIcon.ico" />
@@ -451,13 +452,16 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\TwoTrailsIcon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets')" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.105.2\build\net451\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

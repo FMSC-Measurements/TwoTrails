@@ -6,10 +6,10 @@ namespace TwoTrails.DAL
     public static class TwoTrailsSchema
     {
         //Old Schema Versions
-        public static readonly Version OSV_2_0_0 = new Version(2, 0, 0);
+        public static readonly Version OSV_2_0_1 = new Version(2, 0, 1);
 
         //Schema Version
-        public static readonly Version SchemaVersion = OSV_2_0_0;
+        public static readonly Version SchemaVersion = OSV_2_0_1;
 
 
         public static class SharedSchema

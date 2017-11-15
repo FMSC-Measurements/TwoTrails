@@ -3,27 +3,34 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:TwoTrails"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <cvt:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis" />
         <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
         <cvt:NotNullConverter x:Key="NotNullConverter"/>
         <cvt:InverseBooleanConverter x:Key="IBC"/>
 
-        <BitmapImage x:Key="ImgOpenInNew" UriSource="res/open_in_new.png" />
-        <BitmapImage x:Key="ImgCloseWhite" UriSource="res/close_white.png" />
-        <BitmapImage x:Key="ImgCloseBlack" UriSource="res/close_black.png" />
+        <s:Boolean x:Key="True">True</s:Boolean>
+        <s:Boolean x:Key="False">False</s:Boolean>
+        
+        <BitmapImage x:Key="ImgTwoTrailsIcon" UriSource="Resources/TwoTrailsIcon.png" />
+        
+        <BitmapImage x:Key="ImgOpenInNew" UriSource="Resources/open_in_new.png" />
+        <BitmapImage x:Key="ImgCloseWhite" UriSource="Resources/close_white.png" />
+        <BitmapImage x:Key="ImgCloseBlack" UriSource="Resources/close_black.png" />
 
-        <BitmapImage x:Key="ic_polygon_black" UriSource="res/ic_polygon_black_36dp.png" />
-        <BitmapImage x:Key="ic_polygon_pts_black" UriSource="res/ic_polygon_pts_black_36dp.png" />
-        <BitmapImage x:Key="ic_polygon_pts_white" UriSource="res/ic_polygon_pts_white_36dp.png" />
-        <BitmapImage x:Key="ic_polygon_white" UriSource="res/ic_polygon_white_36dp.png" />
-        <BitmapImage x:Key="ic_unadjusted_polygon_black" UriSource="res/ic_unadjusted_polygon_black_36dp.png" />
-        <BitmapImage x:Key="ic_unadjusted_polygon_pts_black" UriSource="res/ic_unadjusted_polygon_pts_black_36dp.png" />
-        <BitmapImage x:Key="ic_unadjusted_polygon_pts_white" UriSource="res/ic_unadjusted_polygon_pts_white_36dp.png" />
-        <BitmapImage x:Key="ic_unadjusted_polygon_white" UriSource="res/ic_unadjusted_polygon_white_36dp.png" />
-        <BitmapImage x:Key="ic_ttpoint_way_black" UriSource="res/ic_ttpoint_way_black.png" />
-        <BitmapImage x:Key="ic_ttpoint_way_white" UriSource="res/ic_ttpoint_way_white.png" />
+        <BitmapImage x:Key="ic_polygon_black" UriSource="Resources/ic_polygon_black_36dp.png" />
+        <BitmapImage x:Key="ic_polygon_pts_black" UriSource="Resources/ic_polygon_pts_black_36dp.png" />
+        <BitmapImage x:Key="ic_polygon_pts_white" UriSource="Resources/ic_polygon_pts_white_36dp.png" />
+        <BitmapImage x:Key="ic_polygon_white" UriSource="Resources/ic_polygon_white_36dp.png" />
+        <BitmapImage x:Key="ic_unadjusted_polygon_black" UriSource="Resources/ic_unadjusted_polygon_black_36dp.png" />
+        <BitmapImage x:Key="ic_unadjusted_polygon_pts_black" UriSource="Resources/ic_unadjusted_polygon_pts_black_36dp.png" />
+        <BitmapImage x:Key="ic_unadjusted_polygon_pts_white" UriSource="Resources/ic_unadjusted_polygon_pts_white_36dp.png" />
+        <BitmapImage x:Key="ic_unadjusted_polygon_white" UriSource="Resources/ic_unadjusted_polygon_white_36dp.png" />
+        <BitmapImage x:Key="ic_ttpoint_way_black" UriSource="Resources/ic_ttpoint_way_black.png" />
+        <BitmapImage x:Key="ic_ttpoint_way_white" UriSource="Resources/ic_ttpoint_way_white.png" />
 
 
         <Style x:Key="styleMiDisableNullCommand" TargetType="{x:Type MenuItem}">

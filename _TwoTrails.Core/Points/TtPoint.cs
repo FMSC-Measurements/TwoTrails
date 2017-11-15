@@ -212,8 +212,8 @@ namespace TwoTrails.Core.Points
                     if (oldDD != null)
                         oldDD.PropertyChanged -= DataDictionary_PropertyChanged;
 
-                    if (value != null)
-                        _Polygon.PreviewPolygonAccuracyChanged += Polygon_PreviewPolygonAccuracyChanged;
+                    if (_ExtendedData != null)
+                        _ExtendedData.PropertyChanged += DataDictionary_PropertyChanged;
                 }
             }
         }
@@ -221,6 +221,7 @@ namespace TwoTrails.Core.Points
         private void DataDictionary_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged(e.PropertyName);
+            OnPropertyChanged(nameof(ExtendedData));
         }
         #endregion
 
@@ -244,7 +245,7 @@ namespace TwoTrails.Core.Points
         public TtPoint()
         {
             _LinkedPoints.CollectionChanged += LinkedPoints_CollectionChanged;
-            _ExtendedData = new DataDictionary();
+            ExtendedData = new DataDictionary();
         }
 
         public TtPoint(TtPoint point) : base(point.CN)
@@ -283,7 +284,7 @@ namespace TwoTrails.Core.Points
 
             _Accuracy = point._Accuracy;
 
-            _ExtendedData = point._ExtendedData ?? new DataDictionary();
+            ExtendedData = new DataDictionary(point._ExtendedData);
         }
 
         public TtPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,
@@ -313,7 +314,7 @@ namespace TwoTrails.Core.Points
 
             _Accuracy = acc;
 
-            _ExtendedData = extended ?? new DataDictionary();
+            ExtendedData = extended ?? new DataDictionary();
 
             if (qlinks != null)
             {

@@ -59,7 +59,7 @@ namespace TwoTrails.ViewModels
                         nameof(CurrentEditor)
                         );
 
-                    MainWindow.Title = $"{(value != null ? $"{value.Project.ProjectName} - " : String.Empty)}TwoTrails";
+                    MainWindow.Title = $"TwoTrails{(value != null ? $" - {value.Project.ProjectName}" : String.Empty)}";
                 });
             }
         }
@@ -278,11 +278,11 @@ namespace TwoTrails.ViewModels
                                 Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
                             }
                             
-
+                            //todo upgrade
                             if (dal.RequiresUpgrade)
                             {
                                 Trace.WriteLine("DAL Requires Upgrade");
-                                //ask to upgrade
+                                MessageBox.Show("DAL Requires Upgrade");
                             }
                             else
                             {

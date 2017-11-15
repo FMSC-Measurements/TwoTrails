@@ -41,7 +41,7 @@ namespace TwoTrails.Dialogs
                 target = points.First().Polygon;
 
             cboPoly.SelectedItem = target;
-            cboPolyPoints.ItemsSource = manager.GetPoints(target.CN);
+            cboPolyPoints.ItemsSource = manager.GetPoints(target?.CN);
 
             if (quondam)
                 rbActQuondam.IsChecked = true;
