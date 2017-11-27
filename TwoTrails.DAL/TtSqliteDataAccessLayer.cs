@@ -26,7 +26,7 @@ namespace TwoTrails.DAL
 
         private DataDictionaryTemplate _DataDictionaryTemplate;
 
-        private bool HasDataDictionary { get { return GetDataDictionaryTemplate() != null; } }
+        public bool HasDataDictionary { get { return GetDataDictionaryTemplate() != null; } }
 
 
         public TtSqliteDataAccessLayer(String filePath)
@@ -329,11 +329,15 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
+                        bool hasDD = HasDataDictionary;
+
                         foreach (TtPoint point in points)
                         {
                             InsertBasePoint(point, conn, trans);
                             InsertPointTypeData(point, conn, trans);
-                            InsertExtendedData(point, conn, trans);
+
+                            if (hasDD)
+                                InsertExtendedData(point, conn, trans);
                         }
 
                         trans.Commit();
@@ -403,7 +407,9 @@ namespace TwoTrails.DAL
 
                         UpdateBasePoint(point, oldPoint, conn, trans, where);
                         UpdatePointTypeData(point, oldPoint, conn, trans, where);
-                        UpdateExtendedData(point, conn, trans, where);
+
+                        if (HasDataDictionary)
+                            UpdateExtendedData(point, conn, trans, where);
 
                         trans.Commit();
                     }
@@ -431,13 +437,17 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
+                        bool hasDD = HasDataDictionary;
+
                         foreach (Tuple<TtPoint, TtPoint> point in points)
                         {
                             string where = $"{TwoTrailsSchema.SharedSchema.CN} = '{point.Item1.CN}'";
 
                             UpdateBasePoint(point.Item1, point.Item2, conn, trans, where);
                             UpdatePointTypeData(point.Item1, point.Item2, conn, trans, where);
-                            UpdateExtendedData(point.Item1, conn, trans, where);
+
+                            if (hasDD)
+                                UpdateExtendedData(point.Item1, conn, trans, where);
                         }
 
                         trans.Commit();
@@ -2202,7 +2212,7 @@ namespace TwoTrails.DAL
         #region DataDictionary
         public DataDictionaryTemplate GetDataDictionaryTemplate()
         {
-            if (_DataDictionaryTemplate == null || _Database.TableExists(TwoTrailsSchema.DataDictionarySchema.TableName))
+            if (_DataDictionaryTemplate == null && _Database.TableExists(TwoTrailsSchema.DataDictionarySchema.TableName))
             {
                 _DataDictionaryTemplate = new DataDictionaryTemplate();
 
@@ -2261,7 +2271,7 @@ namespace TwoTrails.DAL
                 }
             }
 
-            return _DataDictionaryTemplate;
+            return _DataDictionaryTemplate?.Any() == true ? _DataDictionaryTemplate : null;
         }
 
         public bool CreateDataDictionary(DataDictionaryTemplate template)

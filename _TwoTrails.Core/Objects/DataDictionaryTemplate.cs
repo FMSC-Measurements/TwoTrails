@@ -47,6 +47,11 @@ namespace TwoTrails.Core
         {
             return GetEnumerator();
         }
+
+        public DataDictionaryField this[string cn]
+        {
+            get { return _Fields[cn]; }
+        }
     }
 
     public class DataDictionaryField

@@ -10,6 +10,8 @@ namespace TwoTrails.DAL
     {
         String FilePath { get; }
 
+        bool HasDataDictionary { get; }
+
         #region Points
         bool InsertPoint(TtPoint point);
         int InsertPoints(IEnumerable<TtPoint> points);

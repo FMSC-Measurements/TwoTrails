@@ -473,7 +473,8 @@ namespace TwoTrails.Core.Points
                 _Comment == point._Comment &&
                 _PolyCN == point._PolyCN &&
                 _GroupCN == point._GroupCN &&
-                _MetadataCN == point._MetadataCN;
+                _MetadataCN == point._MetadataCN &&
+                _ExtendedData == point._ExtendedData;
         }
 
         public override int GetHashCode()

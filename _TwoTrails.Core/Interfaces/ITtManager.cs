@@ -11,6 +11,8 @@ namespace TwoTrails.Core
         TtMetadata DefaultMetadata { get; }
         TtGroup MainGroup { get; }
         
+        bool HasDataDictionary { get; }
+
         void RebuildPolygon(TtPolygon polygon, bool reindex = false);
         void RecalculatePolygons();
 

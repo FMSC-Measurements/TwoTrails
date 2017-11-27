@@ -28,6 +28,9 @@ namespace TwoTrails.Core
         public bool CanUndo { get { return _UndoStack.Count > 0; } }
         public bool CanRedo { get { return _RedoStack.Count > 0; } }
 
+
+        public bool HasDataDictionary { get { return BaseManager.HasDataDictionary; } }
+
         public TtGroup MainGroup { get { return BaseManager.MainGroup; } }
 
         public TtMetadata DefaultMetadata { get { return BaseManager.DefaultMetadata; } }

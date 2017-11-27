@@ -166,6 +166,8 @@
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\M2Converter.cs" />
     <Compile Include="Converters\MetersToFeetConverter.cs" />
+    <Compile Include="Converters\MultiBooleanConverter.cs" />
+    <Compile Include="Converters\MultiBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\NotNullConverter.cs" />
     <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\VisibilityToBooleanConverter.cs" />

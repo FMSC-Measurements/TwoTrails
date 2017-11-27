@@ -29,6 +29,7 @@ namespace TwoTrails.ViewModels
         public bool? IsCheckAll { get { return Get<bool?>(); } set { Set(value); } }
 
         public bool ExportPoints { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
+        public bool ExportDataDictionary { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportPolygons { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportMetadata { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportGroups { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
@@ -39,6 +40,10 @@ namespace TwoTrails.ViewModels
         public bool ExportGPX { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportShapes { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportMediaFiles { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
+
+
+        public bool DataDictionaryEnabled { get { return project.Manager.HasDataDictionary; } }
+
 
         public ExportProjectModel(Window window, TtProject project)
         {
@@ -98,6 +103,9 @@ namespace TwoTrails.ViewModels
                             if (ExportPoints)
                                 Export.Points(project.Manager, Path.Combine(path, "Points.csv"));
 
+                            if (ExportDataDictionary)
+                                Export.DataDictionary(project.Manager, Path.Combine(path, "DataDictionary.csv"));
+
                             if (ExportPolygons)
                                 Export.Polygons(project.Manager, Path.Combine(path, "Polygons.csv"));
 
@@ -149,7 +157,7 @@ namespace TwoTrails.ViewModels
 
         private void CheckAll(bool? isChecked)
         {
-            ExportPoints = ExportPolygons = ExportMetadata = ExportGroups =
+            ExportPoints = ExportDataDictionary = ExportPolygons = ExportMetadata = ExportGroups =
             ExportSummary = ExportProject = ExportKMZ = ExportGPX = ExportShapes = ExportMediaInfo = ExportMediaFiles =
                 (isChecked == true);
         }
@@ -158,13 +166,13 @@ namespace TwoTrails.ViewModels
         {
             if (ExportPoints && ExportPolygons && ExportMetadata && ExportGroups &&
                 ExportSummary && ExportProject && ExportKMZ && ExportGPX && ExportShapes &&
-                ExportMediaInfo && ExportMediaFiles)
+                ExportMediaInfo && ExportMediaFiles && (!DataDictionaryEnabled || ExportDataDictionary))
             {
                 IsCheckAll = true; 
             }
             else if (ExportPoints || ExportPolygons || ExportMetadata || ExportGroups ||
                 ExportSummary || ExportProject || ExportKMZ || ExportGPX || ExportShapes ||
-                ExportMediaInfo || ExportMediaFiles)
+                ExportMediaInfo || ExportMediaFiles || ExportDataDictionary)
             {
                 IsCheckAll = null;
             }

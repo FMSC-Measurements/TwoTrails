@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:TwoTrails"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
-             xmlns:s="clr-namespace:System;assembly=mscorlib"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -12,8 +12,8 @@
         <cvt:NotNullConverter x:Key="NotNullConverter"/>
         <cvt:InverseBooleanConverter x:Key="IBC"/>
 
-        <s:Boolean x:Key="True">True</s:Boolean>
-        <s:Boolean x:Key="False">False</s:Boolean>
+        <sys:Boolean x:Key="True">True</sys:Boolean>
+        <sys:Boolean x:Key="False">False</sys:Boolean>
         
         <BitmapImage x:Key="ImgTwoTrailsIcon" UriSource="Resources/TwoTrailsIcon.png" />
         
@@ -50,8 +50,7 @@
         <SolidColorBrush x:Key="colorSystemBackground" Color="LightGray" />
 
 
-        <x:Array x:Key="arrGps" Type="sys:String" 
-            xmlns:sys="clr-namespace:System;assembly=mscorlib">
+        <x:Array x:Key="arrGps" Type="sys:String" >
             <sys:String>Juniper Allegro 2</sys:String>
             <sys:String>Juniper Allegro MX</sys:String>
             <sys:String>Juniper Archer 2</sys:String>
@@ -64,14 +63,14 @@
             <sys:String>Trimble Juno SB</sys:String>
             <sys:String>Trimble Nomad</sys:String>
             <sys:String>Trimble R1</sys:String>
+            <sys:String>Trimble TDC100</sys:String>
             <sys:String>Trimble XT</sys:String>
             <sys:String>Trimble XM</sys:String>
             <sys:String>Trimble Yuma</sys:String>
             <sys:String>Trimble Yuma 2</sys:String>
         </x:Array>
         
-        <x:Array x:Key="arrRangeFinder" Type="sys:String" 
-            xmlns:sys="clr-namespace:System;assembly=mscorlib">
+        <x:Array x:Key="arrRangeFinder" Type="sys:String" >
             <sys:String>Impulse 100</sys:String>
             <sys:String>Impulse 200</sys:String>
             <sys:String>Impulse Other</sys:String>
@@ -83,8 +82,7 @@
             <sys:String>Chains</sys:String>
         </x:Array>
 
-        <x:Array x:Key="arrCompass" Type="sys:String" 
-            xmlns:sys="clr-namespace:System;assembly=mscorlib">
+        <x:Array x:Key="arrCompass" Type="sys:String" >
             <sys:String>Silva</sys:String>
             <sys:String>Suunto</sys:String>
             <sys:String>Other</sys:String>

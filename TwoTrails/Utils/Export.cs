@@ -31,6 +31,7 @@ namespace TwoTrails.Utils
             Project(project.ProjectInfo, Path.Combine(folderPath, "ProjectInfo.txt"));
             Summary(project.Manager, Path.Combine(folderPath, "Summary.txt"));
             Points(project.Manager, Path.Combine(folderPath, "Points.csv"));
+            DataDictionary(project.Manager, Path.Combine(folderPath, "DataDictionary.csv"));
             Polygons(project.Manager, Path.Combine(folderPath, "Polygons.csv"));
             Metadata(project.Manager, Path.Combine(folderPath, "Metadata.csv"));
             Groups(project.Manager, Path.Combine(folderPath, "Groups.csv"));
@@ -165,6 +166,49 @@ namespace TwoTrails.Utils
 
                     sb.Append($"{point.PolygonCN},{point.MetadataCN},{point.GroupCN},");
                     sb.Append(point.LinkedPoints.ToStringContents("_"));
+
+                    sw.WriteLine(sb.ToString());
+                }
+
+                sw.Flush();
+            }
+        }
+
+
+        public static void DataDictionary(ITtManager manager, String fileName)
+        {
+            DataDictionary(manager.GetDataDictionaryTemplate(), manager.GetPoints(), fileName);
+        }
+
+        public static void DataDictionary(DataDictionaryTemplate template, List<TtPoint> points, String fileName)
+        {
+            if (template == null || !template.Any())
+                throw new Exception("Invalid or Empty DataDictionary");
+
+            if (points.Any(p => p.ExtendedData == null))
+                throw new Exception("Points missing DataDictionary");
+
+            using (StreamWriter sw = new StreamWriter(fileName))
+            {
+                #region Columns
+                StringBuilder sb = new StringBuilder();
+                List<string> fieldCNs = new List<string>();
+
+                foreach (DataDictionaryField ddf in template)
+                {
+                    sb.Append($"{ ddf.Name },");
+                    fieldCNs.Add(ddf.CN);
+                }
+
+                sw.WriteLine(sb.ToString());
+                #endregion
+
+                foreach (TtPoint point in points)
+                {
+                    sb.Clear();
+
+                    foreach (string cn in fieldCNs)
+                        sb.Append($"{point.ExtendedData[cn]},");
 
                     sw.WriteLine(sb.ToString());
                 }

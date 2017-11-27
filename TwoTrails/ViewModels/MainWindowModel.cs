@@ -25,6 +25,8 @@ namespace TwoTrails.ViewModels
 {
     public class MainWindowModel : NotifyPropertyChangedEx
     {
+        private const int MESSAGE_DELAY = 5000;
+
         private Dictionary<String, TtProject> _Projects = new Dictionary<String, TtProject>();
 
         private Binding sbiInfoBinding;
@@ -68,9 +70,8 @@ namespace TwoTrails.ViewModels
         public string StatusMessage { get { return Get<string>(); } private set { Set(value); } }
         private DelayActionHandler _EndMessageDelayHandler;
         private Action _EndMessage;
-        private int _Delay = 5000;
 
-        public void PostMessage(string message, int delay = 5000)
+        public void PostMessage(string message, int delay = MESSAGE_DELAY)
         {
             StatusMessage = message;
 
@@ -84,12 +85,12 @@ namespace TwoTrails.ViewModels
                     });
                 };
 
-                _EndMessageDelayHandler = new DelayActionHandler(_EndMessage, _Delay);
+                _EndMessageDelayHandler = new DelayActionHandler(_EndMessage, MESSAGE_DELAY);
                 _EndMessageDelayHandler.DelayInvoke();
             }
-            else if (_Delay != delay)
+            else if (MESSAGE_DELAY != delay)
             {
-                _EndMessageDelayHandler.DelayInvoke(_EndMessage, _Delay);
+                _EndMessageDelayHandler.DelayInvoke(_EndMessage, MESSAGE_DELAY);
             }
             else
             {

@@ -3,10 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:tt="clr-namespace:TwoTrails"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
              xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
              xmlns:cc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
+             
              mc:Ignorable="d" 
              FocusManager.FocusedElement="{Binding ElementName=dgPoints}"
              d:DesignHeight="600" d:DesignWidth="800">
@@ -277,6 +279,13 @@
                 SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 BindableColumns="{Binding DataColumns}">
 
+                <!--<i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseRightButtonDown">
+                        <i:InvokeCommandAction Command="{Binding DataGridRightClick}"  
+                                CommandParameter="{Binding ElementName=dgPoints}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>-->
+                
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SeaGreen"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkSeaGreen"/>
@@ -366,10 +375,10 @@
 
                         <Separator/>
 
-                        <MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}" />
+                        <MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}"/>
 
                         <MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
-                                  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}" />
+                                  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
                         <MenuItem Header="Export Point Values" Command="{Binding ExportValuesCommand}" 
                                   CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
                         
@@ -386,6 +395,9 @@
                         <Separator/>
 
                         <MenuItem Header="Reset" Command="{Binding ResetPointCommand}" />
+                        <MenuItem Header="Reset Field" Command="{Binding ResetPointFieldCommand}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"
+                                  Visibility="{Binding Project.Settings.IsAdvancedMode, Converter={StaticResource BoolToVis}}"/>
 
                         <Separator/>
 

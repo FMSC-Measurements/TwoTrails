@@ -44,6 +44,9 @@ namespace TwoTrails.Core
         public ReadOnlyObservableCollection<TtMetadata> Metadata { get; private set; }
         public ReadOnlyObservableCollection<TtGroup> Groups { get; private set; }
         public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get; private set; }
+        
+
+        public bool HasDataDictionary { get { return _DAL.HasDataDictionary; } }
 
 
         public TtGroup MainGroup { get; private set; }

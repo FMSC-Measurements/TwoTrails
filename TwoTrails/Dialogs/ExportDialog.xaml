@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Title="Export" Height="200" Width="300">
+        Title="Export" Height="225" Width="300">
 
     <DockPanel>
         <Grid DockPanel.Dock="Bottom" Margin="5">
@@ -35,6 +35,7 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <DockPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="0, 0, 0, 5">
@@ -45,10 +46,11 @@
 
                 <CheckBox Grid.Column="0" Grid.Row="1" Content="All" IsChecked="{Binding IsCheckAll}" Command="{Binding CheckAllCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=IsChecked}"/>
                 <CheckBox Grid.Column="0" Grid.Row="2" Content="Points" IsChecked="{Binding ExportPoints}" />
-                <CheckBox Grid.Column="0" Grid.Row="3" Content="Polygons" IsChecked="{Binding ExportPolygons}" />
-                <CheckBox Grid.Column="0" Grid.Row="4" Content="Metadata" IsChecked="{Binding ExportMetadata}" />
-                <CheckBox Grid.Column="0" Grid.Row="5" Content="Groups" IsChecked="{Binding ExportGroups}" />
-                <CheckBox Grid.Column="0" Grid.Row="6" Content="Media Info" IsChecked="{Binding ExportMediaInfo}" />
+                <CheckBox Grid.Column="0" Grid.Row="3" Content="DataDictionary" IsChecked="{Binding ExportDataDictionary}" IsEnabled="{Binding DataDictionaryEnabled}"/>
+                <CheckBox Grid.Column="0" Grid.Row="4" Content="Polygons" IsChecked="{Binding ExportPolygons}" />
+                <CheckBox Grid.Column="0" Grid.Row="5" Content="Metadata" IsChecked="{Binding ExportMetadata}" />
+                <CheckBox Grid.Column="0" Grid.Row="6" Content="Groups" IsChecked="{Binding ExportGroups}" />
+                <CheckBox Grid.Column="0" Grid.Row="7" Content="Media Info" IsChecked="{Binding ExportMediaInfo}" />
 
                 <CheckBox Grid.Column="1" Grid.Row="1" Content="Project" IsChecked="{Binding ExportProject}" />
                 <CheckBox Grid.Column="1" Grid.Row="2" Content="Summary" IsChecked="{Binding ExportSummary}" />
