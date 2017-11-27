@@ -1891,12 +1891,12 @@ namespace TwoTrails.DAL
                             DateTime date;
 
                             name = dr.GetString(0);
-                            district = dr.GetString(1);
-                            forest = dr.GetString(2);
-                            region = dr.GetString(3);
-                            deviceID = dr.GetString(4);
+                            district = dr.GetStringN(1);
+                            forest = dr.GetStringN(2);
+                            region = dr.GetStringN(3);
+                            deviceID = dr.GetStringN(4);
                             date = TtCoreUtils.ParseTime(dr.GetString(5));
-                            desc = dr.GetString(6);
+                            desc = dr.GetStringN(6);
                             dbVersion = new Version(dr.GetString(7));
                             version = dr.GetString(8);
                             creationVersion = dr.GetString(9);
@@ -1954,10 +1954,10 @@ namespace TwoTrails.DAL
                             new Dictionary<string, object>()
                             {
                                 [TwoTrailsSchema.ProjectInfoSchema.Name] = info.Name.Trim(),
-                                [TwoTrailsSchema.ProjectInfoSchema.District] = info.District.Trim(),
-                                [TwoTrailsSchema.ProjectInfoSchema.Forest] = info.Forest.Trim(),
-                                [TwoTrailsSchema.ProjectInfoSchema.Region] = info.Region.Trim(),
-                                [TwoTrailsSchema.ProjectInfoSchema.DeviceID] = info.CreationDeviceID,
+                                [TwoTrailsSchema.ProjectInfoSchema.District] = info.District?.Trim(),
+                                [TwoTrailsSchema.ProjectInfoSchema.Forest] = info.Forest?.Trim(),
+                                [TwoTrailsSchema.ProjectInfoSchema.Region] = info.Region?.Trim(),
+                                [TwoTrailsSchema.ProjectInfoSchema.DeviceID] = info.CreationDeviceID?.Trim(),
                                 [TwoTrailsSchema.ProjectInfoSchema.Created] = info.CreationDate.ToString(Consts.DATE_FORMAT),
                                 [TwoTrailsSchema.ProjectInfoSchema.Description] = info.Description,
                                 [TwoTrailsSchema.ProjectInfoSchema.TtDbSchemaVersion] = info.DbVersion.ToString(),
@@ -1997,10 +1997,10 @@ namespace TwoTrails.DAL
                             new Dictionary<string, object>()
                             {
                                 [TwoTrailsSchema.ProjectInfoSchema.Name] = info.Name,
-                                [TwoTrailsSchema.ProjectInfoSchema.District] = info.District,
-                                [TwoTrailsSchema.ProjectInfoSchema.Forest] = info.Forest,
-                                [TwoTrailsSchema.ProjectInfoSchema.Region] = info.Region,
-                                [TwoTrailsSchema.ProjectInfoSchema.DeviceID] = info.CreationDeviceID,
+                                [TwoTrailsSchema.ProjectInfoSchema.District] = info.District?.Trim(),
+                                [TwoTrailsSchema.ProjectInfoSchema.Forest] = info.Forest?.Trim(),
+                                [TwoTrailsSchema.ProjectInfoSchema.Region] = info.Region?.Trim(),
+                                [TwoTrailsSchema.ProjectInfoSchema.DeviceID] = info.CreationDeviceID?.Trim(),
                                 [TwoTrailsSchema.ProjectInfoSchema.Description] = info.Description,
                                 [TwoTrailsSchema.ProjectInfoSchema.TtVersion] = info.Version.ToString()
                             },
