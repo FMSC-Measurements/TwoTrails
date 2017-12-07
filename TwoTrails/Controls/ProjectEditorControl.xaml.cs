@@ -16,6 +16,8 @@ using TwoTrails.ViewModels;
 
 namespace TwoTrails.Controls
 {
+    //TODO dispaly project version and other info in project tab
+
     /// <summary>
     /// Interaction logic for ProjectEditorControl.xaml
     /// </summary>

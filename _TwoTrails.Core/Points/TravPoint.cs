@@ -200,11 +200,11 @@ namespace TwoTrails.Core.Points
             {
                 az = 90 - Azimuth + Declination;
 
-                double x, y, z, c =  az * Math.PI / 180d;
+                double x, y, z, azInRadians = FMSC.Core.Convert.DegreesToRadians(az);
 
-                x = prevX + (HorizontalDistance * Math.Cos(c));
-                y = prevY + (HorizontalDistance * Math.Sin(c));
-                z = prevZ + (HorizontalDistance * Math.Tan(SlopeAngle));
+                x = prevX + (HorizontalDistance * Math.Cos(azInRadians));
+                y = prevY + (HorizontalDistance * Math.Sin(azInRadians));
+                z = prevZ + (HorizontalDistance * Math.Sin(FMSC.Core.Convert.DegreesToRadians(SlopeAngle)));
 
                 if (isPrevAdjusted)
                 {
