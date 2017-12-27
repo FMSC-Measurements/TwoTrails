@@ -716,14 +716,6 @@ namespace TwoTrails.Core
                     seg.Adjust();
             }
 
-            //Crashed on some Accuracy updating
-            //Parallel.ForEach(GetAllTravTypeSegmentsInPolygon(polygon),
-            //    (seg) => {
-            //        if (seg.IsValid)
-            //            seg.Adjust();
-            //    }
-            //);
-
             IgnorePointEvents = false;
         }
 
@@ -800,7 +792,6 @@ namespace TwoTrails.Core
             IList<TtPoint> points = _PointsByPoly[poly.CN];
             if (points.Count > 1)
             {
-                //TtPoint gpsBaseType = null;
                 TtPoint lastPoint = points[0];
 
                 foreach (TtPoint point in points)

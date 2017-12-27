@@ -1,4 +1,5 @@
-﻿using Microsoft.Maps.MapControl.WPF;
+﻿using FMSC.GeoSpatial.UTM;
+using Microsoft.Maps.MapControl.WPF;
 using Microsoft.Maps.MapControl.WPF.Core;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,8 @@ namespace TwoTrails.Controls
 
         public TtMapManager MapManager { get; private set; }
 
+        public bool IsLatLon { get; private set; } = false;
+
         public MapControl()
         {
             InitializeComponent();
@@ -45,6 +48,8 @@ namespace TwoTrails.Controls
             this.Loaded += MapControl_Loaded;
 
             map.Mode = new AerialMode();
+
+            map.MouseMove += Map_MouseMove;
         }
 
         public MapControl(TtManager manager) : this()
@@ -60,6 +65,20 @@ namespace TwoTrails.Controls
                     MapManager = new TtMapManager(map, Manager);
 
                 lvPolygons.ItemsSource = MapManager.PolygonManagers; 
+            }
+        }
+
+        private void Map_MouseMove(object sender, MouseEventArgs e)
+        {
+            Location loc = map.ViewportPointToLocation(e.GetPosition(map));
+
+            if (IsLatLon)
+                tbLoc.Text = $"Lat: { loc.Latitude.ToString("F5") }  Lon: { loc.Longitude.ToString("F5") }";
+            else
+            {
+                UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(loc.Latitude, loc.Longitude, Manager.DefaultMetadata.Zone);
+
+                tbLoc.Text = $"[{ coords.Zone }]  X: { coords.X.ToString("F2") }  Y: { coords.Y.ToString("F2") }";
             }
         }
     }

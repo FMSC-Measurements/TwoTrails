@@ -261,5 +261,7 @@
         <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Gray"/>
 
         <map:Map Grid.Column="2" x:Name="map" Mode="Aerial"/>
+
+        <TextBlock Name="tbLoc" Grid.Column="2" Foreground="White" Margin="5" HorizontalAlignment="Left" VerticalAlignment="Top"/>
     </Grid>
 </UserControl>
