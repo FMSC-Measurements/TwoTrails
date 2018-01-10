@@ -180,7 +180,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                         {
                             ImportControl = new ImportControl(
                                 new TtKmlDataAccessLayer(
-                                    new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true)
+                                    new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true, startPolyNumber: _Manager.PolygonCount)
                             ), false, false, false);
 
                             IsSettingUp = true;
@@ -195,7 +195,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                 case Consts.SHAPE_EXT:
                     ImportControl = new ImportControl(
                         new TtShapeFileDataAccessLayer(
-                            new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone)
+                            new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
                         ), false, false, false
                     );
                     IsSettingUp = true;
@@ -210,7 +210,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
         {
             ImportControl = new ImportControl(
                         new TtShapeFileDataAccessLayer(
-                            new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone)
+                            new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
                         )
                     );
             IsSettingUp = true;

@@ -30,6 +30,7 @@ namespace TwoTrails.DAL
         private readonly ParseOptions _Options;
         private bool parsed;
         private int secondsInc = 0;
+        private int polyInc = 0;
 
         private static object locker = new object();
 
@@ -37,6 +38,7 @@ namespace TwoTrails.DAL
         public TtShapeFileDataAccessLayer(ParseOptions options)
         {
             _Options = options;
+            polyInc = options.StartPolygonNumber;
 
             string filePath = options.ShapeFiles.First().ShapeFilePath;
             _ProjectInfo = new TtProjectInfo(Path.GetFileName(filePath),
@@ -122,7 +124,7 @@ namespace TwoTrails.DAL
                         {
                             poly = new TtPolygon()
                             {
-                                PointStartIndex = 1000 * _Polygons.Count + 1010,
+                                PointStartIndex = 1000 * ++polyInc + 10,
                                 Name = file.Name,
                                 TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
                             };
@@ -187,7 +189,7 @@ namespace TwoTrails.DAL
 
                                 poly = new TtPolygon()
                                 {
-                                    PointStartIndex = 1000 * _Polygons.Count + 1010,
+                                    PointStartIndex = 1000 * ++polyInc + 10,
                                     Name = features.Count < 2 ? file.Name :
                                         $"{fidInc++}-{file.Name}",
                                     TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
@@ -482,13 +484,16 @@ namespace TwoTrails.DAL
 
             public int TargetZone { get; }
 
+            public int StartPolygonNumber { get; }
 
-            public ParseOptions(string shapeFile, int targetZone) : this(new string[] { shapeFile }, targetZone) { }
 
-            public ParseOptions(IEnumerable<string> shapeFiles, int targetZone)
+            public ParseOptions(string shapeFile, int targetZone, int startPolyNumber = 0) : this(new string[] { shapeFile }, targetZone, startPolyNumber) { }
+
+            public ParseOptions(IEnumerable<string> shapeFiles, int targetZone, int startPolyNumber = 0)
             {
                 TargetZone = targetZone;
                 ShapeFiles = shapeFiles.Select(f => new ShapeFilePackage(f, targetZone));
+                StartPolygonNumber = startPolyNumber;
             }
         }
 

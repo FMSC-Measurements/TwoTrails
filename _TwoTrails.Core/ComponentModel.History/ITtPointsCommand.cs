@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
@@ -11,7 +12,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public ITtPointsCommand(IEnumerable<TtPoint> points)
         {
-            this.Points = new List<TtPoint>(points);
+            this.Points = new List<TtPoint>(points) ?? throw new ArgumentNullException(nameof(points));
         }
 
         public abstract void Redo();

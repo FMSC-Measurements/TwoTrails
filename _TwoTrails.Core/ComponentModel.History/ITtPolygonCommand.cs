@@ -15,7 +15,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public ITtPolygonCommand(TtPolygon polygon)
         {
-            this.polygon = polygon;
+            this.polygon = polygon ?? throw new ArgumentNullException(nameof(polygon));
         }
 
         public abstract void Redo();

@@ -26,6 +26,7 @@ namespace TwoTrails.DAL
         private readonly ParseOptions _Options;
         private bool parsed;
         private int secondsInc = 0;
+        private int polyInc = 0;
 
         private static object locker = new object();
 
@@ -33,6 +34,7 @@ namespace TwoTrails.DAL
         public TtCsvDataAccessLayer(ParseOptions options)
         {
             _Options = options;
+            polyInc = options.StartPolygonNumber;
         }
 
         public void Parse(bool reparse = false)
@@ -235,8 +237,8 @@ namespace TwoTrails.DAL
                         {
                             CN = cn,
                             Name = hasPolyNames ?
-                                reader.GetField<string>(fPolyName) : $"Poly {_Polygons.Count + 1}",
-                            PointStartIndex = _Polygons.Count * 1000 + 1010,
+                                reader.GetField<string>(fPolyName) : $"Poly {++polyInc}",
+                            PointStartIndex = _Polygons.Count * polyInc + 10,
                             TimeCreated = _ProjectInfo.CreationDate.AddSeconds(secondsInc++)
                         };
 
@@ -570,6 +572,8 @@ namespace TwoTrails.DAL
 
             public int TargetZone { get; }
 
+            public int StartPolygonNumber { get; }
+
 
             private Dictionary<PointTextFieldType, int> _PointMapping { get; } = new Dictionary<PointTextFieldType, int>();
             public ReadOnlyDictionary<PointTextFieldType, int> PointMapping { get; }
@@ -598,7 +602,7 @@ namespace TwoTrails.DAL
 
 
             public ParseOptions(string pointsFile, int targetZone, string projectFile = null, string polysFile = null, string metaFile = null,
-                string groupsFile = null, string nmeaFile = null, string mediaFile = null, string activityFile = null)
+                string groupsFile = null, string nmeaFile = null, string mediaFile = null, string activityFile = null, int startPolyNumber = 0)
             {
                 PointsFile = pointsFile;
                 TargetZone = targetZone;
@@ -609,6 +613,8 @@ namespace TwoTrails.DAL
                 NmeaFile = nmeaFile;
                 MediaFile = mediaFile;
                 activityFile = UserActivityFile;
+
+                StartPolygonNumber = startPolyNumber;
 
                 ResetPointMap();
                 PointMapping = new ReadOnlyDictionary<PointTextFieldType, int>(_PointMapping);

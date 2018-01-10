@@ -351,7 +351,19 @@ namespace TwoTrails.ViewModels
         public double? UnAdjX
         {
             get { return _UnAdjX; }
-            set { EditValue(ref _UnAdjZ, value, PointProperties.UNADJX); }
+            set
+            {
+                if (!_UnAdjX.Equals(value))
+                {
+                    _UnAdjX = value;
+                    
+                    Manager.EditPoint(SelectedPoint,
+                        new PropertyInfo[] { PointProperties.UNADJX, PointProperties.LON },
+                        new object[] { value, null });
+                }
+                
+                //EditValue(ref _UnAdjZ, value, PointProperties.UNADJX);
+            }
         }
 
 
@@ -362,7 +374,19 @@ namespace TwoTrails.ViewModels
         public double? UnAdjY
         {
             get { return _UnAdjY; }
-            set { EditValue(ref _UnAdjZ, value, PointProperties.UNADJY); }
+            set
+            {
+                if (!_UnAdjY.Equals(value))
+                {
+                    _UnAdjY = value;
+
+                    Manager.EditPoint(SelectedPoint,
+                        new PropertyInfo[] { PointProperties.UNADJY, PointProperties.LAT },
+                        new object[] { value, null });
+                }
+
+                //EditValue(ref _UnAdjY, value, PointProperties.UNADJY);
+            }
         }
 
 
@@ -373,7 +397,19 @@ namespace TwoTrails.ViewModels
         public double? UnAdjZ
         {
             get { return _UnAdjZ; }
-            set { EditValue(ref _UnAdjZ, value, PointProperties.UNADJZ); }
+            set
+            {
+                if (!_UnAdjZ.Equals(value))
+                {
+                    _UnAdjZ = value;
+
+                    Manager.EditPoint(SelectedPoint,
+                        new PropertyInfo[] { PointProperties.UNADJZ, PointProperties.ELEVATION },
+                        new object[] { value, null });
+                }
+
+                //EditValue(ref _UnAdjZ, value, PointProperties.UNADJZ);
+            }
         }
 
 

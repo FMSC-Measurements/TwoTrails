@@ -163,13 +163,13 @@ namespace TwoTrails.ViewModels
 
 
 
-        public CsvImportModel(string fileName, int zone, Action<TtCsvDataAccessLayer> onSetup)
+        public CsvImportModel(string fileName, int zone, Action<TtCsvDataAccessLayer> onSetup, int startPolyNumber = 0)
         {
             OnSetup = onSetup;
 
             SetupImportCommand = new BindedRelayCommand<CsvImportModel>(x => SetupImport(), x => CanImport, this, x => x.CanImport);
 
-            Options = new ParseOptions(fileName, zone);
+            Options = new ParseOptions(fileName, zone, startPolyNumber: startPolyNumber);
 
             Fields = new List<string>();
             Fields.Add("No Field");

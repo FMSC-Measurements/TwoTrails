@@ -45,8 +45,8 @@
                  Margin="1" Name="txtIncrement"/>
 
         <Button Grid.Column="0" Grid.Row="6" Content="Cancel" Click="Cancel_Click" Width="75"
-                HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="1,4,1,0"/>
+                HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
         <Button Grid.Column="1" Grid.Row="6" Content="Rename" Click="Rename_Click" Width="75"
-                HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="1,4,1,0"/>
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

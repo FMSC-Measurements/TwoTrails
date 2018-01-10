@@ -90,9 +90,15 @@
             <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}"/>
 
             <Style.Triggers>
-                <DataTrigger Binding="{Binding OnlyGpsTypes}" Value="True">
-                    <Setter Property="IsEnabled" Value="True" />
-                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding OnlyGpsTypes}" Value="True"/>
+                        <Condition Binding="{Binding Project.Settings.IsAdvancedMode}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="IsEnabled" Value="True"/>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
             </Style.Triggers>
         </Style>
 

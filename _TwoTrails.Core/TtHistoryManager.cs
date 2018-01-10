@@ -35,6 +35,9 @@ namespace TwoTrails.Core
 
         public TtMetadata DefaultMetadata { get { return BaseManager.DefaultMetadata; } }
 
+        public int PolygonCount => Polygons.Count;
+
+        public int PointCount => Points.Count;
 
         public TtHistoryManager(TtManager manager)
         {

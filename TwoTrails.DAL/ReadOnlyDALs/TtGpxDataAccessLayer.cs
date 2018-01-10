@@ -27,6 +27,7 @@ namespace TwoTrails.DAL
         private readonly ParseOptions _Options;
         private bool parsed;
         private int secondsInc = 0;
+        private int polyInc = 0;
 
         private static object locker = new object();
 
@@ -34,6 +35,9 @@ namespace TwoTrails.DAL
         public TtGpxDataAccessLayer(ParseOptions options)
         {
             _Options = options;
+
+            polyInc = options.StartPolygonNumber;
+
             _ProjectInfo = new TtProjectInfo(Path.GetFileName(options.FilePath),
                 String.Empty,
                 String.Empty,
@@ -87,8 +91,8 @@ namespace TwoTrails.DAL
                                                     inPoly = true;
                                                     poly = new TtPolygon()
                                                     {
-                                                        Name = $"Poly {_Polygons.Count}",
-                                                        PointStartIndex = _Polygons.Count * 1000 + 10,
+                                                        Name = $"Poly {++polyInc}",
+                                                        PointStartIndex = 1000 * polyInc + 10,
                                                         TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
                                                     };
 
@@ -285,12 +289,16 @@ namespace TwoTrails.DAL
 
             public int TargetZone { get; }
 
-            public ParseOptions(string filePath, int targetZone, bool useElevation = false, UomElevation uomElevation = UomElevation.Feet)
+            public int StartPolygonNumber { get; }
+
+            public ParseOptions(string filePath, int targetZone, bool useElevation = false,
+                UomElevation uomElevation = UomElevation.Feet, int startPolyNumber = 0)
             {
                 FilePath = filePath;
                 TargetZone = targetZone;
                 UseElevation = useElevation;
                 UomElevation = uomElevation;
+                StartPolygonNumber = startPolyNumber;
             }
         }
     }

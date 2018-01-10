@@ -13,6 +13,9 @@ namespace TwoTrails.Core
         
         bool HasDataDictionary { get; }
 
+        int PolygonCount { get; }
+        int PointCount { get; }
+
         void RebuildPolygon(TtPolygon polygon, bool reindex = false);
         void RecalculatePolygons();
 

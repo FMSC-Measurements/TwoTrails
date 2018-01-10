@@ -41,6 +41,7 @@ namespace TwoTrails.Utils
             KMZ(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.kmz"));
 
             Shapes(project, folderPath);
+
             if (project.MAL != null)
                 MediaFiles(project.MAL, folderPath);
         }

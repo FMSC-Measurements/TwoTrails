@@ -283,31 +283,45 @@ namespace TwoTrails.Mapping
 
         private void UpdateLocation(TtPoint point)
         {
-            if (point is GpsPoint gps && gps.HasLatLon)
+            if (point is GpsPoint gps)
             {
-                AdjPushpin.Location = AdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
-                UnAdjPushpin.Location = UnAdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
-            }
-            else
-            {
-                if (point.Metadata == null)
+                if (gps.HasLatLon)
                 {
-                    Trace.WriteLine($"Point {point.PID} has no Metadata. ({point.CN})");
-                    return;
+                    AdjPushpin.Location = AdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
+                    UnAdjPushpin.Location = UnAdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
+
+                    LocationChanged?.Invoke(this);
+                }
+                else if (point.Metadata != null)
+                {
+                    Point loc = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone);
+                    AdjPushpin.Location = AdjLocation = new Location(loc.Y, loc.X);
+                    UnAdjPushpin.Location = UnAdjLocation = new Location(loc.Y, loc.X);
+
+                    LocationChanged?.Invoke(this);
                 }
                 else
                 {
-                    Point adj = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone);
-                    AdjLocation = new Location(adj.Y, adj.X);
-                    AdjPushpin.Location = AdjLocation;
-
-                    Point unadj = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
-                    UnAdjLocation = new Location(unadj.Y, unadj.X);
-                    UnAdjPushpin.Location = UnAdjLocation;
+                    Trace.WriteLine($"Point {point.PID} has no Metadata. ({point.CN})");
                 }
             }
+            else
+            {
+                if (point.Metadata != null)
+                {
+                    Point adj = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone);
+                    AdjPushpin.Location = AdjLocation = new Location(adj.Y, adj.X);
 
-            LocationChanged?.Invoke(this);
+                    Point unadj = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
+                    UnAdjPushpin.Location = UnAdjLocation = new Location(unadj.Y, unadj.X);
+
+                    LocationChanged?.Invoke(this);
+                }
+                else
+                {
+                    Trace.WriteLine($"Point {point.PID} has no Metadata. ({point.CN})");
+                }
+            }
         }
 
         private void LoadUnAdjToolTip(Object sender, ToolTipEventArgs e)

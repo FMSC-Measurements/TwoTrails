@@ -73,7 +73,7 @@ namespace TwoTrails.Controls
             Location loc = map.ViewportPointToLocation(e.GetPosition(map));
 
             if (IsLatLon)
-                tbLoc.Text = $"Lat: { loc.Latitude.ToString("F5") }  Lon: { loc.Longitude.ToString("F5") }";
+                tbLoc.Text = $"Lat: { loc.Latitude.ToString("F6") }  Lon: { loc.Longitude.ToString("F6") }";
             else
             {
                 UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(loc.Latitude, loc.Longitude, Manager.DefaultMetadata.Zone);

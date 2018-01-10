@@ -30,6 +30,7 @@ namespace TwoTrails.ViewModels
 
         public bool ExportPoints { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportDataDictionary { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
+        public bool ExportNMEA { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportPolygons { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportMetadata { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
         public bool ExportGroups { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
@@ -106,6 +107,9 @@ namespace TwoTrails.ViewModels
                             if (ExportDataDictionary)
                                 Export.DataDictionary(project.Manager, Path.Combine(path, "DataDictionary.csv"));
 
+                            if (ExportNMEA)
+                                Export.TtNmea(project.Manager, Path.Combine(path, "DataDictionary.csv"));
+
                             if (ExportPolygons)
                                 Export.Polygons(project.Manager, Path.Combine(path, "Polygons.csv"));
 
@@ -115,7 +119,7 @@ namespace TwoTrails.ViewModels
                             if (ExportGroups)
                                 Export.Groups(project.Manager, Path.Combine(path, "Groups.csv"));
 
-                            if (ExportMediaInfo)
+                            if (ExportMediaInfo && project.MAL != null)
                                 Export.ImageInfo(project.Manager, Path.Combine(path, "ImageInfo.csv"));
 
                             if (ExportMediaFiles && project.MAL != null)
@@ -157,20 +161,20 @@ namespace TwoTrails.ViewModels
 
         private void CheckAll(bool? isChecked)
         {
-            ExportPoints = ExportDataDictionary = ExportPolygons = ExportMetadata = ExportGroups =
+            ExportPoints = ExportDataDictionary = ExportNMEA = ExportPolygons = ExportMetadata = ExportGroups =
             ExportSummary = ExportProject = ExportKMZ = ExportGPX = ExportShapes = ExportMediaInfo = ExportMediaFiles =
                 (isChecked == true);
         }
 
         private void CheckChanged()
         {
-            if (ExportPoints && ExportPolygons && ExportMetadata && ExportGroups &&
+            if (ExportPoints && ExportPolygons && ExportMetadata && ExportGroups && ExportNMEA &&
                 ExportSummary && ExportProject && ExportKMZ && ExportGPX && ExportShapes &&
                 ExportMediaInfo && ExportMediaFiles && (!DataDictionaryEnabled || ExportDataDictionary))
             {
                 IsCheckAll = true; 
             }
-            else if (ExportPoints || ExportPolygons || ExportMetadata || ExportGroups ||
+            else if (ExportPoints || ExportPolygons || ExportMetadata || ExportGroups || ExportNMEA ||
                 ExportSummary || ExportProject || ExportKMZ || ExportGPX || ExportShapes ||
                 ExportMediaInfo || ExportMediaFiles || ExportDataDictionary)
             {

@@ -55,6 +55,10 @@ namespace TwoTrails.Core
 
         public bool IgnorePointEvents { get; protected set; }
 
+        public int PolygonCount => _Polygons.Count;
+
+        public int PointCount => _Points.Count;
+
         private object locker = new object();
         
 

@@ -47,17 +47,18 @@
                 <CheckBox Grid.Column="0" Grid.Row="1" Content="All" IsChecked="{Binding IsCheckAll}" Command="{Binding CheckAllCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=IsChecked}"/>
                 <CheckBox Grid.Column="0" Grid.Row="2" Content="Points" IsChecked="{Binding ExportPoints}" />
                 <CheckBox Grid.Column="0" Grid.Row="3" Content="DataDictionary" IsChecked="{Binding ExportDataDictionary}" IsEnabled="{Binding DataDictionaryEnabled}"/>
-                <CheckBox Grid.Column="0" Grid.Row="4" Content="Polygons" IsChecked="{Binding ExportPolygons}" />
-                <CheckBox Grid.Column="0" Grid.Row="5" Content="Metadata" IsChecked="{Binding ExportMetadata}" />
-                <CheckBox Grid.Column="0" Grid.Row="6" Content="Groups" IsChecked="{Binding ExportGroups}" />
-                <CheckBox Grid.Column="0" Grid.Row="7" Content="Media Info" IsChecked="{Binding ExportMediaInfo}" />
+                <CheckBox Grid.Column="0" Grid.Row="4" Content="NMEA" IsChecked="{Binding ExportNMEA}" />
+                <CheckBox Grid.Column="0" Grid.Row="5" Content="Polygons" IsChecked="{Binding ExportPolygons}" />
+                <CheckBox Grid.Column="0" Grid.Row="6" Content="Metadata" IsChecked="{Binding ExportMetadata}" />
+                <CheckBox Grid.Column="0" Grid.Row="7" Content="Groups" IsChecked="{Binding ExportGroups}" />
 
                 <CheckBox Grid.Column="1" Grid.Row="1" Content="Project" IsChecked="{Binding ExportProject}" />
                 <CheckBox Grid.Column="1" Grid.Row="2" Content="Summary" IsChecked="{Binding ExportSummary}" />
                 <CheckBox Grid.Column="1" Grid.Row="3" Content="KMZ" IsChecked="{Binding ExportKMZ}" />
                 <CheckBox Grid.Column="1" Grid.Row="4" Content="GPX" IsChecked="{Binding ExportGPX}" />
                 <CheckBox Grid.Column="1" Grid.Row="5" Content="Shapes" IsChecked="{Binding ExportShapes}" />
-                <CheckBox Grid.Column="1" Grid.Row="6" Content="Media Files" IsChecked="{Binding ExportMediaFiles}" />
+                <CheckBox Grid.Column="1" Grid.Row="6" Content="Media Info" IsChecked="{Binding ExportMediaInfo}" />
+                <CheckBox Grid.Column="1" Grid.Row="7" Content="Media Files" IsChecked="{Binding ExportMediaFiles}" />
             </Grid>
             
             <Grid Name="gridStatus" Panel.ZIndex="2" VerticalAlignment="Stretch" Background="White" Visibility="Collapsed">

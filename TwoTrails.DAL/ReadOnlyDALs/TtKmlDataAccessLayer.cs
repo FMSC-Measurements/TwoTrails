@@ -35,6 +35,7 @@ namespace TwoTrails.DAL
         {
             _Options = options;
             _KDoc = KmlDocument.Load(_Options.FilePath);
+            polyCount = options.StartPolygonNumber;
         }
 
 
@@ -271,14 +272,18 @@ namespace TwoTrails.DAL
 
             public bool ParseOnlyPointFolders { get; }
 
+            public int StartPolygonNumber { get; }
 
-            public ParseOptions(string filePath, int targetZone, bool useElevation = false, UomElevation uomElevation = UomElevation.Feet, bool parseOnlyPointFolders = false)
+
+            public ParseOptions(string filePath, int targetZone, bool useElevation = false,
+                UomElevation uomElevation = UomElevation.Feet, bool parseOnlyPointFolders = false, int startPolyNumber = 0)
             {
                 FilePath = filePath;
                 TargetZone = targetZone;
                 UseElevation = useElevation;
                 UomElevation = uomElevation;
                 ParseOnlyPointFolders = parseOnlyPointFolders;
+                StartPolygonNumber = startPolyNumber;
             }
         }
     }
