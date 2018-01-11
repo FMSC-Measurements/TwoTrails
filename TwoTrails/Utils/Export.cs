@@ -181,7 +181,7 @@ namespace TwoTrails.Utils
             DataDictionary(manager.GetDataDictionaryTemplate(), manager.GetPoints(), fileName);
         }
 
-        public static void DataDictionary(DataDictionaryTemplate template, List<TtPoint> points, String fileName)
+        public static void DataDictionary(DataDictionaryTemplate template, IEnumerable<TtPoint> points, String fileName)
         {
             if (template == null || !template.Any())
                 throw new Exception("Invalid or Empty DataDictionary");

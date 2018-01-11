@@ -15,14 +15,14 @@ namespace TwoTrails.Utils
         {
             TtUserAction activity = new TtUserAction("Upgrader", settings.DeviceName);
             
-            List<TtMetadata> meta = odal.GetMetadata().ToList();
+            IEnumerable<TtMetadata> meta = odal.GetMetadata();
             if (meta.Any())
             {
                 ndal.InsertMetadata(meta);
                 activity.UpdateAction(DataActionType.InsertedMetadata);
             }
 
-            List<TtGroup> groups = odal.GetGroups().ToList();
+            IEnumerable<TtGroup> groups = odal.GetGroups();
             if (groups.Any())
             {
                 ndal.InsertGroups(groups);
@@ -56,7 +56,7 @@ namespace TwoTrails.Utils
                 }
             }
 
-            List<TtNmeaBurst> nmea = odal.GetNmeaBursts().ToList();
+            IEnumerable<TtNmeaBurst> nmea = odal.GetNmeaBursts();
             if (nmea.Any())
             {
                 ndal.InsertNmeaBursts(nmea);

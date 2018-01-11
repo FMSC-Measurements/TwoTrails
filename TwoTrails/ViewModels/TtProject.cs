@@ -311,8 +311,7 @@ namespace TwoTrails.ViewModels
                     MapWindow = new MapWindow(this);
                 }
             }
-
-            //MapWindow.Owner = MainModel.MainWindow;
+            
             MapWindow.Show();
         }
 
