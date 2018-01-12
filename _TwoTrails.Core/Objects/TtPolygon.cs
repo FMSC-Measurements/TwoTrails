@@ -49,7 +49,7 @@ namespace TwoTrails.Core
             set { SetField(ref _TimeCreated, value); }
         }
 
-        protected Double _Accuracy = 6;
+        protected Double _Accuracy = Consts.DEFAULT_POINT_ACCURACY;
         public Double Accuracy
         {
             get { return _Accuracy; }
