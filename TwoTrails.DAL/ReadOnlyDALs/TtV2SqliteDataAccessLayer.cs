@@ -121,7 +121,7 @@ namespace TwoTrails.DAL
                                 md.MagDec = reader.GetDouble(8);
                             if (!reader.IsDBNull(9))
                                 md.GpsReceiver = reader.GetString(9);
-                            md.Distance = (Distance)Enum.Parse(typeof(Distance), reader.GetString(10), true);
+                            md.Distance = Types.ParseDistance(reader.GetString(10));
                             md.Elevation = Types.ParseDistance(reader.GetString(11));
                             md.Slope = Types.ParseSlope(reader.GetString(12));
                             md.Zone = reader.GetInt32(13);

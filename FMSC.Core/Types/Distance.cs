@@ -36,6 +36,8 @@ namespace FMSC.Core
                 case "ft":
                 case "ftt":
                 case "feet":
+                case "feetin":      //legacy
+                case "feetinches":  //legacy
                 case "feettenths": return Distance.FeetTenths;
                 case "1":
                 case "m":
