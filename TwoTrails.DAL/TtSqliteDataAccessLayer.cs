@@ -661,6 +661,7 @@ namespace TwoTrails.DAL
                                 case OpType.Walk:
                                 case OpType.WayPoint:
                                     DeleteGpsPointData(where, conn, trans);
+                                    DeleteNmeaBursts($"{TwoTrailsSchema.TtNmeaSchema.PointCN} = '{point.CN}'", conn, trans);
                                     break;
                                 case OpType.Traverse:
                                 case OpType.SideShot:
@@ -696,7 +697,7 @@ namespace TwoTrails.DAL
         public int DeletePoints(IEnumerable<TtPoint> points)
         {
             StringBuilder sb = new StringBuilder();
-            int total = points.Count();
+            int remaining = points.Count();
             int count = 0;
 
             String where = String.Empty;
@@ -711,23 +712,8 @@ namespace TwoTrails.DAL
                         {
                             count++;
                             where = $"{TwoTrailsSchema.SharedSchema.CN} = '{point.CN}'";
-
-                            if (count % 50 == 0)
-                            {
-                                sb.Append(where);
-
-                                if (!DeleteBasePoints(sb.ToString(), conn, trans))
-                                {
-                                    trans.Rollback();
-                                    return -1;
-                                }
-
-                                count = 0;
-                            }
-                            else
-                            {
-                                sb.Append($"{where}{(count < total ? " or " : String.Empty)}");
-                            }
+                            
+                            sb.Append($"{where}{(count < remaining ? " or " : String.Empty)}");
 
                             if (HasDataDictionary)
                                 DeleteExtendedData(where, conn, trans);
@@ -739,6 +725,7 @@ namespace TwoTrails.DAL
                                 case OpType.Walk:
                                 case OpType.WayPoint:
                                     DeleteGpsPointData(where, conn, trans);
+                                    DeleteNmeaBursts($"{TwoTrailsSchema.TtNmeaSchema.PointCN} = '{point.CN}'", conn, trans);
                                     break;
                                 case OpType.Traverse:
                                 case OpType.SideShot:
@@ -747,6 +734,20 @@ namespace TwoTrails.DAL
                                 case OpType.Quondam:
                                     DeleteQndmPointData(where, conn, trans);
                                     break;
+                            }
+
+                            if (count == 50)
+                            {
+                                if (!DeleteBasePoints(sb.ToString(), conn, trans))
+                                {
+                                    trans.Rollback();
+                                    return -1;
+                                }
+
+                                sb.Clear();
+
+                                remaining -= 50;
+                                count = 0;
                             }
                         }
 
@@ -770,7 +771,7 @@ namespace TwoTrails.DAL
                 } 
             }
 
-            return total;
+            return remaining;
         } 
 
 
@@ -1811,11 +1812,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        res = _Database.Delete(TwoTrailsSchema.TtNmeaSchema.TableName,
-                            $"{TwoTrailsSchema.TtNmeaSchema.PointCN} = '{pointCN}'",
-                            conn,
-                            trans);
-
+                        DeleteNmeaBursts($"{TwoTrailsSchema.TtNmeaSchema.PointCN} = '{pointCN}'", conn, trans);
                         trans.Commit();
                     }
                     catch (Exception ex)
@@ -1831,6 +1828,11 @@ namespace TwoTrails.DAL
             }
 
             return res;
+        }
+        
+        private void DeleteNmeaBursts(String where, SQLiteConnection conn, SQLiteTransaction transaction)
+        {
+            _Database.Delete(TwoTrailsSchema.TtNmeaSchema.TableName, where, conn, transaction);
         }
 
 

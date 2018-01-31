@@ -60,6 +60,7 @@
     <Compile Include="ComponentModel\PropertyWatcher.cs" />
     <Compile Include="ComponentModel\RelayMenuItem.cs" />
     <Compile Include="Controls\DataGridEx.cs" />
+    <Compile Include="Controls\DragAndDropListBox.cs" />
     <Compile Include="Controls\FlipCheckBox.xaml.cs">
       <DependentUpon>FlipCheckBox.xaml</DependentUpon>
     </Compile>

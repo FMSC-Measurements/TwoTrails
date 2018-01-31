@@ -1788,7 +1788,7 @@ namespace TwoTrails.ViewModels
                     case OpType.WayPoint:
                         {
                             if (CreateGpsPointDialog.ShowDialog(Manager, null, optype, Project.MainModel.MainWindow) == true)
-                                Manager.BaseManager.AddDataAction(DataActionType.ManualPointCreation);
+                                Manager.BaseManager.UpdateDataAction(DataActionType.ManualPointCreation);
                             break;
                         }
                     case OpType.Quondam: Retrace(); break;
@@ -1854,7 +1854,7 @@ namespace TwoTrails.ViewModels
             else
                 Manager.ReplacePoint(convertPoint(SelectedPoint as QuondamPoint));
 
-            Manager.BaseManager.AddDataAction(DataActionType.ConvertPoints);
+            Manager.BaseManager.UpdateDataAction(DataActionType.ConvertPoints);
         }
 
         private void ConvertTravTypes()
@@ -1887,7 +1887,7 @@ namespace TwoTrails.ViewModels
                     Manager.ReplacePoint(convertToTrav(SelectedPoint));
             }
 
-            Manager.BaseManager.AddDataAction(DataActionType.ConvertPoints);
+            Manager.BaseManager.UpdateDataAction(DataActionType.ConvertPoints);
         }
 
         private void MovePoints()
@@ -1903,7 +1903,7 @@ namespace TwoTrails.ViewModels
             {
                 Project.MainModel.MainWindow.IsEnabled = true;
                 if (result == true)
-                    Manager.BaseManager.AddDataAction(DataActionType.RetracePoints);
+                    Manager.BaseManager.UpdateDataAction(DataActionType.RetracePoints);
             });
         }
 

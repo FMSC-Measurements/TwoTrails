@@ -1017,6 +1017,8 @@ namespace TwoTrails.Core
                 int index = 0;
                 foreach (TtPoint point in points)
                     point.Index = index++;
+
+                UpdateDataAction(DataActionType.ReindexPoints);
             }
 
             _PointsByPoly[poly.CN] = points;
@@ -1392,13 +1394,13 @@ namespace TwoTrails.Core
                     {
                         index = 0;
                         foreach (TtPoint point in _PointsByPoly[ripoly])
-                        {
                             point.Index = index++;
-                        }
 
                         TtPolygon poly = _PolygonsMap[ripoly];
                         AdjustAllTravTypesInPolygon(poly);
                         UpdatePolygonStats(poly);
+
+                        UpdateDataAction(DataActionType.ReindexPoints);
                     }
                 }
             }
@@ -1795,18 +1797,9 @@ namespace TwoTrails.Core
 
 
 
-        public void AddDataAction(DataActionType action)
+        public void UpdateDataAction(DataActionType action)
         {
-
+            _Activity.UpdateAction(action);
         }
-
-        public void RemoveDataAction(DataActionType action)
-        {
-
-        }
-
-
-
-
     }
 }

@@ -30,6 +30,7 @@ namespace TwoTrails.Core
         MovePoints          = 1 << 17,
         RetracePoints       = 1 << 18,
         ReindexPoints       = 1 << 19,
-        ConvertPoints       = 1 << 20
+        ConvertPoints       = 1 << 20,
+        ModifiedDataDictionary  = 1 << 21
     }
 }
