@@ -8,6 +8,7 @@ namespace TwoTrails.Core.Points
 {
     public delegate void PointChangedEvent(TtPoint point);
     public delegate void PointPolygonChangedEvent(TtPoint point, TtPolygon newPolygon, TtPolygon oldPolygon);
+    public delegate void PointMetadataChangedEvent(TtPoint point, TtMetadata newMetadata, TtMetadata oldMetadata);
     public delegate void PointIndexChangedEvent(TtPoint point, int newIndex, int oldIndex);
 
     public abstract class TtPoint : TtObject, IAccuracy, IComparable<TtPoint>, IComparer<TtPoint>
@@ -16,7 +17,8 @@ namespace TwoTrails.Core.Points
         public event PointChangedEvent PreviewLocationChanged;
         public event PointChangedEvent OnBoundaryChanged;
         public event PointChangedEvent OnAccuracyChanged;
-        public event PointPolygonChangedEvent PointPolygonChanged;
+        public event PointPolygonChangedEvent PolygonChanged;
+        public event PointMetadataChangedEvent MetadataChanged;
         public event PointIndexChangedEvent PointIndexChanged;
 
 
@@ -72,7 +74,7 @@ namespace TwoTrails.Core.Points
 
                     if (oldPoly != null && value != null)
                     {
-                        PointPolygonChanged?.Invoke(this, value, oldPoly);
+                        PolygonChanged?.Invoke(this, value, oldPoly);
                     }
                 }
             }
@@ -106,14 +108,16 @@ namespace TwoTrails.Core.Points
         }
 
         protected TtMetadata _Metadata;
-        public virtual TtMetadata Metadata
+        public TtMetadata Metadata
         {
             get { return _Metadata; }
             set
             {
+                TtMetadata oldMetadata = _Metadata;
                 if (SetField(ref _Metadata, value))
                 {
                     MetadataCN = value?.CN;
+                    MetadataChanged?.Invoke(this, _Metadata, oldMetadata);
                     OnMetadataChanged();
                 }
             }

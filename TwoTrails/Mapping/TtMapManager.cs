@@ -58,7 +58,7 @@ namespace TwoTrails.Mapping
 
             foreach (TtPoint point in _Points)
             {
-                point.PointPolygonChanged += Point_PolygonChanged;
+                point.PolygonChanged += Point_PolygonChanged;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMSC.GeoSpatial.UTM;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -35,6 +36,23 @@ namespace TwoTrails.Core
             }
 
             return time;
+        }
+
+
+        public static void ChangeGpsZone(GpsPoint point, int zone, int oldZone)
+        {
+            UTMCoords coords;
+
+            if (point.HasLatLon)
+            {
+                coords = UTMTools.ConvertLatLonSignedDecToUTM((double)point.Latitude, (double)point.Longitude, zone);
+            }
+            else
+            {
+                coords = UTMTools.ShiftZones(point.UnAdjX, point.UnAdjY, zone, oldZone);
+            }
+
+            point.SetUnAdjLocation(coords.X, coords.Y, point.UnAdjZ);
         }
     }
 }

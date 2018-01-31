@@ -304,6 +304,7 @@ namespace TwoTrails.Core
             if (point.IsGpsType())
             {
                 ((GpsPoint)point).OnAccuracyChanged += Point_LocationChanged;
+                point.MetadataChanged += Point_MetadataChanged;
             }
 
             point.LocationChanged += Point_LocationChanged;
@@ -604,6 +605,14 @@ namespace TwoTrails.Core
 
                     UpdatePolygonStats(point.Polygon); 
                 }
+            }
+        }
+        
+        private void Point_MetadataChanged(TtPoint point, TtMetadata newMetadata, TtMetadata oldMetadata)
+        {
+            if (point.IsGpsType() && oldMetadata != null && newMetadata != null && newMetadata.Zone != oldMetadata.Zone)
+            {
+                ChangeGpsZone(point as GpsPoint, newMetadata.Zone, oldMetadata.Zone);
             }
         }
 
@@ -944,14 +953,6 @@ namespace TwoTrails.Core
             }
 
             point.SetUnAdjLocation(coords.X, coords.Y, point.UnAdjZ);
-        }
-
-        public void ChangePointMetadata(TtPoint point, TtMetadata metadata)
-        {
-            if (point.IsGpsType())
-                ChangeGpsZone(point as GpsPoint, metadata.Zone, point.Metadata.Zone);
-
-            point.Metadata = metadata;
         }
         
         public void UpdatePolygonStats(TtPolygon polygon)
