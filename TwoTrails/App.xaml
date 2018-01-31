@@ -10,6 +10,7 @@
         <cvt:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis" />
         <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
         <cvt:NotNullConverter x:Key="NotNullConverter"/>
+        <cvt:NotNullVisibilityConverter x:Key="NotNullVisibilityConverter"/>
         <cvt:InverseBooleanConverter x:Key="IBC"/>
 
         <sys:Boolean x:Key="True">True</sys:Boolean>

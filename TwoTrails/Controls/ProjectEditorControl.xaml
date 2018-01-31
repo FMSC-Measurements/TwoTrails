@@ -978,6 +978,25 @@
                 </Border>
             </TabItem>
 
+
+
+            <TabItem Header="Data Dictionary">
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+
             <TabItem Header="Map" Visibility="Collapsed">
                 
             </TabItem>

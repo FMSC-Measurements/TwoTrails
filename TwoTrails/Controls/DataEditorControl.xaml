@@ -496,15 +496,18 @@
 									<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
 										<Style.Triggers>
 											<MultiDataTrigger>
-												<MultiDataTrigger.Conditions>
-													<Condition Binding="{Binding MultipleSelections}" Value="False"/>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding MultipleSelections}" Value="False"/>
 													<Condition Binding="{Binding Project.Settings.IsAdvancedMode}" Value="True"/>
 												</MultiDataTrigger.Conditions>
 												<MultiDataTrigger.Setters>
 													<Setter Property="IsEnabled" Value="True"/>
 												</MultiDataTrigger.Setters>
-											</MultiDataTrigger>
-											<DataTrigger Binding="{Binding MultipleSelections}" Value="True">
+                                            </MultiDataTrigger>
+                                            <DataTrigger Binding="{Binding HasSelection}" Value="False">
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding MultipleSelections}" Value="True">
 												<Setter Property="IsEnabled" Value="False"/>
 											</DataTrigger>
 											<DataTrigger Binding="{Binding Project.Settings.IsAdvancedMode}" Value="False">

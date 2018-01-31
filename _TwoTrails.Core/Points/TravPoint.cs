@@ -9,7 +9,6 @@ namespace TwoTrails.Core.Points
     public class TravPoint : TtPoint
     {
         public event TraverseChangedEvent PositionChanged;
-        public event TraverseChangedEvent PreviewPositionChanged;
 
         #region Properties
         private Double? _FwdAzimuth;
@@ -107,12 +106,6 @@ namespace TwoTrails.Core.Points
 
             AdjustAzimuth();
             AdjustSlope();
-        }
-
-
-        protected override void Polygon_PreviewPolygonAccuracyChanged(TtPolygon polygon)
-        {
-            //dont set accuracy
         }
 
         protected override void OnMetadataChanged()
