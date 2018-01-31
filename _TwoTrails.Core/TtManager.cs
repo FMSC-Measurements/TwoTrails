@@ -321,9 +321,11 @@ namespace TwoTrails.Core
             if (point.IsGpsType())
             {
                 ((GpsPoint)point).OnAccuracyChanged -= Point_LocationChanged;
+                point.MetadataChanged -= Point_MetadataChanged;
             }
 
             point.LocationChanged -= Point_LocationChanged;
+            point.OnBoundaryChanged -= Point_OnBoundaryChanged;
         } 
         #endregion
         
