@@ -363,6 +363,8 @@ namespace TwoTrails.Utils
 
                 attPointTable.AddAttribute("Comment", p.Comment == null ? String.Empty : p.Comment);
 
+                attPointTable.AddAttribute("CN", p.CN);
+
                 feat = new Feature();
                 UTMCoords c = TtUtils.GetCoords(p, zone, adjusted);
                 feat.Geometry = new Point(c.X, c.Y);

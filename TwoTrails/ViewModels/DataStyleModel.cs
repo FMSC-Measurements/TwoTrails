@@ -51,7 +51,7 @@ namespace TwoTrails.ViewModels
         {
             Style style = new Style(typeof(DataGridRow));
             
-            //get poly color, if not default use that with adaptions
+            //todo get poly color, if not default use that with adaptions
 
             SolidColorBrush rowBrush = new SolidColorBrush(Colors.White);
             SolidColorBrush rowBrushAlt = new SolidColorBrush(Colors.WhiteSmoke);

@@ -377,10 +377,6 @@
 
 				<DataGrid.ContextMenu>
 					<ContextMenu>
-						<MenuItem Header="Columns" ItemsSource="{Binding VisibleFields}"/>
-
-						<Separator/>
-
 						<MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}"/>
 
 						<MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
@@ -407,8 +403,13 @@
 
 						<Separator/>
 
-						<MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
-					</ContextMenu>
+                        <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
+
+                        <Separator/>
+                        
+                        <MenuItem Header="Columns" ItemsSource="{Binding VisibleFields}"/>
+
+                    </ContextMenu>
 				</DataGrid.ContextMenu>
 			</cc:DataGridEx>
 

@@ -61,6 +61,11 @@ namespace TwoTrails.Dialogs
                     MessageBox.Show("Project must have a name.");
                     prjInfoCtrl.FocusName();
                 }
+                else if (String.IsNullOrWhiteSpace(txtName.Text))
+                {
+                    MessageBox.Show("Must have a Filename.");
+                    txtName.Focus();
+                }
                 else
                 {
                     String fileName = txtName.Text;
