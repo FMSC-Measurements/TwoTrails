@@ -70,13 +70,14 @@ namespace TwoTrails.ViewModels
 
         public bool RequiresUpgrade { get; private set; }
 
-
+        //property changes to polys/meta/groups
         public bool DataChanged
         {
             get { return Get<bool>(); }
             private set { Set(value, () => OnPropertyChanged(nameof(RequiresSave))); }
         }
 
+        //changes to project fields
         public bool ProjectChanged
         {
             get { return Get<bool>(); }
@@ -92,10 +93,10 @@ namespace TwoTrails.ViewModels
         public TtManager Manager { get; }
         public TtHistoryManager HistoryManager { get; }
 
-        private DataEditorModel _DataEditor;
-        public DataEditorModel DataEditor
+        private PointEditorModel _DataEditor;
+        public PointEditorModel DataEditor
         {
-            get { return _DataEditor ?? (_DataEditor = new DataEditorModel(this)); }
+            get { return _DataEditor ?? (_DataEditor = new PointEditorModel(this)); }
         }
 
         public MainWindowModel MainModel { get; private set; }
@@ -140,7 +141,7 @@ namespace TwoTrails.ViewModels
             EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Metadata));
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Groups));
             
-            RecalculateAllPolygonsCommand = new RelayCommand(x => { HistoryManager.RecalculatePolygons(); ProjectUpdated(); });
+            RecalculateAllPolygonsCommand = new RelayCommand(x => { HistoryManager.RecalculatePolygons(); DataChanged |= true; });
 
             OpenMapCommand = new RelayCommand(x => OpenMapTab());
             OpenMapWindowCommand = new RelayCommand(x => OpenMapWindow());
@@ -150,7 +151,7 @@ namespace TwoTrails.ViewModels
 
         private void Manager_HistoryChanged(object sender, EventArgs e)
         {
-            Set(HistoryManager.CanUndo || DataChanged, nameof(RequiresSave));
+            RequiresSave = HistoryManager.CanUndo;
         }
 
 

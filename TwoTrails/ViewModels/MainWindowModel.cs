@@ -57,7 +57,6 @@ namespace TwoTrails.ViewModels
                     OnPropertyChanged(
                         nameof(CurrentProject),
                         nameof(HasOpenedProject),
-                        nameof(CanSaveCurrentProject),
                         nameof(CurrentEditor)
                         );
 
@@ -101,17 +100,12 @@ namespace TwoTrails.ViewModels
 
         public TtProject CurrentProject { get { return CurrentTab?.Project; } }
         
-        public DataEditorModel CurrentEditor { get; private set; }
+        public PointEditorModel CurrentEditor { get; private set; }
 
 
         public bool HasOpenedProject { get { return CurrentTab != null; } }
         public bool HasPolygons { get { return CurrentEditor != null && CurrentEditor.Manager.Polygons.Count > 0; } }
-
-
-        public bool CanSaveCurrentProject
-        {
-            get { return CurrentProject != null && CurrentProject.RequiresSave; }
-        }
+        
         
         public bool HasUnsavedProjects
         {

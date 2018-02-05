@@ -12,6 +12,7 @@
         <cvt:NotNullConverter x:Key="NotNullConverter"/>
         <cvt:NotNullVisibilityConverter x:Key="NotNullVisibilityConverter"/>
         <cvt:InverseBooleanConverter x:Key="IBC"/>
+        <cvt:MultiBooleanConverter x:Key="MultiBoolConverter"/>
 
         <sys:Boolean x:Key="True">True</sys:Boolean>
         <sys:Boolean x:Key="False">False</sys:Boolean>

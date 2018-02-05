@@ -15,7 +15,7 @@ namespace TwoTrails.Converters
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values != null && values.Length > 1 &&
-                values[0] is IEnumerable<DataDictionaryField> ddfs && values[1] is DataEditorModel dem)
+                values[0] is IEnumerable<DataDictionaryField> ddfs && values[1] is PointEditorModel dem)
             {
                 return ddfs.Select<DataDictionaryField, ExtendedDataField>(ddf =>
                 {

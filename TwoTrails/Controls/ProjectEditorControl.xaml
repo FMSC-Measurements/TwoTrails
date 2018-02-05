@@ -980,7 +980,7 @@
 
 
 
-            <TabItem Header="Data Dictionary">
+            <TabItem Header="Data Dictionary" Visibility="Collapsed"> <!-- View / Filter DD Info -->
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid Background="LightGray">
                         <Grid.RowDefinitions>

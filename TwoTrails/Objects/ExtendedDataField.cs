@@ -22,7 +22,7 @@ namespace TwoTrails
 
         public IValueConverter Converter { get; }
 
-        public DataEditorModel DataEditor { get; }
+        public PointEditorModel DataEditor { get; }
         
         public bool IsValueSame { get { return DataEditor.ArePropertyValuesSame(PropertyCN); } }
 
@@ -32,7 +32,7 @@ namespace TwoTrails
             set { DataEditor.ExtendedData[PropertyCN] = value; }
         }
 
-        public ExtendedDataField(DataDictionaryField field, DataEditorModel dataEditor, IValueConverter converter = null)
+        public ExtendedDataField(DataDictionaryField field, PointEditorModel dataEditor, IValueConverter converter = null)
         {
             Name = field.Name;
             PropertyCN = field.CN;
@@ -58,7 +58,7 @@ namespace TwoTrails
         public bool IsNumericDecimal { get; }
 
 
-        public TextBoxExtendedDataField(DataDictionaryField field, DataEditorModel dataEditor, IValueConverter converter = null) :
+        public TextBoxExtendedDataField(DataDictionaryField field, PointEditorModel dataEditor, IValueConverter converter = null) :
             base(field, dataEditor, converter) { }
     }
 
@@ -68,7 +68,7 @@ namespace TwoTrails
 
         public bool IsEditable { get; }
 
-        public ComboBoxExtendedDataField(DataDictionaryField field, DataEditorModel dataEditor, IValueConverter converter = null) :
+        public ComboBoxExtendedDataField(DataDictionaryField field, PointEditorModel dataEditor, IValueConverter converter = null) :
             base(field, dataEditor, converter)
         {
             IsEditable = field.Flags == 1;
@@ -78,7 +78,7 @@ namespace TwoTrails
 
     public class CheckBoxExtendedDataField : ExtendedDataField
     {
-        public CheckBoxExtendedDataField(DataDictionaryField field, DataEditorModel dataEditor, IValueConverter converter = null) :
+        public CheckBoxExtendedDataField(DataDictionaryField field, PointEditorModel dataEditor, IValueConverter converter = null) :
             base(field, dataEditor, converter) { }
     }
 }

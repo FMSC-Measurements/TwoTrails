@@ -1504,22 +1504,6 @@ namespace TwoTrails.Core
             }
         }
         
-
-        /// <summary>
-        /// Create a Polygon
-        /// </summary>
-        /// <param name="name">Name of Polygon</param>
-        /// <param name="pointStartIndex">Point starting index for points in the polygon</param>
-        /// <returns>New Polygon</returns>
-        public TtPolygon CreatePolygon(String name = null, int pointStartIndex = 0)
-        {
-            int num = _PolygonsMap.Count + 1;
-            return new TtPolygon()
-            {
-                Name = name ?? $"Poly {num}",
-                PointStartIndex = pointStartIndex > 0 ? pointStartIndex : num * 1000 + 10
-            };
-        }
         
         /// <summary>
         /// Add a polygon to the project
@@ -1612,20 +1596,6 @@ namespace TwoTrails.Core
             }
         }
 
-
-        /// <summary>
-        /// Create a new Metadata
-        /// </summary>
-        /// <param name="name">Name of metadata</param>
-        /// <returns>New metadata</returns>
-        public TtMetadata CreateMetadata(String name = null)
-        {
-            return new TtMetadata(_Settings.MetadataSettings.CreateDefaultMetadata())
-            {
-                CN = Guid.NewGuid().ToString(),
-                Name = name ?? $"Meta {_MetadataMap.Count + 1}"
-            };
-        }
         
         /// <summary>
         /// Adds a metadata to the project
@@ -1681,16 +1651,6 @@ namespace TwoTrails.Core
             }
         }
 
-
-        /// <summary>
-        /// Creates a new Group
-        /// </summary>
-        /// <param name="groupType">Type of Group to create</param>
-        /// <returns>New Group</returns>
-        public TtGroup CreateGroup(GroupType groupType = GroupType.General)
-        {
-            return new TtGroup($"{(groupType != GroupType.General ? $"{groupType}" : "Group")}_{Guid.NewGuid().ToString().Substring(0, 8)}");
-        }
        
         /// <summary>
         /// Adds a group to the project
@@ -1794,7 +1754,10 @@ namespace TwoTrails.Core
             return _DAL.GetDataDictionaryTemplate();
         }
 
-
+        public void UpdateDataDictionaryTemplate(DataDictionaryTemplate dataDictionaryTemplate)
+        {
+            Load(); //reload all data
+        }
 
 
         public void UpdateDataAction(DataActionType action)

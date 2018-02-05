@@ -20,6 +20,7 @@ namespace TwoTrails.Core
         public ReadOnlyObservableCollection<TtPolygon> Polygons { get { return BaseManager.Polygons; } }
         public ReadOnlyObservableCollection<TtMetadata> Metadata { get { return BaseManager.Metadata; } }
         public ReadOnlyObservableCollection<TtGroup> Groups { get { return BaseManager.Groups; } }
+        public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get { return BaseManager.MediaInfo; } }
 
         private Stack<ITtCommand> _UndoStack = new Stack<ITtCommand>();
         private Stack<ITtCommand> _RedoStack = new Stack<ITtCommand>();

@@ -25,22 +25,22 @@ namespace TwoTrails.ViewModels
         private TtProject _Project;
 
         public TtProjectInfo ProjectInfo { get { return _Project.ProjectInfo; } }
-        public TtManager Manager { get { return _Project.Manager; } }
+        public TtHistoryManager Manager { get { return _Project.HistoryManager; } }
         public TtSettings Settings { get { return _Project.Settings; } }
         
-        public DataEditorControl DataController { get; }
+        public PointEditorControl DataController { get; }
 
-        public ReadOnlyObservableCollection<TtPolygon> Polygons { get { return _Project.Manager.Polygons; } }
-        public ReadOnlyObservableCollection<TtMetadata> Metadata { get { return _Project.Manager.Metadata; } }
-        public ReadOnlyObservableCollection<TtGroup> Groups { get { return _Project.Manager.Groups; } }
-        public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get { return _Project.Manager.MediaInfo; } }
+        public ReadOnlyObservableCollection<TtPolygon> Polygons { get { return Manager.Polygons; } }
+        public ReadOnlyObservableCollection<TtMetadata> Metadata { get { return Manager.Metadata; } }
+        public ReadOnlyObservableCollection<TtGroup> Groups { get { return Manager.Groups; } }
+        public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get { return Manager.MediaInfo; } }
         
 
         public ProjectEditorModel(TtProject project)
         {
             _Project = project;
 
-            DataController = new DataEditorControl(project.DataEditor, new DataStyleModel(project));
+            DataController = new PointEditorControl(project.DataEditor, new DataStyleModel(project));
 
             PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtPolygon));
             NewPolygonCommand = new RelayCommand(x => NewPolygon(x as ListBox));
@@ -127,13 +127,13 @@ namespace TwoTrails.ViewModels
                         old.PolygonChanged -= GeneratePolygonSummary;
                     }
 
-                    if (value != null)
+                    if (_CurrentPolygon != null)
                     {
-                        _BackupPoly = new TtPolygon(value);
+                        _BackupPoly = new TtPolygon(_CurrentPolygon);
                         _CurrentPolygon.PropertyChanged += Polygon_PropertyChanged;
                         _CurrentPolygon.PolygonChanged += GeneratePolygonSummary;
 
-                        GeneratePolygonSummary(value);
+                        GeneratePolygonSummary(_CurrentPolygon);
                     }
                 });
 
@@ -249,10 +249,24 @@ namespace TwoTrails.ViewModels
 
         private void NewPolygon(ListBox listBox)
         {
-            _Project.Manager.AddPolygon(_Project.Manager.CreatePolygon());
+            Manager.AddPolygon(CreatePolygon());
             listBox.SelectedIndex = listBox.Items.Count - 1;
+        }
 
-            _Project.ProjectUpdated();
+        /// <summary>
+        /// Create a Polygon
+        /// </summary>
+        /// <param name="name">Name of Polygon</param>
+        /// <param name="pointStartIndex">Point starting index for points in the polygon</param>
+        /// <returns>New Polygon</returns>
+        public TtPolygon CreatePolygon(String name = null, int pointStartIndex = 0)
+        {
+            int num = Manager.PolygonCount + 1;
+            return new TtPolygon()
+            {
+                Name = name ?? $"Poly {num}",
+                PointStartIndex = pointStartIndex > 0 ? pointStartIndex : num * 1000 + 10
+            };
         }
 
         private void DeletePolygon()
@@ -262,7 +276,7 @@ namespace TwoTrails.ViewModels
                 if (MessageBox.Show($"Confirm Delete Polygon '{CurrentPolygon.Name}'", "Delete Polygon",
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
-                    _Project.Manager.DeletePolygon(CurrentPolygon);
+                    Manager.DeletePolygon(CurrentPolygon);
 
                     _Project.ProjectUpdated();
                 }
@@ -308,9 +322,11 @@ namespace TwoTrails.ViewModels
                         old.PropertyChanged -= Metadata_PropertyChanged;
                     }
 
-                    _BackupMeta = new TtMetadata(value);
-
-                    _CurrentMetadata.PropertyChanged += Metadata_PropertyChanged;
+                    if (_CurrentMetadata != null)
+                    {
+                        _BackupMeta = new TtMetadata(_CurrentMetadata);
+                        _CurrentMetadata.PropertyChanged += Metadata_PropertyChanged;
+                    }
                 });
 
             }
@@ -368,10 +384,22 @@ namespace TwoTrails.ViewModels
 
         private void NewMetadata(ListBox listBox)
         {
-            _Project.Manager.AddMetadata(_Project.Manager.CreateMetadata());
+            Manager.AddMetadata(CreateMetadata());
             listBox.SelectedIndex = listBox.Items.Count - 1;
+        }
 
-            _Project.ProjectUpdated();
+        /// <summary>
+        /// Create a new Metadata
+        /// </summary>
+        /// <param name="name">Name of metadata</param>
+        /// <returns>New metadata</returns>
+        public TtMetadata CreateMetadata(String name = null)
+        {
+            return new TtMetadata(Settings.MetadataSettings.CreateDefaultMetadata())
+            {
+                CN = Guid.NewGuid().ToString(),
+                Name = name ?? $"Meta {Manager.Metadata.Count + 1}"
+            };
         }
 
         private void DeleteMetadata()
@@ -381,7 +409,7 @@ namespace TwoTrails.ViewModels
                 if (MessageBox.Show($"Confirm Delete Metadata '{CurrentMetadata.Name}'", "Delete Metadata",
                 MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
-                    ITtManager manager = _Project.Manager;
+                    ITtManager manager = Manager;
 
                     IEnumerable<TtPoint> points = manager.GetPoints().Where(p => p.MetadataCN == CurrentMetadata.CN);
 
@@ -417,11 +445,14 @@ namespace TwoTrails.ViewModels
                         old.PropertyChanged -= Group_PropertyChanged;
                     }
 
-                    _BackupGroup = new TtGroup(value);
-
-                    _CurrentGroup.PropertyChanged += Group_PropertyChanged;
-
-                    GroupFieldIsEditable = value.CN != Consts.EmptyGuid;
+                    if (_CurrentGroup != null)
+                    {
+                        _BackupGroup = new TtGroup(value);
+                        GroupFieldIsEditable = value.CN != Consts.EmptyGuid;
+                        _CurrentGroup.PropertyChanged += Group_PropertyChanged;
+                    }
+                    else
+                        GroupFieldIsEditable = false;
                 });
 
             }
@@ -448,10 +479,18 @@ namespace TwoTrails.ViewModels
 
         private void NewGroup(ListBox listBox)
         {
-            _Project.Manager.AddGroup(_Project.Manager.CreateGroup());
+            Manager.AddGroup(CreateGroup());
             listBox.SelectedIndex = listBox.Items.Count - 1;
+        }
 
-            _Project.ProjectUpdated();
+        /// <summary>
+        /// Creates a new Group
+        /// </summary>
+        /// <param name="groupType">Type of Group to create</param>
+        /// <returns>New Group</returns>
+        public TtGroup CreateGroup(GroupType groupType = GroupType.General)
+        {
+            return new TtGroup($"{(groupType != GroupType.General ? $"{groupType}" : "Group")}_{Guid.NewGuid().ToString().Substring(0, 8)}");
         }
 
         private void DeleteGroup()
@@ -461,7 +500,7 @@ namespace TwoTrails.ViewModels
                 if (MessageBox.Show($"Confirm Delete Group '{CurrentGroup.Name}'", "Delete Group",
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
-                    _Project.Manager.DeleteGroup(CurrentGroup);
+                    Manager.DeleteGroup(CurrentGroup);
 
                     _Project.ProjectUpdated();
                 }

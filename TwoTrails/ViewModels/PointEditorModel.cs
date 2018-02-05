@@ -26,7 +26,7 @@ using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
 {
-    public class DataEditorModel : NotifyPropertyChangedEx
+    public class PointEditorModel : NotifyPropertyChangedEx
     {
         #region Vars
         private readonly string[] SelectionChangedProperties = new string[]
@@ -93,6 +93,7 @@ namespace TwoTrails.ViewModels
         public ICommand RetraceCommand { get; }
         public ICommand CreatePlotsCommand { get; }
         public ICommand CreateCorridorCommand { get; }
+        public ICommand ModifyDataDictionaryCommand { get; }
         
         public ICommand SelectAlternateCommand { get; }
         public ICommand SelectGpsCommand { get; }
@@ -588,7 +589,7 @@ namespace TwoTrails.ViewModels
 
 
 
-        public DataEditorModel(TtProject project)
+        public PointEditorModel(TtProject project)
         {
             Project = project;
             Manager = project.HistoryManager;
@@ -602,37 +603,37 @@ namespace TwoTrails.ViewModels
             #region Init Commands
             RefreshPoints = new RelayCommand(x => Points.Refresh());
 
-            CopyCellValueCommand = new BindedRelayCommand<DataEditorModel>(
+            CopyCellValueCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CopyCellValue(x as DataGrid), x => HasSelection,
                 this, x => x.HasSelection);
             
-            ExportValuesCommand = new BindedRelayCommand<DataEditorModel>(
+            ExportValuesCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ExportValues(x as DataGrid), x => HasSelection,
                 this, x => x.HasSelection);
 
             ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
 
-            ChangeQuondamParentCommand = new BindedRelayCommand<DataEditorModel>(
+            ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ChangeQuondamParent(), x => OnlyQuondams && !MultipleSelections,
                 this, x => new { x.OnlyQuondams, x.MultipleSelections });
             
-            RenamePointsCommand = new BindedRelayCommand<DataEditorModel>(
+            RenamePointsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => RenamePoints(), x => MultipleSelections,
                 this, x => x.MultipleSelections);
 
-            ReverseSelectedCommand = new BindedRelayCommand<DataEditorModel>(
+            ReverseSelectedCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ReverseSelection(), x => MultipleSelections,
                 this, x => x.MultipleSelections);
 
-            ResetPointCommand = new BindedRelayCommand<DataEditorModel>(
+            ResetPointCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ResetPoint(), x => HasSelection,
                 this, x => x.HasSelection);
             
-            ResetPointFieldCommand = new BindedRelayCommand<DataEditorModel>(
+            ResetPointFieldCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ResetPointField(x as DataGrid), x => HasSelection,
                 this, x => x.HasSelection);
 
-            DeleteCommand = new BindedRelayCommand<DataEditorModel>(
+            DeleteCommand = new BindedRelayCommand<PointEditorModel>(
                 x => DeletePoint(), x => HasSelection,
                 this, x => x.HasSelection);
 
@@ -640,29 +641,31 @@ namespace TwoTrails.ViewModels
                 x => Manager.Polygons.Count > 0,
                 Manager.Polygons, x => x.Count);
 
-            CreateQuondamsCommand = new BindedRelayCommand<DataEditorModel>(
+            CreateQuondamsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CreateQuondams(), x => HasSelection,
                 this, x => x.HasSelection);
 
-            ConvertPointsCommand = new BindedRelayCommand<DataEditorModel>(
+            ConvertPointsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ConvertPoints(), x => OnlyQuondams || OnlyTravTypes,
                 this, x => new { x.OnlyQuondams, x.OnlyTravTypes });
 
-            MovePointsCommand = new BindedRelayCommand<DataEditorModel>(
+            MovePointsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => MovePoints(), x => HasSelection,
                 this, x => x.HasSelection);
 
-            RetraceCommand = new BindedRelayCommand<DataEditorModel>(
+            RetraceCommand = new BindedRelayCommand<PointEditorModel>(
                 x => Retrace(), x => Points.Count > 0,
                 this, x => x.Points.Count);
 
-            CreatePlotsCommand = new BindedRelayCommand<DataEditorModel>(
+            CreatePlotsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CreatePlots(), x => Polygons.Count > 1,
                 this, x => x.Polygons.Count);
 
-            CreateCorridorCommand = new BindedRelayCommand<DataEditorModel>(
+            CreateCorridorCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CreateCorridor(), x => HasPossibleCorridor,
                 this, x => x.HasPossibleCorridor);
+
+            ModifyDataDictionaryCommand = new RelayCommand(x => ModifyDataDictionary());
 
             DeselectCommand = new RelayCommand(x => DeselectAll());
 
@@ -1916,6 +1919,21 @@ namespace TwoTrails.ViewModels
         private void CreateCorridor()
         {
             Manager.CreateCorridor(GetSortedSelectedPoints(), Polygon);
+        }
+
+        private void ModifyDataDictionary()
+        {
+            Project.MainModel.MainWindow.IsEnabled = false;
+            DataDictionaryEditorDialog.Show(Project, Project.MainModel.MainWindow, (result) =>
+            {
+                Project.MainModel.MainWindow.IsEnabled = true;
+
+                if (result == true)
+                {
+                    SetupUI();
+                    Manager.BaseManager.UpdateDataAction(DataActionType.ModifiedDataDictionary);
+                }
+            });
         }
 
 

@@ -16,11 +16,11 @@ namespace TwoTrails.Controls
     /// <summary>
     /// Interaction logic for DataEditorControl.xaml
     /// </summary>
-    public partial class DataEditorControl : UserControl
+    public partial class PointEditorControl : UserControl
     {
         private DataStyleModel DataStyles;
 
-        public DataEditorControl(DataEditorModel dataEditor, DataStyleModel dataStyles)
+        public PointEditorControl(PointEditorModel dataEditor, DataStyleModel dataStyles)
         {
             DataStyles = dataStyles;
 

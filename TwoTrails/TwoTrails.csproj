@@ -179,6 +179,9 @@
     <Compile Include="Dialogs\CreatePointDialog.xaml.cs">
       <DependentUpon>CreatePointDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\DataDictionaryEditorDialog.xaml.cs">
+      <DependentUpon>DataDictionaryEditorDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>
@@ -228,7 +231,7 @@
     <Compile Include="Utils\Upgrade.cs" />
     <Compile Include="ViewModels\CreatePlotsModel.cs" />
     <Compile Include="ViewModels\CsvImportModel.cs" />
-    <Compile Include="ViewModels\DataEditorModel.cs" />
+    <Compile Include="ViewModels\PointEditorModel.cs" />
     <Compile Include="ViewModels\DataStyleModel.cs" />
     <Compile Include="Converters\BindingReflector.cs" />
     <Compile Include="Converters\MetadataValueConverter.cs" />
@@ -249,8 +252,8 @@
     <Compile Include="MapWindow.xaml.cs">
       <DependentUpon>MapWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\DataEditorControl.xaml.cs">
-      <DependentUpon>DataEditorControl.xaml</DependentUpon>
+    <Compile Include="Controls\PointEditorControl.xaml.cs">
+      <DependentUpon>PointEditorControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="DeviceSettings.cs" />
     <Compile Include="MetadataSettings.cs" />
@@ -310,6 +313,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\DataDictionaryEditorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\ExportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -354,7 +361,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\DataEditorControl.xaml">
+    <Page Include="Controls\PointEditorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

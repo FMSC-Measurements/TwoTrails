@@ -33,9 +33,9 @@
                     <Setter Property="IsEnabled" Value="False"/>
                 </DataTrigger>
                 
-                <DataTrigger Binding="{Binding CurrentTab.IsEditingPoints}" Value="False">
+                <!--<DataTrigger Binding="{Binding CurrentTab.IsEditingPoints}" Value="False">
                     <Setter Property="IsEnabled" Value="False"/>
-                </DataTrigger>
+                </DataTrigger>-->
             </Style.Triggers>
         </Style>
 
@@ -80,9 +80,15 @@
 
                     <Separator/>
 
-                    <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}" InputGestureText="Ctrl+S"
-                          IsEnabled="{Binding Path=HasOpenedProject}"/>
-                    
+                    <MenuItem Header="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding CurrentProject}" InputGestureText="Ctrl+S">
+                        <MenuItem.IsEnabled>
+                            <MultiBinding Converter="{StaticResource MultiBoolConverter}">
+                                <Binding Path="HasOpenedProject"/>
+                                <Binding Path="CurrentProject.RequiresSave"/>
+                            </MultiBinding>
+                        </MenuItem.IsEnabled>
+                    </MenuItem>
+
                     <MenuItem Header="Save As" Command="{Binding SaveAsCommand}" CommandParameter="{Binding CurrentProject}" InputGestureText="Ctrl+Alt+S"
                           IsEnabled="{Binding Path=HasOpenedProject}"/>
 
@@ -161,6 +167,11 @@
                           Style="{StaticResource styleMiDisableNullCommand}" InputGestureText="Ctrl+Alt+P"/>
                     <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
                           Style="{StaticResource styleMiPointEdit}" InputGestureText="Ctrl+Alt+C"/>
+
+                    <Separator/>
+
+                    <MenuItem Header="Modify Data Dictionary" Command="{Binding CurrentEditor.ModifyDataDictionaryCommand}" IsEnabled="{Binding HasOpenedProject}"
+                              Style="{StaticResource styleMiDisableNullCommand}" />
 
                     <Separator/>
 
