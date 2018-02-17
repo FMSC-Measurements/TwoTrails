@@ -29,6 +29,9 @@ namespace TwoTrails
             InitializeComponent();
             MainModel = new MainWindowModel(this);
             this.DataContext = MainModel;
+            
+            if (Application.Current is App app)
+                app.MainWindow = this;
         }
 
         protected override void OnClosing(CancelEventArgs e)
