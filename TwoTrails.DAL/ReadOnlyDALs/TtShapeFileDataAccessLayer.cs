@@ -18,9 +18,11 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.DAL
 {
-    public class TtShapeFileDataAccessLayer : IReadOnlyTtDataLayer
+    public class TtShapeFileDataAccessLayer : IReadOnlyTtDataLayer, ITtFileDataLayer
     {
         public Boolean RequiresUpgrade { get; } = false;
+
+        public string FilePath => String.Join(",", _Options.ShapeFiles.Select(sf => sf.ShapeFilePath));
 
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
         private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();

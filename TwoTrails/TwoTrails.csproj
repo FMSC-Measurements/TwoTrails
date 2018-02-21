@@ -233,7 +233,6 @@
     <Compile Include="Utils\TtKmlGenerator.cs" />
     <Compile Include="Utils\TtShapeFileGenerator.cs" />
     <Compile Include="Utils\TtUtils.cs" />
-    <Compile Include="Utils\Upgrade.cs" />
     <Compile Include="ViewModels\CreatePlotsModel.cs" />
     <Compile Include="ViewModels\CsvImportModel.cs" />
     <Compile Include="ViewModels\PointEditorModel.cs" />

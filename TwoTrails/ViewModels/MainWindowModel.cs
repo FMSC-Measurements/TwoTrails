@@ -272,12 +272,23 @@ namespace TwoTrails.ViewModels
                             {
                                 Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
                             }
-                            
+
                             //todo upgrade
                             if (dal.RequiresUpgrade)
                             {
-                                Trace.WriteLine("DAL Requires Upgrade");
-                                MessageBox.Show("DAL Requires Upgrade");
+                                if (MessageBox.Show(MainWindow, @"This is file needs to be upgraded to work with this version of TwoTrails. Upgrading will first create a backup of this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",
+                                   MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
+                                {
+                                    if (Upgrade.DAL(dal))
+                                    {
+                                        AddProject(new TtProject(dal, mal, Settings, this));
+                                        MessageBox.Show("Upgrade Successful");
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show("There has been an error and the Upgrade has failed. Please see log file for details");
+                                    }
+                                }
                             }
                             else
                             {
@@ -297,13 +308,13 @@ namespace TwoTrails.ViewModels
                         if (dalv2.RequiresUpgrade)
                         {
                             MessageBox.Show(MainWindow, @"This TwoTrails V2 file is too old to upgrade. 
-Please Upgrade it with TwoTrails V2 before upgrading it here.", "Too old to upgrade",
+Please Upgrade it to the most recent TT2 version before upgrading it here.", "Too old to upgrade",
                                 MessageBoxButton.OK, MessageBoxImage.Stop);
                         }
                         else
                         {
-                            if (MessageBox.Show(MainWindow, @"This is a TwoTrails V2 file that needs to be upgraded. 
-Would you like to upgrade it now?", "Upgrade TwoTrails file",
+                            if (MessageBox.Show(MainWindow, @"This is a TwoTrails V2 file that needs to be upgraded into the new TTX format. 
+Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",
                                 MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
                             {
                                 TtProjectInfo oinfo = dalv2.GetProjectInfo();
@@ -595,10 +606,10 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
             {
                 try
                 {
-                    if (!Directory.Exists(Consts.TEMP_DIR))
-                        Directory.CreateDirectory(Consts.TEMP_DIR);
+                    if (!Directory.Exists(App.TEMP_DIR))
+                        Directory.CreateDirectory(App.TEMP_DIR);
 
-                    string file = Path.Combine(Consts.TEMP_DIR, $"{Guid.NewGuid().ToString()}.kmz");
+                    string file = Path.Combine(App.TEMP_DIR, $"{Guid.NewGuid().ToString()}.kmz");
                     Export.KMZ(CurrentProject, file);
 
                     if (File.Exists(file))

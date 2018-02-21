@@ -33,8 +33,5 @@ namespace TwoTrails.Core
         public const string KMZ_EXT = ".kmz";
         public const string GPX_EXT = ".gpx";
         public const string SHAPE_EXT = ".shp";
-
-        private static String _TEMP_DIR = null;
-        public static String TEMP_DIR { get; } = _TEMP_DIR ?? (_TEMP_DIR = Path.Combine(Path.GetTempPath(), "TwoTrails\\Temp\\"));
     }
 }

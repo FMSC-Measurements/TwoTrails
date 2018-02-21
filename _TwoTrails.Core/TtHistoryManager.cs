@@ -384,9 +384,16 @@ namespace TwoTrails.Core
             throw new NotImplementedException();
         }
 
+
         public DataDictionaryTemplate GetDataDictionaryTemplate()
         {
             return BaseManager.GetDataDictionaryTemplate();
+        }
+
+
+        void ITtManager.UpdateDataAction(DataActionType action, string notes = null)
+        {
+            BaseManager.UpdateDataAction(action, notes);
         }
     }
 

@@ -2074,9 +2074,7 @@ namespace TwoTrails.ViewModels
             OnSelectionChanged();
         }
         #endregion
-
-
-
+        
 
         private static Tuple<DataGridTextColumn, string>[] CreateDefaultColumns()
         {

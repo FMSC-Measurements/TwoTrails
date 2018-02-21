@@ -1,20 +1,64 @@
-﻿using System;
+﻿using CSUtil.Databases;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
-using TwoTrails.DAL;
 
-namespace TwoTrails.Utils
+namespace TwoTrails.DAL
 {
     public static class Upgrade
     {
+        //Old TTX Files
+        public static bool DAL(TtSqliteDataAccessLayer dal)
+        {
+            String file = dal.FilePath;
+            String oldfile = $"{file}.old";
+
+            Version oldVersion = dal.GetDataVersion();
+
+            File.Copy(file, oldfile);
+
+            SQLiteDatabase _Database = dal._Database;
+
+            try
+            {
+                _Database.Update(TwoTrailsSchema.ProjectInfoSchema.TableName,
+                    new Dictionary<string, object>()
+                    {
+                        [TwoTrailsSchema.ProjectInfoSchema.TtDbSchemaVersion] = TwoTrailsSchema.SchemaVersion.ToString()
+                    });
+
+                if (oldVersion < TwoTrailsSchema.OSV_2_0_2)
+                {
+                    _Database.ExecuteNonQuery(TwoTrailsSchema.UPGRADE_OSV_2_0_2);
+                }
+
+                Trace.WriteLine($"Upgrade ({oldVersion} -> {TwoTrailsSchema.SchemaVersion}): {file}");
+            }
+            catch (Exception ex)
+            {
+                //restore old file
+                File.Delete(file);
+                File.Copy(oldfile, file);
+                
+                Trace.WriteLine(ex.Message, $"Upgrade:DAL (TTX): {file}");
+
+                return false;
+            }
+
+            return true;
+        }
+
+        //TwoTrails V2 Files
         public static void DAL(ITtDataLayer ndal, ITtSettings settings, TtV2SqliteDataAccessLayer odal)
         {
             TtUserAction activity = new TtUserAction("Upgrader", settings.DeviceName);
-            
+
             IEnumerable<TtMetadata> meta = odal.GetMetadata();
             if (meta.Any())
             {

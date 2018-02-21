@@ -191,8 +191,9 @@
 					<ColumnDefinition Width="125"/>
 					<ColumnDefinition Width="170" MinWidth="100" MaxWidth="250"/>
 					<ColumnDefinition Width="150" MinWidth="100" MaxWidth="250"/>
-					<ColumnDefinition Width="*"/>
-				</Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto"/>
@@ -245,7 +246,7 @@
 					</ListBox.ItemTemplate>
 				</ListBox>
 
-				<Grid Grid.Column="4" Grid.Row="1" Grid.ColumnSpan="1" Grid.RowSpan="2" Margin="5, 0, 5, 0">
+				<Grid Grid.Column="4" Grid.Row="1" Margin="5, 0, 5, 0">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
@@ -254,6 +255,10 @@
 					<CheckBox Content="On Boundary" Grid.Row="0" IsThreeState="True" IsChecked="{Binding IsOnBnd}" Command="{Binding RefreshPoints}" />
 					<CheckBox Content="Has Links" Grid.Row="1" IsThreeState="True" IsChecked="{Binding HasLinks}" Command="{Binding RefreshPoints}" />
 				</Grid>
+
+                <Grid Grid.Column="5" Grid.Row="1">
+                    <!-- todo Point Location and Distance info -->
+                </Grid>
 			</Grid>
 		</ScrollViewer>
 		<GridSplitter Grid.Row="1" Background="Gray" Height="3" HorizontalAlignment="Stretch"/>
@@ -265,7 +270,7 @@
 				<ColumnDefinition Width="185" MinWidth="150" MaxWidth="300"/>
 			</Grid.ColumnDefinitions>
 
-			<cc:DataGridEx x:Name="dgPoints"
+            <cc:DataGridEx x:Name="dgPoints"
 				Grid.Column="0"
 				BorderThickness="0"
 				ItemsSource="{Binding Points}"
@@ -284,15 +289,8 @@
 				VisibleItemsList="{Binding VisiblePoints, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
 				SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 				BindableColumns="{Binding DataColumns}">
-
-				<!--<i:Interaction.Triggers>
-					<i:EventTrigger EventName="MouseRightButtonDown">
-						<i:InvokeCommandAction Command="{Binding DataGridRightClick}"  
-								CommandParameter="{Binding ElementName=dgPoints}" />
-					</i:EventTrigger>
-				</i:Interaction.Triggers>-->
-
-				<DataGrid.Resources>
+                
+                <DataGrid.Resources>
 					<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SeaGreen"/>
 					<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkSeaGreen"/>
 
@@ -384,7 +382,7 @@
 						<MenuItem Header="Export Point Values" Command="{Binding ExportValuesCommand}" 
 								  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
 
-						<Separator/>
+                        <Separator/>
 
 						<MenuItem Header="Rename" Command="{Binding RenamePointsCommand}" />
 						<MenuItem Header="{Binding ConvertTypeHeader}" Command="{Binding ConvertPointsCommand}" />

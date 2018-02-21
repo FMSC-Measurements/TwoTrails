@@ -7,9 +7,10 @@ namespace TwoTrails.DAL
     {
         //Old Schema Versions
         public static readonly Version OSV_2_0_1 = new Version(2, 0, 1);
+        public static readonly Version OSV_2_0_2 = new Version(2, 0, 2);
 
         //Schema Version
-        public static readonly Version SchemaVersion = OSV_2_0_1;
+        public static readonly Version SchemaVersion = OSV_2_0_2;
 
 
         public static class SharedSchema
@@ -508,14 +509,16 @@ namespace TwoTrails.DAL
             public const String UserName = "UserName";
             public const String DeviceName = "DeviceName";
             public const String ActivityDate = "ActivityDate";
-            public const String DataActivity = "ActivityType";
+            public const String ActivityType = "ActivityType";
+            public const String ActivityNotes = "ActivityNotes";
 
             public const String CreateTable =
                 "CREATE TABLE " + TableName + " (" +
                 UserName + " TEXT, " +
                 DeviceName + " TEXT, " +
                 ActivityDate + " TEXT, " +
-                DataActivity + " INTEGER" +
+                ActivityType + " INTEGER" +
+                ActivityNotes + " TEXT" +
                 ");";
 
 
@@ -523,7 +526,8 @@ namespace TwoTrails.DAL
                 UserName + ", " +
                 DeviceName + ", " +
                 ActivityDate + ", " +
-                DataActivity;
+                ActivityType + ", " +
+                ActivityNotes;
         }
         #endregion
 
@@ -570,6 +574,14 @@ namespace TwoTrails.DAL
                 ValueRequired + ", " +
                 DataType;
         }
+        #endregion
+
+
+
+        #region Upgrades
+
+        public static readonly string UPGRADE_OSV_2_0_2 = $"ALTER TABLE {ActivitySchema.TableName} ADD {ActivitySchema.ActivityNotes} TEXT;";
+
         #endregion
     }
 }

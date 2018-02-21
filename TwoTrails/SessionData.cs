@@ -11,22 +11,13 @@ namespace TwoTrails
 {
     public static class SessionData
     {
-        public static string TwoTrailsAppDataDir { get; } = Path.Combine(Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData), "TwoTrails");
-
-        public static string GpsAccuracyReportFile { get; } = Path.Combine(TwoTrailsAppDataDir, "GpsTests.xml");
+        public static string GpsAccuracyReportFile { get; } = Path.Combine(App.TwoTrailsAppDataDir, "GpsTests.xml");
         
         public static GpsAccuracyReport GpsAccuracyReport { get; private set; }
 
         public static int MakeID { get; set; } = 0;
         public static int ModelID { get; set; } = 0;
-
-        static SessionData()
-        {
-            if (!Directory.Exists(TwoTrailsAppDataDir))
-                Directory.CreateDirectory(TwoTrailsAppDataDir);
-        }
-
+        
 
         public static GpsReportStatus HasGpsAccReport()
         {

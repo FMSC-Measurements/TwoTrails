@@ -11,9 +11,11 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.DAL
 {
-    public class TtCsvDataAccessLayer : IReadOnlyTtDataLayer
+    public class TtCsvDataAccessLayer : IReadOnlyTtDataLayer, ITtFileDataLayer
     {
         public bool RequiresUpgrade => false;
+
+        public string FilePath => _Options.PointsFile;
 
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
         private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();

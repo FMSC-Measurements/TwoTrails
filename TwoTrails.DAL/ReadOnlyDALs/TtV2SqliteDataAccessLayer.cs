@@ -15,7 +15,7 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.DAL
 {
-    public class TtV2SqliteDataAccessLayer : IReadOnlyTtDataLayer
+    public class TtV2SqliteDataAccessLayer : IReadOnlyTtDataLayer, ITtFileDataLayer
     {
         public String FilePath { get; }
 

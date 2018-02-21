@@ -56,10 +56,12 @@ namespace TwoTrails.Core
 
 
         DataDictionaryTemplate GetDataDictionaryTemplate();
-
-
+        
 
         PolygonGraphicOptions GetPolygonGraphicOption(string polyCN);
         List<PolygonGraphicOptions> GetPolygonGraphicOptions();
+
+
+        void UpdateDataAction(DataActionType action, string notes = null);
     }
 }

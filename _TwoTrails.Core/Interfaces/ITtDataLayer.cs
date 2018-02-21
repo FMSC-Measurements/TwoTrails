@@ -75,7 +75,6 @@ namespace TwoTrails.DAL
 
         #region Project
         Version GetDataVersion();
-        bool InsertProjectInfo(TtProjectInfo properties);
         bool UpdateProjectInfo(TtProjectInfo properties);
         #endregion
 

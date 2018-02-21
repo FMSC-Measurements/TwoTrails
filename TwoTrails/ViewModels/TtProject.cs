@@ -43,8 +43,8 @@ namespace TwoTrails.ViewModels
         public String FilePath { get { return DAL.FilePath; } }
 
         public ProjectTab ProjectTab { get; private set; }
-        private MapTab MapTab { get; set; }
         private UserActivityTab UserActivityTab { get; set; }
+        private MapTab MapTab { get; set; }
         private MapWindow MapWindow { get; set; }
         
         public bool ProjectTabIsOpen { get { return ProjectTab != null; } }

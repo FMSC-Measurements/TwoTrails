@@ -18,11 +18,11 @@ using System.Diagnostics;
 
 namespace TwoTrails.DAL
 {
-    public class TtSqliteDataAccessLayer : ITtDataLayer
+    public class TtSqliteDataAccessLayer : ITtDataLayer, ITtFileDataLayer
     {
         public String FilePath { get; }
 
-        private SQLiteDatabase _Database;
+        internal SQLiteDatabase _Database;
 
         private DataDictionaryTemplate _DataDictionaryTemplate;
 
@@ -1944,7 +1944,7 @@ namespace TwoTrails.DAL
             return version;
         }
 
-        public bool InsertProjectInfo(TtProjectInfo info)
+        private bool InsertProjectInfo(TtProjectInfo info)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -2175,7 +2175,8 @@ namespace TwoTrails.DAL
                 [TwoTrailsSchema.ActivitySchema.UserName] = activity.UserName,
                 [TwoTrailsSchema.ActivitySchema.DeviceName] = activity.DeviceName,
                 [TwoTrailsSchema.ActivitySchema.ActivityDate] = activity.Date,
-                [TwoTrailsSchema.ActivitySchema.DataActivity] = (int)activity.Action
+                [TwoTrailsSchema.ActivitySchema.ActivityType] = (int)activity.Action,
+                [TwoTrailsSchema.ActivitySchema.ActivityNotes] = activity.Notes
             };
         }
 
@@ -2189,7 +2190,7 @@ namespace TwoTrails.DAL
                 {
                     if (dr != null)
                     {
-                        string username, devicename;
+                        string username, devicename, notes;
                         DateTime date;
                         DataActionType dat;
 
@@ -2199,8 +2200,9 @@ namespace TwoTrails.DAL
                             devicename = dr.GetString(1);
                             date = TtCoreUtils.ParseTime(dr.GetString(2));
                             dat = (DataActionType)dr.GetInt32(3);
+                            notes = dr.GetStringN(4);
 
-                            yield return new TtUserAction(username, devicename, date, dat);
+                            yield return new TtUserAction(username, devicename, date, dat, notes);
                         }
 
                         dr.Close();

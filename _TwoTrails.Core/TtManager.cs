@@ -1574,7 +1574,7 @@ namespace TwoTrails.Core
                                 }
                                 else
                                 {
-                                    Debug.WriteLine("Detached Quondam Found");
+                                    Trace.WriteLine("Detached Quondam Found");
                                 }
                             }
                         }
@@ -1760,9 +1760,9 @@ namespace TwoTrails.Core
         }
 
 
-        public void UpdateDataAction(DataActionType action)
+        public void UpdateDataAction(DataActionType action, string notes = null)
         {
-            _Activity.UpdateAction(action);
+            _Activity.UpdateAction(action, notes);
         }
     }
 }

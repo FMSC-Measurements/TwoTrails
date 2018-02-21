@@ -9,6 +9,7 @@ namespace TwoTrails.Core
         public String DeviceName { get; }
         public DateTime Date { get; private set; }
         public DataActionType Action { get; private set; }
+        public String Notes { get; private set; }
         
         public bool ProjectModified { get { return Action.HasFlag(DataActionType.ModifiedProject); } }
 
@@ -44,7 +45,7 @@ namespace TwoTrails.Core
         { }
 
         public TtUserAction(String userName, String deviceName,
-            DateTime date, DataActionType action)
+            DateTime date, DataActionType action, String notes = null)
         {
             if (String.IsNullOrEmpty(userName))
                 throw new ArgumentNullException(nameof(userName));
@@ -56,12 +57,26 @@ namespace TwoTrails.Core
             DeviceName = deviceName;
             Date = date;
             Action = action;
+            Notes = notes;
         }
 
-        public void UpdateAction(DataActionType action)
+        public void UpdateAction(DataActionType action, string notes = null)
         {
             Action |= action;
             Date = DateTime.Now;
+
+            UpdateNotes(notes);
+        }
+
+        public void UpdateNotes(String notes)
+        {
+            if (notes != null)
+            {
+                if (Notes == null)
+                    Notes = notes;
+                else
+                    Notes += $"|{notes}"; 
+            }
         }
 
         public void Reset()

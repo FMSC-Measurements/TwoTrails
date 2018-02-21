@@ -105,6 +105,7 @@
     <Compile Include="TwoTrailsSchema.cs" />
     <Compile Include="TtSqliteDataAccessLayer.cs" />
     <Compile Include="TwoTrailsV2Schema.cs" />
+    <Compile Include="Upgrade.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
