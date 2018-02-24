@@ -583,7 +583,8 @@ namespace TwoTrails.DAL
 
         #region Upgrades
 
-        public static readonly string UPGRADE_OSV_2_0_2 = $"ALTER TABLE {ActivitySchema.TableName} ADD {ActivitySchema.ActivityNotes} TEXT;";
+        public static readonly string UPGRADE_OSV_2_0_2 = $@"ALTER TABLE {ActivitySchema.TableName} ADD {ActivitySchema.ActivityNotes} TEXT; 
+ALTER TABLE {TtNmeaSchema.TableName} ADD {TtNmeaSchema.SatellitesInView} TEXT;";
 
         #endregion
     }
