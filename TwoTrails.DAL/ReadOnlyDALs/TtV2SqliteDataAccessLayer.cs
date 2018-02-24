@@ -440,7 +440,8 @@ namespace TwoTrails.DAL
                                 dr.GetDouble(19),
                                 dr.GetDouble(18),
                                 UomElevationExtensions.Parse(dr.GetString(20)),
-                                dr.GetInt32(24)
+                                dr.GetInt32(24),
+                                String.Empty
                             );
                         }
 

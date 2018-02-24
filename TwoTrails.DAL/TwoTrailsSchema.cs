@@ -300,6 +300,7 @@ namespace TwoTrails.DAL
             public const String SatellitesTrackedCount = "SatTrackCount";
             public const String SatellitesInViewCount = "SatInViewCount";
             public const String UsedSatPRNS = "PRNS";
+            public const String SatellitesInView = "SatInView";
 
             public const String CreateTable =
                 "CREATE TABLE " + TableName + " (" +
@@ -331,6 +332,7 @@ namespace TwoTrails.DAL
                 SatellitesTrackedCount + " INTEGER, " +
                 SatellitesInViewCount + " INTEGER, " +
                 UsedSatPRNS + " TEXT, " +
+                SatellitesInView + " TEXT, " +
                 "PRIMARY KEY (" + SharedSchema.CN + "));";
 
             public const String SelectItems =
@@ -361,7 +363,8 @@ namespace TwoTrails.DAL
                 SatellitesUsedCount + ", " +
                 SatellitesTrackedCount + ", " +
                 SatellitesInViewCount + ", " +
-                UsedSatPRNS;
+                UsedSatPRNS + ", " +
+                SatellitesInView;
         }
         #endregion
 

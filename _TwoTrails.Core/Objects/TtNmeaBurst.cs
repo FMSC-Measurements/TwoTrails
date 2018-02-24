@@ -1,9 +1,11 @@
 ﻿using FMSC.GeoSpatial;
+using FMSC.GeoSpatial.NMEA;
 using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace TwoTrails.Core
@@ -75,6 +77,47 @@ namespace TwoTrails.Core
 
         public int UsedSatelliteIDsCount { get { return UsedSatelliteIDs.Count; } }
 
+        public List<Satellite> SatellitesInView { get; private set; }
+
+        private string _SatellitesInViewString;
+        public string SatellitesInViewString
+        {
+            get
+            {
+                return _SatellitesInViewString ?? (_SatellitesInViewString = String.Join(
+                    "_", SatellitesInView.Select(sat => $"{ sat.NmeaID };{ sat.Elevation };{ sat.Azimuth };{ sat.SRN };{ (int)sat.GnssType }_")));
+            }
+
+            set
+            {
+                if (_SatellitesInViewString != value && !String.IsNullOrEmpty(value))
+                {
+                    SatellitesInView = value.Split('_')
+                        .Select(satstr =>
+                        {
+                            if (!String.IsNullOrWhiteSpace(satstr))
+                            {
+                                String[] tokens = satstr.Split(';');
+                                if (tokens.Length > 4)
+                                {
+                                    if (Int32.TryParse(tokens[0], out int nmeaID))
+                                    {
+                                        return new Satellite(nmeaID,
+                                                float.Parse(tokens[1]),
+                                                float.Parse(tokens[2]),
+                                                float.Parse(tokens[3]));
+                                    }
+                                } 
+                            }
+
+                            return null;
+                        }).Where(sat => sat != null).ToList();
+
+                    _SatellitesInViewString = value;
+                }
+            }
+        }
+
         public Fix Fix { get; }
         public Mode Mode { get; }
 
@@ -117,9 +160,14 @@ namespace TwoTrails.Core
             GeoUom = burst.GeoUom;
 
             SatellitesInViewCount = burst.SatellitesInViewCount;
+
+            if (burst.SatellitesInView != null && burst.SatellitesInView.Count > 0)
+                SatellitesInView = burst.SatellitesInView;
+            else if (burst.SatellitesInViewString != null)
+                SatellitesInViewString = burst.SatellitesInViewString;
         }
 
-        public TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
+        private TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
                        GeoPosition position, DateTime fixTime, double groundSpeed, double trackAngle,
                        double magVar, EastWest magVarDir, Mode mode, Fix fix,
                        List<int> satsUsed, double pdop, double hdop, double vdop, GpsFixType fixQuality,
@@ -154,7 +202,31 @@ namespace TwoTrails.Core
             SatellitesInViewCount = numberOfSatellitesInView;
         }
 
+        public TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
+                       GeoPosition position, DateTime fixTime, double groundSpeed, double trackAngle,
+                       double magVar, EastWest magVarDir, Mode mode, Fix fix,
+                       List<int> satsUsed, double pdop, double hdop, double vdop, GpsFixType fixQuality,
+                       int trackedSatellites, double horizDilution, double geoidHeight, UomElevation geoUom,
+                       int numberOfSatellitesInView, List<Satellite> satellitesInView) : this(
+                            cn, timeCreated, pointCN, used, position, fixTime, groundSpeed, trackAngle,
+                            magVar, magVarDir, mode, fix, satsUsed, pdop, hdop, vdop, fixQuality,
+                            trackedSatellites, horizDilution, geoidHeight, geoUom, numberOfSatellitesInView)
+        {
+            SatellitesInView = satellitesInView;
+        }
 
+        public TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
+                       GeoPosition position, DateTime fixTime, double groundSpeed, double trackAngle,
+                       double magVar, EastWest magVarDir, Mode mode, Fix fix,
+                       List<int> satsUsed, double pdop, double hdop, double vdop, GpsFixType fixQuality,
+                       int trackedSatellites, double horizDilution, double geoidHeight, UomElevation geoUom,
+                       int numberOfSatellitesInView, string satellitesInViewString) : this(
+                            cn, timeCreated, pointCN, used, position, fixTime, groundSpeed, trackAngle,
+                            magVar, magVarDir, mode, fix, satsUsed, pdop, hdop, vdop, fixQuality,
+                            trackedSatellites, horizDilution, geoidHeight, geoUom, numberOfSatellitesInView)
+        {
+            SatellitesInViewString = satellitesInViewString;
+        }
 
 
         public double GetX(int zone)

@@ -1663,7 +1663,8 @@ namespace TwoTrails.DAL
                                 dr.GetInt32(25),
                                 dr.GetDouble(19),
                                 dr.GetDouble(20), (UomElevation)dr.GetInt32(21),
-                                dr.GetInt32(26)
+                                dr.GetInt32(26),
+                                dr.GetString(28)
                             );
                         }
 
