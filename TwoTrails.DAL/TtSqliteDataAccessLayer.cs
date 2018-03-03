@@ -2452,21 +2452,79 @@ namespace TwoTrails.DAL
         public void Fix()
         {
             //fix for non-adjusted points
-            _Database.Update(TwoTrailsSchema.PointSchema.TableName,
-                new Dictionary<string, object>()
-                {
-                    [TwoTrailsSchema.PointSchema.AdjX] = 0,
-                    [TwoTrailsSchema.PointSchema.AdjY] = 0,
-                    [TwoTrailsSchema.PointSchema.AdjZ] = 0
-                }, $"{ TwoTrailsSchema.PointSchema.AdjX } = 0 OR { TwoTrailsSchema.PointSchema.AdjY } = 0 OR { TwoTrailsSchema.PointSchema.AdjZ } = 0");
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+            {
+                _Database.Update(TwoTrailsSchema.PointSchema.TableName,
+                        new Dictionary<string, object>()
+                        {
+                            [TwoTrailsSchema.PointSchema.AdjX] = 0d,
+                            [TwoTrailsSchema.PointSchema.AdjY] = 0d,
+                            [TwoTrailsSchema.PointSchema.AdjZ] = 0d,
+                            [TwoTrailsSchema.PointSchema.Accuracy] = 0d
+                        }, $@"{ TwoTrailsSchema.PointSchema.AdjX } IS NULL OR { TwoTrailsSchema.PointSchema.AdjY
+                            } IS NULL OR { TwoTrailsSchema.PointSchema.AdjZ } IS NULL OR { TwoTrailsSchema.PointSchema.Accuracy } IS NULL",
+                        conn);
+
+                conn.Close();
+            }
         }
 
         public bool HasErrors()
         {
-            //check for non-adjusted points
-            int count = _Database.ExecuteNonQuery($"SELECT count(*) FROM { TwoTrailsSchema.PointSchema.TableName } WHERE { TwoTrailsSchema.PointSchema.AdjX } IS NULL; ");
+            bool errors = false;
 
-            return count > 0;
+            //check for non-adjusted points
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+            {
+                SQLiteDataReader dr = _Database.ExecuteReader($@"SELECT count(*) FROM { TwoTrailsSchema.PointSchema.TableName
+                        } WHERE { TwoTrailsSchema.PointSchema.AdjX } IS NULL OR { TwoTrailsSchema.PointSchema.AdjY
+                        } IS NULL OR { TwoTrailsSchema.PointSchema.AdjZ } IS NULL OR { TwoTrailsSchema.PointSchema.Accuracy } IS NULL;", conn);
+
+                try
+                {
+                    if (dr != null && dr.Read())
+                    {
+                        errors = dr.GetInt32(0) > 0;
+                        dr.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //
+                }
+
+                conn.Close();
+            }
+
+            return GetItemCount(TwoTrailsSchema.PointSchema.TableName, $@"{ TwoTrailsSchema.PointSchema.AdjX } IS NULL OR { TwoTrailsSchema.PointSchema.AdjY
+                        } IS NULL OR { TwoTrailsSchema.PointSchema.AdjZ } IS NULL OR { TwoTrailsSchema.PointSchema.Accuracy } IS NULL") > 0;
+        }
+
+        protected int GetItemCount(String tableName, string where = null)
+        {
+            int count = -1;
+            
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+            {
+                SQLiteDataReader dr = _Database.ExecuteReader($@"SELECT count(*) FROM { tableName }{( where != null ? $" WHERE { where }" : String.Empty )};", conn);
+
+                try
+                {
+                    if (dr != null && dr.Read())
+                    {
+                        count = dr.GetInt32(0);
+                        dr.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //
+                }
+
+                conn.Close();
+            }
+
+            return count;
         }
         #endregion
     }

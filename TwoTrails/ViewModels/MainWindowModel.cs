@@ -266,6 +266,7 @@ namespace TwoTrails.ViewModels
                             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
                             TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
 
+                            //todo remove when nulls are removed from xyza
                             if (dal.HasErrors())
                                 dal.Fix();
 
