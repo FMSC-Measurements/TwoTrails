@@ -16,7 +16,7 @@ using System.Threading;
 
 namespace TwoTrails.DAL
 {
-    public class TtSqliteMediaAccessLayer : ITtMediaLayer, ITtFileDataLayer
+    public class TtSqliteMediaAccessLayer : ITtMediaLayer
     {
         public String FilePath { get; }
         

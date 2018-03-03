@@ -16,6 +16,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
+using TwoTrails.Core.Points;
 using TwoTrails.DAL;
 using TwoTrails.Utils;
 
@@ -116,7 +117,13 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
             {
                 case Consts.FILE_EXTENSION:
                     IsSettingUp = true;
-                    ImportControl = new ImportControl(new TtSqliteDataAccessLayer(fileName), true, true, true);
+
+                    TtSqliteDataAccessLayer idal = new TtSqliteDataAccessLayer(fileName);
+                    
+                    if (idal.HasErrors())
+                        idal.Fix();
+
+                    ImportControl = new ImportControl(idal, true, true, true);
                     break;
                 case Consts.FILE_EXTENSION_V2:
                     IsSettingUp = true;
@@ -218,6 +225,28 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
         public void ImportData()
         {
+            //todo check for quondams and if the parent point's poly is imported
+            //then ask to improt poly or convert quondams
+            if (ImportControl.DAL.HandlesAllPointTypes)
+            {
+                List<string> neededPolys = new List<string>();
+
+                foreach (string polyCN in ImportControl.SelectedPolygons)
+                {
+                    IEnumerable<TtPoint> points = ImportControl.DAL.GetPoints(polyCN, true).Where(p => p.OpType == OpType.Quondam);
+
+                    foreach (QuondamPoint qp in ImportControl.DAL.GetPoints(polyCN, true)
+                        .Where(p => p.OpType == OpType.Quondam).Cast<QuondamPoint>())
+                    {
+                        if (qp.ParentPoint.PolygonCN != polyCN && !neededPolys.Contains(qp.ParentPoint.PolygonCN))
+                            neededPolys.Add(qp.ParentPoint.PolygonCN);
+                    }
+                }
+
+
+            }
+
+
             IsSettingUp = false;
             IsImporting = true;
 

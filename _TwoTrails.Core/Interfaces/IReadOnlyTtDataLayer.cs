@@ -8,6 +8,10 @@ namespace TwoTrails.DAL
 {
     public interface IReadOnlyTtDataLayer
     {
+        bool HandlesAllPointTypes { get; }
+
+        String FilePath { get; }
+
         #region Points
         IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false);
         #endregion

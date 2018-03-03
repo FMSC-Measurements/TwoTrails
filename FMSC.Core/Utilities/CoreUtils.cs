@@ -55,5 +55,14 @@ namespace FMSC.Core.Utilities
             // NOT FOUND
             return false;
         }
+
+        public static bool IsExtensionOpenable(string extension)
+        {
+            string handler = null;
+            RegistryKey key = Registry.LocalMachine.OpenSubKey($"SOFTWARE\\Classes\\.{ extension.Trim('.').ToLower() }");
+            if (key != null && (handler = key.GetValue("", "None") as string) != null && handler != "None")
+                return true;
+            return false;
+        }
     }
 }

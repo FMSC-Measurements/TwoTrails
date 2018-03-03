@@ -172,7 +172,7 @@ namespace TwoTrails.Utils
                 manager.AddNmeaBursts(aPoints.Values.Where(p => p.IsGpsType()).SelectMany(p => dal.GetNmeaBursts(p.CN)));
             }
             
-            manager.UpdateDataAction(DataActionType.DataImported, (dal is ITtFileDataLayer fdal) ? fdal.FilePath : null);
+            manager.UpdateDataAction(DataActionType.DataImported, dal.FilePath);
         }
     }
 }

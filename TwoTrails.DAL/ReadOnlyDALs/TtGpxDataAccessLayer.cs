@@ -15,11 +15,13 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.DAL
 {
-    public class TtGpxDataAccessLayer : IReadOnlyTtDataLayer, ITtFileDataLayer
+    public class TtGpxDataAccessLayer : IReadOnlyTtDataLayer
     {
         public Boolean RequiresUpgrade => false;
 
         public string FilePath => _Options.FilePath;
+
+        public bool HandlesAllPointTypes => false;
 
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
         private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();

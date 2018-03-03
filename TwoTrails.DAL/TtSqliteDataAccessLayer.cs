@@ -18,7 +18,7 @@ using System.Diagnostics;
 
 namespace TwoTrails.DAL
 {
-    public class TtSqliteDataAccessLayer : ITtDataLayer, ITtFileDataLayer
+    public class TtSqliteDataAccessLayer : ITtDataLayer
     {
         public String FilePath { get; }
 
@@ -75,6 +75,8 @@ namespace TwoTrails.DAL
         {
             get { return GetDataVersion() < TwoTrailsSchema.SchemaVersion; }
         }
+
+        public bool HandlesAllPointTypes => true;
 
 
 
@@ -167,9 +169,10 @@ namespace TwoTrails.DAL
                             metacn = dr.GetString(8);
                             time = TtCoreUtils.ParseTime(dr.GetString(9));
 
-                            adjx = dr.GetDouble(10);
-                            adjy = dr.GetDouble(11);
-                            adjz = dr.GetDouble(12);
+                            //fix for non-adjusted points
+                            adjx = dr.GetDoubleN(10) ?? 0;
+                            adjy = dr.GetDoubleN(11) ?? 0;
+                            adjz = dr.GetDoubleN(12) ?? 0;
 
                             unadjx = dr.GetDouble(13);
                             unadjy = dr.GetDouble(14);
@@ -2444,6 +2447,26 @@ namespace TwoTrails.DAL
             IEnumerable<TtPoint> delPoints = GetPoints().Where(p => !polyCNs.ContainsKey(p.PolygonCN));
 
             DeletePoints(delPoints);
+        }
+
+        public void Fix()
+        {
+            //fix for non-adjusted points
+            _Database.Update(TwoTrailsSchema.PointSchema.TableName,
+                new Dictionary<string, object>()
+                {
+                    [TwoTrailsSchema.PointSchema.AdjX] = 0,
+                    [TwoTrailsSchema.PointSchema.AdjY] = 0,
+                    [TwoTrailsSchema.PointSchema.AdjZ] = 0
+                }, $"{ TwoTrailsSchema.PointSchema.AdjX } = 0 OR { TwoTrailsSchema.PointSchema.AdjY } = 0 OR { TwoTrailsSchema.PointSchema.AdjZ } = 0");
+        }
+
+        public bool HasErrors()
+        {
+            //check for non-adjusted points
+            int count = _Database.ExecuteNonQuery($"SELECT count(*) FROM { TwoTrailsSchema.PointSchema.TableName } WHERE { TwoTrailsSchema.PointSchema.AdjX } IS NULL; ");
+
+            return count > 0;
         }
         #endregion
     }

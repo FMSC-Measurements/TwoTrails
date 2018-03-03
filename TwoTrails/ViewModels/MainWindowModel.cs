@@ -266,6 +266,9 @@ namespace TwoTrails.ViewModels
                             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
                             TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
 
+                            if (dal.HasErrors())
+                                dal.Fix();
+
                             Trace.WriteLine($"DAL Opened ({dal.FilePath}): {dal.GetDataVersion()}");
 
                             if (mal != null)
@@ -437,7 +440,12 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
                     File.Copy(oFile, nFile, true);
 
-                    project.ReplaceDAL(new TtSqliteDataAccessLayer(nFile));
+                    TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(nFile);
+
+                    if (dal.HasErrors())
+                        dal.Fix();
+
+                    project.ReplaceDAL(dal);
 
                     if (project.MAL != null)
                     {
@@ -624,7 +632,8 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
             try
             {
-                if (CoreUtils.IsApplictionInstalled("Google Earth") || CoreUtils.IsApplictionInstalled("Google Earth Pro"))
+                //if (CoreUtils.IsApplictionInstalled("Google Earth") || CoreUtils.IsApplictionInstalled("Google Earth Pro"))
+                if (CoreUtils.IsExtensionOpenable("kmz"))
                 {
                     createAndOpenKmz();
                 }
@@ -640,7 +649,8 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             catch (Exception ex)
             {
                 Trace.WriteLine(ex.Message, "MainWindowModel:OpenInGoogleEarth");
-                createAndOpenKmz();
+                MessageBox.Show("Unable to open in Google Earth. See Log file for details.");
+                //createAndOpenKmz(); //try anyway
             }
         }
 

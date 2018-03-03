@@ -13,7 +13,7 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.DAL
 {
-    public class TtKmlDataAccessLayer : IReadOnlyTtDataLayer, ITtFileDataLayer
+    public class TtKmlDataAccessLayer : IReadOnlyTtDataLayer
     {
         private KmlDocument _KDoc;
 
@@ -26,6 +26,8 @@ namespace TwoTrails.DAL
         public bool RequiresUpgrade => false;
 
         public string FilePath => _Options.FilePath;
+
+        public bool HandlesAllPointTypes => false;
 
         private bool parsed = false;
         private object locker = new object();
