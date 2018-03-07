@@ -39,10 +39,10 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <RadioButton Content="Move" Grid.Row="0" Name="rbActMove"
-                             ToolTip="Points will be moved from their current polygon into the Target Polygon" Checked="rbActMove_Checked"/>
-                <RadioButton Content="Quondam" Grid.Row="1" Name="rbActQuondam"
+                <RadioButton Content="Quondam" Grid.Row="0" Name="rbActQuondam"
                              ToolTip="Quondams will be created from the points and inserted into the Target Polygon" Checked="rbActQuondam_Checked"/>
+                <RadioButton Content="Move" Grid.Row="1" Name="rbActMove"
+                             ToolTip="Points will be moved from their current polygon into the Target Polygon" Checked="rbActMove_Checked"/>
             </Grid>
         </GroupBox>
 

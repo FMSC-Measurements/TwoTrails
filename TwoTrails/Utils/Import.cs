@@ -56,17 +56,23 @@ namespace TwoTrails.Utils
 
                 if (includeMetadata)
                 {
+                    TtMetadata meta = iMeta[metaCN];
+
                     if (metadata.ContainsKey(metaCN))
                     {
-                        TtMetadata meta = iMeta[metaCN];
-
-                        if (meta != metadata[metaCN])
+                        if (!meta.Equals(metadata[metaCN]))
                         {
                             meta.Name = $"{meta.Name} (Import)";
                             meta.CN = Guid.NewGuid().ToString();
                             metaMap.Add(metaCN, meta.CN);
+
                             aMeta.Add(meta.CN, meta);
                         }
+                    }
+                    else
+                    {
+                        meta.Name = $"{meta.Name} (Import)";
+                        aMeta.Add(meta.CN, meta);
                     }
                 }
                 else
@@ -83,17 +89,23 @@ namespace TwoTrails.Utils
 
                 if (includeGroups)
                 {
+                    TtGroup group = iGroups[groupCN];
+
                     if (groups.ContainsKey(groupCN))
                     {
-                        TtGroup group = iGroups[groupCN];
-
                         if (group != groups[groupCN])
                         {
                             group.Name = $"{group.Name} (Import)";
                             group.CN = Guid.NewGuid().ToString();
                             groupMap.Add(groupCN, group.CN);
+
                             aGroups.Add(group.CN, group);
                         }
+                    }
+                    else
+                    {
+                        group.Name = $"{group.Name} (Import)";
+                        aGroups.Add(group.CN, group);
                     }
                 }
                 else

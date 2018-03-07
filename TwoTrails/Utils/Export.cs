@@ -387,32 +387,35 @@ namespace TwoTrails.Utils
                 sb.Append("PointCN,");
                 sb.Append("IsUsed,");
 
-                sb.Append("BurstTime,");
-                sb.Append("FixTime,");
+                sb.Append("Time Created,");
+                sb.Append("Time Fix,");
 
                 sb.Append("Latitude,");
                 sb.Append("Longitude,");
-                sb.Append("Elevation,");
-                sb.Append("ElevUom,");
+                sb.Append("Elevation (Mt),");
 
                 sb.Append("MagVar,");
                 sb.Append("MagVarDir,");
 
-                sb.Append("TrackAngle,");
                 sb.Append("GroundSpeed,");
+                sb.Append("TrackAngle,");
                 
                 sb.Append("Fix,");
-                sb.Append("FixType,");
+                sb.Append("Fix Quality,");
                 sb.Append("Mode,");
 
-                sb.Append("TrackedSatellitesCount,");
-                sb.Append("SatellitesInViewCount,");
-                sb.Append("UsedSatellites,");
-                sb.Append("UsedSatellitesCount,");
-
-                sb.Append("HDOP,");
                 sb.Append("PDOP,");
+                sb.Append("HDOP,");
                 sb.Append("VDOP,");
+
+                sb.Append("Horiz Dilution,");
+                sb.Append("Geoid Height (Mt),");
+
+                sb.Append("Tracked Satellites Count,");
+                sb.Append("Satellites In View Count,");
+                sb.Append("Used Satellites Count,");
+                sb.Append("Used Satellites,");
+                sb.Append("Satellites In View Info,");
 
                 sb.Append("CN");
                 sw.WriteLine(sb.ToString());
@@ -424,19 +427,21 @@ namespace TwoTrails.Utils
                     sb.AppendFormat("{0},{1},", burst.PointCN, burst.IsUsed);
                     sb.AppendFormat("{0},{1},", burst.TimeCreated.ToString(Consts.DATE_FORMAT), burst.FixTime.ToString(Consts.DATE_FORMAT));
 
-                    sb.AppendFormat("{0},{1},", burst.Latitude, burst.Longitude);
-                    sb.AppendFormat("{0},{1},", burst.Elevation, burst.UomElevation.ToStringAbv());
+                    sb.AppendFormat("{0},{1},{0},", burst.Latitude, burst.Longitude, burst.Elevation);
 
                     sb.AppendFormat("{0},{1},", burst.MagVar, burst.MagVarDir);
-                    sb.AppendFormat("{0},{1},", burst.TrackAngle, burst.GroundSpeed);
+
+                    sb.AppendFormat("{0},{1},", burst.GroundSpeed, burst.TrackAngle);
 
                     sb.AppendFormat("{0},{1},{2},", burst.Fix.ToStringF(), burst.FixQuality.ToStringF(), burst.Mode.ToStringF());
 
-                    sb.AppendFormat("{0},{1},", burst.TrackedSatellitesCount, burst.SatellitesInViewCount);
-                    sb.AppendFormat("{0},{1},", burst.UsedSatelliteIDsString, burst.UsedSatelliteIDsCount);
-
                     sb.AppendFormat("{0},{1},{2},", burst.HDOP, burst.PDOP, burst.VDOP);
 
+                    sb.AppendFormat("{0},{1},", burst.HorizDilution, burst.GeoidHeight);
+
+                    sb.AppendFormat("{0},{1},", burst.TrackedSatellitesCount, burst.SatellitesInViewCount);
+                    sb.AppendFormat("{0},{1},{2},", burst.UsedSatelliteIDsCount, burst.UsedSatelliteIDsString, burst.SatellitesInViewString);
+                    
                     sb.AppendFormat("{0}", burst.CN);
 
                     sw.WriteLine(sb.ToString());
