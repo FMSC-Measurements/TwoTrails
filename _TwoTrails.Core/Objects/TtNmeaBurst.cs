@@ -19,8 +19,8 @@ namespace TwoTrails.Core
         public DateTime TimeCreated { get; }
         public DateTime FixTime { get; }
 
-        public double MagVar { get; }
-        public EastWest MagVarDir { get; }
+        public double? MagVar { get; }
+        public EastWest? MagVarDir { get; }
 
         public double TrackAngle { get; }
         public double GroundSpeed { get; }
@@ -100,12 +100,15 @@ namespace TwoTrails.Core
                                 String[] tokens = satstr.Split(';');
                                 if (tokens.Length > 4)
                                 {
+                                    float srn = 0;
+                                    float.TryParse(tokens[3], out srn);
+
                                     if (Int32.TryParse(tokens[0], out int nmeaID))
                                     {
                                         return new Satellite(nmeaID,
                                                 float.Parse(tokens[1]),
                                                 float.Parse(tokens[2]),
-                                                float.Parse(tokens[3]));
+                                                srn);
                                     }
                                 } 
                             }
@@ -169,7 +172,7 @@ namespace TwoTrails.Core
 
         private TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
                        GeoPosition position, DateTime fixTime, double groundSpeed, double trackAngle,
-                       double magVar, EastWest magVarDir, Mode mode, Fix fix,
+                       double? magVar, EastWest? magVarDir, Mode mode, Fix fix,
                        List<int> satsUsed, double pdop, double hdop, double vdop, GpsFixType fixQuality,
                        int trackedSatellites, double horizDilution, double geoidHeight, UomElevation geoUom,
                        int numberOfSatellitesInView) : base(cn)
@@ -204,7 +207,7 @@ namespace TwoTrails.Core
 
         public TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
                        GeoPosition position, DateTime fixTime, double groundSpeed, double trackAngle,
-                       double magVar, EastWest magVarDir, Mode mode, Fix fix,
+                       double? magVar, EastWest? magVarDir, Mode mode, Fix fix,
                        List<int> satsUsed, double pdop, double hdop, double vdop, GpsFixType fixQuality,
                        int trackedSatellites, double horizDilution, double geoidHeight, UomElevation geoUom,
                        int numberOfSatellitesInView, List<Satellite> satellitesInView) : this(
@@ -217,7 +220,7 @@ namespace TwoTrails.Core
 
         public TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
                        GeoPosition position, DateTime fixTime, double groundSpeed, double trackAngle,
-                       double magVar, EastWest magVarDir, Mode mode, Fix fix,
+                       double? magVar, EastWest? magVarDir, Mode mode, Fix fix,
                        List<int> satsUsed, double pdop, double hdop, double vdop, GpsFixType fixQuality,
                        int trackedSatellites, double horizDilution, double geoidHeight, UomElevation geoUom,
                        int numberOfSatellitesInView, string satellitesInViewString) : this(

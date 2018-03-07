@@ -35,7 +35,7 @@ namespace TwoTrails.Utils
             Polygons(project.Manager, Path.Combine(folderPath, "Polygons.csv"));
             Metadata(project.Manager, Path.Combine(folderPath, "Metadata.csv"));
             Groups(project.Manager, Path.Combine(folderPath, "Groups.csv"));
-            TtNmea(project.Manager, Path.Combine(folderPath, "NmeaBursts.csv"));
+            TtNmea(project.Manager, Path.Combine(folderPath, "Nmea.csv"));
             ImageInfo(project.Manager, Path.Combine(folderPath, "ImageInfo.csv"));
             GPX(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.gpx"));
             KMZ(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.kmz"));
@@ -183,7 +183,10 @@ namespace TwoTrails.Utils
 
         public static void DataDictionary(DataDictionaryTemplate template, IEnumerable<TtPoint> points, String fileName)
         {
-            if (template == null || !template.Any())
+            if (template == null)
+                return;
+
+            if (!template.Any())
                 throw new Exception("Invalid or Empty DataDictionary");
 
             if (points.Any(p => p.ExtendedData == null))

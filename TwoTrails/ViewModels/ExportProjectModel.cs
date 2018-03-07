@@ -108,7 +108,7 @@ namespace TwoTrails.ViewModels
                                 Export.DataDictionary(project.Manager, Path.Combine(path, "DataDictionary.csv"));
 
                             if (ExportNMEA)
-                                Export.TtNmea(project.Manager, Path.Combine(path, "DataDictionary.csv"));
+                                Export.TtNmea(project.Manager, Path.Combine(path, "Nmea.csv"));
 
                             if (ExportPolygons)
                                 Export.Polygons(project.Manager, Path.Combine(path, "Polygons.csv"));
@@ -145,7 +145,7 @@ namespace TwoTrails.ViewModels
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine(ex.Message, "ExportProjectModel");
+                        Trace.WriteLine($"{ ex.Message }\n\t{ ex.StackTrace }", "ExportProjectModel");
                         System.Windows.MessageBox.Show("An error has occured. Please see log for details.");
                     }
                 }
