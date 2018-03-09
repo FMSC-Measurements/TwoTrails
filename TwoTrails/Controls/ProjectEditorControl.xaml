@@ -227,11 +227,11 @@
                                     <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Manager.Groups.Count}" TextAlignment="Right" />
 
 
-                                    <TextBlock Grid.Column="0" Grid.Row="5" Text="Total Area (Ha)" />
+                                    <!--<TextBlock Grid.Column="0" Grid.Row="5" Text="Total Area (Ha)" />
                                     <TextBlock Grid.Column="2" Grid.Row="5" Text="{Binding TotalPolygonArea, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres, StringFormat=F2}" TextAlignment="Right" />
 
                                     <TextBlock Grid.Column="0" Grid.Row="6" Text="Total Perimeter (Ft)" />
-                                    <TextBlock Grid.Column="2" Grid.Row="6" Text="{Binding TotalPolygonArea, Converter={StaticResource MtoFConverter}, StringFormat=F2}" TextAlignment="Right" />
+                                    <TextBlock Grid.Column="2" Grid.Row="6" Text="{Binding TotalPolygonArea, Converter={StaticResource MtoFConverter}, StringFormat=F2}" TextAlignment="Right" />-->
                                 </Grid>
                             </GroupBox>
                         </Grid>
@@ -390,10 +390,10 @@
                                         </Grid.RowDefinitions>
 
                                         <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ha:"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding CurrentPolygon.AreaHectaAcres, StringFormat=F3}"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding CurrentPolygon.AreaHectaAcres, StringFormat=F4}"/>
 
                                         <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ac:"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding CurrentPolygon.AreaAcres, StringFormat=F3}"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding CurrentPolygon.AreaAcres, StringFormat=F4}"/>
                                     </Grid>
                                 </GroupBox>
 
@@ -469,10 +469,10 @@
                                                 </Grid.RowDefinitions>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ha:"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ac:"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
                                                 
                                                 <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Error"/>
                                                 <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GpsAreaError, StringFormat={}{0:F3}%}"/>
@@ -496,10 +496,10 @@
                                                 </Grid.RowDefinitions>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ha:"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalTraverseError, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalTraverseError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ac:"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalTraverseError, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalTraverseError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Error"/>
                                                 <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.TraverseAreaError, StringFormat={}{0:F3}%}"/>

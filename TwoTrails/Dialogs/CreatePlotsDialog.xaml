@@ -8,7 +8,7 @@
         xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
         xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
         mc:Ignorable="d"
-        Title="Create Plots" Height="280" Width="300"
+        Title="Create Plots" Height="300" Width="300"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
@@ -123,7 +123,7 @@
                         <ColumnDefinition Width="75"/>
                     </Grid.ColumnDefinitions>
 
-                    <CheckBox Name="cbBuffer" Grid.Column="0" Content="Boundary Buffer" IsChecked="{Binding BoundaryBuffer}" VerticalAlignment="Center"/>
+                    <CheckBox Name="cbBuffer" Grid.Column="0" Content="Boundary Buffer" IsChecked="{Binding BoundaryBuffer}" IsEnabled="False" VerticalAlignment="Center"/>
                     
                     <TextBox Grid.Column="4"  Margin="0, 2.5, 0, 2.5"
                          IsEnabled="{Binding ElementName=cbBuffer, Path=IsChecked}"
