@@ -771,7 +771,7 @@ namespace TwoTrails.Core
         }
 
 
-        public void RecalculatePolygons(bool waitForUpdates)
+        public void RecalculatePolygons(bool waitForUpdates = true)
         {
             foreach (TtPolygon poly in _Polygons)
             {
@@ -779,6 +779,7 @@ namespace TwoTrails.Core
 
                 foreach (TtPoint p in _PointsByPoly[poly.CN].Where(p => p.IsGpsType()))
                 {
+                    p.SetAdjLocation(p.UnAdjX, p.UnAdjY, p.UnAdjZ);
                     p.SetAccuracy(poly.Accuracy);
                 }
 

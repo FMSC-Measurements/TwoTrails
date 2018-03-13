@@ -16,6 +16,8 @@ namespace TwoTrails
         private const String REGION = "Region";
         private const String RECENT_PROJECTS = "RecentProjects";
         private const String ADVANCED_MODE = "AdvancedMode";
+        private const String LAST_UPDATE_CHECK = "LastUpdateCheck";
+        private const String UPGRADE_REQUIRED = "UpgradeRequired";
 
         public IMetadataSettings MetadataSettings { get; set; }
         public IDeviceSettings DeviceSettings { get; set; }
@@ -63,13 +65,55 @@ namespace TwoTrails
                 Properties.Settings.Default.Save();
             }
         }
-        
+
+        private DateTime? _LastUpdateCheck;
+        public DateTime? LastUpdateCheck
+        {
+            get
+            {
+                if (_LastUpdateCheck == null && DateTime.TryParse(Properties.Settings.Default[LAST_UPDATE_CHECK] as string, out DateTime time))
+                {
+                    _LastUpdateCheck = time;
+                }
+
+                return _LastUpdateCheck;
+            }
+
+            set
+            {
+                SetField(ref _LastUpdateCheck, value);
+                Properties.Settings.Default[LAST_UPDATE_CHECK] = value.ToString();
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        private bool _UpgradeRequired = true;
+        public bool UpgradeRequired
+        {
+            get { return _UpgradeRequired; }
+
+            set
+            {
+                SetField(ref _UpgradeRequired, value);
+                Properties.Settings.Default[UPGRADE_REQUIRED] = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+
 
         public TtSettings(IDeviceSettings deviceSettings, IMetadataSettings metadataSettings, IPolygonGraphicSettings polyGraphicSettings)
         {
             DeviceSettings = deviceSettings;
             MetadataSettings = metadataSettings;
             PolygonGraphicSettings = polyGraphicSettings;
+
+            _UpgradeRequired = (bool)Properties.Settings.Default[UPGRADE_REQUIRED];
+
+            if (UpgradeRequired)
+            {
+                Properties.Settings.Default.Upgrade();
+                UpgradeRequired = false;
+            }
 
 #if DEBUG
             _IsAdvancedMode = true;

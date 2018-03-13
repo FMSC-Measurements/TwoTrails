@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.DAL;
+using TwoTrails.Utils;
 
 namespace TwoTrails
 {
@@ -39,11 +40,34 @@ namespace TwoTrails
         private TtTextWriterTraceListener _Listener;
 
 
+        public static TtSettings Settings { get; private set; } 
+
+
         [STAThread]
         public static void Main()
         {
             if (SingleInstance<App>.InitializeAsFirstInstance(ID))
             {
+                Settings = new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings());
+
+                //Check for update
+                if (Settings.LastUpdateCheck == null || Settings.LastUpdateCheck < DateTime.Now.Subtract(TimeSpan.FromDays(1)))
+                {
+                    bool? res = TtUtils.CheckForUpdate();
+
+                    if (res != null)
+                    {
+                        Settings.LastUpdateCheck = DateTime.Now;
+
+                        if (res == true && MessageBox.Show("A new version of TwoTrails is ready for download. Would you like to download it now?", "TwoTrails Update",
+                                MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                        {
+                            Process.Start(Consts.URL_TWOTRAILS);
+                            return;
+                        }
+                    }
+                }
+
                 var application = new App();
 
                 application.InitializeComponent();

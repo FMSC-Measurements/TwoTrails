@@ -169,16 +169,16 @@ namespace TwoTrails.DAL
                             metacn = dr.GetString(8);
                             time = TtCoreUtils.ParseTime(dr.GetString(9));
 
-                            //fix for non-adjusted points
-                            adjx = dr.GetDoubleN(10) ?? 0;
-                            adjy = dr.GetDoubleN(11) ?? 0;
-                            adjz = dr.GetDoubleN(12) ?? 0;
-
                             unadjx = dr.GetDouble(13);
                             unadjy = dr.GetDouble(14);
                             unadjz = dr.GetDouble(15);
 
-                            acc = dr.GetDouble(16);
+                            //fix for non-adjusted points
+                            adjx = dr.GetDoubleN(10) ?? unadjx;
+                            adjy = dr.GetDoubleN(11) ?? unadjy;
+                            adjz = dr.GetDoubleN(12) ?? unadjz;
+
+                            acc = dr.GetDoubleN(16) ?? Consts.DEFAULT_POINT_ACCURACY;
 
                             qlinks = dr.GetStringN(17);
                             

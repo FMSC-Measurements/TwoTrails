@@ -219,6 +219,10 @@ namespace TwoTrails.ViewModels
                         MessageBox.Show(ex.Message);
                     }
                 }
+                else if (result == MessageBoxResult.Cancel)
+                {
+                    return;
+                }
             }
 
             CloseViews();

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -127,9 +128,6 @@ namespace TwoTrails.ViewModels
         }
 
 
-        public TtSettings Settings { get; private set; }
-
-
         #region Commands
         public ICommand NewCommand { get; private set; }
         public ICommand OpenCommand { get; private set; }
@@ -147,6 +145,7 @@ namespace TwoTrails.ViewModels
         public ICommand SettingsCommand { get; private set; }
         
         public ICommand ViewLogCommand { get; private set; }
+        public ICommand ExportReportCommand { get; private set; }
         public ICommand AboutCommand { get; private set; }
         #endregion
 
@@ -160,9 +159,6 @@ namespace TwoTrails.ViewModels
             StatusMessage = String.Empty;
 
             MainWindow = mainWindow;
-
-            Settings = new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings());
-
 
             NewCommand = new RelayCommand(x => CreateProject());
             OpenCommand = new RelayCommand(x => BrowseProject());
@@ -181,6 +177,7 @@ namespace TwoTrails.ViewModels
 
 
             ViewLogCommand = new RelayCommand(x => Process.Start(App.LOG_FILE_PATH));
+            ExportReportCommand = new RelayCommand(x => ExportReport());
             AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(MainWindow));
 
             _Tabs = mainWindow.tabControl;
@@ -285,7 +282,7 @@ namespace TwoTrails.ViewModels
                                 {
                                     if (Upgrade.DAL(dal))
                                     {
-                                        AddProject(new TtProject(dal, mal, Settings, this));
+                                        AddProject(new TtProject(dal, mal, App.Settings, this));
                                         MessageBox.Show("Upgrade Successful");
                                     }
                                     else
@@ -296,7 +293,7 @@ namespace TwoTrails.ViewModels
                             }
                             else
                             {
-                                AddProject(new TtProject(dal, mal, Settings, this));
+                                AddProject(new TtProject(dal, mal, App.Settings, this));
                             }
                         }
                         catch (Exception ex)
@@ -348,9 +345,9 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(upgradedFile, info);
                                 TtSqliteMediaAccessLayer mal = GetMalIfExists(upgradedFile);
 
-                                Upgrade.DAL(dal, Settings, dalv2);
+                                Upgrade.DAL(dal, App.Settings, dalv2);
                                     
-                                AddProject(new TtProject(dal, mal, Settings, this));
+                                AddProject(new TtProject(dal, mal, App.Settings, this));
                             }
                         }
                     }
@@ -388,7 +385,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             {
                 MessageBox.Show(MainWindow, "File not found");
 
-                Settings.RemoveRecentProject(filePath);
+                App.Settings.RemoveRecentProject(filePath);
                 UpdateRecentProjectMenu();
             }
         }
@@ -407,20 +404,20 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
         public void CreateProject()
         {
-            NewProjectDialog dialog = new NewProjectDialog(MainWindow, Settings.CreateProjectInfo(AppInfo.Version));
+            NewProjectDialog dialog = new NewProjectDialog(MainWindow, App.Settings.CreateProjectInfo(AppInfo.Version));
 
             if (dialog.ShowDialog() == true)
             {
                 TtProjectInfo info = dialog.ProjectInfo;
 
                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
-                TtProject proj = new TtProject(dal, null, Settings, this);
+                TtProject proj = new TtProject(dal, null, App.Settings, this);
                 Trace.WriteLine($"Project Created ({dal.GetDataVersion()}): {dal.FilePath}");
 
                 AddProject(proj);
 
-                Settings.Region = info.Region;
-                Settings.District = info.District;
+                App.Settings.Region = info.Region;
+                App.Settings.District = info.District;
             }
         }
 
@@ -479,7 +476,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
 
             _Projects.Add(project.FilePath, project);
-            Settings.AddRecentProject(project.FilePath);
+            App.Settings.AddRecentProject(project.FilePath);
             UpdateRecentProjectMenu();
 
             project.MessagePosted += Project_MessagePosted;
@@ -579,7 +576,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
             miRecent.Items.Clear();
 
-            foreach (String filePath in Settings.GetRecentProjects())
+            foreach (String filePath in App.Settings.GetRecentProjects())
             {
                 item = new MenuItem();
 
@@ -657,7 +654,67 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
         private void OpenSettings()
         {
-            SettingsWindow.ShowDialog(Settings, MainWindow);
+            SettingsWindow.ShowDialog(App.Settings, MainWindow);
         }
+
+        private void ExportReport()
+        {
+            string name = $"ExportReport_{DateTime.Now.ToString().Replace(':', '.').Replace('/','-')}";
+            
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.AddExtension = true;
+            sfd.OverwritePrompt = true;
+            sfd.DefaultExt = "zip";
+            sfd.Filter =  "Zip files (*.zip)|*.zip|All files (*.*)|*.*";
+            sfd.FileName = $"{name}.zip";
+            sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+            if (sfd.ShowDialog() == true)
+            {
+                string tempDirectory = Path.Combine(App.TEMP_DIR, name);
+                Directory.CreateDirectory(tempDirectory);
+
+                File.Copy(App.LOG_FILE_PATH, Path.Combine(tempDirectory, App.LOG_FILE_NAME));
+                foreach (TtProject proj in _Projects.Values)
+                {
+                    File.Copy(proj.DAL.FilePath, Path.Combine(tempDirectory, Path.GetFileName(proj.DAL.FilePath)));
+                    if (proj.MAL != null)
+                        File.Copy(proj.MAL.FilePath, Path.Combine(tempDirectory, Path.GetFileName(proj.MAL.FilePath)));
+                }
+
+                using (StreamWriter sw = new StreamWriter(Path.Combine(tempDirectory, "App.Settings.txt")))
+                {
+                    sw.WriteLine("--Main App.Settings--");
+                    sw.WriteLine($"{nameof(App.Settings.UserName)}: {App.Settings.UserName}");
+                    sw.WriteLine($"{nameof(App.Settings.DeviceName)}: {App.Settings.DeviceName}");
+                    sw.WriteLine($"{nameof(App.Settings.Region)}: {App.Settings.Region}");
+                    sw.WriteLine($"{nameof(App.Settings.District)}: {App.Settings.District}");
+                    sw.WriteLine($"{nameof(App.Settings.IsAdvancedMode)}: {App.Settings.IsAdvancedMode}");
+                    sw.WriteLine("Recent Projects:");
+                    foreach (string rp in App.Settings.GetRecentProjects())
+                        sw.WriteLine(rp);
+                    sw.WriteLine();
+
+                    sw.WriteLine("--Device App.Settings--");
+                    sw.WriteLine($"{nameof(App.Settings.DeviceSettings.DeleteExistingPlots)}: {App.Settings.DeviceSettings.DeleteExistingPlots}");
+                    sw.WriteLine();
+
+                    sw.WriteLine("--Metadata App.Settings--");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Datum)}: {App.Settings.MetadataSettings.Datum}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.DecType)}: {App.Settings.MetadataSettings.DecType}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Distance)}: {App.Settings.MetadataSettings.Distance}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Elevation)}: {App.Settings.MetadataSettings.Elevation}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.MagDec)}: {App.Settings.MetadataSettings.MagDec}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Slope)}: {App.Settings.MetadataSettings.Slope}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Zone)}: {App.Settings.MetadataSettings.Zone}");
+                }
+
+                ZipFile.CreateFromDirectory(tempDirectory, Path.GetFullPath(sfd.FileName));
+
+                if (Directory.Exists(tempDirectory))
+                    Directory.Delete(tempDirectory, true);
+            }
+        }
+    
     }
 }

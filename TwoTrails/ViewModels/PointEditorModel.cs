@@ -1111,7 +1111,7 @@ namespace TwoTrails.ViewModels
 
                     bool hasOnbnd = false, hasOffBnd = false;
 
-                    bool hasSS = false, hasTrav = false;
+                    bool hasSS = false, hasSsOnBnd = false, hasTrav = false;
 
                     bool sameCmt = true;
                     string cmt = fpt.Comment;
@@ -1153,20 +1153,24 @@ namespace TwoTrails.ViewModels
                             parseTrav = false;
                             parseQndm = false;
                         }
-                        else if (point.IsTravType() && !HasTravTypes)
+                        else if (point.IsTravType())
                         {
-                            if (!hasTrav)
+                            if (point.OpType == OpType.SideShot)
                             {
-                                if (point.OpType == OpType.SideShot)
-                                    hasSS = true;
-                                else
-                                    hasTrav = true;
+                                hasSS = true;
+                                hasSsOnBnd |= point.OnBoundary;
                             }
 
-                            HasTravTypes = true;
+                            if (!hasTrav && point.OpType == OpType.Traverse)
+                                hasTrav = true;
 
-                            parseManAcc = false;
-                            parseQndm = false;
+                            if (!HasTravTypes)
+                            {
+                                HasTravTypes = true;
+
+                                parseManAcc = false;
+                                parseQndm = false;
+                            }
                         }
                         else if (point.OpType == OpType.Quondam && !HasQndms)
                         {
@@ -1302,7 +1306,7 @@ namespace TwoTrails.ViewModels
                     _Group = group;
                     _SameGroup = group != null;
 
-                    HasPossibleCorridor = HasGpsTypes && hasSS && !HasQndms && !hasTrav && _SamePolygon;
+                    HasPossibleCorridor = HasGpsTypes && hasSsOnBnd && !HasQndms && !hasTrav && _SamePolygon;
 
                     if (hasOnbnd ^ hasOffBnd)
                     {
@@ -1918,7 +1922,7 @@ namespace TwoTrails.ViewModels
 
         private void CreateCorridor()
         {
-            Manager.CreateCorridor(GetSortedSelectedPoints(), Polygon);
+            Manager.CreateCorridor(GetSortedSelectedPoints().Where(p => p.OnBoundary), Polygon);
         }
 
         private void ModifyDataDictionary()

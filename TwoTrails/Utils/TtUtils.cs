@@ -16,6 +16,12 @@ namespace TwoTrails.Utils
     public static class TtUtils
     {
 
+        public static bool? CheckForUpdate()
+        {
+            return null;
+        }
+
+
         public static UtmExtent GetExtents(IEnumerable<TtPoint> points, bool adjusted = true)
         {
             if (!points.Any())
