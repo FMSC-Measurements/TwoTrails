@@ -63,7 +63,7 @@
 
 
         <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Width="75" HorizontalAlignment="Left" Margin="2.5"
-                Content="Cancel" Visibility="{Binding Path=CanSelectValue, Converter={StaticResource BoolToVis}}" Command="{Binding ExitCommand}"/>
+                Content="Cancel" Visibility="{Binding Path=CanSelectValue, Converter={StaticResource BoolToVis}}" Command="{Binding CancelCommand}"/>
         <Button Grid.Column="4" Grid.Row="3" Grid.ColumnSpan="2" Width="75" HorizontalAlignment="Right" Margin="2.5"
                 Content="OK" Command="{Binding OkCommand}"/>
     </Grid>

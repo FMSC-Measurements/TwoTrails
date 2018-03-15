@@ -560,7 +560,7 @@ namespace TwoTrails.Core
                 {
                     ChangeGpsZone(point, metadata.Zone, oldZone);
 
-                    if (adjustPolygons.ContainsKey(point.PolygonCN))
+                    if (!adjustPolygons.ContainsKey(point.PolygonCN))
                         adjustPolygons.Add(point.PolygonCN, point.Polygon);
                 }
 
@@ -568,7 +568,7 @@ namespace TwoTrails.Core
                 {
                     AdjustAllTravTypesInPolygon(polygon);
                     UpdatePolygonStats(polygon);
-                } 
+                }
             }
 
             IgnorePointEvents = false;
