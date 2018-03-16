@@ -9,12 +9,17 @@ using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using System.Linq;
 using FMSC.Core.Utilities;
+using System.Windows.Input;
+using FMSC.Core.ComponentModel.Commands;
+using FMSC.GeoSpatial;
 
 namespace TwoTrails.Mapping
 {
     public class TtMapPolygonManager : NotifyPropertyChangedEx
     {
         public event MapPointSelectedEvent PointSelected;
+
+        public ICommand ZoomToPolygonCommand { get; }
 
         public ObservableConvertedCollection<TtMapPoint, TtPoint> Points { get; set; }
 
@@ -30,8 +35,9 @@ namespace TwoTrails.Mapping
 
         public TtPolygon Polygon { get; }
 
-        private Map Map { get; }
+        public Extent Extents { get; private set; }
 
+        private Map Map { get; }
 
         #region Visibility
         private bool _Visible;
@@ -303,8 +309,26 @@ namespace TwoTrails.Mapping
             {
                 p.PointSelected += MapPointSelected;
             }
+
+            BuildExtents();
+
+            ZoomToPolygonCommand = new RelayCommand(x =>
+            {
+                if (Points.Any())
+                    Map.SetView(
+                        new LocationRect(
+                            new Location(Extents.North, Extents.West),
+                            new Location(Extents.South, Extents.East)));
+            });
         }
 
+        private void BuildExtents()
+        {
+            Extent.Builder builder = new Extent.Builder();
+            foreach (TtMapPoint p in Points)
+                builder.Include(p.AdjLocation.Latitude, p.AdjLocation.Longitude);
+            Extents = builder.HasPositions ? builder.Build() : null;
+        }
 
         private void Points_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -339,6 +363,8 @@ namespace TwoTrails.Mapping
                     default:
                         break;
                 }
+
+                BuildExtents();
             }
         }
 
