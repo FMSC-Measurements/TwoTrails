@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,10 +17,21 @@ namespace TwoTrails.Utils
 {
     public static class TtUtils
     {
-
         public static bool? CheckForUpdate()
         {
-            return null;
+            try
+            {
+                string res = new WebClient().DownloadString(Consts.URL_TWOTRAILS_UPDATE);
+
+                if (res != null && new Version(res.Trim(new char[] { ' ', '\n', '\r' })) > Assembly.GetExecutingAssembly().GetName().Version)
+                    return true;
+            }
+            catch
+            {
+                return null;
+            }
+
+            return false;
         }
 
 

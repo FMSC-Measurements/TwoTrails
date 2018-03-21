@@ -98,7 +98,7 @@ namespace TwoTrails
             {
                 Exception ex = ue.ExceptionObject as Exception;
                 
-                _Listener.WriteLine(ex.Message, "[UnhandledException]");
+                _Listener.WriteLine($"{ex.Message}\n\t{ex.StackTrace}", "[UnhandledException]");
                 _Listener.Flush();
             };
         }
