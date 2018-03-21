@@ -12,7 +12,7 @@ namespace TwoTrails.Utils
     public static class Import
     {
         public static void DAL(ITtManager manager, IReadOnlyTtDataLayer dal, IEnumerable<string> polyCNs,
-            bool includeMetadata = true, bool includeGroups = true, bool includeNmea = true)
+            bool includeMetadata = true, bool includeGroups = true, bool includeNmea = true, bool convertForeignQuondams = true)
         {
             Dictionary<string, TtPolygon> polygons = manager.GetPolygons().ToDictionary(p => p.CN, p => p);
             Dictionary<string, TtMetadata> metadata = manager.GetMetadata().ToDictionary(m => m.CN, m => m);
@@ -115,6 +115,29 @@ namespace TwoTrails.Utils
                 }
             }
 
+            Func<QuondamPoint, GpsPoint> convertQuondam = (qpoint) =>
+            {
+                GpsPoint gpsPoint = new GpsPoint(qpoint)
+                {
+                    Comment = string.IsNullOrWhiteSpace(qpoint.Comment) ? qpoint.ParentPoint.Comment : qpoint.Comment,
+                    TimeCreated = DateTime.Now
+                };
+
+                gpsPoint.SetAccuracy(aPolys[qpoint.PolygonCN].Accuracy);
+
+                return gpsPoint;
+            };
+
+            if (convertForeignQuondams)
+            {
+                foreach(QuondamPoint qpoint in aPoints.Values
+                    .Where(p => p.OpType == OpType.Quondam && !aPolys.ContainsKey((p as QuondamPoint).ParentPoint.PolygonCN))
+                            .Cast<QuondamPoint>().ToList())
+                {
+                    aPoints[qpoint.CN] = convertQuondam(qpoint);
+                }
+            }
+
             foreach (TtPoint p in aPoints.Values.ToList())
             {
                 if (polyMap.ContainsKey(p.PolygonCN))
@@ -131,28 +154,31 @@ namespace TwoTrails.Utils
                     p.GroupCN = groupMap[p.GroupCN];
 
                 p.Group = groups.ContainsKey(p.GroupCN) ? groups[p.GroupCN] : aGroups[p.GroupCN];
-
-
+                
                 p.ClearLinks();
 
-                if (p.OpType == OpType.Quondam)
+                if (p.OpType == OpType.Quondam && p is QuondamPoint qp)
                 {
-                    QuondamPoint qp = p as QuondamPoint;
-
-                    if (!aPoints.ContainsKey(qp.ParentPointCN))
+                    if (aPoints.ContainsKey(qp.ParentPointCN))
                     {
-                        TtPoint parent = qp.ParentPoint;
+                        qp.ParentPoint = aPoints[qp.ParentPointCN];
+                    }
+                    else
+                    {
+                        throw new Exception("Foriegn Quondam");
 
-                        if (parent.IsTravType())
-                            parent = new GpsPoint(parent);
-                        
-                        parent.Index = qp.Index;
-                        parent.Polygon = qp.Polygon;
-                        parent.Group = qp.Group;
-                        parent.Metadata = qp.Metadata;
-                        parent.CN = qp.CN;
+                        //TtPoint parent = qp.ParentPoint;
 
-                        aPoints[parent.CN] = parent;
+                        //if (parent.IsTravType())
+                        //    parent = new GpsPoint(parent);
+
+                        //parent.Index = qp.Index;
+                        //parent.Polygon = qp.Polygon;
+                        //parent.Group = qp.Group;
+                        //parent.Metadata = qp.Metadata;
+                        //parent.CN = qp.CN;
+
+                        //aPoints[qp.CN] = convertQuondam(qp);
                     }
                 }
             }
@@ -162,29 +188,45 @@ namespace TwoTrails.Utils
                 aPoints[qp.ParentPointCN].AddLinkedPoint(qp);
             }
 
-            foreach (TtPolygon p in aPolys.Values)
-            {
-                manager.AddPolygon(p);
-            }
+            TtHistoryManager hm = manager as TtHistoryManager;
+            if (hm != null)
+                hm.StartMultiCommand();
 
-            foreach (TtMetadata m in aMeta.Values)
+            try
             {
-                manager.AddMetadata(m);
-            }
+                foreach (TtPolygon p in aPolys.Values)
+                {
+                    manager.AddPolygon(p);
+                }
 
-            foreach (TtGroup g in aGroups.Values)
+                foreach (TtMetadata m in aMeta.Values)
+                {
+                    manager.AddMetadata(m);
+                }
+
+                foreach (TtGroup g in aGroups.Values)
+                {
+                    manager.AddGroup(g);
+                }
+
+                manager.AddPoints(aPoints.Values);
+
+                if (includeNmea)
+                {
+                    manager.AddNmeaBursts(aPoints.Values.Where(p => p.IsGpsType()).SelectMany(p => dal.GetNmeaBursts(p.CN)));
+                }
+
+                manager.UpdateDataAction(DataActionType.DataImported, dal.FilePath);
+
+                if (hm != null)
+                    hm.CommitMultiCommand();
+            }
+            catch (Exception e)
             {
-                manager.AddGroup(g);
+                if (hm != null)
+                    hm.RevertMultiCommand();
+                throw e;
             }
-
-            manager.AddPoints(aPoints.Values);
-
-            if (includeNmea)
-            {
-                manager.AddNmeaBursts(aPoints.Values.Where(p => p.IsGpsType()).SelectMany(p => dal.GetNmeaBursts(p.CN)));
-            }
-            
-            manager.UpdateDataAction(DataActionType.DataImported, dal.FilePath);
         }
     }
 }

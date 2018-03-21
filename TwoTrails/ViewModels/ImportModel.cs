@@ -225,13 +225,14 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
         public void ImportData()
         {
-            //todo check for quondams and if the parent point's poly is imported
-            //then ask to improt poly or convert quondams
+            IEnumerable<string> selectedPolys = ImportControl.SelectedPolygons;
+            bool convertForeignQuondams = false;
+            
             if (ImportControl.DAL.HandlesAllPointTypes)
             {
                 List<string> neededPolys = new List<string>();
 
-                foreach (string polyCN in ImportControl.SelectedPolygons)
+                foreach (string polyCN in selectedPolys)
                 {
                     IEnumerable<TtPoint> points = ImportControl.DAL.GetPoints(polyCN, true).Where(p => p.OpType == OpType.Quondam);
 
@@ -242,20 +243,34 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                             neededPolys.Add(qp.ParentPoint.PolygonCN);
                     }
                 }
+                
+                if (neededPolys.Count > 0)
+                {
+                    MessageBoxResult res = MessageBox.Show("Some quondams are linked to points that are not within the list of improted polygons. Would you like to import these polygons (YES) or convert the points to GPS (NO)?", "Foreign Quondams",
+                        MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
-
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        selectedPolys = selectedPolys.Concat(neededPolys);
+                    }
+                    else if (res == MessageBoxResult.No)
+                    {
+                        convertForeignQuondams = true;
+                    }
+                    else
+                        return;
+                }
             }
-
 
             IsSettingUp = false;
             IsImporting = true;
 
             try
             {
-                Import.DAL(_Manager, ImportControl.DAL, ImportControl.SelectedPolygons,
-                        ImportControl.IncludeMetadata, ImportControl.IncludeGroups, ImportControl.IncludeNmea);
+                Import.DAL(_Manager, ImportControl.DAL, selectedPolys, ImportControl.IncludeMetadata,
+                    ImportControl.IncludeGroups, ImportControl.IncludeNmea, convertForeignQuondams);
 
-                MessageBox.Show($"{ImportControl.SelectedPolygons.Count()} Polygons Imported",
+                MessageBox.Show($"{selectedPolys.Count()} Polygons Imported",
                     String.Empty, MessageBoxButton.OK, MessageBoxImage.None);
             }
             catch (Exception ex)

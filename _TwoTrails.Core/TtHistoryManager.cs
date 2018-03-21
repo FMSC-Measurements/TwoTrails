@@ -40,6 +40,10 @@ namespace TwoTrails.Core
 
         public int PointCount => Points.Count;
 
+        private MultiTtCommand _ComplexAction;
+
+
+
         public TtHistoryManager(TtManager manager)
         {
             BaseManager = manager;
@@ -68,6 +72,24 @@ namespace TwoTrails.Core
             _UndoStack.Push(command);
             _RedoStack.Clear();
             OnHistoryChanged(HistoryEventType.Redone, command.RequireRefresh);
+        }
+
+        public void StartMultiCommand()
+        {
+            if (_ComplexAction != null)
+                throw new Exception("Complex Action already started");
+
+            //_ComplexAction = new MultiTtCommand();
+        }
+
+        public void CommitMultiCommand()
+        {
+
+        }
+
+        public void RevertMultiCommand()
+        {
+
         }
 
         public void Undo()

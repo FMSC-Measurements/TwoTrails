@@ -27,9 +27,9 @@ namespace TwoTrails
                 {
                     if (File.GetCreationTime(GpsAccuracyReportFile) < DateTime.Now.Subtract(TimeSpan.FromDays(1)))
                     {
-                        if (!DownloadFile())
+                        if (!DownloadGpsAccuracyReportFile())
                         {
-                            if (LoadFromFile())
+                            if (LoadGpsAccuracyReportFromFile())
                                 return GpsReportStatus.HasOldReport;
                             else
                                 return GpsReportStatus.CantGetReport;
@@ -37,13 +37,13 @@ namespace TwoTrails
                     }
                     else
                     {
-                        if (!LoadFromFile() && !DownloadFile())
+                        if (!LoadGpsAccuracyReportFromFile() && !DownloadGpsAccuracyReportFile())
                             return GpsReportStatus.CantGetReport;
                     }
                 }
                 else
                 {
-                    if (!DownloadFile())
+                    if (!DownloadGpsAccuracyReportFile())
                         return GpsReportStatus.CantGetReport;
                 } 
             }
@@ -51,7 +51,7 @@ namespace TwoTrails
             return GpsReportStatus.HasReport;
         }
 
-        private static bool LoadFromFile()
+        private static bool LoadGpsAccuracyReportFromFile()
         {
             try
             {
@@ -65,20 +65,18 @@ namespace TwoTrails
             return true;
         }
 
-        private static bool DownloadFile()
+        private static bool DownloadGpsAccuracyReportFile()
         {
             try
             {
                 GpsAccuracyReport.DownloadGpsTests(GpsAccuracyReportFile);
-                LoadFromFile();
+                return LoadGpsAccuracyReportFromFile();
             }
             catch (Exception e)
             {
                 Trace.WriteLine(e.Message, "SessionData:HasReport");
                 return false;
             }
-
-            return true;
         }
     }
 

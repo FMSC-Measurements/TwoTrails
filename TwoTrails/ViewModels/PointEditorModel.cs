@@ -1825,32 +1825,12 @@ namespace TwoTrails.ViewModels
         {
             Func<QuondamPoint, GpsPoint> convertPoint = (q) =>
             {
-                GpsPoint gps = new GpsPoint(), tmp;
-
-                gps.SetUnAdjLocation(q.ParentPoint);
-                
-                if (q.ParentPoint.IsGpsType())
+                GpsPoint gps = new GpsPoint(q)
                 {
-                    tmp = q.ParentPoint as GpsPoint;
-                    gps.Latitude = tmp.Latitude;
-                    gps.Longitude = tmp.Longitude;
-                    gps.Elevation = tmp.Elevation;
-                }
+                    Comment = string.IsNullOrWhiteSpace(q.Comment) ? q.ParentPoint.Comment : q.Comment,
+                    TimeCreated = DateTime.Now
+                };
 
-                if (q.ParentPoint is IManualAccuracy && q.ManualAccuracy == null)
-                    gps.ManualAccuracy = (q.ParentPoint as IManualAccuracy).ManualAccuracy;
-                else
-                    gps.ManualAccuracy = q.ManualAccuracy;
-
-                gps.CN = q.CN;
-                gps.PID = q.PID;
-                gps.Index = q.Index;
-                gps.Polygon = q.Polygon;
-                gps.Metadata = q.Metadata;
-                gps.Group = q.Group;
-                gps.Comment = string.IsNullOrWhiteSpace(q.Comment) ? q.ParentPoint.Comment : q.Comment;
-                gps.OnBoundary = q.OnBoundary;
-                gps.TimeCreated = DateTime.Now;
                 gps.SetAccuracy(q.Polygon.Accuracy);
 
                 return gps;

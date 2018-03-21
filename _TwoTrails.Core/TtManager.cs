@@ -1419,7 +1419,7 @@ namespace TwoTrails.Core
                 if (_PointsMap.ContainsKey(point.CN))
                 {
                     if (point.HasQuondamLinks)
-                        throw new Exception("Point Has Linked Quondams");
+                        throw new Exception("Point Has Linked Quondam");
 
                     DetachPointEvents(point);
 
@@ -1456,7 +1456,8 @@ namespace TwoTrails.Core
         {
             lock (locker)
             {
-                if (points.Any(p => p.HasQuondamLinks))
+                List<string> pcns = points.Select(p => p.CN).ToList();
+                if (points.Any(p => p.HasQuondamLinks && p.LinkedPoints.Any(lpcn => !pcns.Contains(lpcn))))
                     throw new Exception("Points Have Linked Quondams");
 
                 List<TtPolygon> reindexPolys = new List<TtPolygon>();
