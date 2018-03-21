@@ -280,6 +280,14 @@ namespace TwoTrails.ViewModels
                                 if (MessageBox.Show(MainWindow, @"This is file needs to be upgraded to work with this version of TwoTrails. Upgrading will first create a backup of this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",
                                    MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
                                 {
+                                    string oldFilePath = $"{dal.FilePath}.old";
+                                    if (File.Exists(oldFilePath) &&
+                                        MessageBox.Show($"There is already a filed named '{Path.GetFileName(oldFilePath)}'. Would you like to overwrite this file?",
+                                        "File.Old Already Exists", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
+                                    {
+                                        return;
+                                    }
+
                                     if (Upgrade.DAL(dal))
                                     {
                                         AddProject(new TtProject(dal, mal, App.Settings, this));

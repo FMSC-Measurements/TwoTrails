@@ -1175,6 +1175,14 @@ namespace TwoTrails.Core
                     points.Add(point);
                 }
 
+                if (point.OpType == OpType.Quondam && point is QuondamPoint qp && qp.ParentPoint == null)
+                {
+                    if (_PointsMap.ContainsKey(qp.ParentPointCN))
+                        qp.ParentPoint = _PointsMap[qp.ParentPointCN];
+                    else
+                        throw new Exception("No Parent Point Found");
+                }
+
                 _PointsMap.Add(point.CN, point);
                 _Points.Add(point);
                 AttachPointEvents(point);
@@ -1214,11 +1222,6 @@ namespace TwoTrails.Core
                         lastPoint.Index == point.Index - 1 && point.Index == points.Count)
                     {
                         points.Add(point);
-
-                        if (point.IsTravType() && !polysToAdjustTravsIn.Contains(point.PolygonCN))
-                        {
-                            polysToAdjustTravsIn.Add(point.PolygonCN);
-                        }
                     }
                     else
                     { 
@@ -1239,13 +1242,22 @@ namespace TwoTrails.Core
                         }
 
                         AttachPointEvents(point);
+                    }
 
-                        AdjustAroundPoint(point, points);
+                    if (point.OpType == OpType.Quondam && point is QuondamPoint qp && qp.ParentPoint == null)
+                    {
+                        if (_PointsMap.ContainsKey(qp.ParentPointCN))
+                            qp.ParentPoint = _PointsMap[qp.ParentPointCN];
+                        else
+                            throw new Exception("No Parent Point Found");
                     }
 
                     _Points.Add(point);
                     _PointsMap.Add(point.CN, point);
                     lastPoint = point;
+
+                    if (point.IsTravType() && !polysToAdjustTravsIn.Contains(point.PolygonCN))
+                        polysToAdjustTravsIn.Add(point.PolygonCN);
 
                     if (!polysToAdjust.Contains(point.PolygonCN))
                         polysToAdjust.Add(point.PolygonCN);

@@ -16,7 +16,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private AddTtPointsCommand addPointsCmd;
 
 
-        public CreateQuondamsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex, bool? bndMode = null, bool autoCommit = true) : base(points)
+        public CreateQuondamsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex, bool? bndMode = null) : base(points)
         {
             this.pointsManager = pointsManager;
 
@@ -68,13 +68,10 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
 
-            addPointsCmd = new AddTtPointsCommand(addPoints, pointsManager, false);
+            addPointsCmd = new AddTtPointsCommand(addPoints, pointsManager);
 
             if (editedPoints.Count > 0)
-                editPointsCmd = new EditTtPointsMultiValueCommand<int>(editedPoints, PointProperties.INDEX, editedIndexes, false);
-
-            if (autoCommit)
-                Redo();
+                editPointsCmd = new EditTtPointsMultiValueCommand<int>(editedPoints, PointProperties.INDEX, editedIndexes);
         }
 
         public override void Redo()

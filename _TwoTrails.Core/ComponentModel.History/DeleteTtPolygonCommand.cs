@@ -6,14 +6,11 @@ namespace TwoTrails.Core.ComponentModel.History
         private TtManager pointsManager;
         private DeleteTtPointsCommand dpc;
 
-        public DeleteTtPolygonCommand(TtPolygon polygon, TtManager pointsManager, bool autoCommit = true) : base(polygon)
+        public DeleteTtPolygonCommand(TtPolygon polygon, TtManager pointsManager) : base(polygon)
         {
             this.pointsManager = pointsManager;
 
-            dpc = new DeleteTtPointsCommand(pointsManager.GetPoints(polygon.CN), pointsManager, false);
-
-            if (autoCommit)
-                Redo();
+            dpc = new DeleteTtPointsCommand(pointsManager.GetPoints(polygon.CN), pointsManager);
         }
 
         public override void Redo()

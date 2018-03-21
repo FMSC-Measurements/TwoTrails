@@ -39,8 +39,9 @@ namespace TwoTrails.Core
         public int PolygonCount => Polygons.Count;
 
         public int PointCount => Points.Count;
-
-        private MultiTtCommand _ComplexAction;
+        
+        private List<ITtCommand> _ComplexActionCommands;
+        public bool ComplexActionStarted => _ComplexActionCommands != null;
 
 
 
@@ -69,27 +70,44 @@ namespace TwoTrails.Core
         #region History Management
         protected void AddCommand(ITtCommand command)
         {
-            _UndoStack.Push(command);
-            _RedoStack.Clear();
-            OnHistoryChanged(HistoryEventType.Redone, command.RequireRefresh);
+            if (ComplexActionStarted)
+            {
+                _ComplexActionCommands.Add(command);
+            }
+            else
+            {
+                command.Redo();
+                _UndoStack.Push(command);
+                _RedoStack.Clear();
+                OnHistoryChanged(HistoryEventType.Redone, command.RequireRefresh);
+            }
         }
 
         public void StartMultiCommand()
         {
-            if (_ComplexAction != null)
+            if (_ComplexActionCommands != null)
                 throw new Exception("Complex Action already started");
-
-            //_ComplexAction = new MultiTtCommand();
+            _ComplexActionCommands = new List<ITtCommand>();
         }
 
         public void CommitMultiCommand()
         {
+            if (_ComplexActionCommands == null)
+                throw new Exception("Complex Action not started");
 
+            if (_ComplexActionCommands.Count > 0)
+            {
+                MultiTtCommand command = new MultiTtCommand(_ComplexActionCommands);
+                _ComplexActionCommands = null;
+                AddCommand(command);
+            }
+            else
+                _ComplexActionCommands = null;
         }
 
         public void RevertMultiCommand()
         {
-
+            _ComplexActionCommands = null;
         }
 
         public void Undo()

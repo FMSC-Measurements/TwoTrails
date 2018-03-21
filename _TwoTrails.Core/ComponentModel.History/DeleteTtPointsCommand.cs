@@ -12,7 +12,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private List<Tuple<TtPoint, QuondamPoint, TtPoint>> _ConvertedPoints = null;
 
 
-        public DeleteTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, bool autoCommit = true) : base(points)
+        public DeleteTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager) : base(points)
         {
             this.pointsManager = pointsManager;
 
@@ -35,9 +35,6 @@ namespace TwoTrails.Core.ComponentModel.History
                     }
                 } 
             }
-
-            if (autoCommit)
-                Redo();
         }
 
         public override void Redo()

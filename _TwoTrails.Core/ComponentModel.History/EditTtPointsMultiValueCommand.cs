@@ -12,7 +12,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private List<T> OldValues = new List<T>();
         private PropertyInfo Property;
 
-        public EditTtPointsMultiValueCommand(IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<T> newValues, bool autoCommit = true) : base(points)
+        public EditTtPointsMultiValueCommand(IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<T> newValues) : base(points)
         {
             RequireRefresh = property == PointProperties.INDEX;
 
@@ -23,9 +23,6 @@ namespace TwoTrails.Core.ComponentModel.History
             {
                 OldValues.Add((T)property.GetValue(point));
             }
-
-            if (autoCommit)
-                Redo();
         }
 
         public override void Redo()

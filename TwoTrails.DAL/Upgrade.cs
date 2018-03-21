@@ -21,7 +21,7 @@ namespace TwoTrails.DAL
 
             Version oldVersion = dal.GetDataVersion();
 
-            File.Copy(file, oldfile);
+            File.Copy(file, oldfile, true);
 
             SQLiteDatabase _Database = dal._Database;
 

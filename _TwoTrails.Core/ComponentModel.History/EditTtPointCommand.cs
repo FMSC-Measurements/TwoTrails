@@ -12,16 +12,13 @@ namespace TwoTrails.Core.ComponentModel.History
         private T OldValue;
         private PropertyInfo Property;
 
-        public EditTtPointCommand(TtPoint point, PropertyInfo property, T newValue, bool autoCommit = true) : base(point)
+        public EditTtPointCommand(TtPoint point, PropertyInfo property, T newValue) : base(point)
         {
             RequireRefresh = property == PointProperties.INDEX;
 
             this.Property = property;
             this.NewValue = newValue;
             this.OldValue = (T)property.GetValue(point);
-
-            if (autoCommit)
-                Redo();
         }
 
         public override void Redo()
