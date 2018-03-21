@@ -33,6 +33,9 @@ namespace TwoTrails.Core
         public const string KMZ_EXT = ".kmz";
         public const string GPX_EXT = ".gpx";
         public const string SHAPE_EXT = ".shp";
+        public const string SHAPE_PRJ_EXT = ".prj";
+        public const string SHAPE_SHX_EXT = ".shx";
+        public const string SHAPE_DBF_EXT = ".dbf";
 
 
         public const string URL_TWOTRAILS_UPDATE = "";//@"https://www.fs.fed.us/forestmanagement/products/measurement/geospatial/twotrails/";

@@ -53,7 +53,7 @@ namespace TwoTrails.Core.Media
             {
                 BitmapEncoder encoder;
 
-                switch (Path.GetExtension(filePath))
+                switch (Path.GetExtension(filePath).ToLower())
                 {
                     case ".jpg":
                     case ".jpeg":

@@ -367,13 +367,10 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                         }
                         else
                         {
-                            string fileType = TtUtils.GetFileTypeName(filePath);
-
-                            if (MessageBox.Show($"Would you like to create a project from this {fileType} file?", "Create Project from importable file.",
+                            if (MessageBox.Show($"Would you like to create a project from this {TtUtils.GetFileTypeName(filePath)} file?", "Create Project from importable file.",
                                 MessageBoxButton.YesNo, MessageBoxImage.Hand, MessageBoxResult.No) == MessageBoxResult.Yes)
                             {
-                                //todo create project from importable file
-
+                                
                             }
                         }
                     }

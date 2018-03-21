@@ -51,6 +51,8 @@ namespace TwoTrails.ViewModels
         public int GROUP_CN_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.GROUP_CN, value)); } }
         #endregion
 
+        public int Zone { get; }
+
         public ParseMode Mode {
             get { return Get<ParseMode>(); }
             set
@@ -165,6 +167,8 @@ namespace TwoTrails.ViewModels
 
         public CsvImportModel(string fileName, int zone, Action<TtCsvDataAccessLayer> onSetup, int startPolyNumber = 0)
         {
+            Zone = zone;
+
             OnSetup = onSetup;
 
             SetupImportCommand = new BindedRelayCommand<CsvImportModel>(x => SetupImport(), x => CanImport, this, x => x.CanImport);

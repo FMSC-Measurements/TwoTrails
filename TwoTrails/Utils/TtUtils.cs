@@ -165,7 +165,7 @@ namespace TwoTrails.Utils
 
         public static bool IsImportableFileType(String fileName)
         {
-            switch (Path.GetExtension(fileName))
+            switch (Path.GetExtension(fileName).ToLower())
             {
                 case Consts.CSV_EXT:
                 case Consts.TEXT_EXT:
@@ -173,6 +173,9 @@ namespace TwoTrails.Utils
                 case Consts.KMZ_EXT:
                 case Consts.GPX_EXT:
                 case Consts.SHAPE_EXT:
+                case Consts.SHAPE_PRJ_EXT:
+                case Consts.SHAPE_SHX_EXT:
+                case Consts.SHAPE_DBF_EXT:
                 case Consts.FILE_EXTENSION:
                 case Consts.FILE_EXTENSION_V2:
                     return true;
@@ -183,14 +186,17 @@ namespace TwoTrails.Utils
 
         public static string GetFileTypeName(string fileName)
         {
-            switch (Path.GetExtension(fileName))
+            switch (Path.GetExtension(fileName).ToLower())
             {
                 case Consts.CSV_EXT: return "CSV";
                 case Consts.TEXT_EXT: return "Text";
                 case Consts.KML_EXT:
                 case Consts.KMZ_EXT: return "Google Earth";
                 case Consts.GPX_EXT: return "GPX";
-                case Consts.SHAPE_EXT: return "Shape";
+                case Consts.SHAPE_EXT:
+                case Consts.SHAPE_PRJ_EXT:
+                case Consts.SHAPE_SHX_EXT:
+                case Consts.SHAPE_DBF_EXT: return "Shape";
                 case Consts.FILE_EXTENSION: return "TwoTrails";
                 case Consts.FILE_EXTENSION_V2: return "TwoTrails V2";
             }

@@ -113,7 +113,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
         public void SetupImport(string fileName)
         {
-            switch (Path.GetExtension(fileName))
+            switch (Path.GetExtension(fileName).ToLower())
             {
                 case Consts.FILE_EXTENSION:
                     IsSettingUp = true;
@@ -200,12 +200,33 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                         break;
                     }
                 case Consts.SHAPE_EXT:
-                    ImportControl = new ImportControl(
-                        new TtShapeFileDataAccessLayer(
-                            new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
-                        ), false, false, false
-                    );
-                    IsSettingUp = true;
+                case Consts.SHAPE_PRJ_EXT:
+                case Consts.SHAPE_SHX_EXT:
+                case Consts.SHAPE_DBF_EXT:
+                    switch (TtShapeFileDataAccessLayer.ValidateShapePackage(fileName, _Manager.DefaultMetadata.Zone))
+                    {
+                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.Valid:
+                            {
+                                ImportControl = new ImportControl(
+                                    new TtShapeFileDataAccessLayer(
+                                        new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
+                                    ), false, false, false
+                                );
+                                IsSettingUp = true;
+                                break;
+                            }
+                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.MissingFiles:
+                            MessageBox.Show("Missing one many of the 'shp', 'prj', 'dbf', or 'shx' files.");
+                            break;
+                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.NotNAD83:
+                            MessageBox.Show("Shape File is not in the NAD83 format.");
+                            break;
+                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.MismatchZone:
+                            MessageBox.Show($"Shape File is not in zone {_Manager.DefaultMetadata.Zone}.");
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 default:
                     MessageBox.Show("File type not supported.");
