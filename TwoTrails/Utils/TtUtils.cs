@@ -55,9 +55,7 @@ namespace TwoTrails.Utils
         {
             if (point.Metadata.Zone != targetZone)
             {
-                GpsPoint gps = point as GpsPoint;
-
-                if (gps != null && gps.HasLatLon)
+                if (point is GpsPoint gps && gps.HasLatLon)
                 {
                     return UTMTools.ConvertLatLonSignedDecToUTM((double)gps.Latitude, (double)gps.Longitude, targetZone);
                 }
@@ -84,8 +82,7 @@ namespace TwoTrails.Utils
 
         public static Point GetLatLon(TtPoint point, bool adjusted = true)
         {
-            GpsPoint gps = point as GpsPoint;
-            if (gps != null && gps.HasLatLon)
+            if (point is GpsPoint gps && gps.HasLatLon)
             {
                 return new Point((double)gps.Longitude, (double)gps.Latitude);
             }
