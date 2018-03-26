@@ -117,9 +117,7 @@
       <Name>FMSC.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Objects\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
   <Import Project="..\_FMSC.GeoSpatial\_FMSC.GeoSpatial.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

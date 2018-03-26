@@ -273,8 +273,7 @@ namespace TwoTrails.ViewModels
                             {
                                 Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
                             }
-
-                            //todo upgrade
+                            
                             if (dal.RequiresUpgrade)
                             {
                                 if (MessageBox.Show(MainWindow, @"This is file needs to be upgraded to work with this version of TwoTrails. Upgrading will first create a backup of this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",

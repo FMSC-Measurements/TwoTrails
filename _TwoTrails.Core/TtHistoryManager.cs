@@ -7,6 +7,7 @@ using System.Reflection;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 using TwoTrails.Core.Media;
+using System.Collections;
 
 namespace TwoTrails.Core
 {
@@ -329,14 +330,14 @@ namespace TwoTrails.Core
             AddCommand(new EditTtPointsMultiValueCommand<T>(points, property, newValues));
         }
 
-        public void EditPoints<T>(IEnumerable<TtPoint> points, List<PropertyInfo> properties, T newValue)
+        public void EditPoints<T>(IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, T newValue)
         {
             AddCommand(new EditTtPointsMultiPropertyCommand<T>(points, properties, points.Select(p => newValue)));
         }
 
-        public void EditPointsMultiValues(IEnumerable<TtPoint> points, List<PropertyInfo> properties, List<object> newValues)
+        public void EditPointsMultiValues(IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues)
         {
-            AddCommand(new EditTtPointsMultiPropertyCommand(points, properties, newValues));
+            AddCommand(new EditTtPointsMultiPropertyMultiValueCommand(points, properties, newValues));
         }
 
 

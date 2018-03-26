@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtGroupCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtMetadataCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPointCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPointsMultiPropertyMultiValueCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MovePointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MultiTtCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointCommand.cs" />

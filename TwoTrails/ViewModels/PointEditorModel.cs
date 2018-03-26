@@ -239,7 +239,7 @@ namespace TwoTrails.ViewModels
 
         #region Point Properties
         private bool _SamePID = true;
-        public bool SamePID { get { return _SamePID; } }
+        public bool SamePID => _SamePID;
 
         private int? _PID;
         public int? PID
@@ -250,7 +250,7 @@ namespace TwoTrails.ViewModels
 
 
         private bool _SamePolygon = true;
-        public bool SamePolygon { get { return _SamePolygon; } }
+        public bool SamePolygon => _SamePolygon;
 
         private TtPolygon _Polygon;
         public TtPolygon Polygon
@@ -264,7 +264,7 @@ namespace TwoTrails.ViewModels
 
 
         private bool _SameIndex = true;
-        public bool SameIndex { get { return _SameIndex; } }
+        public bool SameIndex => _SameIndex;
 
         private int? _Index;
         public int? Index
@@ -275,7 +275,7 @@ namespace TwoTrails.ViewModels
 
 
         private bool _SameComment = true;
-        public bool SameComment { get { return _SameComment; } }
+        public bool SameComment => _SameComment;
 
         private string _Comment;
         public string Comment
@@ -310,10 +310,7 @@ namespace TwoTrails.ViewModels
 
 
         private bool _SameMetadata = true;
-        public bool SameMetadata
-        {
-            get { return _SameMetadata; }
-        }
+        public bool SameMetadata => _SameMetadata;
 
         private TtMetadata _Metadata;
         public TtMetadata Metadata
@@ -324,7 +321,7 @@ namespace TwoTrails.ViewModels
 
 
         private bool _SameGroup = true;
-        public bool SameGroup { get { return _SameGroup; } }
+        public bool SameGroup => _SameGroup;
 
         private TtGroup _Group;
         public TtGroup Group
@@ -335,7 +332,7 @@ namespace TwoTrails.ViewModels
 
 
         private bool _SameOnBound = true;
-        public bool SameOnBound { get { return _SameOnBound; } }
+        public bool SameOnBound => _SameOnBound;
 
         private bool? _OnBoundary;
         public bool? OnBoundary
@@ -346,7 +343,7 @@ namespace TwoTrails.ViewModels
 
 
         private bool _SameUnAdjX = true;
-        public bool SameUnAdjX { get { return _SameUnAdjX; } }
+        public bool SameUnAdjX => _SameUnAdjX;
 
         private double? _UnAdjX;
         public double? UnAdjX
@@ -357,19 +354,26 @@ namespace TwoTrails.ViewModels
                 if (!_UnAdjX.Equals(value))
                 {
                     _UnAdjX = value;
-                    
-                    Manager.EditPoint(SelectedPoint,
-                        new PropertyInfo[] { PointProperties.UNADJX, PointProperties.LON },
-                        new object[] { value, null });
+
+                    if (MultipleSelections)
+                    {
+                        Manager.EditPointsMultiValues(SelectedPoints.Cast<GpsPoint>(),
+                            new PropertyInfo[] { PointProperties.UNADJX, PointProperties.LON },
+                            new object[] { value, null });
+                    }
+                    else
+                    {
+                        Manager.EditPoint(SelectedPoint,
+                            new PropertyInfo[] { PointProperties.UNADJX, PointProperties.LON },
+                            new object[] { value, null });
+                    }
                 }
-                
-                //EditValue(ref _UnAdjZ, value, PointProperties.UNADJX);
             }
         }
 
 
         private bool _SameUnAdjY = true;
-        public bool SameUnAdjY { get { return _SameUnAdjY; } }
+        public bool SameUnAdjY => _SameUnAdjY;
 
         private double? _UnAdjY;
         public double? UnAdjY
@@ -381,18 +385,25 @@ namespace TwoTrails.ViewModels
                 {
                     _UnAdjY = value;
 
-                    Manager.EditPoint(SelectedPoint,
-                        new PropertyInfo[] { PointProperties.UNADJY, PointProperties.LAT },
-                        new object[] { value, null });
+                    if (MultipleSelections)
+                    {
+                        Manager.EditPointsMultiValues(SelectedPoints.Cast<GpsPoint>(),
+                            new PropertyInfo[] { PointProperties.UNADJY, PointProperties.LAT },
+                            new object[] { value, null });
+                    }
+                    else
+                    {
+                        Manager.EditPoint(SelectedPoint,
+                            new PropertyInfo[] { PointProperties.UNADJY, PointProperties.LAT },
+                            new object[] { value, null });
+                    }
                 }
-
-                //EditValue(ref _UnAdjY, value, PointProperties.UNADJY);
             }
         }
 
 
         private bool _SameUnAdjZ = true;
-        public bool SameUnAdjZ { get { return _SameUnAdjZ; } }
+        public bool SameUnAdjZ => _SameUnAdjZ;
 
         private double? _UnAdjZ;
         public double? UnAdjZ
@@ -404,18 +415,25 @@ namespace TwoTrails.ViewModels
                 {
                     _UnAdjZ = value;
 
-                    Manager.EditPoint(SelectedPoint,
-                        new PropertyInfo[] { PointProperties.UNADJZ, PointProperties.ELEVATION },
-                        new object[] { value, null });
+                    if (MultipleSelections)
+                    {
+                        Manager.EditPointsMultiValues(SelectedPoints.Cast<GpsPoint>(),
+                            new PropertyInfo[] { PointProperties.UNADJZ, PointProperties.ELEVATION },
+                            new object[] { value, null });
+                    }
+                    else
+                    {
+                        Manager.EditPoint(SelectedPoint,
+                            new PropertyInfo[] { PointProperties.UNADJZ, PointProperties.ELEVATION },
+                            new object[] { value, null });
+                    }
                 }
-
-                //EditValue(ref _UnAdjZ, value, PointProperties.UNADJZ);
             }
         }
 
 
         private bool _SameManAcc = true;
-        public bool SameManAcc { get { return _SameManAcc; } }
+        public bool SameManAcc => _SameManAcc;
 
         private double? _ManAcc;
         public double? ManAcc
@@ -453,7 +471,7 @@ namespace TwoTrails.ViewModels
 
 
         private bool _SameFwdAz = true;
-        public bool SameFwdAz { get { return _SameFwdAz; } }
+        public bool SameFwdAz => _SameFwdAz;
 
         private double? _FwdAz;
         public double? FwdAz
@@ -464,7 +482,7 @@ namespace TwoTrails.ViewModels
 
         
         private bool _SameBkAz = true;
-        public bool SameBkAz { get { return _SameBkAz; } }
+        public bool SameBkAz => _SameBkAz;
 
         private double? _BkAz;
         public double? BkAz
@@ -475,7 +493,7 @@ namespace TwoTrails.ViewModels
 
 
         private bool _SameSlpAng = true;
-        public bool SameSlpAng { get { return _SameSlpAng; } }
+        public bool SameSlpAng => _SameSlpAng;
 
         private double? _SlpAng;
         public double? SlpAng
@@ -486,7 +504,7 @@ namespace TwoTrails.ViewModels
         
 
         private bool _SameSlpDist = true;
-        public bool SameSlpDist { get { return _SameSlpDist; } }
+        public bool SameSlpDist => _SameSlpDist;
 
         private double? _SlpDist;
         public double? SlpDist
@@ -497,13 +515,11 @@ namespace TwoTrails.ViewModels
         
 
         private bool _SameParentPoint = true;
-        public bool SameParentPoint { get { return _SameParentPoint; } }
+        public bool SameParentPoint => _SameParentPoint;
 
         private TtPoint _ParentPoint;
-        public TtPoint ParentPoint
-        {
-            get { return _ParentPoint; }
-        }
+        public TtPoint ParentPoint => _ParentPoint;
+
 
         private void EditValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
         {
