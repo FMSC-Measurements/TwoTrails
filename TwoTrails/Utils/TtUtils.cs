@@ -23,8 +23,16 @@ namespace TwoTrails.Utils
             {
                 string res = new WebClient().DownloadString(Consts.URL_TWOTRAILS_UPDATE);
 
-                if (res != null && new Version(res.Trim(new char[] { ' ', '\n', '\r' })) > Assembly.GetExecutingAssembly().GetName().Version)
-                    return true;
+                if (res != null)
+                {
+                    string[] tokens = res.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (tokens.Length > 0)
+                    {
+                        if (new Version(tokens[0].Trim()) > Assembly.GetExecutingAssembly().GetName().Version)
+                            return true;
+                    }
+                }
             }
             catch
             {

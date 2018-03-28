@@ -38,7 +38,7 @@ namespace TwoTrails.Core
         public const string SHAPE_DBF_EXT = ".dbf";
 
 
-        public const string URL_TWOTRAILS_UPDATE = "";//@"https://www.fs.fed.us/forestmanagement/products/measurement/geospatial/twotrails/";
+        public const string URL_TWOTRAILS_UPDATE = @"https://www.fs.fed.us/fmsc/ftp/measure/geospatial/TwoTrails/twotrails.version";
         public const string URL_TWOTRAILS = @"https://www.fs.fed.us/forestmanagement/products/measurement/geospatial/twotrails/";
         public const string URL_FMSC = @"https://www.fs.fed.us/forestmanagement/products/measurement/";
     }
