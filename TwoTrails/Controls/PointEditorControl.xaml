@@ -288,7 +288,8 @@
 				IsReadOnly="True"
 				VisibleItemsList="{Binding VisiblePoints, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
 				SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-				BindableColumns="{Binding DataColumns}">
+				BindableColumns="{Binding DataColumns}"
+                PreviewMouseRightButtonUp="dgPoints_PreviewMouseRightButtonUp">
                 
                 <DataGrid.Resources>
 					<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SeaGreen"/>

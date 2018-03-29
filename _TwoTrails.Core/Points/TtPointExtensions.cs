@@ -47,6 +47,11 @@ namespace TwoTrails.Core.Points
             return point.OpType == OpType.SideShot && !point.OnBoundary;
         }
 
+        public static bool IsManualAccType(this TtPoint point)
+        {
+            return IsGpsType(point) || point.OpType == OpType.Quondam;
+        }
+
         public static bool HasSameUnAdjLocation(this TtPoint point, TtPoint otherPoint)
         {
             return point.UnAdjX == otherPoint.UnAdjX &&

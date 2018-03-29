@@ -137,6 +137,8 @@ namespace TwoTrails.ViewModels
             set { SetField(ref _SelectedPoints, value);  OnSelectionChanged(); }
         }
 
+        public int SelectedColumnIndex { get; set; }
+
         private bool _SelectionChanged = true;
         private List<TtPoint> _SortedSelectedPoints;
         public List<TtPoint> GetSortedSelectedPoints()
@@ -1732,59 +1734,127 @@ namespace TwoTrails.ViewModels
         {
             if (dataGrid != null)
             {
-                //TODO get correct click index
-                int columnIndex = dataGrid.CurrentCell.Column.DisplayIndex;
+                int columnIndex = SelectedColumnIndex;
+                
                 if (dataGrid.Columns[columnIndex] is DataGridTextColumn dgtc && dgtc.Binding is Binding binding && binding.Path != null)
                 {
                     if (columnIndex < 26)
                     {
+                        TtPoint point = dataGrid.SelectedCells[columnIndex].Item as TtPoint;
+
                         Type type = dataGrid.SelectedCells[columnIndex].Item?.GetType();
-                        PropertyInfo pi = typeof(TtPoint).GetProperty(binding.Path.Path);
+                        PropertyInfo pi = null;
+                        
+                        bool isGps = false, isTrav = false, isManAcc = false, isNonResetable = false;
 
-                        List<TtPoint> points;
-
-                        if (pi == null)
+                        switch (binding.Path.Path)
                         {
-                            Type subType;
+                            case nameof(TtPoint.PID):
+                            case nameof(TtPoint.Polygon):
+                            case nameof(TtPoint.Group):
+                            case nameof(TtPoint.Metadata):
+                            case nameof(TtPoint.Comment):
+                            case nameof(TtPoint.OnBoundary):
+                            case nameof(TtPoint.UnAdjX):
+                            case nameof(TtPoint.UnAdjY):
+                            case nameof(TtPoint.UnAdjZ):
+                                pi = typeof(TtPoint).GetProperty(binding.Path.Path);
+                                break;
+                            case nameof(GpsPoint.Latitude):
+                            case nameof(GpsPoint.Longitude):
+                            case nameof(GpsPoint.Elevation):
+                                pi = typeof(GpsPoint).GetProperty(binding.Path.Path);
+                                isGps = true;
+                                break;
+                            case nameof(TravPoint.FwdAzimuth):
+                            case nameof(TravPoint.BkAzimuth):
+                            case nameof(TravPoint.SlopeDistance):
+                            case nameof(TravPoint.SlopeAngle):
+                                pi = typeof(TravPoint).GetProperty(binding.Path.Path);
+                                isTrav = true;
+                                break;
+                            case nameof(IManualAccuracy.ManualAccuracy):
+                                pi = typeof(IManualAccuracy).GetProperty(binding.Path.Path);
+                                isManAcc = true;
+                                break;
+                            case nameof(TtPoint.Index):
+                            case nameof(TtPoint.OpType):
+                            case nameof(TtPoint.TimeCreated):
+                            case nameof(TtPoint.AdjX):
+                            case nameof(TtPoint.AdjY):
+                            case nameof(TtPoint.AdjZ):
+                            case nameof(TtPoint.Accuracy):
+                            case nameof(TtPoint.HasQuondamLinks):
+                            case nameof(TtPoint.LinkedPoints):
+                            case nameof(TtPoint.ExtendedData):
+                            case nameof(QuondamPoint.ParentPoint):
+                                isNonResetable = true;
+                                break;
+                            default:
+                                break;
+                        }
+                        
+                        IEnumerable<TtPoint> points = null;
 
-                            if ((subType = typeof(GpsPoint)).IsAssignableFrom(type) && (pi = subType.GetProperty(binding.Path.Path)) != null)
+                        if (isNonResetable)
+                        {
+                            MessageBox.Show($"{pi.Name} is not a resetable field.");
+                            return;
+                        }
+                        else if (pi == null)
+                        {
+                            MessageBox.Show("Invalid field selected.");
+                            return;
+                        }
+                        else if (isGps)
+                        {
+                            points = GetSortedSelectedPoints().Where(p => p.IsGpsType());
+                        }
+                        else if (isTrav)
+                        {
+                            points = GetSortedSelectedPoints().Where(p => p.IsTravType());
+                        }
+                        else if (isManAcc)
+                        {
+                            points = GetSortedSelectedPoints().Where(p => p.IsManualAccType());
+                        }
+                        else
+                        {
+                            points = GetSortedSelectedPoints();
+                        }
+
+                        if (MessageBox.Show($"{(MultipleSelections ? $"{ SelectedPoints.Count } Points" : $"Point { SelectedPoint.PID }")} will have field { pi.Name } reset.",
+                            "Reset Field", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
+                        {
+                            if (MultipleSelections)
                             {
-                                points = GetSortedSelectedPoints().Where(p => p.IsGpsType()).ToList();
-                            }
-                            else if ((subType = typeof(TravPoint)).IsAssignableFrom(type) && (pi = subType.GetProperty(binding.Path.Path)) != null)
-                            {
-                                points = GetSortedSelectedPoints().Where(p => p.IsTravType()).ToList();
-                            }
-                            else if ((subType = typeof(QuondamPoint)).IsAssignableFrom(type) && (pi = subType.GetProperty(binding.Path.Path)) != null)
-                            {
-                                points = GetSortedSelectedPoints().Where(p => p.OpType == OpType.Quondam).ToList();
+                                points = points.Where(p => Manager.BaseManager.HasOriginalPoint(p.CN));
+
+                                if (points.Any())
+                                    Manager.EditPointsMultiValues(points, pi, points.Select(p => Manager.BaseManager.GetOriginalPoint(p.CN)));
                             }
                             else
                             {
-                                MessageBox.Show($"No points with (or points that do not contain) { binding.Path.Path } are selected.", "Invalid Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-                                return;
+                                if (Manager.BaseManager.HasOriginalPoint(point.CN))
+                                    Manager.EditPoint(point, pi, pi.GetValue(Manager.BaseManager.GetOriginalPoint(point.CN)));
+                                else
+                                    MessageBox.Show("Point is not resetable due to being recently created.");
                             }
-                        }
-                        else
-                            points = GetSortedSelectedPoints();
-
-                        if (MessageBox.Show($"{( MultipleSelections ? $"{ SelectedPoints.Count } Points" : $"Point { SelectedPoint.PID }" )} will have field { pi.Name } reset.", 
-                            "Reset Field", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
-                        {
-
                         }
                     }
                     else
                     {
-                        DataDictionaryTemplate template = Manager.GetDataDictionaryTemplate();
+                        throw new NotImplementedException("Datadictionary must first be implemented");
+                        ////TODO once datadictionay is implemented
+                        //DataDictionaryTemplate template = Manager.GetDataDictionaryTemplate();
 
-                            DataDictionaryField field = template[binding.Path.Path.Substring(14, 36)];
+                        //DataDictionaryField field = template[binding.Path.Path.Substring(14, 36)];
 
-                        if (MessageBox.Show($"{(MultipleSelections ? $"{ SelectedPoints.Count } Points" : $"Point { SelectedPoint.PID }")} will have field { field.Name } reset.",
-                            "Reset Field", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
-                        {
+                        //if (MessageBox.Show($"{(MultipleSelections ? $"{ SelectedPoints.Count } Points" : $"Point { SelectedPoint.PID }")} will have field { field.Name } reset.",
+                        //    "Reset Field", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
+                        //{
 
-                        }
+                        //}
                     }
                 }
             }
