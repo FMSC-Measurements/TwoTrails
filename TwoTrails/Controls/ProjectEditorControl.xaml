@@ -418,7 +418,7 @@
                                     </Grid>
                                 </GroupBox>
 
-                                <GroupBox Header="Perimeter Line" Grid.Column="2" Grid.Row="8" Grid.RowSpan="4" VerticalAlignment="Stretch">
+                                <GroupBox Header="Poly Line Perimeter" Grid.Column="2" Grid.Row="8" Grid.RowSpan="4" VerticalAlignment="Stretch">
                                     <Grid Margin="5,0,5,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="40"/>
@@ -440,7 +440,7 @@
                                     </Grid>
                                 </GroupBox>
 
-                                <GroupBox Header="Polygon Area Error Summary" Grid.Column="0" Grid.Row="13" Grid.ColumnSpan="3" VerticalAlignment="Center">
+                                <GroupBox Header="Polygon Area-Error Summary" Grid.Column="0" Grid.Row="13" Grid.ColumnSpan="3" VerticalAlignment="Center">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -452,7 +452,7 @@
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
 
-                                        <GroupBox Header="GPS Contribution" Grid.Column="0" Grid.Row="0">
+                                        <GroupBox Header="GPS Contribution*" Grid.Column="0" Grid.Row="0">
                                             <Grid Margin="5,0,5,0">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -474,7 +474,7 @@
                                                 <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ac:"/>
                                                 <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
                                                 
-                                                <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Error"/>
+                                                <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Err Ratio**"/>
                                                 <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GpsAreaError, StringFormat={}{0:F3}%}"/>
                                             </Grid>
                                         </GroupBox>
