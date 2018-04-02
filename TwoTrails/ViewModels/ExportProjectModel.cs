@@ -129,7 +129,7 @@ namespace TwoTrails.ViewModels
                                 Export.Project(project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));
 
                             if (ExportSummary)
-                                Export.Summary(project.Manager, Path.Combine(path, "Summary.txt"));
+                                Export.Summary(project, Path.Combine(path, "Summary.txt"));
 
                             if (ExportGPX)
                                 Export.GPX(project, Path.Combine(path, $"{project.ProjectName.Trim()}.gpx"));

@@ -28,6 +28,8 @@ namespace TwoTrails.Core
         public double GpsAreaError { get; private set; } = 0;
         public double TraverseAreaError { get; private set; } = 0;
 
+        public double WorstTravSegmentError { get; private set; } = double.PositiveInfinity;
+
         private double travLength = 0;
         private int travSegments = 0;
 
@@ -211,7 +213,7 @@ namespace TwoTrails.Core
                     {
                         if (showPoints && !fromQndm)
                         {
-                            sbPoints.Append($"Point {point.PID}: {(point.OnBoundary ? " " : "*")} SideShot off Point {_LastGpsPoint.PID}.{Environment.NewLine}");
+                            sbPoints.Append($"Point {point.PID}: {(point.OnBoundary ? " " : "*")} SideShot off Point {_LastGpsPoint?.PID}.{Environment.NewLine}");
                         }
 
                         if (_LastTtBndPt != null && point.OnBoundary || fromQndm)
@@ -281,9 +283,13 @@ namespace TwoTrails.Core
             
             TotalTraverseError += (travLength * closeError / 2);
 
+            if (travError < WorstTravSegmentError)
+                WorstTravSegmentError = travError;
+
             traversing = false;
         }
     }
+
     public class TtLeg
     {
         public TtPoint Point1 { get; }

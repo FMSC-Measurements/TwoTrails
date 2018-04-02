@@ -163,7 +163,7 @@
 
                     <Separator/>
 
-                    <MenuItem Header="Create Plots" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
+                    <MenuItem Header="Create Grid Sample Points" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
                           Style="{StaticResource styleMiDisableNullCommand}" InputGestureText="Ctrl+Alt+P"/>
                     <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
                           Style="{StaticResource styleMiPointEdit}" InputGestureText="Ctrl+Alt+C"/>

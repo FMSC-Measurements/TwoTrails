@@ -22,22 +22,24 @@ namespace TwoTrails.Dialogs
     /// <summary>
     /// Interaction logic for MtdcDataDialog.xaml
     /// </summary>
-    public partial class MtdcDataDialog : Window
+    public partial class AccuracyDataDialog : Window
     {
-        private MtdcDataModel _Model;
+        private AccuracyDataModel _Model;
 
         public double Accuracy {  get { return _Model.Accuracy; } }
+        public String MakeID { get { return _Model.MakeID; } }
+        public String ModelID { get { return _Model.ModelID; } }
 
-        public MtdcDataDialog(GpsAccuracyReport report, bool hasWASS, bool canSelectValue, int make = 0, int model = 0)
+        public AccuracyDataDialog(GpsAccuracyReport report, double? accuracy, string make = null, string model = null)
         {
-            _Model = new MtdcDataModel(report, hasWASS, canSelectValue, make, model, this);
+            _Model = new AccuracyDataModel(report,accuracy, make, model, this);
             DataContext = _Model;
             InitializeComponent();
         }
 
-        public static bool? ShowDialog(GpsAccuracyReport report, bool hasWASS, int make = 0, int model = 0, Window owner = null)
+        public static bool? ShowDialog(GpsAccuracyReport report, double? accuracy = null, string make = null, string model = null, Window owner = null)
         {
-            MtdcDataDialog diag = new MtdcDataDialog(report, hasWASS, false, make, model);
+            AccuracyDataDialog diag = new AccuracyDataDialog(report, accuracy, make, model);
             if (owner != null)
                 diag.Owner = owner;
             return diag.ShowDialog();
@@ -50,9 +52,7 @@ namespace TwoTrails.Dialogs
                 DataGridCellInfo cell = e.AddedCells[0];
                 if (cell.Column.DisplayIndex > 4 && cell.Column.DisplayIndex < 8)
                 {
-                    Test test = cell.Item as Test;
-
-                    if (test != null)
+                    if (cell.Item is Test test)
                     {
                         if (cell.Column.DisplayIndex == 5 && test.OpenAcc != null)
                             _Model.Accuracy = (double)test.OpenAcc;
@@ -60,8 +60,6 @@ namespace TwoTrails.Dialogs
                             _Model.Accuracy = (double)test.MedAcc;
                         else if (cell.Column.DisplayIndex == 7 && test.HeavyAcc != null)
                             _Model.Accuracy = (double)test.HeavyAcc;
-                        else
-                            _Model.Accuracy = 0;
                     }
                 }
             }

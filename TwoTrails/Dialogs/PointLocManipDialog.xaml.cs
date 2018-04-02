@@ -96,8 +96,7 @@ namespace TwoTrails.Dialogs
 
         private void cboPoly_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            TtPolygon polygon = (cboPoly.SelectedItem as TtPolygon);
-            if (polygon != null)
+            if (cboPoly.SelectedItem is TtPolygon polygon)
             {
                 cboPolyPoints.ItemsSource = _Manager.GetPoints(polygon.CN);
                 cboPoly.ToolTip = polygon.Name; 

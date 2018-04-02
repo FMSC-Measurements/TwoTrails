@@ -35,8 +35,7 @@ namespace TwoTrails
                         return $"{Project.DataEditor.SelectedPoints.Count}/{Project.DataEditor.Points.Count}";
                     case 2:
                         {
-                            TtPolygon poly = _ProjectEditorControl.lbPolys.SelectedItem as TtPolygon;
-                            if (poly != null)
+                            if (_ProjectEditorControl.lbPolys.SelectedItem is TtPolygon poly)
                             {
                                 return $"{Project.Manager.Points.Where(p => p.PolygonCN == poly.CN).Count()} Points in {poly.Name}";
                             }
@@ -45,8 +44,7 @@ namespace TwoTrails
                         }
                     case 3:
                         {
-                            TtMetadata meta = _ProjectEditorControl.lbMetadata.SelectedItem as TtMetadata;
-                            if (meta != null)
+                            if (_ProjectEditorControl.lbMetadata.SelectedItem is TtMetadata meta)
                             {
                                 return $"{Project.Manager.Points.Where(p => p.MetadataCN == meta.CN).Count()} Points use {meta.Name}";
                             }
@@ -55,8 +53,7 @@ namespace TwoTrails
                         }
                     case 4:
                         {
-                            TtGroup group = _ProjectEditorControl.lbGroups.SelectedItem as TtGroup;
-                            if (group != null)
+                            if (_ProjectEditorControl.lbGroups.SelectedItem is TtGroup group)
                             {
                                 return $"{Project.Manager.Points.Where(p => p.GroupCN == group.CN).Count()} Points in {group.Name}";
                             }

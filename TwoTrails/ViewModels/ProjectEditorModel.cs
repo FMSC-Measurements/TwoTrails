@@ -54,8 +54,8 @@ namespace TwoTrails.ViewModels
                 this,
                 x => new { x.PolygonAccuracy, CurrentPolygon.Accuracy });
 
-            PolygonMtdcLookupCommand = new BindedRelayCommand<ProjectEditorModel>(
-                x => MtdcLookup(),
+            PolygonAccuracyLookupCommand = new BindedRelayCommand<ProjectEditorModel>(
+                x => AccuracyLookup(),
                 x => CurrentPolygon != null,
                 this,
                 x => x.CurrentPolygon);
@@ -160,7 +160,7 @@ namespace TwoTrails.ViewModels
         public ICommand NewPolygonCommand { get; }
         public ICommand DeletePolygonCommand { get; }
         public ICommand PolygonUpdateAccCommand { get; }
-        public ICommand PolygonMtdcLookupCommand { get; }
+        public ICommand PolygonAccuracyLookupCommand { get; }
         public ICommand PolygonAccuracyChangedCommand { get; }
         public ICommand SavePolygonSummary { get; }
 
@@ -225,25 +225,20 @@ namespace TwoTrails.ViewModels
             OnPropertyChanged(nameof(PolygonAccuracy));
         }
 
-        private void MtdcLookup()
+        private void AccuracyLookup()
         {
-            GpsReportStatus status = SessionData.HasGpsAccReport();
-            if (status != GpsReportStatus.CantGetReport)
-            {
-                MtdcDataDialog dialog = new MtdcDataDialog(SessionData.GpsAccuracyReport, true, true,
-                    SessionData.MakeID, SessionData.ModelID);
-                dialog.Owner = _Project.MainModel.MainWindow;
+            SessionData.HasGpsAccReport();
+           
+            AccuracyDataDialog dialog = new AccuracyDataDialog(SessionData.GpsAccuracyReport, _CurrentPolygon.Accuracy, SessionData.MakeID, SessionData.ModelID);
+            dialog.Owner = _Project.MainModel.MainWindow;
 
-                if (dialog.ShowDialog() == true)
-                {
-                    CurrentPolygon.Accuracy = dialog.Accuracy;
-                    PolygonAccuracy = dialog.Accuracy;
-                    OnPropertyChanged(nameof(PolygonAccuracy));
-                }
-            }
-            else
+            if (dialog.ShowDialog() == true)
             {
-                MessageBox.Show("Unable to retrieve MTDC data.", "", MessageBoxButton.OK, MessageBoxImage.Error);
+                CurrentPolygon.Accuracy = dialog.Accuracy;
+                PolygonAccuracy = dialog.Accuracy;
+                SessionData.MakeID = dialog.MakeID;
+                SessionData.ModelID = dialog.ModelID;
+                OnPropertyChanged(nameof(PolygonAccuracy));
             }
         }
 

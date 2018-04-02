@@ -23,7 +23,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <CheckBox IsChecked="{Binding Settings.IsAdvancedMode}" Content="Advanced Mode"/>
+            <CheckBox IsChecked="{Binding Settings.IsAdvancedMode}" Content="Advanced User Mode"/>
         </Grid>
 
         <Grid Grid.Row="1">

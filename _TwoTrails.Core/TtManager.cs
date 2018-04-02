@@ -815,11 +815,10 @@ namespace TwoTrails.Core
                     if (point.IsGpsAtBase())
                     {
                         if (ssSeg.Count > 0)
-                        {
                             segments.Add(ssSeg);
-                            ssSeg = new SideShotSegment();
-                            ssSeg.Add(point);
-                        }
+
+                        ssSeg = new SideShotSegment();
+                        ssSeg.Add(point);
                     }
                     else if (point.OpType == OpType.SideShot)
                     {
@@ -1255,9 +1254,12 @@ namespace TwoTrails.Core
                     _Points.Add(point);
                     _PointsMap.Add(point.CN, point);
                     lastPoint = point;
-
-                    if (point.IsTravType() && !polysToAdjustTravsIn.Contains(point.PolygonCN))
+                    
+                    if (!polysToAdjustTravsIn.Contains(point.PolygonCN) && (point.IsTravType() ||
+                        (point.IsGpsAtBase() && points.Count > point.Index + 1 && points[point.Index + 1].IsTravType())))
+                    {
                         polysToAdjustTravsIn.Add(point.PolygonCN);
+                    }
 
                     if (!polysToAdjust.Contains(point.PolygonCN))
                         polysToAdjust.Add(point.PolygonCN);

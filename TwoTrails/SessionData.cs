@@ -15,8 +15,8 @@ namespace TwoTrails
         
         public static GpsAccuracyReport GpsAccuracyReport { get; private set; }
 
-        public static int MakeID { get; set; } = 0;
-        public static int ModelID { get; set; } = 0;
+        public static String MakeID { get; set; }
+        public static String ModelID { get; set; }
         
 
         public static GpsReportStatus HasGpsAccReport()

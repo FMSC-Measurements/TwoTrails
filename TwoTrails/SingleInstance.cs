@@ -426,8 +426,7 @@ namespace Microsoft.Shell
         private static object ActivateFirstInstanceCallback(object arg)
         {
             // Get command line args to be passed to first instance
-            IList<string> args = arg as IList<string>;
-            ActivateFirstInstance(args);
+            ActivateFirstInstance(arg as IList<string>);
             return null;
         }
 

@@ -29,7 +29,7 @@ namespace TwoTrails.Utils
                 Directory.CreateDirectory(folderPath);
 
             Project(project.ProjectInfo, Path.Combine(folderPath, "ProjectInfo.txt"));
-            Summary(project.Manager, Path.Combine(folderPath, "Summary.txt"));
+            Summary(project, Path.Combine(folderPath, "Summary.txt"));
             Points(project.Manager, Path.Combine(folderPath, "Points.csv"));
             DataDictionary(project.Manager, Path.Combine(folderPath, "DataDictionary.csv"));
             Polygons(project.Manager, Path.Combine(folderPath, "Polygons.csv"));
@@ -363,15 +363,33 @@ namespace TwoTrails.Utils
             }
         }
 
-        public static void Summary(ITtManager manager, String fileName)
+        public static void Summary(TtProject project, String fileName)
         {
             using (StreamWriter sw = new StreamWriter(fileName))
             {
-                foreach (TtPolygon poly in manager.GetPolygons())
+                sw.WriteLine($"Project File: { Path.GetFileName(project.DAL.FilePath) }");
+                sw.WriteLine($"Project Name: { project.ProjectName }");
+                sw.WriteLine($"Region: { project.ProjectInfo.Region }");
+                sw.WriteLine($"Forest: { project.ProjectInfo.Forest }");
+                sw.WriteLine($"District: { project.ProjectInfo.District }");
+                sw.WriteLine($"Description: { project.ProjectInfo.Description }");
+                sw.WriteLine($"Created On: { project.ProjectInfo.CreationDate }");
+                sw.WriteLine($"Version: { project.ProjectInfo.Version }");
+                sw.WriteLine($"Data Version: { project.ProjectInfo.Version }");
+                sw.WriteLine($"Creation Version: { project.ProjectInfo.CreationVersion }");
+                sw.WriteLine("\n");
+                sw.WriteLine("**** GPS Error can be divided by 2 if an appropriate ANGLE POINT METHOD is used instead of the WALK METHOD ****");
+                sw.WriteLine("**** Appropriate means that the boundary legs are reasnoably long between verticies where the boundary direction changes by 90 degree angles where possible and changes at least more than 30 degrees most of the time. ****");
+                sw.WriteLine("**** If the unit is totally a direction distance-traverse. Use only the traverse contribution area-error. ****");
+                sw.WriteLine("**** Points with asterisks are OFF boundary points. ****");
+                sw.WriteLine("\n");
+                
+                foreach (TtPolygon poly in project.Manager.GetPolygons())
                 {
-                    sw.WriteLine($"{poly.Name}{Environment.NewLine}{string.Join("", Enumerable.Range(0, poly.Name.Length).Select(x => "-"))}");
-                    sw.WriteLine(HaidLogic.GenerateSummary(manager, poly).SummaryText);
+                    sw.WriteLine($"{poly.Name}{Environment.NewLine}{new String('-', poly.Name.Length)}");
+                    sw.WriteLine(HaidLogic.GenerateSummary(project.Manager, poly).SummaryText);
                 }
+
             }
         }
 

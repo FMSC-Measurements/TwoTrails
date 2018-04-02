@@ -1991,6 +1991,7 @@ namespace TwoTrails.ViewModels
             Manager.CreateCorridor(GetSortedSelectedPoints().Where(p => p.OnBoundary), Polygon);
         }
 
+
         private void ModifyDataDictionary()
         {
             Project.MainModel.MainWindow.IsEnabled = false;
