@@ -23,6 +23,7 @@ namespace TwoTrails.ViewModels
 
         public ICommand OkCommand { get; }
         public ICommand CancelCommand { get; }
+        public ICommand FtToMtCommand { get; }
 
         public int StartupSelectedTabIndex { get; }
         public bool HasGpsAccuracyReport { get; }
@@ -33,6 +34,8 @@ namespace TwoTrails.ViewModels
             {
                 StartupSelectedTabIndex = 1;
                 HasGpsAccuracyReport = false;
+
+                MessageBox.Show("Unable to get MTDC Accuracy Reports.");
             }
             else
             {
@@ -51,6 +54,12 @@ namespace TwoTrails.ViewModels
                 x => Accuracy > 0, this, x => x.Accuracy);
 
             CancelCommand = new RelayCommand(x => window.Close());
+
+            FtToMtCommand = new RelayCommand(x =>
+            {
+                if (x is double val)
+                    Accuracy = val;
+            });
         }
     }
 }
