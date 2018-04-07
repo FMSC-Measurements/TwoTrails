@@ -167,6 +167,19 @@ namespace TwoTrails.Utils
 
 
 
+        public static double AzimuthOfPoint(double x1, double y1, double x2, double y2)
+        {
+            double xCoord = x2 - x1, yCoord = y2 - y1;
+
+            double az = FMSC.Core.Convert.RadiansToDegrees(Math.Atan2(xCoord, yCoord));
+
+            if (az < 0)
+                az += 360;
+
+            return az;
+        }
+
+
 
         public static bool IsImportableFileType(String fileName)
         {

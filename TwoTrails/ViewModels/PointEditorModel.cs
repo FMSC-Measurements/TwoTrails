@@ -1,7 +1,9 @@
 ﻿using CSUtil.ComponentModel;
+using FMSC.Core;
 using FMSC.Core.ComponentModel;
 using FMSC.Core.ComponentModel.Commands;
 using FMSC.Core.Controls;
+using FMSC.GeoSpatial.UTM;
 using Microsoft.Win32;
 using System;
 using System.Collections;
@@ -104,8 +106,9 @@ namespace TwoTrails.ViewModels
         public ICommand CopyCellValueCommand { get; }
         public ICommand ExportValuesCommand { get; }
         public ICommand ViewPointDetailsCommand { get; }
+        public ICommand UpdateAdvInfo { get; }
         #endregion
-        
+
         #region Properties
         private ListCollectionView _Points;
         public ListCollectionView Points
@@ -206,7 +209,150 @@ namespace TwoTrails.ViewModels
 
         public ObservableCollection<Control> VisibleFields { get; private set; }
         
+        public ObservableCollection<MenuItem> AdvInfoItems { get; }
         
+
+
+        #region AdvInfoItems
+        public double? AI_DistFt { get { return Get<double?>(); } set { Set(value); } }
+        public double? AI_DistMt { get { return Get<double?>(); } set { Set(value); } }
+
+        public double? AI_AreaAc { get { return Get<double?>(); } set { Set(value); } }
+        public double? AI_AreaHa { get { return Get<double?>(); } set { Set(value); } }
+
+        public double? AI_Az { get { return Get<double?>(); } set { Set(value); } }
+        public double? AI_AzTrue { get { return Get<double?>(); } set { Set(value); } }
+
+        public string AI_CenterLL { get { return Get<string>(); } set { Set(value); } }
+        public string AI_CenterUTM { get { return Get<string>(); } set { Set(value); } }
+
+        public string AI_AverageLL { get { return Get<string>(); } set { Set(value); } }
+        public string AI_AverageUTM { get { return Get<string>(); } set { Set(value); } }
+        #endregion
+
+
+        private void UpdateAdvInfoItems()
+        {
+            if (HasSelection)
+            {
+                Func<TtPoint, int, UTMCoords> GetCoords = (point, tzone) =>
+                {
+                    if (point.Metadata.Zone == tzone)
+                        return new UTMCoords(point.AdjX, point.AdjY, tzone);
+                    else
+                        return UTMTools.ShiftZones(point.AdjX, point.AdjY, tzone, point.Metadata.Zone);
+                };
+
+                List<TtPoint> points = GetSortedSelectedPoints();
+
+                double n, s, e, w, ax, ay, cx, cy, mine, maxe, dist = 0;
+                double? area = 0, az = null;
+
+                int zone = Manager.DefaultMetadata.Zone;
+
+                TtPoint currPoint = points[0];
+                UTMCoords coords = GetCoords(currPoint, zone);
+
+                n = s = ay = cy = coords.Y;
+                e = w = ax = cx = coords.X;
+                mine = maxe = currPoint.AdjZ;
+
+                if (points.Count > 1)
+                {
+                    TtPoint lastPoint = currPoint;
+                    UTMCoords lastCoords = coords;
+
+                    bool isPoly = points.Count > 2;
+                    for (int i = 1; i < points.Count; i++)
+                    {
+                        currPoint = points[i];
+                        coords = GetCoords(currPoint, zone);
+
+                        if (coords.Y > n)
+                            n = coords.Y;
+
+                        if (coords.Y < s)
+                            s = coords.Y;
+
+                        if (coords.X > e)
+                            e = coords.X;
+
+                        if (coords.X < w)
+                            w = coords.X;
+
+                        if (currPoint.AdjZ > maxe)
+                            maxe = currPoint.AdjZ;
+
+                        if (currPoint.AdjZ < mine)
+                            mine = currPoint.AdjZ;
+
+                        ax += coords.X;
+                        ay += coords.Y;
+
+                        dist += MathEx.Distance(coords.X, coords.Y, lastCoords.X, lastCoords.Y);
+
+                        if (isPoly)
+                        {
+                            area += ((lastCoords.X - coords.X) * (lastCoords.Y + coords.Y) / 2);
+                        }
+                        else
+                        {
+                            az = TtUtils.AzimuthOfPoint(lastCoords.X, lastCoords.Y, coords.X, coords.Y);
+                        }
+                    }
+                    
+                    area = isPoly ? Math.Abs((double)area) : (double?)null;
+
+                    ax /= points.Count;
+                    ay /= points.Count;
+
+                    cx = (e + w) / 2;
+                    cy = (n + s) / 2;
+                }
+            }
+            else
+            {
+
+            }
+        }
+
+        private MenuItem[] GenerateAdvInfoItems()
+        {
+            Func<string, string, Action, MenuItem> GenerateAdvInfoMenuItem =
+                (headerStringFormat, propertyName, action) =>
+            {
+                MenuItem mi = new MenuItem()
+                {
+                    HeaderStringFormat = headerStringFormat,
+                    Command = new RelayCommand(x => action())
+                };
+
+                BindingOperations.SetBinding(mi, MenuItem.HeaderProperty, new Binding()
+                {
+                    Path = new PropertyPath(propertyName),
+                    Mode = BindingMode.OneWay,
+                    Source = this
+                });
+
+                return mi;
+            };
+
+            return new MenuItem[]
+            {
+                GenerateAdvInfoMenuItem("Dist (Ft):      {0:####}", nameof(AI_DistFt), () => Clipboard.SetText(AI_DistFt.ToString())),
+                GenerateAdvInfoMenuItem("Dist (Mt):      {0:####}", nameof(AI_DistMt), () => Clipboard.SetText(AI_DistMt.ToString())),
+                GenerateAdvInfoMenuItem("Area (Ha):      {0:####}", nameof(AI_AreaHa), () => Clipboard.SetText(AI_AreaHa.ToString())),
+                GenerateAdvInfoMenuItem("Area (Ac):      {0:####}", nameof(AI_AreaAc), () => Clipboard.SetText(AI_AreaAc.ToString())),
+                GenerateAdvInfoMenuItem("Azimuth:        {0:##}", nameof(AI_Az), () => Clipboard.SetText(AI_Az.ToString())),
+                GenerateAdvInfoMenuItem("Azimuth (True): {0:##}", nameof(AI_AzTrue), () => Clipboard.SetText(AI_AzTrue.ToString())),
+                GenerateAdvInfoMenuItem("Center (L/L):   {0}", nameof(AI_CenterLL), () => Clipboard.SetText(AI_CenterLL)),
+                GenerateAdvInfoMenuItem("Center (UTM):   {0}", nameof(AI_CenterUTM), () => Clipboard.SetText(AI_CenterUTM)),
+                GenerateAdvInfoMenuItem("Average (L/L):  {0}", nameof(AI_AverageLL), () => Clipboard.SetText(AI_AverageLL)),
+                GenerateAdvInfoMenuItem("Average (UTM):  {0}", nameof(AI_AverageUTM), () => Clipboard.SetText(AI_AverageUTM))
+            };
+        }
+        
+
         private void CompareAndSet<T>(ref bool same, ref T oldVal, T newVal)
         {
             if (oldVal != null && !EqualityComparer<T>.Default.Equals(oldVal, newVal))
@@ -694,9 +840,13 @@ namespace TwoTrails.ViewModels
             SelectTravCommand = new RelayCommand(x => SelectTraverse());
 
             SelectInverseCommand = new RelayCommand(x => SelectInverse());
+            
+            UpdateAdvInfo = new RelayCommand(x => UpdateAdvInfoItems());
             #endregion
 
             //BindingOperations.EnableCollectionSynchronization(_SelectedPoints, _lock);
+
+            AdvInfoItems = new ObservableCollection<MenuItem>(GenerateAdvInfoItems());
 
             SetupUI();
 
@@ -908,6 +1058,8 @@ namespace TwoTrails.ViewModels
                 }; 
             }
             #endregion
+
+            UpdateAdvInfoItems();
         }
 
 
