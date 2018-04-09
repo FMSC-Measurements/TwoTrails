@@ -2,7 +2,6 @@
 using FMSC.Core;
 using FMSC.Core.ComponentModel;
 using FMSC.Core.ComponentModel.Commands;
-using FMSC.Core.Controls;
 using FMSC.GeoSpatial.UTM;
 using Microsoft.Win32;
 using System;
@@ -16,13 +15,11 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Converters;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
-using TwoTrails.CustomProperties;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
 
@@ -217,9 +214,6 @@ namespace TwoTrails.ViewModels
         public double? AI_DistFt { get { return Get<double?>(); } set { Set(value); } }
         public double? AI_DistMt { get { return Get<double?>(); } set { Set(value); } }
 
-        public double? AI_AreaAc { get { return Get<double?>(); } set { Set(value); } }
-        public double? AI_AreaHa { get { return Get<double?>(); } set { Set(value); } }
-
         public double? AI_Az { get { return Get<double?>(); } set { Set(value); } }
         public double? AI_AzTrue { get { return Get<double?>(); } set { Set(value); } }
 
@@ -233,20 +227,20 @@ namespace TwoTrails.ViewModels
 
         private void UpdateAdvInfoItems()
         {
-            if (HasSelection)
+            if (HasSelection && _SelectedPoints.Count > 1)
             {
-                Func<TtPoint, int, UTMCoords> GetCoords = (point, tzone) =>
+                Func<TtPoint, int, UTMCoords> GetCoords = (p, tzone) =>
                 {
-                    if (point.Metadata.Zone == tzone)
-                        return new UTMCoords(point.AdjX, point.AdjY, tzone);
+                    if (p.Metadata.Zone == tzone)
+                        return new UTMCoords(p.AdjX, p.AdjY, tzone);
                     else
-                        return UTMTools.ShiftZones(point.AdjX, point.AdjY, tzone, point.Metadata.Zone);
+                        return UTMTools.ShiftZones(p.AdjX, p.AdjY, tzone, p.Metadata.Zone);
                 };
 
                 List<TtPoint> points = GetSortedSelectedPoints();
 
                 double n, s, e, w, ax, ay, cx, cy, mine, maxe, dist = 0;
-                double? area = 0, az = null;
+                double? az = null;
 
                 int zone = Manager.DefaultMetadata.Zone;
 
@@ -256,63 +250,79 @@ namespace TwoTrails.ViewModels
                 n = s = ay = cy = coords.Y;
                 e = w = ax = cx = coords.X;
                 mine = maxe = currPoint.AdjZ;
+                
+                TtPoint lastPoint = currPoint;
+                UTMCoords lastCoords = coords;
 
-                if (points.Count > 1)
+                bool isPoly = points.Count > 2;
+                for (int i = 1; i < points.Count; i++)
                 {
-                    TtPoint lastPoint = currPoint;
-                    UTMCoords lastCoords = coords;
+                    currPoint = points[i];
+                    coords = GetCoords(currPoint, zone);
 
-                    bool isPoly = points.Count > 2;
-                    for (int i = 1; i < points.Count; i++)
-                    {
-                        currPoint = points[i];
-                        coords = GetCoords(currPoint, zone);
+                    if (coords.Y > n)
+                        n = coords.Y;
 
-                        if (coords.Y > n)
-                            n = coords.Y;
+                    if (coords.Y < s)
+                        s = coords.Y;
 
-                        if (coords.Y < s)
-                            s = coords.Y;
+                    if (coords.X > e)
+                        e = coords.X;
 
-                        if (coords.X > e)
-                            e = coords.X;
+                    if (coords.X < w)
+                        w = coords.X;
 
-                        if (coords.X < w)
-                            w = coords.X;
+                    if (currPoint.AdjZ > maxe)
+                        maxe = currPoint.AdjZ;
 
-                        if (currPoint.AdjZ > maxe)
-                            maxe = currPoint.AdjZ;
+                    if (currPoint.AdjZ < mine)
+                        mine = currPoint.AdjZ;
 
-                        if (currPoint.AdjZ < mine)
-                            mine = currPoint.AdjZ;
+                    ax += coords.X;
+                    ay += coords.Y;
 
-                        ax += coords.X;
-                        ay += coords.Y;
+                    dist += MathEx.Distance(coords.X, coords.Y, lastCoords.X, lastCoords.Y);
 
-                        dist += MathEx.Distance(coords.X, coords.Y, lastCoords.X, lastCoords.Y);
+                    if (!isPoly)
+                        az = TtUtils.AzimuthOfPoint(lastCoords.X, lastCoords.Y, coords.X, coords.Y);
+                }
 
-                        if (isPoly)
-                        {
-                            area += ((lastCoords.X - coords.X) * (lastCoords.Y + coords.Y) / 2);
-                        }
-                        else
-                        {
-                            az = TtUtils.AzimuthOfPoint(lastCoords.X, lastCoords.Y, coords.X, coords.Y);
-                        }
-                    }
-                    
-                    area = isPoly ? Math.Abs((double)area) : (double?)null;
+                AI_DistMt = dist;
+                AI_DistFt = FMSC.Core.Convert.Distance(dist, Distance.FeetTenths, Distance.Meters);
 
+                cx = (e + w) / 2;
+                cy = (n + s) / 2;
+
+                Point point = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(cx, cy, zone);
+
+                AI_CenterUTM = $"X: {cx.ToString("F3")}, Y: {cy.ToString("F3")}";
+                AI_CenterLL = $"Lat: {point.Y.ToString("F3")}, Lon: {point.X.ToString("F3")}";
+                
+                if (isPoly)
+                {
                     ax /= points.Count;
                     ay /= points.Count;
 
-                    cx = (e + w) / 2;
-                    cy = (n + s) / 2;
+                    point = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(ax, ay, zone);
+
+                    AI_AverageUTM = $"X: {ax.ToString("F3")}, Y: {ay.ToString("F3")}";
+                    AI_AverageLL = $"Lat: {point.Y.ToString("F3")}, Lon: {point.X.ToString("F3")}";
+
+                    AI_Az = AI_AzTrue = null;
+                }
+                else
+                {
+                    AI_AverageUTM = AI_AverageLL = null;
+
+                    AI_Az = az;
+                    AI_AzTrue = az + Manager.DefaultMetadata.MagDec;
                 }
             }
             else
             {
-
+                AI_DistFt = AI_DistMt = null;
+                AI_Az = AI_AzTrue = null;
+                AI_AverageUTM = AI_AverageLL = AI_CenterUTM = AI_CenterLL = null;
             }
         }
 
@@ -324,7 +334,7 @@ namespace TwoTrails.ViewModels
                 MenuItem mi = new MenuItem()
                 {
                     HeaderStringFormat = headerStringFormat,
-                    Command = new RelayCommand(x => action())
+                    Command = new RelayCommand(x => action()),
                 };
 
                 BindingOperations.SetBinding(mi, MenuItem.HeaderProperty, new Binding()
@@ -334,17 +344,23 @@ namespace TwoTrails.ViewModels
                     Source = this
                 });
 
+                BindingOperations.SetBinding(mi, MenuItem.VisibilityProperty, new Binding()
+                {
+                    Path = new PropertyPath(propertyName),
+                    Mode = BindingMode.OneWay,
+                    Source = this,
+                    Converter = new NotNullVisibilityConverter()
+                });
+
                 return mi;
             };
 
             return new MenuItem[]
             {
-                GenerateAdvInfoMenuItem("Dist (Ft):      {0:####}", nameof(AI_DistFt), () => Clipboard.SetText(AI_DistFt.ToString())),
-                GenerateAdvInfoMenuItem("Dist (Mt):      {0:####}", nameof(AI_DistMt), () => Clipboard.SetText(AI_DistMt.ToString())),
-                GenerateAdvInfoMenuItem("Area (Ha):      {0:####}", nameof(AI_AreaHa), () => Clipboard.SetText(AI_AreaHa.ToString())),
-                GenerateAdvInfoMenuItem("Area (Ac):      {0:####}", nameof(AI_AreaAc), () => Clipboard.SetText(AI_AreaAc.ToString())),
-                GenerateAdvInfoMenuItem("Azimuth:        {0:##}", nameof(AI_Az), () => Clipboard.SetText(AI_Az.ToString())),
-                GenerateAdvInfoMenuItem("Azimuth (True): {0:##}", nameof(AI_AzTrue), () => Clipboard.SetText(AI_AzTrue.ToString())),
+                GenerateAdvInfoMenuItem("Dist (Ft):      {0:#,0.0000}", nameof(AI_DistFt), () => Clipboard.SetText(AI_DistFt.ToString())),
+                GenerateAdvInfoMenuItem("Dist (Mt):      {0:#,0.0000}", nameof(AI_DistMt), () => Clipboard.SetText(AI_DistMt.ToString())),
+                GenerateAdvInfoMenuItem("Azimuth:        {0:#,0.00}", nameof(AI_Az), () => Clipboard.SetText(AI_Az.ToString())),
+                GenerateAdvInfoMenuItem("Azimuth (True): {0:#,0.00}", nameof(AI_AzTrue), () => Clipboard.SetText(AI_AzTrue.ToString())),
                 GenerateAdvInfoMenuItem("Center (L/L):   {0}", nameof(AI_CenterLL), () => Clipboard.SetText(AI_CenterLL)),
                 GenerateAdvInfoMenuItem("Center (UTM):   {0}", nameof(AI_CenterUTM), () => Clipboard.SetText(AI_CenterUTM)),
                 GenerateAdvInfoMenuItem("Average (L/L):  {0}", nameof(AI_AverageLL), () => Clipboard.SetText(AI_AverageLL)),
@@ -1281,7 +1297,7 @@ namespace TwoTrails.ViewModels
 
                     bool hasOnbnd = false, hasOffBnd = false;
 
-                    bool hasSS = false, hasSsOnBnd = false, hasTrav = false;
+                    bool hasSsOnBnd = false, hasTrav = false;
 
                     bool sameCmt = true;
                     string cmt = fpt.Comment;
@@ -1325,11 +1341,8 @@ namespace TwoTrails.ViewModels
                         }
                         else if (point.IsTravType())
                         {
-                            if (point.OpType == OpType.SideShot)
-                            {
-                                hasSS = true;
+                            if (!hasSsOnBnd && point.OpType == OpType.SideShot)
                                 hasSsOnBnd |= point.OnBoundary;
-                            }
 
                             if (!hasTrav && point.OpType == OpType.Traverse)
                                 hasTrav = true;
@@ -1345,7 +1358,6 @@ namespace TwoTrails.ViewModels
                         else if (point.OpType == OpType.Quondam && !HasQndms)
                         {
                             HasQndms = true;
-
                             parseTrav = false;
                         }
 

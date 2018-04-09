@@ -376,12 +376,6 @@
 
 				<DataGrid.ContextMenu>
                     <ContextMenu>
-                        <!--<i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Opened">
-                                <i:InvokeCommandAction Command="{Binding GenerateAdvInfo}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>-->
-
                         <MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}"/>
 
 						<MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
@@ -389,7 +383,7 @@
 						<MenuItem Header="Export Point Values" Command="{Binding ExportValuesCommand}" 
 								  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
 
-                        <MenuItem x:Name="miDDA" Header="Dist/Dir/Area" ItemsSource="{Binding AdvInfoItems}">
+                        <MenuItem x:Name="miDDA" Header="Dist/Dir/Loc" ItemsSource="{Binding AdvInfoItems}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SubmenuOpened">
                                     <i:InvokeCommandAction Command="{Binding UpdateAdvInfo}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type MenuItem}}}"/>
