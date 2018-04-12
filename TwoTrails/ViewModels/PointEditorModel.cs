@@ -2060,7 +2060,12 @@ namespace TwoTrails.ViewModels
         private void CreateQuondams()
         {
             Project.MainModel.MainWindow.IsEnabled = false;
-            PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), true, false, null, Project.MainModel.MainWindow, () => Project.MainModel.MainWindow.IsEnabled = true);
+            PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), true, false, SessionData.TargetPolygon, Project.MainModel.MainWindow,
+                (target) =>
+                {
+                    Project.MainModel.MainWindow.IsEnabled = true;
+                    SessionData.TargetPolygon = target;
+                });
         }
 
         private void ConvertPoints()
@@ -2130,7 +2135,12 @@ namespace TwoTrails.ViewModels
         private void MovePoints()
         {
             Project.MainModel.MainWindow.IsEnabled = false;
-            PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), false, false, null, Project.MainModel.MainWindow, () => Project.MainModel.MainWindow.IsEnabled = true);
+            PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), false, false, SessionData.TargetPolygon, Project.MainModel.MainWindow,
+                (target) =>
+                {
+                    Project.MainModel.MainWindow.IsEnabled = true;
+                    SessionData.TargetPolygon = target;
+                });
         }
 
         private void Retrace()

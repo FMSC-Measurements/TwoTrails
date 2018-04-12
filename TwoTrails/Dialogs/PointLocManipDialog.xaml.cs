@@ -22,8 +22,9 @@ namespace TwoTrails.Dialogs
     /// </summary>
     public partial class PointLocManipDialog : Window
     {
-        TtHistoryManager _Manager;
-        List<TtPoint> _Points;
+        private TtHistoryManager _Manager;
+        private List<TtPoint> _Points;
+        public TtPolygon TargetPoly { get; private set; }
 
         public PointLocManipDialog(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null)
         {
@@ -73,16 +74,16 @@ namespace TwoTrails.Dialogs
                                     : rbInsEnd.IsChecked == true ? int.MaxValue
                                         : cboPolyPoints.SelectedIndex + 1;
 
-                    TtPolygon targetPoly = cboPoly.SelectedItem as TtPolygon;
+                    TargetPoly = cboPoly.SelectedItem as TtPolygon;
                     bool reverse = rbDirReverse.IsChecked == true;
 
                     if (rbActQuondam.IsChecked == true)
                     {
-                        _Manager.CreateQuondamLinks(_Points, targetPoly, index, null, reverse);
+                        _Manager.CreateQuondamLinks(_Points, TargetPoly, index, null, reverse);
                     }
                     else
                     {
-                        _Manager.MovePointsToPolygon(_Points, targetPoly, index, reverse);
+                        _Manager.MovePointsToPolygon(_Points, TargetPoly, index, reverse);
                     } 
 
                     Close(); 
@@ -124,7 +125,7 @@ namespace TwoTrails.Dialogs
             return plmd.ShowDialog();
         }
 
-        public static void Show(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null, Window owner = null, Action onClose = null)
+        public static void Show(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null, Window owner = null, Action<TtPolygon> onClose = null)
         {
             PointLocManipDialog plmd = new PointLocManipDialog(manager, points, quondam, reverse, target);
             if (owner != null)
@@ -132,7 +133,7 @@ namespace TwoTrails.Dialogs
 
             if (onClose != null)
             {
-                plmd.Closed += (s, e) => onClose();
+                plmd.Closed += (s, e) => onClose(plmd.TargetPoly);
             }
 
             plmd.Show();

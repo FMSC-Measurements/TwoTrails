@@ -1,4 +1,5 @@
-﻿using FMSC.GeoSpatial;
+﻿using FMSC.Core.Utilities;
+using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.NMEA;
 using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.GeoSpatial.Types;
@@ -100,15 +101,12 @@ namespace TwoTrails.Core
                                 String[] tokens = satstr.Split(';');
                                 if (tokens.Length > 4)
                                 {
-                                    float srn = 0;
-                                    float.TryParse(tokens[3], out srn);
-
                                     if (Int32.TryParse(tokens[0], out int nmeaID))
                                     {
                                         return new Satellite(nmeaID,
-                                                float.Parse(tokens[1]),
-                                                float.Parse(tokens[2]),
-                                                srn);
+                                                ParseEx.ParseFloatN(tokens[1]),
+                                                ParseEx.ParseFloatN(tokens[2]),
+                                                ParseEx.ParseFloatN(tokens[3]));
                                     }
                                 } 
                             }

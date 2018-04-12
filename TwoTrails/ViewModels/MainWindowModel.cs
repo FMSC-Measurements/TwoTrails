@@ -103,6 +103,7 @@ namespace TwoTrails.ViewModels
         
         public PointEditorModel CurrentEditor { get; private set; }
 
+        public TtSettings Settings { get; }
 
         public bool HasOpenedProject { get { return CurrentTab != null; } }
         public bool HasPolygons { get { return CurrentEditor != null && CurrentEditor.Manager.Polygons.Count > 0; } }
@@ -156,6 +157,8 @@ namespace TwoTrails.ViewModels
 
         public MainWindowModel(MainWindow mainWindow)
         {
+            Settings = App.Settings;
+
             StatusMessage = String.Empty;
 
             MainWindow = mainWindow;

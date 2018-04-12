@@ -78,6 +78,7 @@
     <Compile Include="TypeTools.cs" />
     <Compile Include="Utilities\CoreUtils.cs" />
     <Compile Include="Utilities\DelayActionHandler.cs" />
+    <Compile Include="Utilities\ParseEx.cs" />
     <Compile Include="Xml\GPX\BaseTrack.cs" />
     <Compile Include="Xml\GPX\Document.cs" />
     <Compile Include="Xml\GPX\GpxWriter.cs" />

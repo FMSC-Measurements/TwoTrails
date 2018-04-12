@@ -400,8 +400,8 @@
 
 						<Separator/>
 
-						<MenuItem Header="Move" Command="{Binding MovePointsCommand}" />
 						<MenuItem Header="Quondam" Command="{Binding CreateQuondamsCommand}" />
+						<MenuItem Header="Move" Command="{Binding MovePointsCommand}" />
 
 						<Separator/>
 

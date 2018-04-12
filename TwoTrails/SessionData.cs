@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TwoTrails.Core;
 
 namespace TwoTrails
 {
@@ -78,6 +79,8 @@ namespace TwoTrails
                 return false;
             }
         }
+
+        public static TtPolygon TargetPolygon { get; set; }
     }
 
     public enum GpsReportStatus

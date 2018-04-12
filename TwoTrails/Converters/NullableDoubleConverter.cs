@@ -17,8 +17,13 @@ namespace TwoTrails.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (Double.TryParse(value as string, out double val))
-                return val;
+            if (value is string str)
+            {
+                if (str.EndsWith("."))
+                    return Binding.DoNothing;
+                else if (Double.TryParse(str, out double val))
+                    return val;
+            }
 
             return null;
         }

@@ -191,6 +191,9 @@ namespace TwoTrails.Core
 
             _Groups = new ObservableCollection<TtGroup>(_GroupsMap.Values);
             Groups = new ReadOnlyObservableCollection<TtGroup>(_Groups);
+
+            foreach (TtPolygon poly in _Polygons)
+                GeneratePolygonStats(poly);
         }
 
         private void LoadMedia()
