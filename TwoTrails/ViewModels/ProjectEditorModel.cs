@@ -1,4 +1,5 @@
 ﻿using CSUtil.ComponentModel;
+using FMSC.Core;
 using FMSC.Core.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
@@ -8,6 +9,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -22,11 +24,17 @@ namespace TwoTrails.ViewModels
 {
     public class ProjectEditorModel : NotifyPropertyChangedEx
     {
+        public ICommand OpenMapWindowCommand { get; }
+
         private TtProject _Project;
 
         public TtProjectInfo ProjectInfo { get { return _Project.ProjectInfo; } }
         public TtHistoryManager Manager { get { return _Project.HistoryManager; } }
         public TtSettings Settings { get { return _Project.Settings; } }
+        
+        public MapControl MapControl { get; set; }
+        public MapWindow MapWindow { get; set; }
+        public bool IsMapWindowOpen { get { return MapWindow != null; } }
         
         public PointEditorControl DataController { get; }
 
@@ -102,6 +110,32 @@ namespace TwoTrails.ViewModels
             MediaInfoChangedCommand = new RelayCommand(x => MediaInfoChanged(x as TtMediaInfo));
             MediaSelectedCommand = new RelayCommand(x => MediaSelected(x as TtMediaInfo));
             HideMediaViewerCommand = new RelayCommand(x => MediaViewerVisible = false);
+
+            OpenMapWindowCommand = new RelayCommand(x =>
+            {
+                if (x is Grid grid)
+                {
+                    MapControl = grid.Children[0] as MapControl;
+
+                    grid.Children.Remove(MapControl);
+
+                    MapWindow = MapControl != null ? new MapWindow(_Project.ProjectName, MapControl) : new MapWindow(_Project);
+                    OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
+
+                    MapWindow.Closed += (s, e) =>
+                    {
+                        MapWindow = null;
+
+                        grid.Dispatcher.Invoke(() =>
+                        {
+                            grid.Children.Add(MapControl);
+                            OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
+                        });
+                    };
+
+                    MapWindow.Show();
+                }
+            });
         }
 
 

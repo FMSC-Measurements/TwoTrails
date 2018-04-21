@@ -28,13 +28,19 @@ namespace TwoTrails.Controls
     public partial class MapControl : UserControl
     {
         public static readonly DependencyProperty ManagerProperty =
-                DependencyProperty.Register(nameof(Manager), typeof(TtManager), typeof(MapControl));
+                DependencyProperty.Register(nameof(Manager), typeof(IObservableTtManager), typeof(MapControl));
 
-        public TtManager Manager
+        public IObservableTtManager Manager
         {
-            get { return (TtManager)this.GetValue(ManagerProperty); }
-            set { this.SetValue(ManagerProperty, value); }
+            get { return (IObservableTtManager)this.GetValue(ManagerProperty); }
+            set
+            {
+                this.SetValue(ManagerProperty, value);
+                HasManager = value != null;
+            }
         }
+
+        public bool HasManager { get; set; }
 
         public TtMapManager MapManager { get; private set; }
 
@@ -44,42 +50,49 @@ namespace TwoTrails.Controls
         {
             InitializeComponent();
             map.CredentialsProvider = new ApplicationIdCredentialsProvider(APIKeys.BING_MAPS_API_KEY);
-
-            this.Loaded += MapControl_Loaded;
-
+            
             map.Mode = new AerialMode();
 
-            map.MouseMove += Map_MouseMove;
+            map.Loaded += (s, e) =>
+            {
+                if (map.ActualHeight > 0)
+                {
+                    IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
+                    if (locs.Any())
+                        map.SetView(locs, new Thickness(30), 0);
+                }
+            };
+
+            map.MouseMove += (s, e) =>
+            {
+                Location loc = map.ViewportPointToLocation(e.GetPosition(map));
+
+                if (IsLatLon)
+                    tbLoc.Text = $"Lat: { loc.Latitude.ToString("F6") }  Lon: { loc.Longitude.ToString("F6") }";
+                else
+                {
+                    UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(loc.Latitude, loc.Longitude,
+                        HasManager ? Manager.DefaultMetadata.Zone : 0);
+
+                    tbLoc.Text = $"[{ coords.Zone }]  X: { coords.X.ToString("F2") }  Y: { coords.Y.ToString("F2") }";
+                }
+            };
+
+            this.Loaded += (s, e) =>
+            {
+                if (Manager != null)
+                {
+                    if (MapManager == null)
+                        MapManager = new TtMapManager(map, Manager);
+
+                    lvPolygons.ItemsSource = MapManager.PolygonManagers;
+                }
+            };
         }
 
         public MapControl(TtManager manager) : this()
         {
             Manager = manager;
-        }
-
-        private void MapControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (Manager != null)
-            {
-                if (MapManager == null)
-                    MapManager = new TtMapManager(map, Manager);
-
-                lvPolygons.ItemsSource = MapManager.PolygonManagers; 
-            }
-        }
-
-        private void Map_MouseMove(object sender, MouseEventArgs e)
-        {
-            Location loc = map.ViewportPointToLocation(e.GetPosition(map));
-
-            if (IsLatLon)
-                tbLoc.Text = $"Lat: { loc.Latitude.ToString("F6") }  Lon: { loc.Longitude.ToString("F6") }";
-            else
-            {
-                UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(loc.Latitude, loc.Longitude, Manager.DefaultMetadata.Zone);
-
-                tbLoc.Text = $"[{ coords.Zone }]  X: { coords.X.ToString("F2") }  Y: { coords.Y.ToString("F2") }";
-            }
         }
     }
 }

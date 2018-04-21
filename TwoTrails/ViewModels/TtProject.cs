@@ -47,6 +47,7 @@ namespace TwoTrails.ViewModels
         private MapTab MapTab { get; set; }
         private MapWindow MapWindow { get; set; }
         
+        //TODO remove mapwindow from TtProject
         public bool ProjectTabIsOpen { get { return ProjectTab != null; } }
         public bool MapTabIsOpen { get { return MapTab != null; } }
         public bool UserActivityTabIsOpen { get { return UserActivityTab != null; } }
@@ -308,7 +309,7 @@ namespace TwoTrails.ViewModels
 
                 if (MapTab != null)
                 {
-                    MapWindow = new MapWindow(this, MapTab.MapControl);
+                    MapWindow = new MapWindow(_ProjectInfo.Name, MapTab.MapControl);
                     CloseTab(MapTab);
                 }
                 else

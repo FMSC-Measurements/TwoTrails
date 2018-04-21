@@ -7,7 +7,7 @@
         xmlns:ctrls="clr-namespace:TwoTrails.Controls"
         WindowStartupLocation="CenterOwner"
         mc:Ignorable="d"
-        Title="MapWindow" Height="800" Width="1000">
+        Height="800" Width="1000">
     <Grid>
         <ContentControl x:Name="cc"/>
     </Grid>

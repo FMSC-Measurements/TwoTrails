@@ -13,7 +13,7 @@ using TwoTrails.Core.Media;
 
 namespace TwoTrails.Core
 {
-    public class TtManager : ITtManager
+    public class TtManager : IObservableTtManager
     {
         private const long POLYGON_UPDATE_DELAY = 1000;
 

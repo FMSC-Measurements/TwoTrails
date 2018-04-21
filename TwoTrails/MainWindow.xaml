@@ -39,9 +39,8 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="styleTabButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-        </Style>
-        
+        <Style x:Key="styleTabButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+
         <Style x:Key="styleTabButtonBorderStyle" TargetType="Border">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -136,7 +135,7 @@
                     <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="View Point Details Table" Command="{Binding ViewPointDetailsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Open in Google Earth" Command="{Binding OpenInEarthCommand}" IsEnabled="{Binding HasOpenedProject}" />
-                    <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                    <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapCommand}" IsEnabled="{Binding HasOpenedProject}" Visibility="Collapsed"/>
                 </MenuItem>
 
                 <MenuItem Header="_Tools">
@@ -222,7 +221,7 @@
                                         <Grid Name="Grid" VerticalAlignment="Bottom" Background="{StaticResource colorBackground}" Margin="-3, 0, 2, 0" HorizontalAlignment="Stretch">
                                             <Border>
                                                 <DockPanel Margin="2">
-                                                    <TextBlock x:Name="ContentSite" Text="{Binding TabTitle}" DockPanel.Dock="Left"  HorizontalAlignment="Center"
+                                                    <TextBlock x:Name="ContentSite" Text="{Binding TabTitle}" DockPanel.Dock="Left" HorizontalAlignment="Center"
                                                        VerticalAlignment="Center" Margin="4,2,8,2" ToolTip="{Binding ToolTip}"/>
 
                                                     <Button Name="btnCloseProject" Visibility="Hidden" DockPanel.Dock="Right" HorizontalAlignment="Right"

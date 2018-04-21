@@ -28,12 +28,12 @@ namespace TwoTrails.Mapping
 
         public ObservableCollection<TtMapPolygonManager> PolygonManagers { get; } = new ObservableCollection<TtMapPolygonManager>();
 
-        private TtManager _Manager;
+        private IObservableTtManager _Manager;
 
 
 
 
-        public TtMapManager(Map map, TtManager manager)
+        public TtMapManager(Map map, IObservableTtManager manager)
         {
             _Map = map;
             _Manager = manager;
@@ -44,17 +44,9 @@ namespace TwoTrails.Mapping
             {
                 CreateMapPolygon(poly);
             }
-
-
+            
             ((INotifyCollectionChanged)_Points).CollectionChanged += Points_CollectionChanged;
             ((INotifyCollectionChanged)_Polygons).CollectionChanged += Polygons_CollectionChanged;
-
-            if (map.ActualHeight > 0)
-            {
-                IEnumerable<Location> locs = PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
-                if (locs.Any())
-                    map.SetView(locs, new Thickness(10), 0);
-            }
 
             foreach (TtPoint point in _Points)
             {

@@ -41,6 +41,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ReplaceTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HaidLogic.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IObservableTtManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IReadOnlyTtMediaLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtMediaLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\MediaTools.cs" />

@@ -241,7 +241,7 @@
     <Compile Include="Converters\MetadataValueConverter.cs" />
     <Compile Include="Converters\NullableDoubleConverter.cs" />
     <Compile Include="Converters\NullOrBoolConverter.cs" />
-    <Compile Include="CustomProperties\ControlProperties.cs" />
+    <Compile Include="CustomProperties\CustomProperties.cs" />
     <Compile Include="Dialogs\NewProjectDialog.xaml.cs">
       <DependentUpon>NewProjectDialog.xaml</DependentUpon>
     </Compile>

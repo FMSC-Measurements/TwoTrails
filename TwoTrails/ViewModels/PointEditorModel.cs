@@ -359,7 +359,7 @@ namespace TwoTrails.ViewModels
             {
                 GenerateAdvInfoMenuItem("Dist (Ft):      {0:#,0.0000}", nameof(AI_DistFt), () => Clipboard.SetText(AI_DistFt.ToString())),
                 GenerateAdvInfoMenuItem("Dist (Mt):      {0:#,0.0000}", nameof(AI_DistMt), () => Clipboard.SetText(AI_DistMt.ToString())),
-                GenerateAdvInfoMenuItem("Azimuth:        {0:#,0.00}", nameof(AI_Az), () => Clipboard.SetText(AI_Az.ToString())),
+                GenerateAdvInfoMenuItem("Azimuth (Mag):  {0:#,0.00}", nameof(AI_Az), () => Clipboard.SetText(AI_Az.ToString())),
                 GenerateAdvInfoMenuItem("Azimuth (True): {0:#,0.00}", nameof(AI_AzTrue), () => Clipboard.SetText(AI_AzTrue.ToString())),
                 GenerateAdvInfoMenuItem("Center (L/L):   {0}", nameof(AI_CenterLL), () => Clipboard.SetText(AI_CenterLL)),
                 GenerateAdvInfoMenuItem("Center (UTM):   {0}", nameof(AI_CenterUTM), () => Clipboard.SetText(AI_CenterUTM)),

@@ -11,7 +11,7 @@ using System.Collections;
 
 namespace TwoTrails.Core
 {
-    public class TtHistoryManager : NotifyPropertyChangedEx, ITtManager
+    public class TtHistoryManager : NotifyPropertyChangedEx, IObservableTtManager
     {
         public TtManager BaseManager { get; private set; }
 

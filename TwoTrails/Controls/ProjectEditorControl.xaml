@@ -10,6 +10,7 @@
              xmlns:tt="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
              xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
              xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+			 xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800"
              Background="{StaticResource colorBackground}">
@@ -57,17 +58,26 @@
                 </Grid>
             </Grid>
         </DataTemplate>
+
+
+
+        <Style x:Key="styleTabButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+
+        <Style x:Key="styleTabButtonBorderStyle" TargetType="Border">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource colorPriamry}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid Background="{StaticResource colorBackground}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="3" MinHeight="3" MaxHeight="3"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Height="3" Background="{StaticResource colorPriamryDark}" HorizontalAlignment="Stretch"/>
-
-        <TabControl x:Name="tabControl" Grid.Row="1" Margin="0" Padding="0"
+        <TabControl x:Name="tabControl"
+                    Grid.Row="1"
+                    Margin="-4,-2,0,0"
+                    Padding="0,2,0,0"
                     TabStripPlacement="Left"
                     BorderThickness="0"
                     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
@@ -76,16 +86,17 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type TabItem}">
-                                <Grid Name="Grid"
-                                      Margin="-2, -2, -1, 1"
-                                      VerticalAlignment="Stretch" HorizontalAlignment="Right"
-                                      Background="{StaticResource colorBackground}">
-                                    <ContentPresenter x:Name="ContentSite" ContentSource="Header" Margin="0" HorizontalAlignment="Right"/>
+                                <Grid Name="ControlContainer" HorizontalAlignment="Right">
+                                    <Grid.LayoutTransform>
+                                        <RotateTransform Angle="90"/>
+                                    </Grid.LayoutTransform>
+
+                                    <ContentPresenter TextElement.Foreground="White" x:Name="ContentSite" ContentSource="Header" HorizontalAlignment="Right" Margin="8,2,8,6"/>
                                 </Grid>
+
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Grid" Property="Background" Value="SeaGreen"/>
-                                        <Setter TargetName="ContentSite" Property="Margin" Value="0, 0, 0, 0"/>
+                                        <Setter TargetName="ControlContainer" Property="Background" Value="SeaGreen"/>
                                     </Trigger>
 
                                     <MultiTrigger>
@@ -95,18 +106,7 @@
                                         </MultiTrigger.Conditions>
 
                                         <MultiTrigger.Setters>
-                                            <Setter TargetName="Grid" Property="Background" Value="MediumSeaGreen"/>
-                                        </MultiTrigger.Setters>
-                                    </MultiTrigger>
-
-                                    <MultiTrigger>
-                                        <MultiTrigger.Conditions>
-                                            <Condition Property="IsSelected" Value="True" />
-                                            <Condition Property="IsMouseOver" Value="False" />
-                                        </MultiTrigger.Conditions>
-
-                                        <MultiTrigger.Setters>
-
+                                            <Setter TargetName="ControlContainer" Property="Background" Value="MediumSeaGreen"/>
                                         </MultiTrigger.Setters>
                                     </MultiTrigger>
                                 </ControlTemplate.Triggers>
@@ -114,20 +114,19 @@
                         </Setter.Value>
                     </Setter>
 
-                    <Setter Property="HeaderTemplate">
+                    <!--<Setter Property="HeaderTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <Grid>
-                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White"
-                                               Margin="4, 8, 4, 8">
-                                        <TextBlock.LayoutTransform>
-                                            <RotateTransform Angle="90" />
-                                        </TextBlock.LayoutTransform>
-                                    </TextBlock>
-                                </Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel.LayoutTransform>
+                                        <RotateTransform Angle="90" />
+                                    </StackPanel.LayoutTransform>
+
+                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White" Margin="8, 4, 0, 4"/>
+                                </StackPanel>
                             </DataTemplate>
                         </Setter.Value>
-                    </Setter>
+                    </Setter>-->
                 </Style>
             </TabControl.Resources>
 
@@ -245,7 +244,7 @@
                 </Border>
             </TabItem>
 
-            <TabItem Header="Polygons" DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type TabControl}},Path=DataContext}">
+            <TabItem Header="Polygons">
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -984,8 +983,6 @@
                 </Border>
             </TabItem>
 
-
-
             <TabItem Header="Data Dictionary" Visibility="Collapsed"> <!-- View / Filter DD Info -->
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid Background="LightGray">
@@ -1012,12 +1009,33 @@
                 </Border>
             </TabItem>
 
+            <TabItem Visibility="{Binding IsMapWindowOpen, Converter={StaticResource InverseBoolToVis}}">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,-8,0">
+                        <TextBlock Text="Map" Foreground="White"/>
+                        <Button BorderThickness="0"
+                                Style="{StaticResource styleTabButtonStyle}" Command="{Binding OpenMapWindowCommand}" CommandParameter="{Binding ElementName=MapContainer}">
 
-            <TabItem Header="Map" Visibility="Collapsed">
-                
+                            <Border Style="{StaticResource styleTabButtonBorderStyle}" Padding="2" Margin="0,0,0,-4">
+                                <Image Source="{StaticResource ImgOpenInNew}" Width="15" Height="15" Stretch="Fill" Margin="0,0,0,-2" ToolTip="Open Map Window">
+                                    <Image.LayoutTransform>
+                                        <RotateTransform Angle="-90"/>
+                                    </Image.LayoutTransform>
+                                </Image>
+                            </Border>
+                        </Button>
+                    </StackPanel>
+                </TabItem.Header>
+
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                    <Grid x:Name="MapContainer">
+                        <local:MapControl x:Name="MapControl" Manager="{Binding Manager, Mode=OneWay}"/>
+                    </Grid>
+                </Border>
             </TabItem>
             
-            
         </TabControl>
+
+        <Grid Grid.Row="0" Height="3" Background="{StaticResource colorPriamryDark}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
     </Grid>
 </UserControl>
