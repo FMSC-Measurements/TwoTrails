@@ -138,6 +138,10 @@ namespace TwoTrails.ViewModels
             });
         }
 
+        public void CloseWindows()
+        {
+            MapWindow?.Close();
+        }
 
         #region Polygon
         public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }

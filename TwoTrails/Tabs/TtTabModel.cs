@@ -69,5 +69,10 @@ namespace TwoTrails
                 OnPropertyChanged(nameof(ToolTip));
             }
         }
+
+        public virtual void Close()
+        {
+
+        }
     }
 }

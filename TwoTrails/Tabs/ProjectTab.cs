@@ -14,6 +14,7 @@ namespace TwoTrails
     public class ProjectTab : TtTabModel
     {
         private ProjectEditorControl _ProjectEditorControl;
+        private ProjectEditorModel _ProjectEditorModel;
 
         public override bool IsDetachable { get; } = false;
 
@@ -68,9 +69,10 @@ namespace TwoTrails
             }
         }
 
+
         public ProjectTab(TtProject project) : base(project)
         {
-            _ProjectEditorControl = new ProjectEditorControl(project, ProjectStartupTab.Points);
+            _ProjectEditorControl = new ProjectEditorControl(_ProjectEditorModel = new ProjectEditorModel(project), ProjectStartupTab.Points);
             Tab.Content = _ProjectEditorControl;
 
             _ProjectEditorControl.tabControl.SelectionChanged += (object sender, SelectionChangedEventArgs e) =>
@@ -91,6 +93,13 @@ namespace TwoTrails
         public void SwitchToTab(ProjectStartupTab tab)
         {
             _ProjectEditorControl.SwitchToTab(tab);
+        }
+
+        public override void Close()
+        {
+            base.Close();
+
+            _ProjectEditorModel.CloseWindows();
         }
     }
 }

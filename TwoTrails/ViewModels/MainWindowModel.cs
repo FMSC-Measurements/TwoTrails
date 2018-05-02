@@ -520,6 +520,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
         {
             if (tab != null)
             {
+                tab.Close();
                 _Tabs.Items.Remove(tab.Tab);
             }
         }
