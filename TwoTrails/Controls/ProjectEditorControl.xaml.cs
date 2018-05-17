@@ -46,8 +46,8 @@ namespace TwoTrails.Controls
         {
             e.Handled = string.IsNullOrEmpty(e.Text) ? false : !(e.Text.All(x => char.IsDigit(x) || x == '.') &&
                 !(
-                    (sender is TextBox) &&
-                    (((TextBox)sender).Text.Contains(".") && e.Text.Contains(".")))
+                    (sender is TextBox tb) &&
+                    (tb.Text.Contains(".") && e.Text.Contains(".")))
                 );
         }
     }

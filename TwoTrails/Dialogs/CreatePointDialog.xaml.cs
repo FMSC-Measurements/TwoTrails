@@ -62,12 +62,15 @@ namespace TwoTrails.Dialogs
             if (opType == OpType.Quondam)
                 throw new Exception("Invalid Operation: Cannot create quondam");
 
+
             _Manager = manager;
 
             _OpType = opType;
 
             DataContext = this;
             InitializeComponent();
+
+            this.Title = $"Create {opType}";
 
             cboPoly.ItemsSource = _Manager.GetPolygons();
             cboPoly.SelectedItem = target??cboPoly.Items[0];
