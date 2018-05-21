@@ -85,8 +85,9 @@ namespace TwoTrails.Core
         {
             get
             {
-                return _SatellitesInViewString ?? (_SatellitesInViewString = String.Join(
-                    "_", SatellitesInView.Select(sat => $"{ sat.NmeaID };{ sat.Elevation };{ sat.Azimuth };{ sat.SRN };{ (int)sat.GnssType }_")));
+                return _SatellitesInViewString ?? (SatellitesInView != null ?
+                    _SatellitesInViewString = String.Join("_", SatellitesInView.Select(sat => $"{ sat.NmeaID };{ sat.Elevation };{ sat.Azimuth };{ sat.SRN };{ (int)sat.GnssType }_")) :
+                    String.Empty);
             }
 
             set
