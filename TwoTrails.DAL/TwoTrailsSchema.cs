@@ -520,7 +520,7 @@ namespace TwoTrails.DAL
                 UserName + " TEXT, " +
                 DeviceName + " TEXT, " +
                 ActivityDate + " TEXT, " +
-                ActivityType + " INTEGER" +
+                ActivityType + " INTEGER, " +
                 ActivityNotes + " TEXT" +
                 ");";
 
