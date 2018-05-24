@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMSC.Core.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,16 +40,12 @@ namespace TwoTrails.Controls
 
         private void TextIsInteger(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = string.IsNullOrEmpty(e.Text) ? false : !e.Text.All(char.IsDigit);
+            e.Handled = ControlUtils.TextIsInteger(sender, e);
         }
 
         private void TextIsDouble(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = string.IsNullOrEmpty(e.Text) ? false : !(e.Text.All(x => char.IsDigit(x) || x == '.') &&
-                !(
-                    (sender is TextBox tb) &&
-                    (tb.Text.Contains(".") && e.Text.Contains(".")))
-                );
+            e.Handled = ControlUtils.TextIsDouble(sender, e);
         }
     }
 
