@@ -217,11 +217,7 @@ namespace TwoTrails.Core
 
         public static string ToStringARGB(int color)
         {
-            return String.Format("{0:X2}{1:X2}{2:X2}{3:X2}",
-                GetAlpha(color),
-                GetRed(color),
-                GetGreen(color),
-                GetBlue(color));
+            return $"{GetAlpha(color):X2}{GetRed(color):X2}{GetGreen(color):X2}{GetBlue(color):X2}";
         }
 
         public static Color GetColor(int argb)

@@ -6,21 +6,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using TwoTrails.Core.Points;
 using FMSC.GeoSpatial.UTM;
-using FMSC.GeoSpatial;
 using TwoTrails.DAL;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using TwoTrails.Core.Media;
 
 namespace TwoTrails.Core
 {
-    public class TtManager : ITtManager
+    public class TtManager : IObservableTtManager
     {
         private const long POLYGON_UPDATE_DELAY = 1000;
 
         private ITtSettings _Settings;
         private ITtDataLayer _DAL;
+        private ITtMediaLayer _MAL;
 
-        private TtUserActivity _Activity;
+        private TtUserAction _Activity;
 
         private Dictionary<String, TtPoint> _PointsMap, _PointsMapOrig;
         private Dictionary<String, List<TtPoint>> _PointsByPoly;
@@ -30,15 +31,22 @@ namespace TwoTrails.Core
         private Dictionary<String, PolygonGraphicOptions> _PolyGraphicOpts, _PolyGraphicOptsOrig;
         private Dictionary<String, DelayActionHandler> _PolygonUpdateHandlers;
 
+        private Dictionary<String, TtMediaInfo> _MediaMap, _MediaMapOrig;
+
         private ObservableCollection<TtPoint> _Points;
         private ObservableCollection<TtPolygon> _Polygons;
         private ObservableCollection<TtMetadata> _Metadata;
         private ObservableCollection<TtGroup> _Groups;
+        private ObservableCollection<TtMediaInfo> _MediaInfo;
 
         public ReadOnlyObservableCollection<TtPoint> Points { get; private set; }
         public ReadOnlyObservableCollection<TtPolygon> Polygons { get; private set; }
         public ReadOnlyObservableCollection<TtMetadata> Metadata { get; private set; }
         public ReadOnlyObservableCollection<TtGroup> Groups { get; private set; }
+        public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get; private set; }
+        
+
+        public bool HasDataDictionary { get { return _DAL.HasDataDictionary; } }
 
 
         public TtGroup MainGroup { get; private set; }
@@ -47,19 +55,34 @@ namespace TwoTrails.Core
 
         public bool IgnorePointEvents { get; protected set; }
 
-        private static object locker = new object();
+        public int PolygonCount => _Polygons.Count;
+
+        public int PointCount => _Points.Count;
+
+        private object locker = new object();
         
 
-        public TtManager(ITtDataLayer dal, ITtSettings settings)
+        public TtManager(ITtDataLayer dal, ITtMediaLayer mal, ITtSettings settings)
         {
             _DAL = dal;
+            _MAL = mal;
             _Settings = settings;
 
-            _Activity = new TtUserActivity(_Settings.UserName, _Settings.DeviceName);
+            _Activity = new TtUserAction(_Settings.UserName, _Settings.DeviceName);
 
             Load();
+            LoadMedia();
         }
 
+        public void ReplaceDAL(ITtDataLayer dal)
+        {
+            _DAL = dal;
+        }
+
+        public void ReplaceMAL(ITtMediaLayer mal)
+        {
+            _MAL = mal;
+        }
 
         #region Load & Attaching
         private void Load()
@@ -124,7 +147,7 @@ namespace TwoTrails.Core
                 _PolygonsMap.Add(poly.CN, poly);
                 _PolygonsMapOrig.Add(poly.CN, new TtPolygon(poly));
                 
-                _PointsByPoly.Add(poly.CN, new List<TtPoint>(_DAL.GetPointsUnlinked(poly.CN)));
+                _PointsByPoly.Add(poly.CN, _DAL.GetPoints(poly.CN).ToList());
                 
                 AttachPolygonEvents(poly);
             }
@@ -145,9 +168,8 @@ namespace TwoTrails.Core
 
             foreach (TtPoint point in points.Where(p => p.OpType == OpType.Quondam))
             {
-                if (point.OpType == OpType.Quondam)
+                if (point is QuondamPoint qp)
                 {
-                    QuondamPoint qp = (QuondamPoint)point;
                     qp.ParentPoint = _PointsMap[qp.ParentPointCN];
                 }
 
@@ -169,6 +191,44 @@ namespace TwoTrails.Core
 
             _Groups = new ObservableCollection<TtGroup>(_GroupsMap.Values);
             Groups = new ReadOnlyObservableCollection<TtGroup>(_Groups);
+
+            foreach (TtPolygon poly in _Polygons)
+                GeneratePolygonStats(poly);
+        }
+
+        private void LoadMedia()
+        {
+            if (_MAL != null)
+            {
+                _MediaMap = new Dictionary<string, TtMediaInfo>();
+                _MediaMapOrig = new Dictionary<string, TtMediaInfo>();
+
+                _MediaInfo = new ObservableCollection<TtMediaInfo>();
+                MediaInfo = new ReadOnlyObservableCollection<TtMediaInfo>(_MediaInfo);
+
+                foreach (TtImage img in _MAL.GetImages())
+                {
+                    if (_MediaMap.ContainsKey(img.PointCN))
+                    {
+                        _MediaMap[img.PointCN].AddImage(img);
+                        _MediaMapOrig[img.PointCN].AddImage(img.DeepCopy());
+                    }
+                    else
+                    {
+                        if (_PointsMap.ContainsKey(img.PointCN))
+                        {
+                            TtMediaInfo mi = new TtMediaInfo(_PointsMap[img.PointCN]);
+                            mi.AddImage(img);
+                            _MediaMap.Add(img.PointCN, mi);
+                            _MediaInfo.Add(mi);
+
+                            mi = new TtMediaInfo(_PointsMapOrig[img.PointCN]);
+                            mi.AddImage(img.DeepCopy());
+                            _MediaMapOrig.Add(img.PointCN, mi);
+                        }
+                    }
+                }
+            }
         }
 
         protected void AttachMetadataEvents(TtMetadata meta)
@@ -244,6 +304,12 @@ namespace TwoTrails.Core
                 ((TravPoint)point).PositionChanged += TravPoint_PositionChanged;
             }
 
+            if (point.IsGpsType())
+            {
+                ((GpsPoint)point).OnAccuracyChanged += Point_LocationChanged;
+                point.MetadataChanged += Point_MetadataChanged;
+            }
+
             point.LocationChanged += Point_LocationChanged;
             point.OnBoundaryChanged += Point_OnBoundaryChanged;
         }
@@ -255,7 +321,14 @@ namespace TwoTrails.Core
                 ((TravPoint)point).PositionChanged -= TravPoint_PositionChanged;
             }
 
+            if (point.IsGpsType())
+            {
+                ((GpsPoint)point).OnAccuracyChanged -= Point_LocationChanged;
+                point.MetadataChanged -= Point_MetadataChanged;
+            }
+
             point.LocationChanged -= Point_LocationChanged;
+            point.OnBoundaryChanged -= Point_OnBoundaryChanged;
         } 
         #endregion
         
@@ -271,11 +344,6 @@ namespace TwoTrails.Core
                     SaveMetadata();
                     SavePolygons();
                     SavePoints();
-
-                    _PointsMapOrig = _PointsMap.Values.ToDictionary(p => p.CN, p => p.DeepCopy());
-                    _PolygonsMapOrig = _PolygonsMap.Values.ToDictionary(p => p.CN, p => new TtPolygon(p));
-                    _MetadataMapOrig = _MetadataMapOrig.Values.ToDictionary(m => m.CN, m => new TtMetadata(m));
-                    _GroupsMapOrig = _GroupsMap.Values.ToDictionary(g => g.CN, g => new TtGroup(g));
 
                     _DAL.InsertActivity(_Activity);
                     _Activity.Reset();
@@ -318,20 +386,22 @@ namespace TwoTrails.Core
             if (pointsToAdd.Count > 0)
             {
                 _DAL.InsertPoints(pointsToAdd);
-                _Activity.UpdateActivity(DataActivityType.InsertedPoints);
+                _Activity.UpdateAction(DataActionType.InsertedPoints);
             }
 
             if (pointsToUpdate.Count > 0)
             {
                 _DAL.UpdatePoints(pointsToUpdate);
-                _Activity.UpdateActivity(DataActivityType.ModifiedPoints);
+                _Activity.UpdateAction(DataActionType.ModifiedPoints);
             }
 
             if (pointsToRemove.Any())
             {
                 _DAL.DeletePoints(pointsToRemove);
-                _Activity.UpdateActivity(DataActivityType.DeletedPoints);
+                _Activity.UpdateAction(DataActionType.DeletedPoints);
             }
+
+            _PointsMapOrig = _PointsMap.Values.ToDictionary(p => p.CN, p => p.DeepCopy());
         }
 
         private void SavePolygons()
@@ -359,20 +429,22 @@ namespace TwoTrails.Core
             if (polygonsToAdd.Count > 0)
             {
                 _DAL.InsertPolygons(polygonsToAdd);
-                _Activity.UpdateActivity(DataActivityType.InsertedPolygons);
+                _Activity.UpdateAction(DataActionType.InsertedPolygons);
             }
 
             if (polygonsToUpdate.Count > 0)
             {
                 _DAL.UpdatePolygons(polygonsToUpdate);
-                _Activity.UpdateActivity(DataActivityType.ModifiedPolygons);
+                _Activity.UpdateAction(DataActionType.ModifiedPolygons);
             }
 
             if (polygonsToRemove.Any())
             {
                 _DAL.DeletePolygons(polygonsToRemove);
-                _Activity.UpdateActivity(DataActivityType.DeletedPolygons);
+                _Activity.UpdateAction(DataActionType.DeletedPolygons);
             }
+
+            _PolygonsMapOrig = _PolygonsMap.Values.ToDictionary(p => p.CN, p => new TtPolygon(p));
         }
 
         private void SaveMetadata()
@@ -400,20 +472,22 @@ namespace TwoTrails.Core
             if (metadataToAdd.Count > 0)
             {
                 _DAL.InsertMetadata(metadataToAdd);
-                _Activity.UpdateActivity(DataActivityType.InsertedMetadata);
+                _Activity.UpdateAction(DataActionType.InsertedMetadata);
             }
 
             if (metadataToUpdate.Count > 0)
             {
                 _DAL.UpdateMetadata(metadataToUpdate);
-                _Activity.UpdateActivity(DataActivityType.ModifiedMetadata);
+                _Activity.UpdateAction(DataActionType.ModifiedMetadata);
             }
 
             if (metadataToRemove.Any())
             {
                 _DAL.DeleteMetadata(metadataToRemove);
-                _Activity.UpdateActivity(DataActivityType.DeletedMetadata);
+                _Activity.UpdateAction(DataActionType.DeletedMetadata);
             }
+
+            _MetadataMapOrig = _MetadataMapOrig.Values.ToDictionary(m => m.CN, m => new TtMetadata(m));
         }
 
         private void SaveGroups()
@@ -441,20 +515,22 @@ namespace TwoTrails.Core
             if (groupsToAdd.Count > 0)
             {
                 _DAL.InsertGroups(groupsToAdd);
-                _Activity.UpdateActivity(DataActivityType.InsertedGroups);
+                _Activity.UpdateAction(DataActionType.InsertedGroups);
             }
 
             if (groupsToUpdate.Count > 0)
             {
                 _DAL.UpdateGroups(groupsToUpdate);
-                _Activity.UpdateActivity(DataActivityType.ModifiedGroups);
+                _Activity.UpdateAction(DataActionType.ModifiedGroups);
             }
 
             if (groupsToRemove.Any())
             {
                 _DAL.DeleteGroups(groupsToRemove);
-                _Activity.UpdateActivity(DataActivityType.DeletedGroups);
+                _Activity.UpdateAction(DataActionType.DeletedGroups);
             }
+
+            _GroupsMapOrig = _GroupsMap.Values.ToDictionary(g => g.CN, g => new TtGroup(g));
         }
         #endregion
 
@@ -487,7 +563,7 @@ namespace TwoTrails.Core
                 {
                     ChangeGpsZone(point, metadata.Zone, oldZone);
 
-                    if (adjustPolygons.ContainsKey(point.PolygonCN))
+                    if (!adjustPolygons.ContainsKey(point.PolygonCN))
                         adjustPolygons.Add(point.PolygonCN, point.Polygon);
                 }
 
@@ -495,7 +571,7 @@ namespace TwoTrails.Core
                 {
                     AdjustAllTravTypesInPolygon(polygon);
                     UpdatePolygonStats(polygon);
-                } 
+                }
             }
 
             IgnorePointEvents = false;
@@ -534,6 +610,14 @@ namespace TwoTrails.Core
 
                     UpdatePolygonStats(point.Polygon); 
                 }
+            }
+        }
+        
+        private void Point_MetadataChanged(TtPoint point, TtMetadata newMetadata, TtMetadata oldMetadata)
+        {
+            if (point.IsGpsType() && oldMetadata != null && newMetadata != null && newMetadata.Zone != oldMetadata.Zone)
+            {
+                ChangeGpsZone(point as GpsPoint, newMetadata.Zone, oldMetadata.Zone);
             }
         }
 
@@ -594,8 +678,7 @@ namespace TwoTrails.Core
                 {
                     AdjustTraverseFromStart(point.Index, points);
                 }
-
-                if (next.OpType == OpType.SideShot)
+                else if (next.OpType == OpType.SideShot)
                 {
                     AdjustSideShotsFromBasePoint(point, points);
                 }
@@ -627,7 +710,7 @@ namespace TwoTrails.Core
             {
                 TtPoint prev;
 
-                for (int i = point.Index - 1; i > 0; i--)
+                for (int i = point.Index - 1; i > -1; i--)
                 {
                     prev = points[i];
 
@@ -645,12 +728,11 @@ namespace TwoTrails.Core
         {
             IgnorePointEvents = true;
             
-            Parallel.ForEach(GetAllTravTypeSegmentsInPolygon(polygon),
-                (seg) => {
-                    if (seg.IsValid)
-                        seg.Adjust();
-                }
-            );
+            foreach (IPointSegment seg in GetAllTravTypeSegmentsInPolygon(polygon))
+            {
+                if (seg.IsValid)
+                    seg.Adjust();
+            }
 
             IgnorePointEvents = false;
         }
@@ -662,9 +744,9 @@ namespace TwoTrails.Core
 
         private void AdjustTraverseFromAfterStart(TtPoint point, IList<TtPoint> points)
         {
-            if (point.Index < points.Count - 1 || point.OpType == OpType.GPS) // make sure traverse isnt at end
+            if (point.Index < points.Count - 1 || point.IsGpsAtBase()) // make sure traverse isnt at end
             {
-                for (int i = point.Index - 1; i > 0; i--)
+                for (int i = point.Index - 1; i > -1; i--)
                 {
                     if (points[i].IsGpsAtBase())
                     {
@@ -692,11 +774,21 @@ namespace TwoTrails.Core
         }
 
 
-        public void RecalculatePolygons(bool waitForUpdates)
+        public void RecalculatePolygons(bool waitForUpdates = true)
         {
             foreach (TtPolygon poly in _Polygons)
             {
+                IgnorePointEvents = true;
+
+                foreach (TtPoint p in _PointsByPoly[poly.CN].Where(p => p.IsGpsType()))
+                {
+                    p.SetAdjLocation(p.UnAdjX, p.UnAdjY, p.UnAdjZ);
+                    p.SetAccuracy(poly.Accuracy);
+                }
+
                 AdjustAllTravTypesInPolygon(poly);
+
+                IgnorePointEvents = false;
 
                 if (waitForUpdates)
                 {
@@ -719,28 +811,20 @@ namespace TwoTrails.Core
             IList<TtPoint> points = _PointsByPoly[poly.CN];
             if (points.Count > 1)
             {
-                TtPoint gpsBaseType = null;
                 TtPoint lastPoint = points[0];
 
                 foreach (TtPoint point in points)
                 {
                     if (point.IsGpsAtBase())
                     {
-                        gpsBaseType = point;
-
                         if (ssSeg.Count > 0)
-                        {
                             segments.Add(ssSeg);
-                            ssSeg = new SideShotSegment();
-                        }
+
+                        ssSeg = new SideShotSegment();
+                        ssSeg.Add(point);
                     }
                     else if (point.OpType == OpType.SideShot)
                     {
-                        if (ssSeg.Count == 0)
-                        {
-                            ssSeg.Add(gpsBaseType);
-                        }
-
                         ssSeg.Add(point);
                     }
                     else if (point.OpType == OpType.Traverse && lastPoint.IsGpsAtBase())
@@ -754,6 +838,7 @@ namespace TwoTrails.Core
                 if (ssSeg.Count > 0)
                     segments.Add(ssSeg);
             }
+
             return segments;
         }
 
@@ -874,14 +959,6 @@ namespace TwoTrails.Core
 
             point.SetUnAdjLocation(coords.X, coords.Y, point.UnAdjZ);
         }
-
-        public void ChangePointMetadata(TtPoint point, TtMetadata metadata)
-        {
-            if (point.IsGpsType())
-                ChangeGpsZone(point as GpsPoint, metadata.Zone, point.Metadata.Zone);
-
-            point.Metadata = metadata;
-        }
         
         public void UpdatePolygonStats(TtPolygon polygon)
         {
@@ -901,25 +978,20 @@ namespace TwoTrails.Core
                     TtPoint p1 = points[0], fBndPt = null, lBndPt = null;
                     TtPoint p2 = points[points.Count - 1];
 
-                    if (p1.OnBoundary)
-                        lBndPt = p1;
+                    lBndPt = p1;
 
                     for (int i = 0; i < points.Count - 1; i++)
                     {
                         p1 = points[i];
                         p2 = points[i + 1];
 
-                        if (p1.OnBoundary)
-                        {
-                            if (fBndPt == null)
-                                fBndPt = p1;
-                        }
+                        if (fBndPt == null)
+                            fBndPt = p1;
 
-                        if (p2.OnBoundary)
-                            lBndPt = p2;
+                        lBndPt = p2;
 
                         perim += MathEx.Distance(p1.AdjX, p1.AdjY, p2.AdjX, p2.AdjY);
-                        area += (p2.AdjX - p1.AdjX) * (p2.AdjY + p1.AdjY) / 2;
+                        area += (p2.AdjX - p1.AdjX) * (p2.AdjY + p1.AdjY);
                     }
 
                     linePerim = perim;
@@ -927,10 +999,10 @@ namespace TwoTrails.Core
                     if (!fBndPt.HasSameAdjLocation(lBndPt))
                     {
                         perim += MathEx.Distance(fBndPt.AdjX, fBndPt.AdjY, lBndPt.AdjX, lBndPt.AdjY);
-                        area += (lBndPt.AdjX - fBndPt.AdjX) * (lBndPt.AdjY + fBndPt.AdjY) / 2;
+                        area += (fBndPt.AdjX - lBndPt.AdjX) * (fBndPt.AdjY + lBndPt.AdjY);
                     }
 
-                    polygon.Update(Math.Abs(area), perim, linePerim);
+                    polygon.Update(Math.Abs(area) / 2, perim, linePerim);
                 }
                 else
                 {
@@ -948,6 +1020,8 @@ namespace TwoTrails.Core
                 int index = 0;
                 foreach (TtPoint point in points)
                     point.Index = index++;
+
+                UpdateDataAction(DataActionType.ReindexPoints);
             }
 
             _PointsByPoly[poly.CN] = points;
@@ -1065,8 +1139,8 @@ namespace TwoTrails.Core
             }
 
             point.Polygon = polygon;
-            point.Metadata = metadata != null ? metadata : DefaultMetadata;
-            point.Group = group != null ? group : MainGroup;
+            point.Metadata = metadata ?? DefaultMetadata;
+            point.Group = group ?? MainGroup;
 
             return point;
         }
@@ -1101,6 +1175,14 @@ namespace TwoTrails.Core
                 else
                 {
                     points.Add(point);
+                }
+
+                if (point.OpType == OpType.Quondam && point is QuondamPoint qp && qp.ParentPoint == null)
+                {
+                    if (_PointsMap.ContainsKey(qp.ParentPointCN))
+                        qp.ParentPoint = _PointsMap[qp.ParentPointCN];
+                    else
+                        throw new Exception("No Parent Point Found");
                 }
 
                 _PointsMap.Add(point.CN, point);
@@ -1142,11 +1224,6 @@ namespace TwoTrails.Core
                         lastPoint.Index == point.Index - 1 && point.Index == points.Count)
                     {
                         points.Add(point);
-
-                        if (point.IsTravType() && !polysToAdjustTravsIn.Contains(point.PolygonCN))
-                        {
-                            polysToAdjustTravsIn.Add(point.PolygonCN);
-                        }
                     }
                     else
                     { 
@@ -1167,13 +1244,25 @@ namespace TwoTrails.Core
                         }
 
                         AttachPointEvents(point);
+                    }
 
-                        AdjustAroundPoint(point, points);
+                    if (point.OpType == OpType.Quondam && point is QuondamPoint qp && qp.ParentPoint == null)
+                    {
+                        if (_PointsMap.ContainsKey(qp.ParentPointCN))
+                            qp.ParentPoint = _PointsMap[qp.ParentPointCN];
+                        else
+                            throw new Exception("No Parent Point Found");
                     }
 
                     _Points.Add(point);
                     _PointsMap.Add(point.CN, point);
                     lastPoint = point;
+                    
+                    if (!polysToAdjustTravsIn.Contains(point.PolygonCN) && (point.IsTravType() ||
+                        (point.IsGpsAtBase() && points.Count > point.Index + 1 && points[point.Index + 1].IsTravType())))
+                    {
+                        polysToAdjustTravsIn.Add(point.PolygonCN);
+                    }
 
                     if (!polysToAdjust.Contains(point.PolygonCN))
                         polysToAdjust.Add(point.PolygonCN);
@@ -1250,13 +1339,14 @@ namespace TwoTrails.Core
                     TtPoint replacedPoint = _PointsMap[point.CN];
 
                     DetachPointEvents(replacedPoint);
-                    _Points.Add(replacedPoint);
+                    _Points.Remove(replacedPoint);
 
                     points[point.Index] = point;
                     _PointsMap[point.CN] = point;
-                    _Points.Add(point);
 
-                    AttachPointEvents(point);
+                    AttachPoint(point);
+
+                    _Points.Add(point);
 
                     if (!polysToAdjustTravsIn.Contains(point.Polygon) &&
                         (point.IsTravType() ||
@@ -1309,8 +1399,8 @@ namespace TwoTrails.Core
                     if (!reindexPolygons.Contains(point.PolygonCN))
                         reindexPolygons.Add(point.PolygonCN);
 
-                    point.Polygon = targetPolygon;
                     point.Index = index++;
+                    point.Polygon = targetPolygon;
                 }
 
                 AdjustAllTravTypesInPolygon(targetPolygon);
@@ -1322,13 +1412,13 @@ namespace TwoTrails.Core
                     {
                         index = 0;
                         foreach (TtPoint point in _PointsByPoly[ripoly])
-                        {
                             point.Index = index++;
-                        }
 
                         TtPolygon poly = _PolygonsMap[ripoly];
                         AdjustAllTravTypesInPolygon(poly);
                         UpdatePolygonStats(poly);
+
+                        UpdateDataAction(DataActionType.ReindexPoints);
                     }
                 }
             }
@@ -1346,7 +1436,7 @@ namespace TwoTrails.Core
                 if (_PointsMap.ContainsKey(point.CN))
                 {
                     if (point.HasQuondamLinks)
-                        throw new Exception("Point Has Linked Quondams");
+                        throw new Exception("Point Has Linked Quondam");
 
                     DetachPointEvents(point);
 
@@ -1363,7 +1453,8 @@ namespace TwoTrails.Core
                             points[i].Index = i;
                         }
 
-                        point = points.Last();
+                        if (points.Count > 0)
+                            point = points.Last();
                     }
 
                     if (points.Count > 0)
@@ -1382,7 +1473,8 @@ namespace TwoTrails.Core
         {
             lock (locker)
             {
-                if (points.Any(p => p.HasQuondamLinks))
+                List<string> pcns = points.Select(p => p.CN).ToList();
+                if (points.Any(p => p.HasQuondamLinks && p.LinkedPoints.Any(lpcn => !pcns.Contains(lpcn))))
                     throw new Exception("Points Have Linked Quondams");
 
                 List<TtPolygon> reindexPolys = new List<TtPolygon>();
@@ -1406,23 +1498,31 @@ namespace TwoTrails.Core
                     RebuildPolygon(polygon, true);
             }
         }
-        
 
-        /// <summary>
-        /// Create a Polygon
-        /// </summary>
-        /// <param name="name">Name of Polygon</param>
-        /// <param name="pointStartIndex">Point starting index for points in the polygon</param>
-        /// <returns>New Polygon</returns>
-        public TtPolygon CreatePolygon(String name = null, int pointStartIndex = 0)
+        public void DeletePointsInPolygon(string polyCN)
         {
-            int num = _PolygonsMap.Count + 1;
-            return new TtPolygon()
+            lock (locker)
             {
-                Name = name != null ? name : String.Format("Poly {0}", num),
-                PointStartIndex = pointStartIndex > 0 ? pointStartIndex : num * 1000 + 10
-            };
+                if (_PolygonsMap.ContainsKey(polyCN))
+                {
+                    List<TtPoint> points = _PointsByPoly[polyCN];
+
+                    if (points.Any(p => p.HasQuondamLinks))
+                        throw new Exception("Points Have Linked Quondams");
+
+                    foreach (TtPoint point in points)
+                    {
+                        DetachPointEvents(point);
+
+                        _PointsMap.Remove(point.CN);
+                        _Points.Remove(point);
+                    }
+
+                    _PointsByPoly[polyCN].Clear(); 
+                }
+            }
         }
+        
         
         /// <summary>
         /// Add a polygon to the project
@@ -1493,7 +1593,7 @@ namespace TwoTrails.Core
                                 }
                                 else
                                 {
-                                    Debug.WriteLine("Detached Quondam Found");
+                                    Trace.WriteLine("Detached Quondam Found");
                                 }
                             }
                         }
@@ -1515,20 +1615,6 @@ namespace TwoTrails.Core
             }
         }
 
-
-        /// <summary>
-        /// Create a new Metadata
-        /// </summary>
-        /// <param name="name">Name of metadata</param>
-        /// <returns>New metadata</returns>
-        public TtMetadata CreateMetadata(String name = null)
-        {
-            return new TtMetadata(_Settings.MetadataSettings.CreateDefaultMetadata())
-            {
-                CN = Guid.NewGuid().ToString(),
-                Name = name != null ? name : String.Format("Meta {0}", _MetadataMap.Count + 1)
-            };
-        }
         
         /// <summary>
         /// Adds a metadata to the project
@@ -1584,18 +1670,6 @@ namespace TwoTrails.Core
             }
         }
 
-
-        /// <summary>
-        /// Creates a new Group
-        /// </summary>
-        /// <param name="groupType">Type of Group to create</param>
-        /// <returns>New Group</returns>
-        public TtGroup CreateGroup(GroupType groupType = GroupType.General)
-        {
-            return new TtGroup(groupType != GroupType.General ?
-                String.Format("{0}_{1}", groupType, Guid.NewGuid().ToString().Substring(0, 8)) :
-                String.Format("Group ", _GroupsMap.Count + 1));
-        }
        
         /// <summary>
         /// Adds a group to the project
@@ -1653,7 +1727,7 @@ namespace TwoTrails.Core
 
         public List<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
-            return _DAL.GetNmeaBursts(pointCN);
+            return _DAL.GetNmeaBursts(pointCN).ToList();
         }
 
         public void AddNmeaBurst(TtNmeaBurst burst)
@@ -1669,6 +1743,45 @@ namespace TwoTrails.Core
         public void DeleteNmeaBursts(string pointCN)
         {
             _DAL.DeleteNmeaBursts(pointCN);
+        }
+
+
+
+        public List<TtImage> GetImages(string pointCN = null)
+        {
+            return _MediaMap == null ? new List<TtImage>() :
+                (pointCN == null ? _MediaMap.SelectMany(kvp => kvp.Value.Images) : _MediaMap[pointCN].Images).ToList();
+        }
+
+        public void InsertMedia(TtMedia media)
+        {
+            //todo add media
+            throw new NotImplementedException();
+        }
+
+        public void DeleteMedia(TtMedia media)
+        {
+            //todo delete media
+            throw new NotImplementedException();
+        }
+
+
+        //datadictionary
+
+        public DataDictionaryTemplate GetDataDictionaryTemplate()
+        {
+            return _DAL.GetDataDictionaryTemplate();
+        }
+
+        public void UpdateDataDictionaryTemplate(DataDictionaryTemplate dataDictionaryTemplate)
+        {
+            Load(); //reload all data
+        }
+
+
+        public void UpdateDataAction(DataActionType action, string notes = null)
+        {
+            _Activity.UpdateAction(action, notes);
         }
     }
 }

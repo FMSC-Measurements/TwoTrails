@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMSC.GeoSpatial.UTM;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -26,17 +27,32 @@ namespace TwoTrails.Core
 
         public static DateTime ParseTime(String value)
         {
-            DateTime time;
-
-            if (!DateTime.TryParse(value, out time))
+            if (!DateTime.TryParseExact(value, Consts.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime time))
             {
-                if (!DateTime.TryParseExact(value, Consts.DATE_FORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out time))
+                if (!DateTime.TryParse(value, out time))
                 {
                     time = DateTime.Now;
                 }
             }
 
             return time;
+        }
+
+
+        public static void ChangeGpsZone(GpsPoint point, int zone, int oldZone)
+        {
+            UTMCoords coords;
+
+            if (point.HasLatLon)
+            {
+                coords = UTMTools.ConvertLatLonSignedDecToUTM((double)point.Latitude, (double)point.Longitude, zone);
+            }
+            else
+            {
+                coords = UTMTools.ShiftZones(point.UnAdjX, point.UnAdjY, zone, oldZone);
+            }
+
+            point.SetUnAdjLocation(coords.X, coords.Y, point.UnAdjZ);
         }
     }
 }

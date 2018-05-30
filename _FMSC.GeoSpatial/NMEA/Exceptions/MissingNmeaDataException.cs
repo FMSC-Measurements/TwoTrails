@@ -15,7 +15,7 @@ namespace FMSC.GeoSpatial.NMEA.Exceptions
         { }
 
         public MissingNmeaDataException(SentenceID sentenceID) :
-            base(String.Format("Missing {0} sentence data.", sentenceID))
+            base($"Missing {sentenceID} sentence data.")
         { }
     }
 }

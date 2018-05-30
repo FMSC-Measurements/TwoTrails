@@ -10,7 +10,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public ITtGroupCommand(TtGroup group)
         {
-            this.group = group;
+            this.group = group ?? throw new ArgumentNullException(nameof(group));
         }
 
         public abstract void Redo();

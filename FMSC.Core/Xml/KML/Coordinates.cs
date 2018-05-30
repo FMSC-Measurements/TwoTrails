@@ -26,6 +26,11 @@ namespace FMSC.Core.Xml.KML
             return false;
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public static bool operator==(Coordinates c1, Coordinates c2)
         {
             return c1.Latitude == c2.Latitude && c1.Longitude == c2.Longitude && c1.Altitude == c2.Altitude;

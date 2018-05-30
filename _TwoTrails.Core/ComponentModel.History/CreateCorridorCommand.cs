@@ -11,7 +11,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private EditTtPointsCommand editPoints;
         private CreateQuondamsCommand createQuondams;
 
-        public CreateCorridorCommand(IEnumerable<TtPoint> points, TtPolygon targetPolygon, ITtManager pointsManager, bool autoCommit = true) : base(points)
+        public CreateCorridorCommand(IEnumerable<TtPoint> points, TtPolygon targetPolygon, ITtManager pointsManager) : base(points)
         {
             IEnumerable<TtPoint> ssPoints = points.Where(p => p.OpType == OpType.SideShot);
 
@@ -20,11 +20,8 @@ namespace TwoTrails.Core.ComponentModel.History
                 ssPoints = ssPoints.TakeWhile(p => p.CN != lastPoint.CN);
                 
 
-            editPoints = new EditTtPointsCommand(ssPoints, PointProperties.BOUNDARY, false, false);
-            createQuondams = new CreateQuondamsCommand(ssPoints.Reverse(), pointsManager, targetPolygon, int.MaxValue, true, false);
-            
-            if (autoCommit)
-                Redo();
+            editPoints = new EditTtPointsCommand(ssPoints, PointProperties.BOUNDARY, false);
+            createQuondams = new CreateQuondamsCommand(ssPoints.Reverse(), pointsManager, targetPolygon, int.MaxValue, true);
         }
 
         public override void Redo()

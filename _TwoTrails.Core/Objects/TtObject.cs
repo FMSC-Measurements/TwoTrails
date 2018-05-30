@@ -8,12 +8,7 @@ namespace TwoTrails.Core
         private String _CN;
         public String CN
         {
-            get
-            {
-                if (_CN == null)
-                    _CN = Guid.NewGuid().ToString();
-                return _CN;
-            }
+            get { return _CN ?? (_CN = Guid.NewGuid().ToString()); }
 
             set { SetField(ref _CN, value); }
         }

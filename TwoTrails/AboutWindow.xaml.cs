@@ -26,7 +26,7 @@ namespace TwoTrails
 
         public string DBVersion { get { return TwoTrailsSchema.SchemaVersion.ToString(); } }
 
-        public string Copyright { get { return String.Format("USDA Forest Service {0}", DateTime.Now.Year); } }
+        public string Copyright { get { return $"USDA Forest Service {DateTime.Now.Year}"; } }
 
         public ICommand CloseCommand { get; }
 

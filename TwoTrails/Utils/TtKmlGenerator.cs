@@ -74,59 +74,56 @@ namespace TwoTrails.Utils
                     List<TtPoint> points = manager.GetPoints(poly.CN);
 
                     #region Create Poly Folder and Point Folders
-                    Folder polyFolder = new Folder(poly.Name, poly.Description)
+                    KmlFolder polyFolder = new KmlFolder(poly.Name, poly.Description)
                     {
 
                         Open = false,
                         Visibility = true,
-                        Properties = new FMSC.Core.Xml.KML.Properties()
+                        Snippit = poly.Description,
+                        ExtendedData = new ExtendedData
                         {
-                            Snippit = poly.Description,
-                            ExtendedData = new ExtendedData
+                            DataItems = new List<ExtendedData.Data>()
                             {
-                                DataItems = new List<ExtendedData.Data>()
-                                {
-                                    new ExtendedData.Data("Accuracy (M)", poly.Accuracy),
-                                    new ExtendedData.Data("Perimeter (M)", poly.Perimeter),
-                                    new ExtendedData.Data("Perimeter (Ft)", poly.PerimeterFt),
-                                    new ExtendedData.Data("Area (Acres)", poly.AreaAcres),
-                                    new ExtendedData.Data("Area (HectaAcres)", poly.AreaHectaAcres)
-                                }
+                                new ExtendedData.Data("Accuracy (M)", poly.Accuracy),
+                                new ExtendedData.Data("Perimeter (M)", poly.Perimeter),
+                                new ExtendedData.Data("Perimeter (Ft)", poly.PerimeterFt),
+                                new ExtendedData.Data("Area (Acres)", poly.AreaAcres),
+                                new ExtendedData.Data("Area (HectaAcres)", poly.AreaHectaAcres)
                             }
                         }
                     };
 
-                    Folder fAdjBound = new Folder("AdjBound", "Adjusted Boundary Polygon")
+                    KmlFolder fAdjBound = new KmlFolder("AdjBound", "Adjusted Boundary Polygon")
                     {
                         Visibility = true,
                         StyleUrl = style.AdjBndStyle.StyleUrl,
                         Open = false
                     };
-                    Folder fUnAdjBound = new Folder("UnAdjBound", "UnAdjusted Boundary Polygon")
+                    KmlFolder fUnAdjBound = new KmlFolder("UnAdjBound", "UnAdjusted Boundary Polygon")
                     {
                         Visibility = false,
                         StyleUrl = style.UnAdjBndStyle.StyleUrl,
                         Open = false
                     };
-                    Folder fAdjNav = new Folder("AdjNav", "Adjusted Navigation Polygon")
+                    KmlFolder fAdjNav = new KmlFolder("AdjNav", "Adjusted Navigation Polygon")
                     {
                         Visibility = false,
                         StyleUrl = style.AdjNavStyle.StyleUrl,
                         Open = false
                     };
-                    Folder fUnAdjNav = new Folder("UnAdjNav", "UnAdjusted Navigation Polygon")
+                    KmlFolder fUnAdjNav = new KmlFolder("UnAdjNav", "UnAdjusted Navigation Polygon")
                     {
                         Visibility = false,
                         StyleUrl = style.UnAdjNavStyle.StyleUrl,
                         Open = false
                     };
-                    Folder fMiscPoints = new Folder("Misc", "Misc Points")
+                    KmlFolder fMiscPoints = new KmlFolder("Misc", "Misc Points")
                     {
                         Visibility = false,
                         StyleUrl = style.UnAdjMiscStyle.StyleUrl,
                         Open = false
                     };
-                    Folder fWayPoints = new Folder("Waypoints", "Waypoints")
+                    KmlFolder fWayPoints = new KmlFolder("Waypoints", "Waypoints")
                     {
                         Visibility = false,
                         StyleUrl = style.WayPtsStyle.StyleUrl,
@@ -136,32 +133,32 @@ namespace TwoTrails.Utils
 
 
                     #region Create Folders for Bound, Nav, and Misc
-                    Folder fAdjBoundPoints = new Folder("Points", "Adjusted Boundary Points")
+                    KmlFolder fAdjBoundPoints = new KmlFolder("Points", "Adjusted Boundary Points")
                     {
                         Visibility = true,
                         Open = true
                     };
-                    Folder fUnAdjBoundPoints = new Folder("Points", "UnAdjusted Boundary Points")
+                    KmlFolder fUnAdjBoundPoints = new KmlFolder("Points", "UnAdjusted Boundary Points")
                     {
                         Visibility = false,
                         Open = false
                     };
-                    Folder fAdjNavPoints = new Folder("Points", "Adjusted Navigation Points")
+                    KmlFolder fAdjNavPoints = new KmlFolder("Points", "Adjusted Navigation Points")
                     {
                         Visibility = false,
                         Open = false
                     };
-                    Folder fUnAdjNavPoints = new Folder("Points", "UnAdjusted Navigation Points")
+                    KmlFolder fUnAdjNavPoints = new KmlFolder("Points", "UnAdjusted Navigation Points")
                     {
                         Visibility = false,
                         Open = false
                     };
-                    Folder fAdjMiscPoints = new Folder("Adj Points", "Adjusted Misc Points")
+                    KmlFolder fAdjMiscPoints = new KmlFolder("Adj Points", "Adjusted Misc Points")
                     {
                         Visibility = false,
                         Open = false
                     };
-                    Folder fUnAdjMiscPoints = new Folder("UnAdj Points", "UnAdjusted Misc Points")
+                    KmlFolder fUnAdjMiscPoints = new KmlFolder("UnAdj Points", "UnAdjusted Misc Points")
                     {
                         Visibility = false,
                         Open = false
@@ -215,11 +212,10 @@ namespace TwoTrails.Utils
                             unadjCoords = new Coordinates(pos.Y, pos.X);
                         }
 
-                        string snippit = String.Format("Point Operation: {0}", point.OpType);
+                        string snippit = $"Point Operation: {point.OpType}";
 
                         Placemark adjPm = new Placemark(point.PID.ToString(),
-                            String.Format("Point Operation: {0}<br><div>\t     Adjusted<br>UtmX: {1}<br>UtmY: {2}</div><br>{3}",
-                            point.OpType, point.AdjX, point.AdjY, point.Comment))
+                            $"Point Operation: {point.OpType}<br><div>\t     Adjusted<br>UtmX: {point.AdjX}<br>UtmY: {point.AdjY}</div><br>{point.Comment}")
                         {
                             View = new View()
                             {
@@ -229,21 +225,17 @@ namespace TwoTrails.Utils
                                 AltMode = AltitudeMode.ClampToGround,
                                 Range = 150
                             },
-                            Properties = new FMSC.Core.Xml.KML.Properties()
-                            {
-                                Snippit = snippit
-                            },
+                            Snippit = snippit,
                             StyleUrl = style.AdjBndStyle.StyleUrl,
                             Open = false,
                             Visibility = true
                         };
 
-                        adjPm.Points.Add(new Point(adjCoords));
+                        adjPm.Points.Add(new KmlPoint(adjCoords));
 
 
                         Placemark unadjPm = new Placemark(point.PID.ToString(),
-                            String.Format("Point Operation: {0}<br><div>\t     Unadjusted<br>UtmX: {1}<br>UtmY: {2}</div><br>{3}",
-                            point.OpType, point.UnAdjX, point.UnAdjY, point.Comment))
+                            $"Point Operation: {point.OpType}<br><div>\t     Unadjusted<br>UtmX: {point.UnAdjX}<br>UtmY: {point.UnAdjY}</div><br>{point.Comment}")
                         {
                             View = new View()
                             {
@@ -253,16 +245,13 @@ namespace TwoTrails.Utils
                                 AltMode = AltitudeMode.ClampToGround,
                                 Range = 150
                             },
-                            Properties = new FMSC.Core.Xml.KML.Properties()
-                            {
-                                Snippit = snippit
-                            },
+                            Snippit = snippit,
                             StyleUrl = style.AdjBndStyle.StyleUrl,
                             Open = false,
                             Visibility = false
                         };
 
-                        adjPm.Points.Add(new Point(unadjCoords));
+                        unadjPm.Points.Add(new KmlPoint(unadjCoords));
                         #endregion
 
                         #region Add Placemarks to Lists
@@ -346,10 +335,7 @@ namespace TwoTrails.Utils
                             Tilt = 5,
                             TimeSpan = pointTimespan
                         } : null,
-                        Properties = new FMSC.Core.Xml.KML.Properties()
-                        {
-                            Snippit = poly.Description
-                        },
+                        Snippit = poly.Description,
                         Open = false,
                         Visibility = true,
                         StyleUrl = style.AdjBndStyle.StyleUrl
@@ -368,10 +354,7 @@ namespace TwoTrails.Utils
                             Tilt = 5,
                             TimeSpan = pointTimespan
                         } : null,
-                        Properties = new FMSC.Core.Xml.KML.Properties()
-                        {
-                            Snippit = poly.Description
-                        },
+                        Snippit = poly.Description,
                         Open = false,
                         Visibility = false,
                         StyleUrl = style.UnAdjBndStyle.StyleUrl
@@ -390,10 +373,7 @@ namespace TwoTrails.Utils
                             Tilt = 5,
                             TimeSpan = pointTimespan
                         } : null,
-                        Properties = new FMSC.Core.Xml.KML.Properties()
-                        {
-                            Snippit = poly.Description
-                        },
+                        Snippit = poly.Description,
                         Open = false,
                         Visibility = false,
                         StyleUrl = style.AdjNavStyle.StyleUrl
@@ -412,10 +392,7 @@ namespace TwoTrails.Utils
                             Tilt = 5,
                             TimeSpan = pointTimespan
                         } : null,
-                        Properties = new FMSC.Core.Xml.KML.Properties()
-                        {
-                            Snippit = poly.Description
-                        },
+                        Snippit = poly.Description,
                         Open = false,
                         Visibility = false,
                         StyleUrl = style.UnAdjNavStyle.StyleUrl
@@ -473,7 +450,7 @@ namespace TwoTrails.Utils
             else
             {
                 KmlColor c = new KmlColor(color.R, color.G, color.B, color.A);
-                Style s = new Style(String.Format("style_{0}", styles.Count));
+                Style s = new Style($"style_{styles.Count}");
                 s.SetColorsILP(c);
                 s.IconScale = 1;
                 s.IconColor = c;
@@ -484,7 +461,7 @@ namespace TwoTrails.Utils
                 s.PolygonOutline = true;
                 s.BalloonDisplayMode = DisplayMode.Default;
 
-                Style hs = new Style(String.Format("styleH_{0}", styles.Count), s);
+                Style hs = new Style($"styleH_{styles.Count}", s);
                 hs.IconScale = 1.1;
                 hs.IconColor = new KmlColor(255, 255, 255, 255);
 
@@ -492,7 +469,7 @@ namespace TwoTrails.Utils
                 styles.Add(color, sp);
 
 
-                StyleMap map = new StyleMap(String.Format("styleMap_{0}", styleMaps.Count), s.StyleUrl, hs.StyleUrl);
+                StyleMap map = new StyleMap($"styleMap_{styleMaps.Count}", s.StyleUrl, hs.StyleUrl);
 
                 styleMaps.Add(color, map);
 

@@ -11,6 +11,11 @@ namespace TwoTrails.Core
         TtMetadata DefaultMetadata { get; }
         TtGroup MainGroup { get; }
         
+        bool HasDataDictionary { get; }
+
+        int PolygonCount { get; }
+        int PointCount { get; }
+
         void RebuildPolygon(TtPolygon polygon, bool reindex = false);
         void RecalculatePolygons();
 
@@ -24,6 +29,7 @@ namespace TwoTrails.Core
         void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex);
         void DeletePoint(TtPoint point);
         void DeletePoints(IEnumerable<TtPoint> points);
+        void DeletePointsInPolygon(string polyCN);
 
         TtPolygon GetPolygon(string polyCN);
         List<TtPolygon> GetPolygons();
@@ -43,14 +49,19 @@ namespace TwoTrails.Core
         void AddNmeaBurst(TtNmeaBurst burst);
         void AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
         void DeleteNmeaBursts(string pointCN);
+        
+        List<TtImage> GetImages(String pointCN = null);
+        void InsertMedia(TtMedia media);
+        void DeleteMedia(TtMedia media);
 
-        //TODO Media Manager
-        //List<TtImage> GetImages(String pointCN);
-        //void InsertMedia(TtMedia media);
-        //void DeleteMedia(TtMedia media);
 
+        DataDictionaryTemplate GetDataDictionaryTemplate();
+        
 
         PolygonGraphicOptions GetPolygonGraphicOption(string polyCN);
         List<PolygonGraphicOptions> GetPolygonGraphicOptions();
+
+
+        void UpdateDataAction(DataActionType action, string notes = null);
     }
 }

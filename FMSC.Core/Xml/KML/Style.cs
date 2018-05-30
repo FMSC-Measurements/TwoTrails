@@ -10,7 +10,7 @@ namespace FMSC.Core.Xml.KML
     {
         #region Properties
         public string ID { get; }
-        public string StyleUrl { get { return String.Format("#{0}", ID); } }
+        public string StyleUrl { get { return $"#{ID}"; } }
 
         public string IconID { get; set; }
         public string IconUrl { get; set; }

@@ -12,6 +12,8 @@ namespace TwoTrails.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (parameter is bool rev)
+                return rev ? value == null : value != null;
             return value != null;
         }
 

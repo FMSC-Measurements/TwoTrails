@@ -44,7 +44,7 @@ namespace TwoTrails.Core
 
         public override string ToString()
         {
-            return String.Format("{0}.{1}.{2}", Major, Minor, Update);
+            return $"{Major}.{Minor}.{Update}";
         }
 
         public int ToIntVersion()

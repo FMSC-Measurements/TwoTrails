@@ -1,18 +1,22 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Controls;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
+using TwoTrails.Core.Points;
 using TwoTrails.DAL;
 using TwoTrails.Utils;
 
@@ -58,7 +62,7 @@ namespace TwoTrails.ViewModels
         public bool CanImport { get { return ImportControl != null && ImportControl.HasSelectedPolygons && !IsImporting; } }
 
 
-        public ImportModel(Window window, ITtManager manager)
+        public ImportModel(Window window, ITtManager manager, string fileName = null)
         {
             _Window = window;
             _Manager = manager;
@@ -71,79 +75,158 @@ namespace TwoTrails.ViewModels
             ImportCommand = new BindedRelayCommand<ImportModel>(x => ImportData(), x => CanImport, this, m => m.CanImport);
 
             CancelCommand = new RelayCommand(x => Cancel());
+
+            if (fileName != null)
+                SetupImport(fileName);
         }
 
         private void BrowseFile()
         {
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Multiselect = false;
-            ofd.Filter = @"Importable Files|*.tt; *.tt2; *.csv; *.txt; *.shp; *.gpx|TwoTrails files (*.tt;*.tt2)|*.tt; *.tt2|
-CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX Files (*.gpx)|*.gpx|All Files (*.*)|*.*";
+            ofd.Multiselect = true;
+            ofd.Filter = $@"Importable Files|*{Consts.FILE_EXTENSION}; *{Consts.FILE_EXTENSION_V2}; *.csv; *.txt; *.shp; *.gpx; *.kml; *.kmz|
+TwoTrails files (*{Consts.FILE_EXTENSION};*{Consts.FILE_EXTENSION_V2})|*{Consts.FILE_EXTENSION}; *{Consts.FILE_EXTENSION_V2}|
+CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX Files (*.gpx)|*.gpx|Google Earth Files (*.kml *.kmz)|*.kml; *.kmz|All Files (*.*)|*.*";
 
             if (ofd.ShowDialog() == true)
             {
-                CurrentFile = ofd.FileName;
-                SetupImport(CurrentFile);
+                if (ofd.FileNames.Length > 1)
+                {
+                    foreach (string fn in ofd.FileNames)
+                    {
+                        if (!fn.EndsWith(".shp"))
+                        {
+                            MessageBox.Show("Only Shape Files can be imported in bulk.", "Import Files", MessageBoxButton.OK, MessageBoxImage.Stop);
+                            return;
+                        }
+                    }
+
+                    SetupShapeFiles(ofd.FileNames);
+                }
+                else
+                {
+                    CurrentFile = ofd.FileName;
+                    SetupImport(CurrentFile);
+                }
             }
         }
 
         public void SetupImport(string fileName)
         {
-            switch (Path.GetExtension(fileName))
+            switch (Path.GetExtension(fileName).ToLower())
             {
-                case ".tt":
+                case Consts.FILE_EXTENSION:
                     IsSettingUp = true;
-                    ImportControl = new ImportControl(new TtSqliteDataAccessLayer(fileName), true, true, true);
+
+                    TtSqliteDataAccessLayer idal = new TtSqliteDataAccessLayer(fileName);
+                    
+                    if (idal.HasErrors())
+                        idal.Fix();
+
+                    ImportControl = new ImportControl(idal, true, true, true);
                     break;
-                case ".tt2":
+                case Consts.FILE_EXTENSION_V2:
                     IsSettingUp = true;
                     ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), true, true, true);
                     break;
-                case ".csv":
-                case ".text":
+                case Consts.CSV_EXT:
+                case Consts.TEXT_EXT:
                     IsSettingUp = true;
                     MainContent = new CsvParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
                     {
                         try
                         {
-                            //TODO show progress indicator while parsing
-                            //MainContent = new WaitCursorControl; ??
-                            dal.Parse();
-                            //hide progress indicator
+                            MainContent = new TtProgressControl();
 
-                            ImportControl = new ImportControl(dal, false, dal.GetGroups().Any(), false);
+                            Task.Run(() =>
+                            {
+                                dal.Parse();
+                                MainContent.Dispatcher.Invoke(() =>
+                                {
+                                    ImportControl = new ImportControl(dal, false, dal.GetGroups().Any(), false);
+                                });
+                            });
                         }
                         catch (Exception ex)
                         {
                             Trace.WriteLine(ex.Message, "ImportModel:SetupImport:CSV");
-                            MessageBox.Show(String.Format("A parsing error has occured. Please check your fields correctly. See log file for details."),
+                            MessageBox.Show("A parsing error has occured. Please check your fields correctly. See log file for details.",
                                 "Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     });
                     break;
-                case ".gpx":
+                case Consts.GPX_EXT:
                     IsSettingUp = true;
                     MainContent = new GpxParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
                     {
                         try
                         {
-                            //TODO show progress indicator while parsing
-                            //MainContent = new WaitCursorControl; ??
-                            dal.Parse();
-                            //hide progress indicator
+                            MainContent = new TtProgressControl();
 
-                            ImportControl = new ImportControl(dal, false, false, false);
+                            Task.Run(() =>
+                            {
+                                dal.Parse();
+                                MainContent.Dispatcher.Invoke(() =>
+                                {
+                                    ImportControl = new ImportControl(dal, false, false, false);
+                                });
+                            });
                         }
                         catch (Exception ex)
                         {
                             Trace.WriteLine(ex.Message, "ImportModel:SetupImport:GPX");
-                            MessageBox.Show(String.Format("A parsing error has occured. Please check your fields correctly. See log file for details."),
+                            MessageBox.Show("A parsing error has occured. Please check your fields correctly. See log file for details.",
                                 "Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     });
                     break;
-                case ".shp":
-                    IsSettingUp = true;
+                case Consts.KML_EXT:
+                case Consts.KMZ_EXT:
+                    {
+                        try
+                        {
+                            ImportControl = new ImportControl(
+                                new TtKmlDataAccessLayer(
+                                    new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true, startPolyNumber: _Manager.PolygonCount)
+                            ), false, false, false);
+
+                            IsSettingUp = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Earth File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+
+                        break;
+                    }
+                case Consts.SHAPE_EXT:
+                case Consts.SHAPE_PRJ_EXT:
+                case Consts.SHAPE_SHX_EXT:
+                case Consts.SHAPE_DBF_EXT:
+                    switch (TtShapeFileDataAccessLayer.ValidateShapePackage(fileName, _Manager.DefaultMetadata.Zone))
+                    {
+                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.Valid:
+                            {
+                                ImportControl = new ImportControl(
+                                    new TtShapeFileDataAccessLayer(
+                                        new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
+                                    ), false, false, false
+                                );
+                                IsSettingUp = true;
+                                break;
+                            }
+                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.MissingFiles:
+                            MessageBox.Show("Missing one many of the 'shp', 'prj', 'dbf', or 'shx' files.");
+                            break;
+                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.NotNAD83:
+                            MessageBox.Show("Shape File is not in the NAD83 format.");
+                            break;
+                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.MismatchZone:
+                            MessageBox.Show($"Shape File is not in zone {_Manager.DefaultMetadata.Zone}.");
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 default:
                     MessageBox.Show("File type not supported.");
@@ -151,17 +234,64 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
             }
         }
 
+        private void SetupShapeFiles(IEnumerable<string> shapefiles)
+        {
+            ImportControl = new ImportControl(
+                        new TtShapeFileDataAccessLayer(
+                            new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
+                        )
+                    );
+            IsSettingUp = true;
+        }
+
         public void ImportData()
         {
+            IEnumerable<string> selectedPolys = ImportControl.SelectedPolygons;
+            bool convertForeignQuondams = false;
+            
+            if (ImportControl.DAL.HandlesAllPointTypes)
+            {
+                List<string> neededPolys = new List<string>();
+
+                foreach (string polyCN in selectedPolys)
+                {
+                    IEnumerable<TtPoint> points = ImportControl.DAL.GetPoints(polyCN, true).Where(p => p.OpType == OpType.Quondam);
+
+                    foreach (QuondamPoint qp in ImportControl.DAL.GetPoints(polyCN, true)
+                        .Where(p => p.OpType == OpType.Quondam).Cast<QuondamPoint>())
+                    {
+                        if (qp.ParentPoint.PolygonCN != polyCN && !neededPolys.Contains(qp.ParentPoint.PolygonCN))
+                            neededPolys.Add(qp.ParentPoint.PolygonCN);
+                    }
+                }
+                
+                if (neededPolys.Count > 0)
+                {
+                    MessageBoxResult res = MessageBox.Show("Some quondams are linked to points that are not within the list of improted polygons. Would you like to import these polygons (YES) or convert the points to GPS (NO)?", "Foreign Quondams",
+                        MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        selectedPolys = selectedPolys.Concat(neededPolys);
+                    }
+                    else if (res == MessageBoxResult.No)
+                    {
+                        convertForeignQuondams = true;
+                    }
+                    else
+                        return;
+                }
+            }
+
             IsSettingUp = false;
             IsImporting = true;
 
             try
             {
-                Import.DAL(_Manager, ImportControl.DAL, ImportControl.SelectedPolygons,
-                        ImportControl.IncludeMetadata, ImportControl.IncludeGroups, ImportControl.IncludeNmea);
+                Import.DAL(_Manager, ImportControl.DAL, selectedPolys, ImportControl.IncludeMetadata,
+                    ImportControl.IncludeGroups, ImportControl.IncludeNmea, convertForeignQuondams);
 
-                MessageBox.Show(String.Format("{0} Polygons Imported", ImportControl.SelectedPolygons.Count()),
+                MessageBox.Show($"{selectedPolys.Count()} Polygons Imported",
                     String.Empty, MessageBoxButton.OK, MessageBoxImage.None);
             }
             catch (Exception ex)

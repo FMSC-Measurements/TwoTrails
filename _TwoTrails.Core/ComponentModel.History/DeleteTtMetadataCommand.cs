@@ -4,12 +4,9 @@
     {
         private ITtManager pointsManager;
 
-        public DeleteTtMetadataCommand(TtMetadata metadata, ITtManager pointsManager, bool autoCommit = true) : base(metadata)
+        public DeleteTtMetadataCommand(TtMetadata metadata, ITtManager pointsManager) : base(metadata)
         {
             this.pointsManager = pointsManager;
-
-            if (autoCommit)
-                Redo();
         }
 
         public override void Redo()

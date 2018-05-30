@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
+# Visual Studio 15
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "_FMSC.GeoSpatial", "_FMSC.GeoSpatial\_FMSC.GeoSpatial.shproj", "{4E12BE73-5F4D-4B6A-90A7-B0A130A6C654}"

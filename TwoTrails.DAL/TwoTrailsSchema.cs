@@ -6,10 +6,11 @@ namespace TwoTrails.DAL
     public static class TwoTrailsSchema
     {
         //Old Schema Versions
-        public static readonly Version OSV_2_0_0 = new Version(2, 0, 0);
+        public static readonly Version OSV_2_0_1 = new Version(2, 0, 1);
+        public static readonly Version OSV_2_0_2 = new Version(2, 0, 2);
 
         //Schema Version
-        public static readonly Version SchemaVersion = OSV_2_0_0;
+        public static readonly Version SchemaVersion = OSV_2_0_2;
 
 
         public static class SharedSchema
@@ -299,6 +300,7 @@ namespace TwoTrails.DAL
             public const String SatellitesTrackedCount = "SatTrackCount";
             public const String SatellitesInViewCount = "SatInViewCount";
             public const String UsedSatPRNS = "PRNS";
+            public const String SatellitesInView = "SatInView";
 
             public const String CreateTable =
                 "CREATE TABLE " + TableName + " (" +
@@ -330,6 +332,7 @@ namespace TwoTrails.DAL
                 SatellitesTrackedCount + " INTEGER, " +
                 SatellitesInViewCount + " INTEGER, " +
                 UsedSatPRNS + " TEXT, " +
+                SatellitesInView + " TEXT, " +
                 "PRIMARY KEY (" + SharedSchema.CN + "));";
 
             public const String SelectItems =
@@ -360,7 +363,8 @@ namespace TwoTrails.DAL
                 SatellitesUsedCount + ", " +
                 SatellitesTrackedCount + ", " +
                 SatellitesInViewCount + ", " +
-                UsedSatPRNS;
+                UsedSatPRNS + ", " +
+                SatellitesInView;
         }
         #endregion
 
@@ -499,72 +503,7 @@ namespace TwoTrails.DAL
                 WayPtsColor;
         }
         #endregion
-
-        #region Media
-        #region Media Table
-        public static class MediaSchema
-        {
-            public const String TableName = "Media";
-
-            public const String PointCN = "PointCN";
-            public const String MediaType = "MediaType";
-            public const String Name = "Name";
-            public const String FilePath = "FilePath";
-            public const String CreationTime = "CreationTime";
-            public const String Comment = "Comment";
-
-            public const String CreateTable =
-                "CREATE TABLE " + TableName + " (" +
-                SharedSchema.CN + " TEXT NOT NULL, " +
-                PointCN + " TEXT, " +
-                MediaType + " INTEGER, " +
-                Name + " TEXT, " +
-                FilePath + " TEXT, " +
-                CreationTime + " TEXT, " +
-                Comment + " TEXT, " +
-                "PRIMARY KEY (" + SharedSchema.CN + "));";
-
-            public const String SelectItems =
-                    SharedSchema.CN + ", " +
-                    PointCN + ", " +
-                    MediaType + ", " +
-                    Name + ", " +
-                    FilePath + ", " +
-                    CreationTime + ", " +
-                    Comment;
-        }
-        #endregion
         
-        #region PictureTable
-        public static class PictureSchema
-        {
-            public const String TableName = "PictureData";
-
-            public const String PicType = "Type";
-            public const String Azimuth = "Azimuth";
-            public const String Pitch = "Pitch";
-            public const String Roll = "Roll";
-
-            public const String CreateTable =
-                "CREATE TABLE " + TableName + " (" +
-                SharedSchema.CN + " TEXT REFERENCES " +
-                MediaSchema.TableName + ", " +
-                PicType + " INTEGER, " +
-                Azimuth + " REAL, " +
-                Pitch + " REAL, " +
-                Roll + " REAL, " +
-                "PRIMARY KEY (" + SharedSchema.CN + "));";
-
-            public const String SelectItemsNoCN =
-                PicType + ", " +
-                Azimuth + ", " +
-                Pitch + ", " +
-                Roll;
-        }
-        #endregion
-        #endregion
-
-
         #region Activity
         public static class ActivitySchema
         {
@@ -573,14 +512,16 @@ namespace TwoTrails.DAL
             public const String UserName = "UserName";
             public const String DeviceName = "DeviceName";
             public const String ActivityDate = "ActivityDate";
-            public const String DataActivity = "ActivityType";
+            public const String ActivityType = "ActivityType";
+            public const String ActivityNotes = "ActivityNotes";
 
             public const String CreateTable =
                 "CREATE TABLE " + TableName + " (" +
                 UserName + " TEXT, " +
                 DeviceName + " TEXT, " +
                 ActivityDate + " TEXT, " +
-                DataActivity + " INTEGER" +
+                ActivityType + " INTEGER, " +
+                ActivityNotes + " TEXT" +
                 ");";
 
 
@@ -588,8 +529,63 @@ namespace TwoTrails.DAL
                 UserName + ", " +
                 DeviceName + ", " +
                 ActivityDate + ", " +
-                DataActivity;
+                ActivityType + ", " +
+                ActivityNotes;
         }
+        #endregion
+
+        #region DataDictionary
+        public static class DataDictionarySchema
+        {
+            public const String TableName = "DataDictionary";
+
+            public const String Name = "Name";
+            public const String FieldOrder = "FieldOrder";
+            public const String FieldType = "FieldType";
+            public const String Flags = "Flags";
+            public const String FieldValues = "FieldValues";
+            public const String DefaultValue = "DefaultValue";
+            public const String ValueRequired = "ValueRequired";
+            public const String DataType = "DataType";
+
+            public const String ExtendDataTableName = "DDData";
+            public const String PointCN = "PointCN";
+            
+
+            public const String CreateTable =
+                "CREATE TABLE " + TableName + " (" +
+                SharedSchema.CN + " TEXT NOT NULL, " +
+                Name + " TEXT NOT NULL, " +
+                FieldOrder + " INTEGER NOT NULL, " +
+                FieldType + " INTEGER NOT NULL, " +
+                Flags + " INTEGER, " +
+                FieldValues + " TEXT, " +
+                DefaultValue + " TEXT, " +
+                ValueRequired + " INTEGER NOT NULL, " +
+                DataType + " INTEGER NOT NULL" +
+                ");";
+
+
+            public const String SelectItems =
+                SharedSchema.CN + ", " +
+                Name + ", " +
+                FieldOrder + ", " +
+                FieldType + ", " +
+                Flags + ", " +
+                FieldValues + ", " +
+                DefaultValue + ", " +
+                ValueRequired + ", " +
+                DataType;
+        }
+        #endregion
+
+
+
+        #region Upgrades
+
+        public static readonly string UPGRADE_OSV_2_0_2 = $@"ALTER TABLE {ActivitySchema.TableName} ADD {ActivitySchema.ActivityNotes} TEXT; 
+ALTER TABLE {TtNmeaSchema.TableName} ADD {TtNmeaSchema.SatellitesInView} TEXT;";
+
         #endregion
     }
 }

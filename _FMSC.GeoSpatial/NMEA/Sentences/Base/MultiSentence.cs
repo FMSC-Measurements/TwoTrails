@@ -40,7 +40,7 @@ namespace FMSC.GeoSpatial.NMEA.Sentences.Base
                 }
                 else
                 {
-                    RawNmea = String.Format("{0}\n{1}", RawNmea, nmea);
+                    RawNmea = $"{RawNmea}\n{nmea}";
                 }
 
                 IsValid = true;

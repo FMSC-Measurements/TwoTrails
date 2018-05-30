@@ -3,16 +3,45 @@ using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using TwoTrails.Core;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Utils
 {
     public static class TtUtils
     {
+        public static bool? CheckForUpdate()
+        {
+            try
+            {
+                string res = new WebClient().DownloadString(Consts.URL_TWOTRAILS_UPDATE);
+
+                if (res != null)
+                {
+                    string[] tokens = res.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (tokens.Length > 0)
+                    {
+                        if (new Version(tokens[0].Trim()) > Assembly.GetExecutingAssembly().GetName().Version)
+                            return true;
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
+            return false;
+        }
+
 
         public static UtmExtent GetExtents(IEnumerable<TtPoint> points, bool adjusted = true)
         {
@@ -34,9 +63,7 @@ namespace TwoTrails.Utils
         {
             if (point.Metadata.Zone != targetZone)
             {
-                GpsPoint gps = point as GpsPoint;
-
-                if (gps != null && gps.HasLatLon)
+                if (point is GpsPoint gps && gps.HasLatLon)
                 {
                     return UTMTools.ConvertLatLonSignedDecToUTM((double)gps.Latitude, (double)gps.Longitude, targetZone);
                 }
@@ -63,8 +90,7 @@ namespace TwoTrails.Utils
 
         public static Point GetLatLon(TtPoint point, bool adjusted = true)
         {
-            GpsPoint gps = point as GpsPoint;
-            if (gps != null && gps.HasLatLon)
+            if (point is GpsPoint gps && gps.HasLatLon)
             {
                 return new Point((double)gps.Longitude, (double)gps.Latitude);
             }
@@ -137,6 +163,63 @@ namespace TwoTrails.Utils
             }
 
             return new TimeSpan((end - start).Ticks);
+        }
+
+
+
+        public static double AzimuthOfPoint(double x1, double y1, double x2, double y2)
+        {
+            double xCoord = x2 - x1, yCoord = y2 - y1;
+
+            double az = FMSC.Core.Convert.RadiansToDegrees(Math.Atan2(xCoord, yCoord));
+
+            if (az < 0)
+                az += 360;
+
+            return az;
+        }
+
+
+
+        public static bool IsImportableFileType(String fileName)
+        {
+            switch (Path.GetExtension(fileName).ToLower())
+            {
+                case Consts.CSV_EXT:
+                case Consts.TEXT_EXT:
+                case Consts.KML_EXT:
+                case Consts.KMZ_EXT:
+                case Consts.GPX_EXT:
+                case Consts.SHAPE_EXT:
+                case Consts.SHAPE_PRJ_EXT:
+                case Consts.SHAPE_SHX_EXT:
+                case Consts.SHAPE_DBF_EXT:
+                case Consts.FILE_EXTENSION:
+                case Consts.FILE_EXTENSION_V2:
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static string GetFileTypeName(string fileName)
+        {
+            switch (Path.GetExtension(fileName).ToLower())
+            {
+                case Consts.CSV_EXT: return "CSV";
+                case Consts.TEXT_EXT: return "Text";
+                case Consts.KML_EXT:
+                case Consts.KMZ_EXT: return "Google Earth";
+                case Consts.GPX_EXT: return "GPX";
+                case Consts.SHAPE_EXT:
+                case Consts.SHAPE_PRJ_EXT:
+                case Consts.SHAPE_SHX_EXT:
+                case Consts.SHAPE_DBF_EXT: return "Shape";
+                case Consts.FILE_EXTENSION: return "TwoTrails";
+                case Consts.FILE_EXTENSION_V2: return "TwoTrails V2";
+            }
+
+            return String.Empty;
         }
     }
 }

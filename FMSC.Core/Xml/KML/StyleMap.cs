@@ -9,7 +9,7 @@ namespace FMSC.Core.Xml.KML
     public class StyleMap
     {
         public string ID { get; }
-        public string StyleUrl { get { return String.Format("#{0}", ID); } }
+        public string StyleUrl { get { return $"#{ID}"; } }
 
         public string NormalStyleUrl { get; set; }
         public string HightLightedStyleUrl { get; set; }

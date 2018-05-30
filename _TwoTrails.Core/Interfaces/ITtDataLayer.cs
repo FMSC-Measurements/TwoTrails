@@ -10,9 +10,9 @@ namespace TwoTrails.DAL
     {
         String FilePath { get; }
 
-        #region Points
-        List<TtPoint> GetPointsUnlinked(String polyCN = null);
+        bool HasDataDictionary { get; }
 
+        #region Points
         bool InsertPoint(TtPoint point);
         int InsertPoints(IEnumerable<TtPoint> points);
 
@@ -75,7 +75,6 @@ namespace TwoTrails.DAL
 
         #region Project
         Version GetDataVersion();
-        bool InsertProjectInfo(TtProjectInfo properties);
         bool UpdateProjectInfo(TtProjectInfo properties);
         #endregion
 
@@ -87,17 +86,13 @@ namespace TwoTrails.DAL
         #endregion
 
 
-        #region Media
-        bool InsertMedia(TtMedia media);
-
-        bool UpdateMedia(TtMedia media);
-
-        bool DeleteMedia(TtMedia media);
+        #region Activity
+        void InsertActivity(TtUserAction activity);
         #endregion
 
 
-        #region Activity
-        void InsertActivity(TtUserActivity activity);
+        #region DataDictionary
+        bool CreateDataDictionary(DataDictionaryTemplate template);
         #endregion
 
 

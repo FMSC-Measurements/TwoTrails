@@ -17,7 +17,6 @@ namespace TwoTrails.ViewModels
         private Action<TtCsvDataAccessLayer> OnSetup { get; }
 
         private ParseOptions Options { get; }
-        private int Zone { get; }
 
         public List<string> Fields { get; }
 
@@ -51,6 +50,8 @@ namespace TwoTrails.ViewModels
         public int POLY_CN_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.POLY_CN, value)); } }
         public int GROUP_CN_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.GROUP_CN, value)); } }
         #endregion
+
+        public int Zone { get; }
 
         public ParseMode Mode {
             get { return Get<ParseMode>(); }
@@ -164,14 +165,15 @@ namespace TwoTrails.ViewModels
 
 
 
-        public CsvImportModel(string fileName, int zone, Action<TtCsvDataAccessLayer> onSetup)
+        public CsvImportModel(string fileName, int zone, Action<TtCsvDataAccessLayer> onSetup, int startPolyNumber = 0)
         {
+            Zone = zone;
+
             OnSetup = onSetup;
 
             SetupImportCommand = new BindedRelayCommand<CsvImportModel>(x => SetupImport(), x => CanImport, this, x => x.CanImport);
 
-            Options = new ParseOptions(fileName);
-            Zone = zone;
+            Options = new ParseOptions(fileName, zone, startPolyNumber: startPolyNumber);
 
             Fields = new List<string>();
             Fields.Add("No Field");
@@ -295,7 +297,7 @@ namespace TwoTrails.ViewModels
 
         private void SetupImport()
         {
-            OnSetup(new TtCsvDataAccessLayer(Options, Zone));
+            OnSetup(new TtCsvDataAccessLayer(Options));
         }
 
 

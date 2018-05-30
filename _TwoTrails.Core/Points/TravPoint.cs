@@ -9,7 +9,6 @@ namespace TwoTrails.Core.Points
     public class TravPoint : TtPoint
     {
         public event TraverseChangedEvent PositionChanged;
-        public event TraverseChangedEvent PreviewPositionChanged;
 
         #region Properties
         private Double? _FwdAzimuth;
@@ -26,7 +25,7 @@ namespace TwoTrails.Core.Points
             set { SetField(ref _BkAzimuth, AzimuthModule(value), AdjustAzimuth); }
         }
 
-        private Double _Azimuth = -1;
+        private Double _Azimuth = 0;
         public Double Azimuth { get { return _Azimuth; } }
 
 
@@ -71,8 +70,7 @@ namespace TwoTrails.Core.Points
 
         public TravPoint(TtPoint point) : base(point)
         {
-            TravPoint trav = point as TravPoint;
-            if (trav != null)
+            if (point is TravPoint trav)
             {
                 CopyTravValues(trav);
             }
@@ -85,9 +83,9 @@ namespace TwoTrails.Core.Points
 
         public TravPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,
             string comment, bool onbnd, double adjx, double adjy, double adjz, double unadjx, double unadjy, double unadjz,
-            double acc, string qlinks, double? fwd, double? bk, double sd, double sa)
+            double acc, string qlinks, double? fwd, double? bk, double sd, double sa, DataDictionary extended = null)
             : base(cn, index, pid, time, polycn, metacn, groupcn, comment, onbnd, adjx, adjy, adjz, unadjx,
-            unadjy, unadjz, acc, qlinks)
+            unadjy, unadjz, acc, qlinks, extended)
         {
             _FwdAzimuth = fwd;
             _BkAzimuth = bk;
@@ -108,12 +106,6 @@ namespace TwoTrails.Core.Points
 
             AdjustAzimuth();
             AdjustSlope();
-        }
-
-
-        protected override void Polygon_PreviewPolygonAccuracyChanged(TtPolygon polygon)
-        {
-            //dont set accuracy
         }
 
         protected override void OnMetadataChanged()
@@ -201,11 +193,11 @@ namespace TwoTrails.Core.Points
             {
                 az = 90 - Azimuth + Declination;
 
-                double x, y, z, c =  az * Math.PI / 180d;
+                double x, y, z, azInRadians = FMSC.Core.Convert.DegreesToRadians(az);
 
-                x = prevX + (HorizontalDistance * Math.Cos(c));
-                y = prevY + (HorizontalDistance * Math.Sin(c));
-                z = prevZ + (HorizontalDistance * Math.Tan(SlopeAngle));
+                x = prevX + (HorizontalDistance * Math.Cos(azInRadians));
+                y = prevY + (HorizontalDistance * Math.Sin(azInRadians));
+                z = prevZ + (HorizontalDistance * Math.Sin(FMSC.Core.Convert.DegreesToRadians(SlopeAngle)));
 
                 if (isPrevAdjusted)
                 {

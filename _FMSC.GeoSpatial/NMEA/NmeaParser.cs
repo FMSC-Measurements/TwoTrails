@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Diagnostics;
 
 namespace FMSC.GeoSpatial.NMEA
 {
@@ -51,14 +52,16 @@ namespace FMSC.GeoSpatial.NMEA
                     if (sentence != null &&
                         (!sentence.IsMultiString || ((MultiSentence)sentence).HasAllMessages))
                             NmeaReceived?.Invoke(sentence);
+
+                    usedNmea = true;
                 }
             }
             catch (ExcessiveStringException e)
             {
-                //
+                Debug.WriteLine(e.Message, "NmeaParser:Parse");
             }
 
-            if (burst != null && burst.IsFull)
+            if (burst.IsFull)
             {
                 BurstReceived?.Invoke(burst);
                 burst = null;

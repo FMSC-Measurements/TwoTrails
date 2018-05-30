@@ -4,24 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails.Dialogs"
+        xmlns:ttc="clr-namespace:TwoTrails.Controls"
         xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
         xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
         mc:Ignorable="d"
-        Title="Create Plots" Height="260" Width="300"
+        Title="Create Grid Sample Points" Height="300" Width="300"
         WindowStartupLocation="CenterScreen">
-    <DockPanel>
-        <Grid DockPanel.Dock="Bottom" Margin="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="75"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="75"/>
-            </Grid.ColumnDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-            <Button Grid.Column="0" Content="Close" Command="{Binding CloseCommand}" />
-            <Button Grid.Column="2" Content="Generate" Command="{Binding GenerateCommand}" />
-        </Grid>
-
-        <Grid DockPanel.Dock="Top" Margin="5, 2.5, 5, 2.5">
+        <Grid Grid.Row="0" Margin="5, 2.5, 5, 2.5">
             <Grid>
                 <Grid.Resources>
                     <Style TargetType="TextBlock">
@@ -39,6 +34,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -127,13 +123,18 @@
                         <ColumnDefinition Width="75"/>
                     </Grid.ColumnDefinitions>
 
-                    <CheckBox Name="cbBuffer" Grid.Column="0" Content="Boundary Buffer" IsChecked="{Binding BoundaryBuffer}" VerticalAlignment="Center"/>
+                    <CheckBox Name="cbBuffer" Grid.Column="0" Content="Boundary Buffer" IsChecked="{Binding BoundaryBuffer}" IsEnabled="False" VerticalAlignment="Center"/>
                     
                     <TextBox Grid.Column="4"  Margin="0, 2.5, 0, 2.5"
                          IsEnabled="{Binding ElementName=cbBuffer, Path=IsChecked}"
                          Text="{Binding BufferAmount}"
                          PreviewTextInput="TextIsInteger"/>
                 </Grid>
+
+                <CheckBox Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2"
+                          Name="cbDelExisting" Content="Delete Existing Plots"
+                          IsChecked="{Binding Settings.DeviceSettings.DeleteExistingPlots}" VerticalAlignment="Center"/>
+
             </Grid>
 
             <Grid Name="gridStatus" Panel.ZIndex="2" VerticalAlignment="Stretch" Background="White" Visibility="Hidden">
@@ -144,5 +145,18 @@
                 </StackPanel>
             </Grid>
         </Grid>
-    </DockPanel>
+        
+        <Grid Grid.Row="1" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="75"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="75"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Close" Command="{Binding CloseCommand}" />
+            <Button Grid.Column="2" Content="Generate" Command="{Binding GenerateCommand}" />
+        </Grid>
+
+        <ttc:TtProgressControl Grid.Row="0" Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}" Background="White" Opacity="70" />
+        </Grid>
 </Window>

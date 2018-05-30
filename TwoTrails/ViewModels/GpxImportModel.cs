@@ -15,25 +15,27 @@ namespace TwoTrails.ViewModels
     {
         private Action<TtGpxDataAccessLayer> OnSetup { get; }
 
+        public int Zone { get; }
+
         public ParseOptions Options { get; }
-        private int Zone { get; }
         public ICommand SetupImportCommand { get; }
 
 
         public GpxImportModel(string fileName, int zone, Action<TtGpxDataAccessLayer> onSetup)
         {
+            Zone = zone;
+
             OnSetup = onSetup;
 
             SetupImportCommand = new RelayCommand(x => SetupImport());
 
-            Options = new ParseOptions(fileName);
-            Zone = zone;
+            Options = new ParseOptions(fileName, zone);
         }
 
 
         private void SetupImport()
         {
-            OnSetup(new TtGpxDataAccessLayer(Options, Zone));
+            OnSetup(new TtGpxDataAccessLayer(Options));
         }
     }
 }

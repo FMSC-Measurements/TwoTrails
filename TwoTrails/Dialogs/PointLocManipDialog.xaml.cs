@@ -22,11 +22,15 @@ namespace TwoTrails.Dialogs
     /// </summary>
     public partial class PointLocManipDialog : Window
     {
-        TtHistoryManager _Manager;
-        List<TtPoint> _Points;
+        private TtHistoryManager _Manager;
+        private List<TtPoint> _Points;
+        public TtPolygon TargetPoly { get; private set; }
 
         public PointLocManipDialog(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null)
         {
+            if (points == null || points.Count < 1)
+                throw new Exception("No Points");
+
             _Manager = manager;
             _Points = points;
 
@@ -35,10 +39,10 @@ namespace TwoTrails.Dialogs
             cboPoly.ItemsSource = manager.GetPolygons();
 
             if (target != null)
-            {
-                cboPoly.SelectedItem = target;
-                cboPolyPoints.ItemsSource = manager.GetPoints(target.CN);
-            }
+                target = points.First().Polygon;
+
+            cboPoly.SelectedItem = target;
+            cboPolyPoints.ItemsSource = manager.GetPoints(target?.CN);
 
             if (quondam)
                 rbActQuondam.IsChecked = true;
@@ -53,7 +57,7 @@ namespace TwoTrails.Dialogs
 
         private void btnCancelClick(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            Close();
         }
 
         private void btnCommitClick(object sender, RoutedEventArgs e)
@@ -70,19 +74,19 @@ namespace TwoTrails.Dialogs
                                     : rbInsEnd.IsChecked == true ? int.MaxValue
                                         : cboPolyPoints.SelectedIndex + 1;
 
-                    TtPolygon targetPoly = cboPoly.SelectedItem as TtPolygon;
+                    TargetPoly = cboPoly.SelectedItem as TtPolygon;
                     bool reverse = rbDirReverse.IsChecked == true;
 
                     if (rbActQuondam.IsChecked == true)
                     {
-                        _Manager.CreateQuondamLinks(_Points, targetPoly, index, null, reverse);
+                        _Manager.CreateQuondamLinks(_Points, TargetPoly, index, null, reverse);
                     }
                     else
                     {
-                        _Manager.MovePointsToPolygon(_Points, targetPoly, index, reverse);
+                        _Manager.MovePointsToPolygon(_Points, TargetPoly, index, reverse);
                     } 
 
-                    this.Close(); 
+                    Close(); 
                 }
             }
             else
@@ -93,8 +97,7 @@ namespace TwoTrails.Dialogs
 
         private void cboPoly_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            TtPolygon polygon = (cboPoly.SelectedItem as TtPolygon);
-            if (polygon != null)
+            if (cboPoly.SelectedItem is TtPolygon polygon)
             {
                 cboPolyPoints.ItemsSource = _Manager.GetPoints(polygon.CN);
                 cboPoly.ToolTip = polygon.Name; 
@@ -120,6 +123,20 @@ namespace TwoTrails.Dialogs
             if (owner != null)
                 plmd.Owner = owner;
             return plmd.ShowDialog();
+        }
+
+        public static void Show(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null, Window owner = null, Action<TtPolygon> onClose = null)
+        {
+            PointLocManipDialog plmd = new PointLocManipDialog(manager, points, quondam, reverse, target);
+            if (owner != null)
+                plmd.Owner = owner;
+
+            if (onClose != null)
+            {
+                plmd.Closed += (s, e) => onClose(plmd.TargetPoly);
+            }
+
+            plmd.Show();
         }
     }
 }

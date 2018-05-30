@@ -1,0 +1,85 @@
+﻿<UserControl x:Class="TwoTrails.Controls.PointDetailsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TwoTrails.Controls"
+             xmlns:cc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
+             xmlns:cm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="500">
+    <cc:DataGridEx x:Name="dgPoints"
+                Grid.Column="0"
+                BorderThickness="0"
+                ItemsSource="{Binding Points}"
+                AutoGenerateColumns="False"
+                CanUserReorderColumns="True" CanUserResizeColumns="True" 
+                CanUserResizeRows="False" CanUserSortColumns="False"
+                CanUserDeleteRows="False" CanUserAddRows="False"
+                EnableRowVirtualization="True"
+                EnableColumnVirtualization="True"
+                VirtualizingStackPanel.IsVirtualizing="True"
+                VirtualizingStackPanel.VirtualizationMode="Recycling"
+                SelectionMode="Extended"
+                SelectionUnit="FullRow"
+                IsReadOnly="True">
+
+        <DataGrid.Resources>
+            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="DodgerBlue"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
+            <cm:BindingProxy x:Key="proxy" Data="{Binding}"/>
+        </DataGrid.Resources>
+
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Index" IsReadOnly="True" Binding="{Binding Index}" Visibility="{Binding Data.FieldController.Index, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="PID" IsReadOnly="True" Binding="{Binding PID}" Visibility="{Binding Data.FieldController.PID, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="OpType" IsReadOnly="True" Binding="{Binding OpType}" Visibility="{Binding Data.FieldController.OpType, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="OnBound" IsReadOnly="True" Binding="{Binding OnBoundary}" Visibility="{Binding Data.FieldController.OnBoundary, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Time Created" IsReadOnly="True" Binding="{Binding TimeCreated}" Visibility="{Binding Data.FieldController.TimeCreated, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+
+            <DataGridTextColumn Header="Polygon" IsReadOnly="True" Binding="{Binding Polygon.Name}" Visibility="{Binding Data.FieldController.Polygon, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Metadata" IsReadOnly="True" Binding="{Binding Metadata.Name}" Visibility="{Binding Data.FieldController.Metadata, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Group" IsReadOnly="True" Binding="{Binding Group.Name}" Visibility="{Binding Data.FieldController.Group, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+
+            <DataGridTextColumn Header="AdjX" IsReadOnly="True" Binding="{Binding AdjX, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.AdjX, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="AdjY" IsReadOnly="True" Binding="{Binding AdjY, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.AdjY, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="AdjZ (M)" IsReadOnly="True" Binding="{Binding AdjZ, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.AdjZ, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="UnAdjX" IsReadOnly="True" Binding="{Binding UnAdjX, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.UnAdjX, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="UnAdjY" IsReadOnly="True" Binding="{Binding UnAdjY, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.UnAdjY, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="UnAdjZ (M)" IsReadOnly="True" Binding="{Binding UnAdjZ, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.UnAdjZ, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+
+            <DataGridTextColumn Header="Acc (M)" IsReadOnly="True" Binding="{Binding Accuracy, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.Accuracy, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+
+            <DataGridTextColumn Header="Latitude" IsReadOnly="True" Binding="{Binding Latitude, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.Latitude, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Longitude" IsReadOnly="True" Binding="{Binding Longitude, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.Longitude, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Elevation (M)" IsReadOnly="True" Binding="{Binding Elevation, StringFormat={}{0:0.##}}" Visibility="{Binding Data.FieldController.Elevation, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="RMSEr" IsReadOnly="True" Binding="{Binding RMSEr, StringFormat={}{0:0.##}}" Visibility="{Binding Data.FieldController.RMSEr, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+
+            <DataGridTextColumn Header="Fwd Az" IsReadOnly="True" Binding="{Binding FwdAzimuth, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.FwdAzimuth, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Back Az" IsReadOnly="True" Binding="{Binding BkAzimuth, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.BkAzimuth, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Horiz Dist" IsReadOnly="True" Binding="{Binding HorizontalDistance, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.HorizontalDistance, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Slope Dist" IsReadOnly="True" Binding="{Binding SlopeDistance, StringFormat={}{0:0.##}}" Visibility="{Binding Data.FieldController.SlopeDistance, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Slope Angle" IsReadOnly="True" Binding="{Binding SlopeAngle, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.SlopeAngle, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+
+            <DataGridTextColumn Header="Parent" IsReadOnly="True" Binding="{Binding ParentPoint.PID}" Visibility="{Binding Data.FieldController.ParentPoint, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+
+            <DataGridTextColumn Header="QndmLink" IsReadOnly="True" Binding="{Binding HasQuondamLinks, StringFormat=F3}" Visibility="{Binding Data.FieldController.HasQuondamLinks, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Comment" Width="100" IsReadOnly="True" Binding="{Binding Comment}" Visibility="{Binding Data.FieldController.Comment, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            
+            <DataGridTextColumn Header="CN" IsReadOnly="True" Binding="{Binding CN}" Visibility="{Binding Data.FieldController.CN, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Polygon CN" IsReadOnly="True" Binding="{Binding PolygonCN}" Visibility="{Binding Data.FieldController.PolygonCN, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Metadata CN" IsReadOnly="True" Binding="{Binding MetadataCN}" Visibility="{Binding Data.FieldController.MetadataCN, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Group CN" IsReadOnly="True" Binding="{Binding GroupCN}" Visibility="{Binding Data.FieldController.GroupCN, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Parent CN" IsReadOnly="True" Binding="{Binding ParentCN}" Visibility="{Binding Data.FieldController.ParentCN, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+        </DataGrid.Columns>
+
+        <DataGrid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Copy Cell Value" Command="{Binding Data.CopyCellValueCommand, Source={StaticResource proxy}}"
+                                  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}" />
+                <MenuItem Header="Export Point Values"  Command="{Binding Data.ExportValuesCommand, Source={StaticResource proxy}}" 
+                                  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
+            </ContextMenu>
+        </DataGrid.ContextMenu>
+    </cc:DataGridEx>
+</UserControl>

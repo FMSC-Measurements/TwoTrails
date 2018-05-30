@@ -1,169 +1,54 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core;
 using FMSC.Core.ComponentModel.Commands;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
+using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
+using TwoTrails.Dialogs;
+using static TwoTrails.Core.Media.MediaTools;
 
 namespace TwoTrails.ViewModels
 {
     public class ProjectEditorModel : NotifyPropertyChangedEx
     {
+        public ICommand OpenMapWindowCommand { get; }
+
         private TtProject _Project;
-        
+
         public TtProjectInfo ProjectInfo { get { return _Project.ProjectInfo; } }
-        public TtManager Manager { get { return _Project.Manager; } }
-
-
-        public DataEditorControl DataController { get; }
-
-
-        public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
-        public double TotalPolygonPerimeter { get { return Get<double>(); } set { Set(value); } }
-
-        public double PolygonAccuracy { get { return Get<double>(); } set { Set(value); } }
-
-        private TtPolygon _BackupPoly;
-        private TtPolygon _CurrentPolygon;
-        public TtPolygon CurrentPolygon
-        {
-            get { return _CurrentPolygon; }
-            private set
-            {
-                TtPolygon old = _CurrentPolygon;
-
-                SetField(ref _CurrentPolygon, value, () => {
-                    if (old != null)
-                    {
-                        old.PropertyChanged -= Polygon_PropertyChanged;
-                    }
-
-                    if (value != null)
-                    {
-                        _BackupPoly = new TtPolygon(value);
-                        _CurrentPolygon.PropertyChanged += Polygon_PropertyChanged;
-                    }
-                });
-
-            }
-        }
-
-        private void Polygon_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (!(sender as TtPolygon).Equals(_BackupPoly))
-            {
-                _Project.ProjectUpdated();
-            }
-        }
-
-        public ICommand PolygonChangedCommand { get; }
-        public ICommand NewPolygonCommand { get; }
-        public ICommand DeletePolygonCommand { get; }
-        public ICommand PolygonUpdateAccCommand { get; }
-        public ICommand PolygonAccuracyChangedCommand { get; }
+        public TtHistoryManager Manager { get { return _Project.HistoryManager; } }
+        public TtSettings Settings { get { return _Project.Settings; } }
         
+        public MapControl MapControl { get; set; }
+        public MapWindow MapWindow { get; set; }
+        public bool IsMapWindowOpen { get { return MapWindow != null; } }
+        
+        public PointEditorControl DataController { get; }
 
-        public int MetadataZone { get { return Get<int>(); } set { Set(value); } }
-
-        private TtMetadata _BackupMeta;
-        private TtMetadata _CurrentMetadata;
-        public TtMetadata CurrentMetadata
-        {
-            get { return _CurrentMetadata; }
-            private set
-            {
-                TtMetadata old = _CurrentMetadata;
-
-                SetField(ref _CurrentMetadata, value, () => {
-                    if (old != null)
-                    {
-                        old.PropertyChanged -= Metadata_PropertyChanged;
-                    }
-
-                    _BackupMeta = new TtMetadata(value);
-
-                    _CurrentMetadata.PropertyChanged += Metadata_PropertyChanged;
-                });
-
-            }
-        }
-
-        private void Metadata_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (!(sender as TtMetadata).Equals(_BackupMeta))
-            {
-                _Project.ProjectUpdated();
-            }
-        }
-
-        public ICommand MetadataChangedCommand { get; }
-        public ICommand NewMetadataCommand { get; }
-        public ICommand DeleteMetadataCommand { get; } 
-        public ICommand MetadataZoneChangedCommand { get; }
-        public ICommand MetadataUpdateZoneCommand { get; }
-        public ICommand SetDefaultMetadataCommand { get; }
-
-
-        private TtGroup _BackupGroup;
-        private TtGroup _CurrentGroup;
-        public TtGroup CurrentGroup
-        {
-            get { return _CurrentGroup; }
-            private set
-            {
-                TtGroup old = _CurrentGroup;
-
-                SetField(ref _CurrentGroup, value, () => {
-                    if (old != null)
-                    {
-                        old.PropertyChanged -= Group_PropertyChanged;
-                    }
-
-                    _BackupGroup = new TtGroup(value);
-
-                    _CurrentGroup.PropertyChanged += Group_PropertyChanged;
-                });
-
-            }
-        }
-
-        private void Group_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (!(sender as TtGroup).Equals(_BackupGroup))
-            {
-                _Project.ProjectUpdated();
-            }
-        }
-
-        public ICommand GroupChangedCommand { get; }
-        public ICommand NewGroupCommand { get; }
-        public ICommand DeleteGroupCommand { get; }
-
-
-        public ReadOnlyObservableCollection<TtPolygon> Polygons { get { return _Project.Manager.Polygons; } }
-        public ReadOnlyObservableCollection<TtMetadata> Metadata { get { return _Project.Manager.Metadata; } }
-        public ReadOnlyObservableCollection<TtGroup> Groups { get { return _Project.Manager.Groups; } }
-
+        public ReadOnlyObservableCollection<TtPolygon> Polygons { get { return Manager.Polygons; } }
+        public ReadOnlyObservableCollection<TtMetadata> Metadata { get { return Manager.Metadata; } }
+        public ReadOnlyObservableCollection<TtGroup> Groups { get { return Manager.Groups; } }
+        public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get { return Manager.MediaInfo; } }
+        
 
         public ProjectEditorModel(TtProject project)
         {
             _Project = project;
 
-            DataController = new DataEditorControl(project.DataEditor, new DataStyleModel(project));
-
-            CurrentPolygon = null;
-            CurrentMetadata = null;
+            DataController = new PointEditorControl(project.DataEditor, new DataStyleModel(project));
 
             PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtPolygon));
             NewPolygonCommand = new RelayCommand(x => NewPolygon(x as ListBox));
@@ -175,8 +60,17 @@ namespace TwoTrails.ViewModels
                 x => UpdatePolygonAcc(),
                 x => CurrentPolygon != null && CurrentPolygon.Accuracy != PolygonAccuracy,
                 this,
-                x => x.PolygonAccuracy);
+                x => new { x.PolygonAccuracy, CurrentPolygon.Accuracy });
 
+            PolygonAccuracyLookupCommand = new BindedRelayCommand<ProjectEditorModel>(
+                x => AccuracyLookup(),
+                x => CurrentPolygon != null,
+                this,
+                x => x.CurrentPolygon);
+
+            SavePolygonSummary = new BindedRelayCommand<ProjectEditorModel>(
+                x => SavePolygonsummary(),
+                x => CurrentPolygon != null, this, x => x.CurrentPolygon);
 
             MetadataChangedCommand = new RelayCommand(x => MetadataChanged(x as TtMetadata));
             NewMetadataCommand = new RelayCommand(x => NewMetadata(x as ListBox));
@@ -210,7 +104,103 @@ namespace TwoTrails.ViewModels
                 poly.PolygonChanged += PolygonShapeChanged;
 
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += PolygonCollectionChanged;
+
+
+            Tiles = new ObservableCollection<ImageTile>();
+            MediaInfoChangedCommand = new RelayCommand(x => MediaInfoChanged(x as TtMediaInfo));
+            MediaSelectedCommand = new RelayCommand(x => MediaSelected(x as TtMediaInfo));
+            HideMediaViewerCommand = new RelayCommand(x => MediaViewerVisible = false);
+
+            OpenMapWindowCommand = new RelayCommand(x =>
+            {
+                if (x is Grid grid)
+                {
+                    MapControl = grid.Children[0] as MapControl;
+
+                    grid.Children.Remove(MapControl);
+
+                    MapWindow = MapControl != null ? new MapWindow(_Project.ProjectName, MapControl) : new MapWindow(_Project);
+                    OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
+
+                    MapWindow.Closed += (s, e) =>
+                    {
+                        MapWindow = null;
+
+                        grid.Dispatcher.Invoke(() =>
+                        {
+                            grid.Children.Add(MapControl);
+                            OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
+                        });
+                    };
+
+                    MapWindow.Show();
+                }
+            });
         }
+
+        public void CloseWindows()
+        {
+            MapWindow?.Close();
+        }
+
+        #region Polygon
+        public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
+        public double TotalPolygonPerimeter { get { return Get<double>(); } set { Set(value); } }
+
+        public double PolygonAccuracy { get { return Get<double>(); } set { Set(value); } }
+
+        private TtPolygon _BackupPoly;
+        private TtPolygon _CurrentPolygon;
+        public TtPolygon CurrentPolygon
+        {
+            get { return _CurrentPolygon; }
+            private set
+            {
+                TtPolygon old = _CurrentPolygon;
+
+                SetField(ref _CurrentPolygon, value, () => {
+                    if (old != null)
+                    {
+                        old.PropertyChanged -= Polygon_PropertyChanged;
+                        old.PolygonChanged -= GeneratePolygonSummary;
+                    }
+
+                    if (_CurrentPolygon != null)
+                    {
+                        _BackupPoly = new TtPolygon(_CurrentPolygon);
+                        _CurrentPolygon.PropertyChanged += Polygon_PropertyChanged;
+                        _CurrentPolygon.PolygonChanged += GeneratePolygonSummary;
+
+                        GeneratePolygonSummary(_CurrentPolygon);
+                    }
+                });
+
+            }
+        }
+
+        private void GeneratePolygonSummary(TtPolygon polygon)
+        {
+            PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true);
+        }
+
+        public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
+
+
+        private void Polygon_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!(sender as TtPolygon).Equals(_BackupPoly))
+            {
+                _Project.ProjectUpdated();
+            }
+        }
+
+        public ICommand PolygonChangedCommand { get; }
+        public ICommand NewPolygonCommand { get; }
+        public ICommand DeletePolygonCommand { get; }
+        public ICommand PolygonUpdateAccCommand { get; }
+        public ICommand PolygonAccuracyLookupCommand { get; }
+        public ICommand PolygonAccuracyChangedCommand { get; }
+        public ICommand SavePolygonSummary { get; }
 
         private void PolygonCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -249,17 +239,15 @@ namespace TwoTrails.ViewModels
 
         private void PolygonChanged(TtPolygon poly)
         {
-            PolygonAccuracy = poly != null ? poly.Accuracy : 6d;
             CurrentPolygon = poly;
+            PolygonAccuracy = poly != null ? poly.Accuracy : 6d;
         }
 
         private bool PolygonAccuracyChanged(string accStr)
         {
             if (accStr != null)
             {
-                double acc;
-
-                if (double.TryParse(accStr, out acc))
+                if (double.TryParse(accStr, out double acc))
                 {
                     PolygonAccuracy = acc;
                     return true;
@@ -275,29 +263,122 @@ namespace TwoTrails.ViewModels
             OnPropertyChanged(nameof(PolygonAccuracy));
         }
 
+        private void AccuracyLookup()
+        {
+            SessionData.HasGpsAccReport();
+           
+            AccuracyDataDialog dialog = new AccuracyDataDialog(SessionData.GpsAccuracyReport, _CurrentPolygon.Accuracy, SessionData.MakeID, SessionData.ModelID);
+            dialog.Owner = _Project.MainModel.MainWindow;
+
+            if (dialog.ShowDialog() == true)
+            {
+                CurrentPolygon.Accuracy = dialog.Accuracy;
+                PolygonAccuracy = dialog.Accuracy;
+                SessionData.MakeID = dialog.MakeID;
+                SessionData.ModelID = dialog.ModelID;
+                OnPropertyChanged(nameof(PolygonAccuracy));
+            }
+        }
+
         private void NewPolygon(ListBox listBox)
         {
-            _Project.Manager.AddPolygon(_Project.Manager.CreatePolygon());
+            Manager.AddPolygon(CreatePolygon());
             listBox.SelectedIndex = listBox.Items.Count - 1;
+        }
 
-            _Project.ProjectUpdated();
+        /// <summary>
+        /// Create a Polygon
+        /// </summary>
+        /// <param name="name">Name of Polygon</param>
+        /// <param name="pointStartIndex">Point starting index for points in the polygon</param>
+        /// <returns>New Polygon</returns>
+        public TtPolygon CreatePolygon(String name = null, int pointStartIndex = 0)
+        {
+            int num = Manager.PolygonCount + 1;
+            return new TtPolygon()
+            {
+                Name = name ?? $"Poly {num}",
+                PointStartIndex = pointStartIndex > 0 ? pointStartIndex : num * 1000 + 10
+            };
         }
 
         private void DeletePolygon()
         {
             if (CurrentPolygon != null)
             {
-                if (MessageBox.Show(String.Format("Confirm Delete Polygon '{0}'", CurrentPolygon.Name), "Delete Polygon",
+                if (MessageBox.Show($"Confirm Delete Polygon '{CurrentPolygon.Name}'", "Delete Polygon",
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
-                    _Project.Manager.DeletePolygon(CurrentPolygon);
+                    Manager.DeletePolygon(CurrentPolygon);
 
                     _Project.ProjectUpdated();
                 }
             }
         }
         
+        private void SavePolygonsummary()
+        {
+            if (CurrentPolygon != null)
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.DefaultExt = "(Text File *.txt)|*.txt";
+                sfd.FileName = $"{CurrentPolygon.Name}_Summary";
+                sfd.DefaultExt = ".txt";
+                sfd.OverwritePrompt = true;
 
+                if (sfd.ShowDialog() == true)
+                {
+                    using (StreamWriter sw = new StreamWriter(sfd.FileName))
+                    {
+                        sw.WriteLine(PolygonSummary.SummaryText);
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region Metadata
+        public int MetadataZone { get { return Get<int>(); } set { Set(value); } }
+
+        private TtMetadata _BackupMeta;
+        private TtMetadata _CurrentMetadata;
+        public TtMetadata CurrentMetadata
+        {
+            get { return _CurrentMetadata; }
+            private set
+            {
+                TtMetadata old = _CurrentMetadata;
+
+                SetField(ref _CurrentMetadata, value, () => {
+                    if (old != null)
+                    {
+                        old.PropertyChanged -= Metadata_PropertyChanged;
+                    }
+
+                    if (_CurrentMetadata != null)
+                    {
+                        _BackupMeta = new TtMetadata(_CurrentMetadata);
+                        _CurrentMetadata.PropertyChanged += Metadata_PropertyChanged;
+                    }
+                });
+
+            }
+        }
+
+        private void Metadata_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!(sender as TtMetadata).Equals(_BackupMeta))
+            {
+                _Project.ProjectUpdated();
+            }
+        }
+
+        public ICommand MetadataChangedCommand { get; }
+        public ICommand NewMetadataCommand { get; }
+        public ICommand DeleteMetadataCommand { get; }
+        public ICommand MetadataZoneChangedCommand { get; }
+        public ICommand MetadataUpdateZoneCommand { get; }
+        public ICommand SetDefaultMetadataCommand { get; }
 
         private void MetadataChanged(TtMetadata meta)
         {
@@ -309,9 +390,7 @@ namespace TwoTrails.ViewModels
         {
             if (zoneStr != null)
             {
-                int zone;
-
-                if (int.TryParse(zoneStr, out zone))
+                if (int.TryParse(zoneStr, out int zone))
                 {
                     MetadataZone = zone;
                     return true;
@@ -338,20 +417,32 @@ namespace TwoTrails.ViewModels
 
         private void NewMetadata(ListBox listBox)
         {
-            _Project.Manager.AddMetadata(_Project.Manager.CreateMetadata());
+            Manager.AddMetadata(CreateMetadata());
             listBox.SelectedIndex = listBox.Items.Count - 1;
+        }
 
-            _Project.ProjectUpdated();
+        /// <summary>
+        /// Create a new Metadata
+        /// </summary>
+        /// <param name="name">Name of metadata</param>
+        /// <returns>New metadata</returns>
+        public TtMetadata CreateMetadata(String name = null)
+        {
+            return new TtMetadata(Settings.MetadataSettings.CreateDefaultMetadata())
+            {
+                CN = Guid.NewGuid().ToString(),
+                Name = name ?? $"Meta {Manager.Metadata.Count + 1}"
+            };
         }
 
         private void DeleteMetadata()
         {
             if (CurrentMetadata != null && CurrentMetadata.CN != Consts.EmptyGuid)
             {
-                if (MessageBox.Show(String.Format("Confirm Delete Metadata '{0}'", CurrentMetadata.Name), "Delete Metadata",
+                if (MessageBox.Show($"Confirm Delete Metadata '{CurrentMetadata.Name}'", "Delete Metadata",
                 MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
-                    ITtManager manager = _Project.Manager;
+                    ITtManager manager = Manager;
 
                     IEnumerable<TtPoint> points = manager.GetPoints().Where(p => p.MetadataCN == CurrentMetadata.CN);
 
@@ -369,7 +460,50 @@ namespace TwoTrails.ViewModels
                 }
             }
         }
+        #endregion
 
+        #region Group
+        private TtGroup _BackupGroup;
+        private TtGroup _CurrentGroup;
+        public TtGroup CurrentGroup
+        {
+            get { return _CurrentGroup; }
+            private set
+            {
+                TtGroup old = _CurrentGroup;
+
+                SetField(ref _CurrentGroup, value, () => {
+                    if (old != null)
+                    {
+                        old.PropertyChanged -= Group_PropertyChanged;
+                    }
+
+                    if (_CurrentGroup != null)
+                    {
+                        _BackupGroup = new TtGroup(value);
+                        GroupFieldIsEditable = value.CN != Consts.EmptyGuid;
+                        _CurrentGroup.PropertyChanged += Group_PropertyChanged;
+                    }
+                    else
+                        GroupFieldIsEditable = false;
+                });
+
+            }
+        }
+
+        public bool GroupFieldIsEditable { get { return Get<bool>(); } set { Set(value); } }
+
+        private void Group_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!(sender as TtGroup).Equals(_BackupGroup))
+            {
+                _Project.ProjectUpdated();
+            }
+        }
+
+        public ICommand GroupChangedCommand { get; }
+        public ICommand NewGroupCommand { get; }
+        public ICommand DeleteGroupCommand { get; }
 
         private void GroupChanged(TtGroup group)
         {
@@ -378,24 +512,86 @@ namespace TwoTrails.ViewModels
 
         private void NewGroup(ListBox listBox)
         {
-            _Project.Manager.AddGroup(_Project.Manager.CreateGroup());
+            Manager.AddGroup(CreateGroup());
             listBox.SelectedIndex = listBox.Items.Count - 1;
+        }
 
-            _Project.ProjectUpdated();
+        /// <summary>
+        /// Creates a new Group
+        /// </summary>
+        /// <param name="groupType">Type of Group to create</param>
+        /// <returns>New Group</returns>
+        public TtGroup CreateGroup(GroupType groupType = GroupType.General)
+        {
+            return new TtGroup($"{(groupType != GroupType.General ? $"{groupType}" : "Group")}_{Guid.NewGuid().ToString().Substring(0, 8)}");
         }
 
         private void DeleteGroup()
         {
             if (CurrentGroup != null && CurrentGroup.CN != Consts.EmptyGuid)
             {
-                if (MessageBox.Show(String.Format("Confirm Delete Group '{0}'", CurrentGroup.Name), "Delete Group",
+                if (MessageBox.Show($"Confirm Delete Group '{CurrentGroup.Name}'", "Delete Group",
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
-                    _Project.Manager.DeleteGroup(CurrentGroup);
+                    Manager.DeleteGroup(CurrentGroup);
 
                     _Project.ProjectUpdated();
                 }
             }
         }
+        #endregion
+
+        #region Media
+        public ObservableCollection<ImageTile> Tiles { get; }
+
+        private TtMediaInfo _CurrentMediaInfo;
+        public TtMediaInfo CurrentMediaInfo
+        {
+            get { return _CurrentMediaInfo; }
+            private set { SetField(ref _CurrentMediaInfo, value); }
+        }
+
+        public ICommand MediaInfoChangedCommand { get; }
+        public ICommand MediaSelectedCommand { get; }
+        public ICommand HideMediaViewerCommand { get; }
+
+        public bool MediaViewerVisible { get { return Get<bool>(); } set { Set(value); } }
+
+        private void MediaInfoChanged(TtMediaInfo mediaInfo)
+        {
+            CurrentMediaInfo = mediaInfo;
+
+            Tiles.Clear();
+
+            foreach (TtImage image in CurrentMediaInfo.Images)
+            {
+                try
+                {
+                    MediaTools.LoadImageAsync(_Project.MAL, image, new AsyncCallback(ImageLoaded));
+                }
+                catch // (FileNotFoundException ex)
+                {
+                    //
+                }
+            }
+
+            MediaViewerVisible = false;
+        }
+
+        private void MediaSelected(TtMediaInfo mediaInfo)
+        {
+            MessageBox.Show(mediaInfo.Title);
+        }
+
+        private void ImageLoaded(IAsyncResult res)
+        {
+            if (res is ImageAsyncResult iar)
+                _Project.MainModel.MainWindow.Dispatcher.Invoke(
+                    () => Tiles.Add(
+                        new ImageTile(iar.ImageInfo, iar.Image, (x) => MediaViewerVisible = true)
+                    )
+                );
+        }
+        #endregion
     }
 }

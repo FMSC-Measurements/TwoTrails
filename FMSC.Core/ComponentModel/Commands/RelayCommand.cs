@@ -14,10 +14,7 @@ namespace FMSC.Core.ComponentModel.Commands
 
         public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
         {
-            if (execute == null)
-                throw new ArgumentNullException("execute");
-
-            _Execute = execute;
+            _Execute = execute ?? throw new ArgumentNullException("execute");
             _CanExecute = canExecute;
         }
 

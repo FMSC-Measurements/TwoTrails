@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,8 @@ namespace TwoTrails.ViewModels
 {
     public class MainWindowModel : NotifyPropertyChangedEx
     {
+        private const int MESSAGE_DELAY = 5000;
+
         private Dictionary<String, TtProject> _Projects = new Dictionary<String, TtProject>();
 
         private Binding sbiInfoBinding;
@@ -55,12 +58,10 @@ namespace TwoTrails.ViewModels
                     OnPropertyChanged(
                         nameof(CurrentProject),
                         nameof(HasOpenedProject),
-                        nameof(CanSaveCurrentProject),
                         nameof(CurrentEditor)
                         );
 
-                    MainWindow.Title = String.Format("{0}TwoTrails",
-                        value != null ? String.Format("{0} - ", value.Project.ProjectName) : null);
+                    MainWindow.Title = $"TwoTrails{(value != null ? $" - {value.Project.ProjectName}" : String.Empty)}";
                 });
             }
         }
@@ -69,9 +70,8 @@ namespace TwoTrails.ViewModels
         public string StatusMessage { get { return Get<string>(); } private set { Set(value); } }
         private DelayActionHandler _EndMessageDelayHandler;
         private Action _EndMessage;
-        private int _Delay = 5000;
 
-        public void PostMessage(string message, int delay = 5000)
+        public void PostMessage(string message, int delay = MESSAGE_DELAY)
         {
             StatusMessage = message;
 
@@ -85,12 +85,12 @@ namespace TwoTrails.ViewModels
                     });
                 };
 
-                _EndMessageDelayHandler = new DelayActionHandler(_EndMessage, _Delay);
+                _EndMessageDelayHandler = new DelayActionHandler(_EndMessage, MESSAGE_DELAY);
                 _EndMessageDelayHandler.DelayInvoke();
             }
-            else if (_Delay != delay)
+            else if (MESSAGE_DELAY != delay)
             {
-                _EndMessageDelayHandler.DelayInvoke(_EndMessage, _Delay);
+                _EndMessageDelayHandler.DelayInvoke(_EndMessage, MESSAGE_DELAY);
             }
             else
             {
@@ -101,16 +101,13 @@ namespace TwoTrails.ViewModels
 
         public TtProject CurrentProject { get { return CurrentTab?.Project; } }
         
-        public DataEditorModel CurrentEditor { get; private set; }
+        public PointEditorModel CurrentEditor { get; private set; }
 
+        public TtSettings Settings { get; }
 
         public bool HasOpenedProject { get { return CurrentTab != null; } }
-
-
-        public bool CanSaveCurrentProject
-        {
-            get { return CurrentProject != null && CurrentProject.RequiresSave; }
-        }
+        public bool HasPolygons { get { return CurrentEditor != null && CurrentEditor.Manager.Polygons.Count > 0; } }
+        
         
         public bool HasUnsavedProjects
         {
@@ -132,23 +129,24 @@ namespace TwoTrails.ViewModels
         }
 
 
-        public TtSettings Settings { get; private set; }
-
-
         #region Commands
         public ICommand NewCommand { get; private set; }
         public ICommand OpenCommand { get; private set; }
         public ICommand OpenProjectCommand { get; private set; }
         public ICommand SaveCommand { get; private set; }
+        public ICommand SaveAsCommand { get; private set; }
         public ICommand CloseProjectCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
 
         public ICommand ImportCommand { get; private set; }
         public ICommand ExportCommand { get; private set; }
+        public ICommand ViewPointDetailsCommand { get; private set; }
+        public ICommand OpenInEarthCommand { get; private set; }
 
         public ICommand SettingsCommand { get; private set; }
         
         public ICommand ViewLogCommand { get; private set; }
+        public ICommand ExportReportCommand { get; private set; }
         public ICommand AboutCommand { get; private set; }
         #endregion
 
@@ -159,25 +157,30 @@ namespace TwoTrails.ViewModels
 
         public MainWindowModel(MainWindow mainWindow)
         {
+            Settings = App.Settings;
+
+            StatusMessage = String.Empty;
+
             MainWindow = mainWindow;
-
-            Settings = new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings());
-
 
             NewCommand = new RelayCommand(x => CreateProject());
             OpenCommand = new RelayCommand(x => BrowseProject());
             OpenProjectCommand = new RelayCommand(x => OpenProject(x as string));
             SaveCommand = new RelayCommand(x => SaveCurrentProject());
+            SaveAsCommand = new RelayCommand(x => SaveCurrentProject(true));
             CloseProjectCommand = new RelayCommand(x => CurrentProject.Close());
             ExitCommand = new RelayCommand(x => Exit());
 
             ImportCommand = new RelayCommand(x => ImportData());
             ExportCommand = new RelayCommand(x => ExportProject());
+            ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
+            OpenInEarthCommand = new RelayCommand(x => OpenInGoogleEarth());
 
             SettingsCommand = new RelayCommand(x => OpenSettings());
 
 
             ViewLogCommand = new RelayCommand(x => Process.Start(App.LOG_FILE_PATH));
+            ExportReportCommand = new RelayCommand(x => ExportReport());
             AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(MainWindow));
 
             _Tabs = mainWindow.tabControl;
@@ -190,7 +193,7 @@ namespace TwoTrails.ViewModels
 
             string[] args = Environment.GetCommandLineArgs();
 
-            if (args != null && args.Length > 0)
+            if (args != null && args.Length > 1)
             {
                 ParseCommandLineArgs(args);
             }
@@ -199,10 +202,28 @@ namespace TwoTrails.ViewModels
 
         private void ParseCommandLineArgs(String[] args)
         {
-            foreach (String file in args.Select(f => f.Trim('"')))
+            if (args[1].ToLower() == "--export-media" && args.Length > 2)
             {
-                if (file.EndsWith(".tt"))
-                    OpenProject(file);
+                try
+                {
+                    string file = args[2];
+                    if (file.EndsWith(Consts.FILE_EXTENSION_MEDIA) && File.Exists(file))
+                        Export.MediaFiles(new TtSqliteMediaAccessLayer(file), Path.GetDirectoryName(file));
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.Message, "MainWindowModel:ParseCommandLineArgs-ExportMedia");
+                }
+
+                Exit(true);
+            }
+            else
+            {
+                foreach (String file in args.Select(f => f.Trim('"')))
+                {
+                    if (file.EndsWith(Consts.FILE_EXTENSION))
+                        OpenProject(file);
+                }
             }
         }
 
@@ -223,12 +244,10 @@ namespace TwoTrails.ViewModels
         {
             OpenFileDialog dialog = new OpenFileDialog();
 
-            dialog.DefaultExt = ".tt";
-            dialog.Filter = "TwoTrails Files (*.tt)|*.tt|TwoTrails V2 Files (*.tt2)|*.tt2";
+            dialog.DefaultExt = Consts.FILE_EXTENSION;
+            dialog.Filter = $"{Consts.FILE_EXTENSION_FILTER}|{Consts.FILE_EXTENSION_FILTER_V2}|All Files|*.*";
             
-            bool? result = dialog.ShowDialog();
-
-            if (result == true)
+            if (dialog.ShowDialog() == true)
             {
                 OpenProject(dialog.FileName);
             }
@@ -240,128 +259,220 @@ namespace TwoTrails.ViewModels
             {
                 if (!_Projects.Keys.Contains(filePath, StringComparer.InvariantCultureIgnoreCase))
                 {
-                    if (filePath.EndsWith(".tt"))
+                    if (filePath.EndsWith(Consts.FILE_EXTENSION))
                     {
                         try
                         {
                             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
-                            Trace.WriteLine(String.Format("DAL Opened ({1}): {0}", dal.FilePath, dal.GetDataVersion()));
+                            TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
 
+                            //todo remove when nulls are removed from xyza
+                            if (dal.HasErrors())
+                                dal.Fix();
+
+                            Trace.WriteLine($"DAL Opened ({dal.FilePath}): {dal.GetDataVersion()}");
+
+                            if (mal != null)
+                            {
+                                Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
+                            }
+                            
                             if (dal.RequiresUpgrade)
                             {
-                                Trace.WriteLine("DAL Requires Upgrade");
-                                //ask to upgrade
+                                if (MessageBox.Show(MainWindow, @"This is file needs to be upgraded to work with this version of TwoTrails. Upgrading will first create a backup of this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",
+                                   MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
+                                {
+                                    string oldFilePath = $"{dal.FilePath}.old";
+                                    if (File.Exists(oldFilePath) &&
+                                        MessageBox.Show($"There is already a filed named '{Path.GetFileName(oldFilePath)}'. Would you like to overwrite this file?",
+                                        "File.Old Already Exists", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
+                                    {
+                                        return;
+                                    }
+
+                                    if (Upgrade.DAL(dal))
+                                    {
+                                        AddProject(new TtProject(dal, mal, App.Settings, this));
+                                        MessageBox.Show("Upgrade Successful");
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show("There has been an error and the Upgrade has failed. Please see log file for details");
+                                    }
+                                }
                             }
                             else
                             {
-                                AddProject(new TtProject(dal, Settings, this));
+                                AddProject(new TtProject(dal, mal, App.Settings, this));
                             }
                         }
                         catch (Exception ex)
                         {
-                            Trace.WriteLine(ex.Message, "MWM:OpenProject");
+                            Trace.WriteLine($"{ ex.Message }\n\t{ ex.StackTrace }", "MWM:OpenProject");
+                            MessageBox.Show(MainWindow, "There is an issue opening this Project. See log file for details.", "Open Project Error");
+                        }
+                    }
+                    else if (filePath.EndsWith(Consts.FILE_EXTENSION_V2))
+                    {
+                        TtV2SqliteDataAccessLayer dalv2 = new TtV2SqliteDataAccessLayer(filePath);
+
+                        if (dalv2.RequiresUpgrade)
+                        {
+                            MessageBox.Show(MainWindow, @"This TwoTrails V2 file is too old to upgrade. 
+Please Upgrade it to the most recent TT2 version before upgrading it here.", "Too old to upgrade",
+                                MessageBoxButton.OK, MessageBoxImage.Stop);
+                        }
+                        else
+                        {
+                            if (MessageBox.Show(MainWindow, @"This is a TwoTrails V2 file that needs to be upgraded into the new TTX format. 
+Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",
+                                MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
+                            {
+                                TtProjectInfo oinfo = dalv2.GetProjectInfo();
+                                TtProjectInfo info = new TtProjectInfo(
+                                    oinfo.Name,
+                                    oinfo.Description,
+                                    oinfo.Region,
+                                    oinfo.Forest,
+                                    oinfo.District,
+                                    AppInfo.Version.ToString(),
+                                    oinfo.CreationVersion,
+                                    TwoTrailsSchema.SchemaVersion,
+                                    oinfo.CreationDeviceID,
+                                    oinfo.CreationDate);
+
+                                string upgradedFile = Path.Combine(Path.GetDirectoryName(filePath), $"{Path.GetFileNameWithoutExtension(filePath)}{Consts.FILE_EXTENSION}");
+
+                                if (File.Exists(upgradedFile))
+                                {
+                                    if (MessageBox.Show(MainWindow, $"File '{Path.GetFileName(upgradedFile)}' already exists. Would you like to overwrite it?",
+                                        "Overwrite File", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
+                                    {
+                                        return;
+                                    }
+                                }
+
+                                TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(upgradedFile, info);
+                                TtSqliteMediaAccessLayer mal = GetMalIfExists(upgradedFile);
+
+                                Upgrade.DAL(dal, App.Settings, dalv2);
+                                    
+                                AddProject(new TtProject(dal, mal, App.Settings, this));
+                            }
+                        }
+                    }
+                    else if (TtUtils.IsImportableFileType(filePath))
+                    {
+                        if (CurrentProject != null)
+                        {
+                            ImportDialog.ShowDialog(CurrentProject, MainWindow, filePath);
+                        }
+                        else
+                        {
+                            if (MessageBox.Show($"Would you like to create a project from this {TtUtils.GetFileTypeName(filePath)} file?", "Create Project from importable file.",
+                                MessageBoxButton.YesNo, MessageBoxImage.Hand, MessageBoxResult.No) == MessageBoxResult.Yes)
+                            {
+                                
+                            }
                         }
                     }
                     else
                     {
-                        if (filePath.EndsWith(".tt2"))
-                        {
-                            TtV2SqliteDataAccessLayer dalv2 = new TtV2SqliteDataAccessLayer(filePath);
-
-                            if (dalv2.RequiresUpgrade)
-                            {
-                                MessageBox.Show(@"This TwoTrails V2 file is too old to upgrade. 
-Please Upgrade it with TwoTrails V2 before upgrading it here.", "Too old to upgrade",
-                                    MessageBoxButton.OK, MessageBoxImage.Stop);
-                            }
-                            else
-                            {
-                                if (MessageBox.Show(@"This is a TwoTrails V2 file that needs to be upgraded. 
-Would you like to upgrade it now?", "Upgrade TwoTrails file",
-                                    MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
-                                {
-                                    TtProjectInfo oinfo = dalv2.GetProjectInfo();
-                                    TtProjectInfo info = new TtProjectInfo(
-                                        oinfo.Name,
-                                        oinfo.Description,
-                                        oinfo.Region,
-                                        oinfo.Forest,
-                                        oinfo.District,
-                                        AppInfo.Version.ToString(),
-                                        oinfo.CreationVersion,
-                                        TwoTrailsSchema.SchemaVersion,
-                                        oinfo.CreationDeviceID,
-                                        oinfo.CreationDate);
-
-                                    string upgradedFile = Path.Combine(Path.GetDirectoryName(filePath),
-                                        String.Format("{0}.tt", Path.GetFileNameWithoutExtension(filePath)));
-
-                                    if (File.Exists(upgradedFile))
-                                    {
-                                        if (MessageBox.Show(String.Format("File '{0}' already exists. Would you like to overwrite it?", Path.GetFileName(upgradedFile)),
-                                            "Overwrite File", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
-                                        {
-                                            return;
-                                        }
-                                    }
-
-                                    TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(upgradedFile, info);
-
-                                    Upgrade.DAL(dal, Settings, dalv2);
-                                    
-                                    AddProject(new TtProject(dal, Settings, this));
-                                }
-                            }
-                        }
-                        else
-                        {
-                            MessageBox.Show("File '{0}' is not a compatible project type.", filePath);
-                        }
+                        MessageBox.Show(MainWindow, $"File '{filePath}' is not a compatible project type.");
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Project is already opened.");
+                    MessageBox.Show(MainWindow, "Project is already opened.");
 
                     SwitchToTab(_Projects[filePath].ProjectTab);
                 }
             }
             else
             {
-                MessageBox.Show("File not found");
+                MessageBox.Show(MainWindow, "File not found");
 
-                Settings.RemoveRecentProject(filePath);
+                App.Settings.RemoveRecentProject(filePath);
                 UpdateRecentProjectMenu();
             }
         }
 
+        private TtSqliteMediaAccessLayer GetMalIfExists(string dalFilePath)
+        {
+            string malFilePath = Path.Combine(Path.GetDirectoryName(dalFilePath),
+                                $"{Path.GetFileNameWithoutExtension(dalFilePath)}{Consts.FILE_EXTENSION_MEDIA}");
 
+            if (File.Exists(malFilePath))
+                return new TtSqliteMediaAccessLayer(malFilePath);
+
+            return null;
+        }
 
 
         public void CreateProject()
         {
-            NewProjectDialog dialog = new NewProjectDialog(MainWindow, Settings.CreateProjectInfo(AppInfo.Version));
+            NewProjectDialog dialog = new NewProjectDialog(MainWindow, App.Settings.CreateProjectInfo(AppInfo.Version));
 
             if (dialog.ShowDialog() == true)
             {
                 TtProjectInfo info = dialog.ProjectInfo;
 
                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
-                TtProject proj = new TtProject(dal, Settings, this);
-                Trace.WriteLine(String.Format("Project Created ({1}): {0}", dal.FilePath, dal.GetDataVersion()));
+                TtProject proj = new TtProject(dal, null, App.Settings, this);
+                Trace.WriteLine($"Project Created ({dal.GetDataVersion()}): {dal.FilePath}");
 
                 AddProject(proj);
 
-                Settings.Region = info.Region;
-                Settings.District = info.District;
+                App.Settings.Region = info.Region;
+                App.Settings.District = info.District;
             }
         }
 
 
 
-        public void SaveCurrentProject()
+        public void SaveCurrentProject(bool rename = false)
         {
-            CurrentProject.Save();
+            if (rename)
+            {
+                SaveFileDialog dialog = new SaveFileDialog();
+                dialog.DefaultExt = Consts.FILE_EXTENSION;
+                dialog.Filter = Consts.FILE_EXTENSION_FILTER;
+
+                if (dialog.ShowDialog() == true)
+                {
+                    TtProject project = CurrentProject;
+                    string nFile = dialog.FileName, oFile = project.DAL.FilePath;
+
+                    File.Copy(oFile, nFile, true);
+
+                    TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(nFile);
+
+                    if (dal.HasErrors())
+                        dal.Fix();
+
+                    project.ReplaceDAL(dal);
+
+                    if (project.MAL != null)
+                    {
+                        string nmFile = dialog.FileName.Replace(Consts.FILE_EXTENSION, Consts.FILE_EXTENSION_MEDIA);
+
+                        File.Copy(project.MAL.FilePath, nmFile, true);
+
+                        project.ReplaceMAL(new TtSqliteMediaAccessLayer(nmFile));
+                    }
+
+                    Trace.WriteLine($"Project Copied: {nFile} from {oFile}");
+
+                    _Projects.Remove(oFile);
+                    _Projects.Add(nFile, project);
+
+                    project.Save();
+                }
+            }
+            else
+            {
+                CurrentProject.Save();
+            }
         }
 
 
@@ -372,7 +483,7 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
             _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
 
             _Projects.Add(project.FilePath, project);
-            Settings.AddRecentProject(project.FilePath);
+            App.Settings.AddRecentProject(project.FilePath);
             UpdateRecentProjectMenu();
 
             project.MessagePosted += Project_MessagePosted;
@@ -409,6 +520,7 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
         {
             if (tab != null)
             {
+                tab.Close();
                 _Tabs.Items.Remove(tab.Tab);
             }
         }
@@ -472,7 +584,7 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
 
             miRecent.Items.Clear();
 
-            foreach (String filePath in Settings.GetRecentProjects())
+            foreach (String filePath in App.Settings.GetRecentProjects())
             {
                 item = new MenuItem();
 
@@ -497,9 +609,120 @@ Would you like to upgrade it now?", "Upgrade TwoTrails file",
             ExportDialog.ShowDialog(CurrentProject, MainWindow);
         }
 
+        private void ViewPointDetails()
+        {
+            PointDetailsDialog.ShowDialog(CurrentProject.Manager.GetPoints(), MainWindow);
+        }
+
+        private void OpenInGoogleEarth()
+        {
+            Action createAndOpenKmz = () =>
+            {
+                try
+                {
+                    if (!Directory.Exists(App.TEMP_DIR))
+                        Directory.CreateDirectory(App.TEMP_DIR);
+
+                    string file = Path.Combine(App.TEMP_DIR, $"{Guid.NewGuid().ToString()}.kmz");
+                    Export.KMZ(CurrentProject, file);
+
+                    if (File.Exists(file))
+                        Process.Start(file);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.Message, "MainWindowModel:OpenInGoogleEarth");
+                    MessageBox.Show("An Error launching Google Earth has occured. Please see log file for details.");
+                }
+            };
+
+            try
+            {
+                //if (CoreUtils.IsApplictionInstalled("Google Earth") || CoreUtils.IsApplictionInstalled("Google Earth Pro"))
+                if (CoreUtils.IsExtensionOpenable("kmz"))
+                {
+                    createAndOpenKmz();
+                }
+                else
+                {
+                    if (MessageBox.Show("Google Earth is not installed. Would you like to install it now?", "Google Earth Not Found",
+                        MessageBoxButton.OKCancel, MessageBoxImage.Hand) == MessageBoxResult.OK)
+                    {
+                        Process.Start("www.google.com/earth/");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message, "MainWindowModel:OpenInGoogleEarth");
+                MessageBox.Show("Unable to open in Google Earth. See Log file for details.");
+                //createAndOpenKmz(); //try anyway
+            }
+        }
+
         private void OpenSettings()
         {
-            SettingsWindow.ShowDialog(Settings, MainWindow);
+            SettingsWindow.ShowDialog(App.Settings, MainWindow);
         }
+
+        private void ExportReport()
+        {
+            string name = $"ExportReport_{DateTime.Now.ToString().Replace(':', '.').Replace('/','-')}";
+            
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.AddExtension = true;
+            sfd.OverwritePrompt = true;
+            sfd.DefaultExt = "zip";
+            sfd.Filter =  "Zip files (*.zip)|*.zip|All files (*.*)|*.*";
+            sfd.FileName = $"{name}.zip";
+            sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+            if (sfd.ShowDialog() == true)
+            {
+                string tempDirectory = Path.Combine(App.TEMP_DIR, name);
+                Directory.CreateDirectory(tempDirectory);
+
+                File.Copy(App.LOG_FILE_PATH, Path.Combine(tempDirectory, App.LOG_FILE_NAME));
+                foreach (TtProject proj in _Projects.Values)
+                {
+                    File.Copy(proj.DAL.FilePath, Path.Combine(tempDirectory, Path.GetFileName(proj.DAL.FilePath)));
+                    if (proj.MAL != null)
+                        File.Copy(proj.MAL.FilePath, Path.Combine(tempDirectory, Path.GetFileName(proj.MAL.FilePath)));
+                }
+
+                using (StreamWriter sw = new StreamWriter(Path.Combine(tempDirectory, "App.Settings.txt")))
+                {
+                    sw.WriteLine("--Main App.Settings--");
+                    sw.WriteLine($"{nameof(App.Settings.UserName)}: {App.Settings.UserName}");
+                    sw.WriteLine($"{nameof(App.Settings.DeviceName)}: {App.Settings.DeviceName}");
+                    sw.WriteLine($"{nameof(App.Settings.Region)}: {App.Settings.Region}");
+                    sw.WriteLine($"{nameof(App.Settings.District)}: {App.Settings.District}");
+                    sw.WriteLine($"{nameof(App.Settings.IsAdvancedMode)}: {App.Settings.IsAdvancedMode}");
+                    sw.WriteLine("Recent Projects:");
+                    foreach (string rp in App.Settings.GetRecentProjects())
+                        sw.WriteLine(rp);
+                    sw.WriteLine();
+
+                    sw.WriteLine("--Device App.Settings--");
+                    sw.WriteLine($"{nameof(App.Settings.DeviceSettings.DeleteExistingPlots)}: {App.Settings.DeviceSettings.DeleteExistingPlots}");
+                    sw.WriteLine();
+
+                    sw.WriteLine("--Metadata App.Settings--");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Datum)}: {App.Settings.MetadataSettings.Datum}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.DecType)}: {App.Settings.MetadataSettings.DecType}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Distance)}: {App.Settings.MetadataSettings.Distance}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Elevation)}: {App.Settings.MetadataSettings.Elevation}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.MagDec)}: {App.Settings.MetadataSettings.MagDec}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Slope)}: {App.Settings.MetadataSettings.Slope}");
+                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Zone)}: {App.Settings.MetadataSettings.Zone}");
+                }
+
+                ZipFile.CreateFromDirectory(tempDirectory, Path.GetFullPath(sfd.FileName));
+
+                if (Directory.Exists(tempDirectory))
+                    Directory.Delete(tempDirectory, true);
+            }
+        }
+    
     }
 }

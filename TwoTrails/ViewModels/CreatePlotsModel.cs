@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
@@ -19,10 +18,9 @@ namespace TwoTrails.ViewModels
 {
     public class CreatePlotsModel : NotifyPropertyChangedEx
     {
-        //TODO Implement async creations with progress indicator
-
-
         private ITtManager _Manager;
+
+        public TtSettings Settings { get; }
 
         public ICommand GenerateCommand { get; }
         public ICommand CloseCommand { get; }
@@ -60,13 +58,16 @@ namespace TwoTrails.ViewModels
         public bool? BoundaryBuffer { get { return Get<bool?>(); } set { Set(value); } }
         public int BufferAmount { get { return Get<int>(); } set { Set(value); } }
 
+        public bool IsGenerating { get { return Get<bool>(); } set { Set(value); } }
 
-        public CreatePlotsModel(ITtManager manager, Window window)
+
+        public CreatePlotsModel(TtProject project, Window window)
         {
-            _Manager = manager;
+            _Manager = project.Manager;
+            Settings = project.Settings;
 
             Polygons = new ObservableCollection<TtPolygon>(
-                manager.GetPolygons().Where(p => manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint())));
+                _Manager.GetPolygons().Where(p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint())));
 
             UomDistance = Distance.FeetTenths;
 
@@ -105,8 +106,7 @@ namespace TwoTrails.ViewModels
                 (SampleTypeItem == SampleType.Percent && SampleAmount < 1 || SampleAmount > 100) ||
                 (SampleTypeItem == SampleType.Points && SampleAmount < 1))
             {
-                MessageBox.Show(String.Format("The Sample Amount must ",
-                    SampleTypeItem == SampleType.Percent ? "be between 1% and 100%." : "be greate than 1 point."));
+                MessageBox.Show($"The Sample Amount must be {(SampleTypeItem == SampleType.Percent ? "between 1% and 100%." : "greater than 1 point.")}");
                 return;
             }
 
@@ -117,7 +117,7 @@ namespace TwoTrails.ViewModels
             }
 
             List<TtPolygon> polygons = _Manager.GetPolygons();
-            string gPolyName = String.Format("{0}_Plts", SelectedPolygon.Name);
+            string gPolyName = $"{SelectedPolygon.Name}_Plts";
 
             TtPolygon poly = null;
 
@@ -133,10 +133,10 @@ namespace TwoTrails.ViewModels
 
             if (poly != null)
             {
-                if (MessageBox.Show(String.Format("Plots '{0}' already exist. Would you like to overwrite the plots?", gPolyName), "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to overwrite the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
                     return;
 
-                _Manager.DeletePoints(_Manager.GetPoints(poly.CN));
+                _Manager.DeletePointsInPolygon(poly.CN);
             }
             else
             {
@@ -150,6 +150,7 @@ namespace TwoTrails.ViewModels
                 _Manager.AddPolygon(poly);
             }
 
+            IsGenerating = true;
             GeneratePoints(poly);
         }
 
@@ -160,8 +161,7 @@ namespace TwoTrails.ViewModels
 
             double angle = Tilt * -1;
 
-            poly.Description = String.Format("Angle: {0}°, Grid({3}) X:{1} Y:{2}, Created from Polygon: {4}",
-                        Tilt, GridX, GridY, UomDistance.ToStringAbv(), SelectedPolygon.Name);
+            poly.Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon: {SelectedPolygon.Name}";
 
             IEnumerable<TtPoint> points = _Manager.GetPoints(SelectedPolygon.CN).Where(p => p.IsBndPoint());
 
@@ -297,7 +297,8 @@ namespace TwoTrails.ViewModels
 
             _Manager.AddPoints(wayPoints);
 
-            MessageBox.Show(String.Format("{0} WayPoints Created", addPoints.Count));
+            MessageBox.Show($"{addPoints.Count} WayPoints Created");
+            IsGenerating = false;
         }
     }
 }

@@ -1,0 +1,72 @@
+﻿<Window x:Class="TwoTrails.Dialogs.PointDetailsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TwoTrails.Dialogs"
+        xmlns:cc="clr-namespace:TwoTrails.Controls"
+        mc:Ignorable="d"
+        Title="Point Details" Height="500" Width="800"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top" Height="25">
+            <Menu.Resources>
+                <Style TargetType="MenuItem">
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="Height" Value="25"/>
+                </Style>
+            </Menu.Resources>
+            <MenuItem Header="_Fields">
+                <MenuItem Header="Index" IsCheckable="True" IsChecked="{Binding FieldController.Index}"/>
+                <MenuItem Header="PID" IsCheckable="True" IsChecked="{Binding FieldController.PID}"/>
+                <MenuItem Header="OpType" IsCheckable="True" IsChecked="{Binding FieldController.OpType}"/>
+                <MenuItem Header="OnBoundary" IsCheckable="True" IsChecked="{Binding FieldController.OnBoundary}"/>
+                <MenuItem Header="TimeCreated" IsCheckable="True" IsChecked="{Binding FieldController.TimeCreated}"/>
+                
+                <MenuItem Header="Polygon" IsCheckable="True" IsChecked="{Binding FieldController.Polygon}"/>
+                <MenuItem Header="Metadata" IsCheckable="True" IsChecked="{Binding FieldController.Metadata}"/>
+                <MenuItem Header="Group" IsCheckable="True" IsChecked="{Binding FieldController.Group}"/>
+                
+                <MenuItem Header="AdjX" IsCheckable="True" IsChecked="{Binding FieldController.AdjX}"/>
+                <MenuItem Header="AdjY" IsCheckable="True" IsChecked="{Binding FieldController.AdjY}"/>
+                <MenuItem Header="AdjZ" IsCheckable="True" IsChecked="{Binding FieldController.AdjZ}"/>
+                <MenuItem Header="UnAdjX" IsCheckable="True" IsChecked="{Binding FieldController.UnAdjX}"/>
+                <MenuItem Header="UnAdjY" IsCheckable="True" IsChecked="{Binding FieldController.UnAdjY}"/>
+                <MenuItem Header="UnAdjZ" IsCheckable="True" IsChecked="{Binding FieldController.UnAdjZ}"/>
+                
+                <MenuItem Header="Accuracy" IsCheckable="True" IsChecked="{Binding FieldController.Accuracy}"/>
+                
+                <MenuItem Header="Latitude" IsCheckable="True" IsChecked="{Binding FieldController.Latitude}"/>
+                <MenuItem Header="Longitude" IsCheckable="True" IsChecked="{Binding FieldController.Longitude}"/>
+                <MenuItem Header="Elevation" IsCheckable="True" IsChecked="{Binding FieldController.Elevation}"/>
+                <MenuItem Header="RMSEr" IsCheckable="True" IsChecked="{Binding FieldController.RMSEr}"/>
+                
+                <MenuItem Header="FwdAzimuth" IsCheckable="True" IsChecked="{Binding FieldController.FwdAzimuth}"/>
+                <MenuItem Header="BkAzimuth" IsCheckable="True" IsChecked="{Binding FieldController.BkAzimuth}"/>
+                <MenuItem Header="HorizontalDistance" IsCheckable="True" IsChecked="{Binding FieldController.HorizontalDistance}"/>
+                <MenuItem Header="SlopeDistance" IsCheckable="True" IsChecked="{Binding FieldController.SlopeDistance}"/>
+                <MenuItem Header="SlopeAngle" IsCheckable="True" IsChecked="{Binding FieldController.SlopeAngle}"/>
+                
+                <MenuItem Header="ParentPoint" IsCheckable="True" IsChecked="{Binding FieldController.ParentPoint}"/>
+                
+                <MenuItem Header="HasQuondamLinks" IsCheckable="True" IsChecked="{Binding FieldController.HasQuondamLinks}"/>
+                <MenuItem Header="Comment" IsCheckable="True" IsChecked="{Binding FieldController.Comment}"/>
+                
+                <MenuItem Header="CN" IsCheckable="True" IsChecked="{Binding FieldController.CN}"/>
+                <MenuItem Header="PolygonCN" IsCheckable="True" IsChecked="{Binding FieldController.PolygonCN}"/>
+                <MenuItem Header="MetadataCN" IsCheckable="True" IsChecked="{Binding FieldController.MetadataCN}"/>
+                <MenuItem Header="GroupCN" IsCheckable="True" IsChecked="{Binding FieldController.GroupCN}"/>
+                <MenuItem Header="ParentCN" IsCheckable="True" IsChecked="{Binding FieldController.ParentCN}"/>
+
+
+                <Separator/>
+
+            </MenuItem>
+
+            <MenuItem Header="Close" Click="Close_Click"/>
+        </Menu>
+        <cc:PointDetailsControl DockPanel.Dock="Top" x:Name="pdcPoints" Points="{Binding Points}" FieldController="{Binding FieldController}"/>
+    </DockPanel>
+</Window>

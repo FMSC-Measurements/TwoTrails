@@ -59,5 +59,17 @@ namespace TwoTrails.Dialogs
                 diag.Owner = owner;
             return diag.ShowDialog();
         }
+
+        public static void Show(TtHistoryManager manager, Window owner = null, Action<bool?> onClose = null)
+        {
+            RetraceDialog dialog = new RetraceDialog(manager);
+            if (owner != null)
+                dialog.Owner = owner;
+
+            if (onClose != null)
+                dialog.Closed += (s, e) => onClose(dialog.DialogResult);
+
+            dialog.Show();
+        }
     }
 }

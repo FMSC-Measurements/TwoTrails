@@ -4,12 +4,9 @@
     {
         private ITtManager pointsManager;
 
-        public DeleteTtGroupCommand(TtGroup group, ITtManager pointsManager, bool autoCommit = true) : base(group)
+        public DeleteTtGroupCommand(TtGroup group, ITtManager pointsManager) : base(group)
         {
             this.pointsManager = pointsManager;
-
-            if (autoCommit)
-                Redo();
         }
 
         public override void Redo()

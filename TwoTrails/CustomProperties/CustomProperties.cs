@@ -8,10 +8,10 @@ using System.Windows.Controls;
 
 namespace TwoTrails.CustomProperties
 {
-    public static class ControlProperties
+    public static class CustomProperties
     {
         public static readonly DependencyProperty BackgroundEnabledProperty =
-        DependencyProperty.RegisterAttached("BackgroundEnabled", typeof(bool), typeof(ControlProperties), new PropertyMetadata(default(bool)));
+        DependencyProperty.RegisterAttached("BackgroundEnabled", typeof(bool), typeof(CustomProperties), new PropertyMetadata(default(bool)));
 
         public static void SetBackgroundEnabled(Control element, bool value)
         {

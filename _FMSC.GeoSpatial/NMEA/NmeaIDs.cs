@@ -81,7 +81,7 @@ namespace FMSC.GeoSpatial.NMEA
 
         public static String ToStringCode(this TalkerID talkerID)
         {
-            return talkerID == TalkerID.Unknown ? "$??" : String.Format("${0}", talkerID);
+            return talkerID == TalkerID.Unknown ? "$??" : $"${talkerID}";
         }
 
         public static TalkerID ParseTalkerID(string value)
@@ -92,7 +92,10 @@ namespace FMSC.GeoSpatial.NMEA
             if (value.StartsWith("$"))
                 value = value.Substring(1, 3);
 
-            return (TalkerID)Enum.Parse(typeof(TalkerID), value);
+            TalkerID tid = TalkerID.Unknown;
+            Enum.TryParse(value, true, out tid);
+
+            return tid;
         }
 
         public static SentenceID ParseSentenceID(string value)
@@ -103,7 +106,10 @@ namespace FMSC.GeoSpatial.NMEA
             if (value.StartsWith("$"))
                 value = value.Substring(3, 6);
 
-            return (SentenceID)Enum.Parse(typeof(SentenceID), value);
+            SentenceID sid = SentenceID.Unknown;
+            Enum.TryParse(value, true, out sid);
+
+            return sid;
         }
     }
 }

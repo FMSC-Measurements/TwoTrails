@@ -60,7 +60,7 @@ namespace FMSC.GeoSpatial
 
         public override string ToString()
         {
-            return String.Format("{0} {1}", base.ToString(), Hemisphere.ToStringAbv());
+            return $"{base.ToString()} {Hemisphere.ToStringAbv()}";
         }
     }
 }

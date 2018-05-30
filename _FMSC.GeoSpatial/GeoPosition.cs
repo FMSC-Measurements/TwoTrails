@@ -67,7 +67,7 @@ namespace FMSC.GeoSpatial
 
         public override string ToString()
         {
-            return String.Format("{0} Elev: {1}({2})", base.ToString(), Elevation, UomElevation.ToStringAbv());
+            return $"{base.ToString()} Elev: {Elevation}({UomElevation.ToStringAbv()})";
         }
     }
 }

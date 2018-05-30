@@ -12,11 +12,11 @@ namespace TwoTrails.Core.ComponentModel.History
         private TtPolygon TargetPolygon;
         private int StartIndex;
 
-        private EditTtPointsMultiValueCommand editPointsCmd = null;
+        private EditTtPointsMultiValueCommand<int> editPointsCmd = null;
         private AddTtPointsCommand addPointsCmd;
 
 
-        public CreateQuondamsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex, bool? bndMode = null, bool autoCommit = true) : base(points)
+        public CreateQuondamsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex, bool? bndMode = null) : base(points)
         {
             this.pointsManager = pointsManager;
 
@@ -26,7 +26,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
             List<TtPoint> addPoints = new List<TtPoint>();
             List<TtPoint> editedPoints = new List<TtPoint>();
-            List<object> editedIndexes = new List<object>();
+            List<int> editedIndexes = new List<int>();
 
             int index = insertIndex > polyPoints.Count ?
                 polyPoints.Count : 
@@ -52,6 +52,8 @@ namespace TwoTrails.Core.ComponentModel.History
                     OnBoundary = (bndMode == null) ? point.OnBoundary : bndMode == true
                 };
 
+                qp.SetAccuracy(TargetPolygon.Accuracy);
+
                 addPoints.Add(qp);
 
                 prevPoint = qp;
@@ -66,13 +68,10 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
 
-            addPointsCmd = new AddTtPointsCommand(addPoints, pointsManager, false);
+            addPointsCmd = new AddTtPointsCommand(addPoints, pointsManager);
 
             if (editedPoints.Count > 0)
-                editPointsCmd = new EditTtPointsMultiValueCommand(editedPoints, PointProperties.INDEX, editedIndexes, false);
-
-            if (autoCommit)
-                Redo();
+                editPointsCmd = new EditTtPointsMultiValueCommand<int>(editedPoints, PointProperties.INDEX, editedIndexes);
         }
 
         public override void Redo()

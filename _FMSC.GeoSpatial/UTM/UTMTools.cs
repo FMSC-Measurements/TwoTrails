@@ -15,7 +15,7 @@ namespace FMSC.GeoSpatial.UTM
             return ConvertLatLonSignedDecToUTM(latitude.toSignedDecimal(), longitude.toSignedDecimal(), targetUTM);
         }
 
-        public static UTMCoords ConvertLatLonSignedDecToUTM(double latitude, double longitude, int targetUTM)
+        public static UTMCoords ConvertLatLonSignedDecToUTM(double latitude, double longitude, int targetUTM = 0)
         {
             const double deg2rad = Math.PI / 180;
 

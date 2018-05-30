@@ -30,7 +30,7 @@ namespace TwoTrails.Mapping
 
 
         public Double Latitude { get { return Adjusted ? Point.AdjLocation.Latitude : Point.UnAdjLocation.Latitude; } }
-        public Double Longitude { get { return Adjusted ? Point.AdjLocation.Latitude : Point.UnAdjLocation.Longitude; } }
+        public Double Longitude { get { return Adjusted ? Point.AdjLocation.Longitude : Point.UnAdjLocation.Longitude; } }
 
         
         public Double UtmX { get { return Adjusted ? Point.Point.AdjX : Point.Point.UnAdjX; } }
@@ -72,17 +72,11 @@ namespace TwoTrails.Mapping
             {
                 TtPoint parent = ((QuondamPoint)point).ParentPoint;
 
-                return String.Format("{0} ({1}) \u2794 {2} ({3})    ",
-                        point.PID,
-                        point.OpType,
-                        parent.PID,
-                        parent.OpType);
+                return $"{point.PID} - {point.Polygon.Name} ({point.OpType}) \u2794 {parent.PID} ({parent.OpType})    ";
             }
             else
             {
-                return String.Format("{0} ({1})",
-                        point.PID,
-                        point.OpType);
+                return $"{point.PID} - {point.Polygon.Name} ({point.OpType})";
             }
         }
     }

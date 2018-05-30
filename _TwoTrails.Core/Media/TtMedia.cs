@@ -57,10 +57,20 @@ namespace TwoTrails.Core.Media
             }
         }
 
+        private bool _IsExternal;
+        public bool IsExternal
+        {
+            get { return _IsExternal; }
+            protected set
+            {
+                SetField(ref _IsExternal, value);
+            }
+        }
+        
 
         public TtMedia() { }
 
-        public TtMedia(String cn, String name, String filePath, String comment, DateTime timeCreated, String pointCN)
+        public TtMedia(String cn, String name, String filePath, String comment, DateTime timeCreated, String pointCN, bool isExternal)
             : base(cn)
         {
             this._Name = name;
@@ -68,6 +78,7 @@ namespace TwoTrails.Core.Media
             this._Comment = comment;
             this._TimeCreated = timeCreated;
             this._PointCN = pointCN;
+            this._IsExternal = isExternal;
         }
 
         public TtMedia(TtMedia media) : base(media.CN)
@@ -77,11 +88,12 @@ namespace TwoTrails.Core.Media
             this._Comment = media._Comment;
             this._TimeCreated = media._TimeCreated;
             this._PointCN = media._PointCN;
+            this._IsExternal = media._IsExternal;
         }
 
 
         public abstract MediaType MediaType { get; }
 
-        public bool IsFileValid { get { return File.Exists(_FilePath); } }
+        public bool ExternalFileExists { get { return File.Exists(_FilePath); } }
     }
 }

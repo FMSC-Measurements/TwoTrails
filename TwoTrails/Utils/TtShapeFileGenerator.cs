@@ -75,7 +75,7 @@ namespace TwoTrails.Utils
                 attTable.AddAttribute("Poly", "Navigation Adjusted");
                 attTable.AddAttribute("CN", polygon.CN);
                 attTable.AddAttribute("Perim_M", polygon.Perimeter);
-                attTable.AddAttribute("PerimLine_M", polygon.PerimeterLine);
+                attTable.AddAttribute("PerimL_M", polygon.PerimeterLine);
 
                 Feature feat = new Feature();
                 DbaseFileHeader dbh;
@@ -300,7 +300,7 @@ namespace TwoTrails.Utils
             
             if (fileName != null && fileName.Length > 0)
             {
-                using (TextWriter tw = new StreamWriter(fileName + ".prj", false))
+                using (TextWriter tw = new StreamWriter($"{fileName}.prj", false))
                 {
                     tw.WriteLine(_Projection);
                 }
@@ -362,6 +362,8 @@ namespace TwoTrails.Utils
 
 
                 attPointTable.AddAttribute("Comment", p.Comment == null ? String.Empty : p.Comment);
+
+                attPointTable.AddAttribute("CN", p.CN);
 
                 feat = new Feature();
                 UTMCoords c = TtUtils.GetCoords(p, zone, adjusted);

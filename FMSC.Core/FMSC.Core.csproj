@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FMSC.Core</RootNamespace>
     <AssemblyName>FMSC.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,9 +21,10 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -37,6 +39,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -49,15 +52,21 @@
   <ItemGroup>
     <Compile Include="Collections\ObservableConvertedCollection.cs" />
     <Compile Include="ComponentModel\BindableMenuItem.cs" />
+    <Compile Include="ComponentModel\BindingProxy.cs" />
     <Compile Include="ComponentModel\CheckedListItem.cs" />
     <Compile Include="ComponentModel\Commands\BindedRelayCommand.cs" />
     <Compile Include="ComponentModel\Commands\RelayCommand.cs" />
     <Compile Include="ComponentModel\EnumToItemsSource.cs" />
     <Compile Include="ComponentModel\PropertyWatcher.cs" />
     <Compile Include="ComponentModel\RelayMenuItem.cs" />
+    <Compile Include="Controls\ControlUtils.cs" />
     <Compile Include="Controls\DataGridEx.cs" />
+    <Compile Include="Controls\DragAndDropListBox.cs" />
     <Compile Include="Controls\FlipCheckBox.xaml.cs">
       <DependentUpon>FlipCheckBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ProgressControl.xaml.cs">
+      <DependentUpon>ProgressControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Convert.cs" />
     <Compile Include="Math.cs" />
@@ -68,7 +77,9 @@
     <Compile Include="Types\SampleType.cs" />
     <Compile Include="Types\Slope.cs" />
     <Compile Include="TypeTools.cs" />
+    <Compile Include="Utilities\CoreUtils.cs" />
     <Compile Include="Utilities\DelayActionHandler.cs" />
+    <Compile Include="Utilities\ParseEx.cs" />
     <Compile Include="Xml\GPX\BaseTrack.cs" />
     <Compile Include="Xml\GPX\Document.cs" />
     <Compile Include="Xml\GPX\GpxWriter.cs" />
@@ -80,20 +91,24 @@
     <Compile Include="Xml\KML\KmlColor.cs" />
     <Compile Include="Xml\KML\Coordinates.cs" />
     <Compile Include="Xml\KML\ExtendedData.cs" />
-    <Compile Include="Xml\KML\Folder.cs" />
+    <Compile Include="Xml\KML\KmlFolder.cs" />
     <Compile Include="Xml\KML\KmlDocument.cs" />
     <Compile Include="Xml\KML\KmlEnums.cs" />
     <Compile Include="Xml\KML\KmlWriter.cs" />
     <Compile Include="Xml\KML\Placemark.cs" />
-    <Compile Include="Xml\KML\Point.cs" />
+    <Compile Include="Xml\KML\KmlPoint.cs" />
     <Compile Include="Xml\KML\Polygon.cs" />
-    <Compile Include="Xml\KML\Properties.cs" />
+    <Compile Include="Xml\KML\KmlProperties.cs" />
     <Compile Include="Xml\KML\Style.cs" />
     <Compile Include="Xml\KML\StyleMap.cs" />
     <Compile Include="Xml\KML\View.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\FlipCheckBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ProgressControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

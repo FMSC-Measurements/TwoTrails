@@ -12,9 +12,9 @@ namespace TwoTrails.Core.Points
 
         public SideShotPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,
             string comment, bool onbnd, double adjx, double adjy, double adjz, double unadjx, double unadjy, double unadjz,
-            double acc, string qlinks, double? fwd, double? bk, double sd, double sa)
+            double acc, string qlinks, double? fwd, double? bk, double sd, double sa, DataDictionary extended = null)
             : base(cn, index, pid, time, polycn, metacn, groupcn, comment, onbnd, adjx, adjy, adjz, unadjx,
-            unadjy, unadjz, acc, qlinks, fwd, bk, sd, sa)
+            unadjy, unadjz, acc, qlinks, fwd, bk, sd, sa, extended)
         { }
 
 
@@ -24,6 +24,7 @@ namespace TwoTrails.Core.Points
         {
             Calculate(point.UnAdjX, point.UnAdjY, point.UnAdjZ, false);
             Calculate(point.AdjX, point.AdjY, point.AdjZ, true);
+            SetAccuracy(point.Accuracy);
         }
     }
 }

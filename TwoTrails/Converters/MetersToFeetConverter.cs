@@ -12,11 +12,13 @@ namespace TwoTrails.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null)
+            if (value != null && double.TryParse(value as string, out double dvalue))
             {
                 try
                 {
-                    return ((double)value * 3937d / 1200d);
+                    if ((parameter is bool rev && rev) || (parameter is string str && str.ToLower() == "true"))
+                        return (dvalue * 1200d / 3937d);
+                    return (dvalue * 3937d / 1200d);
                 }
                 catch
                 {

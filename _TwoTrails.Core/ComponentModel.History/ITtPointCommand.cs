@@ -15,9 +15,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public ITtPointCommand(TtPoint point)
         {
-            if (point == null)
-                throw new ArgumentNullException(nameof(point));
-            this.Point = point;
+            this.Point = point ?? throw new ArgumentNullException(nameof(point));
         }
 
         public abstract void Redo();

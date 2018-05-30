@@ -32,13 +32,13 @@ namespace TwoTrails.Controls
         public IReadOnlyTtDataLayer DAL { get; }
 
         public bool HasMetadata { get; }
-        public bool IncludeMetadata { get; set; }
+        public bool IncludeMetadata { get; set; } = true;
 
         public bool HasGroups { get; }
-        public bool IncludeGroups { get; set; }
+        public bool IncludeGroups { get; set; } = true;
 
         public bool HasNmea { get; }
-        public bool IncludeNmea { get; set; }
+        public bool IncludeNmea { get; set; } = true;
 
 
         public bool HasSelectedPolygons { get { return Polygons.Where(p => p.IsSelected).Any(); } }

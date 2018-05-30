@@ -175,8 +175,7 @@ namespace TwoTrails.ViewModels
 
         private void PolygonChanged(TtPolygon polygon)
         {
-            if (polygon != null)
-                Points = _Manager.GetPoints(polygon.CN);
+            Points = polygon == null ? new List<TtPoint>() : _Manager.GetPoints(polygon.CN);
         }
     }
 }

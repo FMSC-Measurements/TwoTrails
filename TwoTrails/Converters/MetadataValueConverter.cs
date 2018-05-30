@@ -70,9 +70,7 @@ namespace TwoTrails.Converters
             {
                 if (value != null)
                 {
-                    double dval;
-
-                    if (Double.TryParse(value as string, out dval))
+                    if (Double.TryParse(value as string, out double dval))
                     {
                         switch (MetadataPropertyName)
                         {

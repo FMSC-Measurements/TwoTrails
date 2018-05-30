@@ -17,7 +17,8 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"/>
+        <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Source="{StaticResource ResourceKey=ImgTwoTrailsIcon}"
+               Stretch="Uniform"/>
 
         <Grid Grid.Column="1" Grid.Row="0" Margin="2.5,2.5,2.5,0">
             <Grid.ColumnDefinitions>
@@ -48,13 +49,13 @@
 
             <TextBlock Grid.Row="4" Text="Group"/>
             <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
-                <Hyperlink NavigateUri="http://www.fs.fed.us/fmsc/" RequestNavigate="Hyperlink_RequestNavigate">
+                <Hyperlink NavigateUri="https://www.fs.fed.us/forestmanagement/products/measurement/" RequestNavigate="Hyperlink_RequestNavigate">
                     Forest Management Service Center
                 </Hyperlink>
             </TextBlock>
             
             <TextBlock Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right">
-                <Hyperlink NavigateUri="http://www.fs.fed.us/fmsc/measure/" RequestNavigate="Hyperlink_RequestNavigate">
+                <Hyperlink NavigateUri="https://www.fs.fed.us/forestmanagement/products/measurement/" RequestNavigate="Hyperlink_RequestNavigate">
                     Forest Products Measurement
                 </Hyperlink>
             </TextBlock>

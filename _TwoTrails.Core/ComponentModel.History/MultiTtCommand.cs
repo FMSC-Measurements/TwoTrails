@@ -11,13 +11,11 @@ namespace TwoTrails.Core.ComponentModel.History
 
         private List<ITtCommand> _Commands = new List<ITtCommand>();
 
+        public int NumberOfCommands => _Commands.Count;
 
-        public MultiTtCommand(IEnumerable<ITtCommand> commands, bool autoCommit = true)
+        public MultiTtCommand(IEnumerable<ITtCommand> commands)
         {
             _Commands = new List<ITtCommand>(commands);
-
-            if (autoCommit)
-                Redo();
         }
 
         public void Redo()

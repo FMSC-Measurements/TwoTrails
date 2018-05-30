@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TwoTrails.Core
+namespace TwoTrails.Core.Points
 {
     public interface IAccuracy
     {

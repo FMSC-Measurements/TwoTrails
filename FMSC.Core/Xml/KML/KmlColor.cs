@@ -71,20 +71,30 @@ namespace FMSC.Core.Xml.KML
 
         public KmlColor() { }
 
-        public KmlColor (int color)
+        public KmlColor (int color, bool abgrFormat = false)
         {
-            R = color % 256;
-            G = (color / 256) % 256;
-            B = (color / 65536) % 256;
-            A = (color / 16777216) % 256;
+            if (abgrFormat)
+            {
+                A = color % 256;
+                B = (color / 256) % 256;
+                G = (color / 65536) % 256;
+                R = (color / 16777216) % 256;
+            }
+            else
+            {
+                R = color % 256;
+                G = (color / 256) % 256;
+                B = (color / 65536) % 256;
+                A = (color / 16777216) % 256;
+            }
 
             if (A == 0)
                 A = 255;
         }
 
-        public KmlColor(string color)
+        public KmlColor(string color, bool abgrFormat = false)
         {
-            SetColorFromStringRGBA(color);
+            SetColorFromStringRGBA(color, abgrFormat);
         }
 
         public KmlColor(KmlColor color)
@@ -107,7 +117,7 @@ namespace FMSC.Core.Xml.KML
         /// Sets Color from a string
         /// </summary>
         /// <param name="color">Color in format of ######## (3, 2 alpha-numeric values per hue and 2 for opacity)</param>
-        public void SetColorFromStringRGBA(string color)
+        public void SetColorFromStringRGBA(string color, bool abgrFormat = false)
         {
             if (color == null || color.Length < 2)
                 throw new Exception("String must be greater than 2 and even");
@@ -126,24 +136,38 @@ namespace FMSC.Core.Xml.KML
 
             int len = colors.Count;
 
-            if (len > 0)
-                R = System.Convert.ToInt32(colors[0], 16);
-            if (len > 1)
-                G = System.Convert.ToInt32(colors[1], 16);
-            if (len > 2)
-                B = System.Convert.ToInt32(colors[2], 16);
-            if (len > 3)
-                A = System.Convert.ToInt32(colors[3], 16);
+            if (abgrFormat)
+            {
+                if (len > 3)
+                    R = System.Convert.ToInt32(colors[3], 16);
+                if (len > 2)
+                    G = System.Convert.ToInt32(colors[2], 16);
+                if (len > 1)
+                    B = System.Convert.ToInt32(colors[1], 16);
+                if (len > 0)
+                    A = System.Convert.ToInt32(colors[0], 16);
+            }
+            else
+            {
+                if (len > 0)
+                    R = System.Convert.ToInt32(colors[0], 16);
+                if (len > 1)
+                    G = System.Convert.ToInt32(colors[1], 16);
+                if (len > 2)
+                    B = System.Convert.ToInt32(colors[2], 16);
+                if (len > 3)
+                    A = System.Convert.ToInt32(colors[3], 16);
+            }
         }
 
         public string ToStringRGBA()
         {
-            return String.Format("{0:X2}{1:X2}{2:X2}{3:X2}", R, G, B, A);
+            return $"{R:X2}{G:X2}{B:X2}{A:X2}";
         }
 
         public string ToStringABGR()
         {
-            return String.Format("{0:X2}{1:X2}{2:X2}{3:X2}", A, B, G, R);
+            return $"{A:X2}{B:X2}{G:X2}{R:X2}";
         }
 
         /// <returns>ABGR format</returns>

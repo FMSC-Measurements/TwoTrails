@@ -8,6 +8,7 @@ namespace TwoTrails.Core.Points
 {
     public delegate void PointChangedEvent(TtPoint point);
     public delegate void PointPolygonChangedEvent(TtPoint point, TtPolygon newPolygon, TtPolygon oldPolygon);
+    public delegate void PointMetadataChangedEvent(TtPoint point, TtMetadata newMetadata, TtMetadata oldMetadata);
     public delegate void PointIndexChangedEvent(TtPoint point, int newIndex, int oldIndex);
 
     public abstract class TtPoint : TtObject, IAccuracy, IComparable<TtPoint>, IComparer<TtPoint>
@@ -15,8 +16,11 @@ namespace TwoTrails.Core.Points
         public event PointChangedEvent LocationChanged;
         public event PointChangedEvent PreviewLocationChanged;
         public event PointChangedEvent OnBoundaryChanged;
-        public event PointPolygonChangedEvent PointPolygonChanged;
+        public event PointChangedEvent OnAccuracyChanged;
+        public event PointPolygonChangedEvent PolygonChanged;
+        public event PointMetadataChangedEvent MetadataChanged;
         public event PointIndexChangedEvent PointIndexChanged;
+
 
         #region Properties
         private Int32 _Index;
@@ -70,7 +74,7 @@ namespace TwoTrails.Core.Points
 
                     if (oldPoly != null && value != null)
                     {
-                        PointPolygonChanged.Invoke(this, value, oldPoly);
+                        PolygonChanged?.Invoke(this, value, oldPoly);
                     }
                 }
             }
@@ -104,14 +108,16 @@ namespace TwoTrails.Core.Points
         }
 
         protected TtMetadata _Metadata;
-        public virtual TtMetadata Metadata
+        public TtMetadata Metadata
         {
             get { return _Metadata; }
             set
             {
+                TtMetadata oldMetadata = _Metadata;
                 if (SetField(ref _Metadata, value))
                 {
                     MetadataCN = value?.CN;
+                    MetadataChanged?.Invoke(this, _Metadata, oldMetadata);
                     OnMetadataChanged();
                 }
             }
@@ -180,7 +186,7 @@ namespace TwoTrails.Core.Points
         public Double Accuracy
         {
             get { return _Accuracy; }
-            protected set { SetField(ref _Accuracy, value); }
+            protected set { SetField(ref _Accuracy, value, () => OnAccuracyChanged?.Invoke(this)); }
         }
 
         private ObservableCollection<String> _LinkedPoints = new ObservableCollection<string>();
@@ -196,6 +202,34 @@ namespace TwoTrails.Core.Points
 
         public bool HasQuondamLinks { get { return _LinkedPoints.Count > 0; } }
 
+
+        private DataDictionary _ExtendedData;
+        public DataDictionary ExtendedData
+        {
+            get { return _ExtendedData; }
+            private set
+            {
+                DataDictionary oldDD = _ExtendedData;
+                
+                if (SetField(ref _ExtendedData, value))
+                {
+                    if (oldDD != null)
+                        oldDD.PropertyChanged -= DataDictionary_PropertyChanged;
+
+                    if (_ExtendedData != null)
+                        _ExtendedData.PropertyChanged += DataDictionary_PropertyChanged;
+                }
+            }
+        }
+
+        private void DataDictionary_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(e.PropertyName);
+            OnPropertyChanged(nameof(ExtendedData));
+        }
+        #endregion
+
+
         private bool _LocationChangedEventEnabled = true;
         public virtual bool LocationChangedEventEnabled
         {
@@ -210,12 +244,12 @@ namespace TwoTrails.Core.Points
         }
 
         public bool LocationHasChanged { get; protected set; }
-        #endregion
         
 
         public TtPoint()
         {
             _LinkedPoints.CollectionChanged += LinkedPoints_CollectionChanged;
+            ExtendedData = new DataDictionary();
         }
 
         public TtPoint(TtPoint point) : base(point.CN)
@@ -253,11 +287,13 @@ namespace TwoTrails.Core.Points
             _UnAdjZ = point._UnAdjZ;
 
             _Accuracy = point._Accuracy;
+
+            ExtendedData = new DataDictionary(point._ExtendedData);
         }
 
         public TtPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,
             string comment, bool onbnd, double adjx, double adjy, double adjz, double unadjx, double unadjy, double unadjz,
-            double acc, string qlinks) : base(cn)
+            double acc, string qlinks, DataDictionary extended = null) : base(cn)
         {
             _LinkedPoints.CollectionChanged += LinkedPoints_CollectionChanged;
 
@@ -281,6 +317,8 @@ namespace TwoTrails.Core.Points
             _UnAdjZ = unadjz;
 
             _Accuracy = acc;
+
+            ExtendedData = extended ?? new DataDictionary();
 
             if (qlinks != null)
             {
@@ -439,7 +477,8 @@ namespace TwoTrails.Core.Points
                 _Comment == point._Comment &&
                 _PolyCN == point._PolyCN &&
                 _GroupCN == point._GroupCN &&
-                _MetadataCN == point._MetadataCN;
+                _MetadataCN == point._MetadataCN &&
+                _ExtendedData == point._ExtendedData;
         }
 
         public override int GetHashCode()
@@ -450,7 +489,7 @@ namespace TwoTrails.Core.Points
 
         public override string ToString()
         {
-            return String.Format("{0} ({1})", PID, OpType);
+            return $"{PID} ({OpType})";
         }
     }
 }

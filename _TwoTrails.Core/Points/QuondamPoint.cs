@@ -38,7 +38,7 @@ namespace TwoTrails.Core.Points
                         ParentPointCN = _ParentPoint.CN;
 
                         _ParentPoint.AddLinkedPoint(this);
-                        _ParentPoint.LocationChanged += ParentPoint_LocationChanged; 
+                        _ParentPoint.LocationChanged += ParentPoint_LocationChanged;
                     }
 
                     if (oldParent != null)
@@ -50,6 +50,10 @@ namespace TwoTrails.Core.Points
                         {
                             OnLocationChanged();
                         }
+                    }
+                    else
+                    {
+                        OnLocationChanged();
                     }
                 }
             }
@@ -85,9 +89,9 @@ namespace TwoTrails.Core.Points
 
         public QuondamPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,
             string comment, bool onbnd, double adjx, double adjy, double adjz, double unadjx, double unadjy, double unadjz,
-            double acc, string qlinks, string pcn, double? manacc)
+            double acc, string qlinks, string pcn, double? manacc, DataDictionary extended = null)
             : base(cn, index, pid, time, polycn, metacn, groupcn, comment, onbnd, adjx, adjy, adjz, unadjx,
-            unadjy, unadjz, acc, qlinks)
+            unadjy, unadjz, acc, qlinks, extended)
         {
             _ParentPointCN = pcn;
             _ManualAccuracy = manacc;
@@ -105,16 +109,15 @@ namespace TwoTrails.Core.Points
             OnLocationChanged();
         }
 
-        public override void SetAccuracy(double polyAccuracy)
+        public override void SetAccuracy(double accuracy)
         {
-            base.SetAccuracy(ManualAccuracy != null ? (double)ManualAccuracy : polyAccuracy);
+            base.SetAccuracy(ManualAccuracy ?? accuracy);
         }
 
 
         public override string ToString()
         {
-            return String.Format("{0}{1}", base.ToString(),
-                ParentPoint != null ? String.Format(": {0}", ParentPoint.ToString()) : String.Empty);
+            return $"{base.ToString()}{(ParentPoint != null ? $": {ParentPoint.ToString()}" : String.Empty)}";
         }
 
 

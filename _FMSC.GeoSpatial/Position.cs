@@ -60,7 +60,7 @@ namespace FMSC.GeoSpatial
 
         public override string ToString()
         {
-            return String.Format("Lat: {0} Lon: {1}", Latitude, Longitude);
+            return $"Lat: {Latitude} Lon: {Longitude}";
         }
     }
 }

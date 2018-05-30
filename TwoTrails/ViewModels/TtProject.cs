@@ -31,6 +31,8 @@ namespace TwoTrails.ViewModels
         public ICommand EditGroupsCommand { get; }
         public ICommand EditMetadataCommand { get; }
 
+        public ICommand RecalculateAllPolygonsCommand { get; }
+
         public ICommand UndoCommand { get; set; }
         public ICommand RedoCommand { get; set; }
 
@@ -41,10 +43,11 @@ namespace TwoTrails.ViewModels
         public String FilePath { get { return DAL.FilePath; } }
 
         public ProjectTab ProjectTab { get; private set; }
-        private MapTab MapTab { get; set; }
         private UserActivityTab UserActivityTab { get; set; }
+        private MapTab MapTab { get; set; }
         private MapWindow MapWindow { get; set; }
         
+        //TODO remove mapwindow from TtProject
         public bool ProjectTabIsOpen { get { return ProjectTab != null; } }
         public bool MapTabIsOpen { get { return MapTab != null; } }
         public bool UserActivityTabIsOpen { get { return UserActivityTab != null; } }
@@ -68,13 +71,14 @@ namespace TwoTrails.ViewModels
 
         public bool RequiresUpgrade { get; private set; }
 
-
+        //property changes to polys/meta/groups
         public bool DataChanged
         {
             get { return Get<bool>(); }
             private set { Set(value, () => OnPropertyChanged(nameof(RequiresSave))); }
         }
 
+        //changes to project fields
         public bool ProjectChanged
         {
             get { return Get<bool>(); }
@@ -82,26 +86,28 @@ namespace TwoTrails.ViewModels
         }
 
 
-        public ITtDataLayer DAL { get; }
+        public ITtDataLayer DAL { get; private set; }
+        public ITtMediaLayer MAL { get; private set; }
 
         public TtSettings Settings { get; private set; }
 
         public TtManager Manager { get; }
         public TtHistoryManager HistoryManager { get; }
 
-        private DataEditorModel _DataEditor;
-        public DataEditorModel DataEditor
+        private PointEditorModel _DataEditor;
+        public PointEditorModel DataEditor
         {
-            get { return _DataEditor ?? (_DataEditor = new DataEditorModel(this)); }
+            get { return _DataEditor ?? (_DataEditor = new PointEditorModel(this)); }
         }
 
         public MainWindowModel MainModel { get; private set; }
         #endregion
 
 
-        public TtProject(ITtDataLayer dal, TtSettings settings, MainWindowModel mainModel)
+        public TtProject(ITtDataLayer dal, ITtMediaLayer mal, TtSettings settings, MainWindowModel mainModel)
         {
             DAL = dal;
+            MAL = mal;
             Settings = settings;
 
             MainModel = mainModel;
@@ -116,7 +122,7 @@ namespace TwoTrails.ViewModels
 
             RequiresSave = false;
 
-            Manager = new TtManager(dal, settings);
+            Manager = new TtManager(dal, mal, settings);
             HistoryManager = new TtHistoryManager(Manager);
             HistoryManager.HistoryChanged += Manager_HistoryChanged;
             
@@ -135,6 +141,8 @@ namespace TwoTrails.ViewModels
             EditPolygonsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Polygons));
             EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Metadata));
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Groups));
+            
+            RecalculateAllPolygonsCommand = new RelayCommand(x => { HistoryManager.RecalculatePolygons(); DataChanged |= true; });
 
             OpenMapCommand = new RelayCommand(x => OpenMapTab());
             OpenMapWindowCommand = new RelayCommand(x => OpenMapWindow());
@@ -144,7 +152,7 @@ namespace TwoTrails.ViewModels
 
         private void Manager_HistoryChanged(object sender, EventArgs e)
         {
-            Set(HistoryManager.CanUndo || DataChanged, nameof(RequiresSave));
+            RequiresSave = HistoryManager.CanUndo;
         }
 
 
@@ -169,13 +177,28 @@ namespace TwoTrails.ViewModels
                     Manager.Save();
                     HistoryManager.ClearHistory();
                     RequiresSave = DataChanged = ProjectChanged = false;
-                    MessagePosted?.Invoke(this, String.Format("Project '{0}' Saved", ProjectName));
+                    MessagePosted?.Invoke(this, $"Project '{ProjectName}' Saved");
                 }
                 catch (Exception ex)
                 {
                     Trace.WriteLine(ex.Message, "TtProject:Save");
                 }
             }
+        }
+
+        public void ReplaceDAL(ITtDataLayer dal)
+        {
+            DAL = dal;
+            Manager.ReplaceDAL(DAL);
+            OnPropertyChanged(nameof(DAL));
+            OnPropertyChanged(nameof(FilePath));
+        }
+
+        public void ReplaceMAL(ITtMediaLayer mal)
+        {
+            MAL = mal;
+            Manager.ReplaceMAL(MAL);
+            OnPropertyChanged(nameof(MAL));
         }
 
         public void Close()
@@ -196,6 +219,10 @@ namespace TwoTrails.ViewModels
                     {
                         MessageBox.Show(ex.Message);
                     }
+                }
+                else if (result == MessageBoxResult.Cancel)
+                {
+                    return;
                 }
             }
 
@@ -282,7 +309,7 @@ namespace TwoTrails.ViewModels
 
                 if (MapTab != null)
                 {
-                    MapWindow = new MapWindow(this, MapTab.MapControl);
+                    MapWindow = new MapWindow(_ProjectInfo.Name, MapTab.MapControl);
                     CloseTab(MapTab);
                 }
                 else
@@ -290,14 +317,8 @@ namespace TwoTrails.ViewModels
                     MapWindow = new MapWindow(this);
                 }
             }
-
-            MapWindow.Owner = MainModel.MainWindow;
+            
             MapWindow.Show();
-        }
-
-        private void DetachMapTab()
-        {
-
         }
 
         private void ViewUserActivityTab()

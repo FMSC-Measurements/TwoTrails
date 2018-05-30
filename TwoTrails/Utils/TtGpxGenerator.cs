@@ -18,12 +18,12 @@ namespace TwoTrails.Utils
 
         public static GpxDocument Generate(IEnumerable<ITtManager> managers, string name, string description = null)
         {
-            GpxDocument doc = new GpxDocument("USFS TwoTrails - http://www.fs.fed.us/fmsc/measure/geospatial/twotrails/");
+            GpxDocument doc = new GpxDocument($"USFS TwoTrails - {Consts.URL_TWOTRAILS}");
 
             doc.Metadata = new Metadata(name)
             {
                 Time = DateTime.Now,
-                Link = @"http://www.fs.fed.us/fmsc/measure/geospatial/twotrails/"
+                Link = Consts.URL_TWOTRAILS
             };
 
             #region Create Polygons
@@ -54,7 +54,7 @@ namespace TwoTrails.Utils
                                 Name = point.PID.ToString(),
                                 Time = point.TimeCreated,
                                 Comment = point.Comment,
-                                Description = String.Format("Point Operation: {0}<br>UtmX: {1}<br>UtmY: {2}", point.OpType, point.AdjX, point.AdjY)
+                                Description = $"Point Operation: {point.OpType}<br>UtmX: {point.AdjX}<br>UtmY: {point.AdjY}"
                             };
 
                             System.Windows.Point unadj = TtUtils.GetLatLon(point, true);
@@ -63,7 +63,7 @@ namespace TwoTrails.Utils
                                 Name = point.PID.ToString(),
                                 Time = point.TimeCreated,
                                 Comment = point.Comment,
-                                Description = String.Format("Point Operation: {0}<br>UtmX: {1}<br>UtmY: {2}", point.OpType, point.UnAdjX, point.UnAdjY)
+                                Description = $"Point Operation: {point.OpType}<br>UtmX: {point.UnAdjX}<br>UtmY: {point.UnAdjY}"
                             };
 
                             #region Add points to lists

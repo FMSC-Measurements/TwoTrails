@@ -15,7 +15,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public ITtMetadataCommand(TtMetadata metadata)
         {
-            this.metadata = metadata;
+            this.metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
         }
 
         public abstract void Redo();

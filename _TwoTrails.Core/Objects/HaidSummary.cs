@@ -25,6 +25,10 @@ namespace TwoTrails.Core
         public double TotalTraverseError { get; private set; } = 0;
         public double TotalTraverseLength { get; private set; } = 0;
         public int TotalTraverseSegments { get; private set; } = 0;
+        public double GpsAreaError { get; private set; } = 0;
+        public double TraverseAreaError { get; private set; } = 0;
+
+        public double WorstTravSegmentError { get; private set; } = double.PositiveInfinity;
 
         private double travLength = 0;
         private int travSegments = 0;
@@ -32,7 +36,7 @@ namespace TwoTrails.Core
         public String SummaryText { get; }
 
 
-        public PolygonSummary(ITtManager manager, TtPolygon polygon)
+        public PolygonSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false)
         {
             Polygon = polygon;
             Legs = new ReadOnlyCollection<TtLeg>(_Legs);
@@ -41,15 +45,15 @@ namespace TwoTrails.Core
 
             if (allPoints.Count > 2)
             {
-                IEnumerable<TtPoint> points = allPoints.Where(p => p.IsBndPoint());
+                IEnumerable<TtPoint> points = allPoints;//.Where(p => p.OnBoundary);
                 if (points.Count() > 2)
                 {
                     StringBuilder sbPoints = new StringBuilder();
 
                     foreach (TtPoint point in points)
-                        ProcessPoint(sbPoints, point);
+                        ProcessPoint(sbPoints, point, false, showPoints);
 
-                    TtPoint sp = points.First();
+                    TtPoint sp = null;
                     foreach (TtPoint p in points)
                     {
                         if (p.OnBoundary)
@@ -59,16 +63,19 @@ namespace TwoTrails.Core
                         }
                     }
 
-                    if (!sp.HasSameAdjLocation(_LastTtBndPt))
+                    if (sp != null && !sp.HasSameAdjLocation(_LastTtBndPt))
                         _Legs.Add(new TtLeg(_LastTtBndPt, sp));
 
+                    double perim = 0;
                     foreach (TtLeg leg in _Legs.Where(l => l is TtLeg))
+                    {
                         TotalGpsError += leg.Error;
-
+                        perim += leg.LegLength;
+                    }
 
                     StringBuilder sb = new StringBuilder();
                     
-                    sb.AppendFormat("The polygon area is: {0:0.00} Ha ({1:0.00} ac).{2}",
+                    sb.AppendFormat("The polygon area is: {0:0.000} Ha ({1:0.00} ac).{2}",
                         Math.Round(polygon.AreaHectaAcres, 2),
                         Math.Round(polygon.AreaAcres, 2),
                         Environment.NewLine);
@@ -85,25 +92,27 @@ namespace TwoTrails.Core
 
                     if (TotalGpsError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
-                        sb.AppendFormat("GPS Contribution: {0:0.00} Ha ({1:0.00} ac){2}",
+                        sb.AppendFormat("GPS Contribution: {0:0.000} Ha ({1:0.00} ac){2}",
                             Math.Round(FMSC.Core.Convert.MetersSquaredToHa(TotalGpsError), 2),
                             Math.Round(FMSC.Core.Convert.MetersSquaredToAcres(TotalGpsError), 2),
                             Environment.NewLine);
 
+                        GpsAreaError = TotalGpsError / polygon.Area * 100.0;
                         sb.AppendFormat("GPS Contribution Ratio of area-error-area to area is: {0:0.00}%.{1}{1}",
-                            Math.Round(TotalGpsError / polygon.Area * 100.0, 2),
+                            Math.Round(GpsAreaError, 2),
                             Environment.NewLine);
                     }
 
                     if (TotalTraverseError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
-                        sb.AppendFormat("Traverse Contribution: {0:0.00} Ha ({1:0.00} ac){2}",
+                        sb.AppendFormat("Traverse Contribution: {0:0.000} Ha ({1:0.00} ac){2}",
                             Math.Round(FMSC.Core.Convert.MetersSquaredToHa(TotalTraverseError), 2),
                             Math.Round(FMSC.Core.Convert.MetersSquaredToAcres(TotalTraverseError), 2),
                             Environment.NewLine);
 
+                        TraverseAreaError = TotalTraverseError / polygon.Area * 100.0;
                         sb.AppendFormat("Traverse Contribution Ratio of area-error-area to area is: {0:0.00}%.{1}{1}",
-                            Math.Round(TotalTraverseError / polygon.Area * 100.0, 2),
+                            Math.Round(TraverseAreaError, 2),
                             Environment.NewLine);
                     }
 
@@ -144,7 +153,7 @@ namespace TwoTrails.Core
                             {
                                 CloseTraverse(sbPoints, point);
                             }
-                            else if (_LastTtPoint != null)
+                            else if (_LastTtBndPt != null)
                                 _Legs.Add(new TtLeg(_LastTtBndPt, point));
 
                             _LastTtBndPt = point;
@@ -152,8 +161,8 @@ namespace TwoTrails.Core
 
                         if (!fromQndm && showPoints)
                         {
-                            sbPoints.AppendFormat("Point {0}: {1} {2}- ", point.PID, point.OnBoundary ? " " : "*", point.OpType);
-                            sbPoints.AppendFormat("Accuracy is {0:0.00#} meters.{1}", point.Accuracy, Environment.NewLine);
+                            sbPoints.Append($"Point {point.PID}: {(point.OnBoundary ? " " : "*")} {point.OpType}- ");
+                            sbPoints.Append($"Accuracy is {point.Accuracy:0.00#} meters.{Environment.NewLine}");
                         }
 
                         _LastGpsPoint = point;
@@ -180,9 +189,9 @@ namespace TwoTrails.Core
                                     travLength = MathEx.Distance(_LastTtPoint.UnAdjX, _LastTtPoint.UnAdjY, point.UnAdjX, point.UnAdjY);
                                     traversing = true;
 
-                                    if (showPoints)
+                                    if (showPoints && !fromQndm)
                                     {
-                                        sbPoints.AppendFormat("Traverse Start:{0}", Environment.NewLine);
+                                        sbPoints.Append($"Traverse Start:{Environment.NewLine}");
                                     }
 
                                     if (_LastTtBndPt != null)
@@ -202,13 +211,12 @@ namespace TwoTrails.Core
                     break;
                 case OpType.SideShot:
                     {
-                        if (showPoints)
+                        if (showPoints && !fromQndm)
                         {
-                            sbPoints.AppendFormat("Point {0}: {1} SideShot off Point {2}.{3}",
-                                    point.PID, point.OnBoundary ? " " : "*", _LastGpsPoint.PID, Environment.NewLine);
+                            sbPoints.Append($"Point {point.PID}: {(point.OnBoundary ? " " : "*")} SideShot off Point {_LastGpsPoint?.PID}.{Environment.NewLine}");
                         }
 
-                        if (_LastTtBndPt != null)
+                        if (_LastTtBndPt != null && point.OnBoundary || fromQndm)
                         {
                             _Legs.Add(new TtLeg(_LastTtBndPt, point));
                         }
@@ -244,8 +252,16 @@ namespace TwoTrails.Core
 
                         if (showPoints)
                         {
-                            sbPoints.AppendFormat("Point {0}: {1} Quondam to Point {2}.{3}", point.PID,
-                                point.OnBoundary ? " " : "*", qp.ParentPoint.PID, Environment.NewLine);
+                            sbPoints.AppendFormat("Point {0}: {1} Quondam to Point {2} ({3}){4}.{5}", point.PID,
+                                point.OnBoundary ? " " : "*", qp.ParentPoint.PID, qp.ParentPoint.OpType,
+                                qp.Polygon.Name != qp.ParentPoint.Polygon.Name ?
+                                    $" in {qp.ParentPoint.Polygon.Name}" : String.Empty,
+                                Environment.NewLine);
+                        }
+
+                        if (point.OnBoundary)
+                        {
+                            _LastTtBndPt = point;
                         }
                     }
                     break;
@@ -260,18 +276,20 @@ namespace TwoTrails.Core
 
             double travError = closeError < Consts.MINIMUM_POINT_DIGIT_ACCURACY ? Double.PositiveInfinity : travLength / closeError;
 
-            sbPoints.AppendFormat("   Traverse Total Segments: {0}{1}", travSegments, Environment.NewLine);
-            sbPoints.AppendFormat("   Traverse Total Distance: {0:0.00} feet.{1}", Math.Round(FMSC.Core.Convert.ToFeetTenths(travLength, Distance.Meters), 2), Environment.NewLine);
-            sbPoints.AppendFormat("   Traverse Closing Distance: {0:0.00} feet.{1}", Math.Round(FMSC.Core.Convert.ToFeetTenths(closeError, Distance.Meters), 2), Environment.NewLine);
-            sbPoints.AppendFormat("   Traverse Close Error: 1 part in {0:0.00}.{1}",
-                    Double.IsPositiveInfinity(travError) ? "∞" : Math.Round(travError, 2).ToString(),
-                    Environment.NewLine);
+            sbPoints.Append($"   Traverse Total Segments: {travSegments}{Environment.NewLine}");
+            sbPoints.Append($"   Traverse Total Distance: {Math.Round(FMSC.Core.Convert.ToFeetTenths(travLength, Distance.Meters), 2):0.00} feet.{Environment.NewLine}");
+            sbPoints.Append($"   Traverse Closing Distance: {Math.Round(FMSC.Core.Convert.ToFeetTenths(closeError, Distance.Meters), 2):0.00} feet.{Environment.NewLine}");
+            sbPoints.Append($"   Traverse Close Error: 1 part in {(Double.IsPositiveInfinity(travError) ? "∞" : Math.Round(travError, 2).ToString("0.00"))}.{Environment.NewLine}");
             
             TotalTraverseError += (travLength * closeError / 2);
+
+            if (travError < WorstTravSegmentError)
+                WorstTravSegmentError = travError;
 
             traversing = false;
         }
     }
+
     public class TtLeg
     {
         public TtPoint Point1 { get; }

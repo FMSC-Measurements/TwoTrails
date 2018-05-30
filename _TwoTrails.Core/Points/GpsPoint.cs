@@ -19,6 +19,7 @@ namespace TwoTrails.Core.Points
 
         public override double UnAdjX
         {
+            get { return _UnAdjX; }
             set
             {
                 if (SetField(ref _UnAdjX, value))
@@ -30,6 +31,7 @@ namespace TwoTrails.Core.Points
 
         public override double UnAdjY
         {
+            get { return _UnAdjY; }
             set
             {
                 if (SetField(ref _UnAdjY, value))
@@ -41,6 +43,7 @@ namespace TwoTrails.Core.Points
 
         public override double UnAdjZ
         {
+            get { return _UnAdjZ; }
             set
             {
                 if (SetField(ref _UnAdjZ, value))
@@ -108,9 +111,9 @@ namespace TwoTrails.Core.Points
 
         public GpsPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,
             string comment, bool onbnd, double adjx, double adjy, double adjz, double unadjx, double unadjy, double unadjz,
-            double acc, string qlinks, double? lat, double? lon, double? elev, double? manacc, double? rmser)
+            double acc, string qlinks, double? lat, double? lon, double? elev, double? manacc, double? rmser, DataDictionary extended = null)
             : base(cn, index, pid, time, polycn, metacn, groupcn, comment, onbnd, adjx, adjy, adjz, unadjx,
-            unadjy, unadjz, acc, qlinks)
+            unadjy, unadjz, acc, qlinks, extended)
         {
             _Latitude = lat;
             _Longitude = lon;
@@ -143,9 +146,9 @@ namespace TwoTrails.Core.Points
         }
 
 
-        public override void SetAccuracy(double polyAccuracy)
+        public override void SetAccuracy(double accuracy)
         {
-            base.SetAccuracy(ManualAccuracy != null ? (double)ManualAccuracy : polyAccuracy);
+            base.SetAccuracy(ManualAccuracy ?? accuracy);
         }
 
         public void SetUnAdjLocation(TtPoint point)

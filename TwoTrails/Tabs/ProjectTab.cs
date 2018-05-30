@@ -14,6 +14,7 @@ namespace TwoTrails
     public class ProjectTab : TtTabModel
     {
         private ProjectEditorControl _ProjectEditorControl;
+        private ProjectEditorModel _ProjectEditorModel;
 
         public override bool IsDetachable { get; } = false;
 
@@ -21,9 +22,7 @@ namespace TwoTrails
         {
             get
             {
-                return String.Format("{0}{1}",
-                  Project.ProjectName,
-                  Project.RequiresSave ? "*" : String.Empty);
+                return $"{Project.ProjectName}{(Project.RequiresSave ? "*" : String.Empty)}";
             }
         }
 
@@ -34,36 +33,30 @@ namespace TwoTrails
                 switch (_ProjectEditorControl.tabControl.SelectedIndex)
                 {
                     case 1:
-                        return String.Format("{1}/{0}", Project.DataEditor.Points.Count, Project.DataEditor.SelectedPoints.Count);
+                        return $"{Project.DataEditor.SelectedPoints.Count}/{Project.DataEditor.Points.Count}";
                     case 2:
                         {
-                            TtPolygon poly = _ProjectEditorControl.lbPolys.SelectedItem as TtPolygon;
-                            if (poly != null)
+                            if (_ProjectEditorControl.lbPolys.SelectedItem is TtPolygon poly)
                             {
-                                return String.Format("{0} Points in {1}",
-                                    Project.Manager.Points.Where(p => p.PolygonCN == poly.CN).Count(), poly.Name);
+                                return $"{Project.Manager.Points.Where(p => p.PolygonCN == poly.CN).Count()} Points in {poly.Name}";
                             }
 
                             return String.Empty;
                         }
                     case 3:
                         {
-                            TtMetadata meta = _ProjectEditorControl.lbMetadata.SelectedItem as TtMetadata;
-                            if (meta != null)
+                            if (_ProjectEditorControl.lbMetadata.SelectedItem is TtMetadata meta)
                             {
-                                return String.Format("{0} Points use {1}",
-                                    Project.Manager.Points.Where(p => p.MetadataCN == meta.CN).Count(), meta.Name);
+                                return $"{Project.Manager.Points.Where(p => p.MetadataCN == meta.CN).Count()} Points use {meta.Name}";
                             }
 
                             return String.Empty;
                         }
                     case 4:
                         {
-                            TtGroup group = _ProjectEditorControl.lbGroups.SelectedItem as TtGroup;
-                            if (group != null)
+                            if (_ProjectEditorControl.lbGroups.SelectedItem is TtGroup group)
                             {
-                                return String.Format("{0} Points in {1}",
-                                    Project.Manager.Points.Where(p => p.GroupCN == group.CN).Count(), group.Name);
+                                return $"{Project.Manager.Points.Where(p => p.GroupCN == group.CN).Count()} Points in {group.Name}";
                             }
 
                             return String.Empty;
@@ -76,9 +69,10 @@ namespace TwoTrails
             }
         }
 
+
         public ProjectTab(TtProject project) : base(project)
         {
-            _ProjectEditorControl = new ProjectEditorControl(project, ProjectStartupTab.Points);
+            _ProjectEditorControl = new ProjectEditorControl(_ProjectEditorModel = new ProjectEditorModel(project), ProjectStartupTab.Points);
             Tab.Content = _ProjectEditorControl;
 
             _ProjectEditorControl.tabControl.SelectionChanged += (object sender, SelectionChangedEventArgs e) =>
@@ -99,6 +93,13 @@ namespace TwoTrails
         public void SwitchToTab(ProjectStartupTab tab)
         {
             _ProjectEditorControl.SwitchToTab(tab);
+        }
+
+        public override void Close()
+        {
+            base.Close();
+
+            _ProjectEditorModel.CloseWindows();
         }
     }
 }

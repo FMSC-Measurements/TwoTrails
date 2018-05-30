@@ -16,7 +16,8 @@
 
         <Grid.Resources>
             <cvt:EnumBooleanConverter x:Key="ebc" />
-            
+            <cvt:InverseBooleanToVisibilityConverter x:Key="ibtvc" />
+
             <Style TargetType="ComboBox">
                 <Setter Property="Margin" Value="5, 2.5, 0, 2.5"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
@@ -139,17 +140,25 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             
             <TextBlock Text="Mode:" Grid.Column="0"/>
 
             <RadioButton Content="Basic" Grid.Column="1" GroupName="mode" ToolTip="Imports points as GPS using the UTM of the default zone"
                          IsChecked="{Binding Path=Mode, Converter={StaticResource ebc}, ConverterParameter=dal:ParseMode.Basic}"/>
-            <RadioButton Content="Advanced" Grid.Column="2" GroupName="mode" ToolTip="Imports points with all operations (requires all point data)"
+            <RadioButton Name="radAdv" Content="Advanced" Grid.Column="2" GroupName="mode" ToolTip="Imports points with all operations (requires all point data)"
                          IsChecked="{Binding Path=Mode, Converter={StaticResource ebc}, ConverterParameter=dal:ParseMode.Advanced}"/>
             <RadioButton Content="Lat/Lon" Grid.Column="3" GroupName="mode" ToolTip="Imports points as GPS using Latitude and Longitude converted into the default UTM zone"
                          IsChecked="{Binding Path=Mode, Converter={StaticResource ebc}, ConverterParameter=dal:ParseMode.LatLon}"/>
 
             <Button Content="Continue" Grid.Column="5" Command="{Binding SetupImportCommand}"/>
+
+            <TextBlock Grid.Row="1" Grid.ColumnSpan="4" Foreground="Red"
+                       Text="{Binding Path=Zone, StringFormat=Points will be imported into Zone: {0}}" Visibility="{Binding ElementName=radAdv, Path=IsChecked, Converter={StaticResource ibtvc}}"/>
         </Grid>
 
         <ScrollViewer Grid.Row="1">

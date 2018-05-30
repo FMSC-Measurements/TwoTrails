@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace TwoTrails.Core.Points
@@ -46,6 +47,11 @@ namespace TwoTrails.Core.Points
             return point.OpType == OpType.SideShot && !point.OnBoundary;
         }
 
+        public static bool IsManualAccType(this TtPoint point)
+        {
+            return IsGpsType(point) || point.OpType == OpType.Quondam;
+        }
+
         public static bool HasSameUnAdjLocation(this TtPoint point, TtPoint otherPoint)
         {
             return point.UnAdjX == otherPoint.UnAdjX &&
@@ -76,6 +82,12 @@ namespace TwoTrails.Core.Points
 
             return null;
         }
+
+        public static IEnumerable<TtPoint> DeepCopy(this IEnumerable<TtPoint> points)
+        {
+            return points.Select(p => p.DeepCopy());
+        }
+
 
         public static TtPoint CreatePoint(this OpType opType)
         {

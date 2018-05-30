@@ -50,9 +50,7 @@ namespace TwoTrails.Dialogs
 
         private void cbPolys_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            TtPolygon poly = cbPolys.SelectedItem as TtPolygon;
-
-            if (poly != null)
+            if (cbPolys.SelectedItem is TtPolygon poly)
             {
                 txtStartIndex.Text = poly.PointStartIndex.ToString();
                 StartIndex = poly.PointStartIndex;

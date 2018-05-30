@@ -6,12 +6,9 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         private ITtManager pointsManager;
 
-        public AddTtPointCommand(TtPoint point, ITtManager pointsManager, bool autoCommit = true) : base(point)
+        public AddTtPointCommand(TtPoint point, ITtManager pointsManager) : base(point)
         {
             this.pointsManager = pointsManager;
-
-            if (autoCommit)
-                Redo();
         }
 
         public override void Redo()

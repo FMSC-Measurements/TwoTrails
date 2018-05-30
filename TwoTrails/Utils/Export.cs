@@ -14,14 +14,14 @@ using System.IO.Compression;
 using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.Core.Xml.GPX;
+using TwoTrails.Core.Media;
+using TwoTrails.DAL;
+using System.Windows.Media.Imaging;
 
 namespace TwoTrails.Utils
 {
     public static class Export
     {
-        private const string DateTimeFormat = "MM/dd/yyyy hh:mm:ss tt";
-
-
         public static void All(TtProject project, String folderPath)
         {
             folderPath = folderPath.Trim();
@@ -29,15 +29,27 @@ namespace TwoTrails.Utils
                 Directory.CreateDirectory(folderPath);
 
             Project(project.ProjectInfo, Path.Combine(folderPath, "ProjectInfo.txt"));
-            Summary(project.Manager, Path.Combine(folderPath, "Summary.txt"));
+            Summary(project, Path.Combine(folderPath, "Summary.txt"));
             Points(project.Manager, Path.Combine(folderPath, "Points.csv"));
+            DataDictionary(project.Manager, Path.Combine(folderPath, "DataDictionary.csv"));
             Polygons(project.Manager, Path.Combine(folderPath, "Polygons.csv"));
             Metadata(project.Manager, Path.Combine(folderPath, "Metadata.csv"));
             Groups(project.Manager, Path.Combine(folderPath, "Groups.csv"));
-            TtNmea(project.Manager, Path.Combine(folderPath, "NmeaBursts.csv"));
-            GPX(project, Path.Combine(folderPath, String.Format("{0}.gpx", project.ProjectName.Trim())));
-            KMZ(project, Path.Combine(folderPath, String.Format("{0}.kmz", project.ProjectName.Trim())));
+            TtNmea(project.Manager, Path.Combine(folderPath, "Nmea.csv"));
+            ImageInfo(project.Manager, Path.Combine(folderPath, "ImageInfo.csv"));
+            GPX(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.gpx"));
+            KMZ(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.kmz"));
+
             Shapes(project, folderPath);
+
+            if (project.MAL != null)
+                MediaFiles(project.MAL, folderPath);
+        }
+
+        public static void CheckCreateFolder(string folderPath)
+        {
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
         }
 
 
@@ -108,23 +120,23 @@ namespace TwoTrails.Utils
                 foreach (TtPoint point in points)
                 {
                     sb = new StringBuilder();
-                    sb.AppendFormat("{0},{1},", point.PID, point.CN);
-                    sb.AppendFormat("{0},{1},", point.OpType, point.Index);
+                    sb.Append($"{point.PID},{point.CN},");
+                    sb.Append($"{point.OpType},{point.Index},");
 
-                    sb.AppendFormat("{0},{1},", point.Polygon.Scrub(), point.TimeCreated.ToString(DateTimeFormat));
-                    sb.AppendFormat("{0},{1},", point.Metadata.Scrub(), point.Group.Scrub());
+                    sb.Append($"{point.Polygon.Scrub()},{point.TimeCreated.ToString(Consts.DATE_FORMAT)},");
+                    sb.Append($"{point.Metadata.Scrub()},{point.Group.Scrub()},");
 
-                    sb.AppendFormat("{0},", point.OnBoundary);
+                    sb.Append($"{point.OnBoundary},");
                     
-                    sb.AppendFormat("{0},{1},{2},", point.AdjX, point.AdjY, point.AdjZ);
-                    sb.AppendFormat("{0},{1},{2},", point.UnAdjX, point.UnAdjY, point.UnAdjZ);
+                    sb.Append($"{point.AdjX},{point.AdjY},{point.AdjZ},");
+                    sb.Append($"{point.UnAdjX},{point.UnAdjY},{point.UnAdjZ},");
 
-                    sb.AppendFormat("{0},", (point.IsGpsType() || point.OpType == OpType.Quondam) ? ((IManualAccuracy)point).ManualAccuracy : null);
+                    sb.Append($"{((point.IsGpsType() || point.OpType == OpType.Quondam) ? ((IManualAccuracy)point).ManualAccuracy : null)},");
 
                     if (point.IsGpsType())
                     {
                         GpsPoint gps = point as GpsPoint;
-                        sb.AppendFormat("{0},{1},{2},{3},", gps.Latitude, gps.Longitude, gps.Elevation, gps.RMSEr);
+                        sb.Append($"{gps.Latitude},{gps.Longitude},{gps.Elevation},{gps.RMSEr},");
                     }
                     else
                         sb.Append(",,,,");
@@ -132,10 +144,10 @@ namespace TwoTrails.Utils
                     if (point.IsTravType())
                     {
                         TravPoint trav = point as TravPoint;
-                        sb.AppendFormat("{0},{1},", trav.FwdAzimuth, trav.BkAzimuth);
-                        sb.AppendFormat("{0},", FMSC.Core.Convert.Distance(trav.HorizontalDistance, trav.Metadata.Distance, Distance.Meters));
-                        sb.AppendFormat("{0},{1},", FMSC.Core.Convert.Distance(trav.SlopeDistance, trav.Metadata.Distance, Distance.Meters), trav.Metadata.Distance);
-                        sb.AppendFormat("{0},{1},", FMSC.Core.Convert.Angle(trav.SlopeAngle, trav.Metadata.Slope, Slope.Degrees), trav.Metadata.Slope);
+                        sb.Append($"{trav.FwdAzimuth},{trav.BkAzimuth},");
+                        sb.Append($"{FMSC.Core.Convert.Distance(trav.HorizontalDistance, trav.Metadata.Distance, Distance.Meters)},");
+                        sb.Append($"{FMSC.Core.Convert.Distance(trav.SlopeDistance, trav.Metadata.Distance, Distance.Meters)},{trav.Metadata.Distance},");
+                        sb.Append($"{FMSC.Core.Convert.Angle(trav.SlopeAngle, trav.Metadata.Slope, Slope.Degrees)},{trav.Metadata.Slope},");
                     }
                     else
                         sb.Append(",,,,,,,");
@@ -143,18 +155,64 @@ namespace TwoTrails.Utils
                     if (point.OpType == OpType.Quondam)
                     {
                         QuondamPoint qp = point as QuondamPoint;
-                        sb.AppendFormat("{0},{1},", qp.ParentPoint, qp.ParentPointCN);
+                        sb.Append($"{qp.ParentPoint},{qp.ParentPointCN},");
                     }
                     else
                         sb.Append(",,");
 
                     if (point.Comment != null)
-                        sb.AppendFormat("\"{0}\",", point.Comment.Scrub());
+                        sb.Append($"\"{point.Comment.Scrub()}\",");
                     else
                         sb.Append(",");
 
-                    sb.AppendFormat("{0},{1},{2},", point.PolygonCN, point.MetadataCN, point.GroupCN);
+                    sb.Append($"{point.PolygonCN},{point.MetadataCN},{point.GroupCN},");
                     sb.Append(point.LinkedPoints.ToStringContents("_"));
+
+                    sw.WriteLine(sb.ToString());
+                }
+
+                sw.Flush();
+            }
+        }
+
+
+        public static void DataDictionary(ITtManager manager, String fileName)
+        {
+            DataDictionary(manager.GetDataDictionaryTemplate(), manager.GetPoints(), fileName);
+        }
+
+        public static void DataDictionary(DataDictionaryTemplate template, IEnumerable<TtPoint> points, String fileName)
+        {
+            if (template == null)
+                return;
+
+            if (!template.Any())
+                throw new Exception("Invalid or Empty DataDictionary");
+
+            if (points.Any(p => p.ExtendedData == null))
+                throw new Exception("Points missing DataDictionary");
+
+            using (StreamWriter sw = new StreamWriter(fileName))
+            {
+                #region Columns
+                StringBuilder sb = new StringBuilder();
+                List<string> fieldCNs = new List<string>();
+
+                foreach (DataDictionaryField ddf in template)
+                {
+                    sb.Append($"{ ddf.Name },");
+                    fieldCNs.Add(ddf.CN);
+                }
+
+                sw.WriteLine(sb.ToString());
+                #endregion
+
+                foreach (TtPoint point in points)
+                {
+                    sb.Clear();
+
+                    foreach (string cn in fieldCNs)
+                        sb.Append($"{point.ExtendedData[cn]},");
 
                     sw.WriteLine(sb.ToString());
                 }
@@ -305,17 +363,36 @@ namespace TwoTrails.Utils
             }
         }
 
-        public static void Summary(ITtManager manager, String fileName)
+        public static void Summary(TtProject project, String fileName)
         {
             using (StreamWriter sw = new StreamWriter(fileName))
             {
-                foreach (TtPolygon poly in manager.GetPolygons())
+                sw.WriteLine($"Project File: { Path.GetFileName(project.DAL.FilePath) }");
+                sw.WriteLine($"Project Name: { project.ProjectName }");
+                sw.WriteLine($"Region: { project.ProjectInfo.Region }");
+                sw.WriteLine($"Forest: { project.ProjectInfo.Forest }");
+                sw.WriteLine($"District: { project.ProjectInfo.District }");
+                sw.WriteLine($"Description: { project.ProjectInfo.Description }");
+                sw.WriteLine($"Created On: { project.ProjectInfo.CreationDate }");
+                sw.WriteLine($"Version: { project.ProjectInfo.Version }");
+                sw.WriteLine($"Data Version: { project.ProjectInfo.Version }");
+                sw.WriteLine($"Creation Version: { project.ProjectInfo.CreationVersion }");
+                sw.WriteLine("\n");
+                sw.WriteLine("**** GPS Error can be divided by 2 if an appropriate ANGLE POINT METHOD is used instead of the WALK METHOD ****");
+                sw.WriteLine("**** Appropriate means that the boundary legs are reasnoably long between verticies where the boundary direction changes by 90 degree angles where possible and changes at least more than 30 degrees most of the time. ****");
+                sw.WriteLine("**** If the unit is totally a direction distance-traverse. Use only the traverse contribution area-error. ****");
+                sw.WriteLine("**** Points with asterisks are OFF boundary points. ****");
+                sw.WriteLine("\n");
+                
+                foreach (TtPolygon poly in project.Manager.GetPolygons())
                 {
-                    sw.WriteLine(String.Format("{0}{1}{2}", poly.Name, Environment.NewLine, string.Join("", Enumerable.Range(0, poly.Name.Length).Select(x => "-"))));
-                    sw.WriteLine(HaidLogic.GenerateSummary(manager, poly).SummaryText);
+                    sw.WriteLine($"{poly.Name}{Environment.NewLine}{new String('-', poly.Name.Length)}");
+                    sw.WriteLine(HaidLogic.GenerateSummary(project.Manager, poly).SummaryText);
                 }
+
             }
         }
+
 
         public static void TtNmea(ITtManager manager, String fileName)
         {
@@ -331,32 +408,35 @@ namespace TwoTrails.Utils
                 sb.Append("PointCN,");
                 sb.Append("IsUsed,");
 
-                sb.Append("BurstTime,");
-                sb.Append("FixTime,");
+                sb.Append("Time Created,");
+                sb.Append("Time Fix,");
 
                 sb.Append("Latitude,");
                 sb.Append("Longitude,");
-                sb.Append("Elevation,");
-                sb.Append("ElevUom,");
+                sb.Append("Elevation (Mt),");
 
                 sb.Append("MagVar,");
                 sb.Append("MagVarDir,");
 
-                sb.Append("TrackAngle,");
                 sb.Append("GroundSpeed,");
+                sb.Append("TrackAngle,");
                 
                 sb.Append("Fix,");
-                sb.Append("FixType,");
+                sb.Append("Fix Quality,");
                 sb.Append("Mode,");
 
-                sb.Append("TrackedSatellitesCount,");
-                sb.Append("SatellitesInViewCount,");
-                sb.Append("UsedSatellites,");
-                sb.Append("UsedSatellitesCount,");
-
-                sb.Append("HDOP,");
                 sb.Append("PDOP,");
+                sb.Append("HDOP,");
                 sb.Append("VDOP,");
+
+                sb.Append("Horiz Dilution,");
+                sb.Append("Geoid Height (Mt),");
+
+                sb.Append("Tracked Satellites Count,");
+                sb.Append("Satellites In View Count,");
+                sb.Append("Used Satellites Count,");
+                sb.Append("Used Satellites,");
+                sb.Append("Satellites In View Info,");
 
                 sb.Append("CN");
                 sw.WriteLine(sb.ToString());
@@ -366,21 +446,23 @@ namespace TwoTrails.Utils
                 {
                     sb = new StringBuilder();
                     sb.AppendFormat("{0},{1},", burst.PointCN, burst.IsUsed);
-                    sb.AppendFormat("{0},{1},", burst.TimeCreated.ToString(DateTimeFormat), burst.FixTime.ToString(DateTimeFormat));
+                    sb.AppendFormat("{0},{1},", burst.TimeCreated.ToString(Consts.DATE_FORMAT), burst.FixTime.ToString(Consts.DATE_FORMAT));
 
-                    sb.AppendFormat("{0},{1},", burst.Latitude, burst.Longitude);
-                    sb.AppendFormat("{0},{1},", burst.Elevation, burst.UomElevation.ToStringAbv());
+                    sb.AppendFormat("{0},{1},{0},", burst.Latitude, burst.Longitude, burst.Elevation);
 
                     sb.AppendFormat("{0},{1},", burst.MagVar, burst.MagVarDir);
-                    sb.AppendFormat("{0},{1},", burst.TrackAngle, burst.GroundSpeed);
+
+                    sb.AppendFormat("{0},{1},", burst.GroundSpeed, burst.TrackAngle);
 
                     sb.AppendFormat("{0},{1},{2},", burst.Fix.ToStringF(), burst.FixQuality.ToStringF(), burst.Mode.ToStringF());
 
-                    sb.AppendFormat("{0},{1},", burst.TrackedSatellitesCount, burst.SatellitesInViewCount);
-                    sb.AppendFormat("{0},{1},", burst.UsedSatelliteIDsString, burst.UsedSatelliteIDsCount);
-
                     sb.AppendFormat("{0},{1},{2},", burst.HDOP, burst.PDOP, burst.VDOP);
 
+                    sb.AppendFormat("{0},{1},", burst.HorizDilution, burst.GeoidHeight);
+
+                    sb.AppendFormat("{0},{1},", burst.TrackedSatellitesCount, burst.SatellitesInViewCount);
+                    sb.AppendFormat("{0},{1},{2},", burst.UsedSatelliteIDsCount, burst.UsedSatelliteIDsString, burst.SatellitesInViewString);
+                    
                     sb.AppendFormat("{0}", burst.CN);
 
                     sw.WriteLine(sb.ToString());
@@ -390,6 +472,76 @@ namespace TwoTrails.Utils
             }
         }
 
+
+        public static void ImageInfo(ITtManager manager, String fileName)
+        {
+            ImageInfo(manager.GetImages(), fileName);
+        }
+
+        public static void ImageInfo(IEnumerable<TtImage> images, String fileName)
+        {
+            using (StreamWriter sw = new StreamWriter(fileName))
+            {
+                #region Columns
+                StringBuilder sb = new StringBuilder();
+                sb.Append("Name,");
+                sb.Append("Creation Time,");
+                sb.Append("IsExternal,");
+                sb.Append("Comment,");
+                sb.Append("Type,");
+                sb.Append("Azimuth,");
+                sb.Append("Pitch,");
+                sb.Append("Roll,");
+                sb.Append("CN,");
+                sb.Append("PointCN");
+
+                sw.WriteLine(sb.ToString());
+                #endregion
+
+                foreach (TtImage img in images)
+                {
+                    sb = new StringBuilder();
+                    sb.AppendFormat("{0},{1},", img.Name.Scrub(), img.TimeCreated.ToString(Consts.DATE_FORMAT));
+                    sb.AppendFormat("{0},{1},", img.IsExternal, img.Comment.Scrub());
+                    sb.AppendFormat("{0},{1},", img.PictureType.ToString(), img.Azimuth?.ToString("F2"));
+                    sb.AppendFormat("{0},{1},", img.Pitch?.ToString("F2"), img.Roll?.ToString("F2"));
+                    sb.AppendFormat("{0},{1}", img.CN, img.PointCN);
+
+                    sw.WriteLine(sb.ToString());
+                }
+
+                sw.Flush();
+            }
+        }
+
+        //todo add option to put media into sub folders with the point name
+        public static void MediaFiles(ITtMediaLayer mal, String folderPath)
+        {
+            IEnumerable<TtImage> images = mal.GetImages();
+
+            if (images.Any())
+            {
+                string folder = Path.Combine(folderPath, "Media");
+
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                foreach (TtImage img in images)
+                {
+                    String filePath = Path.Combine(folder, Path.GetFileName(img.FilePath));
+
+                    if (img.IsExternal)
+                    {
+                        if (File.Exists(img.FilePath))
+                            File.Copy(img.FilePath, filePath);
+                    }
+                    else
+                    {
+                        mal.GetImageData(img).SaveImageToFile(filePath);
+                    }
+                }
+            }
+        }
 
 
         public static void GPX(TtProject project, String fileName)
@@ -401,7 +553,7 @@ namespace TwoTrails.Utils
         {
             KmlDocument doc = TtKmlGenerator.Generate(project.Manager, project.ProjectName.Trim(), project.ProjectInfo.Description);
             
-            string kmlName = String.Format("{0}.kml", project.ProjectName.Trim());
+            string kmlName = $"{project.ProjectName.Trim()}.kml";
             string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);
 
             KmlWriter.WriteKmlFile(kmlFile, doc);

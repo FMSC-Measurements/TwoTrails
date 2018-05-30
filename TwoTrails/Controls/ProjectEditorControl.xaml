@@ -6,27 +6,78 @@
              xmlns:local="clr-namespace:TwoTrails.Controls"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
-             xmlns:ctrl="clr-namespace:TwoTrails.Controls"
+             xmlns:ttl="clr-namespace:TwoTrails"
              xmlns:tt="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
              xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
              xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+			 xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800"
              Background="{StaticResource colorBackground}">
     <UserControl.Resources>
         <cvt:M2Converter x:Key="M2Converter"/>
-        <cvt:MetersToFeetConverter x:Key="M2FConverter"/>
+        <cvt:MetersToFeetConverter x:Key="MtoFConverter"/>
+
+        <DataTemplate DataType="{x:Type ttl:ImageTile}">
+            <Grid Width="250">
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDown">
+                            <i:InvokeCommandAction Command="{Binding OnClickCommand}"
+                             CommandParameter="{Binding ElementName=imgImage, Path=DataContext}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="False">
+                                    <Setter Property="Width" Value="240"/>
+                                    <Setter Property="Margin" Value="5"/>
+                                    <Setter Property="Opacity" Value=".9"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Width" Value="250"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="Opacity" Value="1"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    
+                    <Image Name="imgImage" Source="{Binding Path=Image}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Grid VerticalAlignment="Bottom">
+                        <Grid.Background>
+                            <SolidColorBrush Color="Black" Opacity="0.75" />
+                        </Grid.Background>
+                        <TextBlock Text="{Binding Path=ImageInfo.Name}" HorizontalAlignment="Stretch" TextAlignment="Center"
+                           Foreground="White" Margin="5, 0, 0, 2" TextTrimming="CharacterEllipsis"
+                               Width="{Binding ActualWidth, ElementName=imgImage}"/>
+
+                    </Grid>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+
+
+        <Style x:Key="styleTabButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+
+        <Style x:Key="styleTabButtonBorderStyle" TargetType="Border">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource colorPriamry}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <Grid Background="{StaticResource colorBackground}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="3" MinHeight="3" MaxHeight="3"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Height="3" Background="{StaticResource colorPriamryDark}" HorizontalAlignment="Stretch"/>
-
-        <TabControl x:Name="tabControl" Grid.Row="1" Margin="0" Padding="0"
+        <TabControl x:Name="tabControl"
+                    Grid.Row="1"
+                    Margin="-4,-2,0,0"
+                    Padding="0,2,0,0"
                     TabStripPlacement="Left"
                     BorderThickness="0"
                     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
@@ -35,16 +86,17 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type TabItem}">
-                                <Grid Name="Grid"
-                                      Margin="-2, -2, -1, 1"
-                                      VerticalAlignment="Stretch" HorizontalAlignment="Right"
-                                      Background="{StaticResource colorBackground}">
-                                    <ContentPresenter x:Name="ContentSite" ContentSource="Header" Margin="0" HorizontalAlignment="Right"/>
+                                <Grid Name="ControlContainer" HorizontalAlignment="Right">
+                                    <Grid.LayoutTransform>
+                                        <RotateTransform Angle="90"/>
+                                    </Grid.LayoutTransform>
+
+                                    <ContentPresenter TextElement.Foreground="White" x:Name="ContentSite" ContentSource="Header" HorizontalAlignment="Right" Margin="8,2,8,6"/>
                                 </Grid>
+
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Grid" Property="Background" Value="SeaGreen"/>
-                                        <Setter TargetName="ContentSite" Property="Margin" Value="0, 0, 0, 0"/>
+                                        <Setter TargetName="ControlContainer" Property="Background" Value="SeaGreen"/>
                                     </Trigger>
 
                                     <MultiTrigger>
@@ -54,18 +106,7 @@
                                         </MultiTrigger.Conditions>
 
                                         <MultiTrigger.Setters>
-                                            <Setter TargetName="Grid" Property="Background" Value="MediumSeaGreen"/>
-                                        </MultiTrigger.Setters>
-                                    </MultiTrigger>
-
-                                    <MultiTrigger>
-                                        <MultiTrigger.Conditions>
-                                            <Condition Property="IsSelected" Value="True" />
-                                            <Condition Property="IsMouseOver" Value="False" />
-                                        </MultiTrigger.Conditions>
-
-                                        <MultiTrigger.Setters>
-
+                                            <Setter TargetName="ControlContainer" Property="Background" Value="MediumSeaGreen"/>
                                         </MultiTrigger.Setters>
                                     </MultiTrigger>
                                 </ControlTemplate.Triggers>
@@ -73,20 +114,19 @@
                         </Setter.Value>
                     </Setter>
 
-                    <Setter Property="HeaderTemplate">
+                    <!--<Setter Property="HeaderTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <Grid>
-                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White"
-                                               Margin="4, 8, 4, 8">
-                                        <TextBlock.LayoutTransform>
-                                            <RotateTransform Angle="90" />
-                                        </TextBlock.LayoutTransform>
-                                    </TextBlock>
-                                </Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel.LayoutTransform>
+                                        <RotateTransform Angle="90" />
+                                    </StackPanel.LayoutTransform>
+
+                                    <TextBlock Text="{TemplateBinding Content}" Foreground="White" Margin="8, 4, 0, 4"/>
+                                </StackPanel>
                             </DataTemplate>
                         </Setter.Value>
-                    </Setter>
+                    </Setter>-->
                 </Style>
             </TabControl.Resources>
 
@@ -186,11 +226,11 @@
                                     <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Manager.Groups.Count}" TextAlignment="Right" />
 
 
-                                    <TextBlock Grid.Column="0" Grid.Row="5" Text="Total Area (Ha)" />
+                                    <!--<TextBlock Grid.Column="0" Grid.Row="5" Text="Total Area (Ha)" />
                                     <TextBlock Grid.Column="2" Grid.Row="5" Text="{Binding TotalPolygonArea, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres, StringFormat=F2}" TextAlignment="Right" />
 
                                     <TextBlock Grid.Column="0" Grid.Row="6" Text="Total Perimeter (Ft)" />
-                                    <TextBlock Grid.Column="2" Grid.Row="6" Text="{Binding TotalPolygonArea, Converter={StaticResource M2FConverter}, StringFormat=F2}" TextAlignment="Right" />
+                                    <TextBlock Grid.Column="2" Grid.Row="6" Text="{Binding TotalPolygonArea, Converter={StaticResource MtoFConverter}, StringFormat=F2}" TextAlignment="Right" />-->
                                 </Grid>
                             </GroupBox>
                         </Grid>
@@ -204,13 +244,18 @@
                 </Border>
             </TabItem>
 
-            <TabItem Header="Polygons" DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type TabControl}},Path=DataContext}">
+            <TabItem Header="Polygons">
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="200"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
                         <ListBox Name="lbPolys" Grid.Column="0" Grid.Row="0" BorderThickness="0"
                                     ItemsSource="{Binding Polygons, Mode=OneWay}"
@@ -236,182 +281,267 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
 
-                        <Grid Grid.Column="1" Grid.Row="0" Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="5"/>
-                                <ColumnDefinition Width="200"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <Grid.Resources>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="IsEnabled" Value="False" />
-
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=lbPolys, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
-                                            <Setter Property="IsEnabled" Value="True" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-
-                                <Style TargetType="GroupBox">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="Margin" Value="5,0,5,5"/>
-                                </Style>
-
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="20"/>
-                                </Style>
-
-                            </Grid.Resources>
-
-                            <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                            <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentPolygon.Name, UpdateSourceTrigger=PropertyChanged}"/>
-
-                            <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy" />
-                            <Grid Grid.Column="0" Grid.Row="3">
+                        <ScrollViewer Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
+                            <Grid Margin="5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition Width="200"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="0"
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid.Resources>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="FontSize" Value="20"/>
+                                        <Setter Property="IsEnabled" Value="False" />
+
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=lbPolys, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
+                                                <Setter Property="IsEnabled" Value="True" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+
+                                    <Style TargetType="GroupBox">
+                                        <Setter Property="FontSize" Value="20"/>
+                                        <Setter Property="Margin" Value="5,0,5,5"/>
+                                    </Style>
+
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontSize" Value="20"/>
+                                    </Style>
+
+                                </Grid.Resources>
+
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentPolygon.Name, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy (Meters)" />
+                                <Grid Grid.Column="0" Grid.Row="3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox Grid.Column="0"
                                      Name="txtPolyAcc"
                                      Text="{Binding CurrentPolygon.Accuracy, Mode=OneWay}"
-                                     PreviewTextInput="TextIsInteger">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="TextChanged">
-                                            <i:InvokeCommandAction Command="{Binding PolygonAccuracyChangedCommand}"
+                                     PreviewTextInput="TextIsDouble">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="TextChanged">
+                                                <i:InvokeCommandAction Command="{Binding PolygonAccuracyChangedCommand}"
                                                 CommandParameter="{Binding ElementName=txtPolyAcc, Path=Text}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </TextBox>
-                                <Button Grid.Column="1" Width="75" Command="{Binding PolygonUpdateAccCommand}" Content="Update"/>
-                            </Grid>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBox>
+                                    <Button Grid.Column="1" Width="75" Command="{Binding PolygonUpdateAccCommand}" Content="Update"/>
+                                    <Button Grid.Column="2" Width="100" Command="{Binding PolygonAccuracyLookupCommand}" Content="Acc Lookup"/> <!-- Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource BoolToVis}}" -->
+                                </Grid>
 
-                            <TextBlock Grid.Column="0" Grid.Row="4" Text="Start Index" />
-                            <TextBox Grid.Column="0" Grid.Row="5"
+                                <TextBlock Grid.Column="0" Grid.Row="4" Text="Start Index" />
+                                <TextBox Grid.Column="0" Grid.Row="5"
                                  Text="{Binding CurrentPolygon.PointStartIndex, UpdateSourceTrigger=PropertyChanged}"
                                  PreviewTextInput="TextIsInteger"/>
 
-                            <TextBlock Grid.Column="0" Grid.Row="6" Text="Increment" />
-                            <TextBox Grid.Column="0" Grid.Row="7"
+                                <TextBlock Grid.Column="0" Grid.Row="6" Text="Increment" />
+                                <TextBox Grid.Column="0" Grid.Row="7"
                                  Text="{Binding CurrentPolygon.Increment, UpdateSourceTrigger=PropertyChanged}"
                                  PreviewTextInput="TextIsInteger"/>
 
-                            <StackPanel Grid.Column="0" Grid.Row="9" Orientation="Horizontal">
-                                <TextBlock Text="Created On: "/>
-                                <TextBlock Text="{Binding CurrentPolygon.TimeCreated}"/>
-                            </StackPanel>
+                                <StackPanel Grid.Column="0" Grid.Row="9" Orientation="Horizontal">
+                                    <TextBlock Text="Created On: "/>
+                                    <TextBlock Text="{Binding CurrentPolygon.TimeCreated}"/>
+                                </StackPanel>
 
-                            <TextBlock Grid.Column="0" Grid.Row="11" Text="Description" />
-                            <TextBox Grid.Column="0" Grid.Row="12" Grid.ColumnSpan="3" MinLines="5" MaxLines="5"
+                                <TextBlock Grid.Column="0" Grid.Row="11" Text="Description" />
+                                <TextBox Grid.Column="0" Grid.Row="12" Grid.ColumnSpan="3" MinLines="3" MaxLines="5"
                                 Text="{Binding CurrentPolygon.Description, UpdateSourceTrigger=PropertyChanged}" />
 
-                            <GroupBox Header="Area" Grid.Column="2" Grid.Row="0" Grid.RowSpan="4" VerticalAlignment="Stretch">
-                                <Grid Margin="5,0,5,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="40"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                                <GroupBox Header="Area" Grid.Column="2" Grid.Row="0" Grid.RowSpan="4" VerticalAlignment="Stretch">
+                                    <Grid Margin="5,0,5,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="5"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="5"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
 
-                                    <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ha:"/>
-                                    <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding CurrentPolygon.AreaHectaAcres, StringFormat=F3}"/>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ha:"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding CurrentPolygon.AreaHectaAcres, StringFormat=F4}"/>
 
-                                    <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ac:"/>
-                                    <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding CurrentPolygon.AreaAcres, StringFormat=F3}"/>
-                                </Grid>
-                            </GroupBox>
+                                        <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ac:"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding CurrentPolygon.AreaAcres, StringFormat=F4}"/>
+                                    </Grid>
+                                </GroupBox>
 
-                            <GroupBox Header="Perimeter" Grid.Column="2" Grid.Row="4" Grid.RowSpan="4" VerticalAlignment="Stretch">
-                                <Grid Margin="5,0,5,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="40"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                                <GroupBox Header="Polygon Perimeter" Grid.Column="2" Grid.Row="4" Grid.RowSpan="4" VerticalAlignment="Stretch">
+                                    <Grid Margin="5,0,5,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="5"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="5"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
 
-                                    <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="M:"/>
-                                    <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding CurrentPolygon.Perimeter, StringFormat=F3}"/>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="M:"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding CurrentPolygon.Perimeter, StringFormat=F3}"/>
 
-                                    <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ft:"/>
-                                    <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding CurrentPolygon.PerimeterFt, StringFormat=F3}"/>
-                                </Grid>
-                            </GroupBox>
+                                        <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ft:"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding CurrentPolygon.PerimeterFt, StringFormat=F3}"/>
+                                    </Grid>
+                                </GroupBox>
 
-                            <GroupBox Header="Perimeter Line" Grid.Column="2" Grid.Row="8" Grid.RowSpan="4" VerticalAlignment="Stretch">
-                                <Grid Margin="5,0,5,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="40"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                                <GroupBox Header="Poly Line Perimeter" Grid.Column="2" Grid.Row="8" Grid.RowSpan="4" VerticalAlignment="Stretch">
+                                    <Grid Margin="5,0,5,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="5"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="5"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
 
-                                    <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="M:" Margin="0,1,0,0"/>
-                                    <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding CurrentPolygon.PerimeterLine, StringFormat=F3}" Grid.ColumnSpan="2" Margin="0,1,0,0"/>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="M:" Margin="0,1,0,0"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding CurrentPolygon.PerimeterLine, StringFormat=F3}" Grid.ColumnSpan="2" Margin="0,1,0,0"/>
 
-                                    <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ft:"/>
-                                    <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding CurrentPolygon.PerimeterLineFt, StringFormat=F3}" Grid.ColumnSpan="2"/>
-                                </Grid>
-                            </GroupBox>
+                                        <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ft:"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding CurrentPolygon.PerimeterLineFt, StringFormat=F3}" Grid.ColumnSpan="2"/>
+                                    </Grid>
+                                </GroupBox>
 
-                            <Grid Grid.Column="0" Grid.Row="15" Grid.ColumnSpan="3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                                <GroupBox Header="Polygon Area-Error Summary" Grid.Column="0" Grid.Row="13" Grid.ColumnSpan="3" VerticalAlignment="Center">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                <Grid.Resources>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Height" Value="25"/>
-                                        <Setter Property="Width" Value="75"/>
-                                    </Style>
-                                </Grid.Resources>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
 
-                                <Button Grid.Column="0" Margin="0, 0, 5, 0" Content="Delete"
+                                        <GroupBox Header="GPS Contribution*" Grid.Column="0" Grid.Row="0">
+                                            <Grid Margin="5,0,5,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="10"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="5"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="5"/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ha:"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ac:"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                
+                                                <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Err Ratio**"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GpsAreaError, StringFormat={}{0:F3}%}"/>
+                                            </Grid>
+                                        </GroupBox>
+
+                                        <GroupBox Header="Traverse Contribution" Grid.Column="1" Grid.Row="0">
+                                            <Grid Margin="5,0,5,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="10"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="5"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="5"/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ha:"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalTraverseError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ac:"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalTraverseError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Error"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.TraverseAreaError, StringFormat={}{0:F3}%}"/>
+                                            </Grid>
+                                        </GroupBox>
+
+                                        <Expander Header="Details" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
+                                            <Grid>
+                                                <TextBox IsReadOnly="True" HorizontalAlignment="Stretch" Text="{Binding PolygonSummary.SummaryText, Mode=OneWay}" TextWrapping="Wrap"/>
+                                                <Button Content="Save Summary" HorizontalAlignment="Right" VerticalAlignment="Top" Padding="2.5" Command="{Binding SavePolygonSummary}"/>
+                                            </Grid>
+                                        </Expander>
+
+                                    </Grid>
+                                </GroupBox>
+
+                                <TextBlock Grid.Row="14" Text="*Or perimeter error such as taping error"/>
+                                <TextBlock Grid.Row="15" Text="**Area-Error/Area to be less than 10%"/>
+                            </Grid>
+                        </ScrollViewer>
+                        
+                        <Grid Grid.Column="0" Grid.Row="2" Margin="2.5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.Resources>
+                                <Style TargetType="Button">
+                                    <Setter Property="Height" Value="25"/>
+                                    <Setter Property="Width" Value="75"/>
+                                </Style>
+                            </Grid.Resources>
+
+                            <Button Grid.Column="0" Margin="0, 0, 5, 0" Content="Delete"
                                     Command="{Binding DeletePolygonCommand}"
                                  IsEnabled="{Binding ElementName=lbPolys, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" />
-                                <Button Grid.Column="3" Content="New" Command="{Binding NewPolygonCommand}" CommandParameter="{Binding ElementName=lbPolys}" />
-                            </Grid>
+                            <Button Grid.Column="3" Content="New" Command="{Binding NewPolygonCommand}" CommandParameter="{Binding ElementName=lbPolys}" />
                         </Grid>
                     </Grid>
                 </Border>
@@ -424,6 +554,11 @@
                             <ColumnDefinition Width="200"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
                         <ListBox Name="lbMetadata" Grid.Column="0" Grid.Row="0" BorderThickness="0"
                                      ItemsSource="{Binding Metadata, Mode=OneWay}"
@@ -449,142 +584,161 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
 
-                        <Grid Grid.Column="1" Grid.Row="0" Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="20"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <Grid.Resources>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="IsEnabled" Value="False" />
-
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=lbMetadata, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
-                                            <Setter Property="IsEnabled" Value="True" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-
-                                <Style TargetType="ComboBox">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="IsEnabled" Value="False" />
-
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=lbMetadata, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
-                                            <Setter Property="IsEnabled" Value="True" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="20"/>
-                                </Style>
-
-                            </Grid.Resources>
-
-                            <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                            <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentMetadata.Name, UpdateSourceTrigger=PropertyChanged}"/>
-
-                            <TextBlock Grid.Column="2" Grid.Row="0" Text="Zone" />
-                            <Grid Grid.Column="2" Grid.Row="1">
+                        <ScrollViewer Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
+                            <Grid Margin="5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="0"
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid.Resources>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="FontSize" Value="20"/>
+                                        <Setter Property="IsEnabled" Value="False" />
+
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=lbMetadata, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
+                                                <Setter Property="IsEnabled" Value="True" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="FontSize" Value="20"/>
+                                        <Setter Property="IsEnabled" Value="False" />
+
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=lbMetadata, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
+                                                <Setter Property="IsEnabled" Value="True" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontSize" Value="20"/>
+                                    </Style>
+
+                                </Grid.Resources>
+
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentMetadata.Name, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                <TextBlock Grid.Column="2" Grid.Row="0" Text="UTM Zone" />
+                                <Grid Grid.Column="2" Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox Grid.Column="0"
                                      Name="txtMetaZone"
                                      Text="{Binding CurrentMetadata.Zone, Mode=OneWay}"
                                      PreviewTextInput="TextIsInteger">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="TextChanged">
-                                            <i:InvokeCommandAction Command="{Binding MetadataZoneChangedCommand}"
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="TextChanged">
+                                                <i:InvokeCommandAction Command="{Binding MetadataZoneChangedCommand}"
                                                 CommandParameter="{Binding ElementName=txtMetaZone, Path=Text}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </TextBox>
-                                <Button Grid.Column="1" Width="75" Command="{Binding MetadataUpdateZoneCommand}" Content="Update"/>
-                            </Grid>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBox>
+                                    <Button Grid.Column="1" Width="75" Command="{Binding MetadataUpdateZoneCommand}" Content="Update"/>
+                                </Grid>
 
 
-                            <TextBlock Grid.Column="0" Grid.Row="4" Text="Declination Type" />
-                            <ComboBox Grid.Column="0" Grid.Row="5"
+                                <TextBlock Grid.Column="0" Grid.Row="4" Text="Declination Type" />
+                                <ComboBox Grid.Column="0" Grid.Row="5"
                                           SelectedItem="{Binding CurrentMetadata.DecType}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:DeclinationType}}"/>
 
-                            <TextBlock Grid.Column="2" Grid.Row="4" Text="Declination" />
-                            <TextBox Grid.Column="2" Grid.Row="5"
+                                <TextBlock Grid.Column="2" Grid.Row="4" Text="Declination" />
+                                <TextBox Grid.Column="2" Grid.Row="5"
                                           Text="{Binding CurrentMetadata.MagDec}"
                                           PreviewTextInput="TextIsDouble"/>
 
 
-                            <TextBlock Grid.Column="0" Grid.Row="6" Text="Distance" />
-                            <ComboBox Grid.Column="0" Grid.Row="7"
+                                <TextBlock Grid.Column="0" Grid.Row="6" Text="Distance" />
+                                <ComboBox Grid.Column="0" Grid.Row="7"
                                           SelectedItem="{Binding CurrentMetadata.Distance}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}}"/>
 
-                            <TextBlock Grid.Column="2" Grid.Row="6" Text="Elevation" />
-                            <ComboBox Grid.Column="2" Grid.Row="7"
+                                <TextBlock Grid.Column="2" Grid.Row="6" Text="Elevation" />
+                                <ComboBox Grid.Column="2" Grid.Row="7"
                                           SelectedItem="{Binding CurrentMetadata.Elevation}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}}"/>
 
 
-                            <TextBlock Grid.Column="0" Grid.Row="8" Text="Slope" />
-                            <ComboBox Grid.Column="0" Grid.Row="9"
+                                <TextBlock Grid.Column="0" Grid.Row="8" Text="Slope" />
+                                <ComboBox Grid.Column="0" Grid.Row="9"
                                           SelectedItem="{Binding CurrentMetadata.Slope}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Slope}}"/>
 
-                            <TextBlock Grid.Column="2" Grid.Row="8" Text="Datum" />
-                            <ComboBox Grid.Column="2" Grid.Row="9" IsEnabled="False"
+                                <TextBlock Grid.Column="2" Grid.Row="8" Text="Datum" />
+                                <ComboBox Grid.Column="2" Grid.Row="9" IsEnabled="False"
                                           SelectedItem="{Binding CurrentMetadata.Datum}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Datum}}"/>
 
+                                <TextBlock Grid.Column="0" Grid.Row="10" Text="GPS Reciever" />
+                                <ComboBox Grid.Column="0" Grid.Row="11" IsEditable="True"
+                                          ItemsSource="{StaticResource arrGps}" Text="{Binding CurrentMetadata.GpsReceiver}" />
 
-                            <TextBlock Grid.Column="0" Grid.Row="10" Text="Comment" />
-                            <TextBox Grid.Column="0" Grid.Row="11" Grid.ColumnSpan="3" MinLines="5" MaxLines="5"
+                                <TextBlock Grid.Column="2" Grid.Row="10" Text="Range Finder" />
+                                <ComboBox Grid.Column="2" Grid.Row="11" IsEditable="True" Text="{Binding CurrentMetadata.RangeFinder}"
+                                          ItemsSource="{StaticResource arrRangeFinder}"/>
+
+
+                                <TextBlock Grid.Column="0" Grid.Row="12" Text="Compass" />
+                                <ComboBox Grid.Column="0" Grid.Row="13" IsEditable="True" Text="{Binding CurrentMetadata.Compass}"
+                                          ItemsSource="{StaticResource arrCompass}"/>
+
+                                <TextBlock Grid.Column="2" Grid.Row="12" Text="Crew" />
+                                <TextBox Grid.Column="2" Grid.Row="13" Text="{Binding CurrentMetadata.Crew, UpdateSourceTrigger=PropertyChanged}" />
+
+
+                                <TextBlock Grid.Column="0" Grid.Row="14" Text="Comment" />
+                                <TextBox Grid.Column="0" Grid.Row="15" Grid.ColumnSpan="3" MinLines="3" MaxLines="5"
                                 Text="{Binding CurrentMetadata.Comment, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </ScrollViewer>
 
+                        <Grid Grid.Column="0" Grid.Row="1" Margin="2.5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                            <Grid Grid.Column="0" Grid.Row="13" Grid.ColumnSpan="3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                            <Grid.Resources>
+                                <Style TargetType="Button">
+                                    <Setter Property="Height" Value="25"/>
+                                    <Setter Property="Width" Value="75"/>
+                                </Style>
+                            </Grid.Resources>
 
-                                <Grid.Resources>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Height" Value="25"/>
-                                        <Setter Property="Width" Value="75"/>
-                                    </Style>
-                                </Grid.Resources>
-
-                                <Button Grid.Column="0" Margin="0, 0, 5, 0" Content="Delete"
+                            <Button Grid.Column="0" Margin="0, 0, 5, 0" Content="Delete"
                                     Command="{Binding DeleteMetadataCommand}" CommandParameter="{Binding ElementName=lbMetadata, Path=SelectedItem}"
                                  IsEnabled="{Binding ElementName=lbMetadata, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" />
-                                <Button Grid.Column="3" Content="New" Command="{Binding NewMetadataCommand}" CommandParameter="{Binding ElementName=lbMetadata}" />
-                            </Grid>
+                            <Button Grid.Column="3" Content="New" Command="{Binding NewMetadataCommand}" CommandParameter="{Binding ElementName=lbMetadata}" />
                         </Grid>
                     </Grid>
                 </Border>
@@ -597,6 +751,11 @@
                             <ColumnDefinition Width="200"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
                         <ListBox Name="lbGroups" Grid.Column="0" Grid.Row="0" BorderThickness="0"
                                      ItemsSource="{Binding Groups, Mode=OneWay}"
@@ -622,81 +781,261 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
 
-                        <Grid Grid.Column="1" Grid.Row="0" Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="20"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <Grid.Resources>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="FontSize" Value="20"/>
-                                    <Setter Property="IsEnabled" Value="False" />
-
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=lbGroups, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
-                                            <Setter Property="IsEnabled" Value="True" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-
-                                <Style TargetType="ComboBox">
-                                    <Setter Property="FontSize" Value="20"/>
-                                </Style>
-
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="20"/>
-                                </Style>
-
-                            </Grid.Resources>
-
-                            <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                            <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentGroup.Name, UpdateSourceTrigger=PropertyChanged}"/>
-
-                            <TextBlock Grid.Column="2" Grid.Row="0" Text="Group Type" />
-                            <ComboBox Grid.Column="2" Grid.Row="1"
-                                          SelectedItem="{Binding CurrentGroup.GroupType}"
-                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type tt:GroupType}}"/>
-
-                            <TextBlock Grid.Column="0" Grid.Row="2" Text="Description" />
-                            <TextBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" MinLines="5" MaxLines="5"
-                                Text="{Binding CurrentGroup.Description, UpdateSourceTrigger=PropertyChanged}" />
-
-
-                            <Grid Grid.Column="0" Grid.Row="13" Grid.ColumnSpan="3">
+                        <ScrollViewer Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
+                            <Grid Margin="5" >
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
                                 <Grid.Resources>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Height" Value="25"/>
-                                        <Setter Property="Width" Value="75"/>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="FontSize" Value="20"/>
+                                        <Setter Property="IsEnabled" Value="False" />
+
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=lbGroups, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
+                                                <Setter Property="IsEnabled" Value="True" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
                                     </Style>
+
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="FontSize" Value="20"/>
+                                    </Style>
+
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontSize" Value="20"/>
+                                    </Style>
+
                                 </Grid.Resources>
 
-                                <Button Grid.Column="0" Margin="0, 0, 5, 0" Content="Delete"
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentGroup.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding GroupFieldIsEditable}"/>
+
+                                <TextBlock Grid.Column="2" Grid.Row="0" Text="Group Type" />
+                                <ComboBox Grid.Column="2" Grid.Row="1"
+                                          SelectedItem="{Binding CurrentGroup.GroupType}"
+                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type tt:GroupType}}"
+                                          IsEnabled="{Binding GroupFieldIsEditable}"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Description" />
+                                <TextBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" MinLines="3" MaxLines="5"
+                                Text="{Binding CurrentGroup.Description, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding GroupFieldIsEditable}"/>
+                            </Grid>
+                        </ScrollViewer>
+
+                        <Grid Grid.Column="0" Grid.Row="1" Margin="2.5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.Resources>
+                                <Style TargetType="Button">
+                                    <Setter Property="Height" Value="25"/>
+                                    <Setter Property="Width" Value="75"/>
+                                </Style>
+                            </Grid.Resources>
+
+                            <Button Grid.Column="0" Margin="0, 0, 5, 0" Content="Delete"
                                     Command="{Binding DeleteGroupCommand}" CommandParameter="{Binding ElementName=lbGroups, Path=SelectedItem}"
                                  IsEnabled="{Binding ElementName=lbGroups, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" />
-                                <Button Grid.Column="3" Content="New" Command="{Binding NewGroupCommand}" CommandParameter="{Binding ElementName=lbGroups}" />
-                            </Grid>
+                            <Button Grid.Column="3" Content="New" Command="{Binding NewGroupCommand}" CommandParameter="{Binding ElementName=lbGroups}" />
                         </Grid>
                     </Grid>
                 </Border>
             </TabItem>
+
+            <TabItem Header="Media">
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <ListBox Name="lbMediaPoints" Grid.Column="0" Grid.Row="0" BorderThickness="0"
+                                     ItemsSource="{Binding MediaInfo, Mode=OneWay}"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding MediaInfoChangedCommand}"
+                             CommandParameter="{Binding ElementName=lbMediaPoints, Path=SelectedItem}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Text="{Binding Title}" FontSize="18"/>
+                                        <TextBlock Grid.Row="1" Text="{Binding TotalMediaCount, StringFormat=Media: {0}}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <ListBox Name="lstMedia" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" ItemsSource="{Binding Tiles}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                <ContentPresenter />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel IsItemsHost="True"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+
+                        <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+                              Visibility="{Binding MediaViewerVisible, Converter={StaticResource BoolToVis}}">
+                            <Grid.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="2.5"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="2.5"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                            </Grid.Resources>
+                            
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Image Grid.ColumnSpan="6" Source="{Binding ElementName=lstMedia, Path=SelectedItem.Image}" />
+                            
+                            <Image Grid.Column="5" Source="{StaticResource ImgCloseBlack}" Stretch="Fill" Height="35" Width="35" VerticalAlignment="Top" HorizontalAlignment="Right">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDown">
+                                        <i:InvokeCommandAction Command="{Binding HideMediaViewerCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Image>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Azimuth:" />
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.Azimuth}" IsReadOnly="True" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Pitch:" />
+                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.Pitch}" IsReadOnly="True" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="4" Text="Roll:" />
+                            <TextBox Grid.Row="1" Grid.Column="5" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.Roll}" IsReadOnly="True" />
+
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Time Created:" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.TimeCreated}" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="2" Text="Is External File:" />
+                            <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.IsExternal}" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="4" Text="Path:" />
+                            <TextBlock Grid.Row="2" Grid.Column="5" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.FilePath}" TextTrimming="WordEllipsis" />
+
+                            <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="6" MinLines="2" IsReadOnly="True" Text="{Binding ElementName=lstMedia, Path=SelectedItem.ImageInfo.Comment}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Data Dictionary" Visibility="Collapsed"> <!-- View / Filter DD Info -->
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                    <Grid Background="LightGray">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            
+                        </Grid>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Content="Reset" Grid.Column="0" Width="75"/>
+                            <Button Content="Commit" Grid.Column="2" Width="75"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <TabItem Visibility="{Binding IsMapWindowOpen, Converter={StaticResource InverseBoolToVis}}">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,-8,0">
+                        <TextBlock Text="Map" Foreground="White"/>
+                        <Button BorderThickness="0"
+                                Style="{StaticResource styleTabButtonStyle}" Command="{Binding OpenMapWindowCommand}" CommandParameter="{Binding ElementName=MapContainer}">
+
+                            <Border Style="{StaticResource styleTabButtonBorderStyle}" Padding="2" Margin="0,0,0,-4">
+                                <Image Source="{StaticResource ImgOpenInNew}" Width="15" Height="15" Stretch="Fill" Margin="0,0,0,-2" ToolTip="Open Map Window">
+                                    <Image.LayoutTransform>
+                                        <RotateTransform Angle="-90"/>
+                                    </Image.LayoutTransform>
+                                </Image>
+                            </Border>
+                        </Button>
+                    </StackPanel>
+                </TabItem.Header>
+
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                    <Grid x:Name="MapContainer">
+                        <local:MapControl x:Name="MapControl" Manager="{Binding Manager, Mode=OneWay}"/>
+                    </Grid>
+                </Border>
+            </TabItem>
+            
         </TabControl>
+
+        <Grid Grid.Row="0" Height="3" Background="{StaticResource colorPriamryDark}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
     </Grid>
 </UserControl>

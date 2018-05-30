@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace FMSC.Core.Xml.KML
 {
-    public class Properties
+    public abstract class KmlProperties
     {
+        public string Name { get; set; }
+        public string Desctription { get; set; }
+        public string StyleUrl { get; set; }
+        public bool? Open { get; set; }
+        public bool? Visibility { get; set; }
+
         public string Author { get; set; }
         public string Link { get; set; }
         public string Address { get; set; }
@@ -16,19 +22,20 @@ namespace FMSC.Core.Xml.KML
         public string Region { get; set; }
         public ExtendedData ExtendedData { get; set; }
 
-        public Properties()
+        public KmlProperties(string name = null, string desc = null)
         {
-            Author = null;
-            Link = null;
-            Address = null;
-            Snippit = null;
-            SnippitMaxLines = null;
-            Region = null;
-            ExtendedData = null;
+            Name = name ?? String.Empty;
+            Desctription = desc ?? String.Empty;
         }
 
-        public Properties(Properties p)
+        public KmlProperties(KmlProperties p)
         {
+            Name = p.Name;
+            Desctription = p.Desctription ?? String.Empty;
+            StyleUrl = p.StyleUrl;
+            Open = p.Open;
+            Visibility = p.Visibility;
+
             Author = p.Author;
             Link = p.Link;
             Address = p.Address;

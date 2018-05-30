@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMSC.Core.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,14 +17,16 @@ using TwoTrails.ViewModels;
 
 namespace TwoTrails.Controls
 {
+    //TODO dispaly project version and other info in project tab
+
     /// <summary>
     /// Interaction logic for ProjectEditorControl.xaml
     /// </summary>
     public partial class ProjectEditorControl : UserControl
     {
-        public ProjectEditorControl(TtProject project, ProjectStartupTab tab = ProjectStartupTab.Project)
+        public ProjectEditorControl(ProjectEditorModel projectEditor, ProjectStartupTab tab = ProjectStartupTab.Project)
         {
-            this.DataContext = new ProjectEditorModel(project);
+            this.DataContext = projectEditor;
 
             InitializeComponent();
 
@@ -37,12 +40,12 @@ namespace TwoTrails.Controls
 
         private void TextIsInteger(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = string.IsNullOrEmpty(e.Text) ? false : !e.Text.All(char.IsDigit);
+            e.Handled = ControlUtils.TextIsInteger(sender, e);
         }
 
         private void TextIsDouble(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = string.IsNullOrEmpty(e.Text) ? false : e.Text.All(x => char.IsDigit(x) || x == '.');
+            e.Handled = ControlUtils.TextIsDouble(sender, e);
         }
     }
 
@@ -52,6 +55,7 @@ namespace TwoTrails.Controls
         Points = 1,
         Polygons = 2,
         Metadata = 3,
-        Groups = 4
+        Groups = 4,
+        Media = 5
     }
 }

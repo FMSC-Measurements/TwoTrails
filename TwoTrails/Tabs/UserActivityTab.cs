@@ -16,8 +16,7 @@ namespace TwoTrails
         {
             get
             {
-                return String.Format("{0} (Activity)",
-                  Project.ProjectName);
+                return $"{Project.ProjectName} (Activity)";
             }
         }
 

@@ -30,6 +30,8 @@ namespace TwoTrails.DAL
             }
         }
 
+        public bool HandlesAllPointTypes => true;
+
         private SQLiteDatabase database;
 
 
@@ -51,10 +53,7 @@ namespace TwoTrails.DAL
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
                 using (SQLiteDataReader dr = database.ExecuteReader(
-                    String.Format("select {0} from {1}",
-                        TwoTrailsV2Schema.ProjectInfoSchema.TtDbSchemaVersion,
-                        TwoTrailsV2Schema.ProjectInfoSchema.TableName
-                    ), conn))
+                    $"select {TwoTrailsV2Schema.ProjectInfoSchema.TtDbSchemaVersion} from {TwoTrailsV2Schema.ProjectInfoSchema.TableName}", conn))
                 {
                     if (dr != null)
                     {
@@ -74,11 +73,9 @@ namespace TwoTrails.DAL
         }
 
 
-        public List<TtMetadata> GetMetadata()
+        public IEnumerable<TtMetadata> GetMetadata()
         {
             CheckVersion();
-            
-            List<TtMetadata> metas = new List<TtMetadata>();
 
             String query = String.Format("SELECT {0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} from {14} ",
                 TwoTrailsV2Schema.MetaDataSchema.CN, //0
@@ -126,11 +123,11 @@ namespace TwoTrails.DAL
                                 md.MagDec = reader.GetDouble(8);
                             if (!reader.IsDBNull(9))
                                 md.GpsReceiver = reader.GetString(9);
-                            md.Distance = (Distance)Enum.Parse(typeof(Distance), reader.GetString(10), true);
+                            md.Distance = Types.ParseDistance(reader.GetString(10));
                             md.Elevation = Types.ParseDistance(reader.GetString(11));
                             md.Slope = Types.ParseSlope(reader.GetString(12));
                             md.Zone = reader.GetInt32(13);
-                            metas.Add(md);
+                            yield return md;
                         }
                     }
 
@@ -139,15 +136,11 @@ namespace TwoTrails.DAL
 
                 conn.Close();
             }
-
-            return metas;
         }
 
-        public List<TtPolygon> GetPolygons()
+        public IEnumerable<TtPolygon> GetPolygons()
         {
             CheckVersion();
-
-            List<TtPolygon> polys = new List<TtPolygon>();
             
             string query = String.Format("SELECT {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7} from {8} ",
                 TwoTrailsV2Schema.SharedSchema.CN,
@@ -186,7 +179,7 @@ namespace TwoTrails.DAL
                             if (!reader.IsDBNull(7))
                                 poly.PointStartIndex = reader.GetInt32(7);
 
-                            polys.Add(poly);
+                            yield return poly;
                         }
 
                         reader.Close();
@@ -195,179 +188,162 @@ namespace TwoTrails.DAL
 
                 conn.Close();
             }
-
-            return polys;
         }
-
-
-
-        public List<TtPoint> GetPoints(String polyCN = null)
+        
+        public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
         {
-            return GetTtPoints(polyCN != null ? String.Format("{0} = '{1}'", TwoTrailsV2Schema.PointSchema.PolyCN, polyCN) : null);
+            return GetTtPoints(polyCN != null ? $"{TwoTrailsV2Schema.PointSchema.PolyCN} = '{polyCN}'" : null, linked);
         }
 
-        public List<TtPoint> GetPointsUnlinked(String polyCN = null)
-        {
-            return GetTtPoints(polyCN != null ? String.Format("{0} = '{1}'", TwoTrailsV2Schema.PointSchema.PolyCN, polyCN) : null, false);
-        }
-
-        private List<TtPoint> GetTtPoints(String where = null, bool linkPoints = true, int limit = 0)
+        private IEnumerable<TtPoint> GetTtPoints(String where = null, bool linkPoints = true, int limit = 0)
         {
             CheckVersion();
+            String query = String.Format(@"select {0}.{1}, {2}, {3}, {4} from {0} left join {5} on {5}.{8} = {0}.{8} 
+left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order by {10} asc{11}",
+                TwoTrailsV2Schema.PointSchema.TableName,              //0
+                TwoTrailsV2Schema.PointSchema.SelectItems,            //1
+                TwoTrailsV2Schema.GpsPointSchema.SelectItemsNoCN,     //2
+                TwoTrailsV2Schema.TravPointSchema.SelectItemsNoCN,    //3
+                TwoTrailsV2Schema.QuondamPointSchema.SelectItemsNoCN, //4
+                TwoTrailsV2Schema.GpsPointSchema.TableName,           //5
+                TwoTrailsV2Schema.TravPointSchema.TableName,          //6
+                TwoTrailsV2Schema.QuondamPointSchema.TableName,       //7
+                TwoTrailsV2Schema.SharedSchema.CN,                    //8
+                where != null ? $" where {where}" : String.Empty,
+                TwoTrailsV2Schema.PointSchema.Order,
+                limit > 0 ? $" limit {limit}" : String.Empty
+            );
+
+            Dictionary<string, TtPolygon> polygons = GetPolygons().ToDictionary(p => p.CN, p => p);
+
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
-                List<TtPoint> points = new List<TtPoint>();
-
-                String query = String.Format(@"select {0}.{1}, {2}, {3}, {4} from {0} left join {5} on {5}.{8} = {0}.{8} 
- left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order by {10} asc{11}",
-                    TwoTrailsV2Schema.PointSchema.TableName,              //0
-                    TwoTrailsV2Schema.PointSchema.SelectItems,            //1
-                    TwoTrailsV2Schema.GpsPointSchema.SelectItemsNoCN,     //2
-                    TwoTrailsV2Schema.TravPointSchema.SelectItemsNoCN,    //3
-                    TwoTrailsV2Schema.QuondamPointSchema.SelectItemsNoCN, //4
-                    TwoTrailsV2Schema.GpsPointSchema.TableName,           //5
-                    TwoTrailsV2Schema.TravPointSchema.TableName,          //6
-                    TwoTrailsV2Schema.QuondamPointSchema.TableName,       //7
-                    TwoTrailsV2Schema.SharedSchema.CN,                    //8
-                    where != null ? String.Format(" where {0}", where) : String.Empty,
-                    TwoTrailsV2Schema.PointSchema.Order,
-                    limit > 0 ? String.Format(" limit {0}", limit) : String.Empty
-                );
-
-                using (SQLiteConnection conn = database.CreateAndOpenConnection())
+                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
                 {
-                    using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                    if (dr != null)
                     {
-                        if (dr != null)
+                        TtPoint point = null;
+                        OpType op;
+
+                        string cn, polycn, metacn, groupcn, comment, pcn, qlinks;
+                        int index, pid;
+                        DateTime time;
+                        bool onbnd;
+                        double adjx, adjy, adjz, unadjx, unadjy, unadjz, sd, sa;
+                        double? manacc, rmser, fw, bk;
+
+                        while (dr.Read())
                         {
-                            TtPoint point = null;
-                            OpType op;
+                            if (dr.IsDBNull(7))
+                                throw new Exception("Point has no OpType");
 
-                            string cn, polycn, metacn, groupcn, comment, pcn, qlinks;
-                            int index, pid;
-                            DateTime time;
-                            bool onbnd;
-                            double adjx, adjy, adjz, unadjx, unadjy, unadjz, sd, sa;
-                            double? manacc, rmser, fw, bk;
+                            cn = dr.GetString(0);
+                            index = dr.GetInt32(1);
+                            pid = dr.GetInt32(2);
+                            polycn = dr.GetString(3);
+                            groupcn = dr.GetString(4);
+                            onbnd = Boolean.Parse(dr.GetString(5));
+                            comment = dr.GetStringN(6);
+                            op = TtTypes.ParseOpType(dr.GetString(7));
+                            metacn = dr.GetString(8);
+                            time = TtCoreUtils.ParseTime(dr.GetString(9));
 
-                            while (dr.Read())
+                            adjx = dr.GetDoubleN(10) ?? 0;
+                            adjy = dr.GetDoubleN(11) ?? 0;
+                            adjz = dr.GetDoubleN(12) ?? 0;
+
+                            unadjx = dr.GetDouble(13);
+                            unadjy = dr.GetDouble(14);
+                            unadjz = dr.GetDouble(15);
+
+                            //acc = dr.GetDouble(16);
+
+                            qlinks = dr.GetStringN(16);
+
+
+                            if (op.IsGpsType())
                             {
-                                if (dr.IsDBNull(7))
-                                    throw new Exception("Point has no OpType");
+                                //lat = dr.GetDoubleN(18);
+                                //lon = dr.GetDoubleN(19);
+                                //elev = dr.GetDoubleN(20);
+                                manacc = dr.GetDoubleN(17);
+                                rmser = dr.GetDoubleN(18);
 
-                                cn = dr.GetString(0);
-                                index = dr.GetInt32(1);
-                                pid = dr.GetInt32(2);
-                                polycn = dr.GetString(3);
-                                groupcn = dr.GetString(4);
-                                onbnd = Boolean.Parse(dr.GetString(5));
-                                comment = dr.GetStringN(6);
-                                op = TtTypes.ParseOpType(dr.GetString(7));
-                                metacn = dr.GetString(8);
-                                time = TtCoreUtils.ParseTime(dr.GetString(9));
-
-                                adjx = dr.GetDoubleN(10) ?? 0;
-                                adjy = dr.GetDoubleN(11) ?? 0;
-                                adjz = dr.GetDoubleN(12) ?? 0;
-
-                                unadjx = dr.GetDouble(13);
-                                unadjy = dr.GetDouble(14);
-                                unadjz = dr.GetDouble(15);
-
-                                //acc = dr.GetDouble(16);
-
-                                qlinks = dr.GetStringN(16);
-
-
-                                if (op.IsGpsType())
+                                switch (op)
                                 {
-                                    //lat = dr.GetDoubleN(18);
-                                    //lon = dr.GetDoubleN(19);
-                                    //elev = dr.GetDoubleN(20);
-                                    manacc = dr.GetDoubleN(17);
-                                    rmser = dr.GetDoubleN(18);
-
-                                    switch (op)
-                                    {
-                                        case OpType.GPS:
-                                            point = new GpsPoint(cn, index, pid, time, polycn, metacn, groupcn,
-                                                        comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
-                                                        Consts.DEFAULT_POINT_ACCURACY, qlinks, null, null, null, manacc, rmser);
-                                            break;
-                                        case OpType.Take5:
-                                            point = new Take5Point(cn, index, pid, time, polycn, metacn, groupcn,
-                                                        comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
-                                                        Consts.DEFAULT_POINT_ACCURACY, qlinks, null, null, null, manacc, rmser);
-                                            break;
-                                        case OpType.Walk:
-                                            point = new WalkPoint(cn, index, pid, time, polycn, metacn, groupcn,
-                                                        comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
-                                                        Consts.DEFAULT_POINT_ACCURACY, qlinks, null, null, null, manacc, rmser);
-                                            break;
-                                        case OpType.WayPoint:
-                                            point = new WayPoint(cn, index, pid, time, polycn, metacn, groupcn,
-                                                        comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
-                                                        Consts.DEFAULT_POINT_ACCURACY, qlinks, null, null, null, manacc, rmser);
-                                            break;
-                                    }
-                                }
-                                else if (op.IsTravType())
-                                {
-                                    fw = dr.GetDoubleN(19);
-                                    bk = dr.GetDoubleN(20);
-                                    sd = dr.GetDouble(21);
-                                    sa = dr.GetDouble(22);
-
-                                    if (op == OpType.Traverse)
-                                    {
-                                        point = new TravPoint(cn, index, pid, time, polycn, metacn, groupcn,
+                                    case OpType.GPS:
+                                        point = new GpsPoint(cn, index, pid, time, polycn, metacn, groupcn,
                                                     comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
-                                                    Consts.DEFAULT_POINT_ACCURACY, qlinks, fw, bk, sd, sa);
-                                    }
-                                    else
-                                    {
-                                        point = new SideShotPoint(cn, index, pid, time, polycn, metacn, groupcn,
+                                                    Consts.DEFAULT_POINT_ACCURACY, qlinks, null, null, null, manacc, rmser);
+                                        break;
+                                    case OpType.Take5:
+                                        point = new Take5Point(cn, index, pid, time, polycn, metacn, groupcn,
                                                     comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
-                                                    Consts.DEFAULT_POINT_ACCURACY, qlinks, fw, bk, sd, sa);
-                                    }
-                                }
-                                else if (op == OpType.Quondam)
-                                {
-                                    pcn = dr.GetString(23);
-                                    manacc = dr.GetDoubleN(24);
-
-                                    point = new QuondamPoint(cn, index, pid, time, polycn, metacn, groupcn,
+                                                    Consts.DEFAULT_POINT_ACCURACY, qlinks, null, null, null, manacc, rmser);
+                                        break;
+                                    case OpType.Walk:
+                                        point = new WalkPoint(cn, index, pid, time, polycn, metacn, groupcn,
                                                     comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
-                                                    Consts.DEFAULT_POINT_ACCURACY, qlinks, pcn, manacc);
-
-                                    if (linkPoints)
-                                    {
-                                        QuondamPoint qp = point as QuondamPoint;
-                                        List<TtPoint> pps = GetTtPoints(String.Format("{0}.CN = '{1}'",
-                                            TwoTrailsV2Schema.PointSchema.TableName, qp.ParentPointCN), false, 1);
-                                        qp.ParentPoint = pps.Any() ? pps.First() : null; 
-                                    }
+                                                    Consts.DEFAULT_POINT_ACCURACY, qlinks, null, null, null, manacc, rmser);
+                                        break;
+                                    case OpType.WayPoint:
+                                        point = new WayPoint(cn, index, pid, time, polycn, metacn, groupcn,
+                                                    comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
+                                                    Consts.DEFAULT_POINT_ACCURACY, qlinks, null, null, null, manacc, rmser);
+                                        break;
                                 }
-
-                                points.Add(point);
                             }
+                            else if (op.IsTravType())
+                            {
+                                fw = dr.GetDoubleN(19);
+                                bk = dr.GetDoubleN(20);
+                                sd = dr.GetDouble(21);
+                                sa = dr.GetDouble(22);
 
-                            dr.Close();
+                                if (op == OpType.Traverse)
+                                {
+                                    point = new TravPoint(cn, index, pid, time, polycn, metacn, groupcn,
+                                                comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
+                                                Consts.DEFAULT_POINT_ACCURACY, qlinks, fw, bk, sd, sa);
+                                }
+                                else
+                                {
+                                    point = new SideShotPoint(cn, index, pid, time, polycn, metacn, groupcn,
+                                                comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
+                                                Consts.DEFAULT_POINT_ACCURACY, qlinks, fw, bk, sd, sa);
+                                }
+                            }
+                            else if (op == OpType.Quondam)
+                            {
+                                pcn = dr.GetString(23);
+                                manacc = dr.GetDoubleN(24);
+
+                                point = new QuondamPoint(cn, index, pid, time, polycn, metacn, groupcn,
+                                                comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
+                                                Consts.DEFAULT_POINT_ACCURACY, qlinks, pcn, manacc);
+
+                                if (linkPoints)
+                                {
+                                    QuondamPoint qp = point as QuondamPoint;
+                                    qp.ParentPoint = GetTtPoints($"{TwoTrailsV2Schema.PointSchema.TableName}.{TwoTrailsV2Schema.SharedSchema.CN} = '{qp.ParentPointCN}'", false).FirstOrDefault();
+                                }
+                            }
+                            
+                            yield return point;
                         }
 
-                        conn.Close();
+                        dr.Close();
                     }
-                }
 
-                return points;
+                    conn.Close();
+                }
             }
         }
 
 
-        public List<TtGroup> GetGroups()
+        public IEnumerable<TtGroup> GetGroups()
         {
             CheckVersion();
-
-            List<TtGroup> groups = new List<TtGroup>();
 
             String query = String.Format("SELECT {0}, {1}, {2}, {3} from {4} ",
                 TwoTrailsV2Schema.GroupSchema.CN,
@@ -393,7 +369,7 @@ namespace TwoTrails.DAL
                             if (!dr.IsDBNull(3))
                                 group.GroupType = (GroupType)Enum.Parse(typeof(GroupType), dr.GetString(3), true);
 
-                            groups.Add(group);
+                            yield return group;
                         }
 
                         dr.Close();
@@ -402,26 +378,15 @@ namespace TwoTrails.DAL
 
                 conn.Close();
             }
-
-            return groups;
         }
 
 
-        public List<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
         {
             CheckVersion();
 
-            List<TtNmeaBurst> bursts = new List<TtNmeaBurst>();
-
-            String query = String.Format(@"select {0} from {1}{2}",
-                TwoTrailsV2Schema.TtNmeaSchema.SelectItems,
-                TwoTrailsV2Schema.TtNmeaSchema.TableName,
-                pointCN != null ?
-                String.Format(" where {0} = '{1}'",
-                        TwoTrailsV2Schema.TtNmeaSchema.PointCN,
-                        pointCN) :
-                String.Empty
-            );
+            String query = $@"select {TwoTrailsV2Schema.TtNmeaSchema.SelectItems} from {TwoTrailsV2Schema.TtNmeaSchema.TableName}
+{(pointCN != null ? $" where {TwoTrailsV2Schema.TtNmeaSchema.PointCN} = '{pointCN}'" : String.Empty)}";
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
@@ -447,7 +412,7 @@ namespace TwoTrails.DAL
                         {
                             DateTime time = TtCoreUtils.ParseTime(dr.GetString(3));
                             
-                            bursts.Add(new TtNmeaBurst(
+                            yield return new TtNmeaBurst(
                                 dr.GetString(0),
                                 time,
                                 dr.GetString(1),
@@ -473,8 +438,9 @@ namespace TwoTrails.DAL
                                 dr.GetDouble(19),
                                 dr.GetDouble(18),
                                 UomElevationExtensions.Parse(dr.GetString(20)),
-                                dr.GetInt32(24)
-                            ));
+                                dr.GetInt32(24),
+                                String.Empty
+                            );
                         }
 
                         dr.Close();
@@ -483,8 +449,6 @@ namespace TwoTrails.DAL
                     conn.Close();
                 }
             }
-
-            return bursts;
         }
 
 
@@ -536,31 +500,47 @@ namespace TwoTrails.DAL
         }
 
 
-        public List<TtImage> GetPictures(String pointCN)
+        public IEnumerable<TtImage> GetPictures(String pointCN)
         {
             return new List<TtImage>();
         }
 
 
-        public List<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
         {
             return new List<PolygonGraphicOptions>();
         }
 
 
-        public List<TtUserActivity> GetUserActivity()
+        public IEnumerable<TtUserAction> GetUserActivity()
         {
-            return new List<TtUserActivity>();
+            return new List<TtUserAction>();
         }
 
 
-        public Boolean HasPolygons()
+        public DataDictionaryTemplate GetDataDictionaryTemplate()
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataDictionary GetExtendedDataForPoint(string pointCN)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DataDictionary> GetExtendedData()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public bool HasPolygons()
         {
             CheckVersion();
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader(String.Format("select count(*) from {0}", TwoTrailsV2Schema.PolygonSchema.TableName), conn))
+                using (SQLiteDataReader dr = database.ExecuteReader($"select count(*) from {TwoTrailsV2Schema.PolygonSchema.TableName}", conn))
                 {
                     if (dr != null)
                     {

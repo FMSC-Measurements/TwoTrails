@@ -12,14 +12,11 @@ namespace TwoTrails.Core.ComponentModel.History
         private List<TtPoint> _ResetPoints = null;
 
 
-        public ResetTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, bool autoCommit = true) : base(points.Where(p => pointsManager.HasOriginalPoint(p.CN)))
+        public ResetTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager) : base(points.Where(p => pointsManager.HasOriginalPoint(p.CN)))
         {
             this.pointsManager = pointsManager;
             
             _ResetPoints = Points.Select(pt => pointsManager.GetOriginalPoint(pt.CN).DeepCopy()).ToList();
-
-            if (autoCommit)
-                Redo();
         }
 
         public override void Redo()

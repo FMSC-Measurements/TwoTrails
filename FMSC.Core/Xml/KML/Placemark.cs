@@ -6,41 +6,28 @@ using System.Threading.Tasks;
 
 namespace FMSC.Core.Xml.KML
 {
-    public class Placemark
+    public class Placemark : KmlProperties
     {
         #region Properties
-
         public string CN { get; }
-        public string Name { get; set; }
-        public string Desctription { get; set; }
-        public string StyleUrl { get; set; }
         public View View { get; set; }
-        public Properties Properties { get; set; }
-        public bool? Visibility { get; set; }
-        public bool? Open { get; set; }
         
         public List<Polygon> Polygons { get; } = new List<Polygon>();
-        public List<Point> Points = new List<Point>();
+        public List<KmlPoint> Points { get; } = new List<KmlPoint>();
         #endregion
         
 
-        public Placemark(string name, string desc = null, View view = null)
+        public Placemark(string name, string desc = null, View view = null) : base(name, desc)
         {
-            Name = name;
             View = view;
-
-            Desctription = desc??String.Empty;
 
             CN = Guid.NewGuid().ToString();
         }
 
-        public Placemark(Placemark pm) : this(pm.Name, pm.Desctription, new View(pm.View))
+        public Placemark(Placemark pm) : base(pm)
         {
             CN = pm.CN;
-            StyleUrl = pm.StyleUrl; ;
-            Properties = new Properties(pm.Properties);
-            Visibility = pm.Visibility;
-            Open = pm.Open;
+            View = new View(pm.View);
 
             Polygons = pm.Polygons.ToList();
             Points = pm.Points.ToList();
@@ -74,9 +61,9 @@ namespace FMSC.Core.Xml.KML
         }
 
 
-        public Point GetPoint(string cn) => Points.FirstOrDefault(p => p.CN == cn);
+        public KmlPoint GetPoint(string cn) => Points.FirstOrDefault(p => p.CN == cn);
 
-        public Point GetPointByName(string name) => Points.FirstOrDefault(p => p.Name == name);
+        public KmlPoint GetPointByName(string name) => Points.FirstOrDefault(p => p.Name == name);
 
 
         public Polygon GetPolygon(string cn) => Polygons.FirstOrDefault(p => p.CN == cn);

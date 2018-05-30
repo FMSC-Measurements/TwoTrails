@@ -17,7 +17,11 @@ namespace TwoTrails.DAL
 {
     public class TtGpxDataAccessLayer : IReadOnlyTtDataLayer
     {
-        public Boolean RequiresUpgrade { get; } = false;
+        public Boolean RequiresUpgrade => false;
+
+        public string FilePath => _Options.FilePath;
+
+        public bool HandlesAllPointTypes => false;
 
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
         private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
@@ -25,17 +29,19 @@ namespace TwoTrails.DAL
         private TtProjectInfo _ProjectInfo;
 
         private readonly ParseOptions _Options;
-        private readonly int _Zone;
         private bool parsed;
         private int secondsInc = 0;
+        private int polyInc = 0;
 
         private static object locker = new object();
 
 
-        public TtGpxDataAccessLayer(ParseOptions options, int projectZone)
+        public TtGpxDataAccessLayer(ParseOptions options)
         {
             _Options = options;
-            _Zone = projectZone;
+
+            polyInc = options.StartPolygonNumber;
+
             _ProjectInfo = new TtProjectInfo(Path.GetFileName(options.FilePath),
                 String.Empty,
                 String.Empty,
@@ -89,8 +95,8 @@ namespace TwoTrails.DAL
                                                     inPoly = true;
                                                     poly = new TtPolygon()
                                                     {
-                                                        Name = String.Format("Poly {0}", _Polygons.Count),
-                                                        PointStartIndex = _Polygons.Count * 1000 + 10,
+                                                        Name = $"Poly {++polyInc}",
+                                                        PointStartIndex = 1000 * polyInc + 10,
                                                         TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
                                                     };
 
@@ -133,7 +139,7 @@ namespace TwoTrails.DAL
                                                     point.Index = index++;
                                                     point.OnBoundary = true;
 
-                                                    UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(lat, lon, _Zone);
+                                                    UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(lat, lon, _Options.TargetZone);
 
                                                     point.SetUnAdjLocation(
                                                         coords.X,
@@ -183,12 +189,32 @@ namespace TwoTrails.DAL
             }
         }
 
+        private IEnumerable<TtPoint> GetLinkedPoints(IEnumerable<TtPoint> points)
+        {
+            foreach (TtPoint point in _Points.Values)
+            {
+                if (point.OpType == OpType.Quondam)
+                {
+                    QuondamPoint qp = new QuondamPoint(point);
 
-        public List<TtPoint> GetPoints(String polyCN = null)
+                    if (_Points.ContainsKey(qp.ParentPointCN))
+                        qp.ParentPoint = _Points[qp.ParentPointCN].DeepCopy();
+
+                    yield return qp;
+                }
+
+                yield return point.DeepCopy();
+            }
+        }
+
+
+        public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
         {
             Parse();
+            
+            IEnumerable<TtPoint> points = (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index);
 
-            return (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index).ToList();
+            return linked ? GetLinkedPoints(points) : points.DeepCopy(); ;
         }
 
         public bool HasPolygons()
@@ -198,24 +224,24 @@ namespace TwoTrails.DAL
             return _Polygons.Count > 0;
         }
 
-        public List<TtPolygon> GetPolygons()
+        public IEnumerable<TtPolygon> GetPolygons()
         {
             Parse();
 
-            return _Polygons.Values.ToList();
+            return _Polygons.Values.DeepCopy();
         }
 
-        public List<TtMetadata> GetMetadata()
+        public IEnumerable<TtMetadata> GetMetadata()
         {
             return new List<TtMetadata>();
         }
 
-        public List<TtGroup> GetGroups()
+        public IEnumerable<TtGroup> GetGroups()
         {
             return new List<TtGroup>();
         }
 
-        public List<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
         {
             return new List<TtNmeaBurst>();
         }
@@ -227,35 +253,56 @@ namespace TwoTrails.DAL
             return new TtProjectInfo(_ProjectInfo);
         }
 
-        public List<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
         {
             return new List<PolygonGraphicOptions>();
         }
 
-        public List<TtImage> GetPictures(String pointCN)
+        public IEnumerable<TtImage> GetPictures(String pointCN)
         {
             return new List<TtImage>();
         }
 
-        public List<TtUserActivity> GetUserActivity()
+        public IEnumerable<TtUserAction> GetUserActivity()
         {
-            return new List<TtUserActivity>();
+            return new List<TtUserAction>();
         }
 
 
+        public DataDictionaryTemplate GetDataDictionaryTemplate()
+        {
+            throw new NotImplementedException();
+        }
+
+        public DataDictionary GetExtendedDataForPoint(string pointCN)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<DataDictionary> GetExtendedData()
+        {
+            throw new NotImplementedException();
+        }
+        
+
         public class ParseOptions
         {
-
             public string FilePath { get; }
             public bool UseElevation { get; set; }
             public UomElevation UomElevation { get; set; }
 
+            public int TargetZone { get; }
 
-            public ParseOptions(string filePath, bool useElevation = false, UomElevation uomElevation = UomElevation.Feet)
+            public int StartPolygonNumber { get; }
+
+            public ParseOptions(string filePath, int targetZone, bool useElevation = false,
+                UomElevation uomElevation = UomElevation.Feet, int startPolyNumber = 0)
             {
                 FilePath = filePath;
+                TargetZone = targetZone;
                 UseElevation = useElevation;
                 UomElevation = uomElevation;
+                StartPolygonNumber = startPolyNumber;
             }
         }
     }

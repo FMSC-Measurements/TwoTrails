@@ -1,4 +1,5 @@
-﻿using TwoTrails.Controls;
+﻿using System.ComponentModel;
+using TwoTrails.Controls;
 using TwoTrails.Mapping;
 using TwoTrails.ViewModels;
 
@@ -11,20 +12,23 @@ namespace TwoTrails
     {
         public MapControl MapControl { get; private set; }
 
-        public MapWindow(TtProject project)
+
+        public MapWindow(TtProject project) :
+            this($"Map - {project.ProjectName}", new MapControl(project.Manager))
+        { }
+
+        public MapWindow(string projectName, MapControl mapControl)
         {
             InitializeComponent();
 
-            MapControl = new MapControl(project.Manager);
-            cc.Content = MapControl;
+            Title = $"Map - {projectName}";
+            cc.Content = MapControl = mapControl;
         }
 
-        public MapWindow(TtProject project, MapControl mapControl)
+        protected override void OnClosing(CancelEventArgs e)
         {
-            InitializeComponent();
-
-            MapControl = mapControl;
-            cc.Content = MapControl;
+            cc.Content = null;
+            base.OnClosing(e);
         }
     }
 }

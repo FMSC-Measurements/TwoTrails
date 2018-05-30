@@ -39,14 +39,14 @@ namespace TwoTrails.Core.Media
 
         public sealed override MediaType MediaType { get { return MediaType.Picture; } }
 
-        public virtual PictureType PictureType { get { return PictureType.Regular; } }
+        public virtual ImageType PictureType { get { return ImageType.Regular; } }
         
 
-        public TtImage(String cn, String name, String filePath, String comment, DateTime timeCreated, String pointCN)
-        : base(cn, name, filePath, comment, timeCreated, pointCN) { }
+        public TtImage(String cn, String name, String filePath, String comment, DateTime timeCreated, String pointCN, bool isExternal)
+        : base(cn, name, filePath, comment, timeCreated, pointCN, isExternal) { }
 
-        public TtImage(String cn, String name, String filePath, String comment, DateTime timeCreated, String pointCN,
-            float? azimuth, float? pitch, float? roll) : base(cn, name, filePath, comment, timeCreated, pointCN)
+        public TtImage(String cn, String name, String filePath, String comment, DateTime timeCreated, String pointCN, bool isExternal,
+            float? azimuth, float? pitch, float? roll) : base(cn, name, filePath, comment, timeCreated, pointCN, isExternal)
         {
             _Azimuth = azimuth;
             _Pitch = pitch;
