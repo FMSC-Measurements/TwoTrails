@@ -473,6 +473,8 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             {
                 CurrentProject.Save();
             }
+
+            MainWindow.Title = $"TwoTrails - {CurrentProject.ProjectName}";
         }
 
 

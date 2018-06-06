@@ -36,7 +36,7 @@ namespace TwoTrails.Core
                 case "sideshot":
                 case "side shot": return OpType.SideShot;
                 case "5":
-                case "walk": return OpType.WayPoint;
+                case "walk": return OpType.Walk;
                 case "6":
                 case "t5":
                 case "take5":
