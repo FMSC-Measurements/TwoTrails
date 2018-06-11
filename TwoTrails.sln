@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "_FMSC.GeoSpatial", "_FMSC.GeoSpatial\_FMSC.GeoSpatial.shproj", "{4E12BE73-5F4D-4B6A-90A7-B0A130A6C654}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoTrails", "TwoTrails\TwoTrails.csproj", "{38E886B8-3FCA-4A41-A465-8FD5746E47EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FMSC.Core", "FMSC.Core\FMSC.Core.csproj", "{08212CDE-1E42-4638-9365-65BD9A08BCA8}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "TwoTrailsSetup", "TwoTrailsSetup\TwoTrailsSetup.vdproj", "{2CF02EC2-9FDB-468A-B34C-80CBFEA25FA6}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -37,8 +39,13 @@ Global
 		{08212CDE-1E42-4638-9365-65BD9A08BCA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08212CDE-1E42-4638-9365-65BD9A08BCA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08212CDE-1E42-4638-9365-65BD9A08BCA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CF02EC2-9FDB-468A-B34C-80CBFEA25FA6}.Debug|Any CPU.ActiveCfg = Debug
+		{2CF02EC2-9FDB-468A-B34C-80CBFEA25FA6}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BA2D14E6-AE83-4635-B341-5897EED5DFE6}
 	EndGlobalSection
 EndGlobal
