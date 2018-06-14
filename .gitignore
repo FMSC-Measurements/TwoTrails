@@ -22,5 +22,12 @@ packages/
 *obj/
 *bin/
 *TestResults/
+
+*.aps
+*.res
+*.csproj.user
+
 TwoTrails/ApiKeys.cs
+TwoTrailsSetup/Debug/
+TwoTrailsSetup/Release/
 DvlErrLog.txt

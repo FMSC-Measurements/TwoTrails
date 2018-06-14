@@ -50,30 +50,38 @@ namespace TwoTrails
             {
                 Settings = new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings());
 
-                //Check for update
-                if (Settings.LastUpdateCheck == null || Settings.LastUpdateCheck < DateTime.Now.Subtract(TimeSpan.FromDays(1)))
+                string[] cmdArgs = Environment.GetCommandLineArgs();
+                if (cmdArgs.Length > 2 && cmdArgs[1].Equals("/export", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    bool? res = TtUtils.CheckForUpdate();
-
-                    if (res != null)
+                    ExportFile(cmdArgs[2]);
+                }
+                else
+                {
+                    //Check for update
+                    if (Settings.LastUpdateCheck == null || Settings.LastUpdateCheck < DateTime.Now.Subtract(TimeSpan.FromDays(1)))
                     {
-                        Settings.LastUpdateCheck = DateTime.Now;
+                        bool? res = TtUtils.CheckForUpdate();
 
-                        if (res == true && MessageBox.Show("A new version of TwoTrails is ready for download. Would you like to download it now?", "TwoTrails Update",
-                                MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                        if (res != null)
                         {
-                            Process.Start(Consts.URL_TWOTRAILS);
-                            return;
+                            Settings.LastUpdateCheck = DateTime.Now;
+
+                            if (res == true && MessageBox.Show("A new version of TwoTrails is ready for download. Would you like to download it now?", "TwoTrails Update",
+                                    MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                            {
+                                Process.Start(Consts.URL_TWOTRAILS);
+                                return;
+                            }
                         }
                     }
+
+                    var application = new App();
+
+                    application.InitializeComponent();
+                    application.Run();
+
+                    SingleInstance<App>.Cleanup();
                 }
-
-                var application = new App();
-
-                application.InitializeComponent();
-                application.Run();
-                
-                SingleInstance<App>.Cleanup();
             }
         }
 
@@ -118,6 +126,49 @@ namespace TwoTrails
             base.OnExit(e);
         }
 
+
+        private static void ExportFile(string file)
+        {
+            if (File.Exists(file))
+            {
+                using (StreamWriter logWriter = new StreamWriter(LOG_FILE_PATH, true))
+                {
+                    try
+                    {
+                        switch (Path.GetExtension(file))
+                        {
+                            case Consts.FILE_EXTENSION:
+                                {
+                                    Export.All(file);
+                                    logWriter.WriteLine($"[{DateTime.Now}] Exported Project: {file}");
+                                    MessageBox.Show("Project Exported");
+                                    break;
+                                }
+                            case Consts.FILE_EXTENSION_FILTER_MEDIA:
+                                {
+                                    TtSqliteMediaAccessLayer mal = new TtSqliteMediaAccessLayer(file);
+                                    Export.MediaFiles(mal, Path.Combine(Path.GetDirectoryName(mal.FilePath), Path.GetFileNameWithoutExtension(mal.FilePath)).Trim());
+                                    logWriter.WriteLine($"[{DateTime.Now}] Exported Media: {file}");
+                                    MessageBox.Show("Media Exported");
+                                    break;
+                                }
+                            default:
+                                MessageBox.Show("Invalid export file type");
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logWriter.WriteLine($"[{DateTime.Now}] [Export Error]: {ex.Message}");
+                        MessageBox.Show("An error has occured. Please view the log file for details");
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show($"File '{file}' not found.");
+            }
+        }
 
 
         public bool SignalExternalCommandLineArgs(IList<string> args)

@@ -626,7 +626,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                         Directory.CreateDirectory(App.TEMP_DIR);
 
                     string file = Path.Combine(App.TEMP_DIR, $"{Guid.NewGuid().ToString()}.kmz");
-                    Export.KMZ(CurrentProject, file);
+                    Export.KMZ(CurrentProject.Manager, CurrentProject.ProjectInfo, file);
 
                     if (File.Exists(file))
                         Process.Start(file);

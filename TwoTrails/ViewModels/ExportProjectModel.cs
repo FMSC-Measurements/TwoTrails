@@ -95,7 +95,7 @@ namespace TwoTrails.ViewModels
                     {
                         if (IsCheckAll == true)
                         {
-                            Export.All(project, path);
+                            Export.All(project.Manager, project.MAL, project.ProjectInfo, project.FilePath, path);
                         }
                         else
                         {
@@ -129,16 +129,16 @@ namespace TwoTrails.ViewModels
                                 Export.Project(project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));
 
                             if (ExportSummary)
-                                Export.Summary(project, Path.Combine(path, "Summary.txt"));
+                                Export.Summary(project.Manager, project.ProjectInfo, project.FilePath, Path.Combine(path, "Summary.txt"));
 
                             if (ExportGPX)
-                                Export.GPX(project, Path.Combine(path, $"{project.ProjectName.Trim()}.gpx"));
+                                Export.GPX(project.Manager, project.ProjectInfo, Path.Combine(path, $"{project.ProjectName.Trim()}.gpx"));
 
                             if (ExportKMZ)
-                                Export.KMZ(project, Path.Combine(path, $"{project.ProjectName.Trim()}.kmz"));
+                                Export.KMZ(project.Manager, project.ProjectInfo, Path.Combine(path, $"{project.ProjectName.Trim()}.kmz"));
 
                             if (ExportShapes)
-                                Export.Shapes(project, Path.Combine(path));
+                                Export.Shapes(project.Manager, project.ProjectInfo, Path.Combine(path));
                         }
 
                         window.Close();
