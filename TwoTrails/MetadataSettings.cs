@@ -1,5 +1,4 @@
 ﻿using System;
-using TwoTrails;
 using FMSC.Core;
 using TwoTrails.Core;
 

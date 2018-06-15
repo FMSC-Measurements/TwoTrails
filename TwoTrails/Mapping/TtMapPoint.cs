@@ -1,9 +1,5 @@
 ﻿using Microsoft.Maps.MapControl.WPF;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core.Points;
 using System.Windows;
 using FMSC.GeoSpatial.UTM;

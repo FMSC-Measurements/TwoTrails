@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FMSC.GeoSpatial.NMEA.Exceptions
+﻿namespace FMSC.GeoSpatial.NMEA.Exceptions
 {
     public class ExcessiveStringException : NmeaException
     {

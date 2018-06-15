@@ -3,13 +3,11 @@ using CSUtil.Databases;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
-using TwoTrails.Core.Media;
 using FMSC.Core;
 using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.Types;
@@ -2488,9 +2486,9 @@ namespace TwoTrails.DAL
                         dr.Close();
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    //
+                    errors = true;
                 }
 
                 conn.Close();
@@ -2516,7 +2514,7 @@ namespace TwoTrails.DAL
                         dr.Close();
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     //
                 }

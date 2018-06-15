@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using TwoTrails.Controls;
-using TwoTrails.Mapping;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails

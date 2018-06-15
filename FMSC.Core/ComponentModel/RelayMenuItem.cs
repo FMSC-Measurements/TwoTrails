@@ -1,9 +1,6 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core.ComponentModel.Commands;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Input;
 
 namespace FMSC.Core.ComponentModel
 {

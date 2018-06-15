@@ -1,18 +1,13 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core.ComponentModel.Commands;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
-using TwoTrails.ViewModels;
 
 namespace TwoTrails.ViewModels
 {

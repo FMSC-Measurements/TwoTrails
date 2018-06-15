@@ -4,7 +4,6 @@ using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FMSC.GeoSpatial.NMEA
 {

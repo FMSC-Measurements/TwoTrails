@@ -3,7 +3,6 @@ using FMSC.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using TwoTrails.Core.Points;
 using FMSC.GeoSpatial.UTM;
 using TwoTrails.DAL;

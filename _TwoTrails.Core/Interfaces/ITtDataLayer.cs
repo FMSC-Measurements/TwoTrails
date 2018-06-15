@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using TwoTrails.Core;
-using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.DAL
 {
     public interface ITtDataLayer : IReadOnlyTtDataLayer
     {
-        String FilePath { get; }
-
         bool HasDataDictionary { get; }
 
         #region Points

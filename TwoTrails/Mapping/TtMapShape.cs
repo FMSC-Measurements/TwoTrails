@@ -1,14 +1,6 @@
 ﻿using CSUtil.ComponentModel;
 using Microsoft.Maps.MapControl.WPF;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core;
-using TwoTrails.Core.Points;
 
 namespace TwoTrails.Mapping
 {

@@ -4,19 +4,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using CSUtil;
 using TwoTrails.ViewModels;
 using FMSC.Core.Xml.KML;
 using System.IO.Compression;
-using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.Core.Xml.GPX;
 using TwoTrails.Core.Media;
 using TwoTrails.DAL;
-using System.Windows.Media.Imaging;
 
 namespace TwoTrails.Utils
 {

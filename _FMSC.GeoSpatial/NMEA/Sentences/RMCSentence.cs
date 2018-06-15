@@ -1,9 +1,7 @@
 ﻿using FMSC.GeoSpatial.NMEA.Sentences.Base;
 using FMSC.GeoSpatial.Types;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace FMSC.GeoSpatial.NMEA.Sentences
 {

@@ -7,7 +7,6 @@ using System.Reflection;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 using TwoTrails.Core.Media;
-using System.Collections;
 
 namespace TwoTrails.Core
 {

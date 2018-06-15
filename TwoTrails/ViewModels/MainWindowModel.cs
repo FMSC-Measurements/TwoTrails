@@ -8,19 +8,14 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
-using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
-using TwoTrails.ViewModels;
 
 namespace TwoTrails.ViewModels
 {

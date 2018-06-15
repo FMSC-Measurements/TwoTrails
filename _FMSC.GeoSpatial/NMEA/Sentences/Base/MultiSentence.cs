@@ -1,7 +1,5 @@
 ﻿using FMSC.GeoSpatial.NMEA.Exceptions;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FMSC.GeoSpatial.NMEA.Sentences.Base
 {

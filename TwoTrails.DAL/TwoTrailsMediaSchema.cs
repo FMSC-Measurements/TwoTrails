@@ -1,5 +1,4 @@
 ﻿using System;
-using TwoTrails.Core;
 
 namespace TwoTrails.DAL
 {

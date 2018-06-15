@@ -1,5 +1,4 @@
 ﻿using CSUtil.ComponentModel;
-using FMSC.Core;
 using FMSC.Core.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
@@ -9,7 +8,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TwoTrails.DAL
+﻿namespace TwoTrails.DAL
 {
 
     public enum ParseMode
