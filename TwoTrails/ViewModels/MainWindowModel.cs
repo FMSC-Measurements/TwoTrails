@@ -142,6 +142,7 @@ namespace TwoTrails.ViewModels
         
         public ICommand ViewLogCommand { get; private set; }
         public ICommand ExportReportCommand { get; private set; }
+        public ICommand CheckForUpdatesCommand { get; private set; }
         public ICommand AboutCommand { get; private set; }
         #endregion
 
@@ -176,6 +177,7 @@ namespace TwoTrails.ViewModels
 
             ViewLogCommand = new RelayCommand(x => Process.Start(App.LOG_FILE_PATH));
             ExportReportCommand = new RelayCommand(x => ExportReport());
+            CheckForUpdatesCommand = new RelayCommand(x => CheckForUpdates());
             AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(MainWindow));
 
             _Tabs = mainWindow.tabControl;
@@ -721,5 +723,31 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             }
         }
     
+        private void CheckForUpdates()
+        {
+            bool? res = TtUtils.CheckForUpdate();
+
+            if (res != null)
+            {
+                Settings.LastUpdateCheck = DateTime.Now;
+
+                if (res == true)
+                {
+                    if (MessageBox.Show("A new version of TwoTrails is ready for download. Would you like to download it now?", "TwoTrails Update",
+                                    MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                    {
+                        Process.Start(Consts.URL_TWOTRAILS);
+                    } 
+                }
+                else if (res == false)
+                {
+                    MessageBox.Show("You have the most recent version of TwoTrails", "TwoTrails Update");
+                }
+                else
+                {
+                    MessageBox.Show("Update check was unsuccessful.", "TwoTrails Update");
+                }
+            }
+        }
     }
 }
