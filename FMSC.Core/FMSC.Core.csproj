@@ -65,6 +65,7 @@
     <Compile Include="Controls\FlipCheckBox.xaml.cs">
       <DependentUpon>FlipCheckBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ListBoxEx.cs" />
     <Compile Include="Controls\ProgressControl.xaml.cs">
       <DependentUpon>ProgressControl.xaml</DependentUpon>
     </Compile>

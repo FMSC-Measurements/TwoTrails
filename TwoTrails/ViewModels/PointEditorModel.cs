@@ -2156,8 +2156,8 @@ namespace TwoTrails.ViewModels
 
         private void CreatePlots()
         {
-            Project.MainModel.MainWindow.IsEnabled = false;
-            CreatePlotsDialog.Show(Project, Project.MainModel.MainWindow, () => Project.MainModel.MainWindow.IsEnabled = true);
+            //Project.MainModel.MainWindow.IsEnabled = false;
+            CreatePlotsDialog.Show(Project, Project.MainModel.MainWindow);//, () => Project.MainModel.MainWindow.IsEnabled = true);
         }
 
         private void CreateCorridor()

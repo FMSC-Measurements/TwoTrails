@@ -4,6 +4,7 @@ using FMSC.Core;
 using FMSC.Core.ComponentModel.Commands;
 using FMSC.GeoSpatial.UTM;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -24,17 +25,20 @@ namespace TwoTrails.ViewModels
         public ICommand GenerateCommand { get; }
         public ICommand CloseCommand { get; }
 
-        public ObservableCollection<TtPolygon> Polygons { get; }
+        public ICommand InclusionPolygonsSelectedCommand { get; }
+        public ICommand ExclusionPolygonsSelectedCommand { get; }
+
+
+        public ObservableCollection<TtPolygon> InclusionPolygons { get; }
+        public ObservableCollection<TtPolygon> ExclusionPolygons { get; }
+
+        public List<TtPolygon> IncludedPolygons;
+        public List<TtPolygon> ExcludedPolygons;
+        
         public ObservableCollection<TtPoint> Points
         {
             get { return Get<ObservableCollection<TtPoint>>(); }
             set { Set(value); }
-        }
-
-        public TtPolygon SelectedPolygon
-        {
-            get { return Get<TtPolygon>(); }
-            set { Set(value, () => Points = new ObservableCollection<TtPoint>(_Manager.GetPoints(value.CN))); }
         }
 
         public TtPoint SelectedPoint { get { return Get<TtPoint>(); } set { Set(value); } }
@@ -65,18 +69,24 @@ namespace TwoTrails.ViewModels
             _Manager = project.Manager;
             Settings = project.Settings;
 
-            Polygons = new ObservableCollection<TtPolygon>(
+            InclusionPolygonsSelectedCommand = new RelayCommand(x => InclusionPolygonsSelected(x as IList));
+            ExclusionPolygonsSelectedCommand = new RelayCommand(x => ExclusionPolygonsSelected(x as IList));
+            
+            InclusionPolygons = new ObservableCollection<TtPolygon>(
                 _Manager.GetPolygons().Where(p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint())));
 
+            ExclusionPolygons = new ObservableCollection<TtPolygon>();
+            
+            IncludedPolygons = new List<TtPolygon>();
+            ExcludedPolygons = new List<TtPolygon>();
+            
             UomDistance = Distance.FeetTenths;
-
-            if (Polygons.Count > 0)
-                SelectedPolygon = Polygons[0];
 
             GridX = GridY = 100;
 
             SamplePoints = false;
             SampleTypeItem = SampleType.Percent;
+            SampleAmount = 100;
 
             BoundaryBuffer = false;
             BufferAmount = 10;
@@ -86,6 +96,47 @@ namespace TwoTrails.ViewModels
             GenerateCommand = new RelayCommand(x => ValidateSettings());
             CloseCommand = new RelayCommand(x => window.Close());
         }
+
+
+        private void InclusionPolygonsSelected(IList selectedItems)
+        {
+            ExclusionPolygons.Clear();
+            ExcludedPolygons.Clear();
+
+            IncludedPolygons.Clear();
+            IncludedPolygons.AddRange(selectedItems.Cast<TtPolygon>());
+            IncludedPolygons.Sort();
+
+            Points = new ObservableCollection<TtPoint>(IncludedPolygons.SelectMany(p => _Manager.GetPoints(p.CN)));
+            
+            foreach (TtPolygon poly in InclusionPolygons)
+            {
+                if (!selectedItems.Contains(poly))
+                    ExclusionPolygons.Add(poly);
+            }
+        }
+
+        private void ExclusionPolygonsSelected(IList selectedItems)
+        {
+            ExcludedPolygons.Clear();
+            ExcludedPolygons.AddRange(selectedItems.Cast<TtPolygon>());
+        }
+
+
+        public String GeneratedPolyName(int rev = 1)
+        {
+            if (IncludedPolygons.Count == 1)
+            {
+                return $"{IncludedPolygons.First().Name}_Plts{(rev > 1 ? $"_{rev.ToString()}" : String.Empty)}";
+            }
+            else if (IncludedPolygons.Count > 1)
+            {
+                return $"MultiPoly_{String.Join("_", IncludedPolygons.Select(p => p.Name))}_Plts{(rev > 1 ? $"_{rev.ToString()}" : String.Empty)}";
+            }
+            else
+                return "Plts";
+        }
+
 
         private void ValidateSettings()
         {
@@ -116,7 +167,7 @@ namespace TwoTrails.ViewModels
             }
 
             List<TtPolygon> polygons = _Manager.GetPolygons();
-            string gPolyName = $"{SelectedPolygon.Name}_Plts";
+            string gPolyName = GeneratedPolyName();
 
             TtPolygon poly = null;
 
@@ -132,8 +183,36 @@ namespace TwoTrails.ViewModels
 
             if (poly != null)
             {
-                if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to overwrite the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
-                    return;
+                if (!Settings.DeviceSettings.DeleteExistingPlots)
+                {
+                    if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                    {
+                        poly = null;
+
+                        for (int i = 2; i < Int32.MaxValue; i++)
+                        {
+                            gPolyName = GeneratedPolyName(i);
+
+                            try
+                            {
+                                poly = polygons.First(p => p.Name == gPolyName);
+                            }
+                            catch
+                            {
+                                poly = new TtPolygon()
+                                {
+                                    Name = gPolyName,
+                                    PointStartIndex = (polygons.Count + 1) * 1000 + 10,
+                                    Increment = 1
+                                };
+
+                                _Manager.AddPolygon(poly);
+                                break;
+                            }
+                        }
+                    }
+                    else return;
+                }
 
                 _Manager.DeletePointsInPolygon(poly.CN);
             }
@@ -160,43 +239,39 @@ namespace TwoTrails.ViewModels
 
             double angle = Tilt * -1;
 
-            poly.Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon: {SelectedPolygon.Name}";
+            poly.Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon{(IncludedPolygons.Count > 1 ? $"s {String.Join(", ", IncludedPolygons)}" : $" {IncludedPolygons.First().Name}")}";
 
-            IEnumerable<TtPoint> points = _Manager.GetPoints(SelectedPolygon.CN).Where(p => p.IsBndPoint());
+            List<IEnumerable<TtPoint>> polyIncludeTtPoints = IncludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint())).ToList();
 
-            TtMetadata defMeta = points.First().Metadata;
+            TtMetadata defMeta = polyIncludeTtPoints.First().First().Metadata;
 
-            IEnumerable<UTMCoords> coords = points.Select(p => TtUtils.GetCoords(p, defMeta.Zone));
-            List<Point> utmPoints = points
-                .Select(p =>
-                {
-                    UTMCoords c = TtUtils.GetCoords(p, defMeta.Zone);
-                    return new Point(c.X, c.Y);
-                }).ToList();
-
-            if (utmPoints[0] != utmPoints[utmPoints.Count - 1])
-                utmPoints.Add(utmPoints[0]);
-
+            List<IEnumerable<Point>> polyIncudePoints = polyIncludeTtPoints.Select(pp => pp.Select(p => TtUtils.GetCoords(p, defMeta.Zone).ToPoint())).ToList();
+            List<Point> allPoints = polyIncudePoints.SelectMany(pts => pts).ToList(); ;
+            
             UtmExtent.Builder builder = new UtmExtent.Builder(defMeta.Zone);
-            builder.Include(utmPoints);
-            UtmExtent extent = builder.Build();
+            builder.Include(allPoints);
+            UtmExtent totalExtents = builder.Build();
 
             Random rand = new Random();
             UTMCoords startCoords = SelectedPoint != null ?
                 TtUtils.GetCoords(SelectedPoint, defMeta.Zone) :
                 new UTMCoords(
-                    (rand.NextDouble() * (extent.East - extent.West) + extent.West),
-                    (rand.NextDouble() * (extent.North - extent.South) + extent.South),
+                    (rand.NextDouble() * (totalExtents.East - totalExtents.West) + totalExtents.West),
+                    (rand.NextDouble() * (totalExtents.North - totalExtents.South) + totalExtents.South),
                     defMeta.Zone
                 );
             
-            PolygonCalculator calc = new PolygonCalculator(utmPoints);
-            PolygonCalculator.Boundaries bnds = calc.PointBoundaries;
+            PolygonCalculator.Boundaries totalPolyBnds = new PolygonCalculator(allPoints).PointBoundaries;
+
+            List<PolygonCalculator> polyIncludeCalcs = polyIncudePoints.Select(pp => new PolygonCalculator(pp)).ToList();
+            List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint()))
+                                                    .Select(pp => pp.Select(p => TtUtils.GetCoords(p, defMeta.Zone).ToPoint()))
+                                                    .Select(pp => new PolygonCalculator(pp)).ToList();
 
             Point farCorner = TtUtils.GetFarthestCorner(
                 startCoords.X, startCoords.Y,
-                bnds.TopLeft.Y, bnds.BottomRight.Y,
-                bnds.TopLeft.X, bnds.BottomRight.X);
+                totalPolyBnds.TopLeft.Y, totalPolyBnds.BottomRight.Y,
+                totalPolyBnds.TopLeft.X, totalPolyBnds.BottomRight.X);
 
             double dist = MathEx.Distance(startCoords.X, startCoords.Y, farCorner.X, farCorner.Y);
 
@@ -205,12 +280,12 @@ namespace TwoTrails.ViewModels
 
             double farLeft, farRight, farTop, farBottom;
 
-            PolygonCalculator inBnds = new PolygonCalculator(new Point[]
+            PolygonCalculator inTotalPolyBnds = new PolygonCalculator(new Point[]
             {
-                bnds.TopLeft,
-                new Point(bnds.BottomRight.X, bnds.TopLeft.Y),
-                bnds.BottomRight,
-                new Point(bnds.TopLeft.X, bnds.BottomRight.Y)
+                totalPolyBnds.TopLeft,
+                new Point(totalPolyBnds.BottomRight.X, totalPolyBnds.TopLeft.Y),
+                totalPolyBnds.BottomRight,
+                new Point(totalPolyBnds.TopLeft.X, totalPolyBnds.BottomRight.Y)
             });
 
             farLeft = startCoords.X - (ptAmtX * gridX);
@@ -230,9 +305,12 @@ namespace TwoTrails.ViewModels
                 while (k >= farBottom)
                 {
                     tmp = angle != 0 ? MathEx.RotatePoint(j, k, angle, startCoords.X, startCoords.Y) : new Point(j, k);
-                    
-                    if (calc.IsPointInPolygon(tmp.X, tmp.Y))
-                        addPoints.Add(tmp);
+
+                    foreach (PolygonCalculator pc in polyIncludeCalcs)
+                    {
+                        if (pc.IsPointInPolygon(tmp.X, tmp.Y) && !polyExcludeCalcs.Any(pec => pec.IsPointInPolygon(tmp.X, tmp.Y)))
+                            addPoints.Add(tmp);
+                    }
 
                     k -= gridY;
                 }
@@ -247,13 +325,16 @@ namespace TwoTrails.ViewModels
                 for (i = addPoints.Count - 1; i > -1; i--)
                 {
                     Point p = addPoints[i];
-                    for (int m = 0; m < utmPoints.Count - 1; m++)
+                    foreach (List<Point> points in polyIncudePoints.Select(pts => pts.ToList()))
                     {
-                        if (MathEx.LineToPointDistance2D(utmPoints[m], utmPoints[m + 1], p) < ba)
+                        for (int m = 0; m < points.Count - 1; m++)
                         {
-                            addPoints.RemoveAt(i);
-                            break;
-                        }
+                            if (MathEx.LineToPointDistance2D(points[m], points[m + 1], p) < ba)
+                            {
+                                addPoints.RemoveAt(i);
+                                break;
+                            }
+                        } 
                     }
                     
                 }
@@ -298,6 +379,15 @@ namespace TwoTrails.ViewModels
 
             MessageBox.Show($"{addPoints.Count} WayPoints Created");
             IsGenerating = false;
+        }
+    }
+
+
+    public static class UTMCoordExtension
+    {
+        public static Point ToPoint(this UTMCoords coords)
+        {
+            return new Point(coords.X, coords.Y);
         }
     }
 }
