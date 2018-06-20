@@ -73,6 +73,8 @@ namespace TwoTrails.ViewModels
             nameof(Comment),
             nameof(SameComment)
         };
+        
+        private bool CtrlKeyPressed { get; set; }
         #endregion
 
         #region Commands
@@ -767,10 +769,18 @@ namespace TwoTrails.ViewModels
         public bool? HasLinks { get { return Get<bool?>(); } set { Set(value); } }
         #endregion
 
-
-
         public PointEditorModel(TtProject project)
         {
+            EventManager.RegisterClassHandler(typeof(Control), Control.KeyDownEvent, new KeyEventHandler((s, e) => {
+                if (e.Key == Key.LeftCtrl)
+                    CtrlKeyPressed = true;
+            }), true);
+            
+            EventManager.RegisterClassHandler(typeof(Control), Control.KeyUpEvent, new KeyEventHandler((s, e) => {
+                if (e.Key == Key.LeftCtrl)
+                    CtrlKeyPressed = false;
+            }), true);
+
             Project = project;
             Manager = project.HistoryManager;
             Manager.HistoryChanged += (s, e) =>
@@ -1113,7 +1123,10 @@ namespace TwoTrails.ViewModels
 
         private void Polygon_ItemCheckedChanged(object sender, EventArgs e)
         {
-            UpdateCheckedItems(sender, ref _CheckedPolygons, ref _Polygons);
+            if (CtrlKeyPressed)
+                OnlyCheckThisItem(sender, ref _CheckedPolygons, ref _Polygons);
+            else
+                UpdateCheckedItems(sender, ref _CheckedPolygons, ref _Polygons);
         }
 
 
@@ -1149,7 +1162,10 @@ namespace TwoTrails.ViewModels
 
         private void Metadata_ItemCheckedChanged(object sender, EventArgs e)
         {
-            UpdateCheckedItems(sender, ref _CheckedMetadata, ref _Metadatas);
+            if (CtrlKeyPressed)
+                OnlyCheckThisItem(sender, ref _CheckedMetadata, ref _Metadatas);
+            else
+                UpdateCheckedItems(sender, ref _CheckedMetadata, ref _Metadatas);
         }
         
 
@@ -1185,7 +1201,10 @@ namespace TwoTrails.ViewModels
 
         private void Group_ItemCheckedChanged(object sender, EventArgs e)
         {
-            UpdateCheckedItems(sender, ref _CheckedGroups, ref _Groups);
+            if (CtrlKeyPressed)
+                OnlyCheckThisItem(sender, ref _CheckedGroups, ref _Groups);
+            else
+                UpdateCheckedItems(sender, ref _CheckedGroups, ref _Groups);
         }
 
 
@@ -1217,6 +1236,40 @@ namespace TwoTrails.ViewModels
             }
         }
 
+        private void OnlyCheckThisItem<T>(object sender, ref Dictionary<string, bool> checkedItems,
+            ref ObservableCollection<CheckedListItem<T>> items) where T : TtObject
+        {
+            if (sender is CheckedListItem<T> cp)
+            {
+                if (cp.Item.CN != Consts.FullGuid)
+                {
+                    foreach (CheckedListItem<T> item in items.Where(cli => cli.Item.CN != cp.Item.CN))
+                    {
+                        checkedItems[item.Item.CN] = false;
+                        item.SetChecked(false, false);
+                    }
+
+                    cp.SetChecked(true, false);
+                    checkedItems[cp.Item.CN] = true;
+                }
+                else
+                {
+                    bool isChecked = cp.IsChecked;
+
+                    foreach (var key in checkedItems.Keys.ToList())
+                    {
+                        checkedItems[key] = isChecked;
+                    }
+
+                    foreach (CheckedListItem<T> item in items)
+                    {
+                        item.SetChecked(isChecked, false);
+                    }
+                }
+
+                Points.Refresh();
+            }
+        }
 
         private void OpType_ItemCheckedChanged(object sender, EventArgs e)
         {
@@ -1224,7 +1277,25 @@ namespace TwoTrails.ViewModels
             {
                 if (cp.Item != "All")
                 {
-                    _CheckedOpTypes[(OpType)Enum.Parse(typeof(OpType), cp.Item)] = cp.IsChecked;
+                    if (CtrlKeyPressed)
+                    {
+                        foreach (CheckedListItem<string> item in _OpTypes)
+                        {
+                            item.SetChecked(false, false);
+                        }
+
+                        foreach (OpType op in Enum.GetValues(typeof(OpType)))
+                        {
+                            _CheckedOpTypes[op] = false;
+                        }
+
+                        _CheckedOpTypes[(OpType)Enum.Parse(typeof(OpType), cp.Item)] = true;
+                        cp.SetChecked(true, false);
+                    }
+                    else
+                    {
+                        _CheckedOpTypes[(OpType)Enum.Parse(typeof(OpType), cp.Item)] = cp.IsChecked;
+                    }
                 }
                 else
                 {
