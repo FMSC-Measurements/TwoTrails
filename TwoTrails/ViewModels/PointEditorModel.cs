@@ -769,6 +769,7 @@ namespace TwoTrails.ViewModels
         public bool? HasLinks { get { return Get<bool?>(); } set { Set(value); } }
         #endregion
 
+
         public PointEditorModel(TtProject project)
         {
             EventManager.RegisterClassHandler(typeof(Control), Control.KeyDownEvent, new KeyEventHandler((s, e) => {
@@ -2236,6 +2237,15 @@ namespace TwoTrails.ViewModels
             Manager.CreateCorridor(GetSortedSelectedPoints().Where(p => p.OnBoundary), Polygon);
         }
 
+        private void IsPointInPolygon()
+        {
+            //TODO
+        }
+
+        private void GetDistanceToPolygonEdge()
+        {
+            //TODO
+        }
 
         private void ModifyDataDictionary()
         {

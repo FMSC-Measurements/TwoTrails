@@ -10,9 +10,9 @@ namespace FMSC.Core
             return Distance(p1.X, p1.Y, p2.X, p2.Y);
         }
 
-        public static double Distance(double x1, double y1, double x2, double y2)
+        public static double Distance(double aX, double aY, double bX, double bY)
         {
-            return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
+            return Math.Sqrt(Math.Pow(bX - aX, 2) + Math.Pow(bY - aY, 2));
         }
 
 
@@ -32,39 +32,50 @@ namespace FMSC.Core
         //Compute the dot product AB . AC
         private static double DotProduct(Point pointA, Point pointB, Point pointC)
         {
-            Point AB = new Point(), BC = new Point();
-            AB.X = pointB.X - pointA.X;
-            AB.Y = pointB.Y - pointA.Y;
-            BC.X = pointC.X - pointB.X;
-            BC.Y = pointC.Y - pointB.Y;
-            return AB.X * BC.X + AB.Y * BC.Y;
+            return DotProduct(pointA.X, pointA.Y, pointB.X, pointB.Y, pointC.X, pointC.Y);
         }
+        
+        //Compute the dot product AB . AC
+        private static double DotProduct(double aX, double aY, double bX, double bY, double cX, double cY)
+        {
+            return (bX - aX) * (cX - bX) + (bY - aY) * (cY - bY);
+        }
+
 
         //Compute the cross product AB x AC
         private static double CrossProduct(Point pointA, Point pointB, Point pointC)
         {
-            Point AB = new Point(), AC = new Point();
-            AB.X = pointB.X - pointA.X;
-            AB.Y = pointB.Y - pointA.Y;
-            AC.X = pointC.X - pointA.X;
-            AC.Y = pointC.Y - pointA.Y;
-            return AB.X * AC.Y - AB.Y * AC.X;
+            return CrossProduct(pointA.X, pointA.Y, pointB.X, pointB.Y, pointC.X, pointC.Y);
         }
+
+        //Compute the cross product AB x AC
+        private static double CrossProduct(double aX, double aY, double bX, double bY, double cX, double cY)
+        {
+            return (bX - aX) * (cY - aY) - bY - aY * (cX - aX);
+        }
+        
 
         //Compute the distance from AB to C
         //if isSegment is true, AB is a segment, not a line.
         public static double LineToPointDistance2D(Point pointA, Point pointB, Point pointC, bool isSegment = true)
         {
-            double dist = CrossProduct(pointA, pointB, pointC) / Distance(pointA, pointB);
+            return LineToPointDistance2D(pointA.X, pointA.Y, pointB.X, pointB.Y, pointC.X, pointC.Y, isSegment);
+        }
+
+        //Compute the distance from AB to C
+        //if isSegment is true, AB is a segment, not a line.
+        public static double LineToPointDistance2D(double aX, double aY, double bX, double bY, double cX, double cY, bool isSegment = true)
+        {
+            double dist = CrossProduct(aX, aY, bX, bY, cX, cY) / Distance(aX, aY, bX, bY);
             if (isSegment)
             {
-                double dot1 = DotProduct(pointA, pointB, pointC);
+                double dot1 = DotProduct(aX, aY, bX, bY, cX, cY);
                 if (dot1 > 0)
-                    return Distance(pointB, pointC);
+                    return Distance(bX, bY, cX, cY);
 
-                double dot2 = DotProduct(pointB, pointA, pointC);
+                double dot2 = DotProduct(aX, aY, bX, bY, cX, cY);
                 if (dot2 > 0)
-                    return Distance(pointA, pointC);
+                    return Distance(aX, aY, cX, cY);
             }
             return Math.Abs(dist);
         }

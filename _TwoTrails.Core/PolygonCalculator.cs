@@ -1,4 +1,5 @@
 ﻿using CSUtil;
+using FMSC.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace TwoTrails.Core
     {
         private int polyCorners;
         private double[] polyX, polyY, constant, multiple;
+
 
         public PolygonCalculator(IEnumerable<Point> points)
         {
@@ -71,6 +73,7 @@ namespace TwoTrails.Core
             }
         }
 
+
         public bool IsPointInPolygon(Point point)
         {
             return IsPointInPolygon(point.X, point.Y);
@@ -91,6 +94,28 @@ namespace TwoTrails.Core
             }
 
             return oddNodes;
+        }
+
+
+        public double ShortestDistanceFromPolygonEdge(Point point)
+        {
+            return ShortestDistanceToPolygonEdge(point.X, point.Y);
+        }
+
+        public double ShortestDistanceToPolygonEdge(double x, double y)
+        {
+            double shortestDist = double.MaxValue, temp;
+
+            for (int i = 0; i < polyX.Length; i++)
+            {
+                temp = MathEx.LineToPointDistance2D(polyX[i], polyY[i], polyX[i + 1], polyY[i + 1], x, y);
+                if (temp < shortestDist)
+                {
+                    shortestDist = temp;
+                }
+            }
+
+            return shortestDist;
         }
 
 
