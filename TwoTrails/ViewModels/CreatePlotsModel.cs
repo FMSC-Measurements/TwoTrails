@@ -277,21 +277,11 @@ namespace TwoTrails.ViewModels
 
             int ptAmtY = (int)(Math.Floor(dist / gridY) + 1);
             int ptAmtX = (int)(Math.Floor(dist / gridX) + 1);
-
-            double farLeft, farRight, farTop, farBottom;
-
-            PolygonCalculator inTotalPolyBnds = new PolygonCalculator(new Point[]
-            {
-                totalPolyBnds.TopLeft,
-                new Point(totalPolyBnds.BottomRight.X, totalPolyBnds.TopLeft.Y),
-                totalPolyBnds.BottomRight,
-                new Point(totalPolyBnds.TopLeft.X, totalPolyBnds.BottomRight.Y)
-            });
-
-            farLeft = startCoords.X - (ptAmtX * gridX);
-            farRight = startCoords.X + (ptAmtX * gridX);
-            farTop = startCoords.Y + (ptAmtY * gridY);
-            farBottom = startCoords.Y - (ptAmtY * gridY);
+            
+            double farLeft = startCoords.X - (ptAmtX * gridX);
+            double farRight = startCoords.X + (ptAmtX * gridX);
+            double farTop = startCoords.Y + (ptAmtY * gridY);
+            double farBottom = startCoords.Y - (ptAmtY * gridY);
             
             int i = 0;
             double j = farLeft;

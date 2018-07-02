@@ -336,7 +336,7 @@
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
                                 <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentPolygon.Name, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy (Meters)" />
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy (Meters)*" />
                                 <Grid Grid.Column="0" Grid.Row="3">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -454,7 +454,7 @@
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
 
-                                        <GroupBox Header="GPS Contribution*" Grid.Column="0" Grid.Row="0">
+                                        <GroupBox Header="GPS Contribution" Grid.Column="0" Grid.Row="0">
                                             <Grid Margin="5,0,5,0">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -518,7 +518,7 @@
                                     </Grid>
                                 </GroupBox>
 
-                                <TextBlock Grid.Row="14" Text="*Or perimeter error such as taping error"/>
+                                <TextBlock Grid.Row="14" Text="*Such as GPS error or taping error"/>
                                 <TextBlock Grid.Row="15" Text="**Area-Error/Area to be less than 10%"/>
                             </Grid>
                         </ScrollViewer>
