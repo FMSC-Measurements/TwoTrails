@@ -242,6 +242,9 @@ namespace TwoTrails.Mapping
             };
 
             point.PropertyChanged += Point_PropertyChanged;
+            if (point is QuondamPoint qp)
+                qp.ParentPoint.PropertyChanged += Point_PropertyChanged;
+
             point.LocationChanged += UpdateLocation;
             UpdateLocation(point);
 
@@ -274,6 +277,11 @@ namespace TwoTrails.Mapping
             if (e.PropertyName == nameof(TtPoint.OnBoundary))
             {
                 UpdateVisibility();
+            }
+            else if (e.PropertyName == nameof(TtPoint.PID))
+            {
+                UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
+                AdjPushpin.ToolTip = new PointInfoBox(this, true);
             }
         }
 
@@ -322,13 +330,13 @@ namespace TwoTrails.Mapping
 
         private void LoadUnAdjToolTip(Object sender, ToolTipEventArgs e)
         {
-            if (UnAdjPushpin.ToolTip is string)
+            if (!(UnAdjPushpin.ToolTip is PointInfoBox))
                 UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
         }
 
         private void LoadAdjToolTip(Object sender, ToolTipEventArgs e)
         {
-            if (AdjPushpin.ToolTip is string)
+            if (!(AdjPushpin.ToolTip is PointInfoBox))
                 AdjPushpin.ToolTip = new PointInfoBox(this, true);
         }
 

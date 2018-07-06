@@ -659,8 +659,9 @@
                                 <Button.ToolTip>
                                     <TextBlock>
                                         <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0} ({1})">
+                                            <MultiBinding StringFormat="{}{0} ({1}) : {2}">
                                                 <Binding Path="ParentPoint.PID" />
+                                                <Binding Path="ParentPoint.OpType" />
                                                 <Binding Path="ParentPoint.Polygon" />
                                             </MultiBinding>
                                         </TextBlock.Text>

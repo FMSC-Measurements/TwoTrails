@@ -1876,9 +1876,9 @@ namespace TwoTrails.ViewModels
             if (!MultipleSelections || MessageBox.Show("Multiple Quondams are selected. Do you wish to change all of their ParentPoints to a new Point?",
                     "Multiple ParentPoints Changing", MessageBoxButton.YesNo, MessageBoxImage.Stop, MessageBoxResult.No) == MessageBoxResult.Yes)
             {
-                List<TtPoint> hidePoints = new List<TtPoint>(SelectedPoints.Cast<TtPoint>());
-
-                SelectPointDialog spd = new SelectPointDialog(Manager, hidePoints)
+                SelectPointDialog spd = new SelectPointDialog(Manager,
+                    !MultipleSelections && (SelectedPoint is QuondamPoint sp) ? sp.ParentPoint : null,
+                    new List<TtPoint>(SelectedPoints.Cast<TtPoint>()))
                 {
                     Owner = Project.MainModel.MainWindow
                 };

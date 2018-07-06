@@ -117,7 +117,7 @@ namespace TwoTrails.Core.Points
 
         public override string ToString()
         {
-            return $"{base.ToString()}{(ParentPoint != null ? $": {ParentPoint.ToString()}" : String.Empty)}";
+            return $"{base.ToString()}{(ParentPoint != null ? $" \u2794 {ParentPoint.ToString()} : {ParentPoint.Polygon.Name}" : String.Empty)}";
         }
 
 

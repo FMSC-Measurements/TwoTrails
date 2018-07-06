@@ -6,11 +6,11 @@
         xmlns:local="clr-namespace:TwoTrails.Dialogs"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="NoResize"
-        Title="Select Point" Height="300" Width="400">
+        ResizeMode="CanResize"
+        Title="Select Point" Height="300" Width="400" MinHeight="300" MinWidth="400">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto" MinWidth="100"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -20,7 +20,7 @@
         </Grid.RowDefinitions>
         
         <ListBox Name="lbPolys" Grid.Column="0" Grid.Row="0" ItemsSource="{Binding Polygons, Mode=OneWay}" SelectionChanged="Polygon_Selected"/>
-        <ListBox Name="lbPoints" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding SelectedPoint}"/>
+        <ListBox Name="lbPoints" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding Points, Mode=OneWay}"/>
 
         <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="2">
             <Grid.ColumnDefinitions>
