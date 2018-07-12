@@ -88,13 +88,13 @@
         "Entry"
         {
         "MsmKey" = "8:_8C252E49660B6445EAD36B4C2691D8E8"
-        "OwnerKey" = "8:_AB6096E55E15CED37ABA0C11627BE9D0"
+        "OwnerKey" = "8:_B03F2249E664667B2B2B843CBD318A21"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_8C252E49660B6445EAD36B4C2691D8E8"
-        "OwnerKey" = "8:_B03F2249E664667B2B2B843CBD318A21"
+        "OwnerKey" = "8:_AB6096E55E15CED37ABA0C11627BE9D0"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -112,13 +112,13 @@
         "Entry"
         {
         "MsmKey" = "8:_9DAFCC4055C31D1725A8238D7A165100"
-        "OwnerKey" = "8:_A839D22BDB4186E6980379912BD6D0F8"
+        "OwnerKey" = "8:_B03F2249E664667B2B2B843CBD318A21"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_9DAFCC4055C31D1725A8238D7A165100"
-        "OwnerKey" = "8:_B4E40A9DA5AB4620CE916DAD801B4F4B"
+        "OwnerKey" = "8:_63E2D6A929597570FD93158DCBC770C3"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -130,13 +130,13 @@
         "Entry"
         {
         "MsmKey" = "8:_9DAFCC4055C31D1725A8238D7A165100"
-        "OwnerKey" = "8:_63E2D6A929597570FD93158DCBC770C3"
+        "OwnerKey" = "8:_B4E40A9DA5AB4620CE916DAD801B4F4B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_9DAFCC4055C31D1725A8238D7A165100"
-        "OwnerKey" = "8:_B03F2249E664667B2B2B843CBD318A21"
+        "OwnerKey" = "8:_A839D22BDB4186E6980379912BD6D0F8"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -148,7 +148,7 @@
         "Entry"
         {
         "MsmKey" = "8:_A839D22BDB4186E6980379912BD6D0F8"
-        "OwnerKey" = "8:_B4E40A9DA5AB4620CE916DAD801B4F4B"
+        "OwnerKey" = "8:_B03F2249E664667B2B2B843CBD318A21"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -160,7 +160,7 @@
         "Entry"
         {
         "MsmKey" = "8:_A839D22BDB4186E6980379912BD6D0F8"
-        "OwnerKey" = "8:_B03F2249E664667B2B2B843CBD318A21"
+        "OwnerKey" = "8:_B4E40A9DA5AB4620CE916DAD801B4F4B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -226,73 +226,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_496E5526D5DBA4530ECAAA1CA021A7F5"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8A9C0E72AADD4BD34406189E53D681CA"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8C252E49660B6445EAD36B4C2691D8E8"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_AB6096E55E15CED37ABA0C11627BE9D0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9DAFCC4055C31D1725A8238D7A165100"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_11F58CC9F544550AD4563093A5262BAF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_21BA412BBBBC4F76BCAE8917E1B25F7C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_A839D22BDB4186E6980379912BD6D0F8"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_C742C03A68815707EB43D78A34A964CB"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_63E2D6A929597570FD93158DCBC770C3"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B4E40A9DA5AB4620CE916DAD801B4F4B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_10EE5AA521955EE2AFD52E803A960C66"
+        "OwnerKey" = "8:_D05B75F81084F516E8D66D4CB4F28003"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -304,19 +238,85 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D05B75F81084F516E8D66D4CB4F28003"
+        "OwnerKey" = "8:_10EE5AA521955EE2AFD52E803A960C66"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_467941AD13367223863278E07AA7E99E"
+        "OwnerKey" = "8:_B4E40A9DA5AB4620CE916DAD801B4F4B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_63E2D6A929597570FD93158DCBC770C3"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_C742C03A68815707EB43D78A34A964CB"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_A839D22BDB4186E6980379912BD6D0F8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_21BA412BBBBC4F76BCAE8917E1B25F7C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_11F58CC9F544550AD4563093A5262BAF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9DAFCC4055C31D1725A8238D7A165100"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_AB6096E55E15CED37ABA0C11627BE9D0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_8C252E49660B6445EAD36B4C2691D8E8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_8A9C0E72AADD4BD34406189E53D681CA"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_496E5526D5DBA4530ECAAA1CA021A7F5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_239F1EA1DB01433D815A62F8B26E1386"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_467941AD13367223863278E07AA7E99E"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -371,7 +371,7 @@
         "InstallerBootstrapper" = "3:2"
             "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
             {
-            "Enabled" = "11:TRUE"
+            "Enabled" = "11:FALSE"
             "PromptEnabled" = "11:TRUE"
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
@@ -421,6 +421,11 @@
             "AssemblyAsmDisplayName" = "8:CsvHelper, Version=6.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_10EE5AA521955EE2AFD52E803A960C66"
+                    {
+                    "Name" = "8:CsvHelper.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:CsvHelper.DLL"
             "TargetName" = "8:"
@@ -447,6 +452,11 @@
             "AssemblyAsmDisplayName" = "8:Microsoft.Maps.MapControl.WPF, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_11F58CC9F544550AD4563093A5262BAF"
+                    {
+                    "Name" = "8:Microsoft.Maps.MapControl.WPF.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:Microsoft.Maps.MapControl.WPF.DLL"
             "TargetName" = "8:"
@@ -473,6 +483,11 @@
             "AssemblyAsmDisplayName" = "8:PowerCollections, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2573bf8a1bdddcd5, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_21BA412BBBBC4F76BCAE8917E1B25F7C"
+                    {
+                    "Name" = "8:PowerCollections.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:PowerCollections.DLL"
             "TargetName" = "8:"
@@ -530,6 +545,11 @@
             "AssemblyAsmDisplayName" = "8:System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_467941AD13367223863278E07AA7E99E"
+                    {
+                    "Name" = "8:System.Windows.Interactivity.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:System.Windows.Interactivity.DLL"
             "TargetName" = "8:"
@@ -587,6 +607,11 @@
             "AssemblyAsmDisplayName" = "8:NetTopologySuite.IO.ShapeFile, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_63E2D6A929597570FD93158DCBC770C3"
+                    {
+                    "Name" = "8:NetTopologySuite.IO.ShapeFile.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:NetTopologySuite.IO.ShapeFile.DLL"
             "TargetName" = "8:"
@@ -610,7 +635,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:TwoTrails, Version=0.9.6.29175, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:TwoTrails, Version=1.0.2.31429, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_69904C8FA7C446E6802997F73E3A4899"
@@ -644,6 +669,11 @@
             "AssemblyAsmDisplayName" = "8:System.Data.SQLite, Version=1.0.106.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_8A9C0E72AADD4BD34406189E53D681CA"
+                    {
+                    "Name" = "8:System.Data.SQLite.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:System.Data.SQLite.DLL"
             "TargetName" = "8:"
@@ -670,6 +700,11 @@
             "AssemblyAsmDisplayName" = "8:CSUtilSlim, Version=1.0.6654.25126, Culture=neutral, PublicKeyToken=5d20ef7f7003f986, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_8C252E49660B6445EAD36B4C2691D8E8"
+                    {
+                    "Name" = "8:CSUtilSlim.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:CSUtilSlim.DLL"
             "TargetName" = "8:"
@@ -716,6 +751,11 @@
             "AssemblyAsmDisplayName" = "8:GeoAPI, Version=1.7.4.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_9DAFCC4055C31D1725A8238D7A165100"
+                    {
+                    "Name" = "8:GeoAPI.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:GeoAPI.DLL"
             "TargetName" = "8:"
@@ -742,6 +782,11 @@
             "AssemblyAsmDisplayName" = "8:NetTopologySuite, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_A839D22BDB4186E6980379912BD6D0F8"
+                    {
+                    "Name" = "8:NetTopologySuite.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:NetTopologySuite.DLL"
             "TargetName" = "8:"
@@ -768,6 +813,11 @@
             "AssemblyAsmDisplayName" = "8:FMSC.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_AB6096E55E15CED37ABA0C11627BE9D0"
+                    {
+                    "Name" = "8:FMSC.Core.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:FMSC.Core.DLL"
             "TargetName" = "8:"
@@ -794,6 +844,11 @@
             "AssemblyAsmDisplayName" = "8:TwoTrails.DAL, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_B03F2249E664667B2B2B843CBD318A21"
+                    {
+                    "Name" = "8:TwoTrails.DAL.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:TwoTrails.DAL.DLL"
             "TargetName" = "8:"
@@ -820,6 +875,11 @@
             "AssemblyAsmDisplayName" = "8:NetTopologySuite.IO.GeoTools, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_B4E40A9DA5AB4620CE916DAD801B4F4B"
+                    {
+                    "Name" = "8:NetTopologySuite.IO.GeoTools.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:NetTopologySuite.IO.GeoTools.DLL"
             "TargetName" = "8:"
@@ -846,6 +906,11 @@
             "AssemblyAsmDisplayName" = "8:NetTopologySuite.IO, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_C742C03A68815707EB43D78A34A964CB"
+                    {
+                    "Name" = "8:NetTopologySuite.IO.DLL"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:NetTopologySuite.IO.DLL"
             "TargetName" = "8:"
@@ -1003,6 +1068,17 @@
             "Property" = "8:ProgramMenuFolder"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_F98E633DE7A2486C9B82A642640F9669"
+                    {
+                    "Name" = "8:FMSC"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_50A7B5D7BA284E2DA92E876825E4BCBD"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_D648227101A04BE7BF4BD70504629530"
@@ -1032,9 +1108,9 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TwoTrails"
-        "ProductCode" = "8:{307C7620-FC3A-44A1-8339-30F88C09B5DC}"
-        "PackageCode" = "8:{719305D3-2AE4-4EEF-BE57-9D10DC1485B6}"
-        "UpgradeCode" = "8:{B5AC0432-4D80-45E6-AD05-A4447F386314}"
+        "ProductCode" = "8:{CCF5C47E-5353-40E8-84D6-DFA24821839C}"
+        "PackageCode" = "8:{6093E64E-39AF-4A53-AA73-3F2DD03828A3}"
+        "UpgradeCode" = "8:{3F39E4A3-41AF-4465-94BF-F45C37B5CD74}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -1153,32 +1229,32 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_7C4F2D6BF5AE46FEA1C6DD5859A5D669"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_07EA2A012C984768BB0D281C27F4CEBC"
             {
             "Name" = "8:TwoTrails"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
+            "IconIndex" = "3:1"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_8CDC92A4BF614848A5DE36F23C3CE977"
-            "Folder" = "8:_8CDC92A4BF614848A5DE36F23C3CE977"
-            "WorkingFolder" = "8:_8CDC92A4BF614848A5DE36F23C3CE977"
-            "Icon" = "8:"
+            "Target" = "8:_69904C8FA7C446E6802997F73E3A4899"
+            "Folder" = "8:_D648227101A04BE7BF4BD70504629530"
+            "WorkingFolder" = "8:_640CBCA699CB4465B9BFEF37E85838E0"
+            "Icon" = "8:_69904C8FA7C446E6802997F73E3A4899"
             "Feature" = "8:"
             }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_FEF6131B29FF4C53B45E8B0C7554F399"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_B1456D3933E24EBBAE2D96C5B0C3E5B2"
             {
             "Name" = "8:TwoTrails"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
+            "IconIndex" = "3:1"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_D648227101A04BE7BF4BD70504629530"
-            "Folder" = "8:_D648227101A04BE7BF4BD70504629530"
-            "WorkingFolder" = "8:_D648227101A04BE7BF4BD70504629530"
-            "Icon" = "8:"
+            "Target" = "8:_69904C8FA7C446E6802997F73E3A4899"
+            "Folder" = "8:_F98E633DE7A2486C9B82A642640F9669"
+            "WorkingFolder" = "8:_640CBCA699CB4465B9BFEF37E85838E0"
+            "Icon" = "8:_69904C8FA7C446E6802997F73E3A4899"
             "Feature" = "8:"
             }
         }
