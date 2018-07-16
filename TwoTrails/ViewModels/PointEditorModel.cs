@@ -791,92 +791,6 @@ namespace TwoTrails.ViewModels
                 OnSelectionChanged();
             };
 
-            #region Init Commands
-            RefreshPoints = new RelayCommand(x => Points.Refresh());
-
-            CopyCellValueCommand = new BindedRelayCommand<PointEditorModel>(
-                x => CopyCellValue(x as DataGrid), x => HasSelection,
-                this, x => x.HasSelection);
-            
-            ExportValuesCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ExportValues(x as DataGrid), x => HasSelection,
-                this, x => x.HasSelection);
-
-            ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
-
-            ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ChangeQuondamParent(), x => OnlyQuondams && !MultipleSelections,
-                this, x => new { x.OnlyQuondams, x.MultipleSelections });
-            
-            RenamePointsCommand = new BindedRelayCommand<PointEditorModel>(
-                x => RenamePoints(), x => MultipleSelections,
-                this, x => x.MultipleSelections);
-
-            ReverseSelectedCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ReverseSelection(), x => MultipleSelections,
-                this, x => x.MultipleSelections);
-
-            ResetPointCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ResetPoint(), x => HasSelection,
-                this, x => x.HasSelection);
-            
-            ResetPointFieldCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ResetPointField(x as DataGrid), x => HasSelection,
-                this, x => x.HasSelection);
-
-            DeleteCommand = new BindedRelayCommand<PointEditorModel>(
-                x => DeletePoint(), x => HasSelection,
-                this, x => x.HasSelection);
-
-            CreatePointCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(x => CreateNewPoint(x != null ? (OpType)x : OpType.GPS),
-                x => Manager.Polygons.Count > 0,
-                Manager.Polygons, x => x.Count);
-
-            CreateQuondamsCommand = new BindedRelayCommand<PointEditorModel>(
-                x => CreateQuondams(), x => HasSelection,
-                this, x => x.HasSelection);
-
-            ConvertPointsCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ConvertPoints(), x => OnlyQuondams || OnlyTravTypes,
-                this, x => new { x.OnlyQuondams, x.OnlyTravTypes });
-
-            MovePointsCommand = new BindedRelayCommand<PointEditorModel>(
-                x => MovePoints(), x => HasSelection,
-                this, x => x.HasSelection);
-
-            RetraceCommand = new BindedRelayCommand<PointEditorModel>(
-                x => Retrace(), x => Points.Count > 0,
-                this, x => x.Points.Count);
-
-            CreatePlotsCommand = new BindedRelayCommand<PointEditorModel>(
-                x => CreatePlots(), x => Polygons.Count > 1,
-                this, x => x.Polygons.Count);
-
-            CreateCorridorCommand = new BindedRelayCommand<PointEditorModel>(
-                x => CreateCorridor(), x => HasPossibleCorridor,
-                this, x => x.HasPossibleCorridor);
-
-            ModifyDataDictionaryCommand = new RelayCommand(x => ModifyDataDictionary());
-
-            DeselectCommand = new RelayCommand(x => DeselectAll());
-
-            SelectAlternateCommand = new RelayCommand(x => SelectAlternate());
-
-            SelectGpsCommand = new RelayCommand(x => SelectGps());
-
-            SelectTravCommand = new RelayCommand(x => SelectTraverse());
-
-            SelectInverseCommand = new RelayCommand(x => SelectInverse());
-            
-            UpdateAdvInfo = new RelayCommand(x => UpdateAdvInfoItems());
-            #endregion
-
-            //BindingOperations.EnableCollectionSynchronization(_SelectedPoints, _lock);
-
-            AdvInfoItems = new ObservableCollection<MenuItem>(GenerateAdvInfoItems());
-
-            SetupUI();
-
             #region Setup Filters
             CheckedListItem<TtPolygon> tmpPoly;
             tmpPoly = new CheckedListItem<TtPolygon>(new TtPolygon() { Name = "All", CN = Consts.FullGuid }, true);
@@ -953,6 +867,95 @@ namespace TwoTrails.ViewModels
             Points.CustomSort = new PointSorter();
 
             Points.Filter = Filter;
+            
+
+            #region Init Commands
+            RefreshPoints = new RelayCommand(x => Points.Refresh());
+
+            CopyCellValueCommand = new BindedRelayCommand<PointEditorModel>(
+                x => CopyCellValue(x as DataGrid), x => HasSelection,
+                this, x => x.HasSelection);
+
+            ExportValuesCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ExportValues(x as DataGrid), x => HasSelection,
+                this, x => x.HasSelection);
+
+            ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
+
+            ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ChangeQuondamParent(), x => OnlyQuondams && !MultipleSelections,
+                this, x => new { x.OnlyQuondams, x.MultipleSelections });
+
+            RenamePointsCommand = new BindedRelayCommand<PointEditorModel>(
+                x => RenamePoints(), x => MultipleSelections,
+                this, x => x.MultipleSelections);
+
+            ReverseSelectedCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ReverseSelection(), x => MultipleSelections,
+                this, x => x.MultipleSelections);
+
+            ResetPointCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ResetPoint(), x => HasSelection,
+                this, x => x.HasSelection);
+
+            ResetPointFieldCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ResetPointField(x as DataGrid), x => HasSelection,
+                this, x => x.HasSelection);
+
+            DeleteCommand = new BindedRelayCommand<PointEditorModel>(
+                x => DeletePoint(), x => HasSelection,
+                this, x => x.HasSelection);
+
+            CreatePointCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
+                x => CreateNewPoint(x != null ? (OpType)x : OpType.GPS),
+                x => Manager.Polygons.Count > 0,
+                Manager.Polygons, x => x.Count);
+
+            CreateQuondamsCommand = new BindedRelayCommand<PointEditorModel>(
+                x => CreateQuondams(), x => HasSelection,
+                this, x => x.HasSelection);
+
+            ConvertPointsCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ConvertPoints(), x => OnlyQuondams || OnlyTravTypes,
+                this, x => new { x.OnlyQuondams, x.OnlyTravTypes });
+
+            MovePointsCommand = new BindedRelayCommand<PointEditorModel>(
+                x => MovePoints(), x => HasSelection,
+                this, x => x.HasSelection);
+
+            RetraceCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPoint>>(
+                x => Retrace(), x => Manager.Points.Count > 0,
+                Manager.Points, x => x.Count);
+
+            CreatePlotsCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
+                x => CreatePlots(),
+                x => Manager.Polygons.Count > 0,
+                Manager.Polygons, x => x.Count);
+
+            CreateCorridorCommand = new BindedRelayCommand<PointEditorModel>(
+                x => CreateCorridor(), x => HasPossibleCorridor,
+                this, x => x.HasPossibleCorridor);
+
+            ModifyDataDictionaryCommand = new RelayCommand(x => ModifyDataDictionary());
+
+            DeselectCommand = new RelayCommand(x => DeselectAll());
+
+            SelectAlternateCommand = new RelayCommand(x => SelectAlternate());
+
+            SelectGpsCommand = new RelayCommand(x => SelectGps());
+
+            SelectTravCommand = new RelayCommand(x => SelectTraverse());
+
+            SelectInverseCommand = new RelayCommand(x => SelectInverse());
+
+            UpdateAdvInfo = new RelayCommand(x => UpdateAdvInfoItems());
+            #endregion
+
+            //BindingOperations.EnableCollectionSynchronization(_SelectedPoints, _lock);
+
+            AdvInfoItems = new ObservableCollection<MenuItem>(GenerateAdvInfoItems());
+
+            SetupUI();
         }
 
 

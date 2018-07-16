@@ -87,8 +87,24 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Text="{Binding Polygon.Name}" Grid.Column="0" TextTrimming="WordEllipsis" FontWeight="Bold" FontSize="18" ToolTip="{Binding Polygon.Name}" VerticalAlignment="Bottom"/>
-                                        <Button Content="ZT" Grid.Column="1" Command="{Binding ZoomToPolygonCommand}" Margin="2"/>
+                                        <TextBlock Text="{Binding Polygon.Name}" Grid.Column="0" TextTrimming="WordEllipsis" FontWeight="Bold" FontSize="18" VerticalAlignment="Bottom">
+                                            <TextBlock.ToolTip>
+                                                <Grid Background="WhiteSmoke">
+                                                    <Border BorderThickness="0.75" BorderBrush="Black">
+                                                        <TextBlock Text="{Binding Polygon.Name}" Padding="2.5"/>
+                                                    </Border>
+                                                </Grid>
+                                            </TextBlock.ToolTip>
+                                        </TextBlock>
+                                        <Button Content="ZT" Grid.Column="1" Command="{Binding ZoomToPolygonCommand}" Margin="2">
+                                            <Button.ToolTip>
+                                                <Grid Background="WhiteSmoke">
+                                                    <Border BorderThickness="0.75" BorderBrush="Black">
+                                                        <TextBlock Text="Zoom to Polygon" Padding="2.5"/>
+                                                    </Border>
+                                                </Grid>
+                                            </Button.ToolTip>
+                                        </Button>
                                         <CheckBox IsChecked="{Binding Visible}" Grid.Column="2"/>
                                     </Grid>
 

@@ -9,17 +9,29 @@ namespace FMSC.Core.Controls
 
         public static bool TextIsInteger(object sender, TextCompositionEventArgs e)
         {
-            return string.IsNullOrEmpty(e.Text) ? false : !e.Text.All(char.IsDigit);
+            return !(e.Text.All(x => char.IsDigit(x) ||
+                (e.Text == "-" && sender is TextBox tb && tb.CaretIndex == 0)
+            ));
         }
 
-
+        public static bool TextIsUnsignedInteger(object sender, TextCompositionEventArgs e)
+        {
+            return string.IsNullOrEmpty(e.Text) ? false : !e.Text.All(char.IsDigit);
+        }
+        
         public static bool TextIsDouble(object sender, TextCompositionEventArgs e)
         {
-            return string.IsNullOrEmpty(e.Text) ? false : !(e.Text.All(x => char.IsDigit(x) || x == '.') &&
-                !(
-                    (sender is TextBox tb) &&
-                    (tb.Text.Contains(".") && e.Text.Contains(".")))
-                );
+            return string.IsNullOrEmpty(e.Text) ? false : !(e.Text.All(x => char.IsDigit(x) ||
+                (e.Text == "." && sender is TextBox tb && !tb.Text.Contains(".")) ||
+                (e.Text == "-" && sender is TextBox tb2 && tb2.CaretIndex == 0)
+            ));
+        }
+
+        public static bool TextIsUnsignedDouble(object sender, TextCompositionEventArgs e)
+        {
+            return string.IsNullOrEmpty(e.Text) ? false : !(e.Text.All(x => char.IsDigit(x) ||
+                (e.Text == "." && sender is TextBox tb && !tb.Text.Contains("."))
+            ));
         }
     }
 }

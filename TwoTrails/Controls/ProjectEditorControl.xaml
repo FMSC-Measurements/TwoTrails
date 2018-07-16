@@ -10,6 +10,7 @@
              xmlns:tt="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
              xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
              xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+             xmlns:fmsccutils="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
 			 xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800"
@@ -362,12 +363,12 @@
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Start Index" />
                                 <TextBox Grid.Column="0" Grid.Row="5"
                                  Text="{Binding CurrentPolygon.PointStartIndex, UpdateSourceTrigger=PropertyChanged}"
-                                 PreviewTextInput="TextIsInteger"/>
+                                 PreviewTextInput="TextIsUnsignedInteger"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="6" Text="Increment" />
                                 <TextBox Grid.Column="0" Grid.Row="7"
                                  Text="{Binding CurrentPolygon.Increment, UpdateSourceTrigger=PropertyChanged}"
-                                 PreviewTextInput="TextIsInteger"/>
+                                 PreviewTextInput="TextIsUnsignedInteger"/>
 
                                 <StackPanel Grid.Column="0" Grid.Row="9" Orientation="Horizontal">
                                     <TextBlock Text="Created On: "/>
@@ -653,7 +654,7 @@
                                     <TextBox Grid.Column="0"
                                      Name="txtMetaZone"
                                      Text="{Binding CurrentMetadata.Zone, Mode=OneWay}"
-                                     PreviewTextInput="TextIsInteger">
+                                     PreviewTextInput="TextIsUnsignedInteger">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="TextChanged">
                                                 <i:InvokeCommandAction Command="{Binding MetadataZoneChangedCommand}"

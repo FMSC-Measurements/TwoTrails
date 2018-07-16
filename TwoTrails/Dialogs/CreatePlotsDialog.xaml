@@ -6,6 +6,7 @@
         xmlns:ttc="clr-namespace:TwoTrails.Controls"
         xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
         xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+        xmlns:fmsccutils="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         Title="Create Grid Sample Points" Height="300" Width="500"
@@ -82,10 +83,10 @@
 
                     <TextBox Grid.Column="0" Grid.Row="1"
                          Text="{Binding GridX}"
-                         PreviewTextInput="TextIsInteger"/>
+                         PreviewTextInput="TextIsUnsignedInteger"/>
                     <TextBox Grid.Column="2" Grid.Row="1"
                          Text="{Binding GridY}"
-                         PreviewTextInput="TextIsInteger"/>
+                         PreviewTextInput="TextIsUnsignedInteger"/>
                 </Grid>
 
                 <Grid Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2">
@@ -118,7 +119,7 @@
                     <TextBox Grid.Column="4"  Margin="0, 2.5, 0, 2.5"
                          IsEnabled="{Binding ElementName=cbSample, Path=IsChecked}"
                          Text="{Binding SampleAmount}"
-                         PreviewTextInput="TextIsInteger"/>
+                         PreviewTextInput="TextIsUnsignedInteger"/>
                 </Grid>
 
                 <Grid Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2">
@@ -133,7 +134,7 @@
                     <TextBox Grid.Column="4"  Margin="0, 2.5, 0, 2.5"
                          IsEnabled="{Binding ElementName=cbBuffer, Path=IsChecked}"
                          Text="{Binding BufferAmount}"
-                         PreviewTextInput="TextIsInteger"/>
+                         PreviewTextInput="TextIsUnsignedInteger"/>
                 </Grid>
 
                 <CheckBox Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2"

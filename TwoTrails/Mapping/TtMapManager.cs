@@ -55,6 +55,13 @@ namespace TwoTrails.Mapping
             _PointsByPolys.Add(polygon.CN, ocPoints);
 
             TtMapPolygonManager mpm = new TtMapPolygonManager(_Map, polygon, ocPoints, _Manager.GetPolygonGraphicOption(polygon.CN));
+            if (polygon.Name.IndexOf("_plt", StringComparison.InvariantCultureIgnoreCase) > 0)
+            {
+                mpm.AdjBndVisible = false;
+                mpm.AdjBndPointsVisible = false;
+                mpm.WayPointsVisible = true;
+            }
+
             _PolygonManagers.Add(polygon.CN, mpm);
             PolygonManagers.Add(mpm);
 
@@ -172,12 +179,14 @@ namespace TwoTrails.Mapping
                 case NotifyCollectionChangedAction.Add:
                     foreach (TtPoint p in e.NewItems)
                     {
+                        p.PolygonChanged += Point_PolygonChanged;
                         _PointsByPolys[p.PolygonCN].Insert(p.Index, p);
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (TtPoint p in e.OldItems)
                     {
+                        p.PolygonChanged -= Point_PolygonChanged;
                         _PointsByPolys[p.PolygonCN].Remove(p);
                     }
                     break;

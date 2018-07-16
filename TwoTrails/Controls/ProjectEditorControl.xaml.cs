@@ -26,9 +26,9 @@ namespace TwoTrails.Controls
             tabControl.SelectedIndex = (int)tab;
         }
 
-        private void TextIsInteger(object sender, TextCompositionEventArgs e)
+        private void TextIsUnsignedInteger(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = ControlUtils.TextIsInteger(sender, e);
+            e.Handled = ControlUtils.TextIsUnsignedInteger(sender, e);
         }
 
         private void TextIsDouble(object sender, TextCompositionEventArgs e)

@@ -166,6 +166,12 @@ namespace TwoTrails.ViewModels
                 return;
             }
 
+            if (IncludedPolygons.Count < 1)
+            {
+                MessageBox.Show("Must Select at least one polygon to add plots to.");
+                return;
+            }
+
             List<TtPolygon> polygons = _Manager.GetPolygons();
             string gPolyName = GeneratedPolyName();
 

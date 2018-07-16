@@ -13,63 +13,63 @@
 			 FocusManager.FocusedElement="{Binding ElementName=dgPoints}"
 			 d:DesignHeight="600" d:DesignWidth="800">
 
-	<UserControl.Resources>
-		<cvt:MetadataValueConverter x:Key="mdvcElev" MetadataPropertyName="Elevation"/>
-		<cvt:MetadataValueConverter x:Key="mdvcSlpDist" MetadataPropertyName="Distance"/>
-		<cvt:MetadataValueConverter x:Key="mdvcSlpAng" MetadataPropertyName="SlopeAngle"/>
-		<cvt:NullableDoubleConverter x:Key="ndblcvtr" />
-		<cvt:DataDictionaryFieldConverter x:Key="ddfcvtr" />
+    <UserControl.Resources>
+        <cvt:MetadataValueConverter x:Key="mdvcElev" MetadataPropertyName="Elevation"/>
+        <cvt:MetadataValueConverter x:Key="mdvcSlpDist" MetadataPropertyName="Distance"/>
+        <cvt:MetadataValueConverter x:Key="mdvcSlpAng" MetadataPropertyName="SlopeAngle"/>
+        <cvt:NullableDoubleConverter x:Key="ndblcvtr" />
+        <cvt:DataDictionaryFieldConverter x:Key="ddfcvtr" />
 
-		<Style x:Key="styleFieldTitle" TargetType="TextBlock">
-			<Setter Property="Margin" Value="0,0,5,0" />
-			<Setter Property="VerticalAlignment" Value="Center"/>
-			<Setter Property="HorizontalAlignment" Value="Right"/>
-			<Setter Property="Foreground" Value="Black"/>
-		</Style>
+        <Style x:Key="styleFieldTitle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,5,0" />
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
 
-		<Style x:Key="styleFieldValue" TargetType="Control">
-			<Setter Property="Margin" Value="0,2.5,0,2.5" />
-			<Setter Property="Height" Value="25"/>
-			<Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
-			<Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Style x:Key="styleFieldValue" TargetType="Control">
+            <Setter Property="Margin" Value="0,2.5,0,2.5" />
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
 
-			<Style.Triggers>
-				<MultiTrigger>
-					<MultiTrigger.Conditions>
-						<Condition Property="IsEnabled" Value="True"/>
-						<Condition Property="cp:CustomProperties.BackgroundEnabled" Value="True"/>
-					</MultiTrigger.Conditions>
+            <Style.Triggers>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsEnabled" Value="True"/>
+                        <Condition Property="cp:CustomProperties.BackgroundEnabled" Value="True"/>
+                    </MultiTrigger.Conditions>
 
-					<MultiTrigger.Setters>
-						<Setter Property="Background" Value="LightGreen"/>
-					</MultiTrigger.Setters>
-				</MultiTrigger>
+                    <MultiTrigger.Setters>
+                        <Setter Property="Background" Value="LightGreen"/>
+                    </MultiTrigger.Setters>
+                </MultiTrigger>
 
-				<MultiTrigger>
-					<MultiTrigger.Conditions>
-						<Condition Property="IsEnabled" Value="False"/>
-						<Condition Property="cp:CustomProperties.BackgroundEnabled" Value="True"/>
-					</MultiTrigger.Conditions>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsEnabled" Value="False"/>
+                        <Condition Property="cp:CustomProperties.BackgroundEnabled" Value="True"/>
+                    </MultiTrigger.Conditions>
 
-					<MultiTrigger.Setters>
-						<Setter Property="Background" Value="PaleGreen"/>
-					</MultiTrigger.Setters>
-				</MultiTrigger>
+                    <MultiTrigger.Setters>
+                        <Setter Property="Background" Value="PaleGreen"/>
+                    </MultiTrigger.Setters>
+                </MultiTrigger>
 
-				<MultiTrigger>
-					<MultiTrigger.Conditions>
-						<Condition Property="IsEnabled" Value="False"/>
-						<Condition Property="cp:CustomProperties.BackgroundEnabled" Value="False"/>
-					</MultiTrigger.Conditions>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsEnabled" Value="False"/>
+                        <Condition Property="cp:CustomProperties.BackgroundEnabled" Value="False"/>
+                    </MultiTrigger.Conditions>
 
-					<MultiTrigger.Setters>
-						<Setter Property="Background" Value="LightGray"/>
-					</MultiTrigger.Setters>
-				</MultiTrigger>
-			</Style.Triggers>
-		</Style>
+                    <MultiTrigger.Setters>
+                        <Setter Property="Background" Value="LightGray"/>
+                    </MultiTrigger.Setters>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
 
-		<!--<Style x:Key="styleTextButtonValue" TargetType="Button" BasedOn="{StaticResource styleFieldValue}">
+        <!--<Style x:Key="styleTextButtonValue" TargetType="Button" BasedOn="{StaticResource styleFieldValue}">
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type Button}">
@@ -84,48 +84,48 @@
 			</Setter>
 		</Style>-->
 
-		<Style x:Key="styleXYZEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
-			<Setter Property="IsEnabled" Value="False" />
-			<Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
-			<Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}"/>
+        <Style x:Key="styleXYZEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
+            <Setter Property="IsEnabled" Value="False" />
+            <Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
+            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}"/>
 
-			<Style.Triggers>
-				<MultiDataTrigger>
-					<MultiDataTrigger.Conditions>
-						<Condition Binding="{Binding OnlyGpsTypes}" Value="True"/>
-						<Condition Binding="{Binding Project.Settings.IsAdvancedMode}" Value="True"/>
-					</MultiDataTrigger.Conditions>
-					<MultiDataTrigger.Setters>
-						<Setter Property="IsEnabled" Value="True"/>
-					</MultiDataTrigger.Setters>
-				</MultiDataTrigger>
-			</Style.Triggers>
-		</Style>
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding OnlyGpsTypes}" Value="True"/>
+                        <Condition Binding="{Binding Project.Settings.IsAdvancedMode}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="IsEnabled" Value="True"/>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
 
-		<Style x:Key="styleManAccEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
-			<Setter Property="IsEnabled" Value="False" />
-			<Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
+        <Style x:Key="styleManAccEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
+            <Setter Property="IsEnabled" Value="False" />
+            <Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
 
-			<Style.Triggers>
-				<DataTrigger Binding="{Binding OnlyManAccTypes}" Value="True">
-					<Setter Property="IsEnabled" Value="True" />
-				</DataTrigger>
-			</Style.Triggers>
-		</Style>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding OnlyManAccTypes}" Value="True">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
 
-		<Style x:Key="styleTravEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
-			<Setter Property="IsEnabled" Value="False" />
-			<Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
-			<Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}"/>
+        <Style x:Key="styleTravEnable" TargetType="Control" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
+            <Setter Property="IsEnabled" Value="False" />
+            <Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
+            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=Text}"/>
 
-			<Style.Triggers>
-				<DataTrigger Binding="{Binding OnlyTravTypes}" Value="True">
-					<Setter Property="IsEnabled" Value="True" />
-				</DataTrigger>
-			</Style.Triggers>
-		</Style>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding OnlyTravTypes}" Value="True">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
 
-		<!--<Style x:Key="styleQndmEnable" TargetType="Button" BasedOn="{StaticResource ResourceKey=styleTextButtonValue}">
+        <!--<Style x:Key="styleQndmEnable" TargetType="Button" BasedOn="{StaticResource ResourceKey=styleTextButtonValue}">
 			<Setter Property="IsEnabled" Value="False" />
 			<Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
 
@@ -136,139 +136,139 @@
 			</Style.Triggers>
 		</Style>-->
 
-		<Style x:Key="ColumnHeaderGripperStyle" TargetType="{x:Type Thumb}">
-			<Setter Property="Width" Value="5" />
-			<Setter Property="Background" Value="Transparent" />
-			<Setter Property="Cursor" Value="SizeWE" />
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type Thumb}">
-						<Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" />
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
+        <Style x:Key="ColumnHeaderGripperStyle" TargetType="{x:Type Thumb}">
+            <Setter Property="Width" Value="5" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Cursor" Value="SizeWE" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
 
 
 
-	</UserControl.Resources>
+    </UserControl.Resources>
 
-	<UserControl.InputBindings>
-		<KeyBinding Command="{Binding SelectAlternateCommand}" Key="A" Modifiers="Ctrl+Alt" />
-		<KeyBinding Command="{Binding SelectGpsCommand}" Key="G" Modifiers="Ctrl"/>
-		<KeyBinding Command="{Binding SelectTravCommand}" Key="T" Modifiers="Ctrl"/>
-		<KeyBinding Command="{Binding SelectInverseCommand}" Key="I" Modifiers="Ctrl"/>
-		<KeyBinding Command="{Binding DeselectCommand}" Key="D" Modifiers="Ctrl"/>
-		<KeyBinding Command="{Binding ReverseSelectedCommand}" Key="R" Modifiers="Ctrl"/>
-	</UserControl.InputBindings>
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding SelectAlternateCommand}" Key="A" Modifiers="Ctrl+Alt" />
+        <KeyBinding Command="{Binding SelectGpsCommand}" Key="G" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding SelectTravCommand}" Key="T" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding SelectInverseCommand}" Key="I" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding DeselectCommand}" Key="D" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding ReverseSelectedCommand}" Key="R" Modifiers="Ctrl"/>
+    </UserControl.InputBindings>
 
 
-	<Grid Margin="0" Background="White">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="150" MinHeight="100" MaxHeight="300"/>
-			<RowDefinition Height="3" MinHeight="3" MaxHeight="3"/>
-			<RowDefinition Height="*"/>
-		</Grid.RowDefinitions>
+    <Grid Margin="0" Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="150" MinHeight="100" MaxHeight="300"/>
+            <RowDefinition Height="3" MinHeight="3" MaxHeight="3"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-		<cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcElev}, Path=Metadata}"
+        <cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcElev}, Path=Metadata}"
 			Source="{Binding Path=Metadata, Mode=OneWay}" />
-		<cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcSlpDist}, Path=Metadata}"
+        <cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcSlpDist}, Path=Metadata}"
 			Source="{Binding Path=Metadata, Mode=OneWay}" />
-		<cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcSlpAng}, Path=Metadata}"
+        <cvt:BindingReflector Target="{Binding  Mode=OneWayToSource, Source = {StaticResource mdvcSlpAng}, Path=Metadata}"
 			Source="{Binding Path=Metadata, Mode=OneWay}" />
 
-		<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-			<Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" HorizontalAlignment="Stretch">
-				<Grid.Resources>
-					<Style TargetType="TextBlock">
-						<Setter Property="Foreground" Value="Black"/>
-					</Style>
-				</Grid.Resources>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <Grid Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" HorizontalAlignment="Stretch">
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="Black"/>
+                    </Style>
+                </Grid.Resources>
 
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="200" MinWidth="100" MaxWidth="250"/>
-					<ColumnDefinition Width="125"/>
-					<ColumnDefinition Width="170" MinWidth="100" MaxWidth="250"/>
-					<ColumnDefinition Width="150" MinWidth="100" MaxWidth="250"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" MinWidth="100" MaxWidth="250"/>
+                    <ColumnDefinition Width="125"/>
+                    <ColumnDefinition Width="170" MinWidth="100" MaxWidth="250"/>
+                    <ColumnDefinition Width="150" MinWidth="100" MaxWidth="250"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="*"/>
-				</Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
 
-				<TextBlock Text="Polygons" Grid.Column="0" Grid.Row="0" TextAlignment="Center"/>
+                <TextBlock Text="Polygons" Grid.Column="0" Grid.Row="0" TextAlignment="Center"/>
 
                 <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Polygons}">
                     <ListBox.ItemTemplate>
-						<DataTemplate>
-							<Viewbox Margin="-1">
-								<CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}"/>
-							</Viewbox>
-						</DataTemplate>
-					</ListBox.ItemTemplate>
-				</ListBox>
+                        <DataTemplate>
+                            <Viewbox Margin="-1">
+                                <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}"/>
+                            </Viewbox>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
 
-				<TextBlock Text="OpTypes" Grid.Column="1" Grid.Row="0" TextAlignment="Center"/>
+                <TextBlock Text="OpTypes" Grid.Column="1" Grid.Row="0" TextAlignment="Center"/>
 
-				<ListBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding OpTypes}">
-					<ListBox.ItemTemplate>
-						<DataTemplate>
-							<CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item}" Margin="2"/>
-						</DataTemplate>
-					</ListBox.ItemTemplate>
-				</ListBox>
-
-
-				<TextBlock Text="Groups" Grid.Column="2" Grid.Row="0" TextAlignment="Center"/>
-
-				<ListBox Grid.Column="2" Grid.Row="1" ItemsSource="{Binding Groups}">
-					<ListBox.ItemTemplate>
-						<DataTemplate>
-							<CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
-						</DataTemplate>
-					</ListBox.ItemTemplate>
-				</ListBox>
+                <ListBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding OpTypes}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item}" Margin="2"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
 
-				<TextBlock Text="Metadata" Grid.Column="3" Grid.Row="0" TextAlignment="Center"/>
+                <TextBlock Text="Groups" Grid.Column="2" Grid.Row="0" TextAlignment="Center"/>
 
-				<ListBox Grid.Column="3" Grid.Row="1" ItemsSource="{Binding Metadatas}">
-					<ListBox.ItemTemplate>
-						<DataTemplate>
-							<CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
-						</DataTemplate>
-					</ListBox.ItemTemplate>
-				</ListBox>
+                <ListBox Grid.Column="2" Grid.Row="1" ItemsSource="{Binding Groups}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
-				<Grid Grid.Column="4" Grid.Row="1" Margin="5, 0, 5, 0">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto"/>
-						<RowDefinition Height="Auto"/>
-					</Grid.RowDefinitions>
 
-					<CheckBox Content="On Boundary" Grid.Row="0" IsThreeState="True" IsChecked="{Binding IsOnBnd}" Command="{Binding RefreshPoints}" />
-					<CheckBox Content="Has Links" Grid.Row="1" IsThreeState="True" IsChecked="{Binding HasLinks}" Command="{Binding RefreshPoints}" />
-				</Grid>
+                <TextBlock Text="Metadata" Grid.Column="3" Grid.Row="0" TextAlignment="Center"/>
+
+                <ListBox Grid.Column="3" Grid.Row="1" ItemsSource="{Binding Metadatas}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Grid Grid.Column="4" Grid.Row="1" Margin="5, 0, 5, 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <CheckBox Content="On Boundary" Grid.Row="0" IsThreeState="True" IsChecked="{Binding IsOnBnd}" Command="{Binding RefreshPoints}" />
+                    <CheckBox Content="Has Links" Grid.Row="1" IsThreeState="True" IsChecked="{Binding HasLinks}" Command="{Binding RefreshPoints}" />
+                </Grid>
 
                 <Grid Grid.Column="5" Grid.Row="1">
                     <!-- todo Point Location and Distance info -->
                 </Grid>
-			</Grid>
-		</ScrollViewer>
-		<GridSplitter Grid.Row="1" Background="Gray" Height="3" HorizontalAlignment="Stretch"/>
+            </Grid>
+        </ScrollViewer>
+        <GridSplitter Grid.Row="1" Background="Gray" Height="3" HorizontalAlignment="Stretch"/>
 
-		<Grid Grid.Row="2">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*" MinWidth="150"/>
-				<ColumnDefinition Width="3"/>
-				<ColumnDefinition Width="185" MinWidth="150" MaxWidth="300"/>
-			</Grid.ColumnDefinitions>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="150"/>
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="185" MinWidth="150" MaxWidth="300"/>
+            </Grid.ColumnDefinitions>
 
             <cc:DataGridEx x:Name="dgPoints"
 				Grid.Column="0"
@@ -290,97 +290,97 @@
 				SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 				BindableColumns="{Binding DataColumns}"
                 PreviewMouseRightButtonUp="dgPoints_PreviewMouseRightButtonUp">
-                
+
                 <DataGrid.Resources>
-					<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SeaGreen"/>
-					<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkSeaGreen"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SeaGreen"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkSeaGreen"/>
 
-					<Style TargetType="DataGridCell">
-						<Style.Triggers>
-							<Trigger Property="IsKeyboardFocusWithin" Value="True">
-								<Setter Property="BorderBrush" Value="SeaGreen" />
-							</Trigger>
-						</Style.Triggers>
-					</Style>
-				</DataGrid.Resources>
+                    <Style TargetType="DataGridCell">
+                        <Style.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter Property="BorderBrush" Value="SeaGreen" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
 
-				<DataGrid.InputBindings>
-					<KeyBinding Command="{Binding DeleteCommand}" Key="Delete"/>
-				</DataGrid.InputBindings>
+                <DataGrid.InputBindings>
+                    <KeyBinding Command="{Binding DeleteCommand}" Key="Delete"/>
+                </DataGrid.InputBindings>
 
-				<DataGrid.ColumnHeaderStyle>
-					<Style TargetType="{x:Type DataGridColumnHeader}">
-						<Setter Property="Background" Value="{DynamicResource NormalBorderBrush}"/>
-						<Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-						<Setter Property="VerticalContentAlignment" Value="Center" />
-						<Setter Property="Template">
-							<Setter.Value>
-								<ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
-									<Grid Background='Transparent' Margin="-1, 0, 0, 0" >
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="Background" Value="{DynamicResource NormalBorderBrush}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                                    <Grid Background='Transparent' Margin="-1, 0, 0, 0" >
 
-										<Grid.ContextMenu>
-											<ContextMenu>
-												<MenuItem Header="Hide Column" Command="{ Binding HideColumn }" />
-											</ContextMenu>
-										</Grid.ContextMenu>
+                                        <Grid.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Hide Column" Command="{ Binding HideColumn }" />
+                                            </ContextMenu>
+                                        </Grid.ContextMenu>
 
-										<Rectangle x:Name="BackgroundRectangle" Grid.ColumnSpan="4" Grid.RowSpan="2"
+                                        <Rectangle x:Name="BackgroundRectangle" Grid.ColumnSpan="4" Grid.RowSpan="2"
 									   Fill="LightGray" Stretch="Fill"
 									   Stroke="Gray" StrokeThickness="1"/>
 
-										<ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
 												  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
 												  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
 												  Margin="{TemplateBinding Padding}"
 												  Cursor="{TemplateBinding Cursor}">
-											<ContentPresenter.ContentTemplate>
-												<DataTemplate>
-													<TextBlock Text="{Binding Path=Name}" Foreground="Black" Margin="5, 3, 6, 3"/>
-												</DataTemplate>
-											</ContentPresenter.ContentTemplate>
-										</ContentPresenter>
+                                            <ContentPresenter.ContentTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Path=Name}" Foreground="Black" Margin="5, 3, 6, 3"/>
+                                                </DataTemplate>
+                                            </ContentPresenter.ContentTemplate>
+                                        </ContentPresenter>
 
 
-										<Path HorizontalAlignment="Left" x:Name="SortArrow" VerticalAlignment="Center" 
+                                        <Path HorizontalAlignment="Left" x:Name="SortArrow" VerticalAlignment="Center" 
 									  Width="8" Opacity="0" RenderTransformOrigin=".5,.5" Grid.Column="2" Grid.RowSpan="2" Fill="#FF000000" Stretch="Uniform" Data="F1 M -5.215,6.099L 5.215,6.099L 0,0L -5.215,6.099 Z ">
-											<Path.RenderTransform>
-												<TransformGroup>
-													<ScaleTransform ScaleX=".9" ScaleY=".9" x:Name="SortIconTransform" />
-												</TransformGroup>
-											</Path.RenderTransform>
-										</Path>
-										<Thumb x:Name="PART_LeftHeaderGripper" Grid.Column="0" HorizontalAlignment="Left" Style="{StaticResource ColumnHeaderGripperStyle}"/>
-										<Thumb x:Name="PART_RightHeaderGripper" Grid.Column="3" HorizontalAlignment="Right" Style="{StaticResource ColumnHeaderGripperStyle}"/>
-									</Grid>
+                                            <Path.RenderTransform>
+                                                <TransformGroup>
+                                                    <ScaleTransform ScaleX=".9" ScaleY=".9" x:Name="SortIconTransform" />
+                                                </TransformGroup>
+                                            </Path.RenderTransform>
+                                        </Path>
+                                        <Thumb x:Name="PART_LeftHeaderGripper" Grid.Column="0" HorizontalAlignment="Left" Style="{StaticResource ColumnHeaderGripperStyle}"/>
+                                        <Thumb x:Name="PART_RightHeaderGripper" Grid.Column="3" HorizontalAlignment="Right" Style="{StaticResource ColumnHeaderGripperStyle}"/>
+                                    </Grid>
 
-									<ControlTemplate.Triggers>
-										<Trigger Property="SortDirection" Value="Ascending">
-											<Setter TargetName="SortArrow" Property="Opacity" Value="1" />
-											<Setter TargetName="SortArrow" Property="RenderTransform">
-												<Setter.Value>
-													<RotateTransform Angle="180" />
-												</Setter.Value>
-											</Setter>
-											<Setter TargetName="BackgroundRectangle" Property="Opacity" Value="1" />
-										</Trigger>
-										<Trigger Property="SortDirection" Value="Descending">
-											<Setter TargetName="SortArrow" Property="Opacity" Value="1" />
-											<Setter TargetName="BackgroundRectangle" Property="Opacity" Value="1" />
-										</Trigger>
-									</ControlTemplate.Triggers>
-								</ControlTemplate>
-							</Setter.Value>
-						</Setter>
-					</Style>
-				</DataGrid.ColumnHeaderStyle>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="SortDirection" Value="Ascending">
+                                            <Setter TargetName="SortArrow" Property="Opacity" Value="1" />
+                                            <Setter TargetName="SortArrow" Property="RenderTransform">
+                                                <Setter.Value>
+                                                    <RotateTransform Angle="180" />
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Setter TargetName="BackgroundRectangle" Property="Opacity" Value="1" />
+                                        </Trigger>
+                                        <Trigger Property="SortDirection" Value="Descending">
+                                            <Setter TargetName="SortArrow" Property="Opacity" Value="1" />
+                                            <Setter TargetName="BackgroundRectangle" Property="Opacity" Value="1" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
 
-				<DataGrid.ContextMenu>
+                <DataGrid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}"/>
 
-						<MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
+                        <MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
 								  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
-						<MenuItem Header="Export Point Values" Command="{Binding ExportValuesCommand}" 
+                        <MenuItem Header="Export Point Values" Command="{Binding ExportValuesCommand}" 
 								  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
 
                         <MenuItem x:Name="miDDA" Header="Dist/Dir/Loc" ItemsSource="{Binding AdvInfoItems}" Visibility="{Binding MultipleSelections, Converter={StaticResource BoolToVis}}">
@@ -393,143 +393,145 @@
 
                         <Separator/>
 
-						<MenuItem Header="Rename" Command="{Binding RenamePointsCommand}" />
+                        <MenuItem Header="Rename" Command="{Binding RenamePointsCommand}" />
                         <MenuItem Header="{Binding ConvertTypeHeader}" Command="{Binding ConvertPointsCommand}">
-                            
+
                         </MenuItem>
 
-						<Separator/>
+                        <Separator/>
 
-						<MenuItem Header="Quondam" Command="{Binding CreateQuondamsCommand}" />
-						<MenuItem Header="Move" Command="{Binding MovePointsCommand}" />
+                        <MenuItem Header="Quondam" Command="{Binding CreateQuondamsCommand}" />
+                        <MenuItem Header="Move" Command="{Binding MovePointsCommand}" />
 
-						<Separator/>
+                        <Separator/>
 
-						<MenuItem Header="Reset" Command="{Binding ResetPointCommand}" />
-						<MenuItem Header="Reset Field" Command="{Binding ResetPointFieldCommand}"
+                        <MenuItem Header="Reset" Command="{Binding ResetPointCommand}" />
+                        <MenuItem Header="Reset Field" Command="{Binding ResetPointFieldCommand}"
 								  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"
 								  Visibility="{Binding Project.Settings.IsAdvancedMode, Converter={StaticResource BoolToVis}}"/>
 
-						<Separator/>
+                        <Separator/>
 
                         <MenuItem Header="Delete" Command="{Binding DeleteCommand}"/>
 
                         <Separator/>
-                        
+
                         <MenuItem Header="Columns" ItemsSource="{Binding VisibleFields}"/>
 
                     </ContextMenu>
-				</DataGrid.ContextMenu>
-			</cc:DataGridEx>
+                </DataGrid.ContextMenu>
+            </cc:DataGridEx>
 
-			<GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Stretch" Background="Gray" />
+            <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Stretch" Background="Gray" />
 
-			<ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
-				<StackPanel>
-					<Expander Header="Default" IsExpanded="True">
-						<Grid Margin="5">
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Expander Header="Default" IsExpanded="True">
+                        <Grid Margin="5">
 
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="*"/>
-							</Grid.ColumnDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-							<Grid.RowDefinitions>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="Auto"/>
-								<RowDefinition Height="*"/>
-							</Grid.RowDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-							<TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="PID"/>
-							<TextBox Grid.Row="0" Grid.Column="1"
+                            <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="PID"/>
+                            <TextBox Grid.Row="0" Grid.Column="1"
 								Text="{Binding PID, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                PreviewTextInput="TextIsUnsginedInteger"
 								cp:CustomProperties.BackgroundEnabled="{Binding SamePID, Converter={StaticResource IBC}}"
 							 LostFocus="TextBox_UpdateBinding">
-								<TextBox.Resources>
-									<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource styleFieldValue}">
-										<Setter Property="IsEnabled" Value="False" />
-										<Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
+                                <TextBox.Resources>
+                                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource styleFieldValue}">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                        <Setter Property="cp:CustomProperties.BackgroundEnabled" Value="False" />
 
-										<Style.Triggers>
-											<DataTrigger Binding="{Binding MultipleSelections}" Value="True">
-												<Setter Property="IsEnabled" Value="False" />
-											</DataTrigger>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MultipleSelections}" Value="True">
+                                                <Setter Property="IsEnabled" Value="False" />
+                                            </DataTrigger>
 
-											<MultiDataTrigger>
-												<MultiDataTrigger.Conditions>
-													<Condition Binding="{Binding HasSelection}" Value="True"/>
-													<Condition Binding="{Binding MultipleSelections}" Value="False"/>
-												</MultiDataTrigger.Conditions>
-												<MultiDataTrigger.Setters>
-													<Setter Property="IsEnabled" Value="True"/>
-												</MultiDataTrigger.Setters>
-											</MultiDataTrigger>
-										</Style.Triggers>
-									</Style>
-								</TextBox.Resources>
-							</TextBox>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding HasSelection}" Value="True"/>
+                                                    <Condition Binding="{Binding MultipleSelections}" Value="False"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <MultiDataTrigger.Setters>
+                                                    <Setter Property="IsEnabled" Value="True"/>
+                                                </MultiDataTrigger.Setters>
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
 
-							<TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Polygon"/>
-							<ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                            <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Polygon"/>
+                            <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
 								cp:CustomProperties.BackgroundEnabled="{Binding SamePolygon, Converter={StaticResource IBC}}"
 								ItemsSource="{Binding Manager.Polygons, Mode=OneWay}"
 								DisplayMemberPath="Name"
 								SelectedItem="{Binding Polygon}"
 								ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}">
-								<ComboBox.IsEnabled>
-									<MultiBinding Converter="{StaticResource NullOrBool}">
-										<Binding Path="SamePolygon"/>
-										<Binding Path="HasSelection"/>
-									</MultiBinding>
-								</ComboBox.IsEnabled>
-							</ComboBox>
+                                <ComboBox.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource NullOrBool}">
+                                        <Binding Path="SamePolygon"/>
+                                        <Binding Path="HasSelection"/>
+                                    </MultiBinding>
+                                </ComboBox.IsEnabled>
+                            </ComboBox>
 
-							<TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Index"/>
-							<TextBox Grid.Row="2" Grid.Column="1"
-							 Text="{Binding Index, Delay=250, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-							 cp:CustomProperties.BackgroundEnabled="{Binding SameIndex, Converter={StaticResource IBC}}"
-							 LostFocus="TextBox_UpdateBinding">
-								<TextBox.Resources>
-									<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
-										<Style.Triggers>
-											<MultiDataTrigger>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Index"/>
+                            <TextBox Grid.Row="2" Grid.Column="1"
+							Text="{Binding Index, Delay=250, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            PreviewTextInput="TextIsUnsginedInteger"
+							cp:CustomProperties.BackgroundEnabled="{Binding SameIndex, Converter={StaticResource IBC}}"
+							LostFocus="TextBox_UpdateBinding">
+                                <TextBox.Resources>
+                                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource ResourceKey=styleFieldValue}">
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
                                                 <MultiDataTrigger.Conditions>
                                                     <Condition Binding="{Binding MultipleSelections}" Value="False"/>
-													<Condition Binding="{Binding Project.Settings.IsAdvancedMode}" Value="True"/>
-												</MultiDataTrigger.Conditions>
-												<MultiDataTrigger.Setters>
-													<Setter Property="IsEnabled" Value="True"/>
-												</MultiDataTrigger.Setters>
+                                                    <Condition Binding="{Binding Project.Settings.IsAdvancedMode}" Value="True"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <MultiDataTrigger.Setters>
+                                                    <Setter Property="IsEnabled" Value="True"/>
+                                                </MultiDataTrigger.Setters>
                                             </MultiDataTrigger>
                                             <DataTrigger Binding="{Binding HasSelection}" Value="False">
                                                 <Setter Property="IsEnabled" Value="False"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding MultipleSelections}" Value="True">
-												<Setter Property="IsEnabled" Value="False"/>
-											</DataTrigger>
-											<DataTrigger Binding="{Binding Project.Settings.IsAdvancedMode}" Value="False">
-												<Setter Property="IsEnabled" Value="False"/>
-											</DataTrigger>
-										</Style.Triggers>
-									</Style>
-								</TextBox.Resources>
-							</TextBox>
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Project.Settings.IsAdvancedMode}" Value="False">
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
 
-							<TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Metadata"/>
-							<ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                            <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Metadata"/>
+                            <ComboBox Grid.Row="3" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
 								cp:CustomProperties.BackgroundEnabled="{Binding SameMetadata, Converter={StaticResource IBC}}"
 								ItemsSource="{Binding Manager.Metadata, Mode=OneWay}"
 								DisplayMemberPath="Name"
@@ -537,8 +539,8 @@
 								IsEnabled="{Binding HasSelection}"
 								ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}"/>
 
-							<TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Group"/>
-							<ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                            <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Group"/>
+                            <ComboBox Grid.Row="4" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
 								cp:CustomProperties.BackgroundEnabled="{Binding SameGroup, Converter={StaticResource IBC}}"
 								ItemsSource="{Binding Manager.Groups, Mode=OneWay}"
 								DisplayMemberPath="Name"
@@ -546,111 +548,119 @@
 								IsEnabled="{Binding HasSelection}"
 								ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}"/>
 
-							<CheckBox Grid.Row="5" Grid.Column="1" Content="OnBound"
+                            <CheckBox Grid.Row="5" Grid.Column="1" Content="OnBound"
 							  Style="{StaticResource ResourceKey=styleFieldValue}"
 							  cp:CustomProperties.BackgroundEnabled="{Binding SameOnBound, Converter={StaticResource IBC}}"
 							  IsChecked="{Binding OnBoundary}"
 							  IsEnabled="{Binding HasSelection}"/>
 
-							<TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjX"/>
-							<TextBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ResourceKey=styleXYZEnable}"
+                            <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjX"/>
+                            <TextBox Grid.Row="6" Grid.Column="1" Style="{StaticResource ResourceKey=styleXYZEnable}"
 							 Name="txtUnAdjX"
 							 Text="{Binding UnAdjX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=500}"
+                             PreviewTextInput="TextIsInteger"
 							 cp:CustomProperties.BackgroundEnabled="{Binding SameUnAdjX, Converter={StaticResource IBC}}"
 							 LostFocus="TextBox_UpdateBinding">
-								<TextBox.ToolTip>
-									<TextBlock Text="{Binding UnAdjX, StringFormat={}{0} (Meters)}" />
-								</TextBox.ToolTip>
-							</TextBox>
+                                <TextBox.ToolTip>
+                                    <TextBlock Text="{Binding UnAdjX, StringFormat={}{0} (Meters)}" />
+                                </TextBox.ToolTip>
+                            </TextBox>
 
-							<TextBlock Grid.Row="7" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjY"/>
-							<TextBox Grid.Row="7" Grid.Column="1" Style="{StaticResource ResourceKey=styleXYZEnable}"
+                            <TextBlock Grid.Row="7" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjY"/>
+                            <TextBox Grid.Row="7" Grid.Column="1" Style="{StaticResource ResourceKey=styleXYZEnable}"
 							 Text="{Binding UnAdjY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=500}"
+                             PreviewTextInput="TextIsInteger"
 							 cp:CustomProperties.BackgroundEnabled="{Binding SameUnAdjY, Converter={StaticResource IBC}}"
 							 LostFocus="TextBox_UpdateBinding">
-								<TextBox.ToolTip>
-									<TextBlock Text="{Binding UnAdjY, StringFormat={}{0} (Meters)}" />
-								</TextBox.ToolTip>
-							</TextBox>
+                                <TextBox.ToolTip>
+                                    <TextBlock Text="{Binding UnAdjY, StringFormat={}{0} (Meters)}" />
+                                </TextBox.ToolTip>
+                            </TextBox>
 
-							<TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjZ"/>
-							<TextBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ResourceKey=styleXYZEnable}"
+                            <TextBlock Grid.Row="8" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="UnAdjZ"/>
+                            <TextBox Grid.Row="8" Grid.Column="1" Style="{StaticResource ResourceKey=styleXYZEnable}"
 							 Text="{Binding UnAdjZ, Converter={StaticResource mdvcElev}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                PreviewTextInput="TextIsInteger"
 							 cp:CustomProperties.BackgroundEnabled="{Binding SameUnAdjZ, Converter={StaticResource IBC}}"
 							 LostFocus="TextBox_UpdateBinding">
-								<TextBox.ToolTip>
-									<TextBlock>
-										<TextBlock.Text>
-											<MultiBinding StringFormat="{}{0} ({1})">
-												<Binding Path="UnAdjZ" Converter="{StaticResource mdvcElev}" />
-												<Binding Path="Metadata.Elevation" />
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</TextBox.ToolTip>
-							</TextBox>
+                                <TextBox.ToolTip>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} ({1})">
+                                                <Binding Path="UnAdjZ" Converter="{StaticResource mdvcElev}" />
+                                                <Binding Path="Metadata.Elevation" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </TextBox.ToolTip>
+                            </TextBox>
 
-							<TextBlock Grid.Row="9" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Man Acc"/>
-							<TextBox Grid.Row="9" Grid.Column="1" Style="{StaticResource ResourceKey=styleManAccEnable}"
+                            <TextBlock Grid.Row="9" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Man Acc"/>
+                            <TextBox Grid.Row="9" Grid.Column="1" Style="{StaticResource ResourceKey=styleManAccEnable}"
 							 Text="{Binding ManAcc, Converter={StaticResource ndblcvtr}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PreviewTextInput="TextIsUnsignedDouble"
 							 cp:CustomProperties.BackgroundEnabled="{Binding SameManAcc, Converter={StaticResource IBC}}"
 							 LostFocus="TextBox_UpdateBinding"/>
 
-							<TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Fwd Az"/>
-							<TextBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
+                            <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Fwd Az"/>
+                            <TextBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
 							 Text="{Binding FwdAz, Converter={StaticResource ndblcvtr}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PreviewTextInput="TextIsDouble"
 							 cp:CustomProperties.BackgroundEnabled="{Binding SameFwdAz, Converter={StaticResource IBC}}"
 							 LostFocus="TextBox_UpdateBinding">
-								<TextBox.ToolTip>
-									<TextBlock Text="{Binding FwdAz, StringFormat={}{0} (Degrees)}" />
-								</TextBox.ToolTip>
-							</TextBox>
+                                <TextBox.ToolTip>
+                                    <TextBlock Text="{Binding FwdAz, StringFormat={}{0} (Degrees)}" />
+                                </TextBox.ToolTip>
+                            </TextBox>
 
-							<TextBlock Grid.Row="11" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Back Az"/>
-							<TextBox Grid.Row="11" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
+                            <TextBlock Grid.Row="11" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Back Az"/>
+                            <TextBox Grid.Row="11" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
 							 Text="{Binding BkAz, Converter={StaticResource ndblcvtr}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PreviewTextInput="TextIsDouble"
 							 cp:CustomProperties.BackgroundEnabled="{Binding SameBkAz, Converter={StaticResource IBC}}"
 							 LostFocus="TextBox_UpdateBinding">
-								<TextBox.ToolTip>
-									<TextBlock Text="{Binding BkAz, StringFormat={}{0} (Degrees)}" />
-								</TextBox.ToolTip>
-							</TextBox>
+                                <TextBox.ToolTip>
+                                    <TextBlock Text="{Binding BkAz, StringFormat={}{0} (Degrees)}" />
+                                </TextBox.ToolTip>
+                            </TextBox>
 
-							<TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Slp Dist"/>
-							<TextBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
+                            <TextBlock Grid.Row="12" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Slp Dist"/>
+                            <TextBox Grid.Row="12" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
 							Text="{Binding SlpDist, Converter={StaticResource mdvcSlpDist}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            PreviewTextInput="TextIsDouble"
 							cp:CustomProperties.BackgroundEnabled="{Binding SameSlpDist, Converter={StaticResource IBC}}"
 							LostFocus="TextBox_UpdateBinding">
-								<TextBox.ToolTip>
-									<TextBlock>
-										<TextBlock.Text>
-											<MultiBinding StringFormat="{}{0} ({1})">
-												<Binding Path="SlpDist" Converter="{StaticResource mdvcSlpDist}" />
-												<Binding Path="Metadata.Distance" />
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</TextBox.ToolTip>
-							</TextBox>
+                                <TextBox.ToolTip>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} ({1})">
+                                                <Binding Path="SlpDist" Converter="{StaticResource mdvcSlpDist}" />
+                                                <Binding Path="Metadata.Distance" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </TextBox.ToolTip>
+                            </TextBox>
 
-							<TextBlock Grid.Row="13" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Slp Ang"/>
-							<TextBox Grid.Row="13" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
+                            <TextBlock Grid.Row="13" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Slp Ang"/>
+                            <TextBox Grid.Row="13" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
 							Text="{Binding SlpAng, Converter={StaticResource mdvcSlpAng}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            PreviewTextInput="TextIsDouble"
 							cp:CustomProperties.BackgroundEnabled="{Binding SameSlpAng, Converter={StaticResource IBC}}"
 							LostFocus="TextBox_UpdateBinding">
-								<TextBox.ToolTip>
-									<TextBlock>
-										<TextBlock.Text>
-											<MultiBinding StringFormat="{}{0} ({1})">
-												<Binding Path="SlpAng" Converter="{StaticResource mdvcSlpAng}" />
-												<Binding Path="Metadata.Slope" />
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</TextBox.ToolTip>
-							</TextBox>
+                                <TextBox.ToolTip>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} ({1})">
+                                                <Binding Path="SlpAng" Converter="{StaticResource mdvcSlpAng}" />
+                                                <Binding Path="Metadata.Slope" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </TextBox.ToolTip>
+                            </TextBox>
 
-							<TextBlock Grid.Row="14" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Qndm Link"/>
+                            <TextBlock Grid.Row="14" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Qndm Link"/>
                             <Button Grid.Row="14" Grid.Column="1" Margin="0, 2.5, 0, 2.5" VerticalContentAlignment="Center"
 								cp:CustomProperties.BackgroundEnabled="{Binding SameParentPoint, Converter={StaticResource IBC}}"
 								Height="25"
@@ -669,8 +679,8 @@
                                 </Button.ToolTip>
                             </Button>
 
-							<TextBlock Grid.Row="15" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" VerticalAlignment="Top" Margin="0,2.5,5,0" Text="Comment"/>
-							<TextBox Grid.Row="15" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                            <TextBlock Grid.Row="15" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" VerticalAlignment="Top" Margin="0,2.5,5,0" Text="Comment"/>
+                            <TextBox Grid.Row="15" Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
 							 TextWrapping="Wrap" VerticalAlignment="Top"
 							 Text="{Binding Comment, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 							 cp:CustomProperties.BackgroundEnabled="{Binding SameComment, Converter={StaticResource IBC}}"
@@ -679,73 +689,74 @@
 							 VerticalContentAlignment="Top"
 							 LostFocus="TextBox_UpdateBinding"
 							 IsEnabled="{Binding HasSelection}"/>
-						</Grid>
-					</Expander>
+                        </Grid>
+                    </Expander>
 
-					<Expander Header="Extended" IsExpanded="True">
-						<ItemsControl Margin="5" Grid.IsSharedSizeScope="True">
-							<ItemsControl.ItemsSource>
-								<MultiBinding Converter="{StaticResource ddfcvtr}">
-									<MultiBinding.Bindings>
-										<Binding Path="ExtendedDataFields"/>
-										<Binding />
-									</MultiBinding.Bindings>
-								</MultiBinding>
-							</ItemsControl.ItemsSource>
+                    <Expander Header="Extended" IsExpanded="True">
+                        <ItemsControl Margin="5" Grid.IsSharedSizeScope="True">
+                            <ItemsControl.ItemsSource>
+                                <MultiBinding Converter="{StaticResource ddfcvtr}">
+                                    <MultiBinding.Bindings>
+                                        <Binding Path="ExtendedDataFields"/>
+                                        <Binding />
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </ItemsControl.ItemsSource>
 
-							<ItemsControl.Resources>
-								<DataTemplate DataType="{x:Type tt:TextBoxExtendedDataField}">
-									<Grid>
-										<Grid.ColumnDefinitions>
-											<ColumnDefinition Width="Auto" SharedSizeGroup="Key"/>
-											<ColumnDefinition Width="*"/>
-										</Grid.ColumnDefinitions>
+                            <ItemsControl.Resources>
+                                <DataTemplate DataType="{x:Type tt:TextBoxExtendedDataField}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="Key"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-										<TextBlock Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="{Binding Name}"/>
-										<TextBox Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" LostFocus="TextBox_UpdateBinding"
+                                        <!--TODO bind validation (TextIsInt/TextIsDouble)--> 
+                                        <TextBlock Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="{Binding Name}"/>
+                                        <TextBox Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" LostFocus="TextBox_UpdateBinding"
 											Text="{Binding Value, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 											IsEnabled="{Binding DataEditor.HasSelection}"
 											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}"/>
-									</Grid>
-								</DataTemplate>
+                                    </Grid>
+                                </DataTemplate>
 
-								<DataTemplate DataType="{x:Type tt:ComboBoxExtendedDataField}">
-									<Grid>
-										<Grid.ColumnDefinitions>
-											<ColumnDefinition Width="Auto" SharedSizeGroup="Key"/>
-											<ColumnDefinition Width="*"/>
-										</Grid.ColumnDefinitions>
+                                <DataTemplate DataType="{x:Type tt:ComboBoxExtendedDataField}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="Key"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-										<TextBlock Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="{Binding Name}"/>
-										<ComboBox Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
+                                        <TextBlock Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="{Binding Name}"/>
+                                        <ComboBox Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
 											ItemsSource="{Binding Values}"
 											IsEditable="{Binding IsEditable}"
 											IsEnabled="{Binding DataEditor.HasSelection}"
 											ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}"
 											Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}"/>
-									</Grid>
-								</DataTemplate>
+                                    </Grid>
+                                </DataTemplate>
 
-								<DataTemplate DataType="{x:Type tt:CheckBoxExtendedDataField}">
-									<Grid>
-										<Grid.ColumnDefinitions>
-											<ColumnDefinition Width="Auto" SharedSizeGroup="Key"/>
-											<ColumnDefinition Width="*"/>
-										</Grid.ColumnDefinitions>
+                                <DataTemplate DataType="{x:Type tt:CheckBoxExtendedDataField}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="Key"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-										<CheckBox Grid.Column="1" Content="{Binding Name}"
+                                        <CheckBox Grid.Column="1" Content="{Binding Name}"
 											Style="{StaticResource ResourceKey=styleFieldValue}"
 											IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 											IsEnabled="{Binding DataEditor.HasSelection}"
 											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}"/>
-									</Grid>
-								</DataTemplate>
-							</ItemsControl.Resources>
-						</ItemsControl>
-					</Expander>
-				</StackPanel>
-			</ScrollViewer>
-		</Grid>
-	</Grid>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.Resources>
+                        </ItemsControl>
+                    </Expander>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
 </UserControl>

@@ -359,7 +359,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\TwoTrailsSetup.msi"
+        "OutputFilename" = "8:Release\\TwoTrailsPC_Setup.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -635,7 +635,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:TwoTrails, Version=1.0.2.31429, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:TwoTrails, Version=1.0.0.24973, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_69904C8FA7C446E6802997F73E3A4899"
@@ -1049,7 +1049,7 @@
         {
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_640CBCA699CB4465B9BFEF37E85838E0"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder]FMSC\\TwoTrails"
+            "DefaultLocation" = "8:[ProgramFilesFolder]\\FMSC\\TwoTrails"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -1077,6 +1077,17 @@
                     "Property" = "8:_50A7B5D7BA284E2DA92E876825E4BCBD"
                         "Folders"
                         {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_594025F9E6E049C980C2C974AC6A5F76"
+                            {
+                            "Name" = "8:TwoTrails"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_17387E61C00C493D820CA66AF6BC1F77"
+                                "Folders"
+                                {
+                                }
+                            }
                         }
                     }
                 }
@@ -1109,7 +1120,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:TwoTrails"
         "ProductCode" = "8:{CCF5C47E-5353-40E8-84D6-DFA24821839C}"
-        "PackageCode" = "8:{6093E64E-39AF-4A53-AA73-3F2DD03828A3}"
+        "PackageCode" = "8:{E3F9FEE9-38BC-4CD1-95A2-4FDF80B2FB1D}"
         "UpgradeCode" = "8:{3F39E4A3-41AF-4465-94BF-F45C37B5CD74}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1120,7 +1131,7 @@
         "Manufacturer" = "8:Fortest Management Service Center"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://www.fs.fed.us/forestmanagement/products/measurement/area-determination/index.shtml"
-        "Title" = "8:TwoTrailsSetup"
+        "Title" = "8:TwoTrailsPC Installer"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Fortest Management Service Center"
         "Keywords" = "8:"
@@ -1252,7 +1263,7 @@
             "IconIndex" = "3:1"
             "Transitive" = "11:FALSE"
             "Target" = "8:_69904C8FA7C446E6802997F73E3A4899"
-            "Folder" = "8:_F98E633DE7A2486C9B82A642640F9669"
+            "Folder" = "8:_594025F9E6E049C980C2C974AC6A5F76"
             "WorkingFolder" = "8:_640CBCA699CB4465B9BFEF37E85838E0"
             "Icon" = "8:_69904C8FA7C446E6802997F73E3A4899"
             "Feature" = "8:"

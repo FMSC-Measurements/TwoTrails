@@ -163,14 +163,14 @@
                     <Separator/>
 
                     <MenuItem Header="Create Grid Sample Points" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
-                          Style="{StaticResource styleMiDisableNullCommand}" InputGestureText="Ctrl+Alt+P"/>
+                          InputGestureText="Ctrl+Alt+P"/><!--Style="{StaticResource styleMiDisableNullCommand}"--> 
                     <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
                           Style="{StaticResource styleMiPointEdit}" InputGestureText="Ctrl+Alt+C"/>
 
-                    <Separator/>
+                    <Separator Visibility="Collapsed"/>
 
                     <MenuItem Header="Modify Data Dictionary" Command="{Binding CurrentEditor.ModifyDataDictionaryCommand}" IsEnabled="{Binding HasOpenedProject}"
-                              Style="{StaticResource styleMiDisableNullCommand}" />
+                              Style="{StaticResource styleMiDisableNullCommand}" Visibility="Collapsed" />
 
                     <Separator/>
 
