@@ -6,88 +6,16 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        <cvt:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis" />
-        <cvt:NullOrBoolConverter x:Key="NullOrBool"/>
-        <cvt:NotNullConverter x:Key="NotNullConverter"/>
-        <cvt:NotNullVisibilityConverter x:Key="NotNullVisibilityConverter"/>
-        <cvt:InverseBooleanConverter x:Key="IBC"/>
-        <cvt:MultiBooleanConverter x:Key="MultiBoolConverter"/>
 
-        <sys:Boolean x:Key="True">True</sys:Boolean>
-        <sys:Boolean x:Key="False">False</sys:Boolean>
-        
-        <BitmapImage x:Key="ImgTwoTrailsIcon" UriSource="Resources/TwoTrailsIcon.png" />
-        
-        <BitmapImage x:Key="ImgOpenInNew" UriSource="Resources/open_in_new.png" />
-        <BitmapImage x:Key="ImgCloseWhite" UriSource="Resources/close_white.png" />
-        <BitmapImage x:Key="ImgCloseBlack" UriSource="Resources/close_black.png" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary  Source="TtResources.xaml"/>
+                
+                <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />-->
 
-        <BitmapImage x:Key="ic_polygon_black" UriSource="Resources/ic_polygon_black_36dp.png" />
-        <BitmapImage x:Key="ic_polygon_pts_black" UriSource="Resources/ic_polygon_pts_black_36dp.png" />
-        <BitmapImage x:Key="ic_polygon_pts_white" UriSource="Resources/ic_polygon_pts_white_36dp.png" />
-        <BitmapImage x:Key="ic_polygon_white" UriSource="Resources/ic_polygon_white_36dp.png" />
-        <BitmapImage x:Key="ic_unadjusted_polygon_black" UriSource="Resources/ic_unadjusted_polygon_black_36dp.png" />
-        <BitmapImage x:Key="ic_unadjusted_polygon_pts_black" UriSource="Resources/ic_unadjusted_polygon_pts_black_36dp.png" />
-        <BitmapImage x:Key="ic_unadjusted_polygon_pts_white" UriSource="Resources/ic_unadjusted_polygon_pts_white_36dp.png" />
-        <BitmapImage x:Key="ic_unadjusted_polygon_white" UriSource="Resources/ic_unadjusted_polygon_white_36dp.png" />
-        <BitmapImage x:Key="ic_ttpoint_way_black" UriSource="Resources/ic_ttpoint_way_black.png" />
-        <BitmapImage x:Key="ic_ttpoint_way_white" UriSource="Resources/ic_ttpoint_way_white.png" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
 
-
-        <Style x:Key="styleMiDisableNullCommand" TargetType="{x:Type MenuItem}">
-            <Style.Triggers>
-                <Trigger Property="Command" Value="{x:Null}">
-                    <Setter Property="IsEnabled" Value="False" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <SolidColorBrush x:Key="colorPriamry" Color="MediumSeaGreen" />
-        <SolidColorBrush x:Key="colorPriamryLighter" Color="PaleGreen" />
-        <SolidColorBrush x:Key="colorPriamryLight" Color="DarkSeaGreen" />
-        <SolidColorBrush x:Key="colorPriamryDark" Color="SeaGreen" />
-        <SolidColorBrush x:Key="colorBackground" Color="DimGray" />
-
-        <SolidColorBrush x:Key="colorSystemBackground" Color="LightGray" />
-
-
-        <x:Array x:Key="arrGps" Type="sys:String" >
-            <sys:String>Juniper Allegro 2</sys:String>
-            <sys:String>Juniper Allegro MX</sys:String>
-            <sys:String>Juniper Archer 2</sys:String>
-            <sys:String>Juniper Mesa</sys:String>
-            <sys:String>QStarz 1000XT</sys:String>
-            <sys:String>Trimble Geo 7X</sys:String>
-            <sys:String>Trimble Geo 6000</sys:String>
-            <sys:String>Trimble Juno 3B</sys:String>
-            <sys:String>Trimble Juno 5B</sys:String>
-            <sys:String>Trimble Juno SB</sys:String>
-            <sys:String>Trimble Nomad</sys:String>
-            <sys:String>Trimble R1</sys:String>
-            <sys:String>Trimble TDC100</sys:String>
-            <sys:String>Trimble XT</sys:String>
-            <sys:String>Trimble XM</sys:String>
-            <sys:String>Trimble Yuma</sys:String>
-            <sys:String>Trimble Yuma 2</sys:String>
-        </x:Array>
-        
-        <x:Array x:Key="arrRangeFinder" Type="sys:String" >
-            <sys:String>Impulse 100</sys:String>
-            <sys:String>Impulse 200</sys:String>
-            <sys:String>Impulse Other</sys:String>
-            <sys:String>TruPulse 200</sys:String>
-            <sys:String>TruPulse 360</sys:String>
-            <sys:String>TruPulse Other</sys:String>
-            <sys:String>Logger Tape</sys:String>
-            <sys:String>Nylon Tape</sys:String>
-            <sys:String>Chains</sys:String>
-        </x:Array>
-
-        <x:Array x:Key="arrCompass" Type="sys:String" >
-            <sys:String>Silva</sys:String>
-            <sys:String>Suunto</sys:String>
-            <sys:String>Other</sys:String>
-        </x:Array>
     </Application.Resources>
 </Application>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Mapping;
 
@@ -80,6 +81,18 @@ namespace TwoTrails.Controls
         public MapControl(TtManager manager) : this()
         {
             Manager = manager;
+        }
+
+        private void ColapseAllPolyControl(object sender, MouseButtonEventArgs e)
+        {
+            gridAllPolyCtrls.Visibility = gridAllPolyCtrls.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void ZoomToAllPolys(object sender, RoutedEventArgs e)
+        {
+            IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
+            if (locs.Any())
+                map.SetView(locs, new Thickness(30), 0);
         }
     }
 }
