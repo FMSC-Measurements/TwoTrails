@@ -85,7 +85,7 @@
                                 <CheckBox IsChecked="{Binding Visible}" Grid.Column="2"/>
                             </Grid>
 
-                            <Grid Name="gridAllPolyCtrls" Grid.Row="1">
+                            <Grid Name="gridAllPolyCtrls" Grid.Row="1" DataContext="{Binding PolygonVisibilityControl}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
@@ -99,25 +99,15 @@
                                     <RowDefinition Height="35"/>
                                 </Grid.RowDefinitions>
 
-                                <fmscc:FlipCheckBox Grid.Column="0" IsChecked="{Binding AdjBndVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
-                                    <fmscc:FlipCheckBox.ToolTip>
+                                <CheckBox Grid.Column="0" IsChecked="{Binding AdjBndVisible, Mode=TwoWay}">
+                                    <CheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
                                                 <TextBlock Text="Adjusted Boundary" Padding="2.5"/>
                                             </Border>
                                         </Grid>
-                                    </fmscc:FlipCheckBox.ToolTip>
-                                    <fmscc:FlipCheckBox.Front>
-                                        <Grid Background="{Binding Graphics.AdjBndBrush}">
-                                            <Image Source="{StaticResource ic_polygon_white}" Style="{StaticResource flpImageStyle}"/>
-                                        </Grid>
-                                    </fmscc:FlipCheckBox.Front>
-                                    <fmscc:FlipCheckBox.Back>
-                                        <Grid Background="Gray">
-                                            <Image Source="{StaticResource ic_polygon_white}" Style="{StaticResource flpImageStyle}"/>
-                                        </Grid>
-                                    </fmscc:FlipCheckBox.Back>
-                                </fmscc:FlipCheckBox>
+                                    </CheckBox.ToolTip>
+                                </CheckBox>
 
                                 <fmscc:FlipCheckBox Grid.Column="1" IsChecked="{Binding AdjBndPointsVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
                                     <fmscc:FlipCheckBox.ToolTip>

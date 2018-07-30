@@ -216,6 +216,7 @@
     <Compile Include="Mapping\PointInfoBox.xaml.cs">
       <DependentUpon>PointInfoBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\PolygonVisibilityControl.cs" />
     <Compile Include="Mapping\TtMapManager.cs" />
     <Compile Include="Mapping\TtMapPath.cs" />
     <Compile Include="Mapping\TtMapPoint.cs" />
