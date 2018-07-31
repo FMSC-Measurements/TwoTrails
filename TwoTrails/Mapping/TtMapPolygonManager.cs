@@ -80,6 +80,7 @@ namespace TwoTrails.Mapping
                 lock (locker)
                 {
                     SetField(ref _AdjBndVisible, value, () => { AdjBoundary.Visible = value && _Visible; }); 
+                    OnPropertyChanged(nameof(AdjBndVisible));
                 }
             }
         }

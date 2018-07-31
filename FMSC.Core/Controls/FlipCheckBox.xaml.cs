@@ -16,7 +16,7 @@ namespace FMSC.Core.Controls
     public partial class FlipCheckBox : UserControl, INotifyPropertyChanged
     {
         public static readonly DependencyProperty FrontProperty =
-            DependencyProperty.Register("Front", typeof(UIElement), typeof(FlipCheckBox), new UIPropertyMetadata(null));
+            DependencyProperty.Register(nameof(Front), typeof(UIElement), typeof(FlipCheckBox), new UIPropertyMetadata(null));
         public UIElement Front
         {
             get { return (UIElement)GetValue(FrontProperty); }
@@ -24,7 +24,7 @@ namespace FMSC.Core.Controls
         }
 
         public static readonly DependencyProperty BackProperty =
-            DependencyProperty.Register("Back", typeof(UIElement), typeof(FlipCheckBox), new UIPropertyMetadata(null));
+            DependencyProperty.Register(nameof(Back), typeof(UIElement), typeof(FlipCheckBox), new UIPropertyMetadata(null));
         public UIElement Back
         {
             get { return (UIElement)GetValue(BackProperty); }
@@ -32,7 +32,7 @@ namespace FMSC.Core.Controls
         }
 
         public static readonly DependencyProperty FlipDurationProperty =
-            DependencyProperty.Register("FlipDuration", typeof(Duration), typeof(FlipCheckBox), new UIPropertyMetadata((Duration)TimeSpan.FromSeconds(0.5)));
+            DependencyProperty.Register(nameof(FlipDuration), typeof(Duration), typeof(FlipCheckBox), new UIPropertyMetadata((Duration)TimeSpan.FromSeconds(0.5)));
         public Duration FlipDuration
         {
             get { return (Duration)GetValue(FlipDurationProperty); }
@@ -42,7 +42,7 @@ namespace FMSC.Core.Controls
 
 
         public static readonly DependencyProperty IsCheckedProperty =
-            DependencyProperty.Register("IsChecked", typeof(bool), typeof(FlipCheckBox), new PropertyMetadata(false));
+            DependencyProperty.Register(nameof(IsChecked), typeof(bool), typeof(FlipCheckBox), new PropertyMetadata(false));
         public bool IsChecked
         {
             get { return (bool)GetValue(IsCheckedProperty); }
@@ -51,7 +51,6 @@ namespace FMSC.Core.Controls
                 if (IsChecked != value)
                 {
                     SetValue(IsCheckedProperty, value);
-
                     Flip(value);
                 }
             }

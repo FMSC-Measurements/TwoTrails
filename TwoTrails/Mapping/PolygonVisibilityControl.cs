@@ -14,7 +14,7 @@ namespace TwoTrails.Mapping
 {
     public class PolygonVisibilityControl : NotifyPropertyChangedEx
     {
-        private readonly ObservableCollection<TtMapPolygonManager> PolygonManagers;
+        private ObservableCollection<TtMapPolygonManager> PolygonManagers { get; set; }
 
         private readonly PropertyInfo VisibileProperty;
         private readonly PropertyInfo AdjBndVisibleProperty;
@@ -32,7 +32,7 @@ namespace TwoTrails.Mapping
         private bool ignoreChanges;
 
 
-        public PolygonVisibilityControl()
+        public PolygonVisibilityControl(ObservableCollection<TtMapPolygonManager> polyManagers)
         {
             Type type = typeof(TtMapPolygonManager);
 
@@ -48,11 +48,9 @@ namespace TwoTrails.Mapping
             AdjMiscPointsVisibleProperty = type.GetProperty(nameof(TtMapPolygonManager.AdjMiscPointsVisible));
             UnAdjMiscPointsVisibleProperty = type.GetProperty(nameof(TtMapPolygonManager.UnAdjMiscPointsVisible));
             WayPointsVisibleProperty = type.GetProperty(nameof(TtMapPolygonManager.WayPointsVisible));
-        }
+            
+            PolygonManagers = polyManagers;
 
-
-        public void AddManagers(ObservableCollection<TtMapPolygonManager> polyManagers)
-        {
             foreach (TtMapPolygonManager pm in PolygonManagers)
             {
                 pm.PropertyChanged += PolyManager_PropertyChanged;
@@ -60,7 +58,6 @@ namespace TwoTrails.Mapping
 
             PolygonManagers.CollectionChanged += PolygonManagers_CollectionChanged;
         }
-
 
         private void PolygonManagers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -93,7 +90,7 @@ namespace TwoTrails.Mapping
 
         private void PolyManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is TtMapPolygonManager pm)
+            if (!ignoreChanges && sender is TtMapPolygonManager pm)
             {
                 switch (e.PropertyName)
                 {
@@ -124,8 +121,9 @@ namespace TwoTrails.Mapping
                 field = null;
             else if (Visible == null)
             {
-                bool areVis = PolygonManagers.All(pm => (bool)propertyInfo.GetValue(pm));
-                field = areVis || PolygonManagers.All(pm => !(bool)propertyInfo.GetValue(pm)) ? (bool?)areVis : null;
+                bool allAreVis = PolygonManagers.All(pm => (bool)propertyInfo.GetValue(pm));
+                bool allNotVis = PolygonManagers.All(pm => !(bool)propertyInfo.GetValue(pm));
+                field = allAreVis || allNotVis ? (bool?)allAreVis : null;
             }
 
             OnPropertyChanged(propertyInfo.Name);
@@ -136,24 +134,33 @@ namespace TwoTrails.Mapping
 
         private bool SetVisibilityField(ref bool? field, bool? value, PropertyInfo propertyInfo, [CallerMemberName] string propertyName = null)
         {
-            if (field != value && !ignoreChanges)
-            {
-                field = value;
+            bool fieldChanged = false;
 
-                if (field is bool val)
+            if (!ignoreChanges)
+            {
+                ignoreChanges = true;
+
+                if (field != value)
                 {
-                    foreach (TtMapPolygonManager pm in PolygonManagers)
+                    field = value;
+
+                    if (field is bool val)
                     {
-                        propertyInfo.SetValue(pm, val);
+                        foreach (TtMapPolygonManager pm in PolygonManagers)
+                        {
+                            propertyInfo.SetValue(pm, val);
+                        }
                     }
+
+                    OnPropertyChanged(propertyName);
+
+                    fieldChanged = true;
                 }
 
-                OnPropertyChanged(propertyName);
-
-                return true;
+                ignoreChanges = false; 
             }
 
-            return false;
+            return fieldChanged;
         }
 
 

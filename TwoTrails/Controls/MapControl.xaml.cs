@@ -41,8 +41,6 @@ namespace TwoTrails.Controls
 
         public MapControl()
         {
-            PolygonVisibilityControl = new PolygonVisibilityControl();
-
             InitializeComponent();
             map.CredentialsProvider = new ApplicationIdCredentialsProvider(APIKeys.BING_MAPS_API_KEY);
             
@@ -50,7 +48,7 @@ namespace TwoTrails.Controls
 
             map.Loaded += (s, e) =>
             {
-                if (map.ActualHeight > 0)
+                if (map.ActualHeight > 0 && MapManager != null)
                 {
                     IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
                     if (locs.Any())
@@ -75,15 +73,11 @@ namespace TwoTrails.Controls
 
             this.Loaded += (s, e) =>
             {
-                if (Manager != null)
+                if (Manager != null && MapManager == null)
                 {
-                    if (MapManager == null)
-                    {
-                        MapManager = new TtMapManager(map, Manager);
-                        PolygonVisibilityControl.AddManagers(MapManager.PolygonManagers);
-                    }
-
-                    lvPolygons.ItemsSource = MapManager.PolygonManagers;
+                    MapManager = new TtMapManager(map, Manager);
+                    PolygonVisibilityControl = new PolygonVisibilityControl(MapManager.PolygonManagers);
+                    DataContext = this;
                 }
             };
         }

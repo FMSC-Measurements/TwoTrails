@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:map="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
              xmlns:fmscc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
+             xmlns:mapping="clr-namespace:TwoTrails.Mapping"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
     <UserControl.Resources>
@@ -85,7 +86,7 @@
                                 <CheckBox IsChecked="{Binding Visible}" Grid.Column="2"/>
                             </Grid>
 
-                            <Grid Name="gridAllPolyCtrls" Grid.Row="1" DataContext="{Binding PolygonVisibilityControl}">
+                            <Grid Name="gridAllPolyCtrls" Grid.Row="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
@@ -99,7 +100,8 @@
                                     <RowDefinition Height="35"/>
                                 </Grid.RowDefinitions>
 
-                                <CheckBox Grid.Column="0" IsChecked="{Binding AdjBndVisible, Mode=TwoWay}">
+                                <CheckBox Grid.Column="0" DataContext="{Binding PolygonVisibilityControl}"
+                                          IsChecked="{Binding AdjBndVisible, Mode=TwoWay}" IsThreeState="True">
                                     <CheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -109,25 +111,15 @@
                                     </CheckBox.ToolTip>
                                 </CheckBox>
 
-                                <fmscc:FlipCheckBox Grid.Column="1" IsChecked="{Binding AdjBndPointsVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
-                                    <fmscc:FlipCheckBox.ToolTip>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding PolygonVisibilityControl.AdjBndPointsVisible, Mode=TwoWay}" IsThreeState="True">
+                                    <CheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
                                                 <TextBlock Text="Adjusted Boundary Points" Padding="2.5"/>
                                             </Border>
                                         </Grid>
-                                    </fmscc:FlipCheckBox.ToolTip>
-                                    <fmscc:FlipCheckBox.Front>
-                                        <Grid Background="{Binding Graphics.AdjPtsBrush}">
-                                            <Image Source="{StaticResource ic_polygon_pts_white}" Style="{StaticResource flpImageStyle}"/>
-                                        </Grid>
-                                    </fmscc:FlipCheckBox.Front>
-                                    <fmscc:FlipCheckBox.Back>
-                                        <Grid Background="Gray">
-                                            <Image Source="{StaticResource ic_polygon_pts_white}" Style="{StaticResource flpImageStyle}"/>
-                                        </Grid>
-                                    </fmscc:FlipCheckBox.Back>
-                                </fmscc:FlipCheckBox>
+                                    </CheckBox.ToolTip>
+                                </CheckBox>
 
                                 <fmscc:FlipCheckBox Grid.Column="2" IsChecked="{Binding UnAdjBndVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
                                     <fmscc:FlipCheckBox.ToolTip>
@@ -317,7 +309,8 @@
             </Grid>
 
             <ListView x:Name="lvPolygons" Grid.Row="1" Background="LightGray"
-                      ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                      ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                      ItemsSource="{Binding MapManager.PolygonManagers, UpdateSourceTrigger=PropertyChanged}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="Background" Value="White" />
@@ -331,7 +324,7 @@
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate DataType="{x:Type mapping:TtMapPolygonManager}">
                         <Grid Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ScrollContentPresenter}}}">
                             <Border Padding="5" Margin="2.5" Background="WhiteSmoke">
                                 <Grid>
@@ -365,7 +358,7 @@
                                                 </Grid>
                                             </Button.ToolTip>
                                         </Button>
-                                        <CheckBox IsChecked="{Binding Visible}" Grid.Column="2"/>
+                                        <CheckBox IsChecked="{Binding Visible, Mode=TwoWay}" Grid.Column="2"/>
                                     </Grid>
 
                                     <Grid Grid.Row="1">
@@ -382,7 +375,7 @@
                                             <RowDefinition Height="35"/>
                                         </Grid.RowDefinitions>
 
-                                        <fmscc:FlipCheckBox Grid.Column="0" IsChecked="{Binding AdjBndVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                        <fmscc:FlipCheckBox Grid.Column="0" IsChecked="{Binding AdjBndVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource fcbStyle}">
                                             <fmscc:FlipCheckBox.ToolTip>
                                                 <Grid Background="WhiteSmoke">
                                                     <Border BorderThickness="0.75" BorderBrush="Black">
