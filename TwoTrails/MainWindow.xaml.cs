@@ -15,6 +15,13 @@ namespace TwoTrails
         public MainWindow()
         {
             InitializeComponent();
+
+            if (SystemParameters.PrimaryScreenHeight < 840 || SystemParameters.PrimaryScreenWidth < 1000)
+            {
+                this.Width = 700;
+                this.Height = 500;
+            }
+
             MainModel = new MainWindowModel(this);
             this.DataContext = MainModel;
 
