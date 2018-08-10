@@ -8,8 +8,8 @@
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
         Title="TwoTrails"
-        Width="1000" MinWidth="710"
-        Height="800" MinHeight="550"
+        Width="1000" MinWidth="700"
+        Height="800" MinHeight="500"
         WindowStartupLocation="CenterScreen">
 
     <Window.InputBindings>
