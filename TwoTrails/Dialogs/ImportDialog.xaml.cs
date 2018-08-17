@@ -34,7 +34,10 @@ namespace TwoTrails.Dialogs
 
             if (files != null && files.Length > 0)
             {
-                _ImportModel.SetupImport(files.First());
+                if (files.Length > 1 && files.All(f => f.EndsWith(Consts.SHAPE_EXT, StringComparison.InvariantCultureIgnoreCase)))
+                    _ImportModel.SetupShapeFiles(files);
+                else
+                    _ImportModel.SetupImport(files.First());
             }
         }
     }

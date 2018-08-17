@@ -92,7 +92,7 @@ namespace TwoTrails.Core
 
                     if (TotalGpsError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
-                        sb.AppendFormat("GPS Contribution: {0:0.000} Ha ({1:0.00} ac){2}",
+                        sb.AppendFormat("GPS area-error Contribution: {0:0.000} Ha ({1:0.00} ac){2}",
                             Math.Round(FMSC.Core.Convert.MetersSquaredToHa(TotalGpsError), 2),
                             Math.Round(FMSC.Core.Convert.MetersSquaredToAcres(TotalGpsError), 2),
                             Environment.NewLine);

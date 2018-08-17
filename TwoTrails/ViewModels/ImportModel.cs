@@ -230,7 +230,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
             }
         }
 
-        private void SetupShapeFiles(IEnumerable<string> shapefiles)
+        public void SetupShapeFiles(IEnumerable<string> shapefiles)
         {
             ImportControl = new ImportControl(
                         new TtShapeFileDataAccessLayer(

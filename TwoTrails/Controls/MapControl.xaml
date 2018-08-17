@@ -50,7 +50,7 @@
             <Grid Grid.Row="0">
                 <Grid Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ScrollContentPresenter}}}">
                     <Border Padding="5" Margin="2.5" Background="WhiteSmoke">
-                        <Grid>
+                        <Grid DataContext="{Binding PolygonVisibilityControl}"><!--{Binding ElementName=lvPolygons, Path=SelectedItem}">-->
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="40"/>
                                 <RowDefinition Height="Auto"/>
@@ -100,8 +100,7 @@
                                     <RowDefinition Height="35"/>
                                 </Grid.RowDefinitions>
 
-                                <CheckBox Grid.Column="0" DataContext="{Binding PolygonVisibilityControl}"
-                                          IsChecked="{Binding AdjBndVisible, Mode=TwoWay}" IsThreeState="True">
+                                <CheckBox Grid.Column="0" IsChecked="{Binding AdjBndVisible, Mode=TwoWay}">
                                     <CheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -111,7 +110,7 @@
                                     </CheckBox.ToolTip>
                                 </CheckBox>
 
-                                <CheckBox Grid.Column="1" IsChecked="{Binding PolygonVisibilityControl.AdjBndPointsVisible, Mode=TwoWay}" IsThreeState="True">
+                                <CheckBox Grid.Column="1" IsChecked="{Binding AdjBndPointsVisible, Mode=TwoWay}">
                                     <CheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -120,6 +119,47 @@
                                         </Grid>
                                     </CheckBox.ToolTip>
                                 </CheckBox>
+
+                                <!--<fmscc:FlipCheckBox Grid.Column="0" IsChecked="{Binding AdjBndVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource fcbStyle}">
+                                    <fmscc:FlipCheckBox.ToolTip>
+                                        <Grid Background="WhiteSmoke">
+                                            <Border BorderThickness="0.75" BorderBrush="Black">
+                                                <TextBlock Text="Adjusted Boundary" Padding="2.5"/>
+                                            </Border>
+                                        </Grid>
+                                    </fmscc:FlipCheckBox.ToolTip>
+                                    <fmscc:FlipCheckBox.Front>
+                                        <Grid Background="SeaGreen">
+                                            <Image Source="{StaticResource ic_polygon_white}" Style="{StaticResource flpImageStyle}"/>
+                                        </Grid>
+                                    </fmscc:FlipCheckBox.Front>
+                                    <fmscc:FlipCheckBox.Back>
+                                        <Grid Background="Gray">
+                                            <Image Source="{StaticResource ic_polygon_white}" Style="{StaticResource flpImageStyle}"/>
+                                        </Grid>
+                                    </fmscc:FlipCheckBox.Back>
+                                </fmscc:FlipCheckBox>-->
+
+                                <!--<fmscc:FlipCheckBox Grid.Column="1" IsChecked="{Binding AdjBndPointsVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                    <fmscc:FlipCheckBox.ToolTip>
+                                        <Grid Background="WhiteSmoke">
+                                            <Border BorderThickness="0.75" BorderBrush="Black">
+                                                <TextBlock Text="Adjusted Boundary Points" Padding="2.5"/>
+                                            </Border>
+                                        </Grid>
+                                    </fmscc:FlipCheckBox.ToolTip>
+                                    <fmscc:FlipCheckBox.Front>
+                                        <Grid Background="{Binding Graphics.AdjPtsBrush}">
+                                            <Image Source="{StaticResource ic_polygon_pts_white}" Style="{StaticResource flpImageStyle}"/>
+                                        </Grid>
+                                    </fmscc:FlipCheckBox.Front>
+                                    <fmscc:FlipCheckBox.Back>
+                                        <Grid Background="Gray">
+                                            <Image Source="{StaticResource ic_polygon_pts_white}" Style="{StaticResource flpImageStyle}"/>
+                                        </Grid>
+                                    </fmscc:FlipCheckBox.Back>
+                                </fmscc:FlipCheckBox>-->
+
 
                                 <fmscc:FlipCheckBox Grid.Column="2" IsChecked="{Binding UnAdjBndVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
                                     <fmscc:FlipCheckBox.ToolTip>
@@ -308,22 +348,23 @@
                 </Grid>
             </Grid>
 
-            <ListView x:Name="lvPolygons" Grid.Row="1" Background="LightGray"
+            <ListBox x:Name="lvPolygons" Grid.Row="1" Background="LightGray"
                       ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                      ScrollViewer.CanContentScroll="False"
                       ItemsSource="{Binding MapManager.PolygonManagers, UpdateSourceTrigger=PropertyChanged}">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Background" Value="White" />
                         <Setter Property="Template">
                             <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
                                     <ContentPresenter />
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
                     </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type mapping:TtMapPolygonManager}">
                         <Grid Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ScrollContentPresenter}}}">
                             <Border Padding="5" Margin="2.5" Background="WhiteSmoke">
@@ -340,7 +381,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Text="{Binding Polygon.Name}" Grid.Column="0" TextTrimming="WordEllipsis" FontWeight="Bold" FontSize="18" VerticalAlignment="Bottom">
+                                        <TextBlock Text="{Binding Polygon.Name}" Grid.Column="0" TextTrimming="WordEllipsis" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
                                             <TextBlock.ToolTip>
                                                 <Grid Background="WhiteSmoke">
                                                     <Border BorderThickness="0.75" BorderBrush="Black">
@@ -362,6 +403,15 @@
                                     </Grid>
 
                                     <Grid Grid.Row="1">
+                                        <Grid.Style>
+                                            <Style>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" Value="False">
+                                                        <Setter Property="Grid.Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Grid.Style>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
@@ -601,8 +651,8 @@
                             </Border>
                         </Grid>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
 
         <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Gray"/>
