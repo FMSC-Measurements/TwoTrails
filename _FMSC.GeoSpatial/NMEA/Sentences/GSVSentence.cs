@@ -46,7 +46,7 @@ namespace FMSC.GeoSpatial.NMEA.Sentences
                             throw new MismatchMessageCountException();
                         }
 
-                        this.TotalMessageCount++;
+                        this.MessageCount++;
 
                         //ignore message id, assuming there are no duplicate messages
 

@@ -67,7 +67,7 @@ namespace FMSC.GeoSpatial
 
             int deg = (int)decDMS;
 
-            double decMin = (decDMS - deg) / 36;
+            double decMin = (decDMS - deg) * 100.0;
 
             int min = (int)decMin;
             double sec = (decMin - min) * 60d;

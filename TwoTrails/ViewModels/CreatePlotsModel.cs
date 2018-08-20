@@ -385,152 +385,152 @@ namespace TwoTrails.ViewModels
 
         private void GeneratePointsInIndividualPolys(string baseName)
         {
-            double gridX = FMSC.Core.Convert.Distance(GridX, Distance.Meters, UomDistance);
-            double gridY = FMSC.Core.Convert.Distance(GridY, Distance.Meters, UomDistance);
+        //    double gridX = FMSC.Core.Convert.Distance(GridX, Distance.Meters, UomDistance);
+        //    double gridY = FMSC.Core.Convert.Distance(GridY, Distance.Meters, UomDistance);
 
-            double angle = Tilt * -1;
+        //    double angle = Tilt * -1;
 
-            int polyCount = _Manager.PolygonCount;
-            IEnumerable<TtPolygon> polys = IncludedPolygons.Select(p =>
-            {
-                return new TtPolygon()
-                {
-                    Name = $"{baseName}({p.Name})",
-                    PointStartIndex = (++polyCount) * 1000 + 10,
-                    Increment = 1,
-                    Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon {p.Name} as a group of {IncludedPolygons.Count} polygons"
-                };
-            });
+        //    int polyCount = _Manager.PolygonCount;
+        //    IEnumerable<TtPolygon> polys = IncludedPolygons.Select(p =>
+        //    {
+        //        return new TtPolygon()
+        //        {
+        //            Name = $"{baseName}({p.Name})",
+        //            PointStartIndex = (++polyCount) * 1000 + 10,
+        //            Increment = 1,
+        //            Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon {p.Name} as a group of {IncludedPolygons.Count} polygons"
+        //        };
+        //    });
 
-            TtMetadata defMeta = _Manager.DefaultMetadata;
+        //    TtMetadata defMeta = _Manager.DefaultMetadata;
 
-            List<Tuple<TtPolygon, IEnumerable<Point>>> polyIncudePoints =
-                IncludedPolygons.Select(p => Tuple.Create(p, _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint())))
-                .Select(pp => Tuple.Create(pp.Item1, pp.Item2.Select(p => TtUtils.GetCoords(p, defMeta.Zone).ToPoint()))).ToList();
+        //    List<Tuple<TtPolygon, IEnumerable<Point>>> polyIncudePoints =
+        //        IncludedPolygons.Select(p => Tuple.Create(p, _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint())))
+        //        .Select(pp => Tuple.Create(pp.Item1, pp.Item2.Select(p => TtUtils.GetCoords(p, defMeta.Zone).ToPoint()))).ToList();
 
-            List<Point> allPoints = polyIncudePoints.SelectMany(pts => pts.Item2).ToList(); ;
+        //    List<Point> allPoints = polyIncudePoints.SelectMany(pts => pts.Item2).ToList(); ;
 
-            UtmExtent.Builder builder = new UtmExtent.Builder(defMeta.Zone);
-            builder.Include(allPoints);
-            UtmExtent totalExtents = builder.Build();
+        //    UtmExtent.Builder builder = new UtmExtent.Builder(defMeta.Zone);
+        //    builder.Include(allPoints);
+        //    UtmExtent totalExtents = builder.Build();
 
-            Random rand = new Random();
-            UTMCoords startCoords = SelectedPoint != null ?
-                TtUtils.GetCoords(SelectedPoint, defMeta.Zone) :
-                new UTMCoords(
-                    (rand.NextDouble() * (totalExtents.East - totalExtents.West) + totalExtents.West),
-                    (rand.NextDouble() * (totalExtents.North - totalExtents.South) + totalExtents.South),
-                    defMeta.Zone
-                );
+        //    Random rand = new Random();
+        //    UTMCoords startCoords = SelectedPoint != null ?
+        //        TtUtils.GetCoords(SelectedPoint, defMeta.Zone) :
+        //        new UTMCoords(
+        //            (rand.NextDouble() * (totalExtents.East - totalExtents.West) + totalExtents.West),
+        //            (rand.NextDouble() * (totalExtents.North - totalExtents.South) + totalExtents.South),
+        //            defMeta.Zone
+        //        );
 
-            PolygonCalculator.Boundaries totalPolyBnds = new PolygonCalculator(allPoints).PointBoundaries;
+        //    PolygonCalculator.Boundaries totalPolyBnds = new PolygonCalculator(allPoints).PointBoundaries;
 
-            List<Tuple<TtPolygon, PolygonCalculator>> polyIncludeCalcs = polyIncudePoints.Select(pp => Tuple.Create(pp.Item1, new PolygonCalculator(pp.Item2))).ToList();
-            List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint()))
-                                                    .Select(pp => pp.Select(p => TtUtils.GetCoords(p, defMeta.Zone).ToPoint()))
-                                                    .Select(pp => new PolygonCalculator(pp)).ToList();
+        //    List<Tuple<TtPolygon, PolygonCalculator>> polyIncludeCalcs = polyIncudePoints.Select(pp => Tuple.Create(pp.Item1, new PolygonCalculator(pp.Item2))).ToList();
+        //    List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint()))
+        //                                            .Select(pp => pp.Select(p => TtUtils.GetCoords(p, defMeta.Zone).ToPoint()))
+        //                                            .Select(pp => new PolygonCalculator(pp)).ToList();
 
-            Point farCorner = TtUtils.GetFarthestCorner(
-                startCoords.X, startCoords.Y,
-                totalPolyBnds.TopLeft.Y, totalPolyBnds.BottomRight.Y,
-                totalPolyBnds.TopLeft.X, totalPolyBnds.BottomRight.X);
+        //    Point farCorner = TtUtils.GetFarthestCorner(
+        //        startCoords.X, startCoords.Y,
+        //        totalPolyBnds.TopLeft.Y, totalPolyBnds.BottomRight.Y,
+        //        totalPolyBnds.TopLeft.X, totalPolyBnds.BottomRight.X);
 
-            double dist = MathEx.Distance(startCoords.X, startCoords.Y, farCorner.X, farCorner.Y);
+        //    double dist = MathEx.Distance(startCoords.X, startCoords.Y, farCorner.X, farCorner.Y);
 
-            int ptAmtY = (int)(Math.Floor(dist / gridY) + 1);
-            int ptAmtX = (int)(Math.Floor(dist / gridX) + 1);
+        //    int ptAmtY = (int)(Math.Floor(dist / gridY) + 1);
+        //    int ptAmtX = (int)(Math.Floor(dist / gridX) + 1);
 
-            double farLeft = startCoords.X - (ptAmtX * gridX);
-            double farRight = startCoords.X + (ptAmtX * gridX);
-            double farTop = startCoords.Y + (ptAmtY * gridY);
-            double farBottom = startCoords.Y - (ptAmtY * gridY);
+        //    double farLeft = startCoords.X - (ptAmtX * gridX);
+        //    double farRight = startCoords.X + (ptAmtX * gridX);
+        //    double farTop = startCoords.Y + (ptAmtY * gridY);
+        //    double farBottom = startCoords.Y - (ptAmtY * gridY);
 
-            int i = 0;
-            double j = farLeft;
-            double k = farTop;
+        //    int i = 0;
+        //    double j = farLeft;
+        //    double k = farTop;
 
-            Dictionary<TtPolygon, List<Point>> addPoints = polys
-            Point tmp;
+        //    Dictionary<TtPolygon, List<Point>> addPoints = polys
+        //    Point tmp;
 
-            while (j <= farRight)
-            {
-                while (k >= farBottom)
-                {
-                    tmp = angle != 0 ? MathEx.RotatePoint(j, k, angle, startCoords.X, startCoords.Y) : new Point(j, k);
+        //    while (j <= farRight)
+        //    {
+        //        while (k >= farBottom)
+        //        {
+        //            tmp = angle != 0 ? MathEx.RotatePoint(j, k, angle, startCoords.X, startCoords.Y) : new Point(j, k);
 
-                    foreach (Tuple<TtPolygon, PolygonCalculator> tpc in polyIncludeCalcs)
-                    {
-                        if (tpc.Item2.IsPointInPolygon(tmp.X, tmp.Y) && !polyExcludeCalcs.Any(pec => pec.IsPointInPolygon(tmp.X, tmp.Y)))
-                            addPoints[tpc.Item1].Add(tmp);
-                    }
+        //            foreach (Tuple<TtPolygon, PolygonCalculator> tpc in polyIncludeCalcs)
+        //            {
+        //                if (tpc.Item2.IsPointInPolygon(tmp.X, tmp.Y) && !polyExcludeCalcs.Any(pec => pec.IsPointInPolygon(tmp.X, tmp.Y)))
+        //                    addPoints[tpc.Item1].Add(tmp);
+        //            }
 
-                    k -= gridY;
-                }
-                j += gridX;
-                k = farTop;
-            }
+        //            k -= gridY;
+        //        }
+        //        j += gridX;
+        //        k = farTop;
+        //    }
 
-            if (BoundaryBuffer == true)
-            {
-                double ba = FMSC.Core.Convert.Distance(BufferAmount, Distance.Meters, UomDistance);
+        //    if (BoundaryBuffer == true)
+        //    {
+        //        double ba = FMSC.Core.Convert.Distance(BufferAmount, Distance.Meters, UomDistance);
 
-                for (i = addPoints.Count - 1; i > -1; i--)
-                {
-                    Point p = addPoints[i];
-                    foreach (List<Point> points in polyIncudePoints.Select(pts => pts.ToList()))
-                    {
-                        for (int m = 0; m < points.Count - 1; m++)
-                        {
-                            if (MathEx.LineToPointDistance2D(points[m], points[m + 1], p) < ba)
-                            {
-                                addPoints.RemoveAt(i);
-                                break;
-                            }
-                        }
-                    }
+        //        for (i = addPoints.Count - 1; i > -1; i--)
+        //        {
+        //            Point p = addPoints[i];
+        //            foreach (List<Point> points in polyIncudePoints.Select(pts => pts.ToList()))
+        //            {
+        //                for (int m = 0; m < points.Count - 1; m++)
+        //                {
+        //                    if (MathEx.LineToPointDistance2D(points[m], points[m + 1], p) < ba)
+        //                    {
+        //                        addPoints.RemoveAt(i);
+        //                        break;
+        //                    }
+        //                }
+        //            }
 
-                }
-            }
+        //        }
+        //    }
 
-            if (SamplePoints == true)
-            {
-                int maxPoints = SampleTypeItem == SampleType.Percent ?
-                    (int)((SampleAmount / 100.0) * addPoints.Count) : SampleAmount;
+        //    if (SamplePoints == true)
+        //    {
+        //        int maxPoints = SampleTypeItem == SampleType.Percent ?
+        //            (int)((SampleAmount / 100.0) * addPoints.Count) : SampleAmount;
 
-                while (maxPoints < addPoints.Count)
-                {
-                    addPoints.RemoveAt(rand.Next(addPoints.Count - 1));
-                }
-            }
+        //        while (maxPoints < addPoints.Count)
+        //        {
+        //            addPoints.RemoveAt(rand.Next(addPoints.Count - 1));
+        //        }
+        //    }
 
 
-            List<TtPoint> wayPoints = new List<TtPoint>();
-            i = 0;
-            WayPoint curr, prev = null;
+        //    List<TtPoint> wayPoints = new List<TtPoint>();
+        //    i = 0;
+        //    WayPoint curr, prev = null;
 
-            foreach (Point p in addPoints)
-            {
-                curr = new WayPoint()
-                {
-                    UnAdjX = p.X,
-                    UnAdjY = p.Y,
-                    Polygon = poly,
-                    Group = _Manager.MainGroup,
-                    Metadata = defMeta,
-                    Index = i,
-                    Comment = "Generated Point",
-                    PID = PointNamer.NamePoint(poly, prev)
-                };
+        //    foreach (Point p in addPoints)
+        //    {
+        //        curr = new WayPoint()
+        //        {
+        //            UnAdjX = p.X,
+        //            UnAdjY = p.Y,
+        //            Polygon = poly,
+        //            Group = _Manager.MainGroup,
+        //            Metadata = defMeta,
+        //            Index = i,
+        //            Comment = "Generated Point",
+        //            PID = PointNamer.NamePoint(poly, prev)
+        //        };
 
-                wayPoints.Add(curr);
-                prev = curr;
-                j++;
-            }
+        //        wayPoints.Add(curr);
+        //        prev = curr;
+        //        j++;
+        //    }
 
-            _Manager.AddPoints(wayPoints);
+        //    _Manager.AddPoints(wayPoints);
 
-            MessageBox.Show($"{addPoints.Count} WayPoints Created");
-            IsGenerating = false;
+        //    MessageBox.Show($"{addPoints.Count} WayPoints Created");
+        //    IsGenerating = false;
         }
     }
 

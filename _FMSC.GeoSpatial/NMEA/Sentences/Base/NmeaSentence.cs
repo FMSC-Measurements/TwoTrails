@@ -51,7 +51,7 @@ namespace FMSC.GeoSpatial.NMEA.Sentences.Base
             {
                 String calcString = nmea.Substring(1);
                 int ast = calcString.IndexOf("*");
-                String checkSumStr = calcString.Substring(ast + 1, ast + 3);
+                String checkSumStr = calcString.Substring(ast + 1, 2);
                 calcString = calcString.Substring(0, ast);
 
                 int checksum = 0;

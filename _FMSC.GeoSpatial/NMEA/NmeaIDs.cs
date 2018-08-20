@@ -88,7 +88,7 @@ namespace FMSC.GeoSpatial.NMEA
                 throw new ArgumentNullException();
 
             if (value.StartsWith("$"))
-                value = value.Substring(1, 3);
+                value = value.Substring(1, 2);
 
             TalkerID tid = TalkerID.Unknown;
             Enum.TryParse(value, true, out tid);
@@ -102,7 +102,7 @@ namespace FMSC.GeoSpatial.NMEA
                 throw new ArgumentNullException();
 
             if (value.StartsWith("$"))
-                value = value.Substring(3, 6);
+                value = value.Substring(3, 3);
 
             SentenceID sid = SentenceID.Unknown;
             Enum.TryParse(value, true, out sid);

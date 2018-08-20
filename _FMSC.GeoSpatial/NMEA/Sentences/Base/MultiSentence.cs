@@ -41,14 +41,10 @@ namespace FMSC.GeoSpatial.NMEA.Sentences.Base
                     RawNmea = $"{RawNmea}\n{nmea}";
                 }
 
-                IsValid = true;
-            }
-            else
-            {
-                IsValid = false;
+                return true;
             }
 
-            return IsValid;
+            return false;
         }
 
 
