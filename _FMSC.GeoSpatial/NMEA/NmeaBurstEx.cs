@@ -474,6 +474,16 @@ namespace FMSC.GeoSpatial.NMEA
             throw new MissingNmeaDataException("Missing RMC and GGA Sentences");
         }
 
+
+
+        public bool Validate()
+        {
+            return Validate(SentenceID.GGA) &&
+                Validate(SentenceID.GSA) &&
+                Validate(SentenceID.GSV) &&
+                Validate(SentenceID.RMC);
+        }
+
         public bool Validate(SentenceID id)
         {
             switch (id)
@@ -530,7 +540,6 @@ namespace FMSC.GeoSpatial.NMEA
 
             return false;
         }
-
 
         public override string ToString()
         {

@@ -112,6 +112,14 @@ namespace FMSC.GeoSpatial.NMEA
             }
         }
         
+        public bool Validate()
+        {
+            return gga != null && gga.IsValid &&
+                gsa != null && gsa.IsValid &&
+                gsv != null && gsv.IsValid &&
+                rmc != null && rmc.IsValid;
+        }
+
         public bool Validate(SentenceID id)
         {
             switch (id)

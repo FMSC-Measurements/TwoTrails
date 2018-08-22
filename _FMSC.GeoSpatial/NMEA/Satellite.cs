@@ -19,5 +19,14 @@ namespace FMSC.GeoSpatial.NMEA
             SRN = srn;
             this.GnssType = GeoSpatialTypes.ParseNmeaId(NmeaID);
         }
+
+        public Satellite(int nmeaId, string elevation, string aziumuth, string srn)
+        {
+            NmeaID = nmeaId;
+            Elevation = string.IsNullOrEmpty(elevation) ? null : (float?)float.Parse(elevation);
+            Azimuth = string.IsNullOrEmpty(aziumuth) ? null : (float?)float.Parse(aziumuth);
+            SRN = string.IsNullOrEmpty(srn) ? null : (float?)float.Parse(srn);
+            this.GnssType = GeoSpatialTypes.ParseNmeaId(NmeaID);
+        }
     }
 }
