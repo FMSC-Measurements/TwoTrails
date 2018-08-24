@@ -61,6 +61,7 @@ namespace FMSC.GeoSpatial.NMEA
 
             if (burst.IsFull)
             {
+                burst.Validate();
                 BurstReceived?.Invoke(burst);
                 burst = null;
             }

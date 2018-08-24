@@ -22,8 +22,6 @@ namespace FMSC.GeoSpatial.NMEA.Sentences
 
         public override bool Parse(string nmea)
         {
-            IsValid = false;
-
             if (Satellites == null)
                 Satellites = new ReadOnlyCollection<Satellite>(_Satellites);
 
@@ -46,7 +44,7 @@ namespace FMSC.GeoSpatial.NMEA.Sentences
                             throw new MismatchMessageCountException();
                         }
 
-                        this.TotalMessageCount++;
+                        this.MessageCount++;
 
                         //ignore message id, assuming there are no duplicate messages
 
@@ -63,9 +61,9 @@ namespace FMSC.GeoSpatial.NMEA.Sentences
                             {
                                 satellite = new Satellite(
                                         int.Parse(tokens[current]),
-                                        float.Parse(tokens[current + 1]),
-                                        float.Parse(tokens[current + 2]),
-                                        float.Parse(tokens[current + 3])
+                                        tokens[current + 1],
+                                        tokens[current + 2],
+                                        tokens[current + 3]
                                 );
 
                                 if (!_Satellites.Any(s => s.NmeaID == satellite.NmeaID))
@@ -75,9 +73,9 @@ namespace FMSC.GeoSpatial.NMEA.Sentences
 
                         IsValid = true;
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        //
+                        IsValid = false;
                     }
                 }
             }

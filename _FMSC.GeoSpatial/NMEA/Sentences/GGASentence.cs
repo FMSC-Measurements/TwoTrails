@@ -8,7 +8,7 @@ namespace FMSC.GeoSpatial.NMEA.Sentences
     [Serializable]
     public class GGASentence : PositionSentence
     {
-        protected static readonly string[] GGATimeFormatters = new string[] { "HHmmss.fff", "HHmmss" };
+        protected static readonly string[] GGATimeFormatters = new string[] { "HHmmss.fff", "HHmmss.ff", "HHmmss.f", "HHmmss" };
 
         public override SentenceID SentenceID { get; } = SentenceID.GGA;
 

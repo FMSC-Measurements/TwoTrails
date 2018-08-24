@@ -12,6 +12,7 @@ namespace FMSC.GeoSpatial.NMEA
         NmeaSentence AddNmeaSentence(string sentence, TalkerID? tid = null);
 
         bool IsValid { get; }
+        bool Validate();
         bool Validate(SentenceID id);
 
         bool IsFull { get; }
