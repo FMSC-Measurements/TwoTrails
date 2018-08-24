@@ -50,10 +50,10 @@ namespace FMSC.GeoSpatial.NMEA
         {
             get
             {
-                return ggaIsValidated && ggaIsValid &&
+                return (ggaIsValidated && ggaIsValid &&
                     gsaIsValidated && gsaIsValid &&
                     rmcIsValidated && rmcIsValid &&
-                    gsvIsValidated && gsvIsValid;
+                    gsvIsValidated && gsvIsValid) || Validate();
             }
         }
         public bool IsFull { get { return rmc.Count > 0 && gsa.Count > 0 && gga.Count > 0 && GsvIsFull; } }

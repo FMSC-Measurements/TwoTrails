@@ -103,14 +103,8 @@ namespace FMSC.GeoSpatial.NMEA
 
         
 
-        public bool IsValid
-        {
-            get
-            {
-                return (gga != null && gsa != null && rmc != null && gsv != null &&
-                  gga.IsValid && gsa.IsValid && rmc.IsValid && gsv.IsValid);
-            }
-        }
+        private bool _IsValid;
+        public bool IsValid => _IsValid || (_IsValid = Validate());
         
         public bool Validate()
         {
