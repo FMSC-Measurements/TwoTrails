@@ -369,7 +369,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                             if (MessageBox.Show($"Would you like to create a project from this {TtUtils.GetFileTypeName(filePath)} file?", "Create Project from importable file.",
                                 MessageBoxButton.YesNo, MessageBoxImage.Hand, MessageBoxResult.No) == MessageBoxResult.Yes)
                             {
-                                
+                                CreateAndOpenProjectFromImportable(null, filePath);
                             }
                         }
                     }
@@ -406,9 +406,9 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
         }
 
 
-        public void CreateProject()
+        public bool CreateProject(TtProjectInfo ttProjectInfo = null)
         {
-            NewProjectDialog dialog = new NewProjectDialog(MainWindow, App.Settings.CreateProjectInfo(AppInfo.Version));
+            NewProjectDialog dialog = new NewProjectDialog(MainWindow, ttProjectInfo ?? App.Settings.CreateProjectInfo(AppInfo.Version));
 
             if (dialog.ShowDialog() == true)
             {
@@ -422,10 +422,83 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
                 App.Settings.Region = info.Region;
                 App.Settings.District = info.District;
+
+                return true;
             }
+
+            return false;
         }
 
+        public bool CreateAndOpenProjectFromImportable(TtProjectInfo ttProjectInfo, params string[] files)
+        {
+            if (ttProjectInfo == null)
+            {
+                ttProjectInfo = App.Settings.CreateProjectInfo(AppInfo.Version);
+                ttProjectInfo.Name = $"Import of {String.Join(", ", files.Select(f => Path.GetFileNameWithoutExtension(f)))}";
+            }
 
+            NewProjectDialog dialog = new NewProjectDialog(MainWindow, ttProjectInfo);
+
+            if (dialog.ShowDialog() == true)
+            {
+                TtProjectInfo info = dialog.ProjectInfo;
+
+                TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
+                TtProject proj = new TtProject(dal, null, App.Settings, this);
+
+                Trace.WriteLine($"Import Project Created ({dal.GetDataVersion()}): {dal.FilePath}");
+                
+                App.Settings.Region = info.Region;
+                App.Settings.District = info.District;
+
+                IReadOnlyTtDataLayer idal = null;
+
+                try
+                {
+                    foreach (string file in files)
+                    {
+                        switch (Path.GetExtension(file).ToLower())
+                        {
+                            case Consts.FILE_EXTENSION: idal = new TtSqliteDataAccessLayer(file); break;
+                            case Consts.FILE_EXTENSION_V2: idal = new TtV2SqliteDataAccessLayer(file); break;
+                            case Consts.GPX_EXT:
+                                idal = new TtGpxDataAccessLayer(
+                                    new TtGpxDataAccessLayer.ParseOptions(file, proj.Manager.DefaultMetadata.Zone, startPolyNumber: proj.Manager.PolygonCount + 1)); break;
+                            case Consts.KML_EXT:
+                            case Consts.KMZ_EXT:
+                                idal = new TtKmlDataAccessLayer(
+                                    new TtKmlDataAccessLayer.ParseOptions(file, proj.Manager.DefaultMetadata.Zone, startPolyNumber: proj.Manager.PolygonCount + 1)); break;
+                            case Consts.SHAPE_EXT:
+                                idal = new TtShapeFileDataAccessLayer(
+                                    new TtShapeFileDataAccessLayer.ParseOptions(file, proj.Manager.DefaultMetadata.Zone, proj.Manager.PolygonCount + 1)); break;
+                            case Consts.TEXT_EXT:
+                            case Consts.CSV_EXT: ImportDialog.ShowDialog(proj, this.MainWindow, file, true); break;
+                            default: idal = null; break;
+                        }
+
+                        if (idal != null)
+                        {
+                            Import.DAL(proj.Manager, idal);
+                        }
+                    }
+
+                    AddProject(proj);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine($"Import Project failed to import data.");
+                    Trace.WriteLine(ex.Message, "MainWindowModel:CreateProjectFromImportable");
+
+                    File.Delete(dialog.FilePath);
+
+                    MessageBox.Show("Error Converting File to TwoTrails Project. See Error Log for Details.");
+                }
+            }
+            
+            return false;
+        }
 
         public void SaveCurrentProject(bool rename = false)
         {

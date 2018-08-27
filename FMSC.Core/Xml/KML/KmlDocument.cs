@@ -93,7 +93,7 @@ namespace FMSC.Core.Xml.KML
         {
             XmlDocument doc = new XmlDocument();
             
-            if (path.EndsWith(".kmz"))
+            if (path.EndsWith(".kmz", StringComparison.InvariantCultureIgnoreCase))
             {
                 string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
@@ -104,16 +104,9 @@ namespace FMSC.Core.Xml.KML
 
                 ZipFile.ExtractToDirectory(path, tempDir);
 
-                foreach (string file in Directory.GetFiles(tempDir))
-                {
-                    if (file.EndsWith(".kml"))
-                    {
-                        path = file;
-                        break;
-                    }
-                }
+                path = Directory.GetFiles(tempDir, "*.kml", SearchOption.AllDirectories).FirstOrDefault();
 
-                if (!path.EndsWith(".kml"))
+                if (path == null || !path.EndsWith(".kml", StringComparison.InvariantCultureIgnoreCase))
                     throw new Exception("Unable to extract KML from KMZ");
 
                 doc.Load(path);

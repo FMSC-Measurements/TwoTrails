@@ -143,6 +143,7 @@ namespace TwoTrails.DAL
                                         OnBoundary = true,
                                         Index = index++,
                                         MetadataCN = Consts.EmptyGuid,
+                                        GroupCN = Consts.EmptyGuid,
                                         PID = PointNamer.NamePoint(poly, lastPoint),
                                         Polygon = poly
                                     };

@@ -57,8 +57,10 @@ namespace TwoTrails.ViewModels
 
         public bool CanImport { get { return ImportControl != null && ImportControl.HasSelectedPolygons && !IsImporting; } }
 
+        private bool _AutoCloseOnImport;
 
-        public ImportModel(Window window, ITtManager manager, string fileName = null)
+
+        public ImportModel(Window window, ITtManager manager, string fileName = null, bool autoCloseOnImport = false)
         {
             _Window = window;
             _Manager = manager;
@@ -74,6 +76,8 @@ namespace TwoTrails.ViewModels
 
             if (fileName != null)
                 SetupImport(fileName);
+
+            _AutoCloseOnImport = true;
         }
 
         private void BrowseFile()
@@ -230,7 +234,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
             }
         }
 
-        private void SetupShapeFiles(IEnumerable<string> shapefiles)
+        public void SetupShapeFiles(IEnumerable<string> shapefiles)
         {
             ImportControl = new ImportControl(
                         new TtShapeFileDataAccessLayer(
@@ -290,7 +294,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                 MessageBox.Show($"{selectedPolys.Count()} Polygons Imported",
                     String.Empty, MessageBoxButton.OK, MessageBoxImage.None);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!_AutoCloseOnImport)
             {
                 Trace.WriteLine(ex.Message, "ImportModel:ImportData");
                 MessageBox.Show("Import Failed. See log file for details.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Error);
@@ -298,6 +302,9 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
             
             IsImporting = false;
             ImportControl = null;
+
+            if (_AutoCloseOnImport)
+                _Window.Close();
         }
 
         private void Cancel()

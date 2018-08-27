@@ -13,16 +13,16 @@ namespace TwoTrails.Dialogs
     {
         private ImportModel _ImportModel;
 
-        public ImportDialog(ITtManager manager, string fileName = null)
+        public ImportDialog(ITtManager manager, string fileName = null, bool autoCloseOnImport = false)
         {
-            _ImportModel = new ImportModel(this, manager, fileName);
+            _ImportModel = new ImportModel(this, manager, fileName, autoCloseOnImport);
             this.DataContext = _ImportModel;
             InitializeComponent();
         }
 
-        public static bool? ShowDialog(TtProject project, Window owner = null, String fileName = null)
+        public static bool? ShowDialog(TtProject project, Window owner = null, String fileName = null, bool autoCloseOnImport = false)
         {
-            ImportDialog diag = new ImportDialog(project.HistoryManager, fileName);
+            ImportDialog diag = new ImportDialog(project.HistoryManager, fileName, autoCloseOnImport);
             if (owner != null)
                 diag.Owner = owner;
             return diag.ShowDialog();
@@ -34,7 +34,17 @@ namespace TwoTrails.Dialogs
 
             if (files != null && files.Length > 0)
             {
-                _ImportModel.SetupImport(files.First());
+                if (files.All(f => f.EndsWith(".shp")))
+                {
+                    _ImportModel.SetupShapeFiles(files);
+                }
+                else
+                {
+                    if (files.Count() > 1)
+                        MessageBox.Show("Only Shape Files can be imported in bulk.", "Import Files", MessageBoxButton.OK, MessageBoxImage.Stop);
+
+                    _ImportModel.SetupImport(files.First());
+                }
             }
         }
     }

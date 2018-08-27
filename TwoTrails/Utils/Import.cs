@@ -9,7 +9,7 @@ namespace TwoTrails.Utils
 {
     public static class Import
     {
-        public static void DAL(ITtManager manager, IReadOnlyTtDataLayer dal, IEnumerable<string> polyCNs,
+        public static void DAL(ITtManager manager, IReadOnlyTtDataLayer dal, IEnumerable<string> polyCNs = null,
             bool includeMetadata = true, bool includeGroups = true, bool includeNmea = true, bool convertForeignQuondams = true)
         {
             Dictionary<string, TtPolygon> polygons = manager.GetPolygons().ToDictionary(p => p.CN, p => p);
@@ -54,7 +54,7 @@ namespace TwoTrails.Utils
 
                 if (includeMetadata)
                 {
-                    TtMetadata meta = iMeta[metaCN];
+                    TtMetadata meta = iMeta.ContainsKey(metaCN) ? iMeta[metaCN]: manager.DefaultMetadata;
 
                     if (metadata.ContainsKey(metaCN))
                     {
@@ -87,7 +87,7 @@ namespace TwoTrails.Utils
 
                 if (includeGroups)
                 {
-                    TtGroup group = iGroups[groupCN];
+                    TtGroup group = iGroups.ContainsKey(groupCN) ? iGroups[groupCN] : manager.MainGroup;
 
                     if (groups.ContainsKey(groupCN))
                     {
