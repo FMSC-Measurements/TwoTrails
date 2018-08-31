@@ -51,32 +51,24 @@ namespace TwoTrails.Utils
             {
                 if (metaCN == null)
                     continue;
+                
+                TtMetadata meta = iMeta.ContainsKey(metaCN) ? iMeta[metaCN]: manager.DefaultMetadata;
 
-                if (includeMetadata)
+                if (metadata.ContainsKey(metaCN))
                 {
-                    TtMetadata meta = iMeta.ContainsKey(metaCN) ? iMeta[metaCN]: manager.DefaultMetadata;
-
-                    if (metadata.ContainsKey(metaCN))
-                    {
-                        if (!meta.Equals(metadata[metaCN]))
-                        {
-                            meta.Name = $"{meta.Name} (Import)";
-                            meta.CN = Guid.NewGuid().ToString();
-                            metaMap.Add(metaCN, meta.CN);
-
-                            aMeta.Add(meta.CN, meta);
-                        }
-                    }
-                    else
+                    if (!meta.Equals(metadata[metaCN]))
                     {
                         meta.Name = $"{meta.Name} (Import)";
+                        meta.CN = Guid.NewGuid().ToString();
+                        metaMap.Add(metaCN, meta.CN);
+
                         aMeta.Add(meta.CN, meta);
                     }
                 }
                 else
                 {
-                    if (!metadata.ContainsKey(metaCN))
-                        metaMap.Add(metaCN, Consts.EmptyGuid);
+                    meta.Name = $"{meta.Name} (Import)";
+                    aMeta.Add(meta.CN, meta);
                 }
             }
 
@@ -143,7 +135,16 @@ namespace TwoTrails.Utils
 
                 p.Polygon = iPolys[p.PolygonCN];
 
-                if (metaMap.ContainsKey(p.MetadataCN))
+                if (!includeMetadata && p is GpsPoint gps)
+                {
+                    TtMetadata meta = aMeta.ContainsKey(p.MetadataCN) ? aMeta[p.MetadataCN] : null;
+
+                    if (meta != null && meta.Zone != manager.DefaultMetadata.Zone)
+                        TtCoreUtils.ChangeGpsZone(gps, manager.DefaultMetadata.Zone, meta.Zone);
+
+                    gps.MetadataCN = Consts.EmptyGuid;
+                }
+                else if (metaMap.ContainsKey(p.MetadataCN))
                     p.MetadataCN = metaMap[p.MetadataCN];
 
                 p.Metadata = metadata.ContainsKey(p.MetadataCN) ? metadata[p.MetadataCN] : aMeta[p.MetadataCN];
@@ -164,19 +165,6 @@ namespace TwoTrails.Utils
                     else
                     {
                         throw new Exception("Foriegn Quondam");
-
-                        //TtPoint parent = qp.ParentPoint;
-
-                        //if (parent.IsTravType())
-                        //    parent = new GpsPoint(parent);
-
-                        //parent.Index = qp.Index;
-                        //parent.Polygon = qp.Polygon;
-                        //parent.Group = qp.Group;
-                        //parent.Metadata = qp.Metadata;
-                        //parent.CN = qp.CN;
-
-                        //aPoints[qp.CN] = convertQuondam(qp);
                     }
                 }
             }
@@ -197,14 +185,20 @@ namespace TwoTrails.Utils
                     manager.AddPolygon(p);
                 }
 
-                foreach (TtMetadata m in aMeta.Values)
+                if (includeMetadata)
                 {
-                    manager.AddMetadata(m);
+                    foreach (TtMetadata m in aMeta.Values)
+                    {
+                        manager.AddMetadata(m);
+                    }
                 }
 
-                foreach (TtGroup g in aGroups.Values)
+                if (includeGroups)
                 {
-                    manager.AddGroup(g);
+                    foreach (TtGroup g in aGroups.Values)
+                    {
+                        manager.AddGroup(g);
+                    }
                 }
 
                 manager.AddPoints(aPoints.Values);
