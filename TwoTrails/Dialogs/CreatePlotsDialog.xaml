@@ -8,9 +8,13 @@
         xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
         xmlns:fmsccutils="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
         Title="Create Grid Sample Points" Height="300" Width="500"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <cvt:MultiBooleanConverter x:Key="MultiBoolConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -40,6 +44,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -137,7 +142,12 @@
                          PreviewTextInput="TextIsUnsignedInteger"/>
                 </Grid>
 
+
                 <CheckBox Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2"
+                          Name="cbSpltMultiPolys" Content="Split Into Individual Plots" IsEnabled="{Binding MultiplePolysIncluded}"
+                          IsChecked="{Binding SplitMultiPolys, Mode=OneWayToSource}" VerticalAlignment="Center" />
+
+                <CheckBox Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="2"
                           Name="cbDelExisting" Content="Delete Existing Plots"
                           IsChecked="{Binding Settings.DeviceSettings.DeleteExistingPlots}" VerticalAlignment="Center"/>
 
