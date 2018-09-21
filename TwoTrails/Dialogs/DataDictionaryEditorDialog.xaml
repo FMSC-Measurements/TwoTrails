@@ -3,10 +3,76 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TwoTrails.Dialogs"
+        xmlns:ddm="clr-namespace:TwoTrails.ViewModels.DataDictionary"
+        xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+        xmlns:ttcore="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
         mc:Ignorable="d"
-        Title="DataDictionaryEditor" Height="300" Width="500">
+        Title="Data Dictionary Editor" Height="450" Width="800">
     <Grid>
-        
+        <Grid>
+
+        </Grid>
+
+        <ListBox ItemsSource="{Binding Fields}">
+            <ListBox.Resources>
+                <DataTemplate DataType="{x:Type ddm:TextBoxFieldModel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0" Text="{Binding Name}" />
+
+                        <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding RequiresValue}"/>
+
+                        <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}" ToolTip="Data Type"/>
+
+                        <TextBox Grid.Column="3" Text="{Binding DefaultValue}" ToolTip="Default Value"/>
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type ddm:ComboBoxFieldModel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0" Text="{Binding Name}" />
+
+                        <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding RequiresValue}"/>
+
+                        <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}" ToolTip="DataType"/>
+
+                        <CheckBox Grid.Column="3" Content="IsEditable" IsChecked="{Binding IsEditable}" />
+
+                        <Button Grid.Column="4" Content="Edit Values" Command="{Binding EditValues}"/>
+
+                        <ComboBox Grid.Column="5" SelectedItem="{Binding DefaultValue}" ItemsSource="{Binding Values}" ToolTip="Default Value"/>
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type ddm:CheckBoxFieldModel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0" Text="{Binding Name}" />
+
+                        <CheckBox Grid.Column="1" Content="Nullable" IsChecked="{Binding RequiresValue}"/>
+
+                        <CheckBox Grid.Column="3" Content="Default Value" IsChecked="{Binding DefaultValue}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.Resources>
+        </ListBox>
     </Grid>
 </Window>

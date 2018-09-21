@@ -730,8 +730,8 @@ namespace TwoTrails.ViewModels
 
         #region Point Extended Properties
 
-        private DataDictionary _ExtendedData;
-        public DataDictionary ExtendedData
+        private Core.DataDictionary _ExtendedData;
+        public Core.DataDictionary ExtendedData
         {
             get { return _ExtendedData; }
         }
@@ -1049,7 +1049,7 @@ namespace TwoTrails.ViewModels
             {
                 ExtendedDataFields = new ObservableCollection<DataDictionaryField>(ddt);
 
-                _ExtendedData = new DataDictionary(ddt);
+                _ExtendedData = new Core.DataDictionary(ddt);
                 _ExtendedDataSame = ddt.ToDictionary(ddf => ddf.CN, ddf => true);
 
                 if (ExtendedDataFields.Count > 0)

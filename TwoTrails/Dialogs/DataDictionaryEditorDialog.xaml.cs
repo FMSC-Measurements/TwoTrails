@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using TwoTrails.ViewModels;
+using TwoTrails.ViewModels.DataDictionary;
 
 namespace TwoTrails.Dialogs
 {
@@ -11,6 +12,7 @@ namespace TwoTrails.Dialogs
     {
         public DataDictionaryEditorDialog(TtProject project)
         {
+            this.DataContext = new DataDictionaryEditorModel(project);
             InitializeComponent();
         }
 

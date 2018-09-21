@@ -241,6 +241,11 @@
     <Compile Include="Utils\TtUtils.cs" />
     <Compile Include="ViewModels\CreatePlotsModel.cs" />
     <Compile Include="ViewModels\CsvImportModel.cs" />
+    <Compile Include="ViewModels\DataDictionary\BaseFieldModel.cs" />
+    <Compile Include="ViewModels\DataDictionary\CheckBoxFieldModel.cs" />
+    <Compile Include="ViewModels\DataDictionary\ComboBoxFieldModel.cs" />
+    <Compile Include="ViewModels\DataDictionary\DataDictionaryEditorModel.cs" />
+    <Compile Include="ViewModels\DataDictionary\TextBoxFieldModel.cs" />
     <Compile Include="ViewModels\PointEditorModel.cs" />
     <Compile Include="ViewModels\DataStyleModel.cs" />
     <Compile Include="Converters\BindingReflector.cs" />

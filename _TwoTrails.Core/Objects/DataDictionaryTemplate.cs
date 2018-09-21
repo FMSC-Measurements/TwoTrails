@@ -62,7 +62,7 @@ namespace TwoTrails.Core
 
         public int Order { get; set; }
 
-        public FeildType FeildType { get; set; }
+        public FieldType FieldType { get; set; }
 
         public int Flags { get; set; }
 
@@ -91,8 +91,8 @@ namespace TwoTrails.Core
                     case DataType.DECIMAL: return Decimal.Parse(DefaultValue);
                     case DataType.FLOAT: return Double.Parse(DefaultValue);
                     case DataType.STRING: return DefaultValue;
-                    case DataType.BYTE_ARRAY: return Int32.Parse(DefaultValue);
-                    case DataType.BOOLEAN: return Encoding.UTF8.GetBytes(DefaultValue);
+                    //case DataType.BYTE_ARRAY: return Int32.Parse(DefaultValue);
+                    case DataType.BOOLEAN: return Boolean.Parse(DefaultValue);
                     default: throw new Exception("Invalid DataType");
                 }
             }
@@ -104,7 +104,7 @@ namespace TwoTrails.Core
                     case DataType.DECIMAL: return 0m;
                     case DataType.FLOAT: return 0d;
                     case DataType.STRING: return String.Empty;
-                    case DataType.BYTE_ARRAY: return new byte[0];
+                    //case DataType.BYTE_ARRAY: return new byte[0];
                     case DataType.BOOLEAN: return false;
                     default: throw new Exception("Invalid DataType");
                 }
@@ -119,7 +119,7 @@ namespace TwoTrails.Core
         }
     }
 
-    public enum FeildType
+    public enum FieldType
     {
         ComboBox = 1,
         TextBox = 2,

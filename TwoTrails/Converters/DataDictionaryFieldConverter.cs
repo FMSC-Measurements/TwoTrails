@@ -17,12 +17,12 @@ namespace TwoTrails.Converters
             {
                 return ddfs.Select<DataDictionaryField, ExtendedDataField>(ddf =>
                 {
-                    switch (ddf.FeildType)
+                    switch (ddf.FieldType)
                     {
-                        case FeildType.ComboBox: return new ComboBoxExtendedDataField(ddf, dem);
-                        case FeildType.CheckBox: return new CheckBoxExtendedDataField(ddf, dem);
+                        case FieldType.ComboBox: return new ComboBoxExtendedDataField(ddf, dem);
+                        case FieldType.CheckBox: return new CheckBoxExtendedDataField(ddf, dem);
                         default:
-                        case FeildType.TextBox: return new TextBoxExtendedDataField(ddf, dem);
+                        case FieldType.TextBox: return new TextBoxExtendedDataField(ddf, dem);
                     }
                 });
             }

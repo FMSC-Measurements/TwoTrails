@@ -2232,7 +2232,7 @@ namespace TwoTrails.DAL
                         {
                             string cn, name, defaultValue = null;
                             int order, flags = 0;
-                            FeildType fieldType;
+                            FieldType fieldType;
                             List<string> values = null;
                             DataType dataType;
                             bool valRequired = false;
@@ -2242,7 +2242,7 @@ namespace TwoTrails.DAL
                                 cn = dr.GetString(0);
                                 name = dr.GetString(1);
                                 order = dr.GetInt32(2);
-                                fieldType = (FeildType)dr.GetInt32(3);
+                                fieldType = (FieldType)dr.GetInt32(3);
 
                                 if (!dr.IsDBNull(4))
                                     flags = dr.GetInt32(4);
@@ -2261,7 +2261,7 @@ namespace TwoTrails.DAL
                                 {
                                     Name = name,
                                     Order = order,
-                                    FeildType = fieldType,
+                                    FieldType = fieldType,
                                     Flags = flags,
                                     Values = values,
                                     DefaultValue = defaultValue,
@@ -2288,7 +2288,8 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        _Database.ClearTable(TwoTrailsSchema.DataDictionarySchema.TableName, conn, trans);
+                        if (_Database.TableExists(TwoTrailsSchema.DataDictionarySchema.TableName))
+                            _Database.ClearTable(TwoTrailsSchema.DataDictionarySchema.TableName, conn, trans);
 
                         Dictionary<string, SQLiteDataType> ddFields = new Dictionary<string, SQLiteDataType>();
                         ddFields.Add(TwoTrailsSchema.DataDictionarySchema.PointCN, SQLiteDataType.TEXT);
@@ -2301,9 +2302,7 @@ namespace TwoTrails.DAL
                         }
 
                         if (_Database.TableExists(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName))
-                        {
                             _Database.DropTable(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, conn, trans);
-                        }
 
                         _Database.CreateTable(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, ddFields, null, conn, trans);
 
@@ -2338,7 +2337,7 @@ namespace TwoTrails.DAL
                 [TwoTrailsSchema.SharedSchema.CN] = field.CN,
                 [TwoTrailsSchema.DataDictionarySchema.Name] = field.Name,
                 [TwoTrailsSchema.DataDictionarySchema.FieldOrder] = field.Order,
-                [TwoTrailsSchema.DataDictionarySchema.FieldType] = (int)field.FeildType,
+                [TwoTrailsSchema.DataDictionarySchema.FieldType] = (int)field.FieldType,
                 [TwoTrailsSchema.DataDictionarySchema.Flags] = field.Flags,
                 [TwoTrailsSchema.DataDictionarySchema.FieldValues] = field.Values != null && field.Values.Any() ? string.Join("\n", field.Values) : null,
                 [TwoTrailsSchema.DataDictionarySchema.DefaultValue] = field.DefaultValue,
