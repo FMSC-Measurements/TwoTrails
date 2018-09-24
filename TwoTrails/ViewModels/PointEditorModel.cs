@@ -2259,8 +2259,8 @@ namespace TwoTrails.ViewModels
 
                 if (result == true)
                 {
-                    SetupUI();
                     Manager.BaseManager.UpdateDataAction(DataActionType.ModifiedDataDictionary);
+                    SetupUI();
                 }
             });
         }

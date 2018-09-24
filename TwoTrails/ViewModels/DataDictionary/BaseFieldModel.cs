@@ -1,31 +1,122 @@
-﻿using System;
+﻿using CSUtil.ComponentModel;
+using FMSC.Core.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Input;
 using TwoTrails.Core;
 
 namespace TwoTrails.ViewModels.DataDictionary
 {
-    public class BaseFieldModel
+    public class BaseFieldModel : NotifyPropertyChangedEx
     {
-        protected DataDictionaryField _DataDictionaryField;
+        public string CN { get; }
 
-        public String Name { get { return _DataDictionaryField.Name; } set { _DataDictionaryField.Name = value; } }
-
-        public bool RequiresValue { get { return _DataDictionaryField.ValueRequired; } set { _DataDictionaryField.ValueRequired = value; } }
-
-
-        public BaseFieldModel(string cn, FieldType fieldType, string name = null, bool requiresValue = false)
+        public String Name
         {
-            _DataDictionaryField = new DataDictionaryField(cn) {
-                FieldType = fieldType,
-                Name = name,
-                ValueRequired = requiresValue
+            get { return Get<string>(); }
+            set { Set(value); }
+        }
+
+        public int Order
+        {
+            get { return Get<int>(); }
+            set { Set(value); }
+        }
+
+        public FieldType FieldType { get; }
+        
+        public int Flags
+        {
+            get { return Get<int>(); }
+            set { Set(value); }
+        }
+
+        public List<String> Values
+        {
+            get { return Get<List<string>>(); }
+            set { Set(value); }
+        }
+
+        public String DefaultValue
+        {
+            get { return Get<string>(); }
+            set { Set(value); }
+        }
+
+        public virtual DataType DataType
+        {
+            get { return Get<DataType>(); }
+            set { Set(value); }
+        }
+
+        public virtual bool ValueRequired
+        {
+            get { return Get<bool>(); }
+            set { Set(value); }
+        }
+
+        
+        public BaseFieldModel(DataDictionaryField field)
+        {
+            CN = field.CN;
+            Name = field.Name;
+            Order = field.Order;
+            FieldType = field.FieldType;
+            Flags = field.Flags;
+            Values = field.Values ?? new List<string>();
+            DefaultValue = field.DefaultValue;
+            DataType = field.DataType;
+            ValueRequired = field.ValueRequired;
+        }
+
+        public BaseFieldModel(string cn, FieldType fieldType, DataType dataType = DataType.TEXT, string name = null, bool valueRequired = false)
+        {
+            CN = cn;
+            FieldType = fieldType;
+            Name = name;
+            DataType = dataType;
+            ValueRequired = valueRequired;
+            Values = new List<string>();
+        }
+
+
+        public DataDictionaryField CreateDataDictionaryField()
+        {
+            return new DataDictionaryField(CN)
+            {
+                Name = Name,
+                Order = Order,
+                FieldType = FieldType,
+                Flags = Flags,
+                Values = Values,
+                DefaultValue = DefaultValue,
+                DataType = DataType,
+                ValueRequired = ValueRequired
             };
         }
 
 
+        public void ValidateText(object sender, TextCompositionEventArgs e)
+        {
+            bool handled = false;
+            switch (DataType)
+            {
+                case DataType.INTEGER: handled = ControlUtils.TextIsInteger(sender, e); break;
+                case DataType.DECIMAL:
+                case DataType.FLOAT: handled = ControlUtils.TextIsDouble(sender, e); break;
+            }
 
+            e.Handled = handled;
+        }
+
+        public void ValidateName(object sender, TextCompositionEventArgs e)
+        {
+            if (!(e.Text.All(x => char.IsLetterOrDigit(x) || " #^*-_+(){}[]:.".Contains(x))))
+                e.Handled = true;
+        }
     }
 }

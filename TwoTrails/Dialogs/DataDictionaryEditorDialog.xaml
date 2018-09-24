@@ -6,6 +6,9 @@
         xmlns:ddm="clr-namespace:TwoTrails.ViewModels.DataDictionary"
         xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
         xmlns:ttcore="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
+        xmlns:cvt="clr-namespace:TwoTrails.Converters"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         mc:Ignorable="d"
         Title="Data Dictionary Editor" Height="450" Width="800">
     <Grid>
@@ -13,24 +16,42 @@
 
         </Grid>
 
-        <ListBox ItemsSource="{Binding Fields}">
-            <ListBox.Resources>
+        <ItemsControl ItemsSource="{Binding Fields}">
+            <ItemsControl.Resources>
+                <cvt:InverseBooleanConverter x:Key="IBC"/>
+                <Style x:Key="fieldStyle" TargetType="{x:Type Control}">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                </Style>
                 <DataTemplate DataType="{x:Type ddm:TextBoxFieldModel}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="150"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0" Text="{Binding Name}" />
+                        <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="PreviewTextInput" >
+                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
 
-                        <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding RequiresValue}"/>
+                        <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
 
-                        <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}" ToolTip="Data Type"/>
+                        <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
+                                  ToolTip="Data Type" Style="{StaticResource fieldStyle}"/>
 
-                        <TextBox Grid.Column="3" Text="{Binding DefaultValue}" ToolTip="Default Value"/>
+                        <TextBox Grid.Column="3" Text="{Binding DefaultValue}" ToolTip="Default Value" Style="{StaticResource fieldStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="PreviewTextInput" >
+                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateText"  />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type ddm:ComboBoxFieldModel}">
@@ -38,23 +59,30 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="150"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0" Text="{Binding Name}" />
+                        <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="PreviewTextInput" >
+                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
 
-                        <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding RequiresValue}"/>
+                        <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
 
-                        <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}" ToolTip="DataType"/>
+                        <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
+                                  ToolTip="DataType" Style="{StaticResource fieldStyle}"/>
 
-                        <CheckBox Grid.Column="3" Content="IsEditable" IsChecked="{Binding IsEditable}" />
+                        <CheckBox Grid.Column="3" Content="IsEditable" IsChecked="{Binding IsEditable}" Style="{StaticResource fieldStyle}" />
 
-                        <Button Grid.Column="4" Content="Edit Values" Command="{Binding EditValues}"/>
+                        <Button Grid.Column="4" Content="Edit Values" Command="{Binding EditValues}" Style="{StaticResource fieldStyle}"/>
 
-                        <ComboBox Grid.Column="5" SelectedItem="{Binding DefaultValue}" ItemsSource="{Binding Values}" ToolTip="Default Value"/>
+                        <ComboBox Grid.Column="5" SelectedItem="{Binding DefaultValue}" ItemsSource="{Binding Values}" ToolTip="Default Value" Style="{StaticResource fieldStyle}"/>
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type ddm:CheckBoxFieldModel}">
@@ -62,17 +90,23 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="100"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0" Text="{Binding Name}" />
+                        <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="PreviewTextInput" >
+                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
 
-                        <CheckBox Grid.Column="1" Content="Nullable" IsChecked="{Binding RequiresValue}"/>
+                        <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
 
-                        <CheckBox Grid.Column="3" Content="Default Value" IsChecked="{Binding DefaultValue}"/>
+                        <CheckBox Grid.Column="3" Content="Default Value" IsThreeState="{Binding ValueRequired, Converter={StaticResource IBC}}" IsChecked="{Binding DefaultValue}" Style="{StaticResource fieldStyle}"/>
                     </Grid>
                 </DataTemplate>
-            </ListBox.Resources>
-        </ListBox>
+            </ItemsControl.Resources>
+        </ItemsControl>
     </Grid>
 </Window>

@@ -18,10 +18,37 @@ namespace TwoTrails.ViewModels.DataDictionary
         {
             Fields = new ObservableCollection<BaseFieldModel>();
 
-            Fields.Add(new ComboBoxFieldModel(Guid.NewGuid().ToString(), "ComboBox"));
-            Fields.Add(new TextBoxFieldModel(Guid.NewGuid().ToString(), "TextBox"));
-            Fields.Add(new CheckBoxFieldModel(Guid.NewGuid().ToString(), "CheckBox"));
+            Fields.Add(new ComboBoxFieldModel(Guid.NewGuid().ToString(), "ComboBox")
+            {
+                ValueRequired = true,
+                DataType = DataType.FLOAT,
+                Values = new List<string>()
+                {
+                    "32.1",
+                    "233.2",
+                    "1.23",
+                    "43.2",
+                    "331.2"
+                },
+                DefaultValue = "1.23"
+            });
+            Fields.Add(new TextBoxFieldModel(Guid.NewGuid().ToString(), "TextBox")
+            {
+                ValueRequired = true,
+                DataType = DataType.TEXT,
+                DefaultValue = "something"
+            });
+            Fields.Add(new CheckBoxFieldModel(Guid.NewGuid().ToString(), "CheckBox")
+            {
+                ValueRequired = false,
+                DefaultValue = null
+            });
         }
 
+
+        private void ValidateFields()
+        {
+
+        }
     }
 }

@@ -197,7 +197,7 @@ namespace TwoTrails.DAL
                                         case DataType.INTEGER: obj = dr.GetInt32N(ei); break;
                                         case DataType.DECIMAL: obj = dr.GetDecimalN(ei); break;
                                         case DataType.FLOAT: obj = dr.GetDoubleN(ei); break;
-                                        case DataType.STRING: obj = dr.GetStringN(ei); break;
+                                        case DataType.TEXT: obj = dr.GetStringN(ei); break;
                                         case DataType.BYTE_ARRAY: obj = dr.GetBytesEx(ei); break;
                                         case DataType.BOOLEAN: obj = dr.GetBoolN(ei); break;
                                         default:
@@ -2404,7 +2404,7 @@ namespace TwoTrails.DAL
                                             case DataType.FLOAT:
                                                 value = dr.GetFloat(findex);
                                                 break;
-                                            case DataType.STRING:
+                                            case DataType.TEXT:
                                                 value = dr.GetString(findex);
                                                 break;
                                             case DataType.BYTE_ARRAY:

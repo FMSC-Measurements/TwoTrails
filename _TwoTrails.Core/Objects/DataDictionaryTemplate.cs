@@ -66,7 +66,7 @@ namespace TwoTrails.Core
 
         public int Flags { get; set; }
 
-        public IList<String> Values { get; set; }
+        public List<String> Values { get; set; }
 
         public String DefaultValue { get; set; }
 
@@ -90,8 +90,8 @@ namespace TwoTrails.Core
                     case DataType.INTEGER: return Int32.Parse(DefaultValue);
                     case DataType.DECIMAL: return Decimal.Parse(DefaultValue);
                     case DataType.FLOAT: return Double.Parse(DefaultValue);
-                    case DataType.STRING: return DefaultValue;
-                    //case DataType.BYTE_ARRAY: return Int32.Parse(DefaultValue);
+                    case DataType.TEXT: return DefaultValue;
+                    case DataType.BYTE_ARRAY: return null;// Int32.Parse(DefaultValue);
                     case DataType.BOOLEAN: return Boolean.Parse(DefaultValue);
                     default: throw new Exception("Invalid DataType");
                 }
@@ -103,8 +103,8 @@ namespace TwoTrails.Core
                     case DataType.INTEGER: return 0;
                     case DataType.DECIMAL: return 0m;
                     case DataType.FLOAT: return 0d;
-                    case DataType.STRING: return String.Empty;
-                    //case DataType.BYTE_ARRAY: return new byte[0];
+                    case DataType.TEXT: return String.Empty;
+                    case DataType.BYTE_ARRAY: return null;// new byte[0];
                     case DataType.BOOLEAN: return false;
                     default: throw new Exception("Invalid DataType");
                 }
@@ -131,7 +131,7 @@ namespace TwoTrails.Core
         INTEGER = 0,
         DECIMAL = 1,
         FLOAT = 2,
-        STRING = 3,
+        TEXT = 3,
         BYTE_ARRAY = 4,
         BOOLEAN = 5
     }

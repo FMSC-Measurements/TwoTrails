@@ -191,6 +191,9 @@
     <Compile Include="Dialogs\DataDictionaryEditorDialog.xaml.cs">
       <DependentUpon>DataDictionaryEditorDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\EditValuesDialog.xaml.cs">
+      <DependentUpon>EditValuesDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>
@@ -329,6 +332,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\DataDictionaryEditorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\EditValuesDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
