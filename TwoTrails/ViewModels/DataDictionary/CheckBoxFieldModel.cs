@@ -43,6 +43,9 @@ namespace TwoTrails.ViewModels.DataDictionary
             }
         }
 
+
+        public CheckBoxFieldModel(DataDictionaryField field) : base(field) { }
+
         public CheckBoxFieldModel(string cn, string name = null, DataType dataType = DataType.TEXT, bool requiresValue = false)
             : base(cn, FieldType.CheckBox, dataType, name, requiresValue)
         {

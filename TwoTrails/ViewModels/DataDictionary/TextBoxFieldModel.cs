@@ -42,6 +42,9 @@ namespace TwoTrails.ViewModels.DataDictionary
             }
         }
 
+
+        public TextBoxFieldModel(DataDictionaryField field) : base(field) { }
+
         public TextBoxFieldModel(string cn, string name = null, DataType dataType = DataType.TEXT, bool requiresValue = false)
             : base(cn, FieldType.TextBox, dataType, name, requiresValue)
         {

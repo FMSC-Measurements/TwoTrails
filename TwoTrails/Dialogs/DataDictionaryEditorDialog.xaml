@@ -10,13 +10,14 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         mc:Ignorable="d"
-        Title="Data Dictionary Editor" Height="450" Width="800">
+        Title="Data Dictionary Editor" Height="450" Width="800"
+        WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid>
 
         </Grid>
 
-        <ItemsControl ItemsSource="{Binding Fields}">
+        <ItemsControl x:Name="icFields" ItemsSource="{Binding Fields}">
             <ItemsControl.Resources>
                 <cvt:InverseBooleanConverter x:Key="IBC"/>
                 <Style x:Key="fieldStyle" TargetType="{x:Type Control}">
@@ -30,6 +31,8 @@
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
 
                         <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
@@ -43,7 +46,7 @@
                         <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
 
                         <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
-                                  ToolTip="Data Type" Style="{StaticResource fieldStyle}"/>
+                                  ToolTip="Data Type" Style="{StaticResource fieldStyle}" IsEnabled="{Binding DataTypeEditable}"/>
 
                         <TextBox Grid.Column="3" Text="{Binding DefaultValue}" ToolTip="Default Value" Style="{StaticResource fieldStyle}">
                             <i:Interaction.Triggers>
@@ -52,6 +55,8 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </TextBox>
+
+                        <Button Grid.Column="5" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type ddm:ComboBoxFieldModel}">
@@ -63,6 +68,8 @@
                             <ColumnDefinition Width="150"/>
                             <ColumnDefinition Width="80"/>
                             <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
 
                         <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
@@ -76,13 +83,15 @@
                         <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
 
                         <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
-                                  ToolTip="DataType" Style="{StaticResource fieldStyle}"/>
+                                  ToolTip="DataType" Style="{StaticResource fieldStyle}" IsEnabled="{Binding DataTypeEditable}"/>
 
                         <CheckBox Grid.Column="3" Content="IsEditable" IsChecked="{Binding IsEditable}" Style="{StaticResource fieldStyle}" />
 
                         <Button Grid.Column="4" Content="Edit Values" Command="{Binding EditValues}" Style="{StaticResource fieldStyle}"/>
 
                         <ComboBox Grid.Column="5" SelectedItem="{Binding DefaultValue}" ItemsSource="{Binding Values}" ToolTip="Default Value" Style="{StaticResource fieldStyle}"/>
+
+                        <Button Grid.Column="7" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type ddm:CheckBoxFieldModel}">
@@ -91,6 +100,8 @@
                             <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
 
                         <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
@@ -104,6 +115,8 @@
                         <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
 
                         <CheckBox Grid.Column="3" Content="Default Value" IsThreeState="{Binding ValueRequired, Converter={StaticResource IBC}}" IsChecked="{Binding DefaultValue}" Style="{StaticResource fieldStyle}"/>
+
+                        <Button Grid.Column="5" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.Resources>

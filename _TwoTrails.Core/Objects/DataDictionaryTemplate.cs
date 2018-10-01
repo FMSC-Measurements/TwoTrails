@@ -28,12 +28,7 @@ namespace TwoTrails.Core
 
         public DataDictionary CreateDefaultDataDictionary()
         {
-            Dictionary<string, object> data = new Dictionary<string, object>();
-
-            foreach (DataDictionaryField ddf in this)
-                data.Add(ddf.CN, ddf.GetDefaultValue());
-
-            return new DataDictionary();
+            return new DataDictionary(this);
         }
 
         

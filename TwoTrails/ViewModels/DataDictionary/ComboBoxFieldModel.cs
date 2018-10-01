@@ -78,6 +78,8 @@ namespace TwoTrails.ViewModels.DataDictionary
         }
 
 
+        public ComboBoxFieldModel(DataDictionaryField field) : base(field) { }
+
         public ComboBoxFieldModel(string cn, string name = null, bool requiresValue = false)
             : base(cn, FieldType.ComboBox, DataType.BOOLEAN, name, requiresValue)
         {

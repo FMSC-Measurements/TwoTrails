@@ -59,6 +59,8 @@ namespace TwoTrails.ViewModels.DataDictionary
             set { Set(value); }
         }
 
+        public bool DataTypeEditable { get; private set; }
+
         
         public BaseFieldModel(DataDictionaryField field)
         {
@@ -81,6 +83,8 @@ namespace TwoTrails.ViewModels.DataDictionary
             DataType = dataType;
             ValueRequired = valueRequired;
             Values = new List<string>();
+
+            DataTypeEditable = true;
         }
 
 
@@ -102,15 +106,12 @@ namespace TwoTrails.ViewModels.DataDictionary
 
         public void ValidateText(object sender, TextCompositionEventArgs e)
         {
-            bool handled = false;
             switch (DataType)
             {
-                case DataType.INTEGER: handled = ControlUtils.TextIsInteger(sender, e); break;
+                case DataType.INTEGER: e.Handled = ControlUtils.TextIsInteger(sender, e); break;
                 case DataType.DECIMAL:
-                case DataType.FLOAT: handled = ControlUtils.TextIsDouble(sender, e); break;
+                case DataType.FLOAT: e.Handled = ControlUtils.TextIsDouble(sender, e); break;
             }
-
-            e.Handled = handled;
         }
 
         public void ValidateName(object sender, TextCompositionEventArgs e)
