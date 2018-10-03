@@ -14,13 +14,34 @@ namespace TwoTrails.ViewModels.DataDictionary
 {
     public class DataDictionaryEditorModel : NotifyPropertyChangedEx
     {
+        public ICommand CreateField { get; }
         public ICommand DeleteField { get; }
+        public ICommand Cancel { get; }
+        public ICommand Finish { get; }
+        public ICommand ImportTemplate { get; }
 
         public ObservableCollection<BaseFieldModel> Fields { get; private set; }
-        
 
-        public DataDictionaryEditorModel(TtProject project)
+        private Window _Window;
+
+
+        public DataDictionaryEditorModel(Window window, TtProject project)
         {
+            _Window = window;
+
+            CreateField = new RelayCommand(x =>
+            {
+                if (x is FieldType fieldType)
+                {
+                    switch (fieldType)
+                    {
+                        case FieldType.ComboBox: Fields.Add(new ComboBoxFieldModel(Guid.NewGuid().ToString())); break;
+                        case FieldType.TextBox: Fields.Add(new TextBoxFieldModel(Guid.NewGuid().ToString())); break;
+                        case FieldType.CheckBox: Fields.Add(new CheckBoxFieldModel(Guid.NewGuid().ToString())); break;
+                    }
+                }
+            });
+
             DeleteField = new RelayCommand(x =>
             {
                 if (x is BaseFieldModel bfm)
@@ -36,9 +57,43 @@ namespace TwoTrails.ViewModels.DataDictionary
                     }
                 }
             });
+
+            Cancel = new RelayCommand(x => { _Window.DialogResult = false; _Window.Close(); });
+
+            Finish = new RelayCommand(x =>
+            {
+                if (ValidateFields())
+                {
+                    DataDictionaryTemplate template = new DataDictionaryTemplate(Fields.Select(f => f.CreateDataDictionaryField()));
+
+                    if (project.DAL.HasDataDictionary)
+                    {
+                        if (!project.DAL.ModifyDataDictionary(template))
+                        {
+
+                        }
+                    }
+                    else
+                    {
+                        if (!project.DAL.CreateDataDictionary(template))
+                        {
+
+                        }
+                    }
+
+                    _Window.DialogResult = true;
+                    _Window.Close();
+                }
+            });
+
+            ImportTemplate = new RelayCommand(x =>
+            {
+                //ability to replace/merge
+            });
             
             Fields = new ObservableCollection<BaseFieldModel>();
 
+            //region temp
             Fields.Add(new ComboBoxFieldModel(Guid.NewGuid().ToString(), "ComboBox")
             {
                 ValueRequired = true,
@@ -68,12 +123,13 @@ namespace TwoTrails.ViewModels.DataDictionary
                 Order = 2
             });
             Fields.Add(new TextBoxFieldModel(new DataDictionaryField() { DataType = DataType.TEXT, DefaultValue = "test", Name = "Test Name", Order = 3, ValueRequired = true }));
+            //endregion
         }
 
 
-        private void ValidateFields()
+        private bool ValidateFields()
         {
-
+            return false;
         }
     }
 }

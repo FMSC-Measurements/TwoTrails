@@ -194,6 +194,20 @@ namespace TwoTrails.ViewModels
             {
                 ParseCommandLineArgs(args);
             }
+
+#if DEBUG
+            if (CurrentProject == null)
+            {
+                foreach (String filePath in App.Settings.GetRecentProjects())
+                {
+                    if (File.Exists(filePath))
+                    {
+                        OpenProject(filePath);
+                        break;
+                    }
+                }
+            }
+#endif
         }
 
 

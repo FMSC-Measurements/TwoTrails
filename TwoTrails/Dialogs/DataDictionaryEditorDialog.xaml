@@ -10,116 +10,152 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         mc:Ignorable="d"
-        Title="Data Dictionary Editor" Height="450" Width="800"
+        Title="Data Dictionary Editor"
+        Height="350" Width="800" MaxWidth="800"
+        MinHeight="250"
         WindowStartupLocation="CenterOwner">
     <Grid>
-        <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        </Grid>
+        <GroupBox Header="Create Fields" Grid.Row="0" Margin="5 0 5 0">
+            <Grid Margin="2.5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
 
-        <ItemsControl x:Name="icFields" ItemsSource="{Binding Fields}">
-            <ItemsControl.Resources>
-                <cvt:InverseBooleanConverter x:Key="IBC"/>
-                <Style x:Key="fieldStyle" TargetType="{x:Type Control}">
-                    <Setter Property="Margin" Value="5"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                </Style>
-                <DataTemplate DataType="{x:Type ddm:TextBoxFieldModel}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="30"/>
-                        </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0" Name="cbFieldType" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:FieldType}}"/>
 
-                        <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="PreviewTextInput" >
-                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </TextBox>
+                <Button Grid.Column="1" Content="Create Field" Margin="5 0 0 0" Command="{Binding CreateField}" CommandParameter="{Binding ElementName=cbFieldType, Path=SelectedItem}"/>
 
-                        <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
+                <Button Grid.Column="3" Content="Import Template" Command="{Binding ImportTemplate}"/>
+            </Grid>
+        </GroupBox>
 
-                        <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
+        <GroupBox Header="Fields" Grid.Row="1" Margin="5 5 5 0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="icFields" ItemsSource="{Binding Fields}">
+                    <ItemsControl.Resources>
+                        <cvt:InverseBooleanConverter x:Key="IBC"/>
+                        <Style x:Key="fieldStyle" TargetType="{x:Type Control}">
+                            <Setter Property="Margin" Value="2.5 2.5 2.5 5"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                        <DataTemplate DataType="{x:Type ddm:TextBoxFieldModel}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="30"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="PreviewTextInput" >
+                                            <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </TextBox>
+
+                                <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
+
+                                <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
                                   ToolTip="Data Type" Style="{StaticResource fieldStyle}" IsEnabled="{Binding DataTypeEditable}"/>
 
-                        <TextBox Grid.Column="3" Text="{Binding DefaultValue}" ToolTip="Default Value" Style="{StaticResource fieldStyle}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="PreviewTextInput" >
-                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateText"  />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </TextBox>
+                                <TextBox Grid.Column="3" Text="{Binding DefaultValue}" ToolTip="Default Value" Style="{StaticResource fieldStyle}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="PreviewTextInput" >
+                                            <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateText"  />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </TextBox>
 
-                        <Button Grid.Column="5" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
-                    </Grid>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type ddm:ComboBoxFieldModel}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="30"/>
-                        </Grid.ColumnDefinitions>
+                                <Button Grid.Column="5" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+                            </Grid>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type ddm:ComboBoxFieldModel}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="150"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="30"/>
+                                </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="PreviewTextInput" >
-                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </TextBox>
+                                <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="PreviewTextInput" >
+                                            <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </TextBox>
 
-                        <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
+                                <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
 
-                        <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
+                                <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
                                   ToolTip="DataType" Style="{StaticResource fieldStyle}" IsEnabled="{Binding DataTypeEditable}"/>
 
-                        <CheckBox Grid.Column="3" Content="IsEditable" IsChecked="{Binding IsEditable}" Style="{StaticResource fieldStyle}" />
+                                <CheckBox Grid.Column="3" Content="IsEditable" IsChecked="{Binding IsEditable}" Style="{StaticResource fieldStyle}" />
 
-                        <Button Grid.Column="4" Content="Edit Values" Command="{Binding EditValues}" Style="{StaticResource fieldStyle}"/>
+                                <Button Grid.Column="4" Content="Edit Values" Command="{Binding EditValues}" Style="{StaticResource fieldStyle}"/>
 
-                        <ComboBox Grid.Column="5" SelectedItem="{Binding DefaultValue}" ItemsSource="{Binding Values}" ToolTip="Default Value" Style="{StaticResource fieldStyle}"/>
+                                <ComboBox Grid.Column="5" SelectedItem="{Binding DefaultValue}" ItemsSource="{Binding Values}" ToolTip="Default Value" Style="{StaticResource fieldStyle}"/>
 
-                        <Button Grid.Column="7" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
-                    </Grid>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type ddm:CheckBoxFieldModel}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="30"/>
-                        </Grid.ColumnDefinitions>
+                                <Button Grid.Column="7" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+                            </Grid>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type ddm:CheckBoxFieldModel}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="30"/>
+                                </Grid.ColumnDefinitions>
 
-                        <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="PreviewTextInput" >
-                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </TextBox>
+                                <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="PreviewTextInput" >
+                                            <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </TextBox>
 
-                        <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
+                                <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
 
-                        <CheckBox Grid.Column="3" Content="Default Value" IsThreeState="{Binding ValueRequired, Converter={StaticResource IBC}}" IsChecked="{Binding DefaultValue}" Style="{StaticResource fieldStyle}"/>
+                                <CheckBox Grid.Column="3" Content="Default Value" IsThreeState="{Binding ValueRequired, Converter={StaticResource IBC}}" IsChecked="{Binding DefaultValue}" Style="{StaticResource fieldStyle}"/>
 
-                        <Button Grid.Column="5" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.Resources>
-        </ItemsControl>
+                                <Button Grid.Column="5" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.Resources>
+                </ItemsControl>
+            </ScrollViewer>
+        </GroupBox>
+
+        <Grid Grid.Row="2" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Cancel" Command="{Binding Cancel}"/>
+            <Button Grid.Column="2" Content="Finish" Command="{Binding Finish}"/>
+        </Grid>
     </Grid>
 </Window>

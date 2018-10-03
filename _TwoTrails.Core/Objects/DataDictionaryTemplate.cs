@@ -11,6 +11,23 @@ namespace TwoTrails.Core
         private readonly Dictionary<string, DataDictionaryField> _Fields = new Dictionary<string, DataDictionaryField>();
         
 
+        public DataDictionaryTemplate(IEnumerable<DataDictionaryField> dataDictionaryFields = null)
+        {
+            if (dataDictionaryFields != null)
+            {
+                foreach (DataDictionaryField field in dataDictionaryFields)
+                {
+                    AddField(field);
+                } 
+            }
+        }
+
+
+        public bool HasField(string cn)
+        {
+            return _Fields.ContainsKey(cn);
+        }
+
         public void AddField(DataDictionaryField field)
         {
             if (_Fields.ContainsKey(field.CN))
@@ -49,7 +66,7 @@ namespace TwoTrails.Core
         }
     }
 
-    public class DataDictionaryField
+    public class DataDictionaryField : IEquatable<DataDictionaryField>
     {
         public string CN { get; }
 
@@ -111,6 +128,42 @@ namespace TwoTrails.Core
         public T GetDefaultValue<T>()
         {
             return (T)GetDefaultValue();
+        }
+
+
+        public override bool Equals(object obj)
+        {
+            return obj is DataDictionaryField field && field == this;
+        }
+
+        public bool Equals(DataDictionaryField other)
+        {
+            return
+                this.CN == other.CN &&
+                this.Name == other.Name &&
+                this.Order == other.Order &&
+                this.FieldType == other.FieldType &&
+                this.Flags == other.Flags &&
+                this.Values.SequenceEqual(other.Values) &&
+                this.DefaultValue == other.DefaultValue &&
+                this.DataType == other.DataType &&
+                this.ValueRequired == other.ValueRequired;
+
+        }
+        
+        public override int GetHashCode()
+        {
+            var hashCode = 1869274798;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(CN);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * -1521134295 + Order.GetHashCode();
+            hashCode = hashCode * -1521134295 + FieldType.GetHashCode();
+            hashCode = hashCode * -1521134295 + Flags.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<List<string>>.Default.GetHashCode(Values);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(DefaultValue);
+            hashCode = hashCode * -1521134295 + DataType.GetHashCode();
+            hashCode = hashCode * -1521134295 + ValueRequired.GetHashCode();
+            return hashCode;
         }
     }
 

@@ -2296,13 +2296,16 @@ namespace TwoTrails.DAL
 
                         foreach (DataDictionaryField field in template)
                         {
-                            InsertDataDictionaryField(field, conn, trans);
-                            
+                            _Database.Insert(TwoTrailsSchema.DataDictionarySchema.TableName, GetDataDictionaryFieldValues(field), conn, trans);
+
                             ddFields.Add(field.CN, field.DataType == DataType.BOOLEAN ? SQLiteDataType.INTEGER : (SQLiteDataType)(int)field.DataType);
                         }
 
                         if (_Database.TableExists(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName))
+                        {
+                            Trace.WriteLine("Overwritting DataDictionary", "DAL:UpdateDataDictionaryTemplate");
                             _Database.DropTable(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, conn, trans);
+                        }
 
                         _Database.CreateTable(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, ddFields, null, conn, trans);
 
@@ -2324,10 +2327,55 @@ namespace TwoTrails.DAL
             return true;
         }
 
-
-        protected void InsertDataDictionaryField(DataDictionaryField field, SQLiteConnection conn, SQLiteTransaction transaction)
+        public bool ModifyDataDictionary(DataDictionaryTemplate template)
         {
-            _Database.Insert(TwoTrailsSchema.DataDictionarySchema.TableName, GetDataDictionaryFieldValues(field), conn, transaction);
+            if (!HasDataDictionary)
+                return CreateDataDictionary(template);
+            else
+            {
+                using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                {
+                    using (SQLiteTransaction trans = conn.BeginTransaction())
+                    {
+                        try
+                        {
+                            DataDictionaryTemplate oldTemplate = GetDataDictionaryTemplate();
+
+                            if (!oldTemplate.All(f => template.HasField(f.CN)))
+                            {
+                                //rebuild since some fields removed
+                            }
+                            else
+                            {
+                                //modify
+                                IEnumerable<DataDictionaryField> modifyFields = template.Where(f => oldTemplate.HasField(f.CN) && oldTemplate[f.CN] != f);
+
+                                foreach (DataDictionaryField field in modifyFields)
+                                {
+                                    _Database.Update(TwoTrailsSchema.DataDictionarySchema.TableName, GetDataDictionaryFieldValues(field), "", conn, trans);
+                                }
+
+                                //add
+                                IEnumerable<DataDictionaryField> addFields = template.Where(f => !oldTemplate.HasField(f.CN));
+
+
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex.Message, "DAL:ModifyDataDictionaryTemplate");
+                            trans.Rollback();
+                            return false;
+                        }
+                        finally
+                        {
+                            conn.Close();
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         private Dictionary<string, object> GetDataDictionaryFieldValues(DataDictionaryField field)

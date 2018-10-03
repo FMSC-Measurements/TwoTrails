@@ -12,12 +12,10 @@ namespace TwoTrails.Dialogs
     {
         public DataDictionaryEditorDialog(TtProject project)
         {
-            this.DataContext = new DataDictionaryEditorModel(project);
+            this.DataContext = new DataDictionaryEditorModel(this, project);
             InitializeComponent();
         }
-
-
-
+        
         public static void Show(TtProject project, Window owner = null, Action<bool?> onClose = null)
         {
             DataDictionaryEditorDialog dialog = new DataDictionaryEditorDialog(project);
