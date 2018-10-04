@@ -1,18 +1,16 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core.ComponentModel.Commands;
+﻿using FMSC.Core.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
 
 namespace TwoTrails.ViewModels.DataDictionary
 {
-    public class DataDictionaryEditorModel : NotifyPropertyChangedEx
+    public class DataDictionaryEditorModel
     {
         public ICommand CreateField { get; }
         public ICommand DeleteField { get; }
@@ -20,7 +18,10 @@ namespace TwoTrails.ViewModels.DataDictionary
         public ICommand Finish { get; }
         public ICommand ImportTemplate { get; }
 
+        private DataDictionaryTemplate origTemplate;
         public ObservableCollection<BaseFieldModel> Fields { get; private set; }
+
+        private int fieldsDeleted, fieldsModified;
 
         private Window _Window;
 
@@ -64,71 +65,80 @@ namespace TwoTrails.ViewModels.DataDictionary
             {
                 if (ValidateFields())
                 {
-                    DataDictionaryTemplate template = new DataDictionaryTemplate(Fields.Select(f => f.CreateDataDictionaryField()));
-
-                    if (project.DAL.HasDataDictionary)
+                    if ((fieldsDeleted + fieldsModified < 1) || MessageBox.Show(GenerateModifyPrompt(), "DataDictionary Changes", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                     {
-                        if (!project.DAL.ModifyDataDictionary(template))
+                        DataDictionaryTemplate template = new DataDictionaryTemplate(Fields.Select(f => f.CreateDataDictionaryField()));
+
+                        if (project.DAL.HasDataDictionary)
                         {
-
+                            if (!project.DAL.ModifyDataDictionary(template))
+                            {
+                                MessageBox.Show("There was a problem Modifying the DataDictionary. Please see the log file for details.");
+                                return;
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (!project.DAL.CreateDataDictionary(template))
+                        else
                         {
-
+                            if (!project.DAL.CreateDataDictionary(template))
+                            {
+                                MessageBox.Show("There was a problem Creating the DataDictionary. Please see the log file for details.");
+                                return;
+                            }
                         }
-                    }
 
-                    _Window.DialogResult = true;
-                    _Window.Close();
+                        project.DAL.InsertActivity(new TtUserAction(project.Settings.UserName, project.Settings.DeviceName, DateTime.Now, DataActionType.ModifiedDataDictionary));
+
+                        _Window.DialogResult = true;
+                        _Window.Close();
+                    }
                 }
             });
 
             ImportTemplate = new RelayCommand(x =>
             {
-                //ability to replace/merge
+                //todo ability to replace/merge
             });
             
             Fields = new ObservableCollection<BaseFieldModel>();
 
-            //region temp
-            Fields.Add(new ComboBoxFieldModel(Guid.NewGuid().ToString(), "ComboBox")
+            if (project.DAL.HasDataDictionary)
             {
-                ValueRequired = true,
-                DataType = DataType.FLOAT,
-                Values = new List<string>()
+                origTemplate = project.DAL.GetDataDictionaryTemplate();
+                foreach (DataDictionaryField field in origTemplate)
                 {
-                    "32.1",
-                    "233.2",
-                    "1.23",
-                    "43.2",
-                    "331.2"
-                },
-                DefaultValue = "1.23",
-                Order = 0
-            });
-            Fields.Add(new TextBoxFieldModel(Guid.NewGuid().ToString(), "TextBox")
-            {
-                ValueRequired = true,
-                DataType = DataType.TEXT,
-                DefaultValue = "something",
-                Order = 1
-            });
-            Fields.Add(new CheckBoxFieldModel(Guid.NewGuid().ToString(), "CheckBox")
-            {
-                ValueRequired = false,
-                DefaultValue = null,
-                Order = 2
-            });
-            Fields.Add(new TextBoxFieldModel(new DataDictionaryField() { DataType = DataType.TEXT, DefaultValue = "test", Name = "Test Name", Order = 3, ValueRequired = true }));
-            //endregion
+                    switch (field.FieldType)
+                    {
+                        case FieldType.ComboBox: Fields.Add(new ComboBoxFieldModel(field)); break;
+                        case FieldType.TextBox: Fields.Add(new TextBoxFieldModel(field)); break;
+                        case FieldType.CheckBox: Fields.Add(new CheckBoxFieldModel(field)); break;
+                    }
+                }
+            }
         }
 
+        private string GenerateModifyPrompt()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("You are about to modify the DataDictionary. This actiona can not be undone. ");
+
+            if (fieldsDeleted > 0)
+            {
+                sb.Append($"{fieldsDeleted} field{(fieldsDeleted > 1 ? "s" : "")} will be removed resulting in some point data being deleted. ");
+            }
+
+            if (fieldsModified > 0)
+            {
+                sb.Append($"{fieldsModified} {(fieldsDeleted > 0 ? "other " : "")} field{(fieldsModified > 1 ? "s" : "")} will also be modified (which may result in some data having Default Values added if Value Requied is selected). ");
+            }
+
+            sb.Append("Would you like to commit your changes?");
+
+            return sb.ToString();
+        }
 
         private bool ValidateFields()
         {
+            //todo
             return false;
         }
     }

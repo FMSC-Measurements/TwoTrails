@@ -1049,7 +1049,7 @@ namespace TwoTrails.ViewModels
             {
                 ExtendedDataFields = new ObservableCollection<DataDictionaryField>(ddt);
 
-                _ExtendedData = new Core.DataDictionary(ddt);
+                _ExtendedData = new Core.DataDictionary(Consts.EmptyGuid, ddt);
                 _ExtendedDataSame = ddt.ToDictionary(ddf => ddf.CN, ddf => true);
 
                 if (ExtendedDataFields.Count > 0)
@@ -2252,6 +2252,17 @@ namespace TwoTrails.ViewModels
 
         private void ModifyDataDictionary()
         {
+            if (Project.RequiresSave)
+            {
+                if (MessageBox.Show("This project has unsaved changes. In order to modify the DataDictionary all data must first be saved. Would you like to save now?",
+                    "Project Needs Saving", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.Yes)
+                {
+                    Project.Save();
+                }
+                else
+                    return;
+            }
+
             Project.MainModel.MainWindow.IsEnabled = false;
             DataDictionaryEditorDialog.Show(Project, Project.MainModel.MainWindow, (result) =>
             {

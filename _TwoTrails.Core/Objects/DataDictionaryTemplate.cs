@@ -43,9 +43,9 @@ namespace TwoTrails.Core
         }
 
 
-        public DataDictionary CreateDefaultDataDictionary()
+        public DataDictionary CreateDefaultDataDictionary(string pointCN = null)
         {
-            return new DataDictionary(this);
+            return new DataDictionary(pointCN, this);
         }
 
         

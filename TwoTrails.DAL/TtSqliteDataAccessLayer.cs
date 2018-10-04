@@ -114,7 +114,7 @@ namespace TwoTrails.DAL
                     TwoTrailsSchema.PointSchema.TableName,
                     TwoTrailsSchema.SharedSchema.CN);
 
-                ddQuerySelect = $" , {( string.Join(", ", fields.Select(f => $"`{ f.CN }`").ToArray()) )}"; 
+                ddQuerySelect = $", {( string.Join(", ", fields.Select(f => $"`{ f.CN }`").ToArray()) )}"; 
             }
 
             String query = String.Format(@"select {0}.{1}, {2}, {3}, {4}{5} from {0} left join {6} on {6}.{10} = {0}.{10} 
@@ -2145,7 +2145,6 @@ namespace TwoTrails.DAL
 
 
         #region Activity
-
         public void InsertActivity(TtUserAction activity)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
@@ -2288,28 +2287,8 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        if (_Database.TableExists(TwoTrailsSchema.DataDictionarySchema.TableName))
-                            _Database.ClearTable(TwoTrailsSchema.DataDictionarySchema.TableName, conn, trans);
-
-                        Dictionary<string, SQLiteDataType> ddFields = new Dictionary<string, SQLiteDataType>();
-                        ddFields.Add(TwoTrailsSchema.DataDictionarySchema.PointCN, SQLiteDataType.TEXT);
-
-                        foreach (DataDictionaryField field in template)
-                        {
-                            _Database.Insert(TwoTrailsSchema.DataDictionarySchema.TableName, GetDataDictionaryFieldValues(field), conn, trans);
-
-                            ddFields.Add(field.CN, field.DataType == DataType.BOOLEAN ? SQLiteDataType.INTEGER : (SQLiteDataType)(int)field.DataType);
-                        }
-
-                        if (_Database.TableExists(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName))
-                        {
-                            Trace.WriteLine("Overwritting DataDictionary", "DAL:UpdateDataDictionaryTemplate");
-                            _Database.DropTable(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, conn, trans);
-                        }
-
-                        _Database.CreateTable(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, ddFields, null, conn, trans);
-
-                        trans.Commit();
+                        CreateDataDictionaryTable(template, conn, trans);
+                        _DataDictionaryTemplate = new DataDictionaryTemplate(template);
                     }
                     catch (Exception ex)
                     {
@@ -2325,6 +2304,27 @@ namespace TwoTrails.DAL
             }
 
             return true;
+        }
+
+        private void CreateDataDictionaryTable(DataDictionaryTemplate template, SQLiteConnection conn, SQLiteTransaction trans)
+        {
+            Dictionary<string, SQLiteDataType> ddFields = new Dictionary<string, SQLiteDataType>();
+            ddFields.Add(TwoTrailsSchema.DataDictionarySchema.PointCN, SQLiteDataType.TEXT);
+
+            foreach (DataDictionaryField field in template)
+            {
+                _Database.Insert(TwoTrailsSchema.DataDictionarySchema.TableName, GetDataDictionaryFieldValues(field), conn, trans);
+
+                ddFields.Add(field.CN, field.DataType == DataType.BOOLEAN ? SQLiteDataType.INTEGER : (SQLiteDataType)(int)field.DataType);
+            }
+
+            if (_Database.TableExists(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName))
+            {
+                Trace.WriteLine("Overwritting DataDictionary", "DAL:UpdateDataDictionaryTemplate");
+                _Database.DropTable(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, conn, trans);
+            }
+
+            _Database.CreateTable(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, ddFields, null, conn, trans);
         }
 
         public bool ModifyDataDictionary(DataDictionaryTemplate template)
@@ -2343,22 +2343,70 @@ namespace TwoTrails.DAL
 
                             if (!oldTemplate.All(f => template.HasField(f.CN)))
                             {
-                                //rebuild since some fields removed
+                                //rebuild table since some fields removed
+                                if (_Database.TableExists(TwoTrailsSchema.DataDictionarySchema.TempExtendDataTableName))
+                                    _Database.DropTable(TwoTrailsSchema.DataDictionarySchema.TempExtendDataTableName, conn, trans);
+                                
+                                _Database.ExecuteNonQuery(
+                                    $"ALTER TABLE {TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName} RENAME TO {TwoTrailsSchema.DataDictionarySchema.TempExtendDataTableName};",
+                                    conn, trans);
+
+                                CreateDataDictionaryTable(template, conn, trans);
+                                
+                                string oldFields = String.Join(", ", template.Where(f => oldTemplate.HasField(f.CN)).Select(f => f.CN));
+                                _Database.ExecuteNonQuery(
+                                    $"INSERT INTO {TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName} ({oldFields}) SELECT ({oldFields}) FROM {TwoTrailsSchema.DataDictionarySchema.TempExtendDataTableName};",
+                                    conn, trans);
+
+                                _Database.DropTable(TwoTrailsSchema.DataDictionarySchema.TempExtendDataTableName, conn, trans);
                             }
                             else
                             {
-                                //modify
-                                IEnumerable<DataDictionaryField> modifyFields = template.Where(f => oldTemplate.HasField(f.CN) && oldTemplate[f.CN] != f);
-
-                                foreach (DataDictionaryField field in modifyFields)
-                                {
-                                    _Database.Update(TwoTrailsSchema.DataDictionarySchema.TableName, GetDataDictionaryFieldValues(field), "", conn, trans);
-                                }
-
-                                //add
+                                //add fields to table
                                 IEnumerable<DataDictionaryField> addFields = template.Where(f => !oldTemplate.HasField(f.CN));
 
+                                if (addFields.Any())
+                                {
+                                    Dictionary<string, object> updates = new Dictionary<string, object>();
 
+                                    Func<DataType, SQLiteDataType> convertDataType = (dt) => dt == DataType.BOOLEAN ? SQLiteDataType.INTEGER : (SQLiteDataType)(int)dt;
+
+                                    foreach (DataDictionaryField field in addFields)
+                                    {
+                                        _Database.Insert(TwoTrailsSchema.DataDictionarySchema.TableName, GetDataDictionaryFieldValues(field), conn, trans);
+                                        
+                                        _Database.ExecuteNonQuery($@"ALTER TABLE {TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName} ADD {field.CN} {convertDataType(field.DataType).ToString()}", conn, trans);
+
+                                        if (field.ValueRequired)
+                                        {
+                                            updates.Add(field.CN, field.GetDefaultValue());
+                                        }
+                                    }
+
+                                    if (updates.Count > 0)
+                                    {
+                                        _Database.Update(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, updates, null, conn, trans);
+                                    }
+                                }
+                            }
+                            
+                            //modify fields in table
+                            IEnumerable<DataDictionaryField> modifyFields = template.Where(f => oldTemplate.HasField(f.CN) && oldTemplate[f.CN] != f);
+
+                            if (modifyFields.Any())
+                            {
+                                foreach (DataDictionaryField field in modifyFields)
+                                {
+                                    _Database.Update(TwoTrailsSchema.DataDictionarySchema.TableName, GetDataDictionaryFieldValues(field), null, conn, trans);
+
+                                    if (field.ValueRequired && !oldTemplate[field.CN].ValueRequired)
+                                    {
+                                        _Database.Update(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName,
+                                            new Dictionary<string, object>() { { field.CN, field.GetDefaultValue() } },
+                                            $"{field.CN} IS NULL",
+                                            conn, trans);
+                                    }
+                                }
                             }
                         }
                         catch (Exception ex)
@@ -2374,6 +2422,8 @@ namespace TwoTrails.DAL
                     }
                 }
             }
+
+            _DataDictionaryTemplate = new DataDictionaryTemplate(template);
 
             return true;
         }
@@ -2468,7 +2518,7 @@ namespace TwoTrails.DAL
                                     findex++;
                                 }
 
-                                yield return new DataDictionary(dic);
+                                yield return new DataDictionary(pointCN, dic);
                             }
 
                             dr.Close();

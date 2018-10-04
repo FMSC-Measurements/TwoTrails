@@ -3,25 +3,30 @@ using CSUtil.ComponentModel;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using System;
 
 namespace TwoTrails.Core
 {
-    public class DataDictionary : NotifyPropertyChangedEx, IEqualityComparer<DataDictionary>, IEnumerable<KeyValuePair<string, object>>
+    public class DataDictionary : NotifyPropertyChangedEx, IEquatable<DataDictionary>, IEqualityComparer<DataDictionary>, IEnumerable<KeyValuePair<string, object>>
     {
         private readonly Dictionary<string, object> _Data;
         
+        public string PointCN { get; private set; }
         
-        public DataDictionary(Dictionary<string, object> data = null)
+
+        public DataDictionary(string pointCN = null, Dictionary<string, object> data = null)
         {
+            PointCN = pointCN;
             _Data = data ?? new Dictionary<string, object>();
         }
 
         public DataDictionary(DataDictionary dataDictionary)
         {
+            PointCN = dataDictionary.PointCN;
             _Data = dataDictionary.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
         
-        public DataDictionary(DataDictionaryTemplate dataDictionaryTemplate) : this()
+        public DataDictionary(string pointCN, DataDictionaryTemplate dataDictionaryTemplate) : this(pointCN)
         {
             foreach (DataDictionaryField field in dataDictionaryTemplate)
                 _Data.Add(field.CN, field.GetDefaultValue());
@@ -77,9 +82,14 @@ namespace TwoTrails.Core
 
         public override bool Equals(object obj)
         {
-            return Equals(this, obj as DataDictionary);
+            return obj is DataDictionary dd && Equals(this, dd);
         }
-
+        
+        public bool Equals(DataDictionary dd)
+        {
+            return Equals(this, dd);
+        }
+        
         public bool Equals(DataDictionary x, DataDictionary y)
         {
             return _Data.DictionaryEqual(y._Data);
