@@ -97,7 +97,7 @@
 
                                 <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
                                     <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="PreviewTextInput" >
+                                        <i:EventTrigger EventName="PreviewTextInput">
                                             <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>

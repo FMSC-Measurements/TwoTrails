@@ -1,4 +1,5 @@
-﻿using FMSC.Core.ComponentModel.Commands;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -77,11 +78,22 @@ namespace TwoTrails.ViewModels.DataDictionary
             }
         }
 
+        public bool IsEditable
+        {
+            get => Flags.GetBit(0);
+            set
+            {
+                if (value)
+                    Flags |= 1 << 0;
+                else
+                    Flags &= ~(1 << 0);
+            }
+        }
 
         public ComboBoxFieldModel(DataDictionaryField field) : base(field) { }
 
         public ComboBoxFieldModel(string cn, string name = null, bool requiresValue = false)
-            : base(cn, FieldType.ComboBox, DataType.BOOLEAN, name, requiresValue)
+            : base(cn, FieldType.ComboBox, DataType.TEXT, name, requiresValue)
         {
             EditValues = new RelayCommand(x =>
             {

@@ -144,6 +144,7 @@ namespace TwoTrails.Core
                 this.Order == other.Order &&
                 this.FieldType == other.FieldType &&
                 this.Flags == other.Flags &&
+                (this.Values.Count > 0 && (other.Values != null && other.Values.Count > 0)) &&
                 this.Values.SequenceEqual(other.Values) &&
                 this.DefaultValue == other.DefaultValue &&
                 this.DataType == other.DataType &&

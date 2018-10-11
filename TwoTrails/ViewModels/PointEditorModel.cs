@@ -202,12 +202,27 @@ namespace TwoTrails.ViewModels
         }
 
 
-        public ObservableCollection<DataGridColumn> DataColumns { get; private set; }
+        private ObservableCollection<DataGridColumn> _DataColumns;
+        public ObservableCollection<DataGridColumn> DataColumns
+        {
+            get { return _DataColumns; }
+            private set { SetField(ref _DataColumns, value); }
+        }
 
-        public ObservableCollection<DataDictionaryField> ExtendedDataFields { get; private set; }
+        private ObservableCollection<DataDictionaryField> _ExtendedDataFields;
+        public ObservableCollection<DataDictionaryField> ExtendedDataFields
+        {
+            get { return _ExtendedDataFields; }
+            private set { SetField(ref _ExtendedDataFields, value); }
+        }
 
-        public ObservableCollection<Control> VisibleFields { get; private set; }
-        
+        private ObservableCollection<Control> _VisibleFields;
+        public ObservableCollection<Control> VisibleFields
+        {
+            get { return _VisibleFields; }
+            private set { SetField(ref _VisibleFields, value); }
+        }
+
         public ObservableCollection<MenuItem> AdvInfoItems { get; }
         
 
@@ -1056,7 +1071,7 @@ namespace TwoTrails.ViewModels
                     VisibleFields.Add(new Separator());
 
                 foreach (DataDictionaryField ddf in ExtendedDataFields)
-                    AddColumnAndMenuItem(CreateDataGridTextColumn(ddf.Name, $"{ nameof(TtPoint.ExtendedData) }.{ $"[{ ddf.CN }]" }"));
+                    AddColumnAndMenuItem(CreateDataGridTextColumn(ddf.Name, $"{ nameof(TtPoint.ExtendedData) }.{ $"[{ ddf.CN }]" }", visibility: Visibility.Collapsed));
             }
             else
             {
@@ -2264,13 +2279,17 @@ namespace TwoTrails.ViewModels
             }
 
             Project.MainModel.MainWindow.IsEnabled = false;
-            DataDictionaryEditorDialog.Show(Project, Project.MainModel.MainWindow, (result) =>
+            DataDictionaryEditorDialog.ShowDialog(Project, Project.MainModel.MainWindow, (result) =>
             {
                 Project.MainModel.MainWindow.IsEnabled = true;
 
                 if (result == true)
                 {
-                    Manager.BaseManager.UpdateDataAction(DataActionType.ModifiedDataDictionary);
+                    Manager.Save();
+                    Manager.BaseManager.Reload();
+                    
+                    Points = CollectionViewSource.GetDefaultView(Manager.Points) as ListCollectionView;
+
                     SetupUI();
                 }
             });

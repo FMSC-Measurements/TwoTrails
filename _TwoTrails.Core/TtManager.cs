@@ -230,6 +230,12 @@ namespace TwoTrails.Core
             }
         }
 
+        public void Reload()
+        {
+            Load();
+            LoadMedia();
+        }
+
         protected void AttachMetadataEvents(TtMetadata meta)
         {
             meta.MagDecChanged += Metadata_MagDecChanged;
@@ -1764,19 +1770,13 @@ namespace TwoTrails.Core
             throw new NotImplementedException();
         }
 
-
-        //datadictionary
+        
 
         public DataDictionaryTemplate GetDataDictionaryTemplate()
         {
             return _DAL.GetDataDictionaryTemplate();
         }
-
-        public void UpdateDataDictionaryTemplate(DataDictionaryTemplate dataDictionaryTemplate)
-        {
-            Load(); //reload all data
-        }
-
+        
 
         public void UpdateDataAction(DataActionType action, string notes = null)
         {

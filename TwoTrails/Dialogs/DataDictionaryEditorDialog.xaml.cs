@@ -16,7 +16,7 @@ namespace TwoTrails.Dialogs
             InitializeComponent();
         }
         
-        public static void Show(TtProject project, Window owner = null, Action<bool?> onClose = null)
+        public static void ShowDialog(TtProject project, Window owner = null, Action<bool?> onClose = null)
         {
             DataDictionaryEditorDialog dialog = new DataDictionaryEditorDialog(project);
 
@@ -30,7 +30,7 @@ namespace TwoTrails.Dialogs
                 dialog.Closed += (s, e) => onClose(dialog.DialogResult);
             }
 
-            dialog.Show();
+            dialog.ShowDialog();
         }
     }
 }

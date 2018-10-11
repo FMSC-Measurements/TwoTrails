@@ -11,7 +11,7 @@ using TwoTrails.Core;
 
 namespace TwoTrails.ViewModels.DataDictionary
 {
-    public class BaseFieldModel : NotifyPropertyChangedEx
+    public class BaseFieldModel : NotifyPropertyChangedEx, IEquatable<BaseFieldModel>, IEquatable<DataDictionaryField>
     {
         public string CN { get; }
 
@@ -118,6 +118,41 @@ namespace TwoTrails.ViewModels.DataDictionary
         {
             if (!(e.Text.All(x => char.IsLetterOrDigit(x) || " #^*-_+(){}[]:.".Contains(x))))
                 e.Handled = true;
+        }
+
+
+        public override bool Equals(object obj)
+        {
+            return obj is BaseFieldModel bfm && this == bfm;
+        }
+
+        public bool Equals(BaseFieldModel bfm)
+        {
+            return
+                this.CN == bfm.CN &&
+                this.Name == bfm.Name &&
+                this.Order == bfm.Order &&
+                this.FieldType == bfm.FieldType &&
+                this.Flags == bfm.Flags &&
+                this.Values.SequenceEqual(bfm.Values) &&
+                this.DefaultValue == bfm.DefaultValue &&
+                this.DataType == bfm.DataType &&
+                this.ValueRequired == bfm.ValueRequired;
+        }
+
+        public bool Equals(DataDictionaryField other)
+        {
+            return
+                this.CN == other.CN &&
+                this.Name == other.Name &&
+                this.Order == other.Order &&
+                this.FieldType == other.FieldType &&
+                this.Flags == other.Flags &&
+                (this.Values.Count > 0 && (other.Values != null && other.Values.Count > 0)) &&
+                this.Values.SequenceEqual(other.Values) &&
+                this.DefaultValue == other.DefaultValue &&
+                this.DataType == other.DataType &&
+                this.ValueRequired == other.ValueRequired;
         }
     }
 }

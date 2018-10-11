@@ -40,6 +40,8 @@ namespace TwoTrails.ViewModels.DataDictionary
                         case FieldType.TextBox: Fields.Add(new TextBoxFieldModel(Guid.NewGuid().ToString())); break;
                         case FieldType.CheckBox: Fields.Add(new CheckBoxFieldModel(Guid.NewGuid().ToString())); break;
                     }
+
+                    Fields.Last().Order = Fields.Count - 1;
                 }
             });
 
@@ -119,7 +121,7 @@ namespace TwoTrails.ViewModels.DataDictionary
         private string GenerateModifyPrompt()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("You are about to modify the DataDictionary. This actiona can not be undone. ");
+            sb.Append("You are about to modify the DataDictionary. This action can not be undone. ");
 
             if (fieldsDeleted > 0)
             {
@@ -138,8 +140,48 @@ namespace TwoTrails.ViewModels.DataDictionary
 
         private bool ValidateFields()
         {
-            //todo
-            return false;
+            fieldsDeleted = origTemplate != null ? fieldsDeleted = origTemplate.Count(of => !Fields.Any(f => f.CN == of.CN)) : 0;
+            //fieldsModified = 0;
+            fieldsModified = origTemplate != null ? Fields.Count(f => origTemplate.HasField(f.CN) && !f.Equals(origTemplate[f.CN])) : 0;
+
+            foreach (BaseFieldModel bfm in Fields)
+            {
+                if (String.IsNullOrWhiteSpace(bfm.Name))
+                {
+                    MessageBox.Show("One or more Fields does not have a name.", "No Field Name", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                //if (origTemplate.HasField(bfm.CN) && !bfm.Equals(origTemplate[bfm.CN]))
+                //{
+                //    fieldsModified++;
+                //}
+
+                if (bfm.ValueRequired && bfm.DefaultValue == null)
+                {
+                    MessageBox.Show($"Field {bfm.Name} is marked as Value Requied but does not have a Default Value.", "No Default Value", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
+                if (bfm is ComboBoxFieldModel cbfm && !cbfm.IsEditable)
+                {
+                    if (!cbfm.Values.Any())
+                    {
+                        MessageBox.Show($"Field {cbfm.Name} does not have any Values. It needs to have Values or be marked as Editable.", "No Values", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return false;
+                    }
+                    else if (cbfm.Values.Count() < 2)
+                    {
+                        if (MessageBox.Show($@"Field {cbfm.Name} has only one Value and is not marked as Editable. You will not be able to select 
+Multiple Values for this field. Do you want to add more options to this field?", "One Value Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
     }
 }
