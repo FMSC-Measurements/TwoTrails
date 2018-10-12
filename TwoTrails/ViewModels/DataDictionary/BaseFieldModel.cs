@@ -41,9 +41,9 @@ namespace TwoTrails.ViewModels.DataDictionary
             set { Set(value); }
         }
 
-        public String DefaultValue
+        public object DefaultValue
         {
-            get { return Get<string>(); }
+            get { return Get(); }
             set { Set(value); }
         }
 
@@ -70,7 +70,7 @@ namespace TwoTrails.ViewModels.DataDictionary
             FieldType = field.FieldType;
             Flags = field.Flags;
             Values = field.Values ?? new List<string>();
-            DefaultValue = field.DefaultValue;
+            DefaultValue = field.GetDefaultValue();
             DataType = field.DataType;
             ValueRequired = field.ValueRequired;
         }
@@ -83,6 +83,7 @@ namespace TwoTrails.ViewModels.DataDictionary
             DataType = dataType;
             ValueRequired = valueRequired;
             Values = new List<string>();
+            DefaultValue = null;
 
             DataTypeEditable = true;
         }
@@ -150,7 +151,7 @@ namespace TwoTrails.ViewModels.DataDictionary
                 this.Flags == other.Flags &&
                 (this.Values.Count > 0 && (other.Values != null && other.Values.Count > 0)) &&
                 this.Values.SequenceEqual(other.Values) &&
-                this.DefaultValue == other.DefaultValue &&
+                this.DefaultValue.Equals(other.DefaultValue) &&
                 this.DataType == other.DataType &&
                 this.ValueRequired == other.ValueRequired;
         }

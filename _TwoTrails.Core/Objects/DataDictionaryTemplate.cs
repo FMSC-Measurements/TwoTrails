@@ -80,7 +80,7 @@ namespace TwoTrails.Core
 
         public List<String> Values { get; set; }
 
-        public String DefaultValue { get; set; }
+        public object DefaultValue { get; set; }
 
         public DataType DataType { get; set; }
 
@@ -97,16 +97,17 @@ namespace TwoTrails.Core
         {
             if (DefaultValue != null)
             {
-                switch (DataType)
-                {
-                    case DataType.INTEGER: return Int32.Parse(DefaultValue);
-                    case DataType.DECIMAL: return Decimal.Parse(DefaultValue);
-                    case DataType.FLOAT: return Double.Parse(DefaultValue);
-                    case DataType.TEXT: return DefaultValue;
-                    case DataType.BYTE_ARRAY: return null;// Int32.Parse(DefaultValue);
-                    case DataType.BOOLEAN: return Boolean.Parse(DefaultValue);
-                    default: throw new Exception("Invalid DataType");
-                }
+                return DefaultValue;
+                //switch (DataType)
+                //{
+                //    case DataType.INTEGER: return Int32.Parse(DefaultValue);
+                //    case DataType.DECIMAL: return Decimal.Parse(DefaultValue);
+                //    case DataType.FLOAT: return Double.Parse(DefaultValue);
+                //    case DataType.TEXT: return DefaultValue;
+                //    case DataType.BYTE_ARRAY: return null;// Int32.Parse(DefaultValue);
+                //    case DataType.BOOLEAN: return Boolean.Parse(DefaultValue);
+                //    default: throw new Exception("Invalid DataType");
+                //}
             }
             else if (ValueRequired)
             {
@@ -161,7 +162,7 @@ namespace TwoTrails.Core
             hashCode = hashCode * -1521134295 + FieldType.GetHashCode();
             hashCode = hashCode * -1521134295 + Flags.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<List<string>>.Default.GetHashCode(Values);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(DefaultValue);
+            hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(DefaultValue);
             hashCode = hashCode * -1521134295 + DataType.GetHashCode();
             hashCode = hashCode * -1521134295 + ValueRequired.GetHashCode();
             return hashCode;

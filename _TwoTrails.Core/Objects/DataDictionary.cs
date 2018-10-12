@@ -7,17 +7,17 @@ using System;
 
 namespace TwoTrails.Core
 {
-    public class DataDictionary : NotifyPropertyChangedEx, IEquatable<DataDictionary>, IEqualityComparer<DataDictionary>, IEnumerable<KeyValuePair<string, object>>
+    public class DataDictionary : NotifyPropertyChangedEx, IEnumerable<KeyValuePair<string, object>>, IEquatable<DataDictionary>, IEqualityComparer<DataDictionary>
     {
         private readonly Dictionary<string, object> _Data;
         
         public string PointCN { get; private set; }
         
 
-        public DataDictionary(string pointCN = null, Dictionary<string, object> data = null)
+        public DataDictionary(string pointCN = null, IEnumerable<KeyValuePair<string, object>> data = null)
         {
             PointCN = pointCN;
-            _Data = data ?? new Dictionary<string, object>();
+            _Data = data != null && data.Any() ? data.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) : new Dictionary<string, object>();
         }
 
         public DataDictionary(DataDictionary dataDictionary)
@@ -77,6 +77,11 @@ namespace TwoTrails.Core
                     OnPropertyChanged(cn);
                 }
             }
+        }
+
+        public bool HasField(string cn)
+        {
+            return _Data.ContainsKey(cn);
         }
 
 

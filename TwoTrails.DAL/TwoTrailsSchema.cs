@@ -560,7 +560,7 @@ namespace TwoTrails.DAL
                 FieldType + " INTEGER NOT NULL, " +
                 Flags + " INTEGER, " +
                 FieldValues + " TEXT, " +
-                DefaultValue + " TEXT, " +
+                DefaultValue + " NONE, " +
                 ValueRequired + " INTEGER NOT NULL, " +
                 DataType + " INTEGER NOT NULL" +
                 ");";

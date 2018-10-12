@@ -481,7 +481,7 @@ namespace TwoTrails.Core.Points
                 _PolyCN == point._PolyCN &&
                 _GroupCN == point._GroupCN &&
                 _MetadataCN == point._MetadataCN &&
-                _ExtendedData == point._ExtendedData;
+                _ExtendedData.Equals(point._ExtendedData);
         }
 
         

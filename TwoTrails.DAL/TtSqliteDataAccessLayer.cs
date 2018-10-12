@@ -368,7 +368,7 @@ namespace TwoTrails.DAL
         private void InsertExtendedData(TtPoint point, SQLiteConnection conn, SQLiteTransaction transaction)
         {
             if (point.ExtendedData != null)
-                _Database.Insert(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, GetExtendedPointValues(point), conn, transaction);
+                _Database.Insert(TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName, GetExtendedPointValues(point, true), conn, transaction);
         }
 
         private void InsertPointTypeData(TtPoint point, SQLiteConnection conn, SQLiteTransaction transaction)
@@ -448,7 +448,7 @@ namespace TwoTrails.DAL
                             UpdatePointTypeData(point.Item1, point.Item2, conn, trans, where);
 
                             if (hasDD)
-                                UpdateExtendedData(point.Item1, conn, trans, where);
+                                UpdateExtendedData(point.Item1, conn, trans, $"{TwoTrailsSchema.DataDictionarySchema.PointCN} = '{point.Item1.CN}'");
                         }
 
                         trans.Commit();
@@ -590,17 +590,24 @@ namespace TwoTrails.DAL
             return dic;
         }
 
-        private Dictionary<string, object> GetExtendedPointValues(TtPoint point)
+        private Dictionary<string, object> GetExtendedPointValues(TtPoint point, bool insert = false)
         {
-            Dictionary<string, object> data = new Dictionary<string, object>()
+            if (insert)
             {
-                [TwoTrailsSchema.DataDictionarySchema.PointCN] = point.CN
-            };
-            
-            foreach (KeyValuePair<string, object> kvp in point.ExtendedData)
-                data.Add(kvp.Key, kvp.Value);
+                Dictionary<string, object> data = new Dictionary<string, object>()
+                {
+                    [TwoTrailsSchema.DataDictionarySchema.PointCN] = point.CN
+                };
 
-            return data;
+                foreach (KeyValuePair<string, object> kvp in point.ExtendedData)
+                    data.Add($"[{kvp.Key}]", kvp.Value);
+
+                return data;
+            }
+            else
+            {
+                return point.ExtendedData.ToDictionary(kvp => $"[{kvp.Key}]", kvp => kvp.Value);
+            }
         }
 
         private Dictionary<string, object> GetGpsPointValues(GpsPoint point)
@@ -2229,7 +2236,8 @@ namespace TwoTrails.DAL
                     {
                         if (dr != null)
                         {
-                            string cn, name, defaultValue = null;
+                            string cn, name;
+                            object defaultValue = null;
                             int order, flags = 0;
                             FieldType fieldType;
                             List<string> values = null;
@@ -2248,13 +2256,32 @@ namespace TwoTrails.DAL
 
                                 if (!dr.IsDBNull(5))
                                     values = dr.GetString(5).Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                
+                                dataType = (DataType)dr.GetInt32(8);
 
                                 if (!dr.IsDBNull(6))
-                                    defaultValue = dr.GetString(6);
+                                {
+                                    switch (dataType)
+                                    {
+                                        case DataType.BOOLEAN:
+                                            defaultValue = int.Parse(dr.GetString(6)) > 0;
+                                            break;
+                                        case DataType.INTEGER:
+                                            defaultValue = int.Parse(dr.GetString(6));
+                                            break;
+                                        case DataType.DECIMAL:
+                                            defaultValue = decimal.Parse(dr.GetString(6));
+                                            break;
+                                        case DataType.FLOAT:
+                                            defaultValue = double.Parse(dr.GetString(6));
+                                            break;
+                                        case DataType.TEXT:
+                                            defaultValue = dr.GetString(6);
+                                            break;
+                                    }
+                                }
 
                                 valRequired = dr.GetBoolean(7);
-
-                                dataType = (DataType)dr.GetInt32(8);
 
                                 _DataDictionaryTemplate.AddField(new DataDictionaryField(cn)
                                 {
@@ -2264,7 +2291,8 @@ namespace TwoTrails.DAL
                                     Flags = flags,
                                     Values = values,
                                     DefaultValue = defaultValue,
-                                    DataType = dataType
+                                    DataType = dataType,
+                                    ValueRequired = valRequired
                                 });
                             }
 
@@ -2399,7 +2427,7 @@ namespace TwoTrails.DAL
                                         
                                     _Database.ExecuteNonQuery($@"ALTER TABLE {TwoTrailsSchema.DataDictionarySchema.ExtendDataTableName} ADD [{field.CN}] {convertDataType(field.DataType).ToString()}", conn, trans);
 
-                                    if (!string.IsNullOrWhiteSpace(field.DefaultValue))
+                                    if (field.DefaultValue != null)
                                     {
                                         updates.Add($"[{field.CN}]", field.GetDefaultValue());
                                     }

@@ -25,29 +25,15 @@ namespace TwoTrails.ViewModels.DataDictionary
 
         public new bool? DefaultValue
         {
-            get
-            {
-                string defVal = Get<string>();
-                return (defVal != null) ? (bool?)bool.Parse(defVal) : null;
-            }
-            set
-            {
-                if (ValueRequired)
-                {
-                    Set(value == true ? "true" : "false");
-                }
-                else
-                {
-                    Set(value == true ? "true" : value == false ? "false" : null);
-                }
-            }
+            get => Get<bool?>(); 
+            set => Set(ValueRequired ? value == true : value); 
         }
 
 
         public CheckBoxFieldModel(DataDictionaryField field) : base(field) { }
 
-        public CheckBoxFieldModel(string cn, string name = null, DataType dataType = DataType.TEXT, bool requiresValue = false)
-            : base(cn, FieldType.CheckBox, dataType, name, requiresValue)
+        public CheckBoxFieldModel(string cn, string name = null, bool requiresValue = false)
+            : base(cn, FieldType.CheckBox, DataType.BOOLEAN, name, requiresValue)
         {
 
         }
