@@ -2251,11 +2251,9 @@ namespace TwoTrails.DAL
                                 order = dr.GetInt32(2);
                                 fieldType = (FieldType)dr.GetInt32(3);
 
-                                if (!dr.IsDBNull(4))
-                                    flags = dr.GetInt32(4);
+                                flags = !dr.IsDBNull(4) ? dr.GetInt32(4) : 0;
 
-                                if (!dr.IsDBNull(5))
-                                    values = dr.GetString(5).Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                values = !dr.IsDBNull(5) ? dr.GetString(5).Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList() : null;
                                 
                                 dataType = (DataType)dr.GetInt32(8);
 
@@ -2413,7 +2411,7 @@ namespace TwoTrails.DAL
                             }
 
                             //add fields to table
-                            IEnumerable<DataDictionaryField> addFields = template.Where(f => !oldTemplate.HasField(f.CN));
+                            List<DataDictionaryField> addFields = template.Where(f => !oldTemplate.HasField(f.CN)).ToList();
 
                             if (addFields.Any())
                             {
@@ -2440,7 +2438,7 @@ namespace TwoTrails.DAL
                             }
                             
                             //modify fields in table
-                            IEnumerable<DataDictionaryField> modifyFields = template.Where(f => oldTemplate.HasField(f.CN) && !f.Equals(oldTemplate[f.CN]));
+                            List<DataDictionaryField> modifyFields = template.Where(f => oldTemplate.HasField(f.CN) && !f.Equals(oldTemplate[f.CN])).ToList();
                             
                             if (modifyFields.Any())
                             {

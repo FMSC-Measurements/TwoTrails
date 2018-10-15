@@ -9,9 +9,10 @@
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:cp="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
         mc:Ignorable="d"
         Title="Data Dictionary Editor"
-        Height="350" Width="800" MaxWidth="800"
+        Height="350" Width="850" MinWidth="850" MaxWidth="850"
         MinHeight="250"
         WindowStartupLocation="CenterOwner">
     <Grid>
@@ -30,11 +31,11 @@
                     <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox Grid.Column="0" Name="cbFieldType" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:FieldType}}"/>
+                <ComboBox Grid.Column="0" Name="cbFieldType" SelectedIndex="1" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:FieldType}}" ToolTip="Field Type"/>
 
-                <Button Grid.Column="1" Content="Create Field" Margin="5 0 0 0" Command="{Binding CreateField}" CommandParameter="{Binding ElementName=cbFieldType, Path=SelectedItem}"/>
+                <Button Grid.Column="1" Content="Create Field" Margin="5 0 0 0" Command="{Binding CreateFieldCommand}" CommandParameter="{Binding ElementName=cbFieldType, Path=SelectedItem}"/>
 
-                <Button Grid.Column="3" Content="Import Template" Command="{Binding ImportTemplate}"/>
+                <Button Grid.Column="3" Content="Import Template" Command="{Binding ImportTemplateCommand}"/>
             </Grid>
         </GroupBox>
 
@@ -55,6 +56,8 @@
                                     <ColumnDefinition Width="100"/>
                                     <ColumnDefinition Width="150"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="30"/>
+                                    <ColumnDefinition Width="30"/>
                                     <ColumnDefinition Width="30"/>
                                 </Grid.ColumnDefinitions>
 
@@ -79,7 +82,10 @@
                                     </i:Interaction.Triggers>
                                 </TextBox>
 
-                                <Button Grid.Column="5" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+                                <Button Grid.Column="5" FontFamily="Marlett" FontSize="20" Content="5" ToolTip="Move Up" Command="{Binding ElementName=icFields, Path=DataContext.MoveUpCommand}" cp:RelayCommandProperties.Parameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+                                <Button Grid.Column="6" FontFamily="Marlett" FontSize="20" Content="6" ToolTip="Move Down" Command="{Binding ElementName=icFields, Path=DataContext.MoveDownCommand}" cp:RelayCommandProperties.Parameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+
+                                <Button Grid.Column="7" Content="X" ToolTip="Delete Field" Command="{Binding ElementName=icFields, Path=DataContext.DeleteFieldCommand}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
                             </Grid>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type ddm:ComboBoxFieldModel}">
@@ -92,6 +98,8 @@
                                     <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="150"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="30"/>
+                                    <ColumnDefinition Width="30"/>
                                     <ColumnDefinition Width="30"/>
                                 </Grid.ColumnDefinitions>
 
@@ -114,7 +122,10 @@
 
                                 <ComboBox Grid.Column="5" SelectedItem="{Binding DefaultValue}" ItemsSource="{Binding Values}" ToolTip="Default Value" Style="{StaticResource fieldStyle}"/>
 
-                                <Button Grid.Column="7" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+                                <Button Grid.Column="7" FontFamily="Marlett" FontSize="20" Content="5" ToolTip="Move Up" Command="{Binding ElementName=icFields, Path=DataContext.MoveUpCommand}" cp:RelayCommandProperties.Parameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+                                <Button Grid.Column="8" FontFamily="Marlett" FontSize="20" Content="6" ToolTip="Move Down" Command="{Binding ElementName=icFields, Path=DataContext.MoveDownCommand}" cp:RelayCommandProperties.Parameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+
+                                <Button Grid.Column="9" Content="X" ToolTip="Delete Field" Command="{Binding ElementName=icFields, Path=DataContext.DeleteFieldCommand}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
                             </Grid>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type ddm:CheckBoxFieldModel}">
@@ -124,6 +135,8 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="100"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="30"/>
+                                    <ColumnDefinition Width="30"/>
                                     <ColumnDefinition Width="30"/>
                                 </Grid.ColumnDefinitions>
 
@@ -139,7 +152,10 @@
 
                                 <CheckBox Grid.Column="3" Content="Default Value" IsThreeState="{Binding ValueRequired, Converter={StaticResource IBC}}" IsChecked="{Binding DefaultValue}" Style="{StaticResource fieldStyle}"/>
 
-                                <Button Grid.Column="5" Content="X" Command="{Binding ElementName=icFields, Path=DataContext.DeleteField}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+                                <Button Grid.Column="4" FontFamily="Marlett" FontSize="20" Content="5" ToolTip="Move Up" Command="{Binding ElementName=icFields, Path=DataContext.MoveUpCommand}" cp:RelayCommandProperties.Parameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+                                <Button Grid.Column="5" FontFamily="Marlett" FontSize="20" Content="6" ToolTip="Move Down" Command="{Binding ElementName=icFields, Path=DataContext.MoveDownCommand}" cp:RelayCommandProperties.Parameter="{Binding}" Style="{StaticResource fieldStyle}"/>
+
+                                <Button Grid.Column="6" Content="X" ToolTip="Delete Field" Command="{Binding ElementName=icFields, Path=DataContext.DeleteFieldCommand}" CommandParameter="{Binding}" Style="{StaticResource fieldStyle}"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.Resources>
@@ -154,8 +170,8 @@
                 <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Cancel" Command="{Binding Cancel}"/>
-            <Button Grid.Column="2" Content="Finish" Command="{Binding Finish}"/>
+            <Button Grid.Column="0" Content="Cancel" Command="{Binding CancelCommand}"/>
+            <Button Grid.Column="2" Content="Finish" Command="{Binding FinishCommand}"/>
         </Grid>
     </Grid>
 </Window>

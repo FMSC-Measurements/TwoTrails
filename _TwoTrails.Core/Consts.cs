@@ -20,7 +20,9 @@ namespace TwoTrails.Core
 
         public const String FILE_EXTENSION_V2 = ".tt2";
         public const String FILE_EXTENSION_FILTER_V2 = "TwoTrails2 Files (*.tt2)|*.tt2";
-
+        
+        public const String FILE_EXTENSION_DATA_DICTIONARY = ".ddt";
+        public const String FILE_EXTENSION_DATA_DICTIONARY_FILTER = "DataDictionary Template Files (*.ddt)|*.ddt";
 
         public const string TEXT_EXT = ".txt";
         public const string CSV_EXT = ".csv";

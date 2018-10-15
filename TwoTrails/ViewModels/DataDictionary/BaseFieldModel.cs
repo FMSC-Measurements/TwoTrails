@@ -24,7 +24,10 @@ namespace TwoTrails.ViewModels.DataDictionary
         public int Order
         {
             get { return Get<int>(); }
-            set { Set(value); }
+            set {
+                Set(value);
+                OnPropertyChanged(nameof(Order)); //to notify commands that fields around it have changed
+            }
         }
 
         public FieldType FieldType { get; }
@@ -69,7 +72,7 @@ namespace TwoTrails.ViewModels.DataDictionary
             Order = field.Order;
             FieldType = field.FieldType;
             Flags = field.Flags;
-            Values = field.Values ?? new List<string>();
+            Values = field.Values ?? (field.FieldType == FieldType.ComboBox ? new List<string>() : null);
             DefaultValue = field.GetDefaultValue();
             DataType = field.DataType;
             ValueRequired = field.ValueRequired;
@@ -82,7 +85,7 @@ namespace TwoTrails.ViewModels.DataDictionary
             Name = name;
             DataType = dataType;
             ValueRequired = valueRequired;
-            Values = new List<string>();
+            Values = (fieldType == FieldType.ComboBox ? new List<string>() : null);
             DefaultValue = null;
 
             DataTypeEditable = true;
@@ -135,10 +138,12 @@ namespace TwoTrails.ViewModels.DataDictionary
                 this.Order == bfm.Order &&
                 this.FieldType == bfm.FieldType &&
                 this.Flags == bfm.Flags &&
-                this.Values.SequenceEqual(bfm.Values) &&
-                this.DefaultValue == bfm.DefaultValue &&
                 this.DataType == bfm.DataType &&
-                this.ValueRequired == bfm.ValueRequired;
+                this.ValueRequired == bfm.ValueRequired &&
+                (!(this.Values != null ^ bfm.Values != null) &&
+                    (this.Values == null || (this.Values.Count == bfm.Values.Count && this.Values.SequenceEqual(bfm.Values)))) &&
+                (!(this.DefaultValue != null ^ bfm.DefaultValue != null) &&
+                    (this.DefaultValue == null || this.DefaultValue.Equals(bfm.DefaultValue)));
         }
 
         public bool Equals(DataDictionaryField other)
@@ -149,11 +154,12 @@ namespace TwoTrails.ViewModels.DataDictionary
                 this.Order == other.Order &&
                 this.FieldType == other.FieldType &&
                 this.Flags == other.Flags &&
-                (this.Values.Count > 0 && (other.Values != null && other.Values.Count > 0)) &&
-                this.Values.SequenceEqual(other.Values) &&
-                this.DefaultValue.Equals(other.DefaultValue) &&
                 this.DataType == other.DataType &&
-                this.ValueRequired == other.ValueRequired;
+                this.ValueRequired == other.ValueRequired &&
+                (!(this.Values != null ^ other.Values != null) &&
+                    (this.Values == null || (this.Values.Count == other.Values.Count && this.Values.SequenceEqual(other.Values)))) &&
+                (!(this.DefaultValue != null ^ other.DefaultValue != null) &&
+                    (this.DefaultValue == null || this.DefaultValue.Equals(other.DefaultValue)));
         }
     }
 }

@@ -56,6 +56,7 @@
     <Compile Include="ComponentModel\CheckedListItem.cs" />
     <Compile Include="ComponentModel\Commands\BindedRelayCommand.cs" />
     <Compile Include="ComponentModel\Commands\RelayCommand.cs" />
+    <Compile Include="ComponentModel\CustomProperties.cs" />
     <Compile Include="ComponentModel\EnumToItemsSource.cs" />
     <Compile Include="ComponentModel\PropertyWatcher.cs" />
     <Compile Include="ComponentModel\RelayMenuItem.cs" />
