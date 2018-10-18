@@ -2278,6 +2278,8 @@ namespace TwoTrails.DAL
                                             break;
                                     }
                                 }
+                                else
+                                    defaultValue = null;
 
                                 valRequired = dr.GetBoolean(7);
 

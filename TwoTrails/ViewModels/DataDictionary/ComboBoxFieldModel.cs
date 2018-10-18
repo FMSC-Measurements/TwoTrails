@@ -90,7 +90,45 @@ namespace TwoTrails.ViewModels.DataDictionary
             }
         }
 
-        public ComboBoxFieldModel(DataDictionaryField field) : base(field) { }
+        public override bool ValueRequired
+        {
+            get => base.ValueRequired;
+            set
+            {
+                base.ValueRequired = value;
+
+                if (base.ValueRequired)
+                    UseDefaultValue = true;
+            }
+        }
+
+        public bool UseDefaultValue
+        {
+            get => Get<bool>();
+            set
+            {
+                if (Set(value))
+                {
+                    if (!value)
+                        DefaultValue = null;
+                }
+            }
+        }
+
+        public ComboBoxFieldModel(DataDictionaryField field) : base(field)
+        {
+            EditValues = new RelayCommand(x =>
+            {
+                EditValuesDialog dialog = new EditValuesDialog(Values, DataType);
+                if (dialog.ShowDialog() == true)
+                {
+                    Values = dialog.Values;
+                }
+            });
+
+            if (DefaultValue != null)
+                UseDefaultValue = true;
+        }
 
         public ComboBoxFieldModel(string cn, string name = null, bool requiresValue = false)
             : base(cn, FieldType.ComboBox, DataType.TEXT, name, requiresValue)
@@ -103,6 +141,9 @@ namespace TwoTrails.ViewModels.DataDictionary
                     Values = dialog.Values;
                 }
             });
+            
+            if (DefaultValue != null)
+                UseDefaultValue = true;
         }
     }
 }
