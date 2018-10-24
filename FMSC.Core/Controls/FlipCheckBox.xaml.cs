@@ -42,7 +42,7 @@ namespace FMSC.Core.Controls
 
 
         public static readonly DependencyProperty IsCheckedProperty =
-            DependencyProperty.Register(nameof(IsChecked), typeof(bool), typeof(FlipCheckBox), new FrameworkPropertyMetadata() { BindsTwoWayByDefault = true });
+            DependencyProperty.Register(nameof(IsChecked), typeof(bool), typeof(FlipCheckBox));
         public bool IsChecked
         {
             get { return (bool)GetValue(IsCheckedProperty); }

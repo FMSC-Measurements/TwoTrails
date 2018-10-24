@@ -16,7 +16,7 @@ namespace TwoTrails.Mapping
     {
         private ObservableCollection<TtMapPolygonManager> PolygonManagers { get; set; }
 
-        private readonly PropertyInfo VisibileProperty;
+        private readonly PropertyInfo VisibleProperty;
         private readonly PropertyInfo AdjBndVisibleProperty;
         private readonly PropertyInfo AdjBndPointsVisibleProperty;
         private readonly PropertyInfo UnAdjBndVisibleProperty;
@@ -36,7 +36,7 @@ namespace TwoTrails.Mapping
         {
             Type type = typeof(TtMapPolygonManager);
 
-            VisibileProperty = type.GetProperty(nameof(TtMapPolygonManager.Visible));
+            VisibleProperty = type.GetProperty(nameof(TtMapPolygonManager.Visible));
             AdjBndVisibleProperty = type.GetProperty(nameof(TtMapPolygonManager.AdjBndVisible));
             AdjBndPointsVisibleProperty = type.GetProperty(nameof(TtMapPolygonManager.AdjBndPointsVisible));
             UnAdjBndVisibleProperty = type.GetProperty(nameof(TtMapPolygonManager.UnAdjBndVisible));
@@ -54,9 +54,23 @@ namespace TwoTrails.Mapping
             foreach (TtMapPolygonManager pm in PolygonManagers)
             {
                 pm.PropertyChanged += PolyManager_PropertyChanged;
+
+                UpdateVisibilityField(ref _Visible, pm, VisibleProperty);
+                UpdateVisibilityField(ref _AdjBndVisible, pm, AdjBndVisibleProperty);
+                UpdateVisibilityField(ref _AdjBndPointsVisible, pm, AdjBndPointsVisibleProperty);
+                UpdateVisibilityField(ref _UnAdjBndVisible, pm, UnAdjBndVisibleProperty);
+                UpdateVisibilityField(ref _UnAdjBndPointsVisible, pm, UnAdjBndPointsVisibleProperty);
+                UpdateVisibilityField(ref _AdjNavVisible, pm, AdjNavVisibleProperty);
+                UpdateVisibilityField(ref _AdjNavPointsVisible, pm, AdjNavPointsVisibleProperty);
+                UpdateVisibilityField(ref _UnAdjNavVisible, pm, UnAdjNavVisibleProperty);
+                UpdateVisibilityField(ref _UnAdjNavPointsVisible, pm, UnAdjNavPointsVisibleProperty);
+                UpdateVisibilityField(ref _AdjMiscPointsVisible, pm, AdjMiscPointsVisibleProperty);
+                UpdateVisibilityField(ref _UnAdjMiscPointsVisible, pm, UnAdjMiscPointsVisibleProperty);
+                UpdateVisibilityField(ref _WayPointsVisible, pm, WayPointsVisibleProperty);
             }
 
             PolygonManagers.CollectionChanged += PolygonManagers_CollectionChanged;
+
         }
 
         private void PolygonManagers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -94,7 +108,7 @@ namespace TwoTrails.Mapping
             {
                 switch (e.PropertyName)
                 {
-                    case nameof(Visible): UpdateVisibilityField(ref _Visible, pm, VisibileProperty); break;
+                    case nameof(Visible): UpdateVisibilityField(ref _Visible, pm, VisibleProperty); break;
                     case nameof(AdjBndVisible): UpdateVisibilityField(ref _AdjBndVisible, pm, AdjBndVisibleProperty); break;
                     case nameof(AdjBndPointsVisible): UpdateVisibilityField(ref _AdjBndPointsVisible, pm, AdjBndPointsVisibleProperty); break;
                     case nameof(UnAdjBndVisible): UpdateVisibilityField(ref _UnAdjBndVisible, pm, UnAdjBndVisibleProperty); break;
@@ -125,6 +139,8 @@ namespace TwoTrails.Mapping
                 bool allNotVis = PolygonManagers.All(pm => !(bool)propertyInfo.GetValue(pm));
                 field = allAreVis || allNotVis ? (bool?)allAreVis : null;
             }
+            else
+                field = value;
 
             OnPropertyChanged(propertyInfo.Name);
 
@@ -167,22 +183,22 @@ namespace TwoTrails.Mapping
 
         private object locker = new object();
         
-        private bool? _Visible;
+        private bool? _Visible = true;
         public bool? Visible
         {
             get { return _Visible; }
-            set { SetVisibilityField(ref _Visible, value, VisibileProperty); }
+            set { SetVisibilityField(ref _Visible, value, VisibleProperty); }
         }
 
 
-        private bool? _AdjBndVisible;
+        private bool? _AdjBndVisible = true;
         public bool? AdjBndVisible
         {
             get { return _AdjBndVisible; }
             set { SetVisibilityField(ref _AdjBndVisible, value, AdjBndVisibleProperty); }
         }
 
-        private bool? _AdjBndPointsVisible;
+        private bool? _AdjBndPointsVisible = true;
         public bool? AdjBndPointsVisible
         {
             get { return _AdjBndPointsVisible; }
@@ -190,14 +206,14 @@ namespace TwoTrails.Mapping
         }
 
 
-        private bool? _UnAdjBndVisible;
+        private bool? _UnAdjBndVisible = true;
         public bool? UnAdjBndVisible
         {
             get { return _UnAdjBndVisible; }
             set { SetVisibilityField(ref _UnAdjBndVisible, value, UnAdjBndVisibleProperty); }
         }
 
-        private bool? _UnAdjBndPointsVisible;
+        private bool? _UnAdjBndPointsVisible = true;
         public bool? UnAdjBndPointsVisible
         {
             get { return _UnAdjBndPointsVisible; }
@@ -205,14 +221,14 @@ namespace TwoTrails.Mapping
         }
 
 
-        private bool? _AdjNavVisible;
+        private bool? _AdjNavVisible = true;
         public bool? AdjNavVisible
         {
             get { return _AdjNavVisible; }
             set { SetVisibilityField(ref _AdjNavVisible, value, AdjNavVisibleProperty); }
         }
 
-        private bool? _AdjNavPointsVisible;
+        private bool? _AdjNavPointsVisible = true;
         public bool? AdjNavPointsVisible
         {
             get { return _AdjNavPointsVisible; }
@@ -220,14 +236,14 @@ namespace TwoTrails.Mapping
         }
 
 
-        private bool? _UnAdjNavVisible;
+        private bool? _UnAdjNavVisible = true;
         public bool? UnAdjNavVisible
         {
             get { return _UnAdjNavVisible; }
             set { SetVisibilityField(ref _UnAdjNavVisible, value, UnAdjNavVisibleProperty); }
         }
 
-        private bool? _UnAdjNavPointsVisible;
+        private bool? _UnAdjNavPointsVisible = true;
         public bool? UnAdjNavPointsVisible
         {
             get { return _UnAdjNavPointsVisible; }
@@ -236,14 +252,14 @@ namespace TwoTrails.Mapping
 
 
 
-        private bool? _AdjMiscPointsVisible;
+        private bool? _AdjMiscPointsVisible = true;
         public bool? AdjMiscPointsVisible
         {
             get { return _AdjMiscPointsVisible; }
             set { SetVisibilityField(ref _AdjMiscPointsVisible, value, AdjMiscPointsVisibleProperty); }
         }
 
-        private bool? _UnAdjMiscPointsVisible;
+        private bool? _UnAdjMiscPointsVisible = true;
         public bool? UnAdjMiscPointsVisible
         {
             get { return _UnAdjMiscPointsVisible; }
@@ -251,7 +267,7 @@ namespace TwoTrails.Mapping
         }
 
 
-        private bool? _WayPointsVisible;
+        private bool? _WayPointsVisible = true;
         public bool? WayPointsVisible
         {
             get { return _WayPointsVisible; }

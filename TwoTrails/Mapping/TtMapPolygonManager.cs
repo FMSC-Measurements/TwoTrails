@@ -79,8 +79,7 @@ namespace TwoTrails.Mapping
             {
                 lock (locker)
                 {
-                    SetField(ref _AdjBndVisible, value, () => { AdjBoundary.Visible = value && _Visible; }); 
-                    OnPropertyChanged(nameof(AdjBndVisible));
+                    SetField(ref _AdjBndVisible, value, () => { AdjBoundary.Visible = value && _Visible; }, nameof(AdjBndVisible));
                 }
             }
         }
@@ -111,7 +110,7 @@ namespace TwoTrails.Mapping
             {
                 lock (locker)
                 {
-                    SetField(ref _UnAdjBndVisible, value, () => { UnAdjBoundary.Visible = value && _Visible; }); 
+                    SetField(ref _UnAdjBndVisible, value, () => { UnAdjBoundary.Visible = value && _Visible; }, nameof(UnAdjBndVisible)); 
                 }
             }
         }
@@ -246,6 +245,26 @@ namespace TwoTrails.Mapping
                             p.WayPointVisible = _WayPointsVisible;
                     });
                 }
+            }
+        }
+
+
+        public void UpdateVisibility(string propertyName, bool visibility)
+        {
+            switch (propertyName)
+            {
+                case nameof(Visible): Visible = visibility; break;
+                case nameof(AdjBndVisible): AdjBndVisible = visibility; break;
+                case nameof(AdjBndPointsVisible): AdjBndPointsVisible = visibility; break;
+                case nameof(UnAdjBndVisible): UnAdjBndVisible = visibility; break;
+                case nameof(UnAdjBndPointsVisible): UnAdjBndPointsVisible = visibility; break;
+                case nameof(AdjNavVisible): AdjNavVisible = visibility; break;
+                case nameof(AdjNavPointsVisible): AdjNavPointsVisible = visibility; break;
+                case nameof(UnAdjNavVisible): UnAdjNavVisible = visibility; break;
+                case nameof(UnAdjNavPointsVisible): UnAdjNavPointsVisible = visibility; break;
+                case nameof(AdjMiscPointsVisible): AdjMiscPointsVisible = visibility; break;
+                case nameof(UnAdjMiscPointsVisible): UnAdjMiscPointsVisible = visibility; break;
+                case nameof(WayPointsVisible): WayPointsVisible = visibility; break;
             }
         }
         #endregion
