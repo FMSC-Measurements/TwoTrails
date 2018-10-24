@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace FMSC.Core.Collections
 {
-    public class ObservableConvertedCollection<TOut, TIn> : IList<TOut>, ICollection<TOut>, IEnumerable<TOut>, IEnumerable, IList, ICollection, IReadOnlyList<TOut>, IReadOnlyCollection<TOut>, INotifyCollectionChanged, INotifyPropertyChanged
+    public class ObservableConvertedCollection<TIn, TOut> : IList<TOut>, ICollection<TOut>, IEnumerable<TOut>, IEnumerable, IList, ICollection, IReadOnlyList<TOut>, IReadOnlyCollection<TOut>, INotifyCollectionChanged, INotifyPropertyChanged
     {
         event NotifyCollectionChangedEventHandler INotifyCollectionChanged.CollectionChanged
         {

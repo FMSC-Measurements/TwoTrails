@@ -35,7 +35,7 @@ namespace TwoTrails.ViewModels.DataDictionary
                                     continue;
                                 }
 
-                                if (DefaultValue == Values[i])
+                                if (DefaultValue?.ToString() == Values[i])
                                 {
                                     DefaultValue = null;
                                     OnPropertyChanged(nameof(DefaultValue));
@@ -57,7 +57,7 @@ namespace TwoTrails.ViewModels.DataDictionary
                         {
                             if (!double.TryParse(Values[i], out double val))
                             {
-                                if (DefaultValue == Values[i])
+                                if (DefaultValue?.ToString() == Values[i])
                                 {
                                     DefaultValue = null;
                                     OnPropertyChanged(nameof(DefaultValue));
@@ -107,11 +107,8 @@ namespace TwoTrails.ViewModels.DataDictionary
             get => Get<bool>();
             set
             {
-                if (Set(value))
-                {
-                    if (!value)
-                        DefaultValue = null;
-                }
+                if (Set(value) && !value)
+                    DefaultValue = null;
             }
         }
 

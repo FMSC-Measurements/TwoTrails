@@ -19,7 +19,7 @@ namespace TwoTrails.Mapping
 
         public ICommand ZoomToPolygonCommand { get; }
 
-        public ObservableConvertedCollection<TtMapPoint, TtPoint> Points { get; set; }
+        public ObservableConvertedCollection<TtPoint, TtMapPoint> Points { get; set; }
 
         private TtMapPolygon _AdjBnd, _UnAdjBnd;
         public TtMapPolygon AdjBoundary { get { return _AdjBnd; } private set { SetField(ref _AdjBnd, value); } }
@@ -293,7 +293,7 @@ namespace TwoTrails.Mapping
             AdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, true, _AdjNavVisible);
             UnAdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, false, _UnAdjNavVisible);
 
-            Points = new ObservableConvertedCollection<TtMapPoint, TtPoint>(
+            Points = new ObservableConvertedCollection<TtPoint, TtMapPoint>(
                 points,
                 p => new TtMapPoint(map, p, Graphics, Visible, _AdjBndPointsVisible, _UnAdjBndPointsVisible,
                         _AdjNavPointsVisible, _UnAdjNavPointsVisible, _AdjMiscPointsVisible, _UnAdjMiscPointsVisible,
