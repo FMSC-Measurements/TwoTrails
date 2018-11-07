@@ -236,7 +236,6 @@
     <Compile Include="SingleInstance.cs" />
     <Compile Include="TtPolygonGraphicSettings.cs" />
     <Compile Include="TtTextWriterTraceListener.cs" />
-    <Compile Include="TtWindow.cs" />
     <Compile Include="Utils\Export.cs" />
     <Compile Include="Utils\Import.cs" />
     <Compile Include="Utils\TtGpxGenerator.cs" />
