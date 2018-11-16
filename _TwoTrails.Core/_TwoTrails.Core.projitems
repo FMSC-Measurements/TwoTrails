@@ -44,7 +44,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IObservableTtManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IReadOnlyTtMediaLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtMediaLayer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Media\MediaTools.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtMediaExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtMediaInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionary.cs" />

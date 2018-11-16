@@ -2,10 +2,12 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using TwoTrails.Core.Media;
 using TwoTrails.DAL;
 
-namespace TwoTrails.Core.Media
+namespace TwoTrails.Core
 {
     public static class MediaTools
     {
@@ -29,7 +31,7 @@ namespace TwoTrails.Core.Media
             }
             else
             {
-                return mal.GetImageData(image);
+                return GetImageData(mal, image);
             }
         }
 
@@ -97,6 +99,51 @@ namespace TwoTrails.Core.Media
                 ImageInfo = tup.Item1;
                 Image = tup.Item2;
             }
+        }
+
+
+        public static Color GetColor(int argb)
+        {
+            return Color.FromArgb(GetAlpha(argb), GetRed(argb), GetGreen(argb), GetBlue(argb));
+        }
+
+        public static BitmapImage GetImageData(ITtMediaLayer mal, TtImage image)
+        {
+            BitmapImage bitmap = new BitmapImage();
+
+            byte[] data = mal.GetRawImageData(image);
+
+            if (data != null)
+            {
+                bitmap.BeginInit();
+                bitmap.StreamSource = new MemoryStream(data);
+                bitmap.EndInit();
+                bitmap.Freeze();
+            }
+
+            return bitmap;
+        }
+
+
+
+        public static byte GetAlpha(int color)
+        {
+            return (byte)((color >> 24) & 255);
+        }
+
+        public static byte GetRed(int color)
+        {
+            return (byte)((color >> 16) & 255);
+        }
+
+        public static byte GetGreen(int color)
+        {
+            return (byte)((color >> 8) & 255);
+        }
+
+        public static byte GetBlue(int color)
+        {
+            return (byte)(color & 255);
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.ComponentModel;
 using TwoTrails.Core;
 using System.Windows.Controls;
+using Point = FMSC.Core.Point;
 
 namespace TwoTrails.Mapping
 {
@@ -217,24 +218,24 @@ namespace TwoTrails.Mapping
             ToolTipService.SetShowDuration(UnAdjPushpin, 60000);
 
 
-            AdjColor = pgo.AdjPtsColor;
-            UnAdjColor = pgo.UnAdjPtsColor;
-            WayPointColor = pgo.WayPtsColor;
+            AdjColor = MediaTools.GetColor(pgo.AdjPtsColor);
+            UnAdjColor = MediaTools.GetColor(pgo.UnAdjPtsColor);
+            WayPointColor = MediaTools.GetColor(pgo.WayPtsColor);
 
             IsNavPoint = point.IsNavPoint();
 
-            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, Color color) =>
+            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, int color) =>
             {
                 switch (code)
                 {
                     case GraphicCode.ADJPTS_COLOR:
-                        AdjColor = color;
+                        AdjColor = MediaTools.GetColor(color);
                         break;
                     case GraphicCode.UNADJPTS_COLOR:
-                        UnAdjColor = color;
+                        UnAdjColor = MediaTools.GetColor(color);
                         break;
                     case GraphicCode.WAYPTS_COLOR:
-                        WayPointColor = color;
+                        WayPointColor = MediaTools.GetColor(color);
                         break;
                     default:
                         break;

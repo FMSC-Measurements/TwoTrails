@@ -6,7 +6,6 @@ using System.IO;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using System.Diagnostics;
-using System.Windows.Media.Imaging;
 
 namespace TwoTrails.DAL
 {
@@ -317,8 +316,7 @@ namespace TwoTrails.DAL
         }
 
 
-
-        public void InsertImageData(TtImage image, BitmapImage data)
+        public void InsertImageData(TtImage image, Stream bitmapDataStream)
         {
             byte[] bdata;
 
@@ -328,7 +326,7 @@ namespace TwoTrails.DAL
                 byte[] buffer = new byte[CHUNK_SIZE];
                 long bytesRead;
 
-                while ((bytesRead = data.StreamSource.Read(buffer, 0, buffer.Length)) > 0)
+                while ((bytesRead = bitmapDataStream.Read(buffer, 0, buffer.Length)) > 0)
                 {
                     ms.Write(buffer, 0, (int)bytesRead);
                 }
@@ -374,23 +372,82 @@ namespace TwoTrails.DAL
                 }
             }
         }
-        
-        public BitmapImage GetImageData(TtImage image)
-        {
-            BitmapImage bitmap = new BitmapImage();
 
-            byte[] data = GetRawImageData(image);
 
-            if (data != null)
-            {
-                bitmap.BeginInit();
-                bitmap.StreamSource = new MemoryStream(data);
-                bitmap.EndInit();
-                bitmap.Freeze();
-            }
+        //public void InsertImageData(TtImage image, BitmapImage data)
+        //{
+        //    byte[] bdata;
+
+        //    using (MemoryStream ms = new MemoryStream())
+        //    {
+        //        const int CHUNK_SIZE = 2 * 1024;
+        //        byte[] buffer = new byte[CHUNK_SIZE];
+        //        long bytesRead;
+
+        //        while ((bytesRead = data.StreamSource.Read(buffer, 0, buffer.Length)) > 0)
+        //        {
+        //            ms.Write(buffer, 0, (int)bytesRead);
+        //        }
+
+        //        bdata = ms.ToArray();
+        //    }
+
+        //    if (image.IsExternal)
+        //    {
+        //        using (FileStream stream = File.Create(image.FilePath))
+        //        {
+        //            stream.Write(bdata, 0, bdata.Length);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (_Database != null)
+        //        {
+        //            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+        //            {
+        //                using (SQLiteTransaction trans = conn.BeginTransaction())
+        //                {
+        //                    try
+        //                    {
+        //                        _Database.Insert(TwoTrailsMediaSchema.Data.TableName,
+        //                            GetDataValues(image.CN, Path.GetExtension(image.FilePath).Trim('.'), bdata),
+        //                            conn,
+        //                            trans);
+
+        //                        trans.Commit();
+        //                    }
+        //                    catch (Exception ex)
+        //                    {
+        //                        Debug.WriteLine(ex.Message, "MAL:InsertImageData");
+        //                        trans.Rollback();
+        //                    }
+        //                    finally
+        //                    {
+        //                        conn.Close();
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
+        //public BitmapImage GetImageData(TtImage image)
+        //{
+        //    BitmapImage bitmap = new BitmapImage();
+
+        //    byte[] data = GetRawImageData(image);
+
+        //    if (data != null)
+        //    {
+        //        bitmap.BeginInit();
+        //        bitmap.StreamSource = new MemoryStream(data);
+        //        bitmap.EndInit();
+        //        bitmap.Freeze();
+        //    }
             
-            return bitmap;
-        }
+        //    return bitmap;
+        //}
+
 
         public byte[] GetRawImageData(TtImage image)
         {

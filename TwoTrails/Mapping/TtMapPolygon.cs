@@ -25,7 +25,7 @@ namespace TwoTrails.Mapping
             _Polygon = polygon;
             _Visible = visible;
 
-            MapPolygon.Stroke = new SolidColorBrush(pgo.AdjBndColor);
+            MapPolygon.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
             MapPolygon.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed;
 
             MapPolygon.StrokeThickness = adjusted ?
@@ -33,15 +33,15 @@ namespace TwoTrails.Mapping
 
             MapPolygon.Locations = locations;
 
-            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, Color color) =>
+            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, int color) =>
             {
                 switch (code)
                 {
                     case GraphicCode.ADJBND_COLOR:
-                        MapPolygon.Stroke = new SolidColorBrush(pgo.AdjBndColor);
+                        MapPolygon.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
                         break;
                     case GraphicCode.UNADJBND_COLOR:
-                        MapPolygon.Stroke = new SolidColorBrush(pgo.UnAdjBndColor);
+                        MapPolygon.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.UnAdjBndColor));
                         break;
                 }
             };

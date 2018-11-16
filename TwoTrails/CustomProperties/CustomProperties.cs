@@ -1,7 +1,5 @@
-﻿using FMSC.Core.ComponentModel.Commands;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 
 namespace TwoTrails.CustomProperties
 {

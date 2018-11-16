@@ -1,5 +1,5 @@
 ﻿using CSUtil.ComponentModel;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial.MTDC;
 using System;
 using System.Windows;

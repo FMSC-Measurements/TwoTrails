@@ -54,15 +54,15 @@ namespace TwoTrails
             };
         }
 
-        public void TextValidation(object sender, TextCompositionEventArgs e)
-        {
-            switch (DataType)
-            {
-                case DataType.INTEGER: e.Handled = FMSC.Core.Controls.ControlUtils.TextIsInteger(sender, e); break;
-                case DataType.DECIMAL:
-                case DataType.FLOAT: e.Handled = FMSC.Core.Controls.ControlUtils.TextIsDouble(sender, e); break;
-            }
-        }
+        //public void TextValidation(object sender, TextCompositionEventArgs e)
+        //{
+        //    switch (DataType)
+        //    {
+        //        case DataType.INTEGER: e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsInteger(sender, e); break;
+        //        case DataType.DECIMAL:
+        //        case DataType.FLOAT: e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsDouble(sender, e); break;
+        //    }
+        //}
     }
 
     public class TextBoxExtendedDataField : ExtendedDataField

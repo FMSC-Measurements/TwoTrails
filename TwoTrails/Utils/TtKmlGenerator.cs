@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Media;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using Point = FMSC.Core.Point;
 
 namespace TwoTrails.Utils
 {
@@ -57,12 +58,12 @@ namespace TwoTrails.Utils
                         }
 
                         style = new PolygonStyle(pgo,
-                            GetStyle(styleMaps, styles, pgo.AdjBndColor, true),
-                            GetStyle(styleMaps, styles, pgo.UnAdjBndColor, false),
-                            GetStyle(styleMaps, styles, pgo.AdjNavColor, true),
-                            GetStyle(styleMaps, styles, pgo.UnAdjNavColor, false),
-                            GetStyle(styleMaps, styles, pgo.UnAdjPtsColor, false),
-                            GetStyle(styleMaps, styles, pgo.WayPtsColor, false));
+                            GetStyle(styleMaps, styles, MediaTools.GetColor(pgo.AdjBndColor), true),
+                            GetStyle(styleMaps, styles, MediaTools.GetColor(pgo.UnAdjBndColor), false),
+                            GetStyle(styleMaps, styles, MediaTools.GetColor(pgo.AdjNavColor), true),
+                            GetStyle(styleMaps, styles, MediaTools.GetColor(pgo.UnAdjNavColor), false),
+                            GetStyle(styleMaps, styles, MediaTools.GetColor(pgo.UnAdjPtsColor), false),
+                            GetStyle(styleMaps, styles, MediaTools.GetColor(pgo.WayPtsColor), false));
 
                         polyStyles.Add(style);
                     }
@@ -195,7 +196,7 @@ namespace TwoTrails.Utils
                     foreach (TtPoint point in points)
                     {
                         #region Create Placemarks
-                        System.Windows.Point pos = TtUtils.GetLatLon(point);
+                        Point pos = TtUtils.GetLatLon(point);
                         Coordinates adjCoords = new Coordinates(pos.Y, pos.X);
 
                         Coordinates unadjCoords;

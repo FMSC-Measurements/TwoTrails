@@ -1,4 +1,4 @@
-﻿using FMSC.Core.ComponentModel.Commands;
+﻿using FMSC.Core.Windows.ComponentModel.Commands;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;

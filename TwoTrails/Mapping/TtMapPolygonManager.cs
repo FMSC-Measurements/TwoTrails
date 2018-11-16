@@ -8,7 +8,7 @@ using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using System.Linq;
 using System.Windows.Input;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial;
 
 namespace TwoTrails.Mapping

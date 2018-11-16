@@ -1,11 +1,8 @@
 ﻿using CSUtil.ComponentModel;
-using FMSC.Core.Controls;
+using FMSC.Core.Windows.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Core;
 

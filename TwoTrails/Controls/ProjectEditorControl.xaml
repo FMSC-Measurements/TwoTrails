@@ -9,9 +9,7 @@
              xmlns:ttl="clr-namespace:TwoTrails"
              xmlns:tt="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
              xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
-             xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
-             xmlns:fmsccutils="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
-			 xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
+             xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800"
              Background="{StaticResource colorBackground}">

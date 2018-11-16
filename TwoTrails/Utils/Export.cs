@@ -572,7 +572,7 @@ namespace TwoTrails.Utils
                     }
                     else
                     {
-                        mal.GetImageData(img).SaveImageToFile(filePath);
+                        MediaTools.GetImageData(mal, img).SaveImageToFile(filePath);
                     }
                 }
             }

@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TwoTrails.Controls"
-             xmlns:cc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
-             xmlns:cm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+             xmlns:cc="clr-namespace:FMSC.Core.Windows.Controls;assembly=FMSC.Core.Windows"
+             xmlns:cm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500">

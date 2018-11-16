@@ -4,12 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ddm="clr-namespace:TwoTrails.ViewModels.DataDictionary"
-        xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
         xmlns:ttcore="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-        xmlns:cp="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+        xmlns:cp="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
         mc:Ignorable="d"
         Title="Data Dictionary Editor"
         Height="350" Width="850" MinWidth="850" MaxWidth="850"
@@ -31,7 +30,7 @@
                     <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox Grid.Column="0" Name="cbFieldType" SelectedIndex="1" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:FieldType}}" ToolTip="Field Type"/>
+                <ComboBox Grid.Column="0" Name="cbFieldType" SelectedIndex="1" ItemsSource="{cp:EnumToItemsSource {x:Type ttcore:FieldType}}" ToolTip="Field Type"/>
 
                 <Button Grid.Column="1" Content="Create Field" Margin="5 0 0 0" Command="{Binding CreateFieldCommand}" CommandParameter="{Binding ElementName=cbFieldType, Path=SelectedItem}"/>
 
@@ -71,7 +70,7 @@
 
                                 <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
 
-                                <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
+                                <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{cp:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
                                   ToolTip="Data Type" Style="{StaticResource fieldStyle}" IsEnabled="{Binding DataTypeEditable}"/>
 
                                 <TextBox Grid.Column="3" Text="{Binding DefaultValue}" ToolTip="Default Value" Style="{StaticResource fieldStyle}">
@@ -114,7 +113,7 @@
 
                                 <CheckBox Grid.Column="1" Content="Value Required" IsChecked="{Binding ValueRequired}" Style="{StaticResource fieldStyle}"/>
 
-                                <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
+                                <ComboBox Grid.Column="2" SelectedItem="{Binding DataType}" ItemsSource="{cp:EnumToItemsSource {x:Type ttcore:DataType}, Exclusions='byte_array,boolean'}"
                                   ToolTip="DataType" Style="{StaticResource fieldStyle}" IsEnabled="{Binding DataTypeEditable}"/>
 
                                 <CheckBox Grid.Column="3" Content="IsEditable" IsChecked="{Binding IsEditable}" Style="{StaticResource fieldStyle}" />

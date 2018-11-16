@@ -78,22 +78,22 @@ namespace TwoTrails.Controls
 
         private void TextIsInteger(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = FMSC.Core.Controls.ControlUtils.TextIsInteger(sender, e);
+            e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsInteger(sender, e);
         }
 
         private void TextIsUnsginedInteger(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = FMSC.Core.Controls.ControlUtils.TextIsUnsignedInteger(sender, e);
+            e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsUnsignedInteger(sender, e);
         }
 
         private void TextIsDouble(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = FMSC.Core.Controls.ControlUtils.TextIsDouble(sender, e);
+            e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsDouble(sender, e);
         }
 
         private void TextIsUnsignedDouble(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = FMSC.Core.Controls.ControlUtils.TextIsUnsignedDouble(sender, e);
+            e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsUnsignedDouble(sender, e);
         }
     }
 }

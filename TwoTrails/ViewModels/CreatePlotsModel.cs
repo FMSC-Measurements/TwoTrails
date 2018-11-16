@@ -1,7 +1,7 @@
 ﻿using CSUtil;
 using CSUtil.ComponentModel;
 using FMSC.Core;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections;
@@ -13,6 +13,7 @@ using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.Utils;
+using Point = FMSC.Core.Point;
 
 namespace TwoTrails.ViewModels
 {

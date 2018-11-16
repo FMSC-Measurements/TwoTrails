@@ -8,7 +8,7 @@
     xmlns:tt="clr-namespace:TwoTrails"
     xmlns:cvt="clr-namespace:TwoTrails.Converters"
     xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
-    xmlns:cc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
+    xmlns:cc="clr-namespace:FMSC.Core.Windows.Controls;assembly=FMSC.Core.Windows"
     mc:Ignorable="d" 
     FocusManager.FocusedElement="{Binding ElementName=dgPoints}"
     d:DesignHeight="600" d:DesignWidth="800">

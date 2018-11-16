@@ -1,4 +1,4 @@
-﻿using FMSC.Core.ComponentModel.Commands;
+﻿using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.Diagnostics;
 using System.Windows;

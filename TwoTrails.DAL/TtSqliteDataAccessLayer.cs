@@ -1,18 +1,18 @@
-﻿using CSUtil;
-using CSUtil.Databases;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using CSUtil.Databases;
+using System.Data.SQLite;
+using CSUtil;
 using FMSC.Core;
 using FMSC.GeoSpatial;
-using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.NMEA.Sentences;
-using System.Diagnostics;
+using FMSC.GeoSpatial.Types;
 
 namespace TwoTrails.DAL
 {

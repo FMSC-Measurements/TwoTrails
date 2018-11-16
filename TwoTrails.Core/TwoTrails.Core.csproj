@@ -4,7 +4,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Fortest Management Service Center</Authors>
     <Copyright>Copyright © USDA Forest Service 2018</Copyright>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -13,14 +12,6 @@
   </PropertyGroup>
 
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
-
-  <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="9.1.0" />
-    <PackageReference Include="NetTopologySuite.Core" Version="1.15.1" />
-    <PackageReference Include="NetTopologySuite.Features" Version="1.15.0" />
-    <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="1.15.2" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.109.2" />
-  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="CSUtilSlim">

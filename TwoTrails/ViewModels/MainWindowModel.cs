@@ -1,5 +1,5 @@
 ﻿using CSUtil.ComponentModel;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.Core.Utilities;
 using Microsoft.Win32;
 using System;
@@ -16,6 +16,7 @@ using TwoTrails.Core;
 using TwoTrails.DAL;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
+using FMSC.Core.Windows.Utilities;
 
 namespace TwoTrails.ViewModels
 {

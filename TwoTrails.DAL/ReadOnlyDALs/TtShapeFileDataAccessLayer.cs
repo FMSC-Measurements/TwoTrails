@@ -27,14 +27,14 @@ namespace TwoTrails.DAL
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
         private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
 
-        private TtProjectInfo _ProjectInfo;
+        private readonly TtProjectInfo _ProjectInfo;
 
         private readonly ParseOptions _Options;
         private bool parsed;
         private int secondsInc = 0;
         private int polyInc = 0;
 
-        private static object locker = new object();
+        private static readonly object locker = new object();
 
 
         public TtShapeFileDataAccessLayer(ParseOptions options)

@@ -1,4 +1,4 @@
-﻿using FMSC.Core.Controls;
+﻿using FMSC.Core.Windows.Controls;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.ViewModels;
