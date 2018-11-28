@@ -76,7 +76,7 @@ namespace TwoTrails.Controls
                 if (Manager != null && MapManager == null)
                 {
                     MapManager = new TtMapManager(map, Manager);
-                    PolygonVisibilityControl = new PolygonVisibilityControl(MapManager.PolygonManagers);
+                    PolygonVisibilityControl = new PolygonVisibilityControl(MapManager.PolygonManagers, new PolygonGraphicBrushOptions(null, Manager.GetDefaultPolygonGraphicOption()));
                     DataContext = this;
                 }
             };

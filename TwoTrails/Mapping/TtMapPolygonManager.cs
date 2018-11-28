@@ -271,7 +271,7 @@ namespace TwoTrails.Mapping
 
 
         #region Color
-        public PolygonGraphicOptions Graphics { get; }
+        public PolygonGraphicBrushOptions Graphics { get; }
         #endregion
 
 
@@ -286,7 +286,7 @@ namespace TwoTrails.Mapping
         {
             Map = map;
             Polygon = polygon;
-            Graphics = pgo;
+            Graphics = new PolygonGraphicBrushOptions(pgo.CN, pgo);
 
             _Visible = vis;
             _AdjBndVisible = adjBndVis;

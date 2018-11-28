@@ -34,6 +34,7 @@
         </Style>
 
         <mapping:UglyFixFlipCheckBoxConverter x:Key="uffcb"/>
+        <mapping:UglyFixFlipCheckBoxConverter2 x:Key="uffcb2"/>
     </UserControl.Resources>
     <Grid Background="White">
         <Grid.ColumnDefinitions>
@@ -100,28 +101,14 @@
                                     <RowDefinition Height="35"/>
                                     <RowDefinition Height="35"/>
                                 </Grid.RowDefinitions>
-
-                                <CheckBox Grid.Column="0" IsChecked="{Binding AdjBndVisible, Mode=TwoWay}">
-                                    <CheckBox.ToolTip>
-                                        <Grid Background="WhiteSmoke">
-                                            <Border BorderThickness="0.75" BorderBrush="Black">
-                                                <TextBlock Text="Adjusted Boundary" Padding="2.5"/>
-                                            </Border>
-                                        </Grid>
-                                    </CheckBox.ToolTip>
-                                </CheckBox>
-
-                                <CheckBox Grid.Column="1" IsChecked="{Binding AdjBndPointsVisible, Mode=TwoWay}">
-                                    <CheckBox.ToolTip>
-                                        <Grid Background="WhiteSmoke">
-                                            <Border BorderThickness="0.75" BorderBrush="Black">
-                                                <TextBlock Text="Adjusted Boundary Points" Padding="2.5"/>
-                                            </Border>
-                                        </Grid>
-                                    </CheckBox.ToolTip>
-                                </CheckBox>
-
-                                <!--<fmsccwc:FlipCheckBox Grid.Column="0" IsChecked="{Binding AdjBndVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource fcbStyle}">
+                                
+                                <fmsccwc:FlipCheckBox Grid.Column="0" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="AdjBndVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="AdjBndVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -130,7 +117,7 @@
                                         </Grid>
                                     </fmsccwc:FlipCheckBox.ToolTip>
                                     <fmsccwc:FlipCheckBox.Front>
-                                        <Grid Background="SeaGreen">
+                                        <Grid Background="{Binding Graphics.AdjBndBrush}">
                                             <Image Source="{StaticResource ic_polygon_white}" Style="{StaticResource flpImageStyle}"/>
                                         </Grid>
                                     </fmsccwc:FlipCheckBox.Front>
@@ -139,9 +126,15 @@
                                             <Image Source="{StaticResource ic_polygon_white}" Style="{StaticResource flpImageStyle}"/>
                                         </Grid>
                                     </fmsccwc:FlipCheckBox.Back>
-                                </fmsccwc:FlipCheckBox>-->
+                                </fmsccwc:FlipCheckBox>
 
-                                <!--<fmsccwc:FlipCheckBox Grid.Column="1" IsChecked="{Binding AdjBndPointsVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                <fmsccwc:FlipCheckBox Grid.Column="1" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="AdjBndPointsVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="AdjBndPointsVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -159,10 +152,16 @@
                                             <Image Source="{StaticResource ic_polygon_pts_white}" Style="{StaticResource flpImageStyle}"/>
                                         </Grid>
                                     </fmsccwc:FlipCheckBox.Back>
-                                </fmsccwc:FlipCheckBox>-->
+                                </fmsccwc:FlipCheckBox>
 
 
-                                <fmsccwc:FlipCheckBox Grid.Column="2" IsChecked="{Binding UnAdjBndVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                <fmsccwc:FlipCheckBox Grid.Column="2" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="UnAdjBndVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="UnAdjBndVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -182,7 +181,13 @@
                                     </fmsccwc:FlipCheckBox.Back>
                                 </fmsccwc:FlipCheckBox>
 
-                                <fmsccwc:FlipCheckBox Grid.Column="3" IsChecked="{Binding UnAdjBndPointsVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                <fmsccwc:FlipCheckBox Grid.Column="3" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="UnAdjBndPointsVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="UnAdjBndPointsVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -203,7 +208,13 @@
                                 </fmsccwc:FlipCheckBox>
 
 
-                                <fmsccwc:FlipCheckBox Grid.Column="0" Grid.Row="1" IsChecked="{Binding AdjNavVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                <fmsccwc:FlipCheckBox Grid.Column="0" Grid.Row="1" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="AdjNavVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="AdjNavVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -223,7 +234,13 @@
                                     </fmsccwc:FlipCheckBox.Back>
                                 </fmsccwc:FlipCheckBox>
 
-                                <fmsccwc:FlipCheckBox Grid.Column="1" Grid.Row="1" IsChecked="{Binding AdjNavPointsVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                <fmsccwc:FlipCheckBox Grid.Column="1" Grid.Row="1" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="AdjNavPointsVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="AdjNavPointsVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -243,7 +260,13 @@
                                     </fmsccwc:FlipCheckBox.Back>
                                 </fmsccwc:FlipCheckBox>
 
-                                <fmsccwc:FlipCheckBox Grid.Column="2" Grid.Row="1" IsChecked="{Binding UnAdjNavVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                <fmsccwc:FlipCheckBox Grid.Column="2" Grid.Row="1" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="UnAdjNavVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="UnAdjNavVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -263,7 +286,13 @@
                                     </fmsccwc:FlipCheckBox.Back>
                                 </fmsccwc:FlipCheckBox>
 
-                                <fmsccwc:FlipCheckBox Grid.Column="3" Grid.Row="1" IsChecked="{Binding UnAdjNavPointsVisible, Mode=TwoWay}"  Style="{StaticResource fcbStyle}">
+                                <fmsccwc:FlipCheckBox Grid.Column="3" Grid.Row="1" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="UnAdjNavPointsVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="UnAdjNavPointsVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -284,7 +313,13 @@
                                 </fmsccwc:FlipCheckBox>
 
 
-                                <fmsccwc:FlipCheckBox Grid.Column="0" Grid.Row="2" IsChecked="{Binding WayPointsVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                <fmsccwc:FlipCheckBox Grid.Column="0" Grid.Row="2" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="WayPointsVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="WayPointsVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -293,7 +328,7 @@
                                         </Grid>
                                     </fmsccwc:FlipCheckBox.ToolTip>
                                     <fmsccwc:FlipCheckBox.Front>
-                                        <Grid Background="{Binding Graphics.AdjNavBrush}">
+                                        <Grid Background="{Binding Graphics.WayPtsBrush}">
                                             <Image Source="{StaticResource ic_ttpoint_way_white}" Style="{StaticResource flpImageStyle}"/>
                                         </Grid>
                                     </fmsccwc:FlipCheckBox.Front>
@@ -304,7 +339,13 @@
                                     </fmsccwc:FlipCheckBox.Back>
                                 </fmsccwc:FlipCheckBox>
 
-                                <fmsccwc:FlipCheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding AdjMiscPointsVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                <fmsccwc:FlipCheckBox Grid.Column="1" Grid.Row="2" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="AdjMiscPointsVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="AdjMiscPointsVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -324,7 +365,15 @@
                                     </fmsccwc:FlipCheckBox.Back>
                                 </fmsccwc:FlipCheckBox>
 
-                                <fmsccwc:FlipCheckBox Grid.Column="2" Grid.Row="2" IsChecked="{Binding UnAdjMiscPointsVisible, Mode=TwoWay}" Style="{StaticResource fcbStyle}">
+                                <Grid Grid.Column="2" Grid.Row="2" Margin="-16 3 0 2.5" Width="30" Background="DarkGray"></Grid>
+
+                                <fmsccwc:FlipCheckBox Grid.Column="3" Grid.Row="2" Style="{StaticResource fcbStyle}">
+                                    <fmsccwc:FlipCheckBox.IsChecked>
+                                        <MultiBinding Converter="{StaticResource uffcb2}" Mode="TwoWay" ConverterParameter="UnAdjMiscPointsVisible">
+                                            <Binding RelativeSource="{RelativeSource Self}"/>
+                                            <Binding Path="UnAdjMiscPointsVisible"/>
+                                        </MultiBinding>
+                                    </fmsccwc:FlipCheckBox.IsChecked>
                                     <fmsccwc:FlipCheckBox.ToolTip>
                                         <Grid Background="WhiteSmoke">
                                             <Border BorderThickness="0.75" BorderBrush="Black">
@@ -333,7 +382,7 @@
                                         </Grid>
                                     </fmsccwc:FlipCheckBox.ToolTip>
                                     <fmsccwc:FlipCheckBox.Front>
-                                        <Grid Background="{Binding Graphics.UnAdjNavBrush}">
+                                        <Grid Background="{Binding Graphics.UnAdjPtsBrush}">
                                             <Image Source="{StaticResource ic_ttpoint_way_white}" Style="{StaticResource flpImageStyle}"/>
                                         </Grid>
                                     </fmsccwc:FlipCheckBox.Front>
@@ -698,7 +747,9 @@
                                             </fmsccwc:FlipCheckBox.Back>
                                         </fmsccwc:FlipCheckBox>
 
-                                        <fmsccwc:FlipCheckBox Grid.Column="2" Grid.Row="2" Style="{StaticResource fcbStyle}">
+                                        <Grid Grid.Column="2" Grid.Row="2" Margin="-11 3 0 2.5" Width="30" Background="DarkGray"></Grid>
+                                        
+                                        <fmsccwc:FlipCheckBox Grid.Column="3" Grid.Row="2" Style="{StaticResource fcbStyle}">
                                             <fmsccwc:FlipCheckBox.IsChecked>
                                                 <MultiBinding Converter="{StaticResource uffcb}" Mode="TwoWay" ConverterParameter="UnAdjMiscPointsVisible">
                                                     <Binding RelativeSource="{RelativeSource Self}"/>
@@ -714,7 +765,7 @@
                                                 </Grid>
                                             </fmsccwc:FlipCheckBox.ToolTip>
                                             <fmsccwc:FlipCheckBox.Front>
-                                                <Grid Background="{Binding Graphics.UnAdjNavBrush}">
+                                                <Grid Background="{Binding Graphics.UnAdjPtsBrush}">
                                                     <Image Source="{StaticResource ic_ttpoint_way_white}" Style="{StaticResource flpImageStyle}"/>
                                                 </Grid>
                                             </fmsccwc:FlipCheckBox.Front>

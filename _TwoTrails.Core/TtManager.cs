@@ -1729,6 +1729,11 @@ namespace TwoTrails.Core
             return _PolyGraphicOpts.Values.ToList();
         }
 
+        public PolygonGraphicOptions GetDefaultPolygonGraphicOption()
+        {
+            return _Settings.PolygonGraphicSettings.CreatePolygonGraphicOptions(null);
+        }
+
 
         public List<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {

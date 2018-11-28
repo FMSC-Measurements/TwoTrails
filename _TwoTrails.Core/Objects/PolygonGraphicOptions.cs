@@ -19,7 +19,7 @@ namespace TwoTrails.Core
     {
         public event OnColorChangeEvent ColorChanged;
 
-        private int _AdjBndColor;
+        protected int _AdjBndColor;
         public int AdjBndColor
         {
             get { return _AdjBndColor; }
@@ -29,13 +29,8 @@ namespace TwoTrails.Core
             }
         }
 
-        //public SolidColorBrush AdjBndBrush
-        //{
-        //    get { return new SolidColorBrush(_AdjBndColor); }
-        //}
 
-
-        private int _UnAdjBndColor;
+        protected int _UnAdjBndColor;
         public int UnAdjBndColor
         {
             get { return _UnAdjBndColor; }
@@ -45,13 +40,8 @@ namespace TwoTrails.Core
             }
         }
 
-        //public SolidColorBrush UnAdjBndBrush
-        //{
-        //    get { return new SolidColorBrush(_UnAdjBndColor); }
-        //}
 
-
-        private int _AdjNavColor;
+        protected int _AdjNavColor;
         public int AdjNavColor
         {
             get { return _AdjNavColor; }
@@ -61,13 +51,8 @@ namespace TwoTrails.Core
             }
         }
 
-        //public SolidColorBrush AdjNavBrush
-        //{
-        //    get { return new SolidColorBrush(_AdjNavColor); }
-        //}
 
-
-        private int _UnAdjNavColor;
+        protected int _UnAdjNavColor;
         public int UnAdjNavColor
         {
             get { return _UnAdjNavColor; }
@@ -77,13 +62,8 @@ namespace TwoTrails.Core
             }
         }
 
-        //public SolidColorBrush UnAdjNavBrush
-        //{
-        //    get { return new SolidColorBrush(_UnAdjNavColor); }
-        //}
 
-
-        private int _AdjPtsColor;
+        protected int _AdjPtsColor;
         public int AdjPtsColor
         {
             get { return _AdjPtsColor; }
@@ -93,13 +73,8 @@ namespace TwoTrails.Core
             }
         }
 
-        //public SolidColorBrush AdjPtsBrush
-        //{
-        //    get { return new SolidColorBrush(_AdjPtsColor); }
-        //}
 
-
-        private int _UnAdjPtsColor;
+        protected int _UnAdjPtsColor;
         public int UnAdjPtsColor
         {
             get { return _UnAdjPtsColor; }
@@ -109,13 +84,8 @@ namespace TwoTrails.Core
             }
         }
 
-        //public SolidColorBrush UnAdjPtsBrush
-        //{
-        //    get { return new SolidColorBrush(_UnAdjPtsColor); }
-        //}
 
-
-        private int _WayPtsColor;
+        protected int _WayPtsColor;
         public int WayPtsColor
         {
             get { return _WayPtsColor; }
@@ -125,13 +95,8 @@ namespace TwoTrails.Core
             }
         }
 
-        //public SolidColorBrush WayPtsBrush
-        //{
-        //    get { return new SolidColorBrush(_WayPtsColor); }
-        //}
 
-
-        private float _AdjWidth;
+        protected float _AdjWidth;
         public float AdjWidth
         {
             get { return _AdjWidth; }
@@ -141,7 +106,7 @@ namespace TwoTrails.Core
             }
         }
 
-        private float _UnAdjWidth;
+        protected float _UnAdjWidth;
         public float UnAdjWidth
         {
             get { return _UnAdjWidth; }
@@ -172,7 +137,7 @@ namespace TwoTrails.Core
             this._AdjBndColor = adjBndColor;// GetColor(adjBndColor);
             this._UnAdjBndColor = unAdjBndColor;// GetColor(unAdjBndColor);
             this._AdjNavColor = adjNavColor;// GetColor(adjNavColor);
-            this._UnAdjNavColor = UnAdjNavColor;// GetColor(unAdjNavColor);
+            this._UnAdjNavColor = unAdjNavColor;// GetColor(unAdjNavColor);
             this._AdjPtsColor = adjPtsColor;// GetColor(adjPtsColor);
             this._UnAdjPtsColor = unAdjPtsColor;// GetColor(unAdjPtsColor);
             this._WayPtsColor = wayPtsColor;// GetColor(wayPtsColor);
@@ -216,11 +181,6 @@ namespace TwoTrails.Core
         {
             return $"{GetAlpha(color):X2}{GetRed(color):X2}{GetGreen(color):X2}{GetBlue(color):X2}";
         }
-
-        //public static int GetColor(int argb)
-        //{
-        //    return Color.FromArgb(GetAlpha(argb), GetRed(argb), GetGreen(argb), GetBlue(argb));
-        //}
 
         public static byte GetAlpha(int color)
         {

@@ -1,14 +1,12 @@
 ﻿using CSUtil.ComponentModel;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using TwoTrails.Core;
 
 namespace TwoTrails.Mapping
 {
@@ -31,9 +29,13 @@ namespace TwoTrails.Mapping
 
         private bool ignoreChanges;
 
+        public PolygonGraphicOptions Graphics { get; }
 
-        public PolygonVisibilityControl(ObservableCollection<TtMapPolygonManager> polyManagers)
+
+        public PolygonVisibilityControl(ObservableCollection<TtMapPolygonManager> polyManagers, PolygonGraphicBrushOptions polygonGraphicBrushOptions)
         {
+            Graphics = polygonGraphicBrushOptions;
+
             Type type = typeof(TtMapPolygonManager);
 
             VisibleProperty = type.GetProperty(nameof(TtMapPolygonManager.Visible));
@@ -124,6 +126,26 @@ namespace TwoTrails.Mapping
             }
         }
 
+        public void UpdateVisibility(string name, bool? value)
+        {
+            switch (name)
+            {
+                case nameof(AdjBndVisible): SetVisibilityField(ref _AdjBndVisible, value, AdjBndVisibleProperty); break;
+                case nameof(AdjBndPointsVisible): SetVisibilityField(ref _AdjBndPointsVisible, value, AdjBndPointsVisibleProperty); break;
+                case nameof(UnAdjBndVisible): SetVisibilityField(ref _UnAdjBndVisible, value, UnAdjBndVisibleProperty); break;
+                case nameof(UnAdjBndPointsVisible): SetVisibilityField(ref _UnAdjBndPointsVisible, value, UnAdjBndPointsVisibleProperty); break;
+                case nameof(AdjNavVisible): SetVisibilityField(ref _AdjNavVisible, value, AdjNavVisibleProperty); break;
+                case nameof(AdjNavPointsVisible): SetVisibilityField(ref _AdjNavPointsVisible, value, AdjNavPointsVisibleProperty); break;
+                case nameof(UnAdjNavVisible): SetVisibilityField(ref _UnAdjNavVisible, value, UnAdjNavVisibleProperty); break;
+                case nameof(UnAdjNavPointsVisible): SetVisibilityField(ref _UnAdjNavPointsVisible, value, UnAdjNavPointsVisibleProperty); break;
+                case nameof(AdjMiscPointsVisible): SetVisibilityField(ref _AdjMiscPointsVisible, value, AdjMiscPointsVisibleProperty); break;
+                case nameof(UnAdjMiscPointsVisible): SetVisibilityField(ref _UnAdjMiscPointsVisible, value, UnAdjMiscPointsVisibleProperty); break;
+                case nameof(WayPointsVisible): SetVisibilityField(ref _WayPointsVisible, value, WayPointsVisibleProperty); break;
+            }
+
+            OnPropertyChanged(name);
+        }
+
 
         private void UpdateVisibilityField(ref bool? field, TtMapPolygonManager polyMapManager, PropertyInfo propertyInfo)
         {
@@ -168,7 +190,7 @@ namespace TwoTrails.Mapping
                         }
                     }
 
-                    OnPropertyChanged(propertyName);
+                    OnPropertyChanged(propertyName ?? propertyInfo.Name);
 
                     fieldChanged = true;
                 }

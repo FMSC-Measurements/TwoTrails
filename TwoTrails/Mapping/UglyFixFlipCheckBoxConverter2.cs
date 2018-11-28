@@ -5,11 +5,12 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace TwoTrails.Mapping
 {
-    public class UglyFixFlipCheckBoxConverter : IMultiValueConverter
+    public class UglyFixFlipCheckBoxConverter2 : IMultiValueConverter
     {
         private bool ignore = false;
         private List<string> keys = new List<string>();
@@ -17,25 +18,28 @@ namespace TwoTrails.Mapping
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             FlipCheckBox fcb = values[0] as FlipCheckBox;
-            bool? isChecked = (bool?)values[1];
+
+            bool? isChecked = null;
+            if (values[1] is bool val)
+                isChecked = val;
+            
             string propertyName = parameter as string;
             
 
             if (fcb != null)
             {
-                if (fcb.DataContext is TtMapPolygonManager mpm)
+                if (fcb.DataContext is PolygonVisibilityControl pvc)
                 {
+                    string key = $"{propertyName}";
 
-                    string key = $"{propertyName}_{mpm.Polygon.CN}";
-
-                    if (mpm != null && !keys.Contains(key))
+                    if (pvc != null && !keys.Contains(key))
                     {
                         keys.Add(key);
 
                         fcb.CheckedChange += (s, e) =>
                         {
                             if (!ignore)
-                                mpm.UpdateVisibility(propertyName, fcb.IsChecked != false);
+                                pvc.UpdateVisibility(propertyName, fcb.IsChecked);
                         };
                     }
                 }
