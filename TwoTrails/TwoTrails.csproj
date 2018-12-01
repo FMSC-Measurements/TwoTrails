@@ -70,16 +70,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\libs\CSUtilSlim.dll</HintPath>
     </Reference>
-    <Reference Include="FMSC.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="FMSC.Core">
       <HintPath>..\..\libs\FMSC.Core.dll</HintPath>
     </Reference>
-    <Reference Include="FMSC.Core.Windows, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="FMSC.Core.Windows">
       <HintPath>..\..\libs\FMSC.Core.Windows.dll</HintPath>
     </Reference>
-    <Reference Include="FMSC.GeoSpatial, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="FMSC.GeoSpatial">
       <HintPath>..\..\libs\FMSC.GeoSpatial.dll</HintPath>
     </Reference>
     <Reference Include="GeoAPI, Version=1.7.5.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
