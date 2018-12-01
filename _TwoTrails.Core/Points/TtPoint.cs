@@ -11,7 +11,7 @@ namespace TwoTrails.Core.Points
     public delegate void PointMetadataChangedEvent(TtPoint point, TtMetadata newMetadata, TtMetadata oldMetadata);
     public delegate void PointIndexChangedEvent(TtPoint point, int newIndex, int oldIndex);
 
-    public abstract class TtPoint : TtObject, IAccuracy, IComparable<TtPoint>, IComparer<TtPoint>
+    public abstract class TtPoint : TtObject, IAccuracy, IEquatable<TtPoint>, IComparable<TtPoint>, IComparer<TtPoint>
     {
         public event PointChangedEvent LocationChanged;
         public event PointChangedEvent PreviewLocationChanged;
@@ -249,7 +249,7 @@ namespace TwoTrails.Core.Points
         public TtPoint()
         {
             _LinkedPoints.CollectionChanged += LinkedPoints_CollectionChanged;
-            ExtendedData = new DataDictionary();
+            ExtendedData = new DataDictionary(this.CN);
         }
 
         public TtPoint(TtPoint point) : base(point.CN)
@@ -318,7 +318,7 @@ namespace TwoTrails.Core.Points
 
             _Accuracy = acc;
 
-            ExtendedData = extended ?? new DataDictionary();
+            ExtendedData = extended ?? new DataDictionary(this.CN);
 
             if (qlinks != null)
             {
@@ -326,7 +326,7 @@ namespace TwoTrails.Core.Points
                 {
                     if (!String.IsNullOrWhiteSpace(lcn))
                         _LinkedPoints.Add(lcn);
-                } 
+                }
             }
         }
 
@@ -461,8 +461,11 @@ namespace TwoTrails.Core.Points
 
         public override bool Equals(object obj)
         {
-            TtPoint point = obj as TtPoint;
-            
+            return obj is TtPoint point && Equals(point);
+        }
+        
+        public bool Equals(TtPoint point)
+        {
             return base.Equals(point) &&
                 _Index == point._Index &&
                 _OnBoundary == point._OnBoundary &&
@@ -478,8 +481,10 @@ namespace TwoTrails.Core.Points
                 _PolyCN == point._PolyCN &&
                 _GroupCN == point._GroupCN &&
                 _MetadataCN == point._MetadataCN &&
-                _ExtendedData == point._ExtendedData;
+                _ExtendedData.Equals(point._ExtendedData);
         }
+
+        
 
         public override int GetHashCode()
         {

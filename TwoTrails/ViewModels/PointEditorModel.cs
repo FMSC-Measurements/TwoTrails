@@ -1,7 +1,7 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core;
-using FMSC.Core.ComponentModel;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial.UTM;
 using Microsoft.Win32;
 using System;
@@ -13,6 +13,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -22,6 +23,7 @@ using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
+using Point = FMSC.Core.Point;
 
 namespace TwoTrails.ViewModels
 {
@@ -202,12 +204,27 @@ namespace TwoTrails.ViewModels
         }
 
 
-        public ObservableCollection<DataGridColumn> DataColumns { get; private set; }
+        private ObservableCollection<DataGridColumn> _DataColumns;
+        public ObservableCollection<DataGridColumn> DataColumns
+        {
+            get { return _DataColumns; }
+            private set { SetField(ref _DataColumns, value); }
+        }
 
-        public ObservableCollection<DataDictionaryField> ExtendedDataFields { get; private set; }
+        private ObservableCollection<DataDictionaryField> _ExtendedDataFields;
+        public ObservableCollection<DataDictionaryField> ExtendedDataFields
+        {
+            get { return _ExtendedDataFields; }
+            private set { SetField(ref _ExtendedDataFields, value); }
+        }
 
-        public ObservableCollection<Control> VisibleFields { get; private set; }
-        
+        private ObservableCollection<Control> _VisibleFields;
+        public ObservableCollection<Control> VisibleFields
+        {
+            get { return _VisibleFields; }
+            private set { SetField(ref _VisibleFields, value); }
+        }
+
         public ObservableCollection<MenuItem> AdvInfoItems { get; }
         
 
@@ -730,8 +747,8 @@ namespace TwoTrails.ViewModels
 
         #region Point Extended Properties
 
-        private DataDictionary _ExtendedData;
-        public DataDictionary ExtendedData
+        private Core.DataDictionary _ExtendedData;
+        public Core.DataDictionary ExtendedData
         {
             get { return _ExtendedData; }
         }
@@ -1004,7 +1021,7 @@ namespace TwoTrails.ViewModels
                     Command = new RelayCommand(x =>
                     {
                         foreach (DataGridTextColumn col in DataColumns)
-                            col.Visibility = IsDefaultColumn((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
+                            col.Visibility = IsDefaultField((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
                     })
                 },
                 new MenuItem()
@@ -1013,7 +1030,7 @@ namespace TwoTrails.ViewModels
                     Command = new RelayCommand(x =>
                     {
                         foreach (DataGridTextColumn col in DataColumns)
-                            col.Visibility = IsExtendedColumn((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
+                            col.Visibility = IsExtendedField((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
                     })
                 },
                 new MenuItem()
@@ -1022,7 +1039,7 @@ namespace TwoTrails.ViewModels
                     Command = new RelayCommand(x =>
                     {
                         foreach (DataGridTextColumn col in DataColumns)
-                            col.Visibility = IsDefaultOrExtendedColumn((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
+                            col.Visibility = IsDefaultOrExtendedField((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
                     })
                 },
                 new MenuItem()
@@ -1049,14 +1066,14 @@ namespace TwoTrails.ViewModels
             {
                 ExtendedDataFields = new ObservableCollection<DataDictionaryField>(ddt);
 
-                _ExtendedData = new DataDictionary(ddt);
+                _ExtendedData = new Core.DataDictionary(Consts.EmptyGuid, ddt);
                 _ExtendedDataSame = ddt.ToDictionary(ddf => ddf.CN, ddf => true);
 
                 if (ExtendedDataFields.Count > 0)
                     VisibleFields.Add(new Separator());
 
                 foreach (DataDictionaryField ddf in ExtendedDataFields)
-                    AddColumnAndMenuItem(CreateDataGridTextColumn(ddf.Name, $"{ nameof(TtPoint.ExtendedData) }.{ $"[{ ddf.CN }]" }"));
+                    AddColumnAndMenuItem(CreateDataGridTextColumn(ddf.Name, $"{ nameof(TtPoint.ExtendedData) }.{ $"[{ ddf.CN }]" }", visibility: Visibility.Collapsed));
             }
             else
             {
@@ -1069,7 +1086,6 @@ namespace TwoTrails.ViewModels
                 {
                     if (!settingFields)
                     {
-                        //todo grid values not changing
                         if (MultipleSelections)
                         {
                             _ExtendedDataSame[e.PropertyName] = true;
@@ -1080,7 +1096,28 @@ namespace TwoTrails.ViewModels
                         }
                         else
                         {
-                            SelectedPoint.ExtendedData[e.PropertyName] = _ExtendedData[e.PropertyName];
+
+
+
+
+                            //if (!SelectedPoint.ExtendedData[e.PropertyName].Equals(_ExtendedData[e.PropertyName]))
+                            //{
+                            //    if (MultipleSelections)
+                            //    {
+                            //        //Manager.EditPoints(SelectedPoints.Cast<TtPoint>(), property, newValue);
+                            //    }
+                            //    else
+                            //    {
+                            //        //Manager.EditPoint(SelectedPoint, property, newValue);
+                            //    }
+                            //}
+
+
+
+
+
+                            Manager.EditPoint(SelectedPoint, PointProperties.EXTENDED_DATA, new Core.DataDictionary(SelectedPoint.CN, _ExtendedData));
+                            //SelectedPoint.ExtendedData[e.PropertyName] = _ExtendedData[e.PropertyName];
                         }
                     }
 
@@ -2252,15 +2289,30 @@ namespace TwoTrails.ViewModels
 
         private void ModifyDataDictionary()
         {
+            if (Project.RequiresSave)
+            {
+                if (MessageBox.Show("This project has unsaved changes. In order to modify the DataDictionary all data must first be saved. Would you like to save now?",
+                    "Project Needs Saving", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.Yes)
+                {
+                    Project.Save();
+                }
+                else
+                    return;
+            }
+
             Project.MainModel.MainWindow.IsEnabled = false;
-            DataDictionaryEditorDialog.Show(Project, Project.MainModel.MainWindow, (result) =>
+            DataDictionaryEditorDialog.ShowDialog(Project, Project.MainModel.MainWindow, (result) =>
             {
                 Project.MainModel.MainWindow.IsEnabled = true;
 
                 if (result == true)
                 {
+                    Manager.Save();
+                    Manager.BaseManager.Reload();
+                    
+                    Points = CollectionViewSource.GetDefaultView(Manager.Points) as ListCollectionView;
+
                     SetupUI();
-                    Manager.BaseManager.UpdateDataAction(DataActionType.ModifiedDataDictionary);
                 }
             });
         }
@@ -2294,6 +2346,59 @@ namespace TwoTrails.ViewModels
                 if (cellInfo.Column.GetCellContent(cellInfo.Item) is TextBlock tb)
                     Clipboard.SetText(tb.Text);
             }
+        }
+
+        private void CopyColumnValues(string binding)
+        {
+            StringBuilder clipData = new StringBuilder();
+
+            PropertyInfo propInfo = PointProperties.GetPropertyByName(binding);
+
+            bool isManAcc = false;
+            string ddProp = null;
+            Type pointType = PointProperties.GetPointTypeByPropertyName(binding);
+
+            if (propInfo == null)
+            {
+                isManAcc = binding == "ManualAccuracy";
+                ddProp = binding.Replace("ExtendedData.[", "").Replace("]", "");
+                if (!isManAcc && !_ExtendedData.HasField(ddProp))
+                {
+                    MessageBox.Show("Unable to Copy Values");
+                    return;
+                }
+            }
+
+            foreach (TtPoint point in VisiblePoints)
+            {
+                if (propInfo != null)
+                {
+                    if (pointType.IsAssignableFrom(point.GetType()))
+                        clipData.AppendLine(propInfo.GetValue(point).ToString());
+                    else
+                        clipData.AppendLine(String.Empty);
+                }
+                else if (isManAcc)
+                {
+                    if (point is IManualAccuracy iManAcc)
+                        clipData.AppendLine(iManAcc.ManualAccuracy.ToString());
+                    else
+                        clipData.AppendLine(String.Empty);
+                }
+                else if (ddProp != null)
+                {
+                    if (point.ExtendedData != null && point.ExtendedData.HasField(ddProp))
+                        clipData.AppendLine(point.ExtendedData[ddProp].ToString());
+                    else
+                        clipData.AppendLine(String.Empty);
+                }
+                else
+                {
+                    clipData.AppendLine(String.Empty);
+                }
+            }
+
+            Clipboard.SetText(clipData.ToString());
         }
 
         private void ViewPointDetails()
@@ -2405,7 +2510,7 @@ namespace TwoTrails.ViewModels
         #endregion
         
 
-        private static Tuple<DataGridTextColumn, string>[] CreateDefaultColumns()
+        private Tuple<DataGridTextColumn, string>[] CreateDefaultColumns()
         {
             string defaultNumberFormat = "{0:0.###}";
             string defaultNumberLongFormat = "{0:0.#####}";
@@ -2445,7 +2550,7 @@ namespace TwoTrails.ViewModels
             };
         }
 
-        private static Tuple<DataGridTextColumn, string> CreateDataGridTextColumn(String name, string binding = null,
+        private Tuple<DataGridTextColumn, string> CreateDataGridTextColumn(String name, string binding = null,
             int? width = null, string stringFormat = null, Visibility visibility = Visibility.Visible)
         {
             DataGridTextColumn dataGridTextColumn = new DataGridTextColumn()
@@ -2460,16 +2565,18 @@ namespace TwoTrails.ViewModels
             {
                 Column = dataGridTextColumn,
                 Name = name,
-                HideColumn = new RelayCommand(x => dataGridTextColumn.Visibility = Visibility.Collapsed)
+                HideColumn = new RelayCommand(x => dataGridTextColumn.Visibility = Visibility.Collapsed),
+                CopyColumnValues = new RelayCommand(x => CopyColumnValues(binding ?? name)),
+                VisibleFields = VisibleFields
             };
 
             return Tuple.Create(dataGridTextColumn, name);
         }
 
 
-        private static bool IsDefaultColumn(string columnName)
+        private bool IsDefaultField(string fieldName)
         {
-            switch (columnName)
+            switch (fieldName)
             {
                 case nameof(TtPoint.Index):
                 case nameof(TtPoint.PID):
@@ -2487,40 +2594,14 @@ namespace TwoTrails.ViewModels
             return false;
         }
 
-        public static bool IsExtendedColumn(string columnName)
+        public bool IsExtendedField(string fieldName)
         {
-            if (IsDefaultColumn(columnName))
-                return false;
-
-            switch (columnName)
-            {
-                case nameof(TtPoint.UnAdjX):
-                case nameof(TtPoint.UnAdjY):
-                case "UnAdjZ (M)":
-                case "Created":
-                case nameof(TtPoint.Comment):
-                    return false;
-            }
-
-            return true;
+            return _ExtendedDataFields.Any(f => f.Name == fieldName);
         }
 
-        public static bool IsDefaultOrExtendedColumn(string columnName)
+        public bool IsDefaultOrExtendedField(string fieldName)
         {
-            if (IsDefaultColumn(columnName))
-                return true;
-
-            switch (columnName)
-            {
-                case nameof(TtPoint.UnAdjX):
-                case nameof(TtPoint.UnAdjY):
-                case "UnAdjZ (M)":
-                case "Created":
-                case nameof(TtPoint.Comment):
-                    return false;
-            }
-
-            return true;
+            return IsDefaultField(fieldName) || IsExtendedField(fieldName);
         }
 
 
@@ -2529,6 +2610,8 @@ namespace TwoTrails.ViewModels
             public DataGridTextColumn Column { get; set; }
             public String Name { get; set; }
             public ICommand HideColumn { get; set; }
+            public ICommand CopyColumnValues { get; set; }
+            public ObservableCollection<Control> VisibleFields { get; set; }
         }
     }
 }

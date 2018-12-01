@@ -1,7 +1,7 @@
 ﻿using CSUtil;
 using CSUtil.ComponentModel;
 using FMSC.Core;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections;
@@ -13,6 +13,7 @@ using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.Utils;
+using Point = FMSC.Core.Point;
 
 namespace TwoTrails.ViewModels
 {
@@ -36,9 +37,7 @@ namespace TwoTrails.ViewModels
         public List<TtPolygon> ExcludedPolygons;
 
         public bool MultiplePolysIncluded { get { return IncludedPolygons.Count > 1; } }
-
         public bool SplitMultiPolys { get; set; }
-
 
         public ObservableCollection<TtPoint> Points
         {
@@ -122,9 +121,7 @@ namespace TwoTrails.ViewModels
                     ExclusionPolygons.Add(poly);
             }
 
-            SplitMultiPolys = false;
             OnPropertyChanged(nameof(MultiplePolysIncluded), nameof(SplitMultiPolys));
-
         }
 
         private void ExclusionPolygonsSelected(IList selectedItems)

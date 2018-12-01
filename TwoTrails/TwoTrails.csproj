@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TwoTrails</RootNamespace>
     <AssemblyName>TwoTrails</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -66,12 +66,27 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
-    <Reference Include="CSUtilSlim">
-      <HintPath>..\libs\CSUtilSlim.dll</HintPath>
+    <Reference Include="CSUtilSlim, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5d20ef7f7003f986, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libs\CSUtilSlim.dll</HintPath>
     </Reference>
-    <Reference Include="GeoAPI, Version=1.7.4.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeoAPI.1.7.4\lib\net45\GeoAPI.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FMSC.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libs\FMSC.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FMSC.Core.Windows, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libs\FMSC.Core.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="FMSC.GeoSpatial, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libs\FMSC.GeoSpatial.dll</HintPath>
+    </Reference>
+    <Reference Include="GeoAPI, Version=1.7.5.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeoAPI.Core.1.7.5\lib\net45\GeoAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="GeoAPI.CoordinateSystems, Version=1.7.5.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeoAPI.CoordinateSystems.1.7.5\lib\net45\GeoAPI.CoordinateSystems.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
@@ -80,39 +95,39 @@
       <HintPath>..\packages\Microsoft.Maps.MapControl.WPF.1.0.0.3\lib\net40-Client\Microsoft.Maps.MapControl.WPF.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetTopologySuite, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.1.14\lib\net45\NetTopologySuite.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NetTopologySuite, Version=1.15.1.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.Core.1.15.1\lib\net45\NetTopologySuite.dll</HintPath>
     </Reference>
-    <Reference Include="NetTopologySuite.IO, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NetTopologySuite.CoordinateSystems, Version=1.15.1.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.CoordinateSystems.1.15.1\lib\net45\NetTopologySuite.CoordinateSystems.dll</HintPath>
     </Reference>
-    <Reference Include="NetTopologySuite.IO.GeoTools, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.GeoTools.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NetTopologySuite.Features, Version=1.15.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.Features.1.15.0\lib\net45\NetTopologySuite.Features.dll</HintPath>
     </Reference>
-    <Reference Include="NetTopologySuite.IO.ShapeFile, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.ShapeFile.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NetTopologySuite.IO.GeoTools, Version=1.15.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.ShapeFile.1.15.2\lib\net45\NetTopologySuite.IO.GeoTools.dll</HintPath>
     </Reference>
-    <Reference Include="NetTopologySuite.IO.ShapeFile.Extended, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.ShapeFile.Extended.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NetTopologySuite.IO.ShapeFile, Version=1.15.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.ShapeFile.1.15.2\lib\net45\NetTopologySuite.IO.ShapeFile.dll</HintPath>
     </Reference>
-    <Reference Include="PowerCollections, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2573bf8a1bdddcd5, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.1.14\lib\net45\PowerCollections.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NetTopologySuite.IO.ShapeFile.Extended, Version=1.15.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.ShapeFile.1.15.2\lib\net45\NetTopologySuite.IO.ShapeFile.Extended.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite, Version=1.0.106.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.106.0\lib\net451\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.109.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.109.2\lib\net46\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Text.Encoding.CodePages, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encoding.CodePages.4.5.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
@@ -185,6 +200,9 @@
     <Compile Include="Dialogs\DataDictionaryEditorDialog.xaml.cs">
       <DependentUpon>DataDictionaryEditorDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\EditValuesDialog.xaml.cs">
+      <DependentUpon>EditValuesDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>
@@ -210,12 +228,16 @@
     <Compile Include="Mapping\PointInfoBox.xaml.cs">
       <DependentUpon>PointInfoBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\PolygonGraphicBrushOptions.cs" />
+    <Compile Include="Mapping\PolygonVisibilityControl.cs" />
     <Compile Include="Mapping\TtMapManager.cs" />
     <Compile Include="Mapping\TtMapPath.cs" />
     <Compile Include="Mapping\TtMapPoint.cs" />
     <Compile Include="Mapping\TtMapPolygon.cs" />
     <Compile Include="Mapping\TtMapPolygonManager.cs" />
     <Compile Include="Mapping\TtMapShape.cs" />
+    <Compile Include="Mapping\UglyFixFlipCheckBoxConverter2.cs" />
+    <Compile Include="Mapping\UglyFixFlipCheckBoxConverter.cs" />
     <Compile Include="Objects\ExtendedDataField.cs" />
     <Compile Include="Objects\ImageTile.cs" />
     <Compile Include="SessionData.cs" />
@@ -225,7 +247,6 @@
     <Compile Include="SingleInstance.cs" />
     <Compile Include="TtPolygonGraphicSettings.cs" />
     <Compile Include="TtTextWriterTraceListener.cs" />
-    <Compile Include="TtWindow.cs" />
     <Compile Include="Utils\Export.cs" />
     <Compile Include="Utils\Import.cs" />
     <Compile Include="Utils\TtGpxGenerator.cs" />
@@ -234,6 +255,11 @@
     <Compile Include="Utils\TtUtils.cs" />
     <Compile Include="ViewModels\CreatePlotsModel.cs" />
     <Compile Include="ViewModels\CsvImportModel.cs" />
+    <Compile Include="ViewModels\DataDictionary\BaseFieldModel.cs" />
+    <Compile Include="ViewModels\DataDictionary\CheckBoxFieldModel.cs" />
+    <Compile Include="ViewModels\DataDictionary\ComboBoxFieldModel.cs" />
+    <Compile Include="ViewModels\DataDictionary\DataDictionaryEditorModel.cs" />
+    <Compile Include="ViewModels\DataDictionary\TextBoxFieldModel.cs" />
     <Compile Include="ViewModels\PointEditorModel.cs" />
     <Compile Include="ViewModels\DataStyleModel.cs" />
     <Compile Include="Converters\BindingReflector.cs" />
@@ -320,6 +346,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\EditValuesDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\ExportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -392,6 +422,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="TtResources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -420,16 +454,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FMSC.Core\FMSC.Core.csproj">
-      <Project>{08212cde-1e42-4638-9365-65bd9a08bca8}</Project>
-      <Name>FMSC.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TwoTrails.DAL\TwoTrails.DAL.csproj">
-      <Project>{0a35612e-514f-4826-805c-fc7ddd71fb79}</Project>
-      <Name>TwoTrails.DAL</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\open_in_new.png" />
@@ -479,17 +503,30 @@
   <ItemGroup>
     <None Include="App.res" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TwoTrails.Core.Windows\TwoTrails.Core.Windows.csproj">
+      <Project>{f582f099-fe6a-45e6-ae7b-89c1296f135d}</Project>
+      <Name>TwoTrails.Core.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TwoTrails.DAL\TwoTrails.DAL.csproj">
+      <Project>{ecfd5466-2d67-4f3f-b095-811a8bc47f76}</Project>
+      <Name>TwoTrails.DAL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ttpoint_gps_white.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets')" />
+  <PropertyGroup>
+    <PreBuildEvent>"C:\Program Files (x86)\Windows Kits\10\bin\x86\rc.exe" /v $(ProjectDir)App.rc</PreBuildEvent>
+  </PropertyGroup>
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets'))" />
   </Target>
-  <PropertyGroup>
-    <PreBuildEvent>"C:\Program Files (x86)\Windows Kits\10\bin\x86\rc.exe" /v $(ProjectDir)App.rc</PreBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

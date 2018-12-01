@@ -548,6 +548,7 @@ namespace TwoTrails.DAL
             public const String DataType = "DataType";
 
             public const String ExtendDataTableName = "DDData";
+            public const String TempExtendDataTableName = "_DDData";
             public const String PointCN = "PointCN";
             
 

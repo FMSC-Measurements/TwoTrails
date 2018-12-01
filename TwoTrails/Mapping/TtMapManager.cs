@@ -1,4 +1,5 @@
-﻿using Microsoft.Maps.MapControl.WPF;
+﻿using FMSC.GeoSpatial.UTM;
+using Microsoft.Maps.MapControl.WPF;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,7 +23,7 @@ namespace TwoTrails.Mapping
         private List<TtPoint> _SelectedPoints { get; } =  new List<TtPoint>();
 
         public ObservableCollection<TtMapPolygonManager> PolygonManagers { get; } = new ObservableCollection<TtMapPolygonManager>();
-
+        
         private IObservableTtManager _Manager;
 
 

@@ -8,7 +8,7 @@ using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using System.Linq;
 using System.Windows.Input;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial;
 
 namespace TwoTrails.Mapping
@@ -19,7 +19,7 @@ namespace TwoTrails.Mapping
 
         public ICommand ZoomToPolygonCommand { get; }
 
-        public ObservableConvertedCollection<TtMapPoint, TtPoint> Points { get; set; }
+        public ObservableConvertedCollection<TtPoint, TtMapPoint> Points { get; set; }
 
         private TtMapPolygon _AdjBnd, _UnAdjBnd;
         public TtMapPolygon AdjBoundary { get { return _AdjBnd; } private set { SetField(ref _AdjBnd, value); } }
@@ -79,7 +79,7 @@ namespace TwoTrails.Mapping
             {
                 lock (locker)
                 {
-                    SetField(ref _AdjBndVisible, value, () => { AdjBoundary.Visible = value && _Visible; }); 
+                    SetField(ref _AdjBndVisible, value, () => { AdjBoundary.Visible = value && _Visible; }, nameof(AdjBndVisible));
                 }
             }
         }
@@ -110,7 +110,7 @@ namespace TwoTrails.Mapping
             {
                 lock (locker)
                 {
-                    SetField(ref _UnAdjBndVisible, value, () => { UnAdjBoundary.Visible = value && _Visible; }); 
+                    SetField(ref _UnAdjBndVisible, value, () => { UnAdjBoundary.Visible = value && _Visible; }, nameof(UnAdjBndVisible)); 
                 }
             }
         }
@@ -247,11 +247,31 @@ namespace TwoTrails.Mapping
                 }
             }
         }
+
+
+        public void UpdateVisibility(string propertyName, bool visibility)
+        {
+            switch (propertyName)
+            {
+                case nameof(Visible): Visible = visibility; break;
+                case nameof(AdjBndVisible): AdjBndVisible = visibility; break;
+                case nameof(AdjBndPointsVisible): AdjBndPointsVisible = visibility; break;
+                case nameof(UnAdjBndVisible): UnAdjBndVisible = visibility; break;
+                case nameof(UnAdjBndPointsVisible): UnAdjBndPointsVisible = visibility; break;
+                case nameof(AdjNavVisible): AdjNavVisible = visibility; break;
+                case nameof(AdjNavPointsVisible): AdjNavPointsVisible = visibility; break;
+                case nameof(UnAdjNavVisible): UnAdjNavVisible = visibility; break;
+                case nameof(UnAdjNavPointsVisible): UnAdjNavPointsVisible = visibility; break;
+                case nameof(AdjMiscPointsVisible): AdjMiscPointsVisible = visibility; break;
+                case nameof(UnAdjMiscPointsVisible): UnAdjMiscPointsVisible = visibility; break;
+                case nameof(WayPointsVisible): WayPointsVisible = visibility; break;
+            }
+        }
         #endregion
 
 
         #region Color
-        public PolygonGraphicOptions Graphics { get; }
+        public PolygonGraphicBrushOptions Graphics { get; }
         #endregion
 
 
@@ -266,7 +286,7 @@ namespace TwoTrails.Mapping
         {
             Map = map;
             Polygon = polygon;
-            Graphics = pgo;
+            Graphics = new PolygonGraphicBrushOptions(pgo.CN, pgo);
 
             _Visible = vis;
             _AdjBndVisible = adjBndVis;
@@ -292,7 +312,7 @@ namespace TwoTrails.Mapping
             AdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, true, _AdjNavVisible);
             UnAdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, false, _UnAdjNavVisible);
 
-            Points = new ObservableConvertedCollection<TtMapPoint, TtPoint>(
+            Points = new ObservableConvertedCollection<TtPoint, TtMapPoint>(
                 points,
                 p => new TtMapPoint(map, p, Graphics, Visible, _AdjBndPointsVisible, _UnAdjBndPointsVisible,
                         _AdjNavPointsVisible, _UnAdjNavPointsVisible, _AdjMiscPointsVisible, _UnAdjMiscPointsVisible,

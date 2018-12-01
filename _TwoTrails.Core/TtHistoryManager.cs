@@ -387,6 +387,11 @@ namespace TwoTrails.Core
             return BaseManager.GetPolygonGraphicOptions();
         }
 
+        public PolygonGraphicOptions GetDefaultPolygonGraphicOption()
+        {
+            return BaseManager.GetDefaultPolygonGraphicOption();
+        }
+
 
         List<TtNmeaBurst> ITtManager.GetNmeaBursts(string pointCN)
         {

@@ -1,6 +1,6 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;

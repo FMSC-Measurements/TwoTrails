@@ -1,17 +1,17 @@
 ﻿<UserControl x:Class="TwoTrails.Controls.PointEditorControl"
-			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-			 xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-			 xmlns:tt="clr-namespace:TwoTrails"
-			 xmlns:cvt="clr-namespace:TwoTrails.Converters"
-			 xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
-			 xmlns:cc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
-			 
-			 mc:Ignorable="d" 
-			 FocusManager.FocusedElement="{Binding ElementName=dgPoints}"
-			 d:DesignHeight="600" d:DesignWidth="800">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+    xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+    xmlns:tt="clr-namespace:TwoTrails"
+    xmlns:cvt="clr-namespace:TwoTrails.Converters"
+    xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
+    xmlns:cc="clr-namespace:FMSC.Core.Windows.Controls;assembly=FMSC.Core.Windows"
+    mc:Ignorable="d" 
+    FocusManager.FocusedElement="{Binding ElementName=dgPoints}"
+    d:DesignHeight="600" d:DesignWidth="800">
 
     <UserControl.Resources>
         <cvt:MetadataValueConverter x:Key="mdvcElev" MetadataPropertyName="Elevation"/>
@@ -321,6 +321,9 @@
                                         <Grid.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Hide Column" Command="{ Binding HideColumn }" />
+                                                <MenuItem Header="Copy Values" Command="{ Binding CopyColumnValues }" />
+                                                <Separator/>
+                                                <MenuItem Header="Columns" ItemsSource="{ Binding VisibleFields }"/>
                                             </ContextMenu>
                                         </Grid.ContextMenu>
 
@@ -711,12 +714,17 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <!--TODO bind validation (TextIsInt/TextIsDouble)--> 
                                         <TextBlock Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="{Binding Name}"/>
                                         <TextBox Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" LostFocus="TextBox_UpdateBinding"
 											Text="{Binding Value, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 											IsEnabled="{Binding DataEditor.HasSelection}"
-											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}"/>
+											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="PreviewTextInput">
+                                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="TextValidation"  />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
                                     </Grid>
                                 </DataTemplate>
 
@@ -734,7 +742,13 @@
 											IsEnabled="{Binding DataEditor.HasSelection}"
 											ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}"
 											Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}"/>
+											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="PreviewTextInput">
+                                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="TextValidation"  />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
                                     </Grid>
                                 </DataTemplate>
 
@@ -749,6 +763,7 @@
 											Style="{StaticResource ResourceKey=styleFieldValue}"
 											IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 											IsEnabled="{Binding DataEditor.HasSelection}"
+                                            IsThreeState="{Binding ValueRequired, Converter={StaticResource IBC}}"
 											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}"/>
                                     </Grid>
                                 </DataTemplate>

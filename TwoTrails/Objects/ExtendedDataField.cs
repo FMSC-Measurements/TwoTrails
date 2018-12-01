@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Data;
+using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.ViewModels;
 
@@ -16,6 +17,10 @@ namespace TwoTrails
         public string PropertyCN { get; }
 
         public int Flags { get; }
+
+        public bool ValueRequired { get; }
+
+        public DataType DataType { get; }
 
         public IValueConverter Converter { get; }
 
@@ -34,6 +39,8 @@ namespace TwoTrails
             Name = field.Name;
             PropertyCN = field.CN;
             Flags = field.Flags;
+            ValueRequired = field.ValueRequired;
+            DataType = field.DataType;
             DataEditor = dataEditor;
             Converter = converter;
 
@@ -46,6 +53,16 @@ namespace TwoTrails
                 }
             };
         }
+
+        //public void TextValidation(object sender, TextCompositionEventArgs e)
+        //{
+        //    switch (DataType)
+        //    {
+        //        case DataType.INTEGER: e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsInteger(sender, e); break;
+        //        case DataType.DECIMAL:
+        //        case DataType.FLOAT: e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsDouble(sender, e); break;
+        //    }
+        //}
     }
 
     public class TextBoxExtendedDataField : ExtendedDataField
@@ -59,6 +76,7 @@ namespace TwoTrails
             base(field, dataEditor, converter) { }
     }
 
+    //todo implement add editable value to combobox list and save directly without notice. (as a setting)
     public class ComboBoxExtendedDataField : ExtendedDataField
     {
         public IList<String> Values { get; }

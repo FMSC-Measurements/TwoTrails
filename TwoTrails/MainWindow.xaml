@@ -12,6 +12,15 @@
         Height="800" MinHeight="500"
         WindowStartupLocation="CenterScreen">
 
+    <!--xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">-->
+        <!--TextOptions.TextFormattingMode="Ideal"--> 
+
     <Window.InputBindings>
         <KeyBinding Command="{Binding CurrentProject.UndoCommand}" Key="Z" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding CurrentProject.RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
@@ -163,14 +172,14 @@
                     <Separator/>
 
                     <MenuItem Header="Create Grid Sample Points" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
-                          InputGestureText="Ctrl+Alt+P"/><!--Style="{StaticResource styleMiDisableNullCommand}"--> 
+                          InputGestureText="Ctrl+Alt+P"/>
                     <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
                           Style="{StaticResource styleMiPointEdit}" InputGestureText="Ctrl+Alt+C"/>
 
                     <Separator Visibility="Collapsed"/>
 
                     <MenuItem Header="Modify Data Dictionary" Command="{Binding CurrentEditor.ModifyDataDictionaryCommand}" IsEnabled="{Binding HasOpenedProject}"
-                              Style="{StaticResource styleMiDisableNullCommand}" Visibility="Collapsed" />
+                              Style="{StaticResource styleMiDisableNullCommand}" />
 
                     <Separator/>
 

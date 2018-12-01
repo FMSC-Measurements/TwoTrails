@@ -48,9 +48,9 @@ namespace TwoTrails
                 Settings = new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings());
 
                 string[] cmdArgs = Environment.GetCommandLineArgs();
-                if (cmdArgs.Length > 2 && cmdArgs[1].Equals("/export", StringComparison.InvariantCultureIgnoreCase))
+                if (cmdArgs.Length > 1 && cmdArgs[0].Equals("/export", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    ExportFile(cmdArgs[2]);
+                    ExportFile(cmdArgs[1]);
                 }
                 else
                 {

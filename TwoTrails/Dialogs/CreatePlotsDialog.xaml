@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ttc="clr-namespace:TwoTrails.Controls"
         xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
-        xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
-        xmlns:fmsccutils="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
+        xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
-        Title="Create Grid Sample Points" Height="300" Width="500"
+        Title="Create Grid Sample Points"
+        Height="300" Width="500"
+        MinHeight="300" MinWidth="500"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <cvt:MultiBooleanConverter x:Key="MultiBoolConverter"/>
@@ -137,8 +138,8 @@
 
 
                 <CheckBox Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2"
-                          Name="cbSpltMultiPolys" Content="Split Into Individual Plots" IsEnabled="{Binding MultiplePolysIncluded}"
-                          IsChecked="{Binding SplitMultiPolys, Mode=OneWayToSource}" VerticalAlignment="Center" />
+                          IsChecked="{Binding Settings.DeviceSettings.SplitToIndividualPolys}" VerticalAlignment="Center"
+                          IsEnabled="{Binding MultiplePolysIncluded}"/>
 
                 <CheckBox Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="2"
                           Name="cbDelExisting" Content="Delete Existing Plots"
@@ -156,10 +157,28 @@
         </Grid>
 
         <Grid Grid.Column="0" Grid.Row="0" Margin="5, 2.5, 0, 2.5">
+            <Grid.Resources>
+                <DataTemplate x:Key="listToolTip">
+                    <TextBlock Text="{Binding Name}">
+                            <ToolTipService.ToolTip>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <TextBlock Grid.Row="0" Text="{Binding Name}" FontWeight="Black"/>
+                                    <TextBlock Grid.Row="1" Text="{Binding Description}"/>
+                                </Grid>
+                            </ToolTipService.ToolTip>
+                        </TextBlock>
+                </DataTemplate>
+            </Grid.Resources>
+            
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="75"/>
+                <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="75"/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
@@ -168,7 +187,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Column="0" Grid.Row="0" Text="Include" TextAlignment="Center" />
-            <ListBox Name="lstIncPoly" Grid.Column="0" Grid.Row="1" ItemsSource="{Binding InclusionPolygons}" SelectionMode="Multiple">
+            <ListBox Name="lstIncPoly" Grid.Column="0" Grid.Row="1" ItemsSource="{Binding InclusionPolygons}" SelectionMode="Multiple" ItemTemplate="{StaticResource listToolTip}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding InclusionPolygonsSelectedCommand}" CommandParameter="{Binding Path=SelectedItems, ElementName=lstIncPoly}"/>
@@ -177,7 +196,7 @@
             </ListBox>
 
             <TextBlock Grid.Column="2" Grid.Row="0" Text="Exlude" TextAlignment="Center" />
-            <ListBox Name="lstExcPoly" Grid.Column="2" Grid.Row="1" ItemsSource="{Binding ExclusionPolygons}" SelectionMode="Multiple">
+            <ListBox Name="lstExcPoly" Grid.Column="2" Grid.Row="1" ItemsSource="{Binding ExclusionPolygons}" SelectionMode="Multiple" ItemTemplate="{StaticResource listToolTip}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding ExclusionPolygonsSelectedCommand}" CommandParameter="{Binding Path=SelectedItems, ElementName=lstExcPoly}"/>

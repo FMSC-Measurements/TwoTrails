@@ -14,6 +14,7 @@ using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.Core.Xml.GPX;
 using TwoTrails.Core.Media;
 using TwoTrails.DAL;
+using System.Xml;
 
 namespace TwoTrails.Utils
 {
@@ -208,30 +209,50 @@ namespace TwoTrails.Utils
 
             using (StreamWriter sw = new StreamWriter(fileName))
             {
-                #region Columns
-                StringBuilder sb = new StringBuilder();
-                List<string> fieldCNs = new List<string>();
+                List<string> fieldCNs = template.Select(ddf => ddf.CN).ToList();
 
-                foreach (DataDictionaryField ddf in template)
-                {
-                    sb.Append($"{ ddf.Name },");
-                    fieldCNs.Add(ddf.CN);
-                }
-
-                sw.WriteLine(sb.ToString());
-                #endregion
+                sw.WriteLine(String.Join(",", template.Select(ddf => ddf.Name)));
 
                 foreach (TtPoint point in points)
                 {
-                    sb.Clear();
-
-                    foreach (string cn in fieldCNs)
-                        sb.Append($"{point.ExtendedData[cn]},");
-
-                    sw.WriteLine(sb.ToString());
+                    sw.WriteLine(String.Join(",", fieldCNs.Select(fcn => point.ExtendedData[fcn])));
                 }
 
                 sw.Flush();
+            }
+
+            using (XmlWriter writer = XmlWriter.Create(fileName.Replace(".csv", ".ddt"), new XmlWriterSettings() { Indent = true }))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("DataDictionaryTemplate");
+
+                foreach (DataDictionaryField ddf in template)
+                {
+                    writer.WriteStartElement("Field");
+                    writer.WriteAttributeString(TwoTrailsSchema.SharedSchema.CN, ddf.CN);
+                    writer.WriteAttributeString(TwoTrailsSchema.DataDictionarySchema.DataType, ddf.DataType.ToString());
+
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.Name, ddf.Name);
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.FieldOrder, ddf.Order.ToString());
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.FieldType, ddf.FieldType.ToString());
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.Flags, ddf.Flags.ToString());
+
+                    if (ddf.Values != null)
+                    {
+                        writer.WriteStartElement(TwoTrailsSchema.DataDictionarySchema.FieldValues);
+                        foreach (string value in ddf.Values)
+                            writer.WriteElementString("Value", value);
+                        writer.WriteEndElement(); 
+                    }
+                    
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.DefaultValue, ddf.DefaultValue?.ToString());
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.ValueRequired, ddf.ValueRequired.ToString());
+
+                    writer.WriteEndElement();
+                }
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
             }
         }
 
@@ -551,7 +572,7 @@ namespace TwoTrails.Utils
                     }
                     else
                     {
-                        mal.GetImageData(img).SaveImageToFile(filePath);
+                        MediaTools.GetImageData(mal, img).SaveImageToFile(filePath);
                     }
                 }
             }

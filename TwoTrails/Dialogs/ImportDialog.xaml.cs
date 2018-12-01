@@ -34,7 +34,7 @@ namespace TwoTrails.Dialogs
 
             if (files != null && files.Length > 0)
             {
-                if (files.All(f => f.EndsWith(".shp")))
+                if (files.All(f => f.EndsWith(Consts.SHAPE_EXT, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     _ImportModel.SetupShapeFiles(files);
                 }

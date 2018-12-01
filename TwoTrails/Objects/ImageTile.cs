@@ -1,4 +1,4 @@
-﻿using FMSC.Core.ComponentModel.Commands;
+﻿using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
