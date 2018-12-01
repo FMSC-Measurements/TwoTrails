@@ -513,6 +513,9 @@
       <Name>TwoTrails.DAL</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ttpoint_gps_white.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"C:\Program Files (x86)\Windows Kits\10\bin\x86\rc.exe" /v $(ProjectDir)App.rc</PreBuildEvent>

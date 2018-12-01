@@ -31,6 +31,7 @@
     <BitmapImage x:Key="ic_unadjusted_polygon_white" UriSource="Resources/ic_unadjusted_polygon_white_36dp.png" />
     <BitmapImage x:Key="ic_ttpoint_way_black" UriSource="Resources/ic_ttpoint_way_black.png" />
     <BitmapImage x:Key="ic_ttpoint_way_white" UriSource="Resources/ic_ttpoint_way_white.png" />
+    <BitmapImage x:Key="ic_ttpoint_gps_white" UriSource="Resources/ttpoint_gps_white.png" />
 
 
     <Style x:Key="styleMiDisableNullCommand" TargetType="{x:Type MenuItem}">
