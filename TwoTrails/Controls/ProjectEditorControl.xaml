@@ -16,6 +16,7 @@
     <UserControl.Resources>
         <cvt:M2Converter x:Key="M2Converter"/>
         <cvt:MetersToFeetConverter x:Key="MtoFConverter"/>
+        <fmsccm:EnumDescriptionConverter x:Key="enumDesc"/>
 
         <DataTemplate DataType="{x:Type ttl:ImageTile}">
             <Grid Width="250">
@@ -667,7 +668,13 @@
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Declination Type" />
                                 <ComboBox Grid.Column="0" Grid.Row="5"
                                           SelectedItem="{Binding CurrentMetadata.DecType}"
-                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:DeclinationType}}"/>
+                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:DeclinationType}}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource ResourceKey=enumDesc}}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
 
                                 <TextBlock Grid.Column="2" Grid.Row="4" Text="Declination" />
                                 <TextBox Grid.Column="2" Grid.Row="5"
@@ -678,7 +685,13 @@
                                 <TextBlock Grid.Column="0" Grid.Row="6" Text="Distance" />
                                 <ComboBox Grid.Column="0" Grid.Row="7"
                                           SelectedItem="{Binding CurrentMetadata.Distance}"
-                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}}"/>
+                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource ResourceKey=enumDesc}}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
 
                                 <TextBlock Grid.Column="2" Grid.Row="6" Text="Elevation" />
                                 <ComboBox Grid.Column="2" Grid.Row="7"

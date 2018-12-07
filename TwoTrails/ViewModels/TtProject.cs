@@ -8,6 +8,7 @@ using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
+using TwoTrails.Dialogs;
 
 namespace TwoTrails.ViewModels
 {
@@ -27,6 +28,7 @@ namespace TwoTrails.ViewModels
         public ICommand EditMetadataCommand { get; }
 
         public ICommand RecalculateAllPolygonsCommand { get; }
+        public ICommand CalculateLogDeckCommand { get; }
 
         public ICommand UndoCommand { get; set; }
         public ICommand RedoCommand { get; set; }
@@ -143,6 +145,19 @@ namespace TwoTrails.ViewModels
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Groups));
             
             RecalculateAllPolygonsCommand = new RelayCommand(x => { HistoryManager.RecalculatePolygons(); DataChanged |= true; });
+            CalculateLogDeckCommand = new RelayCommand(x =>
+            {
+                if (Manager.PolygonCount > 0)
+                {
+                    MainModel.MainWindow.IsEnabled = false;
+                    LogDeckCalculatorDialog.Show(this, this.MainModel.MainWindow, () =>
+                    {
+                        MainModel.MainWindow.IsEnabled = true;
+                    });
+                }
+                else
+                    MessageBox.Show("No Polygons in Project.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Stop);
+            });
 
             OpenMapCommand = new RelayCommand(x => OpenMapTab());
             OpenMapWindowCommand = new RelayCommand(x => OpenMapWindow());

@@ -151,6 +151,9 @@
                     <MenuItem Header="Recalculate All Polygons" Command="{Binding CurrentProject.RecalculateAllPolygonsCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+Shift+R"/>
 
+                    <MenuItem Header="Calculate Log Deck" Command="{Binding CurrentProject.CalculateLogDeckCommand}"
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+L"/>
+
                     <Separator/>
                     <MenuItem Header="Create New Point" Style="{StaticResource styleHasPolygons}">
 

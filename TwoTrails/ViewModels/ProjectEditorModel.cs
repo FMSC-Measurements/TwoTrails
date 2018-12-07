@@ -413,7 +413,7 @@ namespace TwoTrails.ViewModels
         
         private void SetMetadataDefault()
         {
-            _Project.Settings.MetadataSettings.SetSettings(CurrentMetadata);
+            _Project.Settings.MetadataSettings.SetMetadataSettings(CurrentMetadata);
             MessageBox.Show("Metadata defaults set.");
         }
 

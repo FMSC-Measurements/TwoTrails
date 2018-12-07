@@ -209,6 +209,9 @@
     <Compile Include="Dialogs\AccuracyDataDialog.xaml.cs">
       <DependentUpon>AccuracyDataDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\LogDeckCalculatorDialog.xaml.cs">
+      <DependentUpon>LogDeckCalculatorDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\PointDetailsDialog.xaml.cs">
       <DependentUpon>PointDetailsDialog.xaml</DependentUpon>
     </Compile>
@@ -257,6 +260,7 @@
     <Compile Include="ViewModels\DataDictionary\ComboBoxFieldModel.cs" />
     <Compile Include="ViewModels\DataDictionary\DataDictionaryEditorModel.cs" />
     <Compile Include="ViewModels\DataDictionary\TextBoxFieldModel.cs" />
+    <Compile Include="ViewModels\LogDeckCalculatorModel.cs" />
     <Compile Include="ViewModels\PointEditorModel.cs" />
     <Compile Include="ViewModels\DataStyleModel.cs" />
     <Compile Include="Converters\BindingReflector.cs" />
@@ -356,6 +360,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\AccuracyDataDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\LogDeckCalculatorDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
