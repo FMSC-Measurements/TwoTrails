@@ -36,7 +36,8 @@ namespace TwoTrails.ViewModels
 
         public ReadOnlyCollection<TtPolygon> Polygons { get; }
 
-        public TtPolygon Polygon { get => Get<TtPolygon>(); set => Set(value, UpdateVolume); }
+        public TtPolygon Polygon { get => Get<TtPolygon>(); set => Set(value, () => CalculateDeck(value)); }
+        private TtPolygon DeckPolygon = null;
 
 
         public LogDeckCalculatorModel(TtProject project)
@@ -51,12 +52,23 @@ namespace TwoTrails.ViewModels
 
             if (Polygons.Count > 0)
                 Polygon = Polygons[0];
+
+
         }
 
 
+        private void CalculateDeck(TtPolygon polygon)
+        {
+            DeckPolygon = polygon;
+            UpdateVolume();
+        }
+
         private void UpdateVolume()
         {
+            if (DeckPolygon != null)
+            {
 
+            }
         }
     }
 }
