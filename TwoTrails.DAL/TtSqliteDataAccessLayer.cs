@@ -1623,8 +1623,13 @@ namespace TwoTrails.DAL
         #region TTNmea
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
-            String query = $@"select {TwoTrailsSchema.TtNmeaSchema.SelectItems} from {TwoTrailsSchema.TtNmeaSchema.TableName}
-{(pointCN != null ? $" where {TwoTrailsSchema.TtNmeaSchema.PointCN} = '{pointCN}'" : String.Empty)}"; ;
+            return GetNmeaBursts(new string[] { pointCN });
+        }
+
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
+        {
+            String query = $@"select {TwoTrailsSchema.TtNmeaSchema.SelectItems} from {TwoTrailsSchema.TtNmeaSchema.TableName} 
+            {(pointCNs == null ? String.Empty : $" where { String.Join(" OR ", pointCNs.Select(pcn => $"{TwoTrailsSchema.TtNmeaSchema.PointCN} = '{pcn}'"))}")}";
 
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {

@@ -45,6 +45,7 @@ namespace TwoTrails.Core
 
 
         List<TtNmeaBurst> GetNmeaBursts(string pointCN = null);
+        List<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs);
         void AddNmeaBurst(TtNmeaBurst burst);
         void AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
         void DeleteNmeaBursts(string pointCN);

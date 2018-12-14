@@ -9,8 +9,8 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
         Title="Log Deck Calculator"
-        Height="225" Width="400"
-        MinHeight="225" MinWidth="375">
+        Height="200" Width="400"
+        MinHeight="200" MinWidth="375">
     <Window.Resources>
         <fmsccm:EnumDescriptionConverter x:Key="enumDesc"/>
     </Window.Resources>
@@ -40,7 +40,9 @@
                     <Setter Property="HorizontalAlignment" Value="Right"/>
                     <Setter Property="Margin" Value="0 2.5 2.5 2.5"/>
                 </Style>
-
+                <Style TargetType="ComboBox">
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
             </Grid.Resources>
             
             <Grid.ColumnDefinitions>
@@ -79,19 +81,19 @@
 
             
             <TextBlock Grid.Column="0" Grid.Row="1" Text="Log Length"/>
-            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding LogLength}" PreviewTextInput="TextIsUnsignedDouble" />
+            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding LogLength, UpdateSourceTrigger=PropertyChanged, Delay=500}" PreviewTextInput="TextIsUnsignedDouble" />
 
-            <TextBlock Grid.Column="0" Grid.Row="2" Text="Defect"/>
-            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Defect}" PreviewTextInput="TextIsUnsignedDouble" />
+            <TextBlock Grid.Column="0" Grid.Row="2" Text="Collar Width"/>
+            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding CollarWidth, UpdateSourceTrigger=PropertyChanged, Delay=500}" PreviewTextInput="TextIsUnsignedDouble" />
 
-            <TextBlock Grid.Column="0" Grid.Row="3" Text="Edge Buffer"/>
-            <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding EdgeBuffer}" PreviewTextInput="TextIsUnsignedDouble" />
+            <TextBlock Grid.Column="0" Grid.Row="3" Text="Defect %"/>
+            <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding Defect, UpdateSourceTrigger=PropertyChanged, Delay=500}" PreviewTextInput="TextIsUnsignedDouble" />
             
-            <TextBlock Grid.Column="0" Grid.Row="4" Text="Void"/>
-            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Void}" PreviewTextInput="TextIsUnsignedDouble" />
+            <TextBlock Grid.Column="0" Grid.Row="4" Text="Void %"/>
+            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Void, UpdateSourceTrigger=PropertyChanged, Delay=500}" PreviewTextInput="TextIsUnsignedDouble" />
 
-            <TextBlock Grid.Column="2" Grid.Row="1" Text="Perimeter:"/>
-            <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding Perimeter, StringFormat=0.###}" Style="{StaticResource ResourceKey=tbInfo}"/>
+            <TextBlock Grid.Column="2" Grid.Row="1" Text="Area:"/>
+            <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding Area, StringFormat=0.###}" Style="{StaticResource ResourceKey=tbInfo}"/>
 
             <TextBlock Grid.Column="2" Grid.Row="2" Text="Face Area:"/>
             <TextBlock Grid.Column="3" Grid.Row="2" Text="{Binding FaceArea, StringFormat=0.###}" Style="{StaticResource ResourceKey=tbInfo}"/>

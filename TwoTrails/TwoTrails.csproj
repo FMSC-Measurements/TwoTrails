@@ -177,6 +177,7 @@
       <DependentUpon>UserActionControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\DataDictionaryFieldConverter.cs" />
+    <Compile Include="Converters\DmsToDecDegConverter.cs" />
     <Compile Include="Converters\EnumBooleanConverter.cs" />
     <Compile Include="Converters\FullPointDetailsConverter.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
@@ -223,6 +224,9 @@
     </Compile>
     <Compile Include="Dialogs\RetraceDialog.xaml.cs">
       <DependentUpon>RetraceDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ViewSatInfoDialog.xaml.cs">
+      <DependentUpon>ViewSatInfoDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Mapping\MapExtensions.cs" />
     <Compile Include="Mapping\PointInfoBox.xaml.cs">
@@ -388,6 +392,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\SelectPointDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ViewSatInfoDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

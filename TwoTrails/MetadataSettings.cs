@@ -13,7 +13,6 @@ namespace TwoTrails
         private const String MAG_DEC = "MagDec";
         private const String SLOPE = "Slope";
         private const String ZONE = "Zone";
-        private const String VOLUME = "Volume";
 
         public Datum Datum { get; set; } = Datum.NAD83;
 
@@ -29,8 +28,6 @@ namespace TwoTrails
 
         public int Zone { get; set; } = 13;
 
-        public Volume Volume { get; set; } = Volume.BoardFoot;
-
 
         public MetadataSettings()
         {
@@ -41,7 +38,6 @@ namespace TwoTrails
             MagDec = (double)Properties.Settings.Default[MAG_DEC];
             Slope = (Slope)Properties.Settings.Default[SLOPE];
             Zone = (int)Properties.Settings.Default[ZONE];
-            Volume = (Volume)Properties.Settings.Default[VOLUME];
         }
 
 
@@ -74,7 +70,6 @@ namespace TwoTrails
             Properties.Settings.Default[MAG_DEC] = MagDec;
             Properties.Settings.Default[SLOPE] = (int)Slope;
             Properties.Settings.Default[ZONE] = Zone;
-            Properties.Settings.Default[VOLUME] = (int)Volume;
 
             Properties.Settings.Default.Save();
         }

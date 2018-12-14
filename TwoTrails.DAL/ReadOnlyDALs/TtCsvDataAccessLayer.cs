@@ -524,6 +524,22 @@ namespace TwoTrails.DAL
             return (pointCN == null ? _Nmea.Values.DeepCopy() : _Nmea.Values.Where(n => n.PointCN == pointCN)).OrderBy(n => n.TimeCreated).DeepCopy();
         }
 
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
+        {
+            Parse();
+
+            List<string> pcns = pointCNs.ToList();
+
+            if (pointCNs.Any())
+            {
+                foreach (TtNmeaBurst burst in _Nmea.Values)
+                {
+                    if (pointCNs.Contains(burst.PointCN))
+                        yield return burst.DeepCopy();
+                }
+            }
+        }
+
         public TtProjectInfo GetProjectInfo()
         {
             Parse();
@@ -561,7 +577,6 @@ namespace TwoTrails.DAL
         {
             throw new NotImplementedException();
         }
-
 
         public class ParseOptions
         {

@@ -17,8 +17,6 @@ namespace TwoTrails.Core
         
         Slope Slope { get; }
 
-        Volume Volume { get; }
-
         void SetMetadataSettings(TtMetadata metadata);
 
         TtMetadata CreateDefaultMetadata();

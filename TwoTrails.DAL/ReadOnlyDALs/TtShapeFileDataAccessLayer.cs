@@ -348,6 +348,11 @@ namespace TwoTrails.DAL
             return new List<TtNmeaBurst>();
         }
 
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
+        {
+            return new List<TtNmeaBurst>();
+        }
+
         public TtProjectInfo GetProjectInfo()
         {
             Parse();

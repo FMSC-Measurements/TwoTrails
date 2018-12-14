@@ -202,12 +202,72 @@ namespace TwoTrails.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int Volume {
+        public int LogDeckVolume {
             get {
-                return ((int)(this["Volume"]));
+                return ((int)(this["LogDeckVolume"]));
             }
             set {
-                this["Volume"] = value;
+                this["LogDeckVolume"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int LogDeckDistance {
+            get {
+                return ((int)(this["LogDeckDistance"]));
+            }
+            set {
+                this["LogDeckDistance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.5")]
+        public double LogDeckCollarWidth {
+            get {
+                return ((double)(this["LogDeckCollarWidth"]));
+            }
+            set {
+                this["LogDeckCollarWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("16")]
+        public double LogDeckLength {
+            get {
+                return ((double)(this["LogDeckLength"]));
+            }
+            set {
+                this["LogDeckLength"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double LogDeckDefect {
+            get {
+                return ((double)(this["LogDeckDefect"]));
+            }
+            set {
+                this["LogDeckDefect"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double LogDeckVoid {
+            get {
+                return ((double)(this["LogDeckVoid"]));
+            }
+            set {
+                this["LogDeckVoid"] = value;
             }
         }
     }

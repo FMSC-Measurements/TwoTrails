@@ -9,6 +9,7 @@ using TwoTrails.DAL;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using TwoTrails.Core.Media;
+using CSUtil;
 
 namespace TwoTrails.Core
 {
@@ -1740,6 +1741,11 @@ namespace TwoTrails.Core
             return _DAL.GetNmeaBursts(pointCN).ToList();
         }
 
+        public List<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
+        {
+            return _DAL.GetNmeaBursts(pointCNs).ToList();
+        }
+
         public void AddNmeaBurst(TtNmeaBurst burst)
         {
             _DAL.InsertNmeaBurst(burst);
@@ -1786,6 +1792,51 @@ namespace TwoTrails.Core
         public void UpdateDataAction(DataActionType action, string notes = null)
         {
             _Activity.UpdateAction(action, notes);
+        }
+
+
+        public bool IsPolygonValid(string polyCN)
+        {
+            if (_PointsByPoly.ContainsKey(polyCN))
+                return _PointsByPoly[polyCN].HasAtLeast(3, pt => pt.OnBoundary);
+            throw new Exception("Polygon Not Found");
+        }
+
+        public bool IsIslandPolygon(string polyCN)
+        {
+            return IsIslandPolygon(GetPoints(polyCN));
+        }
+
+        public static bool IsIslandPolygon(IEnumerable<TtPoint> points)
+        {
+            if (points.HasAtLeast(3, pt => pt.OnBoundary))
+            {
+                bool hasGps = false;
+                int sideShotCount = 0;
+
+                foreach (TtPoint pt in points)
+                {
+                    if (!hasGps && !pt.OnBoundary)
+                    {
+                        if (pt.IsGpsAtBase())
+                            hasGps = true;
+                    }
+                    else if (hasGps && pt.OnBoundary)
+                    {
+                        if (pt.OpType == OpType.SideShot)
+                            sideShotCount++;
+                        else
+                            break;
+                    }
+                    else
+                        break;
+                }
+                
+                if (sideShotCount > 2)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

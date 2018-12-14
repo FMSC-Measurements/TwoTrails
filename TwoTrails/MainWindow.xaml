@@ -33,6 +33,7 @@
         <KeyBinding Command="{Binding CurrentEditor.RetraceCommand}" Key="R" Modifiers="Ctrl+Alt"/>
         <KeyBinding Command="{Binding CurrentEditor.MovePointsCommand}" Key="M" Modifiers="Ctrl+Alt"/>
         <KeyBinding Command="{Binding CurrentEditor.CreateQuondamsCommand}" Key="Q" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding OpenInEarthCommand}" Key="G" Modifiers="Ctrl+Alt"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -142,9 +143,13 @@
                 <MenuItem Header="_Data">
                     <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                    
                     <MenuItem Header="View Point Details Table" Command="{Binding ViewPointDetailsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+
+                    <MenuItem Header="View Sattelite Info" Command="{Binding CurrentEditor.ViewSatInfoCommand}"
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+
                     <MenuItem Header="Open in Google Earth" Command="{Binding OpenInEarthCommand}" IsEnabled="{Binding HasOpenedProject}" />
-                    <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapCommand}" IsEnabled="{Binding HasOpenedProject}" Visibility="Collapsed"/>
                 </MenuItem>
 
                 <MenuItem Header="_Tools">

@@ -107,6 +107,7 @@ namespace TwoTrails.ViewModels
         public ICommand CopyCellValueCommand { get; }
         public ICommand ExportValuesCommand { get; }
         public ICommand ViewPointDetailsCommand { get; }
+        public ICommand ViewSatInfoCommand { get; }
         public ICommand UpdateAdvInfo { get; }
         #endregion
 
@@ -145,17 +146,16 @@ namespace TwoTrails.ViewModels
 
         private bool _SelectionChanged = true;
         private List<TtPoint> _SortedSelectedPoints;
-        public List<TtPoint> GetSortedSelectedPoints()
+        public List<TtPoint> GetSortedSelectedPoints(Func<TtPoint, bool> where = null)
         {
             if (_SelectionChanged)
             {
                 _SortedSelectedPoints = _SelectedPoints.Cast<TtPoint>().ToList();
                 _SortedSelectedPoints.Sort();
                 _SelectionChanged = false;
-                return _SortedSelectedPoints;
             }
-            else
-                return new List<TtPoint>(_SortedSelectedPoints);
+
+            return new List<TtPoint>(where != null ? _SortedSelectedPoints.Where(where) : _SortedSelectedPoints);
         }
 
         public IList VisiblePoints { get; set; } = new ArrayList();
@@ -898,6 +898,10 @@ namespace TwoTrails.ViewModels
                 this, x => x.HasSelection);
 
             ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
+
+            ViewSatInfoCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ViewSafeInfo(), x => _SelectedPoints.Cast<TtPoint>().Any(pt => pt.IsGpsType()),
+                this, x => x.SelectedPoints);
 
             ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ChangeQuondamParent(), x => OnlyQuondams && !MultipleSelections,
@@ -2405,6 +2409,16 @@ namespace TwoTrails.ViewModels
         {
             PointDetailsDialog.ShowDialog(SelectedPoints.Cast<TtPoint>().ToList(), Project.MainModel.MainWindow);
         }
+
+        private void ViewSafeInfo()
+        {
+            List<TtPoint> points = GetSortedSelectedPoints(pt => pt.IsGpsType());
+
+            if (points.Count > 0)
+                ViewSatInfoDialog.ShowDialog(GetSortedSelectedPoints(), Manager, Project.MainModel.MainWindow);
+            else
+                MessageBox.Show("No GPS type points selected");
+        }
         #endregion
 
         #region Selections
@@ -2532,16 +2546,20 @@ namespace TwoTrails.ViewModels
                 
                 CreateDataGridTextColumn(nameof(GpsPoint.Latitude), stringFormat: defaultNumberLongFormat, visibility: Visibility.Collapsed),
                 CreateDataGridTextColumn(nameof(GpsPoint.Longitude), stringFormat: defaultNumberLongFormat, visibility: Visibility.Collapsed),
-                CreateDataGridTextColumn("Elev (M)", nameof(GpsPoint.Elevation), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn("Elev", nameof(GpsPoint.Elevation), stringFormat: defaultNumberFormat,
+                    converter: new MetadataValueConverter() { Metadata = Manager.DefaultMetadata, MetadataPropertyName = MetadataPropertyName.Elevation }, visibility: Visibility.Collapsed),
                 CreateDataGridTextColumn(nameof(IManualAccuracy.ManualAccuracy), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
 
                 CreateDataGridTextColumn("Fwd Az", nameof(TravPoint.FwdAzimuth), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
                 CreateDataGridTextColumn("Back Az", nameof(TravPoint.BkAzimuth), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
                 CreateDataGridTextColumn("Azimuth", nameof(TravPoint.Azimuth), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
-                CreateDataGridTextColumn("Slp Dist", nameof(TravPoint.SlopeDistance), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
-                CreateDataGridTextColumn("Slp Ang", nameof(TravPoint.SlopeAngle), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
-                CreateDataGridTextColumn("Horiz Dist", nameof(TravPoint.HorizontalDistance), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
-                
+                CreateDataGridTextColumn("Slp Dist", nameof(TravPoint.SlopeDistance), stringFormat: defaultNumberFormat,
+                    converter: new MetadataValueConverter() { Metadata = Manager.DefaultMetadata, MetadataPropertyName = MetadataPropertyName.Distance }, visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn("Slp Ang", nameof(TravPoint.SlopeAngle), stringFormat: defaultNumberFormat,
+                    converter: new MetadataValueConverter() { Metadata = Manager.DefaultMetadata, MetadataPropertyName = MetadataPropertyName.SlopeAngle }, visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn("Horiz Dist", nameof(TravPoint.HorizontalDistance), stringFormat: defaultNumberFormat,
+                    converter: new MetadataValueConverter() { Metadata = Manager.DefaultMetadata, MetadataPropertyName = MetadataPropertyName.Distance }, visibility: Visibility.Collapsed),
+
                 CreateDataGridTextColumn("Parent", nameof(QuondamPoint.ParentPoint), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
 
                 CreateDataGridTextColumn("QndmLink", nameof(TtPoint.HasQuondamLinks)),
@@ -2551,14 +2569,14 @@ namespace TwoTrails.ViewModels
         }
 
         private Tuple<DataGridTextColumn, string> CreateDataGridTextColumn(String name, string binding = null,
-            int? width = null, string stringFormat = null, Visibility visibility = Visibility.Visible)
+            int? width = null, string stringFormat = null, IValueConverter converter = null, Visibility visibility = Visibility.Visible)
         {
             DataGridTextColumn dataGridTextColumn = new DataGridTextColumn()
             {
                 IsReadOnly = true,
                 Width = width ?? DataGridLength.Auto,
                 Visibility = visibility,
-                Binding = new Binding(binding ?? name) { StringFormat = stringFormat }
+                Binding = new Binding(binding ?? name) { StringFormat = stringFormat, Converter = converter }
             };
 
             dataGridTextColumn.Header = new ColumnHeader()

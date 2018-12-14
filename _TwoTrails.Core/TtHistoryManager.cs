@@ -48,6 +48,19 @@ namespace TwoTrails.Core
         public TtHistoryManager(TtManager manager)
         {
             BaseManager = manager;
+
+            DefaultMetadata.PropertyChanged += (s, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(TtMetadata.Zone):
+                    case nameof(TtMetadata.Slope):
+                    case nameof(TtMetadata.Distance):
+                    case nameof(TtMetadata.Elevation):
+                        OnHistoryChanged(HistoryEventType.Reset, true);
+                        break;
+                }
+            };
         }
 
 
@@ -396,6 +409,11 @@ namespace TwoTrails.Core
         List<TtNmeaBurst> ITtManager.GetNmeaBursts(string pointCN)
         {
             return BaseManager.GetNmeaBursts(pointCN);
+        }
+
+        List<TtNmeaBurst> ITtManager.GetNmeaBursts(IEnumerable<string> pointCNs)
+        {
+            return BaseManager.GetNmeaBursts(pointCNs);
         }
 
         void ITtManager.AddNmeaBurst(TtNmeaBurst burst)
