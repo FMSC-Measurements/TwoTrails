@@ -48,7 +48,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LogDeckVolume" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="LogDeckDistance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>

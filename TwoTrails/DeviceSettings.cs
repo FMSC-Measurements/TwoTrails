@@ -77,7 +77,7 @@ namespace TwoTrails
             set
             {
                 SetField(ref _LogDeckCollarWidth, value);
-                Properties.Settings.Default[LOG_DECK_COLLAR_WIDTH] = (int)value;
+                Properties.Settings.Default[LOG_DECK_COLLAR_WIDTH] = (double)value;
                 Properties.Settings.Default.Save();
             }
         }
@@ -91,7 +91,7 @@ namespace TwoTrails
             set
             {
                 SetField(ref _LogDeckLength, value);
-                Properties.Settings.Default[LOG_DECK_LENGTH] = (int)value;
+                Properties.Settings.Default[LOG_DECK_LENGTH] = (double)value;
                 Properties.Settings.Default.Save();
             }
         }
@@ -104,7 +104,7 @@ namespace TwoTrails
             set
             {
                 SetField(ref _LogDeckDefect, value);
-                Properties.Settings.Default[LOG_DECK_DEFECT] = (int)value;
+                Properties.Settings.Default[LOG_DECK_DEFECT] = (double)value;
                 Properties.Settings.Default.Save();
             }
         }
@@ -118,7 +118,7 @@ namespace TwoTrails
             set
             {
                 SetField(ref _LogDeckVoid, value);
-                Properties.Settings.Default[LOG_DECK_VOID] = (int)value;
+                Properties.Settings.Default[LOG_DECK_VOID] = (double)value;
                 Properties.Settings.Default.Save();
             }
         }

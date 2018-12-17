@@ -43,7 +43,7 @@ namespace TwoTrails.ViewModels
             });
         }
 
-
+        private double areaMt;
         public double Area { get => Get<double>(); set => Set(value); }
         public double Perimeter { get => Get<double>(); set => Set(value); }
         public double FaceArea { get => Get<double>(); set => Set(value); } // = area + collar area
@@ -84,13 +84,12 @@ namespace TwoTrails.ViewModels
         private void CalculateDeck(TtPolygon polygon)
         {
             DeckPolygon = polygon;
-            List<TtPoint> points = _Project.DAL.GetPoints(DeckPolygon.CN)
-                .Where(pt => pt.OnBoundary).ToList();
+            List<TtPoint> points = _Project.Manager.GetPoints(DeckPolygon.CN).Where(pt => pt.OnBoundary).ToList();
 
             List<Point> LzPoints = new List<Point>();
             var fpt = points[0];
 
-            foreach (var pt in _Project.DAL.GetPoints(DeckPolygon.CN))
+            foreach (var pt in points)
                 LzPoints.Add(new Point(pt.AdjZ, MathEx.Distance(fpt.AdjX, fpt.AdjY, pt.AdjX, pt.AdjY)));
 
             LzPoints.Add(LzPoints[0]);
@@ -107,7 +106,7 @@ namespace TwoTrails.ViewModels
                 area += (p2.X - p1.X) * (p2.Y + p1.Y);
             }
 
-            Area = Math.Abs(area) / 2d;
+            areaMt = Math.Abs(area) / 2d;
             Perimeter = perim;
 
             UpdateVolume();
@@ -117,6 +116,8 @@ namespace TwoTrails.ViewModels
         {
             if (DeckPolygon != null)
             {
+
+                Area = Convert.Distance(areaMt, Distance, Distance.Meters);
                 FaceArea = Area + (Convert.Distance(CollarWidth, Distance.Meters, Distance) * Perimeter);
                 GrossVolume = Convert.Volume(FaceArea * Convert.Distance(LogLength, Distance.Meters, Distance), Volume, Volume.CubicMeter);
                 NetVolume = GrossVolume * (1 - Defect / 100d) * (1 - Void / 100d);
