@@ -9,7 +9,6 @@ namespace TwoTrails.Core.Points
     public delegate void PointChangedEvent(TtPoint point);
     public delegate void PointPolygonChangedEvent(TtPoint point, TtPolygon newPolygon, TtPolygon oldPolygon);
     public delegate void PointMetadataChangedEvent(TtPoint point, TtMetadata newMetadata, TtMetadata oldMetadata);
-    public delegate void PointIndexChangedEvent(TtPoint point, int newIndex, int oldIndex);
 
     public abstract class TtPoint : TtObject, IAccuracy, IEquatable<TtPoint>, IComparable<TtPoint>, IComparer<TtPoint>
     {
@@ -19,7 +18,6 @@ namespace TwoTrails.Core.Points
         public event PointChangedEvent OnAccuracyChanged;
         public event PointPolygonChangedEvent PolygonChanged;
         public event PointMetadataChangedEvent MetadataChanged;
-        public event PointIndexChangedEvent PointIndexChanged;
 
 
         #region Properties
@@ -27,7 +25,7 @@ namespace TwoTrails.Core.Points
         public Int32 Index
         {
             get { return _Index; }
-            set { int oldIndex = _Index; SetField(ref _Index, value, () => PointIndexChanged?.Invoke(this, value, oldIndex)); }
+            set { SetField(ref _Index, value); }
         }
 
         private Int32 _PID;
@@ -131,7 +129,7 @@ namespace TwoTrails.Core.Points
         }
 
         private bool _OnBoundary;
-        public bool OnBoundary
+        public virtual bool OnBoundary
         {
             get { return _OnBoundary; }
             set { SetField(ref _OnBoundary, value, () => OnBoundaryChanged?.Invoke(this)); }

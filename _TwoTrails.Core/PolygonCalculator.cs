@@ -35,8 +35,7 @@ namespace TwoTrails.Core
             {
                 throw new Exception("Input points are not a polygon.");
             }
-
-
+            
             polyCorners = nPoints.Count;
             polyX = new double[polyCorners];
             polyY = new double[polyCorners];

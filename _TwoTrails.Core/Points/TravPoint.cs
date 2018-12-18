@@ -218,19 +218,13 @@ namespace TwoTrails.Core.Points
 
         protected Double AzimuthModule(Double value)
         {
-            double v = (double)value;
-            double integerPart = Math.Floor(v);
-            double fraction = v - integerPart;
-
-            return (integerPart % 360) + fraction;
+            double integerPart = Math.Floor(value);
+            return (integerPart % 360) + value - integerPart;
         }
 
         protected Double? AzimuthModule(Double? value)
         {
-            if (value == null)
-                return value;
-
-            return AzimuthModule((double)value);
+            return (value != null) ? (double?)AzimuthModule((double)value) : null;
         }
 
 

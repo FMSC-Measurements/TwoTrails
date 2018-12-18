@@ -84,7 +84,7 @@ namespace TwoTrails.ViewModels
         private void CalculateDeck(TtPolygon polygon)
         {
             DeckPolygon = polygon;
-            List<TtPoint> points = _Project.Manager.GetPoints(DeckPolygon.CN).Where(pt => pt.OnBoundary).ToList();
+            List<TtPoint> points = _Project.Manager.GetPoints(DeckPolygon.CN).Where(pt => pt.IsBndPoint()).ToList();
 
             List<Point> LzPoints = new List<Point>();
             var fpt = points[0];

@@ -107,7 +107,7 @@ namespace TwoTrails.Core
 
                     if (curr.OpType == OpType.SideShot)
                     {
-                        (curr as SideShotPoint).Adjust(last);
+                        ((SideShotPoint)curr).Adjust(last);
                     }
                     else if (curr.OpType == OpType.Traverse)
                     {
@@ -128,7 +128,7 @@ namespace TwoTrails.Core
             {
                 if (point.OpType == OpType.Traverse)
                 {
-                    (point as TravPoint).Calculate(last.UnAdjX, last.UnAdjY, last.UnAdjZ, false);
+                    ((TravPoint)point).Calculate(last.UnAdjX, last.UnAdjY, last.UnAdjZ, false);
                 }
 
                 last = point;

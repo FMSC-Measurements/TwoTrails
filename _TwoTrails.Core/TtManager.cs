@@ -59,7 +59,7 @@ namespace TwoTrails.Core
 
         public int PointCount => _Points.Count;
 
-        private object locker = new object();
+        private readonly object locker = new object();
         
 
         public TtManager(ITtDataLayer dal, ITtMediaLayer mal, ITtSettings settings)
