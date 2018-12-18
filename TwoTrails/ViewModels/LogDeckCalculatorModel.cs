@@ -117,10 +117,11 @@ namespace TwoTrails.ViewModels
             if (DeckPolygon != null)
             {
 
+                double faceAreaMt = Convert.Distance(CollarWidth, Distance.Meters, Distance) * Perimeter;
                 Area = Convert.Distance(areaMt, Distance, Distance.Meters);
-                FaceArea = Area + (Convert.Distance(CollarWidth, Distance.Meters, Distance) * Perimeter);
-                GrossVolume = Convert.Volume(FaceArea * Convert.Distance(LogLength, Distance.Meters, Distance), Volume, Volume.CubicMeter);
-                NetVolume = GrossVolume * (1 - Defect / 100d) * (1 - Void / 100d);
+                FaceArea = Area + Convert.Distance(faceAreaMt, Distance, Distance.Meters);
+                GrossVolume = Convert.Volume(faceAreaMt * Convert.Distance(LogLength, Distance.Meters, Distance), Volume, Volume.CubicMeter);
+                NetVolume = GrossVolume * (1 - (Defect + Void) / 100d);
             }
         }
     }
