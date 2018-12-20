@@ -32,12 +32,12 @@ namespace TwoTrails
         private bool _SplitToIndividualPolys;
         public bool SplitToIndividualPolys
         {
-            get { return _DeleteExistingPlots; }
+            get { return _SplitToIndividualPolys; }
 
             set
             {
                 SetField(ref _SplitToIndividualPolys, value);
-                Properties.Settings.Default[DELETE_EXISTING_PLOTS] = value;
+                Properties.Settings.Default[SPLIT_INTO_INDIVIDUAL_POLYS] = value;
                 Properties.Settings.Default.Save();
             }
         }

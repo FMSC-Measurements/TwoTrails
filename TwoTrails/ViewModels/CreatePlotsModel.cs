@@ -21,7 +21,7 @@ namespace TwoTrails.ViewModels
     {
         private ITtManager _Manager;
 
-        public TtSettings Settings { get; }
+        private TtSettings _Settings { get; }
 
         public ICommand GenerateCommand { get; }
         public ICommand CloseCommand { get; }
@@ -37,7 +37,6 @@ namespace TwoTrails.ViewModels
         public List<TtPolygon> ExcludedPolygons;
 
         public bool MultiplePolysIncluded { get { return IncludedPolygons.Count > 1; } }
-        public bool SplitMultiPolys { get; set; }
 
         public ObservableCollection<TtPoint> Points
         {
@@ -67,13 +66,25 @@ namespace TwoTrails.ViewModels
 
         public bool IsGenerating { get { return Get<bool>(); } set { Set(value); } }
 
-        public bool SplitToIndividualPolys { get { return Get<bool>(); } set { Set(value); } }
+        public bool SplitToIndividualPolys {
+            get => _Settings.DeviceSettings.SplitToIndividualPolys;
+            set => Set(value, () => {
+                if (_Settings.DeviceSettings is DeviceSettings ds) { ds.SplitToIndividualPolys = value; }
+            });
+        }
+        public bool DeleteExistingPlots
+        {
+            get => _Settings.DeviceSettings.DeleteExistingPlots;
+            set => Set(value, () => {
+                if (_Settings.DeviceSettings is DeviceSettings ds) { ds.DeleteExistingPlots = value; }
+            });
+        }
 
 
         public CreatePlotsModel(TtProject project, Window window)
         {
             _Manager = project.Manager;
-            Settings = project.Settings;
+            _Settings = project.Settings;
 
             InclusionPolygonsSelectedCommand = new RelayCommand(x => InclusionPolygonsSelected(x as IList));
             ExclusionPolygonsSelectedCommand = new RelayCommand(x => ExclusionPolygonsSelected(x as IList));
@@ -121,7 +132,7 @@ namespace TwoTrails.ViewModels
                     ExclusionPolygons.Add(poly);
             }
 
-            OnPropertyChanged(nameof(MultiplePolysIncluded), nameof(SplitMultiPolys));
+            OnPropertyChanged(nameof(MultiplePolysIncluded), nameof(SplitToIndividualPolys));
         }
 
         private void ExclusionPolygonsSelected(IList selectedItems)
@@ -180,7 +191,7 @@ namespace TwoTrails.ViewModels
                 return;
             }
 
-            if (!SplitMultiPolys)
+            if (!SplitToIndividualPolys || IncludedPolygons.Count < 2)
             {
                 List<TtPolygon> polygons = _Manager.GetPolygons();
                 string gPolyName = GeneratedPolyName(IncludedPolygons);
@@ -199,7 +210,7 @@ namespace TwoTrails.ViewModels
 
                 if (poly != null)
                 {
-                    if (!Settings.DeviceSettings.DeleteExistingPlots)
+                    if (!_Settings.DeviceSettings.DeleteExistingPlots)
                     {
                         if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                         {
