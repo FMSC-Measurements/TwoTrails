@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMSC.GeoSpatial.NMEA;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,6 +44,47 @@ namespace TwoTrails.Dialogs
         private void Close_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (dgNmea.SelectedItem is TtNmeaBurst burst)
+            {
+                DrawSatInfo(burst);
+            }
+        }
+
+        private void DrawSatInfo(TtNmeaBurst burst)
+        {
+            cvsSatInfo.Children.Clear();
+
+            double width = cvsSatInfo.Width, height = cvsSatInfo.Height;
+
+
+            if (burst.SatellitesInView != null)
+            {
+
+                foreach (Satellite sat in burst.SatellitesInView)
+                {
+                    if (sat.Azimuth != null && sat.Elevation != null)
+                    {
+                        Image image = new Image();
+
+                        cvsSatInfo.Children.Add(image);
+
+                        Canvas.SetTop(image, 0);
+                        Canvas.SetLeft(image, 0);
+                    }
+
+
+                    if (sat.SRN != null)
+                    {
+
+                    }
+                }
+            }
+
+
         }
     }
 }

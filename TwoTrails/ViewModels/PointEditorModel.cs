@@ -1576,7 +1576,7 @@ namespace TwoTrails.ViewModels
 
                                     if (oval == null)
                                         _ExtendedData[id] = pval;
-                                    else if (!pval.Equals(oval))
+                                    else if (pval == null || !pval.Equals(oval))
                                     {
                                         _ExtendedDataSame[id] = false;
                                         _ExtendedData[id] = null;

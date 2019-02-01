@@ -24,7 +24,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <DataGrid Grid.Column="0" Grid.RowSpan="2"
+        <DataGrid Name="dgNmea"
+            Grid.Column="0" Grid.RowSpan="2"
             ItemsSource="{Binding Bursts}"
             AutoGenerateColumns="False"
             CanUserResizeRows="False" CanUserSortColumns="False"
@@ -37,7 +38,7 @@
             BorderThickness="0"
             SelectionMode="Single"
             SelectionUnit="FullRow"
-            IsReadOnly="True">
+            IsReadOnly="True" SelectionChanged="DataGrid_SelectionChanged">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Fix Time" Binding="{Binding FixTime}" />
@@ -61,7 +62,7 @@
 
         <GridSplitter Grid.Column="1"/>
 
-        <Canvas Grid.Column="2">
+        <Canvas Name="cvsSatInfo" Grid.Column="2">
             
         </Canvas>
 
