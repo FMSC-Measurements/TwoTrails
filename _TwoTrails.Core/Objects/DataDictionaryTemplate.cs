@@ -147,10 +147,14 @@ namespace TwoTrails.Core
                 this.Flags == other.Flags &&
                 this.DataType == other.DataType &&
                 this.ValueRequired == other.ValueRequired &&
-                (!(this.Values != null ^ other.Values != null) &&
+                ((this.Values == null) == (other.Values == null) &&
                     (this.Values == null || (this.Values.Count == other.Values.Count && this.Values.SequenceEqual(other.Values)))) &&
-                (!(this.DefaultValue != null ^ other.DefaultValue != null) &&
+                ((this.DefaultValue == null) == (other.DefaultValue == null) &&
                     (this.DefaultValue == null || this.DefaultValue.Equals(other.DefaultValue)));
+            //(!(this.Values != null ^ other.Values != null) &&
+            //    (this.Values == null || (this.Values.Count == other.Values.Count && this.Values.SequenceEqual(other.Values)))) &&
+            //(!(this.DefaultValue != null ^ other.DefaultValue != null) &&
+            //    (this.DefaultValue == null || this.DefaultValue.Equals(other.DefaultValue)));
 
         }
         

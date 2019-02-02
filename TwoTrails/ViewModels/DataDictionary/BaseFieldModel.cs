@@ -137,10 +137,14 @@ namespace TwoTrails.ViewModels.DataDictionary
                 this.Flags == bfm.Flags &&
                 this.DataType == bfm.DataType &&
                 this.ValueRequired == bfm.ValueRequired &&
-                (!(this.Values != null ^ bfm.Values != null) &&
+                ((this.Values == null) == (bfm.Values == null) &&
                     (this.Values == null || (this.Values.Count == bfm.Values.Count && this.Values.SequenceEqual(bfm.Values)))) &&
-                (!(this.DefaultValue != null ^ bfm.DefaultValue != null) &&
+                ((this.DefaultValue == null) == (bfm.DefaultValue == null) &&
                     (this.DefaultValue == null || this.DefaultValue.Equals(bfm.DefaultValue)));
+            //(!(this.Values != null ^ bfm.Values != null) &&
+            //    (this.Values == null || (this.Values.Count == bfm.Values.Count && this.Values.SequenceEqual(bfm.Values)))) &&
+            //(!(this.DefaultValue != null ^ bfm.DefaultValue != null) &&
+            //    (this.DefaultValue == null || this.DefaultValue.Equals(bfm.DefaultValue)));
         }
 
         public bool Equals(DataDictionaryField other)
