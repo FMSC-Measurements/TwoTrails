@@ -450,7 +450,7 @@ namespace TwoTrails.DAL
                 tmp = tmp.Substring(tmp.IndexOf("nad"), 21);
                 if (tmp.Contains("zone"))
                 {
-                    tmp = tmp.Substring(tmp.IndexOf("zone") + 5, 2);
+                    tmp = new string(tmp.Substring(tmp.IndexOf("zone") + 5, 2).Where(Char.IsDigit).ToArray());
                     
                     if (Int32.TryParse(tmp, out int zone))
                         return zone;

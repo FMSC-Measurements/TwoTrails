@@ -236,12 +236,30 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
         public void SetupShapeFiles(IEnumerable<string> shapefiles)
         {
-            ImportControl = new ImportControl(
-                        new TtShapeFileDataAccessLayer(
-                            new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
-                        )
-                    );
-            IsSettingUp = true;
+            List<TtShapeFileDataAccessLayer.ShapeFileValidityResult> invalids =
+                shapefiles.Select(sf => TtShapeFileDataAccessLayer.ValidateShapePackage(sf, _Manager.DefaultMetadata.Zone))
+                .Where(r => r != TtShapeFileDataAccessLayer.ShapeFileValidityResult.Valid).ToList();
+
+            if (invalids.Count > 0)
+            {
+                if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.MissingFiles))
+                    MessageBox.Show("Missing one many of the 'shp', 'prj', 'dbf', or 'shx' files.");
+                else if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.NotNAD83))
+                    MessageBox.Show("Shape File is not in the NAD83 format.");
+                else if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.MismatchZone))
+                    MessageBox.Show($"Shape File is not in zone {_Manager.DefaultMetadata.Zone}.");
+                else
+                    MessageBox.Show("Issue with shapefile(s).");
+            }
+            else
+            {
+                ImportControl = new ImportControl(
+                            new TtShapeFileDataAccessLayer(
+                                new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
+                            )
+                        );
+                IsSettingUp = true;
+            }
         }
 
         public void ImportData()
