@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using TwoTrails.Core;
 using TwoTrails.Utils;
 using TwoTrails.ViewModels;
 
@@ -52,16 +53,17 @@ namespace TwoTrails
             {
                 if (MainModel.CurrentProject == null)
                 {
-                    if (files.All(f => TtUtils.IsImportableFileType(f)))
+                    if (files.All(file => TtUtils.IsImportableFileType(file) && !file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase)))
                     {
                         MainModel.CreateAndOpenProjectFromImportable(null, files);
                     }
-                    else
+
+                    foreach (string file in files)
                     {
-                        foreach (string file in files)
-                        {
+                        if (file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
                             MainModel.OpenProject(file);
-                        }
+                        else if (TtUtils.IsImportableFileType(file))
+                            MainModel.CreateAndOpenProjectFromImportable(null, file);
                     }
                 }
                 else

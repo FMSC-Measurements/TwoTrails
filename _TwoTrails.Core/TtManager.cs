@@ -786,10 +786,9 @@ namespace TwoTrails.Core
             {
                 IgnorePointEvents = true;
 
-                foreach (TtPoint p in _PointsByPoly[poly.CN].Where(p => p.IsGpsType()))
+                foreach (GpsPoint p in _PointsByPoly[poly.CN].Where(p => p.IsGpsType()))
                 {
-                    p.SetAdjLocation(p.UnAdjX, p.UnAdjY, p.UnAdjZ);
-                    p.SetAccuracy(poly.Accuracy);
+                    p.Adjust();
                 }
 
                 AdjustAllTravTypesInPolygon(poly);

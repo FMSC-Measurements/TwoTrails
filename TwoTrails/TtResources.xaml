@@ -64,9 +64,11 @@
 
 
     <x:Array x:Key="arrGps" Type="sys:String" >
+        <sys:String>EOS Arrow</sys:String>
         <sys:String>Juniper Allegro 2</sys:String>
         <sys:String>Juniper Allegro MX</sys:String>
         <sys:String>Juniper Archer 2</sys:String>
+        <sys:String>Juniper Geode</sys:String>
         <sys:String>Juniper Mesa</sys:String>
         <sys:String>QStarz 1000XT</sys:String>
         <sys:String>Trimble Geo 7X</sys:String>
@@ -89,7 +91,6 @@
         <sys:String>Impulse Other</sys:String>
         <sys:String>TruPulse 200</sys:String>
         <sys:String>TruPulse 360</sys:String>
-        <sys:String>TruPulse Other</sys:String>
         <sys:String>Logger Tape</sys:String>
         <sys:String>Nylon Tape</sys:String>
         <sys:String>Chains</sys:String>

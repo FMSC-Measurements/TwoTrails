@@ -15,6 +15,8 @@ namespace TwoTrails.Mapping
 {
     public class TtMapPolygonManager : NotifyPropertyChangedEx
     {
+        private const double BOUNDARY_ZOOM_MARGIN = 0.00035;
+
         public event MapPointSelectedEvent PointSelected;
 
         public ICommand ZoomToPolygonCommand { get; }
@@ -335,8 +337,8 @@ namespace TwoTrails.Mapping
                 if (Points.Any())
                     Map.SetView(
                         new LocationRect(
-                            new Location(Extents.North, Extents.West),
-                            new Location(Extents.South, Extents.East)));
+                            new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BOUNDARY_ZOOM_MARGIN),
+                            new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN)));
             });
         }
 
@@ -400,12 +402,15 @@ namespace TwoTrails.Mapping
                 LocationCollection adjNavLocs = new LocationCollection();
                 LocationCollection unadjNavLocs = new LocationCollection();
 
+                Extent.Builder builder = new Extent.Builder();
+
                 foreach (TtMapPoint p in Points.OrderBy(p => p.Index))
                 {
                     if (p.IsBndPoint)
                     {
                         adjBndLocs.Add(p.AdjLocation);
                         unadjBndLocs.Add(p.UnAdjLocation);
+                        builder.Include(p.AdjLocation.Latitude, p.AdjLocation.Longitude);
                     }
 
                     if (p.IsNavPoint)
@@ -415,11 +420,13 @@ namespace TwoTrails.Mapping
                     }
                 }
 
+                Extents = builder.HasPositions ? builder.Build() : null;
+
                 AdjBoundary.UpdateLocations(adjBndLocs);
                 UnAdjBoundary.UpdateLocations(unadjBndLocs);
 
                 AdjNavigation.UpdateLocations(adjNavLocs);
-                UnAdjNavigation.UpdateLocations(unadjNavLocs); 
+                UnAdjNavigation.UpdateLocations(unadjNavLocs);
             }
         }
         

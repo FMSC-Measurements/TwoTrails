@@ -1623,7 +1623,7 @@ namespace TwoTrails.DAL
         #region TTNmea
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
-            return GetNmeaBursts(new string[] { pointCN });
+            return GetNmeaBursts(pointCN != null ? new string[] { pointCN } : null);
         }
 
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)

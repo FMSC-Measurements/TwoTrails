@@ -166,6 +166,15 @@ namespace TwoTrails.Core.Points
             SetUnAdjLocation(coords.X, coords.Y, elev);
         }
 
+        internal void Adjust()
+        {
+            if (HasLatLon)
+                SetUnAdjLocation((double)Latitude, (double)Longitude, Metadata.Zone, Elevation ?? 0);
+            else
+                SetUnAdjLocation(this);
+
+            SetAccuracy(Polygon.Accuracy);
+        }
 
         public override bool Equals(object obj)
         {
