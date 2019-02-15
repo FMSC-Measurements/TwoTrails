@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Fortest Management Service Center")]
 [assembly: AssemblyProduct("TwoTrails.Core.Windows")]
-[assembly: AssemblyCopyright("Copyright © USDA Forest Service 2018")]
+[assembly: AssemblyCopyright("Copyright © USDA Forest Service 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

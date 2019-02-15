@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Fortest Management Service Center")]
 [assembly: AssemblyProduct("TwoTrails")]
-[assembly: AssemblyCopyright("Copyright © USDA Forest Service 2018")]
+[assembly: AssemblyCopyright("Copyright © USDA Forest Service 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
