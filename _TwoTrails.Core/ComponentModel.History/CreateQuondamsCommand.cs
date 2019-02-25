@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using TwoTrails.Core.Points;
 
@@ -14,7 +15,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private AddTtPointsCommand addPointsCmd;
 
 
-        public CreateQuondamsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex, bool? bndMode = null) : base(points)
+        public CreateQuondamsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
         {
             this.pointsManager = pointsManager;
 
@@ -39,22 +40,25 @@ namespace TwoTrails.Core.ComponentModel.History
 
             foreach (TtPoint point in Points)
             {
-                qp = new QuondamPoint()
+                if (point.OnBoundary || bndMode != QuondamBoundaryMode.OBO)
                 {
-                    PID = PointNamer.NamePoint(TargetPolygon, prevPoint),
-                    Index = index++,
-                    ParentPoint = point.OpType == OpType.Quondam ? ((QuondamPoint)point).ParentPoint : point,
-                    Polygon = TargetPolygon,
-                    Metadata = pointsManager.DefaultMetadata,
-                    Group = pointsManager.MainGroup,
-                    OnBoundary = (bndMode == null) ? point.OnBoundary : bndMode == true
-                };
+                    qp = new QuondamPoint()
+                    {
+                        PID = PointNamer.NamePoint(TargetPolygon, prevPoint),
+                        Index = index++,
+                        ParentPoint = point.OpType == OpType.Quondam ? ((QuondamPoint)point).ParentPoint : point,
+                        Polygon = TargetPolygon,
+                        Metadata = pointsManager.DefaultMetadata,
+                        Group = pointsManager.MainGroup,
+                        OnBoundary = (bndMode == QuondamBoundaryMode.Inherit) ? point.OnBoundary : (bndMode == QuondamBoundaryMode.On)
+                    };
 
-                qp.SetAccuracy(TargetPolygon.Accuracy);
+                    qp.SetAccuracy(TargetPolygon.Accuracy);
 
-                addPoints.Add(qp);
+                    addPoints.Add(qp);
 
-                prevPoint = qp;
+                    prevPoint = qp;
+                }
             }
 
             if (StartIndex < polyPoints.Count)
@@ -87,5 +91,17 @@ namespace TwoTrails.Core.ComponentModel.History
 
             addPointsCmd.Undo();
         }
+    }
+
+    public enum QuondamBoundaryMode
+    {
+        [Description("(On Boundary Only) Quondams only created for points that are on the Boundary")]
+        OBO = 0,
+        [Description("Quondam inherits the parents OnBoundary")]
+        Inherit = 1,
+        [Description("Quondam will be On the Boundarys")]
+        On = 2,
+        [Description("Quondam will be Off the Boundary")]
+        Off = 3
     }
 }

@@ -188,9 +188,9 @@ namespace TwoTrails.Utils
                 case Consts.KMZ_EXT:
                 case Consts.GPX_EXT:
                 case Consts.SHAPE_EXT:
-                case Consts.SHAPE_PRJ_EXT:
-                case Consts.SHAPE_SHX_EXT:
-                case Consts.SHAPE_DBF_EXT:
+                //case Consts.SHAPE_PRJ_EXT:
+                //case Consts.SHAPE_SHX_EXT:
+                //case Consts.SHAPE_DBF_EXT:
                 case Consts.FILE_EXTENSION:
                 case Consts.FILE_EXTENSION_V2:
                     return true;

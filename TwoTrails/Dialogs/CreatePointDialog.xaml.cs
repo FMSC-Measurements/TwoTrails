@@ -143,7 +143,8 @@ namespace TwoTrails.Dialogs
                             TtMetadata meta = cboMeta.SelectedItem as TtMetadata;
                             TtGroup group = cboGroup.SelectedItem as TtGroup;
 
-                            TtPoint prevPoint = null;
+                            TtPoint prevPoint = null, nextPoint = null;
+
                             int index = 0;
 
                             if (cboPolyPoints.Items.Count > 0)
@@ -152,7 +153,13 @@ namespace TwoTrails.Dialogs
                                 {
                                     index = cboPolyPoints.SelectedIndex;
                                     prevPoint = cboPolyPoints.Items.GetItemAt(index) as TtPoint;
+
                                     index++;
+
+                                    if (index < cboPolyPoints.Items.Count)
+                                    {
+                                        nextPoint = cboPolyPoints.Items.GetItemAt(index) as TtPoint;
+                                    }
                                 }
                                 else if (rbInsEnd.IsChecked == true)
                                 {
@@ -175,7 +182,12 @@ namespace TwoTrails.Dialogs
                             }
 
                             if (pidIsEmpty)
+                            {
                                 pid = PointNamer.NamePoint(poly, prevPoint);
+
+                                if (nextPoint != null && nextPoint.PID < pid)
+                                    pid = prevPoint.PID + 1;
+                            }
 
                             bool onBnd = chkBnd.IsChecked == true;
 

@@ -298,7 +298,7 @@ namespace TwoTrails.Core
         #endregion
 
 
-        public void CreateQuondamLinks(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, bool? bndMode = null, bool reverse = false)
+        public void CreateQuondamLinks(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit, bool reverse = false)
         {
             AddCommand(new CreateQuondamsCommand(reverse ? points.Reverse() : points, BaseManager, targetPolygon, insertIndex, bndMode));
         }

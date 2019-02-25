@@ -57,13 +57,15 @@ namespace TwoTrails
                     {
                         MainModel.CreateAndOpenProjectFromImportable(null, files);
                     }
-
-                    foreach (string file in files)
+                    else
                     {
-                        if (file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
-                            MainModel.OpenProject(file);
-                        else if (TtUtils.IsImportableFileType(file))
-                            MainModel.CreateAndOpenProjectFromImportable(null, file);
+                        foreach (string file in files)
+                        {
+                            if (file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
+                                MainModel.OpenProject(file);
+                            else if (TtUtils.IsImportableFileType(file))
+                                MainModel.CreateAndOpenProjectFromImportable(null, file);
+                        }
                     }
                 }
                 else

@@ -152,17 +152,10 @@ namespace TwoTrails.Mapping
             ignoreChanges = true;
 
             bool value = (bool)propertyInfo.GetValue(polyMapManager);
-
-            if ((field == true && !value) || (field == false && value))
-                field = null;
-            else if (Visible == null)
-            {
-                bool allAreVis = PolygonManagers.All(pm => (bool)propertyInfo.GetValue(pm));
-                bool allNotVis = PolygonManagers.All(pm => !(bool)propertyInfo.GetValue(pm));
-                field = allAreVis || allNotVis ? (bool?)allAreVis : null;
-            }
-            else
-                field = value;
+            
+            bool allAreVis = PolygonManagers.All(pm => (bool)propertyInfo.GetValue(pm));
+            bool allNotVis = PolygonManagers.All(pm => !(bool)propertyInfo.GetValue(pm));
+            field = allAreVis || allNotVis ? (bool?)allAreVis : null;
 
             OnPropertyChanged(propertyInfo.Name);
 

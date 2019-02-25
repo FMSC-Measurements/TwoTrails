@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
+using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.ViewModels
@@ -24,9 +25,7 @@ namespace TwoTrails.ViewModels
         public int InsertIndex { get { return Get<int>(); } set { Set(value); } }
         public List<TtPoint> AfterPoints { get { return Get<List<TtPoint>>(); } set { Set(value); } }
 
-        public bool OnBoundary { get { return Get<bool>(); } set { Set(value); } }
-        public bool OffBoundary { get { return Get<bool>(); } set { Set(value); } }
-
+        public QuondamBoundaryMode BoundaryMode { get { return Get<QuondamBoundaryMode>(); } set { Set(value); } }
         public bool InsertBegining { get { return Get<bool>(); } set { Set(value); } }
         public bool InsertAfter { get { return Get<bool>(); } set { Set(value); } }
 
@@ -130,8 +129,7 @@ namespace TwoTrails.ViewModels
                     }
 
                     _Manager.CreateQuondamLinks(retracePoints, TargetPolygon, 
-                        InsertBegining ? 0 : InsertAfter ? InsertIndex : int.MaxValue, 
-                        OnBoundary || OffBoundary ? (bool?)OnBoundary : null);
+                        InsertBegining ? 0 : InsertAfter ? InsertIndex : int.MaxValue, BoundaryMode);
 
                     return true;
                 } 

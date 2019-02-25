@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using TwoTrails.Core;
+using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Dialogs
@@ -70,7 +71,7 @@ namespace TwoTrails.Dialogs
 
                     if (rbActQuondam.IsChecked == true)
                     {
-                        _Manager.CreateQuondamLinks(_Points, TargetPoly, index, null, reverse);
+                        _Manager.CreateQuondamLinks(_Points, TargetPoly, index, QuondamBoundaryMode.Inherit, reverse);
                     }
                     else
                     {

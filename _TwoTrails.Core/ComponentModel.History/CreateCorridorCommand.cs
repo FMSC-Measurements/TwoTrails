@@ -18,7 +18,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 ssPoints = ssPoints.TakeWhile(p => p.CN != lastPoint.CN);
             
             editPoints = new EditTtPointsCommand(ssPoints, PointProperties.BOUNDARY, false);
-            createQuondams = new CreateQuondamsCommand(ssPoints.Reverse(), pointsManager, targetPolygon, int.MaxValue, true);
+            createQuondams = new CreateQuondamsCommand(ssPoints.Reverse(), pointsManager, targetPolygon, int.MaxValue, QuondamBoundaryMode.On);
         }
 
         public override void Redo()
