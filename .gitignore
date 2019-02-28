@@ -28,6 +28,5 @@ packages/
 *.csproj.user
 
 TwoTrails/ApiKeys.cs
-TwoTrailsSetup/Debug/
-TwoTrailsSetup/Release/
+Installer/*
 DvlErrLog.txt

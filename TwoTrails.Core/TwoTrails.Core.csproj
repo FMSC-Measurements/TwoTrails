@@ -1,18 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Fortest Management Service Center</Authors>
     <Copyright>Copyright © USDA Forest Service 2018</Copyright>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <Version>1.1.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
-
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
-
   <ItemGroup>
     <Reference Include="CSUtilSlim">
       <HintPath>..\..\libs\CSUtilSlim.dll</HintPath>
@@ -24,5 +21,4 @@
       <HintPath>..\..\libs\FMSC.GeoSpatial.dll</HintPath>
     </Reference>
   </ItemGroup>
-
 </Project>

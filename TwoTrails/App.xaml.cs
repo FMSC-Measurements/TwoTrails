@@ -37,7 +37,7 @@ namespace TwoTrails
         private TtTextWriterTraceListener _Listener;
 
 
-        public static TtSettings Settings { get; private set; } 
+        public static TtSettings Settings { get; private set; }
 
 
         [STAThread]
