@@ -14,11 +14,14 @@ namespace TwoTrails.Utils
 {
     public static class TtUtils
     {
-        public static bool? CheckForUpdate()
+        public static UpdateStatus CheckForUpdate()
         {
+            UpdateStatus status = new UpdateStatus();
+
             try
             {
                 string res = new WebClient().DownloadString(Consts.URL_TWOTRAILS_UPDATE);
+
 
                 if (res != null)
                 {
@@ -26,17 +29,33 @@ namespace TwoTrails.Utils
 
                     if (tokens.Length > 0)
                     {
-                        if (new Version(tokens[0].Trim()) > Assembly.GetExecutingAssembly().GetName().Version)
-                            return true;
+                        status.CheckStatus = new Version(tokens[0].Trim()) > Assembly.GetExecutingAssembly().GetName().Version;
+
+                        if (tokens.Length > 1)
+                        {
+                            UpdateType updateType = UpdateType.None;
+                            string updateStr = tokens[1];
+
+                            for (int i = 0; i < 5 && i < updateStr.Length; i++)
+                            {
+                                if (updateStr[i] != '0')
+                                    updateType |= (UpdateType)(1 << i);
+                            }
+
+                            status.UpdateType = updateType;
+
+                            status.UpdateMessage = (tokens.Length > 2) ? String.Join(Environment.NewLine, tokens.Skip(2)) : String.Empty;
+
+                        }
                     }
                 }
             }
             catch
             {
-                return null;
+
             }
 
-            return false;
+            return status;
         }
 
 
@@ -218,5 +237,24 @@ namespace TwoTrails.Utils
 
             return String.Empty;
         }
+    }
+
+    public struct UpdateStatus
+    {
+        public bool? CheckStatus { get; set; }
+        public UpdateType UpdateType { get; set; }
+        public string UpdateMessage { get; set; }
+    }
+
+    [Flags]
+    public enum UpdateType
+    {
+        None = 0,
+        MinorBugFixes = 1 << 1,
+        MajorBugFixes = 1 << 2,
+        CriticalBugFixes = 1 << 3,
+        Optimiztions = 1 << 4,
+        FeatureUpdates = 1 << 5
+
     }
 }

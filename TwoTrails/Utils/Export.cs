@@ -20,7 +20,7 @@ namespace TwoTrails.Utils
 {
     public static class Export
     {
-        public static void All(String projectFilePath)
+        public static void All(String projectFilePath, TtSettings settings)
         {
             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(projectFilePath);
             TtSqliteMediaAccessLayer mal = null;
@@ -31,7 +31,7 @@ namespace TwoTrails.Utils
             if (File.Exists(malFilePath))
                 mal = new TtSqliteMediaAccessLayer(malFilePath);
             
-            TtManager manager = new TtManager(dal, mal, App.Settings);
+            TtManager manager = new TtManager(dal, mal, settings);
             
             string outputPath = Path.Combine(Path.GetDirectoryName(projectFilePath), dal.GetProjectInfo().Name.Trim()).Trim();
 

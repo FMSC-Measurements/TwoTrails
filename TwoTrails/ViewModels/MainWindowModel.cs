@@ -813,27 +813,29 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
     
         private void CheckForUpdates()
         {
-            bool? res = TtUtils.CheckForUpdate();
+            UpdateStatus status = TtUtils.CheckForUpdate();
 
-            if (res != null)
+            if (status.CheckStatus != null)
             {
                 Settings.LastUpdateCheck = DateTime.Now;
 
-                if (res == true)
+                if (status.CheckStatus == true)
                 {
-                    if (MessageBox.Show("A new version of TwoTrails is ready for download. Would you like to download it now?", "TwoTrails Update",
-                                    MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                    if (MessageBox.Show($@"A new version of TwoTrails is ready for download.{
+                        (status.UpdateType.HasFlag(UpdateType.CriticalBugFixes) ? " There are CRITICAL updates implemented that should be installed. " : String.Empty)
+                    }Would you like to download it now?", "TwoTrails Update",
+                        MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
                     {
                         Process.Start(Consts.URL_TWOTRAILS);
-                    } 
+                    }
                 }
-                else if (res == false)
+                else if (status.CheckStatus == false)
                 {
                     MessageBox.Show("You have the most recent version of TwoTrails", "TwoTrails Update");
                 }
                 else
                 {
-                    MessageBox.Show("Update check was unsuccessful.", "TwoTrails Update");
+                    MessageBox.Show("Checking for updates was unsuccessful.", "TwoTrails Update");
                 }
             }
         }
