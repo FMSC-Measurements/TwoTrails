@@ -134,6 +134,15 @@ namespace TwoTrails.ViewModels
                     MapWindow.Show();
                 }
             });
+
+            CurrentMetadata = Metadata[0];
+            CurrentGroup = Groups[0];
+
+            if (Polygons != null && Polygons.Count > 0)
+                CurrentPolygon = Polygons[0];
+
+            if (MediaInfo != null && MediaInfo.Count > 0)
+                CurrentMediaInfo = MediaInfo[0];
         }
 
         public void CloseWindows()
