@@ -119,6 +119,25 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                     IsSettingUp = true;
 
                     TtSqliteDataAccessLayer idal = new TtSqliteDataAccessLayer(fileName);
+
+                    if  (idal.GetDataVersion() < TwoTrailsSchema.SchemaVersion)
+                    {
+                        if (MessageBox.Show("The importing file needs to be upgraded before import. Do you want to upgrade it now?",
+                            "File Requires Upgrade", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            if (!Upgrade.DAL(idal))
+                            {
+                                MessageBox.Show("File Failed to Upgrade. See Log File for details.");
+                                IsSettingUp = false;
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            IsSettingUp = false;
+                            return;
+                        }
+                    }
                     
                     if (idal.HasErrors())
                         idal.Fix();
