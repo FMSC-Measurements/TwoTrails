@@ -7,6 +7,7 @@ namespace TwoTrails.DAL
         //Old Schema Versions
         public static readonly Version OSV_2_0_1 = new Version(2, 0, 1);
         public static readonly Version OSV_2_0_2 = new Version(2, 0, 2);
+        public static readonly Version OSV_2_0_3 = new Version(2, 0, 3);
 
         //Schema Version
         public static readonly Version SchemaVersion = OSV_2_0_2;
@@ -586,6 +587,8 @@ namespace TwoTrails.DAL
         public static readonly string UPGRADE_OSV_2_0_2 = $@"ALTER TABLE {ActivitySchema.TableName} ADD {ActivitySchema.ActivityNotes} TEXT; 
 ALTER TABLE {TtNmeaSchema.TableName} ADD {TtNmeaSchema.SatellitesInView} TEXT;";
 
+
+        public static readonly string UPGRADE_OSV_2_0_3 = $"UPDATE {TtNmeaSchema.TableName} SET {TtNmeaSchema.Fix} = {TtNmeaSchema.Fix} + 1;";
         #endregion
     }
 }

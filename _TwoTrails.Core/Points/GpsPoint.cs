@@ -96,12 +96,8 @@ namespace TwoTrails.Core.Points
 
         public GpsPoint(TtPoint point) : base(point)
         {
-            GpsPoint gps = point as GpsPoint;
-
-            if (gps != null)
-            {
+            if (point is GpsPoint gps)
                 CopyGpsValues(gps);
-            }
         }
 
         public GpsPoint(GpsPoint point) : base(point)

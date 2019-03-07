@@ -4,11 +4,11 @@
     <Authors>Fortest Management Service Center</Authors>
     <Copyright>Copyright © USDA Forest Service 2019</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <DebugSymbols>false</DebugSymbols>
-    <DebugType>none</DebugType>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
   </PropertyGroup>
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
   <ItemGroup>

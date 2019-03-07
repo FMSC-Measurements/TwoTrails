@@ -13,7 +13,6 @@ namespace TwoTrails.Core.Points
     public abstract class TtPoint : TtObject, IAccuracy, IEquatable<TtPoint>, IComparable<TtPoint>, IComparer<TtPoint>
     {
         public event PointChangedEvent LocationChanged;
-        public event PointChangedEvent PreviewLocationChanged;
         public event PointChangedEvent OnBoundaryChanged;
         public event PointChangedEvent OnAccuracyChanged;
         public event PointPolygonChangedEvent PolygonChanged;
@@ -346,7 +345,6 @@ namespace TwoTrails.Core.Points
         {
             if (LocationChangedEventEnabled)
             {
-                PreviewLocationChanged?.Invoke(this);
                 LocationChanged?.Invoke(this);
                 LocationHasChanged = false;
             }

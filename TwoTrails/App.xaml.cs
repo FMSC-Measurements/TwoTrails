@@ -54,7 +54,8 @@ namespace TwoTrails
             else if (SingleInstance<App>.InitializeAsFirstInstance(ID))
             {
                 Settings = new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings());
-                
+
+#if !DEBUG
                 //Check for update
                 if (Settings.LastUpdateCheck == null || Settings.LastUpdateCheck < DateTime.Now.Subtract(TimeSpan.FromDays(1)))
                 {
@@ -75,6 +76,7 @@ namespace TwoTrails
                         }
                     }
                 }
+#endif
 
                 var application = new App();
 

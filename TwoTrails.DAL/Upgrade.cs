@@ -1,6 +1,7 @@
 ﻿using CSUtil.Databases;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -25,24 +26,36 @@ namespace TwoTrails.DAL
 
             try
             {
-                _Database.Update(TwoTrailsSchema.ProjectInfoSchema.TableName,
-                    new Dictionary<string, object>()
-                    {
-                        [TwoTrailsSchema.ProjectInfoSchema.TtDbSchemaVersion] = TwoTrailsSchema.SchemaVersion.ToString()
-                    });
-
-                if (oldVersion < TwoTrailsSchema.OSV_2_0_2)
+                using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
                 {
-                    _Database.ExecuteNonQuery(TwoTrailsSchema.UPGRADE_OSV_2_0_2);
-                }
+                    using (SQLiteTransaction trans = conn.BeginTransaction())
+                    {
+                        if (oldVersion < TwoTrailsSchema.OSV_2_0_2)
+                        {
+                            _Database.ExecuteNonQuery(TwoTrailsSchema.UPGRADE_OSV_2_0_2, conn, trans);
+                        }
 
-                Trace.WriteLine($"Upgrade ({oldVersion} -> {TwoTrailsSchema.SchemaVersion}): {file}");
+                        if (oldVersion < TwoTrailsSchema.OSV_2_0_3 && dal.GetProjectInfo().CreationVersion.StartsWith("ANDROID"))
+                        {
+                            _Database.ExecuteNonQuery(TwoTrailsSchema.UPGRADE_OSV_2_0_3, conn, trans);
+                        }
+
+                        _Database.Update(TwoTrailsSchema.ProjectInfoSchema.TableName,
+                            new Dictionary<string, object>()
+                            {
+                                [TwoTrailsSchema.ProjectInfoSchema.TtDbSchemaVersion] = TwoTrailsSchema.SchemaVersion.ToString()
+                            }, null, conn, trans);
+
+                        trans.Commit();
+
+                        Trace.WriteLine($"Upgrade ({oldVersion} -> {TwoTrailsSchema.SchemaVersion}): {file}");
+                    }
+                }
             }
             catch (Exception ex)
             {
-                //restore old file
-                File.Delete(file);
-                File.Copy(oldfile, file);
+                if (File.Exists(oldfile))
+                    File.Delete(oldfile);
                 
                 Trace.WriteLine(ex.Message, $"Upgrade:DAL (TTX): {file}");
 
