@@ -7,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
@@ -381,12 +379,17 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
         }
 
 
-        public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
+        {
+            return GetNmeaBursts(new string[] { pointCN });
+        }
+
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<String> pointCNs)
         {
             CheckVersion();
 
-            String query = $@"select {TwoTrailsV2Schema.TtNmeaSchema.SelectItems} from {TwoTrailsV2Schema.TtNmeaSchema.TableName}
-{(pointCN != null ? $" where {TwoTrailsV2Schema.TtNmeaSchema.PointCN} = '{pointCN}'" : String.Empty)}";
+            String query = $@"select {TwoTrailsV2Schema.TtNmeaSchema.SelectItems} from {TwoTrailsV2Schema.TtNmeaSchema.TableName} 
+            { (pointCNs == null ? String.Empty : $" where { String.Join(" OR ", pointCNs.Select(pcn => $"{TwoTrailsSchema.TtNmeaSchema.PointCN} = '{pcn}'"))}")}";
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {

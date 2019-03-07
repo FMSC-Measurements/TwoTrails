@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
@@ -29,14 +27,14 @@ namespace TwoTrails.DAL
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
         private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
 
-        private TtProjectInfo _ProjectInfo;
+        private readonly TtProjectInfo _ProjectInfo;
 
         private readonly ParseOptions _Options;
         private bool parsed;
         private int secondsInc = 0;
         private int polyInc = 0;
 
-        private static object locker = new object();
+        private static readonly object locker = new object();
 
 
         public TtShapeFileDataAccessLayer(ParseOptions options)
@@ -145,6 +143,7 @@ namespace TwoTrails.DAL
                                         OnBoundary = true,
                                         Index = index++,
                                         MetadataCN = Consts.EmptyGuid,
+                                        GroupCN = Consts.EmptyGuid,
                                         PID = PointNamer.NamePoint(poly, lastPoint),
                                         Polygon = poly
                                     };
@@ -349,6 +348,11 @@ namespace TwoTrails.DAL
             return new List<TtNmeaBurst>();
         }
 
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
+        {
+            return new List<TtNmeaBurst>();
+        }
+
         public TtProjectInfo GetProjectInfo()
         {
             Parse();
@@ -446,7 +450,7 @@ namespace TwoTrails.DAL
                 tmp = tmp.Substring(tmp.IndexOf("nad"), 21);
                 if (tmp.Contains("zone"))
                 {
-                    tmp = tmp.Substring(tmp.IndexOf("zone") + 5, 2);
+                    tmp = new string(tmp.Substring(tmp.IndexOf("zone") + 5, 2).Where(Char.IsDigit).ToArray());
                     
                     if (Int32.TryParse(tmp, out int zone))
                         return zone;

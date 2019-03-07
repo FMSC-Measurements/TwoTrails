@@ -7,7 +7,6 @@ using System.Reflection;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 using TwoTrails.Core.Media;
-using System.Collections;
 
 namespace TwoTrails.Core
 {
@@ -49,6 +48,19 @@ namespace TwoTrails.Core
         public TtHistoryManager(TtManager manager)
         {
             BaseManager = manager;
+
+            DefaultMetadata.PropertyChanged += (s, e) =>
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(TtMetadata.Zone):
+                    case nameof(TtMetadata.Slope):
+                    case nameof(TtMetadata.Distance):
+                    case nameof(TtMetadata.Elevation):
+                        OnHistoryChanged(HistoryEventType.Reset, true);
+                        break;
+                }
+            };
         }
 
 
@@ -286,7 +298,7 @@ namespace TwoTrails.Core
         #endregion
 
 
-        public void CreateQuondamLinks(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, bool? bndMode = null, bool reverse = false)
+        public void CreateQuondamLinks(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit, bool reverse = false)
         {
             AddCommand(new CreateQuondamsCommand(reverse ? points.Reverse() : points, BaseManager, targetPolygon, insertIndex, bndMode));
         }
@@ -388,10 +400,20 @@ namespace TwoTrails.Core
             return BaseManager.GetPolygonGraphicOptions();
         }
 
+        public PolygonGraphicOptions GetDefaultPolygonGraphicOption()
+        {
+            return BaseManager.GetDefaultPolygonGraphicOption();
+        }
+
 
         List<TtNmeaBurst> ITtManager.GetNmeaBursts(string pointCN)
         {
             return BaseManager.GetNmeaBursts(pointCN);
+        }
+
+        List<TtNmeaBurst> ITtManager.GetNmeaBursts(IEnumerable<string> pointCNs)
+        {
+            return BaseManager.GetNmeaBursts(pointCNs);
         }
 
         void ITtManager.AddNmeaBurst(TtNmeaBurst burst)

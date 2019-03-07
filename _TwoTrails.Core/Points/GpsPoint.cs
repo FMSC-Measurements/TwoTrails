@@ -96,12 +96,8 @@ namespace TwoTrails.Core.Points
 
         public GpsPoint(TtPoint point) : base(point)
         {
-            GpsPoint gps = point as GpsPoint;
-
-            if (gps != null)
-            {
+            if (point is GpsPoint gps)
                 CopyGpsValues(gps);
-            }
         }
 
         public GpsPoint(GpsPoint point) : base(point)
@@ -166,6 +162,15 @@ namespace TwoTrails.Core.Points
             SetUnAdjLocation(coords.X, coords.Y, elev);
         }
 
+        internal void Adjust()
+        {
+            if (HasLatLon)
+                SetUnAdjLocation((double)Latitude, (double)Longitude, Metadata.Zone, Elevation ?? 0);
+            else
+                SetUnAdjLocation(this);
+
+            SetAccuracy(Polygon.Accuracy);
+        }
 
         public override bool Equals(object obj)
         {

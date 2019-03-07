@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Media;
 
 namespace TwoTrails.Core
 {
-    public delegate void OnColorChangeEvent(PolygonGraphicOptions pgo, GraphicCode code, Color color);
+    public delegate void OnColorChangeEvent(PolygonGraphicOptions pgo, GraphicCode code, int color);
 
     public enum GraphicCode
     {
@@ -22,8 +19,8 @@ namespace TwoTrails.Core
     {
         public event OnColorChangeEvent ColorChanged;
 
-        private Color _AdjBndColor;
-        public Color AdjBndColor
+        protected int _AdjBndColor;
+        public int AdjBndColor
         {
             get { return _AdjBndColor; }
             set
@@ -32,14 +29,9 @@ namespace TwoTrails.Core
             }
         }
 
-        public SolidColorBrush AdjBndBrush
-        {
-            get { return new SolidColorBrush(_AdjBndColor); }
-        }
 
-
-        private Color _UnAdjBndColor;
-        public Color UnAdjBndColor
+        protected int _UnAdjBndColor;
+        public int UnAdjBndColor
         {
             get { return _UnAdjBndColor; }
             set
@@ -48,14 +40,9 @@ namespace TwoTrails.Core
             }
         }
 
-        public SolidColorBrush UnAdjBndBrush
-        {
-            get { return new SolidColorBrush(_UnAdjBndColor); }
-        }
 
-
-        private Color _AdjNavColor;
-        public Color AdjNavColor
+        protected int _AdjNavColor;
+        public int AdjNavColor
         {
             get { return _AdjNavColor; }
             set
@@ -64,14 +51,9 @@ namespace TwoTrails.Core
             }
         }
 
-        public SolidColorBrush AdjNavBrush
-        {
-            get { return new SolidColorBrush(_AdjNavColor); }
-        }
 
-
-        private Color _UnAdjNavColor;
-        public Color UnAdjNavColor
+        protected int _UnAdjNavColor;
+        public int UnAdjNavColor
         {
             get { return _UnAdjNavColor; }
             set
@@ -80,14 +62,9 @@ namespace TwoTrails.Core
             }
         }
 
-        public SolidColorBrush UnAdjNavBrush
-        {
-            get { return new SolidColorBrush(_UnAdjNavColor); }
-        }
 
-
-        private Color _AdjPtsColor;
-        public Color AdjPtsColor
+        protected int _AdjPtsColor;
+        public int AdjPtsColor
         {
             get { return _AdjPtsColor; }
             set
@@ -96,14 +73,9 @@ namespace TwoTrails.Core
             }
         }
 
-        public SolidColorBrush AdjPtsBrush
-        {
-            get { return new SolidColorBrush(_AdjPtsColor); }
-        }
 
-
-        private Color _UnAdjPtsColor;
-        public Color UnAdjPtsColor
+        protected int _UnAdjPtsColor;
+        public int UnAdjPtsColor
         {
             get { return _UnAdjPtsColor; }
             set
@@ -112,14 +84,9 @@ namespace TwoTrails.Core
             }
         }
 
-        public SolidColorBrush UnAdjPtsBrush
-        {
-            get { return new SolidColorBrush(_UnAdjPtsColor); }
-        }
 
-
-        private Color _WayPtsColor;
-        public Color WayPtsColor
+        protected int _WayPtsColor;
+        public int WayPtsColor
         {
             get { return _WayPtsColor; }
             set
@@ -128,13 +95,8 @@ namespace TwoTrails.Core
             }
         }
 
-        public SolidColorBrush WayPtsBrush
-        {
-            get { return new SolidColorBrush(_WayPtsColor); }
-        }
 
-
-        private float _AdjWidth;
+        protected float _AdjWidth;
         public float AdjWidth
         {
             get { return _AdjWidth; }
@@ -144,7 +106,7 @@ namespace TwoTrails.Core
             }
         }
 
-        private float _UnAdjWidth;
+        protected float _UnAdjWidth;
         public float UnAdjWidth
         {
             get { return _UnAdjWidth; }
@@ -172,57 +134,52 @@ namespace TwoTrails.Core
                                      int adjPtsColor, int unAdjPtsColor, int wayPtsColor,
                                      float adjWidth, float unAdjWidth) : base(cn)
         {
-            this._AdjBndColor = GetColor(adjBndColor);
-            this._UnAdjBndColor = GetColor(unAdjBndColor);
-            this._AdjNavColor = GetColor(adjNavColor);
-            this._UnAdjNavColor = GetColor(unAdjNavColor);
-            this._AdjPtsColor = GetColor(adjPtsColor);
-            this._UnAdjPtsColor = GetColor(unAdjPtsColor);
-            this._WayPtsColor = GetColor(wayPtsColor);
+            this._AdjBndColor = adjBndColor;// GetColor(adjBndColor);
+            this._UnAdjBndColor = unAdjBndColor;// GetColor(unAdjBndColor);
+            this._AdjNavColor = adjNavColor;// GetColor(adjNavColor);
+            this._UnAdjNavColor = unAdjNavColor;// GetColor(unAdjNavColor);
+            this._AdjPtsColor = adjPtsColor;// GetColor(adjPtsColor);
+            this._UnAdjPtsColor = unAdjPtsColor;// GetColor(unAdjPtsColor);
+            this._WayPtsColor = wayPtsColor;// GetColor(wayPtsColor);
             this._AdjWidth = adjWidth;
             this._UnAdjWidth = unAdjWidth;
         }
 
 
-        private void OnColorChange(GraphicCode code, Color color)
+        private void OnColorChange(GraphicCode code, int color)
         {
             ColorChanged?.Invoke(this, code, color);
 
-            switch (code)
-            {
-                case GraphicCode.ADJBND_COLOR:
-                    OnPropertyChanged(nameof(AdjBndBrush));
-                    break;
-                case GraphicCode.ADJNAV_COLOR:
-                    OnPropertyChanged(nameof(AdjNavBrush));
-                    break;
-                case GraphicCode.ADJPTS_COLOR:
-                    OnPropertyChanged(nameof(AdjPtsBrush));
-                    break;
-                case GraphicCode.UNADJBND_COLOR:
-                    OnPropertyChanged(nameof(UnAdjBndBrush));
-                    break;
-                case GraphicCode.UNADJNAV_COLOR:
-                    OnPropertyChanged(nameof(UnAdjNavBrush));
-                    break;
-                case GraphicCode.UNADJPTS_COLOR:
-                    OnPropertyChanged(nameof(UnAdjPtsBrush));
-                    break;
-                case GraphicCode.WAYPTS_COLOR:
-                    OnPropertyChanged(nameof(WayPtsBrush));
-                    break;
-            }
+            //switch (code)
+            //{
+            //    case GraphicCode.ADJBND_COLOR:
+            //        OnPropertyChanged(nameof(AdjBndBrush));
+            //        break;
+            //    case GraphicCode.ADJNAV_COLOR:
+            //        OnPropertyChanged(nameof(AdjNavBrush));
+            //        break;
+            //    case GraphicCode.ADJPTS_COLOR:
+            //        OnPropertyChanged(nameof(AdjPtsBrush));
+            //        break;
+            //    case GraphicCode.UNADJBND_COLOR:
+            //        OnPropertyChanged(nameof(UnAdjBndBrush));
+            //        break;
+            //    case GraphicCode.UNADJNAV_COLOR:
+            //        OnPropertyChanged(nameof(UnAdjNavBrush));
+            //        break;
+            //    case GraphicCode.UNADJPTS_COLOR:
+            //        OnPropertyChanged(nameof(UnAdjPtsBrush));
+            //        break;
+            //    case GraphicCode.WAYPTS_COLOR:
+            //        OnPropertyChanged(nameof(WayPtsBrush));
+            //        break;
+            //}
         }
 
 
         public static string ToStringARGB(int color)
         {
             return $"{GetAlpha(color):X2}{GetRed(color):X2}{GetGreen(color):X2}{GetBlue(color):X2}";
-        }
-
-        public static Color GetColor(int argb)
-        {
-            return Color.FromArgb(GetAlpha(argb), GetRed(argb), GetGreen(argb), GetBlue(argb));
         }
 
         public static byte GetAlpha(int color)
@@ -253,9 +210,7 @@ namespace TwoTrails.Core
 
         public override bool Equals(object obj)
         {
-            PolygonGraphicOptions opts = obj as PolygonGraphicOptions;
-
-            return object.ReferenceEquals(opts, null) &&
+            return (obj is PolygonGraphicOptions opts) &&
                 AdjBndColor == opts.AdjBndColor &&
                 UnAdjBndColor == opts.UnAdjBndColor &&
                 AdjNavColor == opts.AdjNavColor &&
@@ -269,10 +224,10 @@ namespace TwoTrails.Core
 
         public static bool operator ==(PolygonGraphicOptions a, PolygonGraphicOptions b)
         {
-            if (object.ReferenceEquals(a, null) ^ object.ReferenceEquals(b, null))
+            if (a is null ^ b is null)
                 return false;
 
-            if (object.ReferenceEquals(a, null))
+            if (a is null)
                 return true;
 
             return a.AdjBndColor == b.AdjBndColor &&
@@ -288,7 +243,7 @@ namespace TwoTrails.Core
 
         public static bool operator !=(PolygonGraphicOptions a, PolygonGraphicOptions b)
         {
-            if (object.ReferenceEquals(a, null) ^ object.ReferenceEquals(b, null) || object.ReferenceEquals(a, null))
+            if (a is null ^ b is null || a is null)
                 return true;
 
             return a.AdjBndColor != b.AdjBndColor ||

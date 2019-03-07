@@ -3,18 +3,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TwoTrails.Dialogs"
-        xmlns:cvt="clr-namespace:TwoTrails.Converters"
+        xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
+        xmlns:ttcmh="clr-namespace:TwoTrails.Core.ComponentModel.History;assembly=TwoTrails.DAL"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Retrace" Height="350" Width="600" MinHeight="350" MaxHeight="600" MinWidth="600" MaxWidth="600">
     
     <Window.Resources>
+        <fmsccm:EnumDescriptionConverter x:Key="edc"/>
+
         <Style TargetType="RadioButton">
             <Setter Property="Margin" Value="1"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
         <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="CheckBox">
             <Setter Property="Margin" Value="1"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
@@ -59,13 +65,22 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <!--<ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>-->
                     </Grid.ColumnDefinitions>
 
-                    <RadioButton Grid.Column="0" Content="Inherit" IsChecked="True" ToolTip="Quondam inherits the parents OnBoundary"/>
-                    <RadioButton Grid.Column="1" Content="On" IsChecked="{Binding OnBoundary, Mode=OneWayToSource}" ToolTip="Quondam will be On the Boundary"/>
-                    <RadioButton Grid.Column="2" Content="Off" IsChecked="{Binding OnBoundary, Mode=OneWayToSource}" ToolTip="Quondam will be Off the Boundary"/>
+                    <ComboBox SelectedIndex="0" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcmh:QuondamBoundaryMode}}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <ListBoxItem Content="{Binding}" ToolTip="{Binding Converter={StaticResource edc}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    
+                    <!--<RadioButton Grid.Column="0" Content="OBO" IsChecked="{Binding OnBoundary, Mode=OneWayToSource}" ToolTip="Quondam will only be created for On Boundary Points"/>
+                    <RadioButton Grid.Column="1" Content="Inherit" IsChecked="True" ToolTip="Quondam inherits the parents OnBoundary"/>
+                    <RadioButton Grid.Column="2" Content="On" IsChecked="{Binding OnBoundary, Mode=OneWayToSource}" ToolTip="Quondam will be On the Boundary"/>
+                    <RadioButton Grid.Column="3" Content="Off" IsChecked="{Binding OnBoundary, Mode=OneWayToSource}" ToolTip="Quondam will be Off the Boundary"/>-->
                 </Grid>
             </GroupBox>
         </Grid>
@@ -108,7 +123,7 @@
                         <RadioButton Name="rbSingle" Grid.Column="3" GroupName="{Binding GCN}" Content="Single" IsChecked="{Binding SinglePoint, Mode=OneWayToSource}" ToolTip="Only a single Quondam will be created."/>
                         <RadioButton Grid.Column="4" GroupName="{Binding GCN}" Content="Rev" Padding="0, 0, 5, 0" ToolTip="The Quondams will be added in the reverse order from how their parent's were collected."/>
                         <ComboBox Grid.Column="5" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointTo, Mode=OneWayToSource}" IsEnabled="{Binding ElementName=rbSingle, Path=IsChecked, Converter={StaticResource IBC}}"/>
-
+                        
                         <Button Grid.Column="7" Width="30" Content="+" Margin="2" Click="Add_Click" ToolTip="Add New Retrace"/>
                         <Button Grid.Column="8" Width="30" Content="-" Margin="2" Click="Delete_Click" ToolTip="Delete Retrace"/>
                     </Grid>

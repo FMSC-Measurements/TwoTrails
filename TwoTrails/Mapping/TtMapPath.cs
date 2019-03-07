@@ -1,14 +1,7 @@
 ﻿using Microsoft.Maps.MapControl.WPF;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using TwoTrails.Core;
-using TwoTrails.Core.Points;
 
 namespace TwoTrails.Mapping
 {
@@ -32,7 +25,7 @@ namespace TwoTrails.Mapping
             _Polygon = polygon;
             _Visible = visible;
 
-            MapPolyline.Stroke = new SolidColorBrush(pgo.AdjBndColor);
+            MapPolyline.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
             MapPolyline.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed;
 
             MapPolyline.StrokeThickness = adjusted ?
@@ -40,15 +33,15 @@ namespace TwoTrails.Mapping
 
             MapPolyline.Locations = locations;
 
-            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, Color color) =>
+            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, int color) =>
             {
                 switch (code)
                 {
                     case GraphicCode.ADJNAV_COLOR:
-                        MapPolyline.Stroke = new SolidColorBrush(pgo.AdjNavColor);
+                        MapPolyline.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjNavColor));
                         break;
                     case GraphicCode.UNADJNAV_COLOR:
-                        MapPolyline.Stroke = new SolidColorBrush(pgo.UnAdjNavColor);
+                        MapPolyline.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.UnAdjNavColor));
                         break;
                 }
             };

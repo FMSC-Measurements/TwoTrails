@@ -3,20 +3,32 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TwoTrails.Dialogs"
         xmlns:ttc="clr-namespace:TwoTrails.Controls"
         xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
-        xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+        xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
-        Title="Create Grid Sample Points" Height="300" Width="300"
+        Title="Create Grid Sample Points"
+        Height="300" Width="500"
+        MinHeight="300" MinWidth="500"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <cvt:MultiBooleanConverter x:Key="MultiBoolConverter"/>
+        <cvt:InverseBooleanConverter x:Key="ibc"/>
+    </Window.Resources>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="5, 2.5, 5, 2.5">
+        <Grid Grid.Column="1" Grid.Row="0" Margin="5, 2.5, 5, 2.5">
             <Grid>
                 <Grid.Resources>
                     <Style TargetType="TextBlock">
@@ -43,21 +55,15 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-
-                <TextBlock Grid.Column="0" Grid.Row="0" Text="Polygon" />
-                <ComboBox  Grid.Column="1" Grid.Row="0" ItemsSource="{Binding Polygons}" SelectedItem="{Binding SelectedPolygon}"/>
-
 
                 <TextBlock Grid.Column="0" Grid.Row="1" Text="Start Point" />
                 <ComboBox  Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Points}" SelectedItem="{Binding SelectedPoint}"/>
 
-
                 <TextBlock Grid.Column="0" Grid.Row="2" Text="UOM Distance" />
                 <ComboBox  Grid.Column="1" Grid.Row="2" ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}}" SelectedItem="{Binding UomDistance}" />
-
-
 
                 <TextBlock Grid.Column="0" Grid.Row="3" Text="Grid Interval" />
                 <Grid Grid.Column="1" Grid.Row="3" HorizontalAlignment="Right" Margin="5, 2.5, 0, 2.5">
@@ -77,10 +83,10 @@
 
                     <TextBox Grid.Column="0" Grid.Row="1"
                          Text="{Binding GridX}"
-                         PreviewTextInput="TextIsInteger"/>
+                         PreviewTextInput="TextIsUnsignedInteger"/>
                     <TextBox Grid.Column="2" Grid.Row="1"
                          Text="{Binding GridY}"
-                         PreviewTextInput="TextIsInteger"/>
+                         PreviewTextInput="TextIsUnsignedInteger"/>
                 </Grid>
 
                 <Grid Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2">
@@ -113,7 +119,7 @@
                     <TextBox Grid.Column="4"  Margin="0, 2.5, 0, 2.5"
                          IsEnabled="{Binding ElementName=cbSample, Path=IsChecked}"
                          Text="{Binding SampleAmount}"
-                         PreviewTextInput="TextIsInteger"/>
+                         PreviewTextInput="TextIsUnsignedInteger"/>
                 </Grid>
 
                 <Grid Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2">
@@ -128,12 +134,17 @@
                     <TextBox Grid.Column="4"  Margin="0, 2.5, 0, 2.5"
                          IsEnabled="{Binding ElementName=cbBuffer, Path=IsChecked}"
                          Text="{Binding BufferAmount}"
-                         PreviewTextInput="TextIsInteger"/>
+                         PreviewTextInput="TextIsUnsignedInteger"/>
                 </Grid>
 
-                <CheckBox Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2"
+
+                <CheckBox Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" Content="Merge Grid Plots to Single Polygon"
+                          IsChecked="{Binding SplitToIndividualPolys, Converter={StaticResource ibc}}" VerticalAlignment="Center"
+                          IsEnabled="{Binding MultiplePolysIncluded}" Margin="0 5"/>
+
+                <CheckBox Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="2"
                           Name="cbDelExisting" Content="Delete Existing Plots"
-                          IsChecked="{Binding Settings.DeviceSettings.DeleteExistingPlots}" VerticalAlignment="Center"/>
+                          IsChecked="{Binding DeleteExistingPlots}" VerticalAlignment="Center"/>
 
             </Grid>
 
@@ -145,8 +156,57 @@
                 </StackPanel>
             </Grid>
         </Grid>
+
+        <Grid Grid.Column="0" Grid.Row="0" Margin="5, 2.5, 0, 2.5">
+            <Grid.Resources>
+                <DataTemplate x:Key="listToolTip">
+                    <TextBlock Text="{Binding Name}">
+                            <ToolTipService.ToolTip>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <TextBlock Grid.Row="0" Text="{Binding Name}" FontWeight="Black"/>
+                                    <TextBlock Grid.Row="1" Text="{Binding Description}"/>
+                                </Grid>
+                            </ToolTipService.ToolTip>
+                        </TextBlock>
+                </DataTemplate>
+            </Grid.Resources>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Include" TextAlignment="Center" />
+            <ListBox Name="lstIncPoly" Grid.Column="0" Grid.Row="1" ItemsSource="{Binding InclusionPolygons}" SelectionMode="Multiple" ItemTemplate="{StaticResource listToolTip}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding InclusionPolygonsSelectedCommand}" CommandParameter="{Binding Path=SelectedItems, ElementName=lstIncPoly}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListBox>
+
+            <TextBlock Grid.Column="2" Grid.Row="0" Text="Exlude" TextAlignment="Center" />
+            <ListBox Name="lstExcPoly" Grid.Column="2" Grid.Row="1" ItemsSource="{Binding ExclusionPolygons}" SelectionMode="Multiple" ItemTemplate="{StaticResource listToolTip}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding ExclusionPolygonsSelectedCommand}" CommandParameter="{Binding Path=SelectedItems, ElementName=lstExcPoly}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListBox>
+        </Grid>
         
-        <Grid Grid.Row="1" Margin="5">
+        <Grid Grid.ColumnSpan="2" Grid.Row="1" Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="75"/>
                 <ColumnDefinition Width="*"/>
@@ -157,6 +217,6 @@
             <Button Grid.Column="2" Content="Generate" Command="{Binding GenerateCommand}" />
         </Grid>
 
-        <ttc:TtProgressControl Grid.Row="0" Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}" Background="White" Opacity="70" />
+        <!--<ttc:TtProgressControl Grid.ColumnSpan="2" Grid.Row="0" Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}" Background="White" Opacity="70" />-->
         </Grid>
 </Window>

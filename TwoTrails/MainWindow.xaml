@@ -8,8 +8,8 @@
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
         Title="TwoTrails"
-        Width="1000" MinWidth="710"
-        Height="800" MinHeight="550"
+        Width="1000" MinWidth="700"
+        Height="800" MinHeight="500"
         WindowStartupLocation="CenterScreen">
 
     <Window.InputBindings>
@@ -24,6 +24,7 @@
         <KeyBinding Command="{Binding CurrentEditor.RetraceCommand}" Key="R" Modifiers="Ctrl+Alt"/>
         <KeyBinding Command="{Binding CurrentEditor.MovePointsCommand}" Key="M" Modifiers="Ctrl+Alt"/>
         <KeyBinding Command="{Binding CurrentEditor.CreateQuondamsCommand}" Key="Q" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding OpenInEarthCommand}" Key="G" Modifiers="Ctrl+Alt"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -133,14 +134,21 @@
                 <MenuItem Header="_Data">
                     <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                    
                     <MenuItem Header="View Point Details Table" Command="{Binding ViewPointDetailsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+
+                    <MenuItem Header="View Sattelite Info" Command="{Binding CurrentEditor.ViewSatInfoCommand}"
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" Visibility="Collapsed"/>
+
                     <MenuItem Header="Open in Google Earth" Command="{Binding OpenInEarthCommand}" IsEnabled="{Binding HasOpenedProject}" />
-                    <MenuItem Header="Open Map" Command="{Binding CurrentProject.OpenMapCommand}" IsEnabled="{Binding HasOpenedProject}" Visibility="Collapsed"/>
                 </MenuItem>
 
                 <MenuItem Header="_Tools">
                     <MenuItem Header="Recalculate All Polygons" Command="{Binding CurrentProject.RecalculateAllPolygonsCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+Shift+R"/>
+
+                    <MenuItem Header="Calculate Log Deck" Command="{Binding CurrentProject.CalculateLogDeckCommand}"
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+L"/>
 
                     <Separator/>
                     <MenuItem Header="Create New Point" Style="{StaticResource styleHasPolygons}">
@@ -163,11 +171,11 @@
                     <Separator/>
 
                     <MenuItem Header="Create Grid Sample Points" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
-                          Style="{StaticResource styleMiDisableNullCommand}" InputGestureText="Ctrl+Alt+P"/>
+                          InputGestureText="Ctrl+Alt+P"/>
                     <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
                           Style="{StaticResource styleMiPointEdit}" InputGestureText="Ctrl+Alt+C"/>
 
-                    <Separator/>
+                    <Separator Visibility="Collapsed"/>
 
                     <MenuItem Header="Modify Data Dictionary" Command="{Binding CurrentEditor.ModifyDataDictionaryCommand}" IsEnabled="{Binding HasOpenedProject}"
                               Style="{StaticResource styleMiDisableNullCommand}" />
@@ -186,6 +194,7 @@
 
                     <Separator/>
 
+                    <MenuItem Header="Check for Updates" Command="{Binding CheckForUpdatesCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                     <MenuItem Header="About TwoTrails" Command="{Binding AboutCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                 </MenuItem>
             </Menu>

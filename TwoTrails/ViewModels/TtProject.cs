@@ -1,18 +1,14 @@
 ﻿using CSUtil.ComponentModel;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
-using TwoTrails.ViewModels;
+using TwoTrails.Dialogs;
 
 namespace TwoTrails.ViewModels
 {
@@ -32,6 +28,7 @@ namespace TwoTrails.ViewModels
         public ICommand EditMetadataCommand { get; }
 
         public ICommand RecalculateAllPolygonsCommand { get; }
+        public ICommand CalculateLogDeckCommand { get; }
 
         public ICommand UndoCommand { get; set; }
         public ICommand RedoCommand { get; set; }
@@ -118,6 +115,11 @@ namespace TwoTrails.ViewModels
             ProjectInfo.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
             {
                 ProjectChanged = !_ProjectInfo.Equals(ProjectInfo);
+
+                if (e.PropertyName == nameof(ProjectInfo.Name))
+                {
+
+                }
             };
 
             RequiresSave = false;
@@ -143,6 +145,19 @@ namespace TwoTrails.ViewModels
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Groups));
             
             RecalculateAllPolygonsCommand = new RelayCommand(x => { HistoryManager.RecalculatePolygons(); DataChanged |= true; });
+            CalculateLogDeckCommand = new RelayCommand(x =>
+            {
+                if (Manager.PolygonCount > 0)
+                {
+                    MainModel.MainWindow.IsEnabled = false;
+                    LogDeckCalculatorDialog.Show(this, this.MainModel.MainWindow, () =>
+                    {
+                        MainModel.MainWindow.IsEnabled = true;
+                    });
+                }
+                else
+                    MessageBox.Show("No Polygons in Project.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Stop);
+            });
 
             OpenMapCommand = new RelayCommand(x => OpenMapTab());
             OpenMapWindowCommand = new RelayCommand(x => OpenMapWindow());

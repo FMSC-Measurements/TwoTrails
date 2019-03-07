@@ -4,46 +4,61 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using CSUtil;
 using TwoTrails.ViewModels;
 using FMSC.Core.Xml.KML;
 using System.IO.Compression;
-using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.Core.Xml.GPX;
 using TwoTrails.Core.Media;
 using TwoTrails.DAL;
-using System.Windows.Media.Imaging;
+using System.Xml;
 
 namespace TwoTrails.Utils
 {
     public static class Export
     {
-        public static void All(TtProject project, String folderPath)
+        public static void All(String projectFilePath, TtSettings settings)
+        {
+            TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(projectFilePath);
+            TtSqliteMediaAccessLayer mal = null;
+
+            string malFilePath = Path.Combine(Path.GetDirectoryName(projectFilePath),
+                                $"{Path.GetFileNameWithoutExtension(projectFilePath)}{Consts.FILE_EXTENSION_MEDIA}");
+
+            if (File.Exists(malFilePath))
+                mal = new TtSqliteMediaAccessLayer(malFilePath);
+            
+            TtManager manager = new TtManager(dal, mal, settings);
+            
+            string outputPath = Path.Combine(Path.GetDirectoryName(projectFilePath), dal.GetProjectInfo().Name.Trim()).Trim();
+
+            All(manager, mal, dal.GetProjectInfo(), dal.FilePath, outputPath);
+        }
+
+        public static void All(ITtManager manager, ITtMediaLayer mal, TtProjectInfo projectInfo, String projectFilePath, String folderPath)
         {
             folderPath = folderPath.Trim();
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
+            CheckCreateFolder(folderPath);
 
-            Project(project.ProjectInfo, Path.Combine(folderPath, "ProjectInfo.txt"));
-            Summary(project, Path.Combine(folderPath, "Summary.txt"));
-            Points(project.Manager, Path.Combine(folderPath, "Points.csv"));
-            DataDictionary(project.Manager, Path.Combine(folderPath, "DataDictionary.csv"));
-            Polygons(project.Manager, Path.Combine(folderPath, "Polygons.csv"));
-            Metadata(project.Manager, Path.Combine(folderPath, "Metadata.csv"));
-            Groups(project.Manager, Path.Combine(folderPath, "Groups.csv"));
-            TtNmea(project.Manager, Path.Combine(folderPath, "Nmea.csv"));
-            ImageInfo(project.Manager, Path.Combine(folderPath, "ImageInfo.csv"));
-            GPX(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.gpx"));
-            KMZ(project, Path.Combine(folderPath, $"{project.ProjectName.Trim()}.kmz"));
+            Project(projectInfo, Path.Combine(folderPath, "ProjectInfo.txt"));
+            Summary(manager, projectInfo, projectFilePath, Path.Combine(folderPath, "Summary.txt"));
+            Points(manager, Path.Combine(folderPath, "Points.csv"));
+            DataDictionary(manager, Path.Combine(folderPath, "DataDictionary.csv"));
+            Polygons(manager, Path.Combine(folderPath, "Polygons.csv"));
+            Metadata(manager, Path.Combine(folderPath, "Metadata.csv"));
+            Groups(manager, Path.Combine(folderPath, "Groups.csv"));
+            TtNmea(manager, Path.Combine(folderPath, "Nmea.csv"));
+            ImageInfo(manager, Path.Combine(folderPath, "ImageInfo.csv"));
+            GPX(manager, projectInfo, Path.Combine(folderPath, $"{projectInfo.Name.Trim()}.gpx"));
+            KMZ(manager, projectInfo, Path.Combine(folderPath, $"{projectInfo.Name.Trim()}.kmz"));
 
-            Shapes(project, folderPath);
+            Shapes(manager, projectInfo, folderPath);
 
-            if (project.MAL != null)
-                MediaFiles(project.MAL, folderPath);
+            if (mal != null)
+                MediaFiles(mal, folderPath);
         }
 
         public static void CheckCreateFolder(string folderPath)
@@ -194,30 +209,50 @@ namespace TwoTrails.Utils
 
             using (StreamWriter sw = new StreamWriter(fileName))
             {
-                #region Columns
-                StringBuilder sb = new StringBuilder();
-                List<string> fieldCNs = new List<string>();
+                List<string> fieldCNs = template.Select(ddf => ddf.CN).ToList();
 
-                foreach (DataDictionaryField ddf in template)
-                {
-                    sb.Append($"{ ddf.Name },");
-                    fieldCNs.Add(ddf.CN);
-                }
-
-                sw.WriteLine(sb.ToString());
-                #endregion
+                sw.WriteLine(String.Join(",", template.Select(ddf => ddf.Name)));
 
                 foreach (TtPoint point in points)
                 {
-                    sb.Clear();
-
-                    foreach (string cn in fieldCNs)
-                        sb.Append($"{point.ExtendedData[cn]},");
-
-                    sw.WriteLine(sb.ToString());
+                    sw.WriteLine(String.Join(",", fieldCNs.Select(fcn => point.ExtendedData[fcn])));
                 }
 
                 sw.Flush();
+            }
+
+            using (XmlWriter writer = XmlWriter.Create(fileName.Replace(".csv", ".ddt"), new XmlWriterSettings() { Indent = true }))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("DataDictionaryTemplate");
+
+                foreach (DataDictionaryField ddf in template)
+                {
+                    writer.WriteStartElement("Field");
+                    writer.WriteAttributeString(TwoTrailsSchema.SharedSchema.CN, ddf.CN);
+                    writer.WriteAttributeString(TwoTrailsSchema.DataDictionarySchema.DataType, ddf.DataType.ToString());
+
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.Name, ddf.Name);
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.FieldOrder, ddf.Order.ToString());
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.FieldType, ddf.FieldType.ToString());
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.Flags, ddf.Flags.ToString());
+
+                    if (ddf.Values != null)
+                    {
+                        writer.WriteStartElement(TwoTrailsSchema.DataDictionarySchema.FieldValues);
+                        foreach (string value in ddf.Values)
+                            writer.WriteElementString("Value", value);
+                        writer.WriteEndElement(); 
+                    }
+                    
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.DefaultValue, ddf.DefaultValue?.ToString());
+                    writer.WriteElementString(TwoTrailsSchema.DataDictionarySchema.ValueRequired, ddf.ValueRequired.ToString());
+
+                    writer.WriteEndElement();
+                }
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
             }
         }
 
@@ -363,20 +398,20 @@ namespace TwoTrails.Utils
             }
         }
 
-        public static void Summary(TtProject project, String fileName)
+        public static void Summary(ITtManager manager, TtProjectInfo projectInfo, String projectFilePath, String summaryFilePath)
         {
-            using (StreamWriter sw = new StreamWriter(fileName))
+            using (StreamWriter sw = new StreamWriter(summaryFilePath))
             {
-                sw.WriteLine($"Project File: { Path.GetFileName(project.DAL.FilePath) }");
-                sw.WriteLine($"Project Name: { project.ProjectName }");
-                sw.WriteLine($"Region: { project.ProjectInfo.Region }");
-                sw.WriteLine($"Forest: { project.ProjectInfo.Forest }");
-                sw.WriteLine($"District: { project.ProjectInfo.District }");
-                sw.WriteLine($"Description: { project.ProjectInfo.Description }");
-                sw.WriteLine($"Created On: { project.ProjectInfo.CreationDate }");
-                sw.WriteLine($"Version: { project.ProjectInfo.Version }");
-                sw.WriteLine($"Data Version: { project.ProjectInfo.Version }");
-                sw.WriteLine($"Creation Version: { project.ProjectInfo.CreationVersion }");
+                sw.WriteLine($"Project File: { Path.GetFileName(projectFilePath) }");
+                sw.WriteLine($"Project Name: { projectInfo.Name }");
+                sw.WriteLine($"Region: { projectInfo.Region }");
+                sw.WriteLine($"Forest: { projectInfo.Forest }");
+                sw.WriteLine($"District: { projectInfo.District }");
+                sw.WriteLine($"Description: { projectInfo.Description }");
+                sw.WriteLine($"Created On: { projectInfo.CreationDate }");
+                sw.WriteLine($"Version: { projectInfo.Version }");
+                sw.WriteLine($"Data Version: { projectInfo.Version }");
+                sw.WriteLine($"Creation Version: { projectInfo.CreationVersion }");
                 sw.WriteLine("\n");
                 sw.WriteLine("**** GPS Error can be divided by 2 if an appropriate ANGLE POINT METHOD is used instead of the WALK METHOD ****");
                 sw.WriteLine("**** Appropriate means that the boundary legs are reasnoably long between verticies where the boundary direction changes by 90 degree angles where possible and changes at least more than 30 degrees most of the time. ****");
@@ -384,10 +419,10 @@ namespace TwoTrails.Utils
                 sw.WriteLine("**** Points with asterisks are OFF boundary points. ****");
                 sw.WriteLine("\n");
                 
-                foreach (TtPolygon poly in project.Manager.GetPolygons())
+                foreach (TtPolygon poly in manager.GetPolygons())
                 {
                     sw.WriteLine($"{poly.Name}{Environment.NewLine}{new String('-', poly.Name.Length)}");
-                    sw.WriteLine(HaidLogic.GenerateSummary(project.Manager, poly).SummaryText);
+                    sw.WriteLine(HaidLogic.GenerateSummary(manager, poly).SummaryText);
                 }
 
             }
@@ -537,23 +572,23 @@ namespace TwoTrails.Utils
                     }
                     else
                     {
-                        mal.GetImageData(img).SaveImageToFile(filePath);
+                        MediaTools.GetImageData(mal, img).SaveImageToFile(filePath);
                     }
                 }
             }
         }
 
 
-        public static void GPX(TtProject project, String fileName)
+        public static void GPX(ITtManager manager, TtProjectInfo projectInfo, String fileName)
         {
-            GpxWriter.WriteGpxFile(fileName, TtGpxGenerator.Generate(project.Manager, project.ProjectName.Trim(), project.ProjectInfo.Description));
+            GpxWriter.WriteGpxFile(fileName, TtGpxGenerator.Generate(manager, projectInfo.Name.Trim(), projectInfo.Description));
         }
 
-        public static void KMZ(TtProject project, String fileName)
+        public static void KMZ(ITtManager manager, TtProjectInfo projectInfo, String fileName)
         {
-            KmlDocument doc = TtKmlGenerator.Generate(project.Manager, project.ProjectName.Trim(), project.ProjectInfo.Description);
+            KmlDocument doc = TtKmlGenerator.Generate(manager, projectInfo.Name.Trim(), projectInfo.Description);
             
-            string kmlName = $"{project.ProjectName.Trim()}.kml";
+            string kmlName = $"{projectInfo.Name.Trim()}.kml";
             string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);
 
             KmlWriter.WriteKmlFile(kmlFile, doc);
@@ -585,13 +620,13 @@ namespace TwoTrails.Utils
             File.Delete(kmlFile);
         }
 
-        public static void Shapes(TtProject project, String folderPath)
+        public static void Shapes(ITtManager manager, TtProjectInfo projectInfo, String folderPath)
         {
-            string shapeFolderPath = Path.Combine(folderPath, project.ProjectName);
+            string shapeFolderPath = Path.Combine(folderPath, projectInfo.Name);
 
-            foreach (TtPolygon poly in project.Manager.Polygons)
+            foreach (TtPolygon poly in manager.GetPolygons())
             {
-                TtShapeFileGenerator.WritePolygon(project.Manager, poly, shapeFolderPath);
+                TtShapeFileGenerator.WritePolygon(manager, poly, shapeFolderPath);
             }
         }
 

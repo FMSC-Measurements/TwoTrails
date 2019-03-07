@@ -39,11 +39,13 @@ namespace TwoTrails.Core.Points
 
                         _ParentPoint.AddLinkedPoint(this);
                         _ParentPoint.LocationChanged += ParentPoint_LocationChanged;
+                        _ParentPoint.OnAccuracyChanged += ParentPoint_OnAccuracyChanged;
                     }
 
                     if (oldParent != null)
                     {
                         oldParent.LocationChanged -= ParentPoint_LocationChanged;
+                        _ParentPoint.OnAccuracyChanged -= ParentPoint_OnAccuracyChanged;
                         oldParent.RemoveLinkedPoint(this);
 
                         if (_ParentPoint != null && !oldParent.HasSameAdjLocation(_ParentPoint))
@@ -74,12 +76,8 @@ namespace TwoTrails.Core.Points
 
         public QuondamPoint(TtPoint point) : base(point)
         {
-            QuondamPoint qndm = point as QuondamPoint;
-
-            if (qndm != null)
-            {
+            if (point is QuondamPoint qndm)
                 CopyQndmValues(qndm);
-            }
         }
 
         public QuondamPoint(QuondamPoint point) : base(point)
@@ -109,15 +107,20 @@ namespace TwoTrails.Core.Points
             OnLocationChanged();
         }
 
+        private void ParentPoint_OnAccuracyChanged(TtPoint point)
+        {
+            SetAccuracy(point.Accuracy);
+        }
+
         public override void SetAccuracy(double accuracy)
         {
-            base.SetAccuracy(ManualAccuracy ?? accuracy);
+            base.SetAccuracy(ManualAccuracy ?? ParentPoint.Accuracy);
         }
 
 
         public override string ToString()
         {
-            return $"{base.ToString()}{(ParentPoint != null ? $": {ParentPoint.ToString()}" : String.Empty)}";
+            return $"{base.ToString()}{(ParentPoint != null ? $" \u2794 {ParentPoint.ToString()} : {ParentPoint.Polygon.Name}" : String.Empty)}";
         }
 
 

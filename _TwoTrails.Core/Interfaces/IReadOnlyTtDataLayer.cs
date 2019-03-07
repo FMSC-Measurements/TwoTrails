@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using TwoTrails.Core;
-using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.DAL
@@ -36,6 +35,7 @@ namespace TwoTrails.DAL
 
         #region TTNmeaBurst
         IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null);
+        IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<String> pointCNs);
         #endregion
 
 

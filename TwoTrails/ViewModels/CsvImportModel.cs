@@ -1,11 +1,9 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using TwoTrails.DAL;
 using static TwoTrails.DAL.TtCsvDataAccessLayer;

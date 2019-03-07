@@ -1,6 +1,4 @@
-﻿using TwoTrails.Core.Points;
-
-namespace TwoTrails.Core.ComponentModel.History
+﻿namespace TwoTrails.Core.ComponentModel.History
 {
     public class AddTtMetadataCommand : ITtMetadataCommand
     {

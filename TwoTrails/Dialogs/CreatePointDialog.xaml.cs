@@ -1,18 +1,8 @@
 ﻿using FMSC.Core;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 
@@ -153,7 +143,8 @@ namespace TwoTrails.Dialogs
                             TtMetadata meta = cboMeta.SelectedItem as TtMetadata;
                             TtGroup group = cboGroup.SelectedItem as TtGroup;
 
-                            TtPoint prevPoint = null;
+                            TtPoint prevPoint = null, nextPoint = null;
+
                             int index = 0;
 
                             if (cboPolyPoints.Items.Count > 0)
@@ -162,7 +153,13 @@ namespace TwoTrails.Dialogs
                                 {
                                     index = cboPolyPoints.SelectedIndex;
                                     prevPoint = cboPolyPoints.Items.GetItemAt(index) as TtPoint;
+
                                     index++;
+
+                                    if (index < cboPolyPoints.Items.Count)
+                                    {
+                                        nextPoint = cboPolyPoints.Items.GetItemAt(index) as TtPoint;
+                                    }
                                 }
                                 else if (rbInsEnd.IsChecked == true)
                                 {
@@ -185,7 +182,12 @@ namespace TwoTrails.Dialogs
                             }
 
                             if (pidIsEmpty)
+                            {
                                 pid = PointNamer.NamePoint(poly, prevPoint);
+
+                                if (nextPoint != null && nextPoint.PID < pid)
+                                    pid = prevPoint.PID + 1;
+                            }
 
                             bool onBnd = chkBnd.IsChecked == true;
 

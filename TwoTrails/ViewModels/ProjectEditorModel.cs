@@ -1,6 +1,5 @@
 ﻿using CSUtil.ComponentModel;
-using FMSC.Core;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -18,7 +16,7 @@ using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
-using static TwoTrails.Core.Media.MediaTools;
+using static TwoTrails.Core.MediaTools;
 
 namespace TwoTrails.ViewModels
 {
@@ -266,9 +264,11 @@ namespace TwoTrails.ViewModels
         private void AccuracyLookup()
         {
             SessionData.HasGpsAccReport();
-           
-            AccuracyDataDialog dialog = new AccuracyDataDialog(SessionData.GpsAccuracyReport, _CurrentPolygon.Accuracy, SessionData.MakeID, SessionData.ModelID);
-            dialog.Owner = _Project.MainModel.MainWindow;
+
+            AccuracyDataDialog dialog = new AccuracyDataDialog(SessionData.GpsAccuracyReport, _CurrentPolygon.Accuracy, SessionData.MakeID, SessionData.ModelID)
+            {
+                Owner = _Project.MainModel.MainWindow
+            };
 
             if (dialog.ShowDialog() == true)
             {
@@ -320,9 +320,11 @@ namespace TwoTrails.ViewModels
         {
             if (CurrentPolygon != null)
             {
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.DefaultExt = "(Text File *.txt)|*.txt";
-                sfd.FileName = $"{CurrentPolygon.Name}_Summary";
+                SaveFileDialog sfd = new SaveFileDialog
+                {
+                    DefaultExt = "(Text File *.txt)|*.txt",
+                    FileName = $"{CurrentPolygon.Name}_Summary"
+                };
                 sfd.DefaultExt = ".txt";
                 sfd.OverwritePrompt = true;
 
@@ -411,7 +413,7 @@ namespace TwoTrails.ViewModels
         
         private void SetMetadataDefault()
         {
-            _Project.Settings.MetadataSettings.SetSettings(CurrentMetadata);
+            _Project.Settings.MetadataSettings.SetMetadataSettings(CurrentMetadata);
             MessageBox.Show("Metadata defaults set.");
         }
 

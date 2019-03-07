@@ -1,24 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TwoTrails.Core.Points;
+﻿using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core
 {
     public class PointNamer
     {
-        public static int NamePoint(TtPolygon polygon)
+        public static int NamePoint(TtPolygon polygon, TtPoint prevPoint = null)
         {
-            return polygon.PointStartIndex;
+            return (prevPoint != null) ? prevPoint.PID + polygon.Increment : polygon.PointStartIndex;
         }
-
-        public static int NamePoint(TtPolygon polygon, TtPoint prevPoint)
-        {
-            if (prevPoint != null)
-                return prevPoint.PID + polygon.Increment;
-            return polygon.PointStartIndex;
-        }
-
-
     }
 }

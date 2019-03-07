@@ -5,12 +5,9 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NetTopologySuite.Operation.Polygonize;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 
@@ -70,12 +67,12 @@ namespace TwoTrails.Utils
                 List<IFeature> features = new List<IFeature>();
                 AttributesTable attTable = new AttributesTable();
 
-                attTable.AddAttribute("Poly_Name", polygon.Name);
-                attTable.AddAttribute("Desc", polygon.Description);
-                attTable.AddAttribute("Poly", "Navigation Adjusted");
-                attTable.AddAttribute("CN", polygon.CN);
-                attTable.AddAttribute("Perim_M", polygon.Perimeter);
-                attTable.AddAttribute("PerimL_M", polygon.PerimeterLine);
+                attTable.Add("Poly_Name", polygon.Name);
+                attTable.Add("Desc", polygon.Description);
+                attTable.Add("Poly", "Navigation Adjusted");
+                attTable.Add("CN", polygon.CN);
+                attTable.Add("Perim_M", polygon.Perimeter);
+                attTable.Add("PerimL_M", polygon.PerimeterLine);
 
                 Feature feat = new Feature();
                 DbaseFileHeader dbh;
@@ -206,7 +203,7 @@ namespace TwoTrails.Utils
                     geoFac = new GeometryFactory();
                     sdw = new ShapefileDataWriter(fileName, geoFac);
                     features = new List<IFeature>();
-                    attTable.AddAttribute("Area_MtSq", polygon.Area);
+                    attTable.Add("Area_MtSq", polygon.Area);
                     attTable["Poly"] = "Boundary Adjusted";
                     feat = new Feature();
 
@@ -295,7 +292,7 @@ namespace TwoTrails.Utils
 
         private static void WriteProjection(string fileName, int zone)
         {
-            string _Projection = String.Format("PROJCS[\"NAD_1983_UTM_Zone_{0}N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",{1}],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0],AUTHORITY[\"EPSG\",269{0}]]",
+            string _Projection = String.Format("PROJCS[\"NAD_1983_UTM_Zone_{0:D2}N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",{1}],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0],AUTHORITY[\"EPSG\",269{0}]]",
                 zone, (zone * 6 - 183));
             
             if (fileName != null && fileName.Length > 0)
@@ -307,7 +304,7 @@ namespace TwoTrails.Utils
             }
         }
         
-        private static List<IFeature> GetPointFeatures(IEnumerable<TtPoint> points, bool adjusted, int zone)
+        private static List<IFeature> GetPointFeatures(IEnumerable<TtPoint> points, bool adjusted, int zone, DataDictionaryTemplate template = null)
         {
             List<IFeature> features = new List<IFeature>();
             Feature feat;
@@ -317,53 +314,63 @@ namespace TwoTrails.Utils
             foreach (TtPoint p in points)
             {
                 attPointTable = new AttributesTable();
-                attPointTable.AddAttribute("PID", p.PID);
-                attPointTable.AddAttribute("Op", p.OpType.ToString());
-                attPointTable.AddAttribute("Index", p.Index);
-                attPointTable.AddAttribute("PolyName", p.Polygon.Name);
-                attPointTable.AddAttribute("DateTime", p.TimeCreated.ToString("MM/dd/yyyy hh:mm:ss tt"));
+                attPointTable.Add("PID", p.PID);
+                attPointTable.Add("Op", p.OpType.ToString());
+                attPointTable.Add("Index", p.Index);
+                attPointTable.Add("PolyName", p.Polygon.Name);
+                attPointTable.Add("DateTime", p.TimeCreated.ToString("MM/dd/yyyy hh:mm:ss tt"));
                 
-                attPointTable.AddAttribute("OnBnd", p.OnBoundary);
-                attPointTable.AddAttribute("AdjX", p.AdjX);
-                attPointTable.AddAttribute("AdjY", p.AdjY);
-                attPointTable.AddAttribute("AdjZ", p.AdjZ);
-                attPointTable.AddAttribute("UnAdjX", p.UnAdjX);
-                attPointTable.AddAttribute("UnAdjY", p.UnAdjY);
-                attPointTable.AddAttribute("UnAdjZ", p.UnAdjZ);
+                attPointTable.Add("OnBnd", p.OnBoundary);
+                attPointTable.Add("AdjX", p.AdjX);
+                attPointTable.Add("AdjY", p.AdjY);
+                attPointTable.Add("AdjZ", p.AdjZ);
+                attPointTable.Add("UnAdjX", p.UnAdjX);
+                attPointTable.Add("UnAdjY", p.UnAdjY);
+                attPointTable.Add("UnAdjZ", p.UnAdjZ);
 
 
                 if (p.IsGpsType())
                 {
                     GpsPoint gps = p as GpsPoint;
-                    attPointTable.AddAttribute("Latitude", gps.Latitude.ToStringEx());
-                    attPointTable.AddAttribute("Longitude", gps.Longitude.ToStringEx());
-                    attPointTable.AddAttribute("Elevation", gps.Elevation.ToStringEx());
-                    attPointTable.AddAttribute("RMSEr", gps.RMSEr.ToStringEx());
-                    attPointTable.AddAttribute("ManAcc", gps.ManualAccuracy.ToStringEx());
+                    attPointTable.Add("Latitude", gps.Latitude.ToStringEx());
+                    attPointTable.Add("Longitude", gps.Longitude.ToStringEx());
+                    attPointTable.Add("Elevation", gps.Elevation.ToStringEx());
+                    attPointTable.Add("RMSEr", gps.RMSEr.ToStringEx());
+                    attPointTable.Add("ManAcc", gps.ManualAccuracy.ToStringEx());
                 }
                 else
                 {
-                    attPointTable.AddAttribute("Latitude", String.Empty);
-                    attPointTable.AddAttribute("Longitude", String.Empty);
-                    attPointTable.AddAttribute("Elevation", String.Empty);
-                    attPointTable.AddAttribute("RMSEr", String.Empty);
-                    attPointTable.AddAttribute("ManAcc", String.Empty);
+                    attPointTable.Add("Latitude", String.Empty);
+                    attPointTable.Add("Longitude", String.Empty);
+                    attPointTable.Add("Elevation", String.Empty);
+                    attPointTable.Add("RMSEr", String.Empty);
+                    attPointTable.Add("ManAcc", String.Empty);
                 }
 
                 if (p.OpType == OpType.Quondam)
                 {
                     QuondamPoint q = (QuondamPoint)p;
-                    attPointTable.AddAttribute("ParentName", q.ParentPoint.PID);
+                    attPointTable.Add("ParentName", q.ParentPoint.PID);
                 }
                 else
                 {
-                    attPointTable.AddAttribute("ParentName", String.Empty);
+                    attPointTable.Add("ParentName", String.Empty);
                 }
 
 
-                attPointTable.AddAttribute("Comment", p.Comment == null ? String.Empty : p.Comment);
+                attPointTable.Add("Comment", p.Comment == null ? String.Empty : p.Comment);
 
-                attPointTable.AddAttribute("CN", p.CN);
+                attPointTable.Add("CN", p.CN);
+
+
+                if (template != null && p.ExtendedData != null)
+                {
+                    foreach (DataDictionaryField field in template)
+                    {
+                        attPointTable.Add(field.Name.Replace(" ", ""), p.ExtendedData[field.CN]);
+                    }
+                }
+
 
                 feat = new Feature();
                 UTMCoords c = TtUtils.GetCoords(p, zone, adjusted);

@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
@@ -242,6 +240,11 @@ namespace TwoTrails.DAL
         }
 
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
+        {
+            return new List<TtNmeaBurst>();
+        }
+
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
         {
             return new List<TtNmeaBurst>();
         }

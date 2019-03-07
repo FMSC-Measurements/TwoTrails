@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
@@ -18,10 +16,9 @@ namespace TwoTrails.Core.ComponentModel.History
             TtPoint lastPoint = points.Last();
             if (lastPoint.OpType == OpType.SideShot)
                 ssPoints = ssPoints.TakeWhile(p => p.CN != lastPoint.CN);
-                
-
+            
             editPoints = new EditTtPointsCommand(ssPoints, PointProperties.BOUNDARY, false);
-            createQuondams = new CreateQuondamsCommand(ssPoints.Reverse(), pointsManager, targetPolygon, int.MaxValue, true);
+            createQuondams = new CreateQuondamsCommand(ssPoints.Reverse(), pointsManager, targetPolygon, int.MaxValue, QuondamBoundaryMode.On);
         }
 
         public override void Redo()

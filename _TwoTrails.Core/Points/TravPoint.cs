@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TwoTrails.Core.Points
 {
@@ -71,9 +69,7 @@ namespace TwoTrails.Core.Points
         public TravPoint(TtPoint point) : base(point)
         {
             if (point is TravPoint trav)
-            {
                 CopyTravValues(trav);
-            }
         }
         
         public TravPoint(TravPoint point) : base(point)
@@ -197,7 +193,7 @@ namespace TwoTrails.Core.Points
 
                 x = prevX + (HorizontalDistance * Math.Cos(azInRadians));
                 y = prevY + (HorizontalDistance * Math.Sin(azInRadians));
-                z = prevZ + (HorizontalDistance * Math.Sin(FMSC.Core.Convert.DegreesToRadians(SlopeAngle)));
+                z = prevZ + (SlopeDistance * Math.Sin(FMSC.Core.Convert.DegreesToRadians(SlopeAngle)));
 
                 if (isPrevAdjusted)
                 {
@@ -220,19 +216,13 @@ namespace TwoTrails.Core.Points
 
         protected Double AzimuthModule(Double value)
         {
-            double v = (double)value;
-            double integerPart = Math.Floor(v);
-            double fraction = v - integerPart;
-
-            return (integerPart % 360) + fraction;
+            double integerPart = Math.Floor(value);
+            return (integerPart % 360) + value - integerPart;
         }
 
         protected Double? AzimuthModule(Double? value)
         {
-            if (value == null)
-                return value;
-
-            return AzimuthModule((double)value);
+            return (value != null) ? (double?)AzimuthModule((double)value) : null;
         }
 
 

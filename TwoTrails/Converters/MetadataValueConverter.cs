@@ -1,10 +1,5 @@
-﻿using TwoTrails;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using TwoTrails.Core;
@@ -56,7 +51,7 @@ namespace TwoTrails.Converters
                         case MetadataPropertyName.Distance:
                             return FMSC.Core.Convert.Distance((double)value, Metadata.Distance, Distance.Meters);
                         case MetadataPropertyName.SlopeAngle:
-                            return FMSC.Core.Convert.Angle((double)value, Metadata.Slope, Slope.Percent);
+                            return FMSC.Core.Convert.Angle((double)value, Metadata.Slope, Slope.Degrees);
                     }
                 }
             }
@@ -79,7 +74,7 @@ namespace TwoTrails.Converters
                             case MetadataPropertyName.Distance:
                                 return FMSC.Core.Convert.Distance(dval, Distance.Meters, Metadata.Distance);
                             case MetadataPropertyName.SlopeAngle:
-                                return FMSC.Core.Convert.Angle(dval, Slope.Percent, Metadata.Slope);
+                                return FMSC.Core.Convert.Angle(dval, Slope.Degrees, Metadata.Slope);
                         }
                     }
                 }

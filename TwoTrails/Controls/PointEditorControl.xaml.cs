@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.ViewModels;
 
@@ -78,6 +73,27 @@ namespace TwoTrails.Controls
                 if (dep is DataGridCell cell)
                     DataEditor.SelectedColumnIndex = cell.Column.DisplayIndex;
             }
+        }
+
+
+        private void TextIsInteger(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsInteger(sender, e);
+        }
+
+        private void TextIsUnsginedInteger(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsUnsignedInteger(sender, e);
+        }
+
+        private void TextIsDouble(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsDouble(sender, e);
+        }
+
+        private void TextIsUnsignedDouble(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = FMSC.Core.Windows.Controls.ControlUtils.TextIsUnsignedDouble(sender, e);
         }
     }
 }

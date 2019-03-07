@@ -1,14 +1,11 @@
 ﻿using Microsoft.Shell;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Permissions;
-using System.Threading.Tasks;
 using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.DAL;
@@ -40,26 +37,38 @@ namespace TwoTrails
         private TtTextWriterTraceListener _Listener;
 
 
-        public static TtSettings Settings { get; private set; } 
+        public static TtSettings Settings { get; private set; }
 
 
         [STAThread]
         public static void Main()
         {
-            if (SingleInstance<App>.InitializeAsFirstInstance(ID))
+
+            string[] cmdArgs = Environment.GetCommandLineArgs();
+            if (cmdArgs.Length > 2 && cmdArgs.Any(arg => arg.Equals("/export", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                ExportFile(cmdArgs.SkipWhile(arg =>
+                    !arg.EndsWith(Consts.FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase) &&
+                    !arg.EndsWith(Consts.FILE_EXTENSION_MEDIA, StringComparison.InvariantCultureIgnoreCase)).First());
+            }
+            else if (SingleInstance<App>.InitializeAsFirstInstance(ID))
             {
                 Settings = new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings());
 
+#if !DEBUG
                 //Check for update
                 if (Settings.LastUpdateCheck == null || Settings.LastUpdateCheck < DateTime.Now.Subtract(TimeSpan.FromDays(1)))
                 {
-                    bool? res = TtUtils.CheckForUpdate();
+                    UpdateStatus status = TtUtils.CheckForUpdate();
 
-                    if (res != null)
+                    if (status.CheckStatus != null)
                     {
                         Settings.LastUpdateCheck = DateTime.Now;
 
-                        if (res == true && MessageBox.Show("A new version of TwoTrails is ready for download. Would you like to download it now?", "TwoTrails Update",
+                        if (status.CheckStatus == true &&
+                            MessageBox.Show($@"A new version of TwoTrails is ready for download.{
+                                (status.UpdateType.HasFlag(UpdateType.CriticalBugFixes) ? " There are CRITICAL updates implemented that should be installed. " : String.Empty)
+                            }Would you like to download it now?", "TwoTrails Update",
                                 MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
                         {
                             Process.Start(Consts.URL_TWOTRAILS);
@@ -67,12 +76,13 @@ namespace TwoTrails
                         }
                     }
                 }
+#endif
 
                 var application = new App();
 
                 application.InitializeComponent();
                 application.Run();
-                
+
                 SingleInstance<App>.Cleanup();
             }
         }
@@ -119,10 +129,85 @@ namespace TwoTrails
         }
 
 
+        private static void ExportFile(string file)
+        {
+            if (File.Exists(file))
+            {
+                StreamWriter logWriter = null;
+                if (SingleInstance<App>.CheckIfFirstInstance(ID))
+                    logWriter = new StreamWriter(LOG_FILE_PATH, true);
+                
+                try
+                {
+                    switch (Path.GetExtension(file))
+                    {
+                        case Consts.FILE_EXTENSION:
+                            {
+                                Export.All(file, new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings()));
+
+                                string message = $"[{DateTime.Now}] Exported Project: {file}";
+
+                                if (logWriter != null)
+                                    logWriter.WriteLine(message);
+                                else
+                                    SingleInstance<App>.SendMessageToFirstInstance(ID, new string[] { "LOG", message });
+
+                                MessageBox.Show("Project Exported");
+                                break;
+                            }
+                        case Consts.FILE_EXTENSION_FILTER_MEDIA:
+                            {
+                                TtSqliteMediaAccessLayer mal = new TtSqliteMediaAccessLayer(file);
+                                Export.MediaFiles(mal, Path.Combine(Path.GetDirectoryName(mal.FilePath), Path.GetFileNameWithoutExtension(mal.FilePath)).Trim());
+
+                                string message = $"[{DateTime.Now}] Exported Media: {file}";
+
+                                if (logWriter != null)
+                                    logWriter.WriteLine(message);
+                                else
+                                    SingleInstance<App>.SendMessageToFirstInstance(ID, new string[] { "LOG", message });
+                                    
+                                MessageBox.Show("Media Exported");
+                                break;
+                            }
+                        default:
+                            MessageBox.Show("Invalid export file type");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string message = $"[{DateTime.Now}] [Export Error]: {ex.Message}";
+
+                    if (logWriter != null)
+                        logWriter.WriteLine(message);
+                    else
+                        SingleInstance<App>.SendMessageToFirstInstance(ID, new string[] { "LOG", message });
+                        
+                    MessageBox.Show("An error has occured. Please view the log file for details");
+                }
+
+                if (logWriter != null)
+                {
+                    logWriter.Flush();
+                    logWriter.Dispose();
+                }
+            }
+            else
+            {
+                MessageBox.Show($"File '{file}' not found.");
+            }
+        }
+
 
         public bool SignalExternalCommandLineArgs(IList<string> args)
         {
-            ExternalInstanceArgs?.Invoke(this, args?.Skip(1));
+            if (args.Count > 1 && args[0] == "LOG" && _Listener != null)
+            {
+                _Listener.WriteLine(args[1]);
+            }
+            else
+                ExternalInstanceArgs?.Invoke(this, args?.Skip(1));
 
             return true;
         }

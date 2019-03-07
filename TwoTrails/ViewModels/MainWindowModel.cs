@@ -1,5 +1,5 @@
 ﻿using CSUtil.ComponentModel;
-using FMSC.Core.ComponentModel.Commands;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.Core.Utilities;
 using Microsoft.Win32;
 using System;
@@ -8,19 +8,15 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
-using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
-using TwoTrails.ViewModels;
+using FMSC.Core.Windows.Utilities;
 
 namespace TwoTrails.ViewModels
 {
@@ -147,6 +143,7 @@ namespace TwoTrails.ViewModels
         
         public ICommand ViewLogCommand { get; private set; }
         public ICommand ExportReportCommand { get; private set; }
+        public ICommand CheckForUpdatesCommand { get; private set; }
         public ICommand AboutCommand { get; private set; }
         #endregion
 
@@ -181,6 +178,7 @@ namespace TwoTrails.ViewModels
 
             ViewLogCommand = new RelayCommand(x => Process.Start(App.LOG_FILE_PATH));
             ExportReportCommand = new RelayCommand(x => ExportReport());
+            CheckForUpdatesCommand = new RelayCommand(x => CheckForUpdates());
             AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(MainWindow));
 
             _Tabs = mainWindow.tabControl;
@@ -197,6 +195,20 @@ namespace TwoTrails.ViewModels
             {
                 ParseCommandLineArgs(args);
             }
+
+#if DEBUG
+            if (CurrentProject == null)
+            {
+                foreach (String filePath in App.Settings.GetRecentProjects())
+                {
+                    if (File.Exists(filePath))
+                    {
+                        OpenProject(filePath);
+                        break;
+                    }
+                }
+            }
+#endif
         }
 
 
@@ -372,7 +384,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                             if (MessageBox.Show($"Would you like to create a project from this {TtUtils.GetFileTypeName(filePath)} file?", "Create Project from importable file.",
                                 MessageBoxButton.YesNo, MessageBoxImage.Hand, MessageBoxResult.No) == MessageBoxResult.Yes)
                             {
-                                
+                                CreateAndOpenProjectFromImportable(null, filePath);
                             }
                         }
                     }
@@ -409,9 +421,9 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
         }
 
 
-        public void CreateProject()
+        public bool CreateProject(TtProjectInfo ttProjectInfo = null)
         {
-            NewProjectDialog dialog = new NewProjectDialog(MainWindow, App.Settings.CreateProjectInfo(AppInfo.Version));
+            NewProjectDialog dialog = new NewProjectDialog(MainWindow, ttProjectInfo ?? App.Settings.CreateProjectInfo(AppInfo.Version));
 
             if (dialog.ShowDialog() == true)
             {
@@ -425,10 +437,83 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
                 App.Settings.Region = info.Region;
                 App.Settings.District = info.District;
+
+                return true;
             }
+
+            return false;
         }
 
+        public bool CreateAndOpenProjectFromImportable(TtProjectInfo ttProjectInfo, params string[] files)
+        {
+            if (ttProjectInfo == null)
+            {
+                ttProjectInfo = App.Settings.CreateProjectInfo(AppInfo.Version);
+                ttProjectInfo.Name = $"Import of {String.Join(", ", files.Select(f => Path.GetFileNameWithoutExtension(f)))}";
+            }
 
+            NewProjectDialog dialog = new NewProjectDialog(MainWindow, ttProjectInfo);
+
+            if (dialog.ShowDialog() == true)
+            {
+                TtProjectInfo info = dialog.ProjectInfo;
+
+                TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
+                TtProject proj = new TtProject(dal, null, App.Settings, this);
+
+                Trace.WriteLine($"Import Project Created ({dal.GetDataVersion()}): {dal.FilePath}");
+                
+                App.Settings.Region = info.Region;
+                App.Settings.District = info.District;
+
+                IReadOnlyTtDataLayer idal = null;
+
+                try
+                {
+                    foreach (string file in files)
+                    {
+                        switch (Path.GetExtension(file).ToLower())
+                        {
+                            case Consts.FILE_EXTENSION: idal = new TtSqliteDataAccessLayer(file); break;
+                            case Consts.FILE_EXTENSION_V2: idal = new TtV2SqliteDataAccessLayer(file); break;
+                            case Consts.GPX_EXT:
+                                idal = new TtGpxDataAccessLayer(
+                                    new TtGpxDataAccessLayer.ParseOptions(file, proj.Manager.DefaultMetadata.Zone, startPolyNumber: proj.Manager.PolygonCount + 1)); break;
+                            case Consts.KML_EXT:
+                            case Consts.KMZ_EXT:
+                                idal = new TtKmlDataAccessLayer(
+                                    new TtKmlDataAccessLayer.ParseOptions(file, proj.Manager.DefaultMetadata.Zone, startPolyNumber: proj.Manager.PolygonCount + 1)); break;
+                            case Consts.SHAPE_EXT:
+                                idal = new TtShapeFileDataAccessLayer(
+                                    new TtShapeFileDataAccessLayer.ParseOptions(file, proj.Manager.DefaultMetadata.Zone, proj.Manager.PolygonCount + 1)); break;
+                            case Consts.TEXT_EXT:
+                            case Consts.CSV_EXT: ImportDialog.ShowDialog(proj, this.MainWindow, file, true); break;
+                            default: idal = null; break;
+                        }
+
+                        if (idal != null)
+                        {
+                            Import.DAL(proj.Manager, idal);
+                        }
+                    }
+
+                    AddProject(proj);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine($"Import Project failed to import data.");
+                    Trace.WriteLine(ex.Message, "MainWindowModel:CreateProjectFromImportable");
+
+                    File.Delete(dialog.FilePath);
+
+                    MessageBox.Show("Error Converting File to TwoTrails Project. See Error Log for Details.");
+                }
+            }
+            
+            return false;
+        }
 
         public void SaveCurrentProject(bool rename = false)
         {
@@ -473,6 +558,8 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             {
                 CurrentProject.Save();
             }
+
+            MainWindow.Title = $"TwoTrails - {CurrentProject.ProjectName}";
         }
 
 
@@ -624,7 +711,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                         Directory.CreateDirectory(App.TEMP_DIR);
 
                     string file = Path.Combine(App.TEMP_DIR, $"{Guid.NewGuid().ToString()}.kmz");
-                    Export.KMZ(CurrentProject, file);
+                    Export.KMZ(CurrentProject.Manager, CurrentProject.ProjectInfo, file);
 
                     if (File.Exists(file))
                         Process.Start(file);
@@ -724,5 +811,33 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             }
         }
     
+        private void CheckForUpdates()
+        {
+            UpdateStatus status = TtUtils.CheckForUpdate();
+
+            if (status.CheckStatus != null)
+            {
+                Settings.LastUpdateCheck = DateTime.Now;
+
+                if (status.CheckStatus == true)
+                {
+                    if (MessageBox.Show($@"A new version of TwoTrails is ready for download.{
+                        (status.UpdateType.HasFlag(UpdateType.CriticalBugFixes) ? " There are CRITICAL updates implemented that should be installed. " : String.Empty)
+                    }Would you like to download it now?", "TwoTrails Update",
+                        MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                    {
+                        Process.Start(Consts.URL_TWOTRAILS);
+                    }
+                }
+                else if (status.CheckStatus == false)
+                {
+                    MessageBox.Show("You have the most recent version of TwoTrails", "TwoTrails Update");
+                }
+                else
+                {
+                    MessageBox.Show("Checking for updates was unsuccessful.", "TwoTrails Update");
+                }
+            }
+        }
     }
 }

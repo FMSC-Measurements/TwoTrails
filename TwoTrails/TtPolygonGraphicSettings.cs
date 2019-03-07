@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TwoTrails.Core;
+﻿using TwoTrails.Core;
 
 namespace TwoTrails
 {
@@ -12,9 +7,9 @@ namespace TwoTrails
         //All Colors are in the ARGB format
 
         //FFF44336
-        public int AdjBndColor { get; } = -769226;
+        public int AdjBndColor { get; } = -65536;//- 769226;
         //FFB71C1C
-        public int UnAdjBndColor { get; } = -15064194;
+        public int UnAdjBndColor { get; } = -4776932;
 
         //FF3F51B5
         public int AdjNavColor { get; } = -12627531;

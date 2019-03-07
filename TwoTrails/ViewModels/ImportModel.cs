@@ -1,15 +1,11 @@
 ﻿using CSUtil.ComponentModel;
-using FMSC.Core.ComponentModel.Commands;
-using FMSC.Core.Controls;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -61,8 +57,10 @@ namespace TwoTrails.ViewModels
 
         public bool CanImport { get { return ImportControl != null && ImportControl.HasSelectedPolygons && !IsImporting; } }
 
+        private bool _AutoCloseOnImport;
 
-        public ImportModel(Window window, ITtManager manager, string fileName = null)
+
+        public ImportModel(Window window, ITtManager manager, string fileName = null, bool autoCloseOnImport = false)
         {
             _Window = window;
             _Manager = manager;
@@ -78,6 +76,8 @@ namespace TwoTrails.ViewModels
 
             if (fileName != null)
                 SetupImport(fileName);
+
+            _AutoCloseOnImport = true;
         }
 
         private void BrowseFile()
@@ -234,14 +234,32 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
             }
         }
 
-        private void SetupShapeFiles(IEnumerable<string> shapefiles)
+        public void SetupShapeFiles(IEnumerable<string> shapefiles)
         {
-            ImportControl = new ImportControl(
-                        new TtShapeFileDataAccessLayer(
-                            new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
-                        )
-                    );
-            IsSettingUp = true;
+            List<TtShapeFileDataAccessLayer.ShapeFileValidityResult> invalids =
+                shapefiles.Select(sf => TtShapeFileDataAccessLayer.ValidateShapePackage(sf, _Manager.DefaultMetadata.Zone))
+                .Where(r => r != TtShapeFileDataAccessLayer.ShapeFileValidityResult.Valid).ToList();
+
+            if (invalids.Count > 0)
+            {
+                if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.MissingFiles))
+                    MessageBox.Show("Missing one many of the 'shp', 'prj', 'dbf', or 'shx' files.");
+                else if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.NotNAD83))
+                    MessageBox.Show("Shape File is not in the NAD83 format.");
+                else if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.MismatchZone))
+                    MessageBox.Show($"Shape File is not in zone {_Manager.DefaultMetadata.Zone}.");
+                else
+                    MessageBox.Show("Issue with shapefile(s).");
+            }
+            else
+            {
+                ImportControl = new ImportControl(
+                            new TtShapeFileDataAccessLayer(
+                                new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
+                            )
+                        );
+                IsSettingUp = true;
+            }
         }
 
         public void ImportData()
@@ -294,7 +312,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                 MessageBox.Show($"{selectedPolys.Count()} Polygons Imported",
                     String.Empty, MessageBoxButton.OK, MessageBoxImage.None);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!_AutoCloseOnImport)
             {
                 Trace.WriteLine(ex.Message, "ImportModel:ImportData");
                 MessageBox.Show("Import Failed. See log file for details.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Error);
@@ -302,6 +320,9 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
             
             IsImporting = false;
             ImportControl = null;
+
+            if (_AutoCloseOnImport)
+                _Window.Close();
         }
 
         private void Cancel()

@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FMSC.Core.Windows.Controls;
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using TwoTrails.Core;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.Dialogs
@@ -27,9 +18,14 @@ namespace TwoTrails.Dialogs
             InitializeComponent();
         }
 
+        private void TextIsUnsignedInteger(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = ControlUtils.TextIsUnsignedInteger(sender, e);
+        }
+
         private void TextIsInteger(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = string.IsNullOrEmpty(e.Text) ? false : !e.Text.All(char.IsDigit);
+            e.Handled = ControlUtils.TextIsInteger(sender, e);
         }
 
 

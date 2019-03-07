@@ -1,29 +1,32 @@
 ﻿using CSUtil;
 using CSUtil.ComponentModel;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections;
 using System.Linq;
+using System;
 
 namespace TwoTrails.Core
 {
-    public class DataDictionary : NotifyPropertyChangedEx, IEqualityComparer<DataDictionary>, IEnumerable<KeyValuePair<string, object>>
+    public class DataDictionary : NotifyPropertyChangedEx, IEnumerable<KeyValuePair<string, object>>, IEquatable<DataDictionary>, IEqualityComparer<DataDictionary>
     {
         private readonly Dictionary<string, object> _Data;
         
+        public string PointCN { get; private set; }
         
-        public DataDictionary(Dictionary<string, object> data = null)
+
+        public DataDictionary(string pointCN = null, IEnumerable<KeyValuePair<string, object>> data = null)
         {
-            _Data = data ?? new Dictionary<string, object>();
+            PointCN = pointCN;
+            _Data = data != null && data.Any() ? data.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) : new Dictionary<string, object>();
         }
 
         public DataDictionary(DataDictionary dataDictionary)
         {
+            PointCN = dataDictionary.PointCN;
             _Data = dataDictionary.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
         
-        public DataDictionary(DataDictionaryTemplate dataDictionaryTemplate) : this()
+        public DataDictionary(string pointCN, DataDictionaryTemplate dataDictionaryTemplate) : this(pointCN)
         {
             foreach (DataDictionaryField field in dataDictionaryTemplate)
                 _Data.Add(field.CN, field.GetDefaultValue());
@@ -76,12 +79,22 @@ namespace TwoTrails.Core
             }
         }
 
+        public bool HasField(string cn)
+        {
+            return _Data.ContainsKey(cn);
+        }
+
 
         public override bool Equals(object obj)
         {
-            return Equals(this, obj as DataDictionary);
+            return obj is DataDictionary dd && Equals(this, dd);
         }
-
+        
+        public bool Equals(DataDictionary dd)
+        {
+            return Equals(this, dd);
+        }
+        
         public bool Equals(DataDictionary x, DataDictionary y)
         {
             return _Data.DictionaryEqual(y._Data);

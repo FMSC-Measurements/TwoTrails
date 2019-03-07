@@ -1,8 +1,6 @@
 ﻿using FMSC.GeoSpatial.UTM;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core

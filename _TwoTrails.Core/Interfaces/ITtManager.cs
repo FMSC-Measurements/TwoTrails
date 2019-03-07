@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 
@@ -46,6 +45,7 @@ namespace TwoTrails.Core
 
 
         List<TtNmeaBurst> GetNmeaBursts(string pointCN = null);
+        List<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs);
         void AddNmeaBurst(TtNmeaBurst burst);
         void AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
         void DeleteNmeaBursts(string pointCN);
@@ -60,6 +60,8 @@ namespace TwoTrails.Core
 
         PolygonGraphicOptions GetPolygonGraphicOption(string polyCN);
         List<PolygonGraphicOptions> GetPolygonGraphicOptions();
+
+        PolygonGraphicOptions GetDefaultPolygonGraphicOption();
 
 
         void UpdateDataAction(DataActionType action, string notes = null);

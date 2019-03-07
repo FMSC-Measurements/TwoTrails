@@ -1,18 +1,6 @@
-﻿using FMSC.Core.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using FMSC.Core.Windows.Controls;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.Controls
@@ -38,9 +26,9 @@ namespace TwoTrails.Controls
             tabControl.SelectedIndex = (int)tab;
         }
 
-        private void TextIsInteger(object sender, TextCompositionEventArgs e)
+        private void TextIsUnsignedInteger(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = ControlUtils.TextIsInteger(sender, e);
+            e.Handled = ControlUtils.TextIsUnsignedInteger(sender, e);
         }
 
         private void TextIsDouble(object sender, TextCompositionEventArgs e)

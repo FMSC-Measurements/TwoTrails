@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core
@@ -109,7 +107,7 @@ namespace TwoTrails.Core
 
                     if (curr.OpType == OpType.SideShot)
                     {
-                        (curr as SideShotPoint).Adjust(last);
+                        ((SideShotPoint)curr).Adjust(last);
                     }
                     else if (curr.OpType == OpType.Traverse)
                     {
@@ -130,7 +128,7 @@ namespace TwoTrails.Core
             {
                 if (point.OpType == OpType.Traverse)
                 {
-                    (point as TravPoint).Calculate(last.UnAdjX, last.UnAdjY, last.UnAdjZ, false);
+                    ((TravPoint)point).Calculate(last.UnAdjX, last.UnAdjY, last.UnAdjZ, false);
                 }
 
                 last = point;

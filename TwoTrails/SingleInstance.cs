@@ -7,25 +7,26 @@
 //     this application is running at a time.
 // </summary>
 //-----------------------------------------------------------------------
+//Modifications by FMSC
 
-namespace Microsoft.Shell 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Ipc;
+using System.Runtime.Serialization.Formatters;
+using System.Threading;
+using System.Windows;
+using System.Windows.Threading;
+using System.Security;
+using System.Runtime.InteropServices;
+using System.ComponentModel;
+
+namespace Microsoft.Shell
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Runtime.Remoting;
-    using System.Runtime.Remoting.Channels;
-    using System.Runtime.Remoting.Channels.Ipc;
-    using System.Runtime.Serialization.Formatters;
-    using System.Threading;
-    using System.Windows;
-    using System.Windows.Threading;
-    using System.Xml.Serialization;
-    using System.Security;
-    using System.Runtime.InteropServices;
-    using System.ComponentModel;
-
+    #region Native
     internal enum WM
     {
         NULL = 0x0000,
@@ -189,8 +190,8 @@ namespace Microsoft.Shell
                 // Assert.AreEqual(IntPtr.Zero, p);
             }
         }
-
-    } 
+    }
+    #endregion
 
     public interface ISingleInstanceApp 
     { 
@@ -208,8 +209,7 @@ namespace Microsoft.Shell
     /// running as Administrator, can activate it with command line arguments.
     /// For most apps, this will not be much of an issue.
     /// </remarks>
-    public static class SingleInstance<TApplication>  
-                where   TApplication: Application ,  ISingleInstanceApp 
+    public static class SingleInstance<TApplication> where TApplication : Application, ISingleInstanceApp 
                                     
     {
         #region Private Fields
@@ -244,11 +244,6 @@ namespace Microsoft.Shell
         /// </summary>
         private static IpcServerChannel channel;
 
-        /// <summary>
-        /// List of command line arguments for the application.
-        /// </summary>
-        private static IList<string> commandLineArgs;
-
         #endregion
 
         #region Public Properties
@@ -256,10 +251,7 @@ namespace Microsoft.Shell
         /// <summary>
         /// Gets list of command line arguments for the application.
         /// </summary>
-        public static IList<string> CommandLineArgs
-        {
-            get { return commandLineArgs; }
-        }
+        public static IList<string> CommandLineArgs { get; private set; }
 
         #endregion
 
@@ -270,28 +262,44 @@ namespace Microsoft.Shell
         /// If not, activates the first instance.
         /// </summary>
         /// <returns>True if this is the first instance of the application.</returns>
-        public static bool InitializeAsFirstInstance( string uniqueName )
+        public static bool InitializeAsFirstInstance(string uniqueName)
         {
-            commandLineArgs = GetCommandLineArgs(uniqueName);
-
-            // Build unique application Id and the IPC channel name.
-            string applicationIdentifier = uniqueName + Environment.UserName;
-
-            string channelName = String.Concat(applicationIdentifier, Delimiter, ChannelNameSuffix);
-
-            // Create mutex based on unique application Id to check if this is the first instance of the application. 
-            bool firstInstance;
-            singleInstanceMutex = new Mutex(true, applicationIdentifier, out firstInstance);
+            CommandLineArgs = GetCommandLineArgs(uniqueName);
+            
+            singleInstanceMutex = CreateAppMutex(uniqueName, out string applicationIdentifier, out string channelName, out bool firstInstance);
             if (firstInstance)
             {
                 CreateRemoteService(channelName);
             }
             else
             {
-                SignalFirstInstance(channelName, commandLineArgs);
+                SignalFirstInstance(channelName, CommandLineArgs);
             }
 
             return firstInstance;
+        }
+
+        public static bool CheckIfFirstInstance(string uniqueName)
+        {
+            singleInstanceMutex = CreateAppMutex(uniqueName, out string applicationIdentifier, out string channelName, out bool firstInstance);
+
+            if (firstInstance)
+                Cleanup();
+
+            return firstInstance;
+        }
+
+        public static void SendMessageToFirstInstance(string uniqueName, IList<string> messages)
+        {
+            singleInstanceMutex = CreateAppMutex(uniqueName, out string applicationIdentifier, out string channelName, out bool firstInstance);
+            if (!firstInstance)
+            {
+                SignalFirstInstance(String.Concat(applicationIdentifier, Delimiter, ChannelNameSuffix), messages);
+            }
+            else
+            {
+                Cleanup();
+            }
         }
 
         /// <summary>
@@ -388,6 +396,18 @@ namespace Microsoft.Shell
             IPCRemoteService remoteService = new IPCRemoteService();
             RemotingServices.Marshal(remoteService, RemoteServiceName);
         }
+
+
+        private static Mutex CreateAppMutex(string uniqueName, out string applicationIdentifier, out string channelName, out bool firstInstance)
+        {
+            // Build unique application Id and the IPC channel name.
+            applicationIdentifier = uniqueName + Environment.UserName;
+            channelName = String.Concat(applicationIdentifier, Delimiter, ChannelNameSuffix);
+
+            // Create mutex based on unique application Id to check if this is the first instance of the application. 
+            return new Mutex(true, applicationIdentifier, out firstInstance);
+        }
+
 
         /// <summary>
         /// Creates a client channel and obtains a reference to the remoting service exposed by the server - 

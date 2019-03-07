@@ -11,6 +11,23 @@ namespace TwoTrails.Core
         private readonly Dictionary<string, DataDictionaryField> _Fields = new Dictionary<string, DataDictionaryField>();
         
 
+        public DataDictionaryTemplate(IEnumerable<DataDictionaryField> dataDictionaryFields = null)
+        {
+            if (dataDictionaryFields != null)
+            {
+                foreach (DataDictionaryField field in dataDictionaryFields)
+                {
+                    AddField(field);
+                } 
+            }
+        }
+
+
+        public bool HasField(string cn)
+        {
+            return _Fields.ContainsKey(cn);
+        }
+
         public void AddField(DataDictionaryField field)
         {
             if (_Fields.ContainsKey(field.CN))
@@ -26,14 +43,9 @@ namespace TwoTrails.Core
         }
 
 
-        public DataDictionary CreateDefaultDataDictionary()
+        public DataDictionary CreateDefaultDataDictionary(string pointCN = null)
         {
-            Dictionary<string, object> data = new Dictionary<string, object>();
-
-            foreach (DataDictionaryField ddf in this)
-                data.Add(ddf.CN, ddf.GetDefaultValue());
-
-            return new DataDictionary();
+            return new DataDictionary(pointCN, this);
         }
 
         
@@ -54,7 +66,7 @@ namespace TwoTrails.Core
         }
     }
 
-    public class DataDictionaryField
+    public class DataDictionaryField : IEquatable<DataDictionaryField>
     {
         public string CN { get; }
 
@@ -62,13 +74,13 @@ namespace TwoTrails.Core
 
         public int Order { get; set; }
 
-        public FeildType FeildType { get; set; }
+        public FieldType FieldType { get; set; }
 
         public int Flags { get; set; }
 
-        public IList<String> Values { get; set; }
+        public List<String> Values { get; set; }
 
-        public String DefaultValue { get; set; }
+        public object DefaultValue { get; set; }
 
         public DataType DataType { get; set; }
 
@@ -85,16 +97,17 @@ namespace TwoTrails.Core
         {
             if (DefaultValue != null)
             {
-                switch (DataType)
-                {
-                    case DataType.INTEGER: return Int32.Parse(DefaultValue);
-                    case DataType.DECIMAL: return Decimal.Parse(DefaultValue);
-                    case DataType.FLOAT: return Double.Parse(DefaultValue);
-                    case DataType.STRING: return DefaultValue;
-                    case DataType.BYTE_ARRAY: return Int32.Parse(DefaultValue);
-                    case DataType.BOOLEAN: return Encoding.UTF8.GetBytes(DefaultValue);
-                    default: throw new Exception("Invalid DataType");
-                }
+                return DefaultValue;
+                //switch (DataType)
+                //{
+                //    case DataType.INTEGER: return Int32.Parse(DefaultValue);
+                //    case DataType.DECIMAL: return Decimal.Parse(DefaultValue);
+                //    case DataType.FLOAT: return Double.Parse(DefaultValue);
+                //    case DataType.TEXT: return DefaultValue;
+                //    case DataType.BYTE_ARRAY: return null;// Int32.Parse(DefaultValue);
+                //    case DataType.BOOLEAN: return Boolean.Parse(DefaultValue);
+                //    default: throw new Exception("Invalid DataType");
+                //}
             }
             else if (ValueRequired)
             {
@@ -103,8 +116,8 @@ namespace TwoTrails.Core
                     case DataType.INTEGER: return 0;
                     case DataType.DECIMAL: return 0m;
                     case DataType.FLOAT: return 0d;
-                    case DataType.STRING: return String.Empty;
-                    case DataType.BYTE_ARRAY: return new byte[0];
+                    case DataType.TEXT: return String.Empty;
+                    case DataType.BYTE_ARRAY: return null;// new byte[0];
                     case DataType.BOOLEAN: return false;
                     default: throw new Exception("Invalid DataType");
                 }
@@ -117,9 +130,51 @@ namespace TwoTrails.Core
         {
             return (T)GetDefaultValue();
         }
+
+
+        public override bool Equals(object obj)
+        {
+            return obj is DataDictionaryField field && field == this;
+        }
+
+        public bool Equals(DataDictionaryField other)
+        {
+            return
+                this.CN == other.CN &&
+                this.Name == other.Name &&
+                this.Order == other.Order &&
+                this.FieldType == other.FieldType &&
+                this.Flags == other.Flags &&
+                this.DataType == other.DataType &&
+                this.ValueRequired == other.ValueRequired &&
+                ((this.Values == null) == (other.Values == null) &&
+                    (this.Values == null || (this.Values.Count == other.Values.Count && this.Values.SequenceEqual(other.Values)))) &&
+                ((this.DefaultValue == null) == (other.DefaultValue == null) &&
+                    (this.DefaultValue == null || this.DefaultValue.Equals(other.DefaultValue)));
+            //(!(this.Values != null ^ other.Values != null) &&
+            //    (this.Values == null || (this.Values.Count == other.Values.Count && this.Values.SequenceEqual(other.Values)))) &&
+            //(!(this.DefaultValue != null ^ other.DefaultValue != null) &&
+            //    (this.DefaultValue == null || this.DefaultValue.Equals(other.DefaultValue)));
+
+        }
+        
+        public override int GetHashCode()
+        {
+            var hashCode = 1869274798;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(CN);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * -1521134295 + Order.GetHashCode();
+            hashCode = hashCode * -1521134295 + FieldType.GetHashCode();
+            hashCode = hashCode * -1521134295 + Flags.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<List<string>>.Default.GetHashCode(Values);
+            hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(DefaultValue);
+            hashCode = hashCode * -1521134295 + DataType.GetHashCode();
+            hashCode = hashCode * -1521134295 + ValueRequired.GetHashCode();
+            return hashCode;
+        }
     }
 
-    public enum FeildType
+    public enum FieldType
     {
         ComboBox = 1,
         TextBox = 2,
@@ -131,7 +186,7 @@ namespace TwoTrails.Core
         INTEGER = 0,
         DECIMAL = 1,
         FLOAT = 2,
-        STRING = 3,
+        TEXT = 3,
         BYTE_ARRAY = 4,
         BOOLEAN = 5
     }

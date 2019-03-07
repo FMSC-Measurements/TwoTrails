@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
+using System.Windows;
 using TwoTrails.Controls;
-using TwoTrails.Mapping;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails
@@ -8,7 +8,7 @@ namespace TwoTrails
     /// <summary>
     /// Interaction logic for MapWindow.xaml
     /// </summary>
-    public partial class MapWindow : TtWindow
+    public partial class MapWindow : Window
     {
         public MapControl MapControl { get; private set; }
 

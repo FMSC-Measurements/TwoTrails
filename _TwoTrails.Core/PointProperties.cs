@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core
@@ -40,7 +36,6 @@ namespace TwoTrails.Core
 
         public static readonly PropertyInfo PARENT_POINT;
         public static readonly PropertyInfo MAN_ACC_QP;
-
 
         static PointProperties()
         {
@@ -80,6 +75,82 @@ namespace TwoTrails.Core
 
             PARENT_POINT = qp.GetProperty(nameof(QuondamPoint.ParentPoint), bf);
             MAN_ACC_QP = qp.GetProperty(nameof(QuondamPoint.ManualAccuracy), bf);
+        }
+
+        public static PropertyInfo GetPropertyByName(string name)
+        {
+            switch (name)
+            {
+                case nameof(TtPoint.Index): return INDEX;
+                case nameof(TtPoint.PID): return PID;
+                case nameof(TtPoint.TimeCreated): return TIME_CREATED;
+                case nameof(TtPoint.Polygon): return POLY;
+                case nameof(TtPoint.Group): return GROUP;
+                case nameof(TtPoint.Metadata): return META;
+                case nameof(TtPoint.Comment): return COMMENT;
+                case nameof(TtPoint.OnBoundary): return BOUNDARY;
+                case nameof(TtPoint.AdjX): return ADJX;
+                case nameof(TtPoint.AdjY): return ADJY;
+                case nameof(TtPoint.AdjZ): return ADJZ;
+                case nameof(TtPoint.UnAdjX): return UNADJX;
+                case nameof(TtPoint.UnAdjY): return UNADJY;
+                case nameof(TtPoint.UnAdjZ): return UNADJZ;
+                case nameof(TtPoint.Accuracy): return ACCURACY;
+                case nameof(TtPoint.LinkedPoints): return QLINKS;
+
+                case nameof(GpsPoint.Latitude): return LAT;
+                case nameof(GpsPoint.Longitude): return LON;
+                case nameof(GpsPoint.Elevation): return ELEVATION;
+                //case nameof(GpsPoint.ManualAccuracy): return MAN_ACC_GPS;
+
+                case nameof(TravPoint.FwdAzimuth): return FWD_AZ;
+                case nameof(TravPoint.BkAzimuth): return BK_AZ;
+                case nameof(TravPoint.SlopeDistance): return SLP_DIST;
+                case nameof(TravPoint.SlopeAngle): return SLP_ANG;
+
+                case nameof(QuondamPoint.ParentPoint): return PARENT_POINT;
+                //case nameof(QuondamPoint.ManualAccuracy): return MAN_ACC_QP;
+            }
+
+            return null;
+        }
+
+        public static Type GetPointTypeByPropertyName(string name)
+        {
+            switch (name)
+            {
+                case nameof(TtPoint.Index):
+                case nameof(TtPoint.PID):
+                case nameof(TtPoint.TimeCreated):
+                case nameof(TtPoint.Polygon):
+                case nameof(TtPoint.Group):
+                case nameof(TtPoint.Metadata):
+                case nameof(TtPoint.Comment):
+                case nameof(TtPoint.OnBoundary):
+                case nameof(TtPoint.AdjX):
+                case nameof(TtPoint.AdjY):
+                case nameof(TtPoint.AdjZ):
+                case nameof(TtPoint.UnAdjX):
+                case nameof(TtPoint.UnAdjY):
+                case nameof(TtPoint.UnAdjZ):
+                case nameof(TtPoint.Accuracy):
+                case nameof(TtPoint.LinkedPoints): return typeof(TtPoint);
+
+                case nameof(GpsPoint.Latitude):
+                case nameof(GpsPoint.Longitude):
+                case nameof(GpsPoint.Elevation): return typeof(GpsPoint);
+                //case nameof(GpsPoint.ManualAccuracy): return MAN_ACC_GPS;
+
+                case nameof(TravPoint.FwdAzimuth):
+                case nameof(TravPoint.BkAzimuth):
+                case nameof(TravPoint.SlopeDistance):
+                case nameof(TravPoint.SlopeAngle): return typeof(TravPoint);
+
+                case nameof(QuondamPoint.ParentPoint): return typeof(QuondamPoint);
+                //case nameof(QuondamPoint.ManualAccuracy): return MAN_ACC_QP;
+            }
+
+            return null;
         }
     }
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History

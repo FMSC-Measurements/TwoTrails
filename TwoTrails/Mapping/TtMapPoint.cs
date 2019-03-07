@@ -1,9 +1,5 @@
 ﻿using Microsoft.Maps.MapControl.WPF;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core.Points;
 using System.Windows;
 using FMSC.GeoSpatial.UTM;
@@ -14,6 +10,7 @@ using System.Windows.Media;
 using System.ComponentModel;
 using TwoTrails.Core;
 using System.Windows.Controls;
+using Point = FMSC.Core.Point;
 
 namespace TwoTrails.Mapping
 {
@@ -221,24 +218,24 @@ namespace TwoTrails.Mapping
             ToolTipService.SetShowDuration(UnAdjPushpin, 60000);
 
 
-            AdjColor = pgo.AdjPtsColor;
-            UnAdjColor = pgo.UnAdjPtsColor;
-            WayPointColor = pgo.WayPtsColor;
+            AdjColor = MediaTools.GetColor(pgo.AdjPtsColor);
+            UnAdjColor = MediaTools.GetColor(pgo.UnAdjPtsColor);
+            WayPointColor = MediaTools.GetColor(pgo.WayPtsColor);
 
             IsNavPoint = point.IsNavPoint();
 
-            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, Color color) =>
+            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, int color) =>
             {
                 switch (code)
                 {
                     case GraphicCode.ADJPTS_COLOR:
-                        AdjColor = color;
+                        AdjColor = MediaTools.GetColor(color);
                         break;
                     case GraphicCode.UNADJPTS_COLOR:
-                        UnAdjColor = color;
+                        UnAdjColor = MediaTools.GetColor(color);
                         break;
                     case GraphicCode.WAYPTS_COLOR:
-                        WayPointColor = color;
+                        WayPointColor = MediaTools.GetColor(color);
                         break;
                     default:
                         break;
@@ -246,6 +243,9 @@ namespace TwoTrails.Mapping
             };
 
             point.PropertyChanged += Point_PropertyChanged;
+            if (point is QuondamPoint qp)
+                qp.ParentPoint.PropertyChanged += Point_PropertyChanged;
+
             point.LocationChanged += UpdateLocation;
             UpdateLocation(point);
 
@@ -278,6 +278,11 @@ namespace TwoTrails.Mapping
             if (e.PropertyName == nameof(TtPoint.OnBoundary))
             {
                 UpdateVisibility();
+            }
+            else if (e.PropertyName == nameof(TtPoint.PID))
+            {
+                UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
+                AdjPushpin.ToolTip = new PointInfoBox(this, true);
             }
         }
 
@@ -326,13 +331,13 @@ namespace TwoTrails.Mapping
 
         private void LoadUnAdjToolTip(Object sender, ToolTipEventArgs e)
         {
-            if (UnAdjPushpin.ToolTip is string)
+            if (!(UnAdjPushpin.ToolTip is PointInfoBox))
                 UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
         }
 
         private void LoadAdjToolTip(Object sender, ToolTipEventArgs e)
         {
-            if (AdjPushpin.ToolTip is string)
+            if (!(AdjPushpin.ToolTip is PointInfoBox))
                 AdjPushpin.ToolTip = new PointInfoBox(this, true);
         }
 

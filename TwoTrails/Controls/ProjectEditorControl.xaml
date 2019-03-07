@@ -9,14 +9,14 @@
              xmlns:ttl="clr-namespace:TwoTrails"
              xmlns:tt="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
              xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
-             xmlns:fmsccm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
-			 xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
+             xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800"
              Background="{StaticResource colorBackground}">
     <UserControl.Resources>
         <cvt:M2Converter x:Key="M2Converter"/>
         <cvt:MetersToFeetConverter x:Key="MtoFConverter"/>
+        <fmsccm:EnumDescriptionConverter x:Key="enumDesc"/>
 
         <DataTemplate DataType="{x:Type ttl:ImageTile}">
             <Grid Width="250">
@@ -336,7 +336,7 @@
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
                                 <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentPolygon.Name, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy (Meters)" />
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy (Meters)*" />
                                 <Grid Grid.Column="0" Grid.Row="3">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -362,12 +362,12 @@
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Start Index" />
                                 <TextBox Grid.Column="0" Grid.Row="5"
                                  Text="{Binding CurrentPolygon.PointStartIndex, UpdateSourceTrigger=PropertyChanged}"
-                                 PreviewTextInput="TextIsInteger"/>
+                                 PreviewTextInput="TextIsUnsignedInteger"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="6" Text="Increment" />
                                 <TextBox Grid.Column="0" Grid.Row="7"
                                  Text="{Binding CurrentPolygon.Increment, UpdateSourceTrigger=PropertyChanged}"
-                                 PreviewTextInput="TextIsInteger"/>
+                                 PreviewTextInput="TextIsUnsignedInteger"/>
 
                                 <StackPanel Grid.Column="0" Grid.Row="9" Orientation="Horizontal">
                                     <TextBlock Text="Created On: "/>
@@ -454,7 +454,7 @@
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
 
-                                        <GroupBox Header="GPS Contribution*" Grid.Column="0" Grid.Row="0">
+                                        <GroupBox Header="GPS Contribution" Grid.Column="0" Grid.Row="0">
                                             <Grid Margin="5,0,5,0">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -518,7 +518,7 @@
                                     </Grid>
                                 </GroupBox>
 
-                                <TextBlock Grid.Row="14" Text="*Or perimeter error such as taping error"/>
+                                <TextBlock Grid.Row="14" Text="*Such as GPS error or taping error"/>
                                 <TextBlock Grid.Row="15" Text="**Area-Error/Area to be less than 10%"/>
                             </Grid>
                         </ScrollViewer>
@@ -653,7 +653,7 @@
                                     <TextBox Grid.Column="0"
                                      Name="txtMetaZone"
                                      Text="{Binding CurrentMetadata.Zone, Mode=OneWay}"
-                                     PreviewTextInput="TextIsInteger">
+                                     PreviewTextInput="TextIsUnsignedInteger">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="TextChanged">
                                                 <i:InvokeCommandAction Command="{Binding MetadataZoneChangedCommand}"
@@ -667,47 +667,59 @@
 
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Declination Type" />
                                 <ComboBox Grid.Column="0" Grid.Row="5"
-                                          SelectedItem="{Binding CurrentMetadata.DecType}"
-                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:DeclinationType}}"/>
+                                          SelectedItem="{Binding CurrentMetadata.DecType, UpdateSourceTrigger=PropertyChanged}"
+                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:DeclinationType}}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource ResourceKey=enumDesc}}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
 
                                 <TextBlock Grid.Column="2" Grid.Row="4" Text="Declination" />
                                 <TextBox Grid.Column="2" Grid.Row="5"
-                                          Text="{Binding CurrentMetadata.MagDec}"
+                                          Text="{Binding CurrentMetadata.MagDec, Delay=750, UpdateSourceTrigger=PropertyChanged}"
                                           PreviewTextInput="TextIsDouble"/>
 
 
                                 <TextBlock Grid.Column="0" Grid.Row="6" Text="Distance" />
                                 <ComboBox Grid.Column="0" Grid.Row="7"
-                                          SelectedItem="{Binding CurrentMetadata.Distance}"
-                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}}"/>
+                                          SelectedItem="{Binding CurrentMetadata.Distance, UpdateSourceTrigger=PropertyChanged}"
+                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource ResourceKey=enumDesc}}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
 
                                 <TextBlock Grid.Column="2" Grid.Row="6" Text="Elevation" />
                                 <ComboBox Grid.Column="2" Grid.Row="7"
-                                          SelectedItem="{Binding CurrentMetadata.Elevation}"
+                                          SelectedItem="{Binding CurrentMetadata.Elevation, UpdateSourceTrigger=PropertyChanged}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}}"/>
 
 
                                 <TextBlock Grid.Column="0" Grid.Row="8" Text="Slope" />
                                 <ComboBox Grid.Column="0" Grid.Row="9"
-                                          SelectedItem="{Binding CurrentMetadata.Slope}"
+                                          SelectedItem="{Binding CurrentMetadata.Slope, UpdateSourceTrigger=PropertyChanged}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Slope}}"/>
 
                                 <TextBlock Grid.Column="2" Grid.Row="8" Text="Datum" />
                                 <ComboBox Grid.Column="2" Grid.Row="9" IsEnabled="False"
-                                          SelectedItem="{Binding CurrentMetadata.Datum}"
+                                          SelectedItem="{Binding CurrentMetadata.Datum, UpdateSourceTrigger=PropertyChanged}"
                                           ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Datum}}"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="10" Text="GPS Reciever" />
                                 <ComboBox Grid.Column="0" Grid.Row="11" IsEditable="True"
-                                          ItemsSource="{StaticResource arrGps}" Text="{Binding CurrentMetadata.GpsReceiver}" />
+                                          ItemsSource="{StaticResource arrGps}" Text="{Binding CurrentMetadata.GpsReceiver, UpdateSourceTrigger=PropertyChanged}" />
 
                                 <TextBlock Grid.Column="2" Grid.Row="10" Text="Range Finder" />
-                                <ComboBox Grid.Column="2" Grid.Row="11" IsEditable="True" Text="{Binding CurrentMetadata.RangeFinder}"
+                                <ComboBox Grid.Column="2" Grid.Row="11" IsEditable="True" Text="{Binding CurrentMetadata.RangeFinder, UpdateSourceTrigger=PropertyChanged}"
                                           ItemsSource="{StaticResource arrRangeFinder}"/>
 
 
                                 <TextBlock Grid.Column="0" Grid.Row="12" Text="Compass" />
-                                <ComboBox Grid.Column="0" Grid.Row="13" IsEditable="True" Text="{Binding CurrentMetadata.Compass}"
+                                <ComboBox Grid.Column="0" Grid.Row="13" IsEditable="True" Text="{Binding CurrentMetadata.Compass, UpdateSourceTrigger=PropertyChanged}"
                                           ItemsSource="{StaticResource arrCompass}"/>
 
                                 <TextBlock Grid.Column="2" Grid.Row="12" Text="Crew" />

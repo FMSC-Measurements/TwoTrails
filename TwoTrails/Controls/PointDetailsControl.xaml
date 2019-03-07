@@ -4,8 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TwoTrails.Controls"
-             xmlns:cc="clr-namespace:FMSC.Core.Controls;assembly=FMSC.Core"
-             xmlns:cm="clr-namespace:FMSC.Core.ComponentModel;assembly=FMSC.Core"
+             xmlns:cc="clr-namespace:FMSC.Core.Windows.Controls;assembly=FMSC.Core.Windows"
+             xmlns:cm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
+             xmlns:cvt="clr-namespace:TwoTrails.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500">
     <cc:DataGridEx x:Name="dgPoints"
@@ -28,6 +29,7 @@
             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="DodgerBlue"/>
             <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue"/>
             <cm:BindingProxy x:Key="proxy" Data="{Binding}"/>
+            <cvt:FullPointDetailsConverter x:Key="fpdc"/>
         </DataGrid.Resources>
 
         <DataGrid.Columns>
@@ -50,8 +52,8 @@
 
             <DataGridTextColumn Header="Acc (M)" IsReadOnly="True" Binding="{Binding Accuracy, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.Accuracy, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
 
-            <DataGridTextColumn Header="Latitude" IsReadOnly="True" Binding="{Binding Latitude, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.Latitude, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
-            <DataGridTextColumn Header="Longitude" IsReadOnly="True" Binding="{Binding Longitude, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.Longitude, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Latitude" IsReadOnly="True" Binding="{Binding Latitude, StringFormat={}{0:0.######}}" Visibility="{Binding Data.FieldController.Latitude, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Longitude" IsReadOnly="True" Binding="{Binding Longitude, StringFormat={}{0:0.######}}" Visibility="{Binding Data.FieldController.Longitude, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
             <DataGridTextColumn Header="Elevation (M)" IsReadOnly="True" Binding="{Binding Elevation, StringFormat={}{0:0.##}}" Visibility="{Binding Data.FieldController.Elevation, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
             <DataGridTextColumn Header="RMSEr" IsReadOnly="True" Binding="{Binding RMSEr, StringFormat={}{0:0.##}}" Visibility="{Binding Data.FieldController.RMSEr, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
 
@@ -61,7 +63,7 @@
             <DataGridTextColumn Header="Slope Dist" IsReadOnly="True" Binding="{Binding SlopeDistance, StringFormat={}{0:0.##}}" Visibility="{Binding Data.FieldController.SlopeDistance, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
             <DataGridTextColumn Header="Slope Angle" IsReadOnly="True" Binding="{Binding SlopeAngle, StringFormat={}{0:0.###}}" Visibility="{Binding Data.FieldController.SlopeAngle, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
 
-            <DataGridTextColumn Header="Parent" IsReadOnly="True" Binding="{Binding ParentPoint.PID}" Visibility="{Binding Data.FieldController.ParentPoint, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Parent" IsReadOnly="True" Binding="{Binding ParentPoint, Mode=OneWay, Converter={StaticResource fpdc}}" Visibility="{Binding Data.FieldController.ParentPoint, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
 
             <DataGridTextColumn Header="QndmLink" IsReadOnly="True" Binding="{Binding HasQuondamLinks, StringFormat=F3}" Visibility="{Binding Data.FieldController.HasQuondamLinks, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
             <DataGridTextColumn Header="Comment" Width="100" IsReadOnly="True" Binding="{Binding Comment}" Visibility="{Binding Data.FieldController.Comment, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
@@ -70,7 +72,7 @@
             <DataGridTextColumn Header="Polygon CN" IsReadOnly="True" Binding="{Binding PolygonCN}" Visibility="{Binding Data.FieldController.PolygonCN, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
             <DataGridTextColumn Header="Metadata CN" IsReadOnly="True" Binding="{Binding MetadataCN}" Visibility="{Binding Data.FieldController.MetadataCN, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
             <DataGridTextColumn Header="Group CN" IsReadOnly="True" Binding="{Binding GroupCN}" Visibility="{Binding Data.FieldController.GroupCN, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
-            <DataGridTextColumn Header="Parent CN" IsReadOnly="True" Binding="{Binding ParentCN}" Visibility="{Binding Data.FieldController.ParentCN, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
+            <DataGridTextColumn Header="Parent CN" IsReadOnly="True" Binding="{Binding ParentPointCN}" Visibility="{Binding Data.FieldController.ParentCN, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}, Mode=OneWay}"/>
         </DataGrid.Columns>
 
         <DataGrid.ContextMenu>

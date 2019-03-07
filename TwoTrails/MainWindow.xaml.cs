@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using TwoTrails.Core;
+using TwoTrails.Utils;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails
@@ -27,6 +18,13 @@ namespace TwoTrails
         public MainWindow()
         {
             InitializeComponent();
+
+            if (SystemParameters.PrimaryScreenHeight < 840 || SystemParameters.PrimaryScreenWidth < 1000)
+            {
+                this.Width = 700;
+                this.Height = 500;
+            }
+
             MainModel = new MainWindowModel(this);
             this.DataContext = MainModel;
 
@@ -53,9 +51,29 @@ namespace TwoTrails
 
             if (files != null && files.Length > 0)
             {
-                foreach (string file in files)
+                if (MainModel.CurrentProject == null)
                 {
-                    MainModel.OpenProject(file);
+                    if (files.All(file => TtUtils.IsImportableFileType(file) && !file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        MainModel.CreateAndOpenProjectFromImportable(null, files);
+                    }
+                    else
+                    {
+                        foreach (string file in files)
+                        {
+                            if (file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
+                                MainModel.OpenProject(file);
+                            else if (TtUtils.IsImportableFileType(file))
+                                MainModel.CreateAndOpenProjectFromImportable(null, file);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (string file in files)
+                    {
+                        MainModel.OpenProject(file);
+                    }
                 }
             }
         }

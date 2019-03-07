@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using TwoTrails.Core;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
@@ -79,7 +71,7 @@ namespace TwoTrails.Dialogs
 
                     if (rbActQuondam.IsChecked == true)
                     {
-                        _Manager.CreateQuondamLinks(_Points, TargetPoly, index, null, reverse);
+                        _Manager.CreateQuondamLinks(_Points, TargetPoly, index, QuondamBoundaryMode.Inherit, reverse);
                     }
                     else
                     {

@@ -1,14 +1,10 @@
-﻿using FMSC.Core.Utilities;
-using FMSC.GeoSpatial;
+﻿using FMSC.GeoSpatial.UTM;
 using Microsoft.Maps.MapControl.WPF;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
@@ -27,7 +23,7 @@ namespace TwoTrails.Mapping
         private List<TtPoint> _SelectedPoints { get; } =  new List<TtPoint>();
 
         public ObservableCollection<TtMapPolygonManager> PolygonManagers { get; } = new ObservableCollection<TtMapPolygonManager>();
-
+        
         private IObservableTtManager _Manager;
 
 
@@ -60,6 +56,13 @@ namespace TwoTrails.Mapping
             _PointsByPolys.Add(polygon.CN, ocPoints);
 
             TtMapPolygonManager mpm = new TtMapPolygonManager(_Map, polygon, ocPoints, _Manager.GetPolygonGraphicOption(polygon.CN));
+            if (polygon.Name.IndexOf("_plt", StringComparison.InvariantCultureIgnoreCase) > 0)
+            {
+                mpm.AdjBndVisible = false;
+                mpm.AdjBndPointsVisible = false;
+                mpm.WayPointsVisible = true;
+            }
+
             _PolygonManagers.Add(polygon.CN, mpm);
             PolygonManagers.Add(mpm);
 
@@ -177,12 +180,14 @@ namespace TwoTrails.Mapping
                 case NotifyCollectionChangedAction.Add:
                     foreach (TtPoint p in e.NewItems)
                     {
+                        p.PolygonChanged += Point_PolygonChanged;
                         _PointsByPolys[p.PolygonCN].Insert(p.Index, p);
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (TtPoint p in e.OldItems)
                     {
+                        p.PolygonChanged -= Point_PolygonChanged;
                         _PointsByPolys[p.PolygonCN].Remove(p);
                     }
                     break;

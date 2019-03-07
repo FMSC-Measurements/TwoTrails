@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core
@@ -27,11 +24,8 @@ namespace TwoTrails.Core
         public void Adjust()
         {
             TtPoint basePoint = _SegmentPoints[0];
-            for (int i = 1; i < _SegmentPoints.Count; i++)
-            {
-                SideShotPoint ss = _SegmentPoints[i] as SideShotPoint;
-                ss.Adjust(basePoint);
-            }
+            foreach (SideShotPoint ssp in _SegmentPoints.Skip(1))
+                ssp.Adjust(basePoint);
         }
     }
 }
