@@ -166,7 +166,7 @@ namespace TwoTrails.Core.Points
             }
             else if (BkAzimuth != null && BkAzimuth >= 0)
             {
-                az = (double)BkAzimuth;
+                az = AzimuthModule((double)BkAzimuth + 180);
             }
 
             if (!Double.IsInfinity(az))
