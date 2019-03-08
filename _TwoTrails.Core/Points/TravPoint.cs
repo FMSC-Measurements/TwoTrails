@@ -135,12 +135,10 @@ namespace TwoTrails.Core.Points
         {
             double az = Double.PositiveInfinity;
 
-            if (FwdAzimuth != null && FwdAzimuth >= 0)
+            if (FwdAzimuth is double fwdaz && fwdaz >= 0)
             {
-                if (BkAzimuth != null && BkAzimuth >= 0)
+                if (BkAzimuth is double bkaz && bkaz >= 0)
                 {
-                    double bkaz = (double)BkAzimuth;
-                    double fwdaz = (double)FwdAzimuth;
                     double adjBackAz;
 
                     if (bkaz > fwdaz && bkaz >= 180)
@@ -161,12 +159,12 @@ namespace TwoTrails.Core.Points
                 }
                 else
                 {
-                    az = (double)FwdAzimuth;
+                    az = fwdaz;
                 }
             }
-            else if (BkAzimuth != null && BkAzimuth >= 0)
+            else if (BkAzimuth is double bkaz && bkaz >= 0)
             {
-                az = AzimuthModule((double)BkAzimuth + 180);
+                az = AzimuthModule(bkaz + 180);
             }
 
             if (!Double.IsInfinity(az))
