@@ -1264,7 +1264,8 @@ namespace TwoTrails.Core
                     lastPoint = point;
                     
                     if (!polysToAdjustTravsIn.Contains(point.PolygonCN) && (point.IsTravType() ||
-                        (point.IsGpsAtBase() && points.Count > point.Index + 1 && points[point.Index + 1].IsTravType())))
+                        (point.IsGpsAtBase() && ((points.Count > point.Index + 1 && points[point.Index + 1].IsTravType()) ||
+                        (point.Index > 0 && points[point.Index - 1].IsTravType())))))
                     {
                         polysToAdjustTravsIn.Add(point.PolygonCN);
                     }

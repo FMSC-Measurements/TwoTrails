@@ -61,7 +61,8 @@ namespace TwoTrails
                     {
                         foreach (string file in files)
                         {
-                            if (file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
+                            if (file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase) ||
+                                file.EndsWith(Consts.FILE_EXTENSION_MEDIA, System.StringComparison.InvariantCultureIgnoreCase))
                                 MainModel.OpenProject(file);
                             else if (TtUtils.IsImportableFileType(file))
                                 MainModel.CreateAndOpenProjectFromImportable(null, file);

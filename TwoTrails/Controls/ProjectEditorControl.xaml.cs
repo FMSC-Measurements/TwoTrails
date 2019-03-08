@@ -18,6 +18,15 @@ namespace TwoTrails.Controls
 
             InitializeComponent();
 
+            lbMetadata.SelectedIndex = 0;
+            lbGroups.SelectedIndex = 0;
+
+            if (lbPolys.Items.Count > 0)
+                lbPolys.SelectedIndex = 0;
+
+            if (lbMediaPoints.Items.Count > 0)
+                lbMediaPoints.SelectedIndex = 0;
+
             SwitchToTab(tab);
         }
 
