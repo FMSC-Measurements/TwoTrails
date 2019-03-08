@@ -38,7 +38,9 @@ namespace TwoTrails.Core
         public bool PointsRetraced { get { return Action.HasFlag(DataActionType.RetracePoints); } }
         public bool PointsReindexed { get { return Action.HasFlag(DataActionType.ReindexPoints); } }
         public bool PointsConverted { get { return Action.HasFlag(DataActionType.ConvertPoints); } }
-
+        
+        public bool DataImported { get { return Action.HasFlag(DataActionType.DataImported); } }
+        public bool ModifiedDataDictionary { get { return Action.HasFlag(DataActionType.ModifiedDataDictionary); } }
 
         public TtUserAction(String userName, String deviceName) :
             this(userName, deviceName, DateTime.Now, DataActionType.None)
