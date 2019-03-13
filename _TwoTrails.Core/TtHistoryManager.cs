@@ -81,7 +81,7 @@ namespace TwoTrails.Core
 
 
         #region History Management
-        protected void AddCommand(ITtCommand command)
+        internal void AddCommand(ITtCommand command)
         {
             if (ComplexActionStarted)
             {

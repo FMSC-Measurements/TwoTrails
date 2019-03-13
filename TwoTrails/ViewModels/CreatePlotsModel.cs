@@ -20,7 +20,7 @@ namespace TwoTrails.ViewModels
 {
     public class CreatePlotsModel : NotifyPropertyChangedEx
     {
-        private ITtManager _Manager;
+        private TtHistoryManager _Manager;
         private TtSettings _Settings { get; }
 
         public ICommand GenerateCommand { get; }
@@ -240,8 +240,10 @@ namespace TwoTrails.ViewModels
                         }
                         else return;
                     }
-
-                    _Manager.DeletePointsInPolygon(poly.CN);
+                    else
+                    {
+                        _Manager.DeletePointsInPolygon(poly.CN);
+                    }
                 }
                 else
                 {
@@ -533,9 +535,7 @@ namespace TwoTrails.ViewModels
                 }
             }
 
-            TtHistoryManager hm = _Manager as TtHistoryManager;
-            if (hm != null)
-                hm.StartMultiCommand();
+            _Manager.StartMultiCommand();
 
             foreach (Tuple<TtPolygon, List<Point>> polypts in addPoints.Values)
             {
@@ -567,8 +567,7 @@ namespace TwoTrails.ViewModels
                 _Manager.AddPoints(wayPoints); 
             }
 
-            if (hm != null)
-                hm.CommitMultiCommand();
+            _Manager.CommitMultiCommand();
 
             MessageBox.Show($"{addPoints.Count} WayPoints Created");
             IsGenerating = false;

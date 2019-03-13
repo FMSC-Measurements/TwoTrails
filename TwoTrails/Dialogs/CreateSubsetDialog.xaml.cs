@@ -1,11 +1,9 @@
 ﻿using FMSC.Core.Collections;
 using FMSC.Core.Windows.Controls;
-using FMSC.Core.Windows.Utilities;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
@@ -20,9 +18,14 @@ namespace TwoTrails.Dialogs
     {
         private TtProject _Project;
 
+        public TtPolygon SelectedPlotPolygon { get; set; }
         public int SubsetValue { get; set; }
         public bool IsPercentMode { get; set; } = true;
-        public bool DeleteExisting { get; set; }
+        public bool DeleteExistingPlots
+        {
+            get => _Project.Settings.DeviceSettings.DeleteExistingPlots;
+            set { if (_Project.Settings.DeviceSettings is DeviceSettings ds) { ds.DeleteExistingPlots = value; } }
+        }
 
         public ObservableFilteredCollection<TtPolygon> PlotPolygons { get; }
 
@@ -37,24 +40,160 @@ namespace TwoTrails.Dialogs
             this.DataContext = this;
         }
 
+
+        private void CreateSubset()
+        {
+            if (SelectedPlotPolygon == null)
+            {
+                MessageBox.Show("A polygon filled with plots must be selected.");
+                return;
+            }
+
+            if (SubsetValue < 1)
+            {
+                MessageBox.Show("You must have at least 1 point or 1% to create a subset.");
+                return;
+            }
+
+            if (IsPercentMode == true && SubsetValue >= 100)
+            {
+                MessageBox.Show("You can have a maximum of 99% of points to create a subset.");
+                return;
+            }
+            
+            
+            List<TtPolygon> polygons = _Project.Manager.GetPolygons();
+            string gPolyName = GeneratePolyName(SelectedPlotPolygon);
+
+            TtPolygon poly = null;
+
+            try
+            {
+                poly = polygons.First(p => p.Name == gPolyName);
+            }
+            catch
+            {
+                //
+            }
+            
+
+            if (poly != null)
+            {
+                if (!DeleteExistingPlots)
+                {
+                    if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                    {
+                        poly = null;
+
+                        for (int i = 2; i < Int32.MaxValue; i++)
+                        {
+                            gPolyName = GeneratePolyName(SelectedPlotPolygon, i);
+
+                            try
+                            {
+                                poly = polygons.First(p => p.Name == gPolyName);
+                            }
+                            catch
+                            {
+                                poly = new TtPolygon()
+                                {
+                                    Name = gPolyName,
+                                    PointStartIndex = (polygons.Count + 1) * 1000 + 10,
+                                    Increment = 1
+                                };
+
+                                _Project.Manager.AddPolygon(poly);
+                                break;
+                            }
+                        }
+                        _Project.Manager.StartMultiCommand();
+                    }
+                    else return;
+                }
+                else
+                {
+                    _Project.Manager.StartMultiCommand();
+                    _Project.Manager.DeletePointsInPolygon(poly.CN);
+                }
+            }
+            else
+            {
+                _Project.Manager.StartMultiCommand();
+
+                poly = new TtPolygon()
+                {
+                    Name = gPolyName,
+                    PointStartIndex = (polygons.Count + 1) * 1000 + 10,
+                    Increment = 1
+                };
+
+                _Project.Manager.AddPolygon(poly);
+            }
+
+            List<TtPoint> points = _Project.Manager.GetPoints(SelectedPlotPolygon.CN);
+
+            int maxPoints = IsPercentMode ? (int)((SubsetValue / 100.0) * points.Count) : SubsetValue > points.Count ? points.Count : SubsetValue;
+            Random rand = new Random(DateTime.Now.Millisecond);
+
+
+            poly.Description = $"Subsample of {SelectedPlotPolygon.Name}. {maxPoints} of {points.Count} points.";
+
+            while (maxPoints < points.Count)
+            {
+                points.RemoveAt(rand.Next(points.Count - 1));
+            }
+
+            List<TtPoint> wayPoints = new List<TtPoint>();
+            int index = 0, j;
+            WayPoint curr, prev = null;
+
+            foreach (TtPoint p in points)
+            {
+                curr = new WayPoint()
+                {
+                    UnAdjX = p.UnAdjX,
+                    UnAdjY = p.UnAdjY,
+                    Polygon = poly,
+                    Group = _Project.Manager.MainGroup,
+                    Metadata = p.Metadata,
+                    Index = index++,
+                    Comment = "Generated Point",
+                    PID = PointNamer.NamePoint(poly, prev)
+                };
+
+                wayPoints.Add(curr);
+                prev = curr;
+            }
+
+            _Project.Manager.AddPoints(wayPoints);
+            
+            _Project.Manager.CommitMultiCommand();
+
+            MessageBox.Show($"{points.Count} WayPoints Created");
+        }
+
+
+        public String GeneratePolyName(TtPolygon poly, int rev = 1)
+        {
+            return $"{poly.Name}_Plts_Sample{(rev > 1 ? $"_{rev.ToString()}" : String.Empty)}";
+        }
+
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             e.Handled = ControlUtils.TextIsUnsignedInteger(sender, e);
         }
 
+
         private void Create_Click(object sender, RoutedEventArgs e)
         {
-            if (this.IsShownAsDialog())
-                this.DialogResult = true;
+            CreateSubset();
+        }
+
+        private void Close_Click(object sender, RoutedEventArgs e)
+        {
             this.Close();
         }
 
-        private void Cancel_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.IsShownAsDialog())
-                this.DialogResult = false;
-            this.Close();
-        }
 
         public static bool? ShowDialog(TtProject project, Window owner = null)
         {

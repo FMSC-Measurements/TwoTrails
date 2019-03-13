@@ -2292,7 +2292,11 @@ namespace TwoTrails.ViewModels
             {
                 //Project.MainModel.MainWindow.IsEnabled = false;
                 PlotToolInUse = true;
-                CreatePlotsDialog.Show(Project, Project.MainModel.MainWindow, () => PlotToolInUse = false);//, () => Project.MainModel.MainWindow.IsEnabled = true);
+                CreatePlotsDialog.Show(Project, Project.MainModel.MainWindow, () =>
+                {
+                    PlotToolInUse = false;
+                    Project.MainModel.MainWindow.Activate();
+                });//, () => Project.MainModel.MainWindow.IsEnabled = true);
             }
             else
             {
@@ -2305,7 +2309,11 @@ namespace TwoTrails.ViewModels
             if (Manager.Polygons.Any(poly => Manager.GetPoints(poly.CN).All(p => p.IsWayPointAtBase())))
             {
                 PlotToolInUse = true;
-                CreateSubsetDialog.Show(Project, Project.MainModel.MainWindow, () => PlotToolInUse = false);
+                CreateSubsetDialog.Show(Project, Project.MainModel.MainWindow, () =>
+                {
+                    PlotToolInUse = false;
+                    Project.MainModel.MainWindow.Activate();
+                });
             }
             else
             {

@@ -1072,7 +1072,7 @@ namespace TwoTrails.Core
             if (polyCN != null)
             {
                 if (_PointsByPoly.ContainsKey(polyCN))
-                    return _PointsByPoly[polyCN];
+                    return _PointsByPoly[polyCN].ToList();
                 throw new Exception("Polygon Not Found");
             }
             else
@@ -1778,8 +1778,7 @@ namespace TwoTrails.Core
             _DAL.DeleteNmeaBursts(pointCN);
         }
 
-
-
+        
         public List<TtImage> GetImages(string pointCN = null)
         {
             return _MediaMap == null ? new List<TtImage>() :
@@ -1799,7 +1798,6 @@ namespace TwoTrails.Core
         }
 
         
-
         public DataDictionaryTemplate GetDataDictionaryTemplate()
         {
             return _DAL.GetDataDictionaryTemplate();
@@ -1809,51 +1807,6 @@ namespace TwoTrails.Core
         public void UpdateDataAction(DataActionType action, string notes = null)
         {
             _Activity.UpdateAction(action, notes);
-        }
-
-
-        public bool IsPolygonValid(string polyCN)
-        {
-            if (_PointsByPoly.ContainsKey(polyCN))
-                return _PointsByPoly[polyCN].HasAtLeast(3, pt => pt.OnBoundary);
-            throw new Exception("Polygon Not Found");
-        }
-
-        public bool IsIslandPolygon(string polyCN)
-        {
-            return IsIslandPolygon(GetPoints(polyCN));
-        }
-
-        public static bool IsIslandPolygon(IEnumerable<TtPoint> points)
-        {
-            if (points.HasAtLeast(3, pt => pt.OnBoundary))
-            {
-                bool hasGps = false;
-                int sideShotCount = 0;
-
-                foreach (TtPoint pt in points)
-                {
-                    if (!hasGps && !pt.OnBoundary)
-                    {
-                        if (pt.IsGpsAtBase())
-                            hasGps = true;
-                    }
-                    else if (hasGps && pt.OnBoundary)
-                    {
-                        if (pt.OpType == OpType.SideShot)
-                            sideShotCount++;
-                        else
-                            break;
-                    }
-                    else
-                        break;
-                }
-                
-                if (sideShotCount > 2)
-                    return true;
-            }
-
-            return false;
         }
     }
 }

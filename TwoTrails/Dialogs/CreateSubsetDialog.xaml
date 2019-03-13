@@ -25,7 +25,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Column="0" Grid.Row="0" Margin="1" Text="Polygon" />
-        <ComboBox Name="cbPolys" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="1" ItemsSource="{Binding PlotPolygons}" />
+        <ComboBox Name="cbPolys" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="1" SelectedValue="{Binding SelectedPlotPolygon}" ItemsSource="{Binding PlotPolygons}" />
 
         <RadioButton Name="rbPercent" Grid.Column="0" Grid.Row="2" Margin="1" GroupName="rbSelect" Content="Percent" IsChecked="{Binding IsPercentMode}"/>
         <RadioButton Name="rbAmount" Grid.Column="1" Grid.Row="2" Margin="1" GroupName="rbSelect" Content="Amount" />
@@ -34,9 +34,9 @@
                  Text="{Binding SubsetValue}" PreviewTextInput="TextBox_PreviewTextInput"
                  Margin="1" Name="txtValue" />
 
-        <CheckBox Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Content="Delete Existing Subset" IsChecked="{Binding DeleteExisting}" />
+        <CheckBox Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Content="Delete Existing Subset" IsChecked="{Binding DeleteExistingPlots}" />
 
-        <Button Grid.Column="0" Grid.Row="6" Content="Cancel" Click="Cancel_Click" Width="75"
+        <Button Grid.Column="0" Grid.Row="6" Content="Close" Click="Close_Click" Width="75"
                 HorizontalAlignment="Left" VerticalAlignment="Bottom" />
         <Button Grid.Column="1" Grid.Row="6" Content="Create" Click="Create_Click" Width="75"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
