@@ -1,9 +1,15 @@
-﻿using FMSC.Core.Windows.Controls;
+﻿using FMSC.Core.Collections;
+using FMSC.Core.Windows.Controls;
+using FMSC.Core.Windows.Utilities;
+using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Core;
+using TwoTrails.Core.Points;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails.Dialogs
 {
@@ -12,19 +18,23 @@ namespace TwoTrails.Dialogs
     /// </summary>
     public partial class CreateSubsetDialog : Window
     {
-        public int StartIndex { get; set; } = 1010;
-        public int Increment { get; set; } = 10;
+        private TtProject _Project;
 
         public int SubsetValue { get; set; }
+        public bool IsPercentMode { get; set; } = true;
+        public bool DeleteExisting { get; set; }
 
+        public ObservableFilteredCollection<TtPolygon> PlotPolygons { get; }
 
-
-        public CreateSubsetDialog(ITtManager manager)
+        public CreateSubsetDialog(TtProject project)
         {
+            _Project = project;
+
+            PlotPolygons = new ObservableFilteredCollection<TtPolygon>(_Project.Manager.Polygons,
+                poly => _Project.Manager.GetPoints(poly.CN).All(p => p.IsWayPointAtBase()));
+
             InitializeComponent();
             this.DataContext = this;
-
-            cbPolys.ItemsSource = manager.GetPolygons();
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -34,14 +44,45 @@ namespace TwoTrails.Dialogs
 
         private void Create_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
+            if (this.IsShownAsDialog())
+                this.DialogResult = true;
             this.Close();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            if (this.IsShownAsDialog())
+                this.DialogResult = false;
             this.Close();
+        }
+
+        public static bool? ShowDialog(TtProject project, Window owner = null)
+        {
+            CreateSubsetDialog dialog = new CreateSubsetDialog(project);
+
+            if (owner != null)
+                dialog.Owner = owner;
+            else
+                dialog.Owner = project.MainModel.MainWindow;
+
+            return dialog.ShowDialog();
+        }
+
+        public static void Show(TtProject project, Window owner = null, Action onClose = null)
+        {
+            CreateSubsetDialog dialog = new CreateSubsetDialog(project);
+
+            if (owner != null)
+                dialog.Owner = owner;
+            else
+                dialog.Owner = project.MainModel.MainWindow;
+
+            if (onClose != null)
+            {
+                dialog.Closed += (s, e) => onClose();
+            }
+
+            dialog.Show();
         }
     }
 }

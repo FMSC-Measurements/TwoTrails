@@ -283,7 +283,7 @@ namespace TwoTrails.Utils
                 #endregion
             }
 
-            IEnumerable<TtPoint> wayPoints = manager.GetPoints(polygon.CN).Where(p => p.OpType == OpType.WayPoint);
+            IEnumerable<TtPoint> wayPoints = manager.GetPoints(polygon.CN).Where(p => p.IsWayPointAtBase());
 
             if (wayPoints.Any())
                 WriteWayPointsFile(baseFileName, polygon, wayPoints.Cast<WayPoint>());

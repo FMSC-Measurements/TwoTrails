@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using FMSC.Core.Windows.Utilities;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -29,13 +30,15 @@ namespace TwoTrails.Dialogs
 
         private void Rename_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
+            if (this.IsShownAsDialog())
+                this.DialogResult = true;
             this.Close();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            if (this.IsShownAsDialog())
+                this.DialogResult = false;
             this.Close();
         }
 

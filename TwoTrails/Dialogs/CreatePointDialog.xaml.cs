@@ -1,4 +1,5 @@
 ﻿using FMSC.Core;
+using FMSC.Core.Windows.Utilities;
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -263,7 +264,8 @@ namespace TwoTrails.Dialogs
                                 _Manager.AddPoint(point);
                             }
 
-                            DialogResult = true;
+                            if (this.IsShownAsDialog())
+                                this.DialogResult = true;
 
                             Close();
                         }

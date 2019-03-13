@@ -88,7 +88,7 @@ namespace TwoTrails.Mapping
 
         private void UpdateColor()
         {
-            if (Point.OpType == OpType.WayPoint)
+            if (Point.IsWayPointAtBase())
             {
                 UnAdjPushpin.Background = new SolidColorBrush(WayPointColor)
                 {
@@ -185,7 +185,7 @@ namespace TwoTrails.Mapping
                         ((UnAdjBndVisible && Point.IsBndPoint()) ||
                         (UnAdjNavVisible && IsNavPoint) ||
                         (UnAdjMiscVisible && Point.IsMiscPoint())) ||
-                        (WayPointVisible && Point.OpType == OpType.WayPoint) ?
+                        (WayPointVisible && Point.IsWayPointAtBase()) ?
                         Visibility.Visible : Visibility.Collapsed;
                 }
                 else

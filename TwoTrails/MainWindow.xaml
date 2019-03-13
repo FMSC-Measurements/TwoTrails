@@ -33,7 +33,7 @@
                 <DataTrigger Binding="{Binding CurrentTab}" Value="{x:Null}">
                     <Setter Property="IsEnabled" Value="False"/>
                 </DataTrigger>
-                
+
                 <!--<DataTrigger Binding="{Binding CurrentTab.IsEditingPoints}" Value="False">
                     <Setter Property="IsEnabled" Value="False"/>
                 </DataTrigger>-->
@@ -113,7 +113,7 @@
 
                     <MenuItem Header="Rename Points" Command="{Binding CurrentEditor.RenamePointsCommand}"
                           Style="{StaticResource styleMiPointEdit}"/>
-                    <MenuItem Header="Reverse Points" Command="{Binding CurrentEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
+                    <MenuItem Header="{Binding CurrentEditor.ReverseTypeHeader}" Command="{Binding CurrentEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
                           Style="{StaticResource styleMiPointEdit}"/>
 
                     <MenuItem Header="{Binding CurrentEditor.ConvertTypeHeader}" Command="{Binding CurrentEditor.ConvertPointsCommand}" Visibility="{Binding CurrentEditor, Converter={StaticResource NotNullVisibilityConverter}}" />
@@ -134,7 +134,7 @@
                 <MenuItem Header="_Data">
                     <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                    
+
                     <MenuItem Header="View Point Details Table" Command="{Binding ViewPointDetailsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
 
                     <MenuItem Header="View Sattelite Info" Command="{Binding CurrentEditor.ViewSatInfoCommand}"
@@ -172,6 +172,7 @@
 
                     <MenuItem Header="Create Grid Sample Points" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
                           InputGestureText="Ctrl+Alt+P"/>
+                    <MenuItem Header="Create Subsample" Command="{Binding CurrentEditor.CreateSubsampleCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
                           Style="{StaticResource styleMiPointEdit}" InputGestureText="Ctrl+Alt+C"/>
 
@@ -207,7 +208,7 @@
                         <Setter Property="Foreground" Value="White"/>
                     </Style>
                 </StatusBar.Resources>
-                
+
                 <StatusBarItem>
                     <TextBlock Name="sbiMessage" Text="{Binding StatusMessage}"/>
                 </StatusBarItem>
@@ -218,9 +219,13 @@
             </StatusBar>
 
             <Grid Margin="0" Drop="FilesDrop" AllowDrop="True" DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="53*"/>
+                    <ColumnDefinition Width="942*"/>
+                </Grid.ColumnDefinitions>
                 <TabControl x:Name="tabControl"
-                    Margin="0" Padding="0" AllowDrop="True" BorderThickness="0"
-                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                    Margin="0,0,0,0.5" Padding="0" AllowDrop="True" BorderThickness="0"
+                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Grid.ColumnSpan="2">
 
                     <TabControl.Resources>
                         <Style TargetType="{x:Type TabItem}">
@@ -311,7 +316,7 @@
                     </TabControl.Resources>
                 </TabControl>
 
-                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Center" Opacity="0.5" Margin="0 -100 0 0" Visibility="{Binding HasOpenedProject, Converter={StaticResource InverseBoolToVis}}">
+                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Center" Opacity="0.5" Margin="0,193,0,292.5" Visibility="{Binding HasOpenedProject, Converter={StaticResource InverseBoolToVis}}" Grid.ColumnSpan="2">
                     <Image Source="{StaticResource ImgTwoTrailsIcon}" Width="200"/>
                     <TextBlock Text="TwoTrails" FontSize="50" HorizontalAlignment="Center" Margin="0 -30 0 0" VerticalAlignment="Center"/>
                 </StackPanel>

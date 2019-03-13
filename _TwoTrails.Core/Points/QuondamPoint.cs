@@ -69,6 +69,8 @@ namespace TwoTrails.Core.Points
         }
 
         public override OpType OpType { get { return OpType.Quondam; } }
+
+        public override bool OnBoundary { get => false; set => base.OnBoundary = value; }
         #endregion
 
 

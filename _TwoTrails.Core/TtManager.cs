@@ -1081,6 +1081,11 @@ namespace TwoTrails.Core
         }
 
 
+        public bool PolygonExists(string polyCN)
+        {
+            return _PolygonsMap.ContainsKey(polyCN);
+        }
+
         public TtPolygon GetPolygon(string polyCN)
         {
             if (_PolygonsMap.ContainsKey(polyCN))
@@ -1093,9 +1098,21 @@ namespace TwoTrails.Core
             return _PolygonsMap.Values.ToList();
         }
 
+
+        public bool MetadataExists(string metaCN)
+        {
+            return _MetadataMap.ContainsKey(metaCN);
+        }
+
         public List<TtMetadata> GetMetadata()
         {
             return _MetadataMap.Values.ToList();
+        }
+
+
+        public bool GroupExists(string groupCN)
+        {
+            return _GroupsMap.ContainsKey(groupCN);
         }
 
         public List<TtGroup> GetGroups()
@@ -1541,13 +1558,13 @@ namespace TwoTrails.Core
                 if (_PolygonsMap.ContainsKey(polygon.CN))
                     throw new Exception("Polygon already exists");
 
+                if (!_PointsByPoly.ContainsKey(polygon.CN))
+                    _PointsByPoly.Add(polygon.CN, new List<TtPoint>());
+
                 _PolygonsMap.Add(polygon.CN, polygon);
                 _Polygons.Add(polygon);
 
                 AttachPolygonEvents(polygon);
-
-                if (!_PointsByPoly.ContainsKey(polygon.CN))
-                    _PointsByPoly.Add(polygon.CN, new List<TtPoint>());
             }
         }
         

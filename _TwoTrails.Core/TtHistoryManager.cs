@@ -216,6 +216,12 @@ namespace TwoTrails.Core
             return BaseManager.GetPoints(polyCN);
         }
 
+
+        public bool PolygonExists(string polyCN)
+        {
+            return BaseManager.PolygonExists(polyCN);
+        }
+
         public TtPolygon GetPolygon(string polyCN)
         {
             return BaseManager.GetPolygon(polyCN);
@@ -225,10 +231,22 @@ namespace TwoTrails.Core
         {
             return BaseManager.GetPolygons();
         }
+        
+
+        public bool MetadataExists(string metaCN)
+        {
+            return BaseManager.MetadataExists(metaCN);
+        }
 
         public List<TtMetadata> GetMetadata()
         {
             return BaseManager.GetMetadata();
+        }
+
+
+        public bool GroupExists(string groupCN)
+        {
+            return BaseManager.GroupExists(groupCN);
         }
 
         public List<TtGroup> GetGroups()

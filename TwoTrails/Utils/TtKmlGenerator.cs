@@ -275,7 +275,7 @@ namespace TwoTrails.Utils
                             fUnAdjNavPoints.Placemarks.Add(unadjPm);
                         }
 
-                        if (point.OpType == OpType.WayPoint)
+                        if (point.IsWayPointAtBase())
                         {
                             unadjPm = new Placemark(unadjPm);
                             unadjPm.StyleUrl = style.WayPtsStyle.StyleUrl;

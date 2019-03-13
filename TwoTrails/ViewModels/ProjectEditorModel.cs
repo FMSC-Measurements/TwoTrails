@@ -27,7 +27,7 @@ namespace TwoTrails.ViewModels
         private TtProject _Project;
 
         public TtProjectInfo ProjectInfo { get { return _Project.ProjectInfo; } }
-        public TtHistoryManager Manager { get { return _Project.HistoryManager; } }
+        public TtHistoryManager Manager { get { return _Project.Manager; } }
         public TtSettings Settings { get { return _Project.Settings; } }
         
         public MapControl MapControl { get; set; }

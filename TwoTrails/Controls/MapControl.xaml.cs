@@ -82,7 +82,7 @@ namespace TwoTrails.Controls
             };
         }
 
-        public MapControl(TtManager manager) : this()
+        public MapControl(IObservableTtManager manager) : this()
         {
             Manager = manager;
         }

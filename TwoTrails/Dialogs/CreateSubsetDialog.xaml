@@ -25,9 +25,9 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Column="0" Grid.Row="0" Margin="1" Text="Polygon" />
-        <ComboBox Name="cbPolys" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="1" ItemsSource="{Binding PolyPlots}" />
+        <ComboBox Name="cbPolys" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Margin="1" ItemsSource="{Binding PlotPolygons}" />
 
-        <RadioButton Name="rbPercent" Grid.Column="0" Grid.Row="2" Margin="1" GroupName="rbSelect" Content="Percent" IsChecked="True"/>
+        <RadioButton Name="rbPercent" Grid.Column="0" Grid.Row="2" Margin="1" GroupName="rbSelect" Content="Percent" IsChecked="{Binding IsPercentMode}"/>
         <RadioButton Name="rbAmount" Grid.Column="1" Grid.Row="2" Margin="1" GroupName="rbSelect" Content="Amount" />
 
         <TextBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2"

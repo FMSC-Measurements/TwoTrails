@@ -51,10 +51,12 @@ namespace TwoTrails.Controls
         {
             if (grid.SelectedItems.Count > 0)
             {
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.FileName = "SelectedPoints";
-                sfd.DefaultExt = ".csv";
-                sfd.Filter = "CSV Document (*.csv)|*.csv|All Types (*.*)|*.*";
+                SaveFileDialog sfd = new SaveFileDialog
+                {
+                    FileName = "SelectedPoints",
+                    DefaultExt = ".csv",
+                    Filter = "CSV Document (*.csv)|*.csv|All Types (*.*)|*.*"
+                };
 
                 if (sfd.ShowDialog() == true)
                 {

@@ -87,7 +87,7 @@ namespace TwoTrails.Utils
                                 }
                             }
 
-                            if (point.OpType == OpType.WayPoint)
+                            if (point.IsWayPointAtBase())
                             {
                                 doc.Waypoints.Add(unAdjpoint);
                             }

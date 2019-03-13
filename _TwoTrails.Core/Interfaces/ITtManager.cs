@@ -30,15 +30,18 @@ namespace TwoTrails.Core
         void DeletePoints(IEnumerable<TtPoint> points);
         void DeletePointsInPolygon(string polyCN);
 
+        bool PolygonExists(string polyCN);
         TtPolygon GetPolygon(string polyCN);
         List<TtPolygon> GetPolygons();
         void AddPolygon(TtPolygon polygon);
         void DeletePolygon(TtPolygon polygon);
 
+        bool MetadataExists(string metaCN);
         List<TtMetadata> GetMetadata();
         void AddMetadata(TtMetadata metadata);
         void DeleteMetadata(TtMetadata metadata);
 
+        bool GroupExists(string groupCN);
         List<TtGroup> GetGroups();
         void AddGroup(TtGroup group);
         void DeleteGroup(TtGroup group);

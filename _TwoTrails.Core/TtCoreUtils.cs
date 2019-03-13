@@ -1,5 +1,7 @@
-﻿using FMSC.GeoSpatial.UTM;
+﻿using CSUtil;
+using FMSC.GeoSpatial.UTM;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using TwoTrails.Core.Points;
 
@@ -51,6 +53,53 @@ namespace TwoTrails.Core
             }
 
             point.SetUnAdjLocation(coords.X, coords.Y, point.UnAdjZ);
+        }
+
+
+
+
+        public static bool IsPolygonValid(this ITtManager manager, string polyCN)
+        {
+            if (manager.PolygonExists(polyCN))
+                return manager.GetPoints(polyCN).HasAtLeast(3, pt => pt.OnBoundary);
+            throw new Exception("Polygon Not Found");
+        }
+
+        public static bool IsIslandPolygon(this ITtManager manager, string polyCN)
+        {
+            return IsIslandPolygon(manager.GetPoints(polyCN));
+        }
+
+        public static bool IsIslandPolygon(IEnumerable<TtPoint> points)
+        {
+            if (points.HasAtLeast(3, pt => pt.OnBoundary))
+            {
+                bool hasGps = false;
+                int sideShotCount = 0;
+
+                foreach (TtPoint pt in points)
+                {
+                    if (!hasGps && !pt.OnBoundary)
+                    {
+                        if (pt.IsGpsAtBase())
+                            hasGps = true;
+                    }
+                    else if (hasGps && pt.OnBoundary)
+                    {
+                        if (pt.OpType == OpType.SideShot)
+                            sideShotCount++;
+                        else
+                            break;
+                    }
+                    else
+                        break;
+                }
+
+                if (sideShotCount > 2)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

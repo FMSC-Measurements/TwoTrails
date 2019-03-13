@@ -397,9 +397,10 @@
                         <Separator/>
 
                         <MenuItem Header="Rename" Command="{Binding RenamePointsCommand}" />
-                        <MenuItem Header="{Binding ConvertTypeHeader}" Command="{Binding ConvertPointsCommand}">
+                        <MenuItem Header="{Binding ConvertTypeHeader}" Command="{Binding ConvertPointsCommand}" />
+                        <MenuItem Header="{Binding ReverseTypeHeader}" Command="{Binding ReverseSelectedCommand}" />
 
-                        </MenuItem>
+
 
                         <Separator/>
 

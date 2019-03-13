@@ -1,6 +1,7 @@
 ﻿using CSUtil;
 using CSUtil.ComponentModel;
 using FMSC.Core;
+using FMSC.Core.Collections;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial.UTM;
 using System;
@@ -20,7 +21,6 @@ namespace TwoTrails.ViewModels
     public class CreatePlotsModel : NotifyPropertyChangedEx
     {
         private ITtManager _Manager;
-
         private TtSettings _Settings { get; }
 
         public ICommand GenerateCommand { get; }
@@ -30,7 +30,7 @@ namespace TwoTrails.ViewModels
         public ICommand ExclusionPolygonsSelectedCommand { get; }
 
 
-        public ObservableCollection<TtPolygon> InclusionPolygons { get; }
+        public ObservableFilteredCollection<TtPolygon> InclusionPolygons { get; }
         public ObservableCollection<TtPolygon> ExclusionPolygons { get; }
 
         public List<TtPolygon> IncludedPolygons;
@@ -89,8 +89,8 @@ namespace TwoTrails.ViewModels
             InclusionPolygonsSelectedCommand = new RelayCommand(x => InclusionPolygonsSelected(x as IList));
             ExclusionPolygonsSelectedCommand = new RelayCommand(x => ExclusionPolygonsSelected(x as IList));
             
-            InclusionPolygons = new ObservableCollection<TtPolygon>(
-                _Manager.GetPolygons().Where(p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint())));
+            InclusionPolygons = new ObservableFilteredCollection<TtPolygon>(
+                project.Manager.Polygons, p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint()));
 
             ExclusionPolygons = new ObservableCollection<TtPolygon>();
             

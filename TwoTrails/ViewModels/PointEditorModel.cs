@@ -1,4 +1,5 @@
-﻿using CSUtil.ComponentModel;
+﻿using CSUtil;
+using CSUtil.ComponentModel;
 using FMSC.Core;
 using FMSC.Core.Windows.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
@@ -89,14 +90,15 @@ namespace TwoTrails.ViewModels
         public ICommand ResetPointFieldCommand { get; }
         public ICommand DeleteCommand { get; }
 
-        public ICommand CreatePointCommand { get; }
-        public ICommand CreateQuondamsCommand { get; }
-        public ICommand ConvertPointsCommand { get; }
-        public ICommand MovePointsCommand { get; }
-        public ICommand RetraceCommand { get; }
-        public ICommand CreatePlotsCommand { get; }
-        public ICommand CreateCorridorCommand { get; }
-        public ICommand ModifyDataDictionaryCommand { get; }
+        public RelayCommand CreatePointCommand { get; }
+        public RelayCommand CreateQuondamsCommand { get; }
+        public RelayCommand ConvertPointsCommand { get; }
+        public RelayCommand MovePointsCommand { get; }
+        public RelayCommand RetraceCommand { get; }
+        public RelayCommand CreatePlotsCommand { get; }
+        public RelayCommand CreateSubsampleCommand { get; }
+        public RelayCommand CreateCorridorCommand { get; }
+        public RelayCommand ModifyDataDictionaryCommand { get; }
         
         public ICommand SelectAlternateCommand { get; }
         public ICommand SelectGpsCommand { get; }
@@ -171,38 +173,32 @@ namespace TwoTrails.ViewModels
         public bool HasPossibleCorridor { get; private set; }
 
         private bool ignoreSelectionChange = false, settingFields = false;
-
-        private String _ConvertTypeHeader;
+        
         public String ConvertTypeHeader
         {
             get
             {
-                if (_SelectionChanged)
+                if (HasSelection)
                 {
-                    if (HasSelection)
-                    {
-                        if (OnlyQuondams)
-                            _ConvertTypeHeader = "Convert to GPS";
-                        else
-                        {
-                            OpType op = GetSortedSelectedPoints().First().OpType;
-
-                            if (op == OpType.SideShot)
-                                _ConvertTypeHeader = "Convert to Traverse";
-                            else if (op == OpType.Traverse)
-                                _ConvertTypeHeader = "Convert to SideShot";
-                            else
-                                _ConvertTypeHeader = "Convert";
-                        }
-                    }
+                    if (OnlyQuondams)
+                        return "Convert to GPS";
                     else
-                        _ConvertTypeHeader = "Convert";
-                }
+                    {
+                        OpType op = GetSortedSelectedPoints().First().OpType;
 
-                return _ConvertTypeHeader;
+                        if (op == OpType.SideShot)
+                            return "Convert to Traverse";
+                        else if (op == OpType.Traverse)
+                            return "Convert to SideShot";
+                        else
+                            return "Convert";
+                    }
+                }
+                else
+                    return "Convert";
             }
         }
-
+        public String ReverseTypeHeader => SelectedPoints.Count > 2 ? "Reverse Points" : "Swap Points";
 
         private ObservableCollection<DataGridColumn> _DataColumns;
         public ObservableCollection<DataGridColumn> DataColumns
@@ -226,8 +222,17 @@ namespace TwoTrails.ViewModels
         }
 
         public ObservableCollection<MenuItem> AdvInfoItems { get; }
-        
 
+        #region ToolsProperties
+        public bool PlotToolInUse
+        {
+            get => Get<bool>();
+            set => Set(value, () => {
+                CreatePlotsCommand.RaiseCanExecuteChanged();
+                CreateSubsampleCommand.RaiseCanExecuteChanged();
+            });
+        }
+        #endregion
 
         #region AdvInfoItems
         public double? AI_DistFt { get { return Get<double?>(); } set { Set(value); } }
@@ -248,13 +253,13 @@ namespace TwoTrails.ViewModels
         {
             if (HasSelection && _SelectedPoints.Count > 1)
             {
-                Func<TtPoint, int, UTMCoords> GetCoords = (p, tzone) =>
+                UTMCoords GetCoords(TtPoint p, int tzone)
                 {
                     if (p.Metadata.Zone == tzone)
                         return new UTMCoords(p.AdjX, p.AdjY, tzone);
                     else
                         return UTMTools.ShiftZones(p.AdjX, p.AdjY, tzone, p.Metadata.Zone);
-                };
+                }
 
                 List<TtPoint> points = GetSortedSelectedPoints();
 
@@ -347,8 +352,7 @@ namespace TwoTrails.ViewModels
 
         private MenuItem[] GenerateAdvInfoItems()
         {
-            Func<string, string, Action, MenuItem> GenerateAdvInfoMenuItem =
-                (headerStringFormat, propertyName, action) =>
+            MenuItem GenerateAdvInfoMenuItem(string headerStringFormat, string propertyName, Action action)
             {
                 MenuItem mi = new MenuItem()
                 {
@@ -372,7 +376,7 @@ namespace TwoTrails.ViewModels
                 });
 
                 return mi;
-            };
+            }
 
             return new MenuItem[]
             {
@@ -800,7 +804,7 @@ namespace TwoTrails.ViewModels
             }), true);
 
             Project = project;
-            Manager = project.HistoryManager;
+            Manager = project.Manager;
             Manager.HistoryChanged += (s, e) =>
             {
                 if (e.RequireRefresh)
@@ -885,7 +889,6 @@ namespace TwoTrails.ViewModels
 
             Points.Filter = Filter;
             
-
             #region Init Commands
             RefreshPoints = new RelayCommand(x => Points.Refresh());
 
@@ -908,11 +911,12 @@ namespace TwoTrails.ViewModels
                 this, x => new { x.OnlyQuondams, x.MultipleSelections });
 
             RenamePointsCommand = new BindedRelayCommand<PointEditorModel>(
-                x => RenamePoints(), x => MultipleSelections,
+                x => RenamePoints(), x => MultipleSelections && SamePolygon,
                 this, x => x.MultipleSelections);
 
             ReverseSelectedCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ReverseSelection(), x => MultipleSelections,
+                x => { if (SelectedPoints.Count > 2) ReverseSelection(); else SwapPoints(); },
+                x => MultipleSelections && SamePolygon,
                 this, x => x.MultipleSelections);
 
             ResetPointCommand = new BindedRelayCommand<PointEditorModel>(
@@ -950,7 +954,12 @@ namespace TwoTrails.ViewModels
 
             CreatePlotsCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
                 x => CreatePlots(),
-                x => Manager.Polygons.Count > 0,
+                x => Manager.Polygons.Count > 0 && !PlotToolInUse,
+                Manager.Polygons, x => x.Count);
+
+            CreateSubsampleCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
+                x => CreateSubsample(),
+                x => Manager.Polygons.Count > 0 && !PlotToolInUse,
                 Manager.Polygons, x => x.Count);
 
             CreateCorridorCommand = new BindedRelayCommand<PointEditorModel>(
@@ -983,7 +992,7 @@ namespace TwoTrails.ViewModels
         private void SetupUI()
         {
             #region Setup Columns and Visibility Menu
-            Action<Tuple<DataGridTextColumn, string>> AddColumnAndMenuItem = (tup) =>
+            void AddColumnAndMenuItem(Tuple<DataGridTextColumn, string> tup)
             {
                 DataColumns.Add(tup.Item1);
 
@@ -1013,7 +1022,7 @@ namespace TwoTrails.ViewModels
                 });
 
                 VisibleFields.Add(mi);
-            };
+            }
 
 
             DataColumns = new ObservableCollection<DataGridColumn>();
@@ -1851,6 +1860,7 @@ namespace TwoTrails.ViewModels
                     nameof(OnlyQuondams),
                     nameof(HasPossibleCorridor),
                     nameof(ConvertTypeHeader),
+                    nameof(ReverseTypeHeader),
                     nameof(PID),
                     nameof(SamePID),
                     nameof(Index),
@@ -1967,7 +1977,7 @@ namespace TwoTrails.ViewModels
 
         private void ReverseSelection()
         {
-            if (MultipleSelections)
+            if (MultipleSelections && SamePolygon)
             {
                 List<TtPoint> points = GetSortedSelectedPoints();
 
@@ -2194,7 +2204,7 @@ namespace TwoTrails.ViewModels
 
         private void ConvertQuondams()
         {
-            Func<QuondamPoint, GpsPoint> convertPoint = (q) =>
+            GpsPoint convertPoint(QuondamPoint q)
             {
                 GpsPoint gps = new GpsPoint(q)
                 {
@@ -2205,7 +2215,7 @@ namespace TwoTrails.ViewModels
                 gps.SetAccuracy(q.Polygon.Accuracy);
 
                 return gps;
-            };
+            }
 
             if (MultipleSelections)
                 Manager.ReplacePoints(GetSortedSelectedPoints().Select(p => convertPoint(p as QuondamPoint)));
@@ -2217,15 +2227,15 @@ namespace TwoTrails.ViewModels
 
         private void ConvertTravTypes()
         {
-            Func<TtPoint, TtPoint> convertToTrav = (ss) =>
+            TtPoint convertToTrav(TtPoint ss)
             {
                 return new TravPoint(ss);
-            };
+            }
 
-            Func<TtPoint, TtPoint> convertToSS = (trav) =>
+            TtPoint convertToSS(TtPoint trav)
             {
                 return new SideShotPoint(trav);
-            };
+            }
 
 
             if (MultipleSelections)
@@ -2270,10 +2280,37 @@ namespace TwoTrails.ViewModels
             });
         }
 
+        private void SwapPoints()
+        {
+            Manager.EditPointsMultiValues(SelectedPoints.Cast<TtPoint>().Take(2), PointProperties.INDEX,
+                new int[] { (SelectedPoints[1] as TtPoint).Index, (SelectedPoints[0] as TtPoint).Index });
+        }
+
         private void CreatePlots()
         {
-            //Project.MainModel.MainWindow.IsEnabled = false;
-            CreatePlotsDialog.Show(Project, Project.MainModel.MainWindow);//, () => Project.MainModel.MainWindow.IsEnabled = true);
+            if (Manager.Polygons.Any(poly => Manager.GetPoints(poly.CN).HasAtLeast(3, p => p.IsBndPoint())))
+            {
+                //Project.MainModel.MainWindow.IsEnabled = false;
+                PlotToolInUse = true;
+                CreatePlotsDialog.Show(Project, Project.MainModel.MainWindow, () => PlotToolInUse = false);//, () => Project.MainModel.MainWindow.IsEnabled = true);
+            }
+            else
+            {
+                MessageBox.Show("No Valid Polygons Found");
+            }
+        }
+
+        private void CreateSubsample()
+        {
+            if (Manager.Polygons.Any(poly => Manager.GetPoints(poly.CN).All(p => p.IsWayPointAtBase())))
+            {
+                PlotToolInUse = true;
+                CreateSubsetDialog.Show(Project, Project.MainModel.MainWindow, () => PlotToolInUse = false);
+            }
+            else
+            {
+                MessageBox.Show("No Plot Polygons Found");
+            }
         }
 
         private void CreateCorridor()

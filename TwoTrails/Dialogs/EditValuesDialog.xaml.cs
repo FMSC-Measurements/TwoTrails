@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMSC.Core.Windows.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,7 +58,8 @@ namespace TwoTrails.Dialogs
                 }
             }
 
-            DialogResult = true;
+            if (this.IsShownAsDialog())
+                this.DialogResult = true;
             Close();
         }
 

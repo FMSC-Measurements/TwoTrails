@@ -88,8 +88,8 @@ namespace TwoTrails.ViewModels
 
         public TtSettings Settings { get; private set; }
 
-        public TtManager Manager { get; }
-        public TtHistoryManager HistoryManager { get; }
+        private TtManager _BaseManager { get; }
+        public TtHistoryManager Manager { get; }
 
         private PointEditorModel _DataEditor;
         public PointEditorModel DataEditor
@@ -124,17 +124,17 @@ namespace TwoTrails.ViewModels
 
             RequiresSave = false;
 
-            Manager = new TtManager(dal, mal, settings);
-            HistoryManager = new TtHistoryManager(Manager);
-            HistoryManager.HistoryChanged += Manager_HistoryChanged;
+            _BaseManager = new TtManager(dal, mal, settings);
+            Manager = new TtHistoryManager(_BaseManager);
+            Manager.HistoryChanged += Manager_HistoryChanged;
             
             UndoCommand = new BindedRelayCommand<TtHistoryManager>(
-                x => HistoryManager.Undo(), x => HistoryManager.CanUndo, HistoryManager, x => x.CanUndo);
+                x => Manager.Undo(), x => Manager.CanUndo, Manager, x => x.CanUndo);
 
             RedoCommand = new BindedRelayCommand<TtHistoryManager>(
-                x => HistoryManager.Redo(), x => HistoryManager.CanRedo, HistoryManager, x => x.CanRedo);
+                x => Manager.Redo(), x => Manager.CanRedo, Manager, x => x.CanRedo);
 
-            DiscardChangesCommand = new RelayCommand(x => Manager.Reset());
+            DiscardChangesCommand = new RelayCommand(x => _BaseManager.Reset());
 
             ViewUserActivityCommand = new RelayCommand(x => ViewUserActivityTab());
             
@@ -144,10 +144,10 @@ namespace TwoTrails.ViewModels
             EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Metadata));
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Groups));
             
-            RecalculateAllPolygonsCommand = new RelayCommand(x => { HistoryManager.RecalculatePolygons(); DataChanged |= true; });
+            RecalculateAllPolygonsCommand = new RelayCommand(x => { Manager.RecalculatePolygons(); DataChanged |= true; });
             CalculateLogDeckCommand = new RelayCommand(x =>
             {
-                if (Manager.PolygonCount > 0)
+                if (_BaseManager.PolygonCount > 0)
                 {
                     MainModel.MainWindow.IsEnabled = false;
                     LogDeckCalculatorDialog.Show(this, this.MainModel.MainWindow, () =>
@@ -167,7 +167,7 @@ namespace TwoTrails.ViewModels
 
         private void Manager_HistoryChanged(object sender, EventArgs e)
         {
-            RequiresSave = HistoryManager.CanUndo;
+            RequiresSave = Manager.CanUndo;
         }
 
 
@@ -189,8 +189,8 @@ namespace TwoTrails.ViewModels
                         _ProjectInfo = new TtProjectInfo(ProjectInfo);
                     }
 
-                    Manager.Save();
-                    HistoryManager.ClearHistory();
+                    _BaseManager.Save();
+                    Manager.ClearHistory();
                     RequiresSave = DataChanged = ProjectChanged = false;
                     MessagePosted?.Invoke(this, $"Project '{ProjectName}' Saved");
                 }
@@ -204,7 +204,7 @@ namespace TwoTrails.ViewModels
         public void ReplaceDAL(ITtDataLayer dal)
         {
             DAL = dal;
-            Manager.ReplaceDAL(DAL);
+            _BaseManager.ReplaceDAL(DAL);
             OnPropertyChanged(nameof(DAL));
             OnPropertyChanged(nameof(FilePath));
         }
@@ -212,7 +212,7 @@ namespace TwoTrails.ViewModels
         public void ReplaceMAL(ITtMediaLayer mal)
         {
             MAL = mal;
-            Manager.ReplaceMAL(MAL);
+            _BaseManager.ReplaceMAL(MAL);
             OnPropertyChanged(nameof(MAL));
         }
 

@@ -8,7 +8,7 @@ namespace TwoTrails.Core.Points
     {
         public static bool IsGpsType(this TtPoint point)
         {
-            return point.OpType == OpType.GPS || point.OpType == OpType.Take5 ||
+            return point.OpType == OpType.Take5 || point.OpType == OpType.GPS ||
                 point.OpType == OpType.Walk || point.OpType == OpType.WayPoint;
         }
 
@@ -24,26 +24,23 @@ namespace TwoTrails.Core.Points
 
         public static bool IsBndPoint(this TtPoint point)
         {
-            return point.OnBoundary && point.OpType != OpType.WayPoint;
+            return point.OnBoundary;
         }
 
         public static bool IsNavPoint(this TtPoint point)
         {
-            switch (point.OpType)
-            {
-                case OpType.GPS:
-                case OpType.Take5:
-                case OpType.Traverse:
-                case OpType.Walk:
-                    return true;
-            }
-
-            return false;
+            return point.OpType == OpType.Take5 || point.OpType == OpType.GPS ||
+                point.OpType == OpType.Traverse || point.OpType == OpType.Walk;
         }
         
         public static bool IsMiscPoint(this TtPoint point)
         {
             return point.OpType == OpType.SideShot && !point.OnBoundary;
+        }
+
+        public static bool IsWayPointAtBase(this TtPoint point)
+        {
+            return point.OpType == OpType.WayPoint || (point is QuondamPoint qp && qp.ParentPoint.OpType == OpType.WayPoint);
         }
 
         public static bool IsManualAccType(this TtPoint point)

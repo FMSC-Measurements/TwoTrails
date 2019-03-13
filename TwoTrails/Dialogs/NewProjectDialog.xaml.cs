@@ -3,6 +3,7 @@ using System.Windows;
 using System.IO;
 using TwoTrails.Core;
 using System.ComponentModel;
+using FMSC.Core.Windows.Utilities;
 
 namespace TwoTrails.Dialogs
 {
@@ -49,6 +50,7 @@ namespace TwoTrails.Dialogs
 
         private void Create_Click(object sender, RoutedEventArgs e)
         {
+            bool result = false;
             try
             {
                 if (String.IsNullOrWhiteSpace(ProjectInfo.Name))
@@ -71,20 +73,24 @@ namespace TwoTrails.Dialogs
                     if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0)
                     {
                         FilePath = Path.Combine(txtLocation.Text, fileName);
-                        
+
                         if (File.Exists(FilePath))
                         {
                             if (MessageBox.Show($"{fileName} already exists. Would you like to overwrite it?", "File Exists",
-                                MessageBoxButton.YesNo, MessageBoxImage.Warning)  == MessageBoxResult.Yes)
+                                MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                             {
-                                DialogResult = true;
+                                result = true;
                             }
                         }
                         else
-                            DialogResult = true;
+                            result = true;
 
-                        if (DialogResult == true)
+                        if (result == true)
+                        {
+                            if (this.IsShownAsDialog())
+                                this.DialogResult = true;
                             this.Close();
+                        }
                     }
                     else
                     {
@@ -101,7 +107,8 @@ namespace TwoTrails.Dialogs
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            if (this.IsShownAsDialog())
+                this.DialogResult = false;
             this.Close();
         }
     }
