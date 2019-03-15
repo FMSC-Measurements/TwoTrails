@@ -338,7 +338,7 @@ namespace TwoTrails.ViewModels
                     if (!_Projects.Keys.Contains(ttFile, StringComparer.InvariantCultureIgnoreCase))
                         OpenProject(ttFile);
                 }
-                else if (filePath.EndsWith(Consts.FILE_EXTENSION_V2, StringComparison.InvariantCultureIgnoreCase))
+                else if (filePath.EndsWith(Consts.FILE_EXTENSION_V2, StringComparison.InvariantCultureIgnoreCase) && CurrentProject == null)
                 {
                     TtV2SqliteDataAccessLayer dalv2 = new TtV2SqliteDataAccessLayer(filePath);
 
@@ -459,7 +459,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                 ttProjectInfo.Name = $"Import of {String.Join(", ", files.Select(f => Path.GetFileNameWithoutExtension(f)))}";
             }
 
-            NewProjectDialog dialog = new NewProjectDialog(MainWindow, ttProjectInfo);
+            NewProjectDialog dialog = new NewProjectDialog(MainWindow, ttProjectInfo, Path.GetDirectoryName(files.First()));
 
             if (dialog.ShowDialog() == true)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
@@ -45,7 +46,7 @@ namespace TwoTrails.Utils
                 aPolys.Add(poly.CN, poly);
             }
 
-            aPoints = aPolys.Values.SelectMany(p => dal.GetPoints(p.CN)).ToDictionary(p => p.CN, p => p);
+            aPoints = aPolys.Values.SelectMany(p => dal.GetPoints(p.CN, convertForeignQuondams)).ToDictionary(p => p.CN, p => p);
 
             foreach (string metaCN in aPoints.Values.Select(p => p.MetadataCN).Distinct())
             {
@@ -121,8 +122,7 @@ namespace TwoTrails.Utils
             if (convertForeignQuondams)
             {
                 foreach(QuondamPoint qpoint in aPoints.Values
-                    .Where(p => p.OpType == OpType.Quondam && !aPolys.ContainsKey((p as QuondamPoint).ParentPoint.PolygonCN))
-                            .Cast<QuondamPoint>().ToList())
+                    .Where(p => p.OpType == OpType.Quondam && !aPolys.ContainsKey((p as QuondamPoint).ParentPoint.PolygonCN)).ToList())
                 {
                     aPoints[qpoint.CN] = convertQuondam(qpoint);
                 }
