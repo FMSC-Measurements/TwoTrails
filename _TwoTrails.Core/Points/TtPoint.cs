@@ -66,7 +66,9 @@ namespace TwoTrails.Core.Points
                     {
                         PolygonCN = value.CN;
 
-                        _Polygon.PreviewPolygonAccuracyChanged += Polygon_PreviewPolygonAccuracyChanged; 
+                        _Polygon.PreviewPolygonAccuracyChanged += Polygon_PreviewPolygonAccuracyChanged;
+
+                        SetAccuracy(_Polygon.Accuracy);
                     }
 
                     if (oldPoly != null && value != null)
