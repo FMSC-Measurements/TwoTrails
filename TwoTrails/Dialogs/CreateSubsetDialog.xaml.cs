@@ -144,7 +144,7 @@ namespace TwoTrails.Dialogs
             }
 
             List<TtPoint> wayPoints = new List<TtPoint>();
-            int index = 0, j;
+            int index = 0;
             WayPoint curr, prev = null;
 
             foreach (TtPoint p in points)
