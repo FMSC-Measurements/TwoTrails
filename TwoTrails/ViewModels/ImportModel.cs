@@ -297,7 +297,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                     foreach (QuondamPoint qp in ImportControl.DAL.GetPoints(polyCN, true)
                         .Where(p => p.OpType == OpType.Quondam).Cast<QuondamPoint>())
                     {
-                        if (qp.ParentPoint.PolygonCN != polyCN && !neededPolys.Contains(qp.ParentPoint.PolygonCN))
+                        if (qp.ParentPoint.PolygonCN != polyCN && !selectedPolys.Contains(qp.ParentPoint.PolygonCN) && !neededPolys.Contains(qp.ParentPoint.PolygonCN))
                             neededPolys.Add(qp.ParentPoint.PolygonCN);
                     }
                 }

@@ -72,7 +72,7 @@ namespace TwoTrails.Core.Points
 
         public override OpType OpType { get { return OpType.Quondam; } }
 
-        public override bool OnBoundary { get => false; set => base.OnBoundary = value; }
+        //public override bool OnBoundary { get => false; set => base.OnBoundary = value; }
         #endregion
 
 
@@ -101,8 +101,8 @@ namespace TwoTrails.Core.Points
 
         private void CopyQndmValues(QuondamPoint point)
         {
-            _ParentPointCN = point._ParentPointCN;
             _ManualAccuracy = point._ManualAccuracy;
+            ParentPoint = point.ParentPoint;
         }
 
 
@@ -118,7 +118,7 @@ namespace TwoTrails.Core.Points
 
         public override void SetAccuracy(double accuracy)
         {
-            base.SetAccuracy(ManualAccuracy ?? ParentPoint.Accuracy);
+            base.SetAccuracy(ManualAccuracy ?? (ParentPoint != null ? ParentPoint.Accuracy : Consts.DEFAULT_POINT_ACCURACY));
         }
 
 

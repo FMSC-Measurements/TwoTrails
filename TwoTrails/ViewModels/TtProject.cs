@@ -197,6 +197,8 @@ namespace TwoTrails.ViewModels
                 catch (Exception ex)
                 {
                     Trace.WriteLine(ex.Message, "TtProject:Save");
+                    MessagePosted?.Invoke(this, "Error Saving Project");
+                    MessageBox.Show("Error Saving Project. See Log for details.", "Project Save Error");
                 }
             }
         }

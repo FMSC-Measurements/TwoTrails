@@ -501,6 +501,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                         if (idal != null)
                         {
                             Import.DAL(proj.Manager, idal);
+                            proj.Save();
                         }
                     }
 
