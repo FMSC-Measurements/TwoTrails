@@ -19,8 +19,8 @@
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         
         <Grid.RowDefinitions>
@@ -177,9 +177,9 @@
             </Grid.Resources>
             
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>

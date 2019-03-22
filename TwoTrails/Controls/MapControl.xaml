@@ -19,7 +19,7 @@
         <Style x:Key="fcbStyle" TargetType="fmsccwc:FlipCheckBox">
             <Setter Property="Width" Value="30"/>
             <Setter Property="Height" Value="30"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
@@ -433,7 +433,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Text="{Binding Polygon.Name}" Grid.Column="0" HorizontalAlignment="Stretch" TextTrimming="WordEllipsis" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Polygon.Name}" Grid.Column="0" HorizontalAlignment="Stretch" TextTrimming="CharacterEllipsis" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
                                             <TextBlock.ToolTip>
                                                 <Grid Background="WhiteSmoke">
                                                     <Border BorderThickness="0.75" BorderBrush="Black">
