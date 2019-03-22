@@ -31,7 +31,7 @@ namespace TwoTrails.DAL
 
         private readonly ParseOptions _Options;
         private bool parsed;
-        private int secondsInc = 0;
+        private int milliSecondsInc = 0;
         private int polyInc = 0;
 
         private static readonly object locker = new object();
@@ -66,7 +66,7 @@ namespace TwoTrails.DAL
                     {
                         _Points.Clear();
                         _Polygons.Clear();
-                        secondsInc = 0;
+                        milliSecondsInc = 0;
                     }
 
                     GeometryFactory factory;
@@ -128,7 +128,7 @@ namespace TwoTrails.DAL
                             {
                                 PointStartIndex = 1000 * ++polyInc + 10,
                                 Name = file.Name,
-                                TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
+                                TimeCreated = DateTime.Now.AddMilliseconds(milliSecondsInc++)
                             };
 
                             index = 0;
@@ -195,7 +195,7 @@ namespace TwoTrails.DAL
                                     PointStartIndex = 1000 * ++polyInc + 10,
                                     Name = features.Count < 2 ? file.Name :
                                         $"{fidInc++}-{file.Name}",
-                                    TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
+                                    TimeCreated = DateTime.Now.AddMilliseconds(milliSecondsInc++)
                                 };
 
                                 #region Shape Desc Properties

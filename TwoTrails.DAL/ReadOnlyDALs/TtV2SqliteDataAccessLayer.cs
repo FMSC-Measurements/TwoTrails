@@ -159,6 +159,8 @@ namespace TwoTrails.DAL
                     if (reader != null)
                     {
                         TtPolygon poly;
+                        int seconds = 0;
+
                         while (reader.Read())
                         {
                             poly = new TtPolygon();
@@ -176,6 +178,8 @@ namespace TwoTrails.DAL
                                 poly.Increment = reader.GetInt32(6);
                             if (!reader.IsDBNull(7))
                                 poly.PointStartIndex = reader.GetInt32(7);
+
+                            poly.TimeCreated = DateTime.Now.AddMilliseconds(seconds++);
 
                             yield return poly;
                         }

@@ -29,7 +29,7 @@ namespace TwoTrails.DAL
 
         private readonly ParseOptions _Options;
         private bool parsed;
-        private int secondsInc = 0;
+        private int milliSecondsInc = 0;
         private int polyInc = 0;
 
         private static object locker = new object();
@@ -54,7 +54,7 @@ namespace TwoTrails.DAL
                         _Metadata.Clear();
                         _Groups.Clear();
                         _Nmea.Clear();
-                        secondsInc = 0;
+                        milliSecondsInc = 0;
                     }
 
                     ParseProject(_Options.ProjectFile);
@@ -243,7 +243,7 @@ namespace TwoTrails.DAL
                             Name = hasPolyNames ?
                                 reader.GetField<string>(fPolyName) : $"Poly {++polyInc}",
                             PointStartIndex = _Polygons.Count * polyInc + 10,
-                            TimeCreated = _ProjectInfo.CreationDate.AddSeconds(secondsInc++)
+                            TimeCreated = _ProjectInfo.CreationDate.AddMilliseconds(milliSecondsInc++)
                         };
 
                         _Polygons.Add(cn, poly);
@@ -263,7 +263,7 @@ namespace TwoTrails.DAL
                         {
                             Name = reader.GetField<string>(fPolyName),
                             PointStartIndex = _Polygons.Count * 1000 + 1010,
-                            TimeCreated = _ProjectInfo.CreationDate.AddHours(secondsInc++)
+                            TimeCreated = _ProjectInfo.CreationDate.AddMilliseconds(milliSecondsInc++)
                         };
 
                         _Polygons.Add(poly.CN, poly);

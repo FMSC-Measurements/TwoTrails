@@ -28,7 +28,7 @@ namespace TwoTrails.DAL
 
         private readonly ParseOptions _Options;
         private bool parsed;
-        private int secondsInc = 0;
+        private int milliSecondsInc = 0;
         private int polyInc = 0;
 
         private static object locker = new object();
@@ -95,7 +95,7 @@ namespace TwoTrails.DAL
                                                     {
                                                         Name = $"Poly {++polyInc}",
                                                         PointStartIndex = 1000 * polyInc + 10,
-                                                        TimeCreated = DateTime.Now.AddSeconds(secondsInc++)
+                                                        TimeCreated = DateTime.Now.AddMilliseconds(milliSecondsInc++)
                                                     };
 
                                                     lastPoint = null;

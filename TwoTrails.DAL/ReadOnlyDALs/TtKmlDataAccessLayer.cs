@@ -102,6 +102,7 @@ namespace TwoTrails.DAL
             poly.Name = String.IsNullOrWhiteSpace(folder.Name) ? $"Poly {polyCount} ({parentFolderName})" : folder.Name;
             poly.PointStartIndex = polyCount * 1000 + 10;
             poly.Description = folder.Desctription;
+            poly.TimeCreated = DateTime.Now.AddMilliseconds(polyCount);
 
             GpsPoint point, prev = null;
 
@@ -132,6 +133,7 @@ namespace TwoTrails.DAL
                     poly.Name = String.IsNullOrWhiteSpace(kpoly.Name) ? $"Poly {polyCount} ({parentFolderName})" : kpoly.Name;
                     poly.PointStartIndex = polyCount * 1000 + 10;
                     poly.Description = placemark.Desctription;
+                    poly.TimeCreated = DateTime.Now.AddMilliseconds(polyCount);
 
                     GpsPoint point, prev = null;
 

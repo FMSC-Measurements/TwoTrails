@@ -213,7 +213,8 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.Message, "Earth File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            Trace.WriteLine(ex.Message, "ImportModel:SetupImport:KMZ");
+                            MessageBox.Show(ex.Message, "Google Earth File Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
 
                         break;
