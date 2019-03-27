@@ -50,7 +50,7 @@ namespace TwoTrails.Core.ComponentModel.History
                         Polygon = TargetPolygon,
                         Metadata = pointsManager.DefaultMetadata,
                         Group = pointsManager.MainGroup,
-                        OnBoundary = (bndMode == QuondamBoundaryMode.Inherit) ? point.OnBoundary : (bndMode == QuondamBoundaryMode.On)
+                        OnBoundary = (bndMode == QuondamBoundaryMode.Inherit) ? point.OnBoundary : (bndMode != QuondamBoundaryMode.Off)
                     };
 
                     qp.SetAccuracy(TargetPolygon.Accuracy);
