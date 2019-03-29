@@ -167,7 +167,7 @@ namespace TwoTrails.Core.Points
         internal void Adjust()
         {
             if (HasLatLon)
-                SetUnAdjLocation((double)Latitude, (double)Longitude, Metadata.Zone, Elevation ?? 0);
+                SetUnAdjLocation((double)Latitude, (double)Longitude, Metadata.Zone, Elevation ?? UnAdjZ);
             else
                 SetUnAdjLocation(this);
 
