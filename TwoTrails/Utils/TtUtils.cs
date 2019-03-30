@@ -22,29 +22,31 @@ namespace TwoTrails.Utils
             {
                 string res = new WebClient().DownloadString(Consts.URL_TWOTRAILS_UPDATE);
 
-
                 if (res != null)
                 {
-                    string[] tokens = res.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] tokens = res.Split('\n').Select(l => l.Trim('\r', ' ')).ToArray();
 
                     if (tokens.Length > 0)
                     {
                         status.CheckStatus = new Version(tokens[0].Trim()) > Assembly.GetExecutingAssembly().GetName().Version;
 
-                        if (tokens.Length > 1)
+                        if (status.CheckStatus == true && tokens.Length > 1)
                         {
                             UpdateType updateType = UpdateType.None;
-                            string updateStr = tokens[1];
 
-                            for (int i = 0; i < 5 && i < updateStr.Length; i++)
+                            for (int r = 1; r < tokens.Length; r += 3)
                             {
-                                if (updateStr[i] != '0')
-                                    updateType |= (UpdateType)(1 << i);
+                                string updateStr = tokens[r];
+                                for (int i = 0; i < 5 && i < updateStr.Length; i++)
+                                {
+                                    if (updateStr[i] != '0')
+                                        updateType |= (UpdateType)(1 << i);
+                                }
                             }
 
                             status.UpdateType = updateType;
 
-                            status.UpdateMessage = (tokens.Length > 2) ? String.Join(Environment.NewLine, tokens.Skip(2)) : String.Empty;
+                            status.UpdateMessage = (tokens.Length > 2) ? tokens[2] : String.Empty;
 
                         }
                     }

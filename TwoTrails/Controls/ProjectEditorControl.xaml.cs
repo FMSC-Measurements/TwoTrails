@@ -24,9 +24,6 @@ namespace TwoTrails.Controls
             if (lbPolys.Items.Count > 0)
                 lbPolys.SelectedIndex = 0;
 
-            if (lbMediaPoints.Items.Count > 0)
-                lbMediaPoints.SelectedIndex = 0;
-
             SwitchToTab(tab);
         }
 
