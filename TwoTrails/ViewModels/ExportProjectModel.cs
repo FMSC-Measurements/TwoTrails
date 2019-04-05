@@ -138,6 +138,9 @@ namespace TwoTrails.ViewModels
                         }
 
                         window.Close();
+
+
+                        //TODO notice of export
                     }
                     catch (Exception ex)
                     {

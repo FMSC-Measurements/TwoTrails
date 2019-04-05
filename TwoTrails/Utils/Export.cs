@@ -622,7 +622,7 @@ namespace TwoTrails.Utils
 
         public static void Shapes(ITtManager manager, TtProjectInfo projectInfo, String folderPath)
         {
-            string shapeFolderPath = Path.Combine(folderPath, projectInfo.Name);
+            string shapeFolderPath = Path.Combine(folderPath, $"GIS_{projectInfo.Name}");
 
             foreach (TtPolygon poly in manager.GetPolygons())
             {

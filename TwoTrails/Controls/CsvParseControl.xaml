@@ -155,7 +155,7 @@
             <RadioButton Content="Lat/Lon" Grid.Column="3" GroupName="mode" ToolTip="Imports points as GPS using Latitude and Longitude converted into the default UTM zone"
                          IsChecked="{Binding Path=Mode, Converter={StaticResource ebc}, ConverterParameter=dal:ParseMode.LatLon}"/>
 
-            <Button Content="Continue" Grid.Column="5" Command="{Binding SetupImportCommand}"/>
+            <!--<Button Content="Continue" Grid.Column="5" Command="{Binding SetupImportCommand}"/>-->
 
             <TextBlock Grid.Row="1" Grid.ColumnSpan="4" Foreground="Red"
                        Text="{Binding Path=Zone, StringFormat=Points will be imported into Zone: {0}}" Visibility="{Binding ElementName=radAdv, Path=IsChecked, Converter={StaticResource ibtvc}}"/>

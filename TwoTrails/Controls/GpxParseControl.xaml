@@ -43,7 +43,7 @@
                   SelectedItem="{Binding PathOptions.UomElevation, Mode=OneWayToSource}"
                   SelectedIndex="0"/>
 
-            <Button Grid.Column="4" Grid.Row="0" Margin="0" Content="Continue" Command="{Binding SetupImportCommand}"/>
+            <!--<Button Grid.Column="4" Grid.Row="0" Margin="0" Content="Continue" Command="{Binding SetupImportCommand}"/>-->
         </Grid>
     </Grid>
 </UserControl>

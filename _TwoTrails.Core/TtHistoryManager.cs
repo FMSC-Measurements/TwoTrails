@@ -452,17 +452,17 @@ namespace TwoTrails.Core
 
         public List<TtImage> GetImages(string pointCN)
         {
-            throw new NotImplementedException();
+            return BaseManager.GetImages(pointCN);
         }
 
         public void InsertMedia(TtMedia media)
         {
-            throw new NotImplementedException();
+            InsertMedia(media);
         }
 
         public void DeleteMedia(TtMedia media)
         {
-            throw new NotImplementedException();
+            DeleteMedia(media);
         }
 
 

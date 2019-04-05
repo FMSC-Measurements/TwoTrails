@@ -5,12 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
+using TwoTrails.Core.Interfaces;
 using TwoTrails.DAL;
 using static TwoTrails.DAL.TtCsvDataAccessLayer;
 
 namespace TwoTrails.ViewModels
 {
-    public class CsvImportModel : NotifyPropertyChangedEx
+    public class CsvImportModel : NotifyPropertyChangedEx, IFileImportModel
     {
         private Action<TtCsvDataAccessLayer> OnSetup { get; }
 

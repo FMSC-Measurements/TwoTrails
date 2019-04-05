@@ -47,7 +47,7 @@
             </Grid.ColumnDefinitions>
             
             <Button Content="{Binding CloseText}" Width="75" Grid.Column="0" Command="{Binding CancelCommand}"/>
-            <Button Content="Import" Width="75" Grid.Column="2"
+            <Button Content="{Binding ImportBtnText}" Width="75" Grid.Column="2"
                     Command="{Binding ImportCommand}" CommandParameter="{Binding ElementName=txtFile, Path=Text}"/>
         </Grid>
     </Grid>
