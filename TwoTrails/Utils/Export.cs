@@ -414,7 +414,7 @@ namespace TwoTrails.Utils
                 sw.WriteLine($"Creation Version: { projectInfo.CreationVersion }");
                 sw.WriteLine("\n");
                 sw.WriteLine("**** GPS Error can be divided by 2 if an appropriate ANGLE POINT METHOD is used instead of the WALK METHOD ****");
-                sw.WriteLine("**** Appropriate means that the boundary legs are reasnoably long between verticies where the boundary direction changes by 90 degree angles where possible and changes at least more than 30 degrees most of the time. ****");
+                sw.WriteLine("**** Appropriate means that the boundary legs are reasonably long between verticies where the boundary direction changes by 90 degree angles where possible and changes at least more than 30 degrees most of the time. ****");
                 sw.WriteLine("**** If the unit is totally a direction distance-traverse. Use only the traverse contribution area-error. ****");
                 sw.WriteLine("**** Points with asterisks are OFF boundary points. ****");
                 sw.WriteLine("\n");
