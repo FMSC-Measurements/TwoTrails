@@ -24,8 +24,8 @@ namespace TwoTrails.DAL
 
         public bool HandlesAllPointTypes => false;
 
-        private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
-        private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
+        private readonly Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
+        private readonly Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
 
         private readonly TtProjectInfo _ProjectInfo;
 
@@ -103,7 +103,7 @@ namespace TwoTrails.DAL
                             {
                                 fldDescriptor = header.Fields[i];
                                 keys[i] = fldDescriptor.Name;
-                                attributesTable.AddAttribute(fldDescriptor.Name, shapeFileDataReader.GetValue(i));
+                                attributesTable.Add(fldDescriptor.Name, shapeFileDataReader.GetValue(i));
                             }
 
                             feature.Geometry = geometry;
@@ -293,7 +293,7 @@ namespace TwoTrails.DAL
 
         private IEnumerable<TtPoint> GetLinkedPoints(IEnumerable<TtPoint> points)
         {
-            foreach (TtPoint point in _Points.Values)
+            foreach (TtPoint point in points)
             {
                 if (point.OpType == OpType.Quondam)
                 {
@@ -305,7 +305,7 @@ namespace TwoTrails.DAL
                     yield return qp;
                 }
 
-                yield return point.DeepCopy();
+                yield return point;
             }
         }
 
@@ -316,7 +316,7 @@ namespace TwoTrails.DAL
 
             IEnumerable<TtPoint> points = (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index);
 
-            return linked ? GetLinkedPoints(points) : points.DeepCopy();
+            return linked ? GetLinkedPoints(points).DeepCopy() : points.DeepCopy();
         }
 
         public bool HasPolygons()

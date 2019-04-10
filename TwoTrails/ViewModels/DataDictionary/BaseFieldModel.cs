@@ -162,5 +162,16 @@ namespace TwoTrails.ViewModels.DataDictionary
                 (!(this.DefaultValue != null ^ other.DefaultValue != null) &&
                     (this.DefaultValue == null || this.DefaultValue.Equals(other.DefaultValue)));
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -1167242670;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(CN);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * -1521134295 + FieldType.GetHashCode();
+            hashCode = hashCode * -1521134295 + Flags.GetHashCode();
+            hashCode = hashCode * -1521134295 + DataType.GetHashCode();
+            return hashCode;
+        }
     }
 }

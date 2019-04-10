@@ -22,8 +22,8 @@ namespace TwoTrails.Core
         public ReadOnlyObservableCollection<TtGroup> Groups { get { return BaseManager.Groups; } }
         public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get { return BaseManager.MediaInfo; } }
 
-        private Stack<ITtCommand> _UndoStack = new Stack<ITtCommand>();
-        private Stack<ITtCommand> _RedoStack = new Stack<ITtCommand>();
+        private readonly Stack<ITtCommand> _UndoStack = new Stack<ITtCommand>();
+        private readonly Stack<ITtCommand> _RedoStack = new Stack<ITtCommand>();
         
 
         public bool CanUndo { get { return _UndoStack.Count > 0; } }
@@ -337,7 +337,7 @@ namespace TwoTrails.Core
 
         public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, bool reverse)
         {
-            MovePointsToPolygon(reverse? points.Reverse() : points, targetPolygon, insertIndex);
+            AddCommand(new MovePointsCommand(reverse ? points.Reverse() : points, BaseManager, targetPolygon, insertIndex));
         }
 
 
@@ -476,7 +476,7 @@ namespace TwoTrails.Core
         }
 
 
-        void ITtManager.UpdateDataAction(DataActionType action, string notes = null)
+        void ITtManager.UpdateDataAction(DataActionType action, string notes)
         {
             BaseManager.UpdateDataAction(action, notes);
         }
