@@ -15,6 +15,7 @@ namespace TwoTrails
         private const String LOG_DECK_COLLAR_WIDTH = "LogDeckCollarWidth";
         private const String LOG_DECK_DEFECT = "LogDeckDefect";
         private const String LOG_DECK_VOID = "LogDeckVoid";
+        private const String DELETE_POINT_WARNING = "DeletePointWarning";
 
         private bool _DeleteExistingPlots;
         public bool DeleteExistingPlots
@@ -38,6 +39,19 @@ namespace TwoTrails
             {
                 SetField(ref _SplitToIndividualPolys, value);
                 Properties.Settings.Default[SPLIT_INTO_INDIVIDUAL_POLYS] = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        private bool _DeletePointWarning;
+        public bool DeletePointWarning
+        {
+            get { return _DeletePointWarning; }
+
+            set
+            {
+                SetField(ref _DeletePointWarning, value);
+                Properties.Settings.Default[DELETE_POINT_WARNING] = value;
                 Properties.Settings.Default.Save();
             }
         }
@@ -127,6 +141,7 @@ namespace TwoTrails
         {
             _DeleteExistingPlots = (bool)Properties.Settings.Default[DELETE_EXISTING_PLOTS];
             _SplitToIndividualPolys = (bool)Properties.Settings.Default[SPLIT_INTO_INDIVIDUAL_POLYS];
+            _DeletePointWarning = (bool)Properties.Settings.Default[DELETE_POINT_WARNING];
 
             _LogDeckCollarWidth = (double)Properties.Settings.Default[LOG_DECK_COLLAR_WIDTH];
             _LogDeckDefect = (double)Properties.Settings.Default[LOG_DECK_DEFECT];

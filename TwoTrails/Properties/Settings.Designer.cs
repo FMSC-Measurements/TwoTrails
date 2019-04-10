@@ -270,5 +270,17 @@ namespace TwoTrails.Properties {
                 this["LogDeckVoid"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DeleteTravTypeWarning {
+            get {
+                return ((bool)(this["DeleteTravTypeWarning"]));
+            }
+            set {
+                this["DeleteTravTypeWarning"] = value;
+            }
+        }
     }
 }

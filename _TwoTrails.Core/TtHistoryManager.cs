@@ -216,6 +216,10 @@ namespace TwoTrails.Core
             return BaseManager.GetPoints(polyCN);
         }
 
+        public TtPoint GetNextPoint(TtPoint point)
+        {
+            return BaseManager.GetNextPoint(point);
+        }
 
         public bool PolygonExists(string polyCN)
         {

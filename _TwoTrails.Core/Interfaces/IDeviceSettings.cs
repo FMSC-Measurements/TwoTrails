@@ -6,6 +6,7 @@ namespace TwoTrails.Core
     {
         bool DeleteExistingPlots { get; }
         bool SplitToIndividualPolys { get; }
+        bool DeletePointWarning { get; }
         Distance LogDeckDistance { get; }
         Volume LogDeckVolume { get; }
         double LogDeckCollarWidth { get; }

@@ -2152,10 +2152,36 @@ namespace TwoTrails.ViewModels
 
         private void DeletePoint()
         {
-            if (MultipleSelections)
-                Manager.DeletePoints(SelectedPoints.Cast<TtPoint>());
+            if (Project.Settings.DeviceSettings.DeletePointWarning)
+            {
+                if (MultipleSelections)
+                    Manager.DeletePoints(SelectedPoints.Cast<TtPoint>());
+                else
+                {
+                    TtPoint point = SelectedPoints.Cast<TtPoint>().First();
+                    if (point.OpType == OpType.Quondam)
+                    {
+
+                    }
+                    else if (point.OpType != OpType.SideShot)
+                    {
+                        TtPoint next = Manager.GetNextPoint(point);
+                        if (next != null && next.IsTravType())
+                        {
+
+                        }
+                    }
+
+                    Manager.DeletePoint(point);
+                }
+            }
             else
-                Manager.DeletePoint(SelectedPoints.Cast<TtPoint>().First());
+            {
+                if (MultipleSelections)
+                    Manager.DeletePoints(SelectedPoints.Cast<TtPoint>());
+                else
+                    Manager.DeletePoint(SelectedPoints.Cast<TtPoint>().First());
+            }
         }
         
 

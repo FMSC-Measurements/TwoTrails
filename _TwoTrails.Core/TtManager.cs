@@ -1080,6 +1080,16 @@ namespace TwoTrails.Core
             
         }
 
+        public TtPoint GetNextPoint(TtPoint point)
+        {
+            if (_PointsByPoly.ContainsKey(point.PolygonCN) && point.Index < _PointsByPoly[point.PolygonCN].Count - 1)
+            {
+                return _PointsByPoly[point.PolygonCN][point.Index + 1];
+            }
+
+            return null;
+        }
+
 
         public bool PolygonExists(string polyCN)
         {
