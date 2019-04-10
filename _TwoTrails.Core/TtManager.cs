@@ -1405,12 +1405,24 @@ namespace TwoTrails.Core
         {
             lock (locker)
             {
-                List<string> reindexPolygons = new List<string>();
+                IgnorePointEvents = true;
+
+                List<string> reindexPolygons = new List<string>() { targetPolygon.CN };
                 List<TtPoint> targetPoints = _PointsByPoly[targetPolygon.CN];
                 
                 foreach (TtPoint point in points)
                 {
                     _PointsByPoly[point.PolygonCN].Remove(point);
+
+                    if (point.PolygonCN == targetPolygon.CN && point.Index < insertIndex)
+                    {
+                        insertIndex--;
+                    }
+
+                    if (!reindexPolygons.Contains(point.PolygonCN))
+                        reindexPolygons.Add(point.PolygonCN);
+
+                    point.Polygon = targetPolygon;
                 }
 
                 if (insertIndex < 1)
@@ -1426,26 +1438,14 @@ namespace TwoTrails.Core
                     targetPoints.AddRange(points);
                 }
                 
-                int index = 0;
-                foreach (TtPoint point in targetPoints)
-                {
-                    if (!reindexPolygons.Contains(point.PolygonCN))
-                        reindexPolygons.Add(point.PolygonCN);
-
-                    point.Index = index++;
-                    point.Polygon = targetPolygon;
-                }
-
-                AdjustAllTravTypesInPolygon(targetPolygon);
-                GeneratePolygonStats(targetPolygon);
-
+                int pointIndex = 0;
                 foreach (string ripoly in reindexPolygons)
                 {
-                    if (targetPolygon.CN != ripoly && _PointsByPoly.ContainsKey(ripoly))
+                    if (_PointsByPoly.ContainsKey(ripoly))
                     {
-                        index = 0;
+                        pointIndex = 0;
                         foreach (TtPoint point in _PointsByPoly[ripoly])
-                            point.Index = index++;
+                            point.Index = pointIndex++;
 
                         TtPolygon poly = _PolygonsMap[ripoly];
                         AdjustAllTravTypesInPolygon(poly);
@@ -1454,7 +1454,10 @@ namespace TwoTrails.Core
                         UpdateDataAction(DataActionType.ReindexPoints);
                     }
                 }
+
+                IgnorePointEvents = false;
             }
+
         }
 
 

@@ -274,12 +274,12 @@ namespace TwoTrails.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool DeleteTravTypeWarning {
+        public bool DeletePointWarning {
             get {
-                return ((bool)(this["DeleteTravTypeWarning"]));
+                return ((bool)(this["DeletePointWarning"]));
             }
             set {
-                this["DeleteTravTypeWarning"] = value;
+                this["DeletePointWarning"] = value;
             }
         }
     }
