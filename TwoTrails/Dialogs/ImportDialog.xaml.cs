@@ -13,16 +13,16 @@ namespace TwoTrails.Dialogs
     {
         private ImportModel _ImportModel;
 
-        public ImportDialog(ITtManager manager, string fileName = null, bool autoCloseOnImport = false)
+        public ImportDialog(TtProject project, string fileName = null, bool autoCloseOnImport = false)
         {
-            _ImportModel = new ImportModel(this, manager, fileName, autoCloseOnImport);
+            _ImportModel = new ImportModel(this, project, fileName, autoCloseOnImport);
             this.DataContext = _ImportModel;
             InitializeComponent();
         }
 
         public static bool? ShowDialog(TtProject project, Window owner = null, String fileName = null, bool autoCloseOnImport = false)
         {
-            ImportDialog diag = new ImportDialog(project.Manager, fileName, autoCloseOnImport);
+            ImportDialog diag = new ImportDialog(project, fileName, autoCloseOnImport);
             if (owner != null)
                 diag.Owner = owner;
             return diag.ShowDialog();

@@ -80,6 +80,8 @@ namespace TwoTrails.ViewModels
             });
         }
 
+        private int polyCount;
+
 
         public CreatePlotsModel(TtProject project, Window window)
         {
@@ -144,16 +146,52 @@ namespace TwoTrails.ViewModels
 
         public String GeneratedPolyName(IEnumerable<TtPolygon> polys, int rev = 1)
         {
-            if (polys.Count() == 1)
-            {
-                return $"{polys.First().Name}_Plts{(rev > 1 ? $"_{rev.ToString()}" : String.Empty)}";
-            }
-            else if (polys.Any())
+            if (polys.HasAtLeast(2))
             {
                 return $"MultiPoly_{String.Join("_", polys.Select(p => p.Name))}_Plts{(rev > 1 ? $"_{rev.ToString()}" : String.Empty)}";
             }
+            else if (polys.Any())
+            {
+                return $"{polys.First().Name}_Plts{(rev > 1 ? $"_{rev.ToString()}" : String.Empty)}";
+            }
             else
                 return "Plts";
+        }
+
+        private TtPolygon GetOrCreateNewPoly(List<TtPolygon> allPolygons, IEnumerable<TtPolygon> polygons)
+        {
+            TtPolygon poly = null;
+            for (int i = 1; i < Int32.MaxValue; i++)
+            {
+                string gPolyName = GeneratedPolyName(polygons, i);
+
+                try
+                {
+                    poly = allPolygons.First(p => p.Name == gPolyName);
+
+                    if (DeleteExistingPlots)
+                    {
+                        _Manager.DeletePointsInPolygon(poly.CN);
+                        return poly;
+                    }
+                }
+                catch
+                {
+                    String created = $"Created from Polygon{(polygons.HasAtLeast(2) ? $"s {String.Join(", ", polygons.Select(p => p.Name))}" : $" {polygons.First().Name}")}.";
+
+                    poly = new TtPolygon()
+                    {
+                        Name = gPolyName,
+                        PointStartIndex = (++polyCount) * 1000 + 10,
+                        Increment = 1,
+                        Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, {created}"
+                    };
+
+                    return poly;
+                }
+            }
+
+            return poly;
         }
 
 
@@ -191,9 +229,10 @@ namespace TwoTrails.ViewModels
                 return;
             }
 
+            List<TtPolygon> polygons = _Manager.GetPolygons();
+
             if (!SplitToIndividualPolys || IncludedPolygons.Count < 2)
             {
-                List<TtPolygon> polygons = _Manager.GetPolygons();
                 string gPolyName = GeneratedPolyName(IncludedPolygons);
 
                 TtPolygon poly = null;
@@ -214,29 +253,31 @@ namespace TwoTrails.ViewModels
                     {
                         if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                         {
-                            poly = null;
+                            //poly = null;
 
-                            for (int i = 2; i < Int32.MaxValue; i++)
-                            {
-                                gPolyName = GeneratedPolyName(IncludedPolygons, i);
+                            //for (int i = 2; i < Int32.MaxValue; i++)
+                            //{
+                            //    gPolyName = GeneratedPolyName(IncludedPolygons, i);
 
-                                try
-                                {
-                                    poly = polygons.First(p => p.Name == gPolyName);
-                                }
-                                catch
-                                {
-                                    poly = new TtPolygon()
-                                    {
-                                        Name = gPolyName,
-                                        PointStartIndex = (polygons.Count + 1) * 1000 + 10,
-                                        Increment = 1
-                                    };
+                            //    try
+                            //    {
+                            //        poly = polygons.First(p => p.Name == gPolyName);
+                            //    }
+                            //    catch
+                            //    {
+                            //        poly = new TtPolygon()
+                            //        {
+                            //            Name = gPolyName,
+                            //            PointStartIndex = (polygons.Count + 1) * 1000 + 10,
+                            //            Increment = 1
+                            //        };
 
-                                    _Manager.AddPolygon(poly);
-                                    break;
-                                }
-                            }
+                            //        _Manager.AddPolygon(poly);
+                            //        break;
+                            //    }
+                            //}
+
+                            _Manager.AddPolygon(GetOrCreateNewPoly(polygons, IncludedPolygons));
                         }
                         else return;
                     }
@@ -414,18 +455,24 @@ namespace TwoTrails.ViewModels
             double angle = Tilt * -1;
 
             int polyCount = _Manager.PolygonCount;
-            IEnumerable<Tuple<TtPolygon, string>> polys = IncludedPolygons.Select(p =>
+
+            List<TtPolygon> allPolys = _Manager.GetPolygons();
+            this.polyCount = allPolys.Count;
+
+            List<Tuple<TtPolygon, string>> polys = IncludedPolygons.Select(p =>
             {
-                return Tuple.Create(
-                    new TtPolygon()
-                    {
-                        Name = GeneratedPolyName(new TtPolygon[] { p }),
-                        PointStartIndex = (++polyCount) * 1000 + 10,
-                        Increment = 1,
-                        Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon {p.Name} as a group of {IncludedPolygons.Count} polygons"
-                    }, 
-                    p.CN);
-            });
+                return Tuple.Create(GetOrCreateNewPoly(allPolys, new TtPolygon[] { p }), p.CN);
+
+                //return Tuple.Create(
+                //    new TtPolygon()
+                //    {
+                //        Name = GeneratedPolyName(new TtPolygon[] { p }),
+                //        PointStartIndex = (++polyCount) * 1000 + 10,
+                //        Increment = 1,
+                //        Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon {p.Name} as a group of {IncludedPolygons.Count} polygons"
+                //    }, 
+                //    p.CN);
+            }).ToList();
 
             TtMetadata defMeta = _Manager.DefaultMetadata;
 
@@ -543,7 +590,10 @@ namespace TwoTrails.ViewModels
                 i = 0;
                 WayPoint curr, prev = null;
 
-                _Manager.AddPolygon(polypts.Item1);
+                if (!allPolys.Contains(polypts.Item1))
+                {
+                    _Manager.AddPolygon(polypts.Item1);
+                }
 
                 foreach (Point p in polypts.Item2)
                 {
@@ -569,7 +619,7 @@ namespace TwoTrails.ViewModels
 
             _Manager.CommitMultiCommand();
 
-            MessageBox.Show($"{addPoints.Count} WayPoints Created");
+            MessageBox.Show($"{addPoints.Sum(p => p.Value.Item2.Count)} WayPoints Created");
             IsGenerating = false;
         }
     }

@@ -10,7 +10,7 @@ namespace TwoTrails.DAL
         public static readonly Version OSV_2_0_3 = new Version(2, 0, 3);
 
         //Schema Version
-        public static readonly Version SchemaVersion = OSV_2_0_2;
+        public static readonly Version SchemaVersion = OSV_2_0_3;
 
 
         public static class SharedSchema
@@ -585,10 +585,11 @@ namespace TwoTrails.DAL
         #region Upgrades
 
         public static readonly string UPGRADE_OSV_2_0_2 = $@"ALTER TABLE {ActivitySchema.TableName} ADD {ActivitySchema.ActivityNotes} TEXT; 
-ALTER TABLE {TtNmeaSchema.TableName} ADD {TtNmeaSchema.SatellitesInView} TEXT;";
+ALTER TABLE {TtNmeaSchema.TableName} ADD {TtNmeaSchema.SatellitesInView} TEXT; UPDATE {ProjectInfoSchema.TableName} SET {ProjectInfoSchema.TtDbSchemaVersion} = '{OSV_2_0_2}';";
 
 
-        public static readonly string UPGRADE_OSV_2_0_3 = $"UPDATE {TtNmeaSchema.TableName} SET {TtNmeaSchema.Fix} = {TtNmeaSchema.Fix} + 1;";
+        public static readonly string UPGRADE_OSV_2_0_3 = $@"UPDATE {TtNmeaSchema.TableName} SET {TtNmeaSchema.Fix} = {TtNmeaSchema.Fix} + 1;
+UPDATE {ProjectInfoSchema.TableName} SET {ProjectInfoSchema.TtDbSchemaVersion} = '{OSV_2_0_3}';";
         #endregion
     }
 }

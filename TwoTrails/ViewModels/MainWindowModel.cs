@@ -303,7 +303,7 @@ namespace TwoTrails.ViewModels
                                         return;
                                     }
 
-                                    if (Upgrade.DAL(dal))
+                                    if (Upgrade.DAL(dal, Settings))
                                     {
                                         AddProject(new TtProject(dal, mal, App.Settings, this));
                                         MessageBox.Show("Upgrade Successful");

@@ -32,7 +32,8 @@ namespace TwoTrails.ViewModels
         public ICommand CancelCommand { get; }
 
         private Window _Window;
-        private ITtManager _Manager;
+        private ITtManager _Manager => _Project.Manager;
+        private TtProject _Project;
 
         public Control MainContent
         {
@@ -72,10 +73,10 @@ namespace TwoTrails.ViewModels
         private bool _AutoCloseOnImport;
 
 
-        public ImportModel(Window window, ITtManager manager, string fileName = null, bool autoCloseOnImport = false)
+        public ImportModel(Window window, TtProject project, string fileName = null, bool autoCloseOnImport = false)
         {
             _Window = window;
-            _Manager = manager;
+            _Project = project;
             MainContent = null;
             CurrentFile = null;
 
@@ -143,7 +144,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                             if (MessageBox.Show("The importing file needs to be upgraded before import. Do you want to upgrade it now?",
                                 "File Requires Upgrade", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                             {
-                                if (!Upgrade.DAL(idal))
+                                if (!Upgrade.DAL(idal, _Project.Settings))
                                 {
                                     MessageBox.Show("File Failed to Upgrade. See Log File for details.");
                                     IsSettingUp = false;

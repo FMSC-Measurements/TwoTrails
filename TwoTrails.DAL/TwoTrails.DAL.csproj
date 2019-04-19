@@ -4,8 +4,8 @@
     <Authors>Fortest Management Service Center</Authors>
     <Copyright>Copyright © USDA Forest Service 2019</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
     <AssemblyVersion>1.1.5.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <Version>1.1.5</Version>
@@ -29,4 +29,13 @@
       <HintPath>..\..\libs\FMSC.GeoSpatial.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
 </Project>
