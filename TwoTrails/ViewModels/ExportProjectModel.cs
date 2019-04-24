@@ -12,8 +12,8 @@ namespace TwoTrails.ViewModels
 {
     public class ExportProjectModel : NotifyPropertyChangedEx
     {
-        private TtProject project;
-        private Window window;
+        private TtProject Project;
+        private Window Window;
 
         public string FolderLocation { get { return Get<string>(); } set { Set(value); } }
 
@@ -39,13 +39,13 @@ namespace TwoTrails.ViewModels
         public bool ExportMediaFiles { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
 
 
-        public bool DataDictionaryEnabled { get { return project.Manager.HasDataDictionary; } }
+        public bool DataDictionaryEnabled { get { return Project.Manager.HasDataDictionary; } }
 
 
         public ExportProjectModel(Window window, TtProject project)
         {
-            this.window = window;
-            this.project = project;
+            this.Window = window;
+            this.Project = project;
             FolderLocation = Path.GetDirectoryName(project.FilePath);
 
             BrowseCommand = new RelayCommand(x => BrowseFolder());
@@ -75,7 +75,7 @@ namespace TwoTrails.ViewModels
             {
                 if (Directory.Exists(FolderLocation))
                 {
-                    string path = Path.Combine(FolderLocation, project.ProjectName.Trim()).Trim();
+                    string path = Path.Combine(FolderLocation, Path.GetFileNameWithoutExtension(Project.DAL.FilePath)).Trim();
 
                     if (Directory.Exists(path))
                     {
@@ -91,56 +91,55 @@ namespace TwoTrails.ViewModels
                     {
                         if (IsCheckAll == true)
                         {
-                            Export.All(project.Manager, project.MAL, project.ProjectInfo, project.FilePath, path);
+                            Export.All(Project.Manager, Project.MAL, Project.ProjectInfo, Project.FilePath, path);
                         }
                         else
                         {
                             Export.CheckCreateFolder(path);
 
                             if (ExportPoints)
-                                Export.Points(project.Manager, Path.Combine(path, "Points.csv"));
+                                Export.Points(Project.Manager, Path.Combine(path, "Points.csv"));
 
                             if (ExportDataDictionary)
-                                Export.DataDictionary(project.Manager, Path.Combine(path, "DataDictionary.csv"));
+                                Export.DataDictionary(Project.Manager, Path.Combine(path, "DataDictionary.csv"));
 
                             if (ExportNMEA)
-                                Export.TtNmea(project.Manager, Path.Combine(path, "Nmea.csv"));
+                                Export.TtNmea(Project.Manager, Path.Combine(path, "TTNmea.csv"));
 
                             if (ExportPolygons)
-                                Export.Polygons(project.Manager, Path.Combine(path, "Polygons.csv"));
+                                Export.Polygons(Project.Manager, Path.Combine(path, "Polygons.csv"));
 
                             if (ExportMetadata)
-                                Export.Metadata(project.Manager, Path.Combine(path, "Metadata.csv"));
+                                Export.Metadata(Project.Manager, Path.Combine(path, "Metadata.csv"));
 
                             if (ExportGroups)
-                                Export.Groups(project.Manager, Path.Combine(path, "Groups.csv"));
+                                Export.Groups(Project.Manager, Path.Combine(path, "Groups.csv"));
 
-                            if (ExportMediaInfo && project.MAL != null)
-                                Export.ImageInfo(project.Manager, Path.Combine(path, "ImageInfo.csv"));
+                            if (ExportMediaInfo && Project.MAL != null)
+                                Export.ImageInfo(Project.Manager, Path.Combine(path, "ImageInfo.csv"));
 
-                            if (ExportMediaFiles && project.MAL != null)
-                                Export.MediaFiles(project.MAL, path);
+                            if (ExportMediaFiles && Project.MAL != null)
+                                Export.MediaFiles(Project.MAL, path);
 
                             if (ExportProject)
-                                Export.Project(project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));
+                                Export.Project(Project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));
 
                             if (ExportSummary)
-                                Export.Summary(project.Manager, project.ProjectInfo, project.FilePath, Path.Combine(path, "Summary.txt"));
+                                Export.Summary(Project.Manager, Project.ProjectInfo, Project.FilePath, Path.Combine(path, "Summary.txt"));
 
                             if (ExportGPX)
-                                Export.GPX(project.Manager, project.ProjectInfo, Path.Combine(path, $"{project.ProjectName.Trim()}.gpx"));
+                                Export.GPX(Project.Manager, Project.ProjectInfo, Path.Combine(path, $"{Project.ProjectName.Trim()}.gpx"));
 
                             if (ExportKMZ)
-                                Export.KMZ(project.Manager, project.ProjectInfo, Path.Combine(path, $"{project.ProjectName.Trim()}.kmz"));
+                                Export.KMZ(Project.Manager, Project.ProjectInfo, Path.Combine(path, $"{Project.ProjectName.Trim()}.kmz"));
 
                             if (ExportShapes)
-                                Export.Shapes(project.Manager, project.ProjectInfo, Path.Combine(path));
+                                Export.Shapes(Project.Manager, Project.ProjectInfo, Path.Combine(path));
                         }
 
-                        window.Close();
+                        Window.Close();
 
-
-                        //TODO notice of export
+                        Project.MainModel.PostMessage($"Project Exported to: '{path}'");
                     }
                     catch (Exception ex)
                     {
@@ -155,7 +154,7 @@ namespace TwoTrails.ViewModels
 
         private void Cancel()
         {
-            window.Close();
+            Window.Close();
         }
 
         private void CheckAll(bool? isChecked)

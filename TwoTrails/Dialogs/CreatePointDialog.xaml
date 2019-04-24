@@ -140,7 +140,7 @@
                     </Grid.RowDefinitions>
 
                     <RadioButton Content="End" Grid.Column="0" Grid.Row="0" Name="rbInsEnd" IsChecked="True" ToolTip="Add the point to the End of the polygon"/>
-                    <RadioButton Content="Begining" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" Name="rbInsBeg" ToolTip="Insert the point to the Beggining of the polygon"/>
+                    <RadioButton Content="Beginning" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" Name="rbInsBeg" ToolTip="Insert the point to the Beggining of the polygon"/>
                     <RadioButton Content="After Point" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Name="rbInsAft" ToolTip="Insert the point after another point in the polygon"/>
 
                     <ComboBox Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Margin="3"

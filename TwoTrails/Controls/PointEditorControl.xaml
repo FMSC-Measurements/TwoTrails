@@ -680,8 +680,17 @@
                             <Button Grid.Row="14" Grid.Column="1" Margin="0, 2.5, 0, 2.5" VerticalContentAlignment="Center"
 								cp:CustomProperties.BackgroundEnabled="{Binding SameParentPoint, Converter={StaticResource IBC}}"
 								Height="25"
-								Content="{Binding ParentPoint.PID}"
 								Command="{Binding ChangeQuondamParentCommand}">
+                                <Button.Content>
+                                    <TextBlock FontSize="12">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} ({1})">
+                                                <Binding Path="ParentPoint.PID" />
+                                                <Binding Path="ParentPoint.Polygon" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </Button.Content>
                                 <Button.ToolTip>
                                     <TextBlock>
                                         <TextBlock.Text>

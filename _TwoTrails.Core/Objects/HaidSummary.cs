@@ -279,7 +279,7 @@ namespace TwoTrails.Core
             sbPoints.Append($"   Traverse Total Segments: {travSegments}{Environment.NewLine}");
             sbPoints.Append($"   Traverse Total Distance: {Math.Round(FMSC.Core.Convert.ToFeetTenths(travLength, Distance.Meters), 2):0.00} feet.{Environment.NewLine}");
             sbPoints.Append($"   Traverse Closing Distance: {Math.Round(FMSC.Core.Convert.ToFeetTenths(closeError, Distance.Meters), 2):0.00} feet.{Environment.NewLine}");
-            sbPoints.Append($"   Traverse Close Error: 1 part in {(Double.IsPositiveInfinity(travError) ? "∞" : Math.Round(travError, 2).ToString("0.00"))}.{Environment.NewLine}");
+            sbPoints.Append($"   Traverse Closing Error: 1 part in {(Double.IsPositiveInfinity(travError) ? "∞" : Math.Round(travError, 2).ToString("0.00"))}.{Environment.NewLine}");
             
             TotalTraverseError += (travLength * closeError / 2);
 

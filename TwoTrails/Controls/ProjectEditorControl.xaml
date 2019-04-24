@@ -420,7 +420,7 @@
                                     </Grid>
                                 </GroupBox>
 
-                                <GroupBox Header="Poly Line Perimeter" Grid.Column="2" Grid.Row="8" Grid.RowSpan="4" VerticalAlignment="Stretch">
+                                <GroupBox Header="Poly Line Length" Grid.Column="2" Grid.Row="8" Grid.RowSpan="4" VerticalAlignment="Stretch">
                                     <Grid Margin="5,0,5,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="40"/>

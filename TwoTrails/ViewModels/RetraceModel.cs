@@ -26,7 +26,7 @@ namespace TwoTrails.ViewModels
         public List<TtPoint> AfterPoints { get { return Get<List<TtPoint>>(); } set { Set(value); } }
 
         public QuondamBoundaryMode BoundaryMode { get { return Get<QuondamBoundaryMode>(); } set { Set(value); } }
-        public bool InsertBegining { get { return Get<bool>(); } set { Set(value); } }
+        public bool InsertBeginning { get { return Get<bool>(); } set { Set(value); } }
         public bool InsertAfter { get { return Get<bool>(); } set { Set(value); } }
 
         public RetraceModel(TtHistoryManager manager)
@@ -129,7 +129,7 @@ namespace TwoTrails.ViewModels
                     }
 
                     _Manager.CreateQuondamLinks(retracePoints, TargetPolygon, 
-                        InsertBegining ? 0 : InsertAfter ? InsertIndex : int.MaxValue, BoundaryMode);
+                        InsertBeginning ? 0 : InsertAfter ? InsertIndex : int.MaxValue, BoundaryMode);
 
                     return true;
                 } 

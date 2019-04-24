@@ -33,7 +33,7 @@ namespace TwoTrails.Utils
             
             TtManager manager = new TtManager(dal, mal, settings);
             
-            string outputPath = Path.Combine(Path.GetDirectoryName(projectFilePath), dal.GetProjectInfo().Name.Trim()).Trim();
+            string outputPath = Path.Combine(Path.GetDirectoryName(projectFilePath), Path.GetFileNameWithoutExtension(dal.FilePath)).Trim();
 
             All(manager, mal, dal.GetProjectInfo(), dal.FilePath, outputPath);
         }
@@ -50,7 +50,7 @@ namespace TwoTrails.Utils
             Polygons(manager, Path.Combine(folderPath, "Polygons.csv"));
             Metadata(manager, Path.Combine(folderPath, "Metadata.csv"));
             Groups(manager, Path.Combine(folderPath, "Groups.csv"));
-            TtNmea(manager, Path.Combine(folderPath, "Nmea.csv"));
+            TtNmea(manager, Path.Combine(folderPath, "TTNmea.csv"));
             ImageInfo(manager, Path.Combine(folderPath, "ImageInfo.csv"));
             GPX(manager, projectInfo, Path.Combine(folderPath, $"{projectInfo.Name.Trim()}.gpx"));
             KMZ(manager, projectInfo, Path.Combine(folderPath, $"{projectInfo.Name.Trim()}.kmz"));
@@ -402,22 +402,7 @@ namespace TwoTrails.Utils
         {
             using (StreamWriter sw = new StreamWriter(summaryFilePath))
             {
-                sw.WriteLine($"Project File: { Path.GetFileName(projectFilePath) }");
-                sw.WriteLine($"Project Name: { projectInfo.Name }");
-                sw.WriteLine($"Region: { projectInfo.Region }");
-                sw.WriteLine($"Forest: { projectInfo.Forest }");
-                sw.WriteLine($"District: { projectInfo.District }");
-                sw.WriteLine($"Description: { projectInfo.Description }");
-                sw.WriteLine($"Created On: { projectInfo.CreationDate }");
-                sw.WriteLine($"Version: { projectInfo.Version }");
-                sw.WriteLine($"Data Version: { projectInfo.Version }");
-                sw.WriteLine($"Creation Version: { projectInfo.CreationVersion }");
-                sw.WriteLine("\n");
-                sw.WriteLine("**** GPS Error can be divided by 2 if an appropriate ANGLE POINT METHOD is used instead of the WALK METHOD ****");
-                sw.WriteLine("**** Appropriate means that the boundary legs are reasonably long between verticies where the boundary direction changes by 90 degree angles where possible and changes at least more than 30 degrees most of the time. ****");
-                sw.WriteLine("**** If the unit is totally a direction distance-traverse. Use only the traverse contribution area-error. ****");
-                sw.WriteLine("**** Points with asterisks are OFF boundary points. ****");
-                sw.WriteLine("\n");
+                sw.Write(HaidLogic.GenerateSummaryHeader(projectInfo, projectFilePath));
                 
                 foreach (TtPolygon poly in manager.GetPolygons())
                 {
@@ -464,7 +449,7 @@ namespace TwoTrails.Utils
                 sb.Append("HDOP,");
                 sb.Append("VDOP,");
 
-                sb.Append("Horiz Dilution,");
+                //sb.Append("Horiz Dilution,");
                 sb.Append("Geoid Height (Mt),");
 
                 sb.Append("Tracked Satellites Count,");
@@ -493,7 +478,8 @@ namespace TwoTrails.Utils
 
                     sb.AppendFormat("{0},{1},{2},", burst.HDOP, burst.PDOP, burst.VDOP);
 
-                    sb.AppendFormat("{0},{1},", burst.HorizDilution, burst.GeoidHeight);
+                    sb.AppendFormat("{0},", burst.GeoidHeight);
+                    //sb.AppendFormat("{0},{1},", burst.HorizDilution, burst.GeoidHeight);
 
                     sb.AppendFormat("{0},{1},", burst.TrackedSatellitesCount, burst.SatellitesInViewCount);
                     sb.AppendFormat("{0},{1},{2},", burst.UsedSatelliteIDsCount, burst.UsedSatelliteIDsString, burst.SatellitesInViewString);

@@ -341,6 +341,7 @@ namespace TwoTrails.ViewModels
                 {
                     using (StreamWriter sw = new StreamWriter(sfd.FileName))
                     {
+                        sw.Write(HaidLogic.GenerateSummaryHeader(ProjectInfo, _Project.FilePath));
                         sw.WriteLine(PolygonSummary.SummaryText);
                     }
                 }

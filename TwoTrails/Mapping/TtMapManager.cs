@@ -4,7 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
@@ -26,7 +29,7 @@ namespace TwoTrails.Mapping
         
         private IObservableTtManager _Manager;
 
-
+        private bool CtrlKeyPressed, SettingVisibilities;
 
 
         public TtMapManager(Map map, IObservableTtManager manager)
@@ -48,6 +51,16 @@ namespace TwoTrails.Mapping
             {
                 point.PolygonChanged += Point_PolygonChanged;
             }
+
+            EventManager.RegisterClassHandler(typeof(Control), Control.KeyDownEvent, new KeyEventHandler((s, e) => {
+                if (e.Key == Key.LeftCtrl)
+                    CtrlKeyPressed = true;
+            }), true);
+
+            EventManager.RegisterClassHandler(typeof(Control), Control.KeyUpEvent, new KeyEventHandler((s, e) => {
+                if (e.Key == Key.LeftCtrl)
+                    CtrlKeyPressed = false;
+            }), true);
         }
 
         private void CreateMapPolygon(TtPolygon polygon)
@@ -67,6 +80,25 @@ namespace TwoTrails.Mapping
             PolygonManagers.Add(mpm);
 
             mpm.PointSelected += PointSelected;
+            mpm.PropertyChanged += TtMapPolygonManager_PropertyChanged;
+        }
+
+        private void TtMapPolygonManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!SettingVisibilities && CtrlKeyPressed && e.PropertyName == nameof(TtMapPolygonManager.Visible) &&
+                sender is TtMapPolygonManager mapPolyManager)
+            {
+                SettingVisibilities = true;
+
+                foreach (TtMapPolygonManager m in PolygonManagers.Where(ttmpm => ttmpm != mapPolyManager))
+                {
+                    m.Visible = false;
+                }
+
+                mapPolyManager.Visible = true;
+
+                SettingVisibilities = false;
+            }
         }
 
         private void PointSelected(TtMapPoint mapPoint, Boolean adjusted)

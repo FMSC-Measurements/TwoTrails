@@ -21,7 +21,7 @@ namespace TwoTrails.ViewModels
     public class CreatePlotsModel : NotifyPropertyChangedEx
     {
         private TtHistoryManager _Manager;
-        private TtSettings _Settings { get; }
+        public TtSettings Settings { get; }
 
         public ICommand GenerateCommand { get; }
         public ICommand CloseCommand { get; }
@@ -67,16 +67,16 @@ namespace TwoTrails.ViewModels
         public bool IsGenerating { get { return Get<bool>(); } set { Set(value); } }
 
         public bool SplitToIndividualPolys {
-            get => _Settings.DeviceSettings.SplitToIndividualPolys;
+            get => Settings.DeviceSettings.SplitToIndividualPolys;
             set => Set(value, () => {
-                if (_Settings.DeviceSettings is DeviceSettings ds) { ds.SplitToIndividualPolys = value; }
+                if (Settings.DeviceSettings is DeviceSettings ds) { ds.SplitToIndividualPolys = value; }
             });
         }
         public bool DeleteExistingPlots
         {
-            get => _Settings.DeviceSettings.DeleteExistingPlots;
+            get => Settings.DeviceSettings.DeleteExistingPlots;
             set => Set(value, () => {
-                if (_Settings.DeviceSettings is DeviceSettings ds) { ds.DeleteExistingPlots = value; }
+                if (Settings.DeviceSettings is DeviceSettings ds) { ds.DeleteExistingPlots = value; }
             });
         }
 
@@ -86,7 +86,7 @@ namespace TwoTrails.ViewModels
         public CreatePlotsModel(TtProject project, Window window)
         {
             _Manager = project.Manager;
-            _Settings = project.Settings;
+            Settings = project.Settings;
 
             InclusionPolygonsSelectedCommand = new RelayCommand(x => InclusionPolygonsSelected(x as IList));
             ExclusionPolygonsSelectedCommand = new RelayCommand(x => ExclusionPolygonsSelected(x as IList));
@@ -249,7 +249,7 @@ namespace TwoTrails.ViewModels
 
                 if (poly != null)
                 {
-                    if (!_Settings.DeviceSettings.DeleteExistingPlots)
+                    if (!Settings.DeviceSettings.DeleteExistingPlots)
                     {
                         if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                         {

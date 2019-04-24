@@ -49,7 +49,7 @@
                     </Grid.ColumnDefinitions>
 
                     <RadioButton Content="End" Grid.Column="0" Name="rbInsEnd" IsChecked="True"/>
-                    <RadioButton Content="Begining" Grid.Column="1" HorizontalAlignment="Center" Name="rbInsBeg" IsChecked="{Binding InsertBegining}"/>
+                    <RadioButton Content="Beginning" Grid.Column="1" HorizontalAlignment="Center" Name="rbInsBeg" IsChecked="{Binding InsertBeginning}"/>
                     <RadioButton Content="After Point" Grid.Column="2" Name="rbInsAft" IsChecked="{Binding InsertAfter}"/>
 
                     <ComboBox Grid.Column="3"
@@ -69,7 +69,7 @@
                         <ColumnDefinition Width="*"/>-->
                     </Grid.ColumnDefinitions>
 
-                    <ComboBox SelectedIndex="0" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcmh:QuondamBoundaryMode}}">
+                    <ComboBox SelectedIndex="1" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcmh:QuondamBoundaryMode}}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <ListBoxItem Content="{Binding}" ToolTip="{Binding Converter={StaticResource edc}}" />
