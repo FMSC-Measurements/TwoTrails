@@ -34,15 +34,15 @@ namespace TwoTrails.Utils
                         {
                             UpdateType updateType = UpdateType.None;
 
-                            for (int r = 1; r < tokens.Length; r += 3)
-                            {
-                                string updateStr = tokens[r];
+                            //for (int r = 1; r < tokens.Length; r += 3)
+                            //{
+                                string updateStr = tokens[1];
                                 for (int i = 0; i < 5 && i < updateStr.Length; i++)
                                 {
                                     if (updateStr[i] != '0')
-                                        updateType |= (UpdateType)(1 << i);
+                                        updateType |= (UpdateType)(1 << (i + 1));
                                 }
-                            }
+                            //}
 
                             status.UpdateType = updateType;
 
