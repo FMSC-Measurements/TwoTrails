@@ -60,7 +60,7 @@
                                     <ColumnDefinition Width="30"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
+                                <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}" ToolTip="Field Name">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewTextInput" >
                                             <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
@@ -103,7 +103,7 @@
                                     <ColumnDefinition Width="30"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
+                                <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}" ToolTip="Field Name">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewTextInput">
                                             <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
@@ -142,7 +142,7 @@
                                     <ColumnDefinition Width="30"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}">
+                                <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}" ToolTip="Field Name">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewTextInput" >
                                             <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />

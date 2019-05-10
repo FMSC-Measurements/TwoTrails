@@ -11,11 +11,23 @@ namespace TwoTrails.Core.ComponentModel.History
         private List<TtPoint> _ResetPoints = null;
 
 
-        public ResetTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager) : base(points.Where(p => pointsManager.HasOriginalPoint(p.CN)))
+        public ResetTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, bool keepIndexAndPoly = false) : base(points.Where(p => pointsManager.HasOriginalPoint(p.CN)))
         {
             this.pointsManager = pointsManager;
             
             _ResetPoints = Points.Select(pt => pointsManager.GetOriginalPoint(pt.CN).DeepCopy()).ToList();
+
+            if (keepIndexAndPoly)
+            {
+                foreach (TtPoint point in Points)
+                {
+                    TtPoint resetPoint = _ResetPoints.First(p => p.CN == point.CN);
+                    resetPoint.LocationChangedEventEnabled = false;
+                    resetPoint.Index = point.Index;
+                    resetPoint.Polygon = point.Polygon;
+                    resetPoint.LocationChangedEventEnabled = true;
+                }
+            }
         }
 
         public override void Redo()

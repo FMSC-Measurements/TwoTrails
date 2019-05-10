@@ -375,14 +375,14 @@ namespace TwoTrails.Core
         }
 
 
-        public void ResetPoint(TtPoint point)
+        public void ResetPoint(TtPoint point, bool keepIndexAndPoly = false)
         {
-            AddCommand(new ResetTtPointCommand(point, BaseManager));
+            AddCommand(new ResetTtPointCommand(point, BaseManager, keepIndexAndPoly));
         }
 
-        public void ResetPoints(IEnumerable<TtPoint> points)
+        public void ResetPoints(IEnumerable<TtPoint> points, bool keepIndexAndPoly = false)
         {
-            AddCommand(new ResetTtPointsCommand(points, BaseManager));
+            AddCommand(new ResetTtPointsCommand(points, BaseManager, keepIndexAndPoly));
         }
 
         #endregion

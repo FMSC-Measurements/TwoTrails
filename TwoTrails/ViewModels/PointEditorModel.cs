@@ -95,6 +95,7 @@ namespace TwoTrails.ViewModels
         public RelayCommand ConvertPointsCommand { get; }
         public RelayCommand MovePointsCommand { get; }
         public RelayCommand RetraceCommand { get; }
+        public RelayCommand ReindexCommand { get; }
         public RelayCommand CreatePlotsCommand { get; }
         public RelayCommand CreateSubsampleCommand { get; }
         public RelayCommand CreateCorridorCommand { get; }
@@ -950,6 +951,10 @@ namespace TwoTrails.ViewModels
 
             RetraceCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPoint>>(
                 x => Retrace(), x => Manager.Points.Count > 0,
+                Manager.Points, x => x.Count);
+
+            ReindexCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPoint>>(
+                x => Reindex(), x => Manager.Points.Count > 0,
                 Manager.Points, x => x.Count);
 
             CreatePlotsCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
@@ -2011,12 +2016,62 @@ namespace TwoTrails.ViewModels
 
         private void ResetPoint()
         {
+            Func<TtPoint, bool> hasConflict = (currPoint) =>
+            {
+                TtPoint origPoint = Manager.BaseManager.GetOriginalPoint(currPoint.CN);
+                return currPoint.Index != origPoint.Index || currPoint.PolygonCN != origPoint.PolygonCN;
+            };
+
             if (HasSelection)
             {
                 if (MultipleSelections)
-                    Manager.ResetPoints(SelectedPoints.Cast<TtPoint>());
+                {
+                    TtPoint[] points = SelectedPoints.Cast<TtPoint>().Where(p => Manager.BaseManager.HasOriginalPoint(p.CN)).ToArray();
+
+                    if (points.Any(hasConflict))
+                    {
+                        MessageBoxResult result = MessageBox.Show("One or more of the points has a different Index or is in a different Polygon and resetting those points may cause issues "+
+                            "to the order of the points within polygons. Would you like to exclude the index and polygon from the resetting process to " +
+                            "mitigate ordering problems?",
+                            "Point Index and Polygon Conflicts", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            Manager.ResetPoints(points, true);
+                        }
+                        else if (result == MessageBoxResult.No)
+                        {
+                            Manager.ResetPoints(points, false);
+                        }
+                    }
+                    else
+                    {
+                        Manager.ResetPoints(points);
+                    }
+                }
                 else
-                    Manager.ResetPoint(SelectedPoint);
+                {
+                    if (hasConflict(SelectedPoint))
+                    {
+                        MessageBoxResult result = MessageBox.Show("The selected point has a different Index or is in a different Polygon and resetting this point may cause issues " +
+                            "to the order of the points within polygons. Would you like to exclude the index and polygon from the resetting process to " +
+                            "mitigate ordering problems?",
+                            "Point Index and Polygon Conflict", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            Manager.ResetPoint(SelectedPoint, true);
+                        }
+                        else if (result == MessageBoxResult.No)
+                        {
+                            Manager.ResetPoint(SelectedPoint, false);
+                        }
+                    }
+                    else
+                    {
+                        Manager.ResetPoint(SelectedPoint);
+                    }
+                }
             }
         }
 
@@ -2040,7 +2095,6 @@ namespace TwoTrails.ViewModels
                         switch (binding.Path.Path)
                         {
                             case nameof(TtPoint.PID):
-                            case nameof(TtPoint.Polygon):
                             case nameof(TtPoint.Group):
                             case nameof(TtPoint.Metadata):
                             case nameof(TtPoint.Comment):
@@ -2068,6 +2122,7 @@ namespace TwoTrails.ViewModels
                                 isManAcc = true;
                                 break;
                             case nameof(TtPoint.Index):
+                            case nameof(TtPoint.Polygon):
                             case nameof(TtPoint.OpType):
                             case nameof(TtPoint.TimeCreated):
                             case nameof(TtPoint.AdjX):
@@ -2303,6 +2358,17 @@ namespace TwoTrails.ViewModels
                 Project.MainModel.MainWindow.IsEnabled = true;
                 if (result == true)
                     Manager.BaseManager.UpdateDataAction(DataActionType.RetracePoints);
+            });
+        }
+
+        private void Reindex()
+        {
+            Project.MainModel.MainWindow.IsEnabled = false;
+            ReindexDialog.Show(Manager, Project.MainModel.MainWindow, (result) =>
+            {
+                Project.MainModel.MainWindow.IsEnabled = true;
+                if (result == true)
+                    Manager.BaseManager.UpdateDataAction(DataActionType.ReindexPoints);
             });
         }
 

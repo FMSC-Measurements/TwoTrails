@@ -151,6 +151,7 @@
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+L"/>
 
                     <Separator/>
+                    
                     <MenuItem Header="Create New Point" Style="{StaticResource styleHasPolygons}">
 
                         <MenuItem Header="GPS" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.GPS}"/>
@@ -167,6 +168,8 @@
                         Style="{StaticResource ResourceKey=styleMiPointEdit}" InputGestureText="Ctrl+Alt+M"/>
                     <MenuItem Header="Retrace Points" Command="{Binding CurrentEditor.RetraceCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+Alt+R"/>
+                    <MenuItem Header="Reindex Points" Command="{Binding CurrentEditor.ReindexCommand}"
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
 
                     <Separator/>
 
