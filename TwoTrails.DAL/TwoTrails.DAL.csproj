@@ -6,9 +6,9 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
-    <AssemblyVersion>1.1.5.0</AssemblyVersion>
+    <AssemblyVersion>1.1.6.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <Version>1.1.5</Version>
+    <Version>1.1.6</Version>
   </PropertyGroup>
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
   <ItemGroup>
