@@ -41,6 +41,11 @@ namespace TwoTrails.Controls
         {
             e.Handled = ControlUtils.TextIsDouble(sender, e);
         }
+
+        private void TextHasRestrictedCharacters(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = ControlUtils.TextHasRestrictedCharacters(sender, e);
+        }
     }
 
     public enum ProjectStartupTab

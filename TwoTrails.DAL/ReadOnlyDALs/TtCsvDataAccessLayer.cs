@@ -400,7 +400,7 @@ namespace TwoTrails.DAL
                     point.OnBoundary = hasBnd ? reader.GetField<bool>(fBnd) : true;
 
                     if (hasComment)
-                        point.Comment = reader.GetField<string>(fCmt);
+                        point.Comment = reader.GetField<string>(fCmt).UnScrub();
 
                     _Points.Add(point.CN, point);
 
@@ -825,4 +825,13 @@ namespace TwoTrails.DAL
         }
     }
 
+    internal static class CsvParseExts
+    {
+        internal static string UnScrub(this string text)
+        {
+            if (text != null)
+                return text.Replace("\\n", "\n").Replace("\\r", "\r").Replace("\"\"", "\"");
+            return String.Empty;
+        }
+    }
 }

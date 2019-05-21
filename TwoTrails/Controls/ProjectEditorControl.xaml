@@ -334,7 +334,8 @@
                                 </Grid.Resources>
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentPolygon.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentPolygon.Name, UpdateSourceTrigger=PropertyChanged}"
+                                         PreviewTextInput="TextHasRestrictedCharacters"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy (Meters)*" />
                                 <Grid Grid.Column="0" Grid.Row="3">
@@ -641,7 +642,8 @@
                                 </Grid.Resources>
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentMetadata.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentMetadata.Name, UpdateSourceTrigger=PropertyChanged}"
+                                         PreviewTextInput="TextHasRestrictedCharacters"/>
 
                                 <TextBlock Grid.Column="2" Grid.Row="0" Text="UTM Zone" />
                                 <Grid Grid.Column="2" Grid.Row="1">
@@ -831,7 +833,8 @@
                                 </Grid.Resources>
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentGroup.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding GroupFieldIsEditable}"/>
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentGroup.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding GroupFieldIsEditable}"
+                                         PreviewTextInput="TextHasRestrictedCharacters"/>
 
                                 <TextBlock Grid.Column="2" Grid.Row="0" Text="Group Type" />
                                 <ComboBox Grid.Column="2" Grid.Row="1"

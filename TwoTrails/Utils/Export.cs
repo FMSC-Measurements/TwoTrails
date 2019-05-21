@@ -215,7 +215,8 @@ namespace TwoTrails.Utils
 
                 foreach (TtPoint point in points)
                 {
-                    sw.WriteLine(String.Join(",", fieldCNs.Select(fcn => point.ExtendedData[fcn])));
+                    sw.WriteLine(String.Join(",", fieldCNs.Select(fcn =>
+                        template[fcn].DataType == DataType.TEXT ? $"\"{point.ExtendedData[fcn].Scrub()}\"" : point.ExtendedData[fcn])));
                 }
 
                 sw.Flush();
@@ -241,7 +242,7 @@ namespace TwoTrails.Utils
                     {
                         writer.WriteStartElement(TwoTrailsSchema.DataDictionarySchema.FieldValues);
                         foreach (string value in ddf.Values)
-                            writer.WriteElementString("Value", value);
+                            writer.WriteElementString("Value", ddf.DataType == DataType.TEXT ? $"\"{value.Scrub()}\"" : value);
                         writer.WriteEndElement(); 
                     }
                     
@@ -284,7 +285,7 @@ namespace TwoTrails.Utils
                     sb = new StringBuilder();
                     sb.AppendFormat("{0},{1},", poly.Name.Scrub(), poly.Accuracy);
                     sb.AppendFormat("{0},{1},{2},", poly.Area, poly.Perimeter, poly.PerimeterLine);
-                    sb.AppendFormat("{0},{1}", poly.Description.Scrub(), poly.CN);
+                    sb.AppendFormat("\"{0}\",{1}", poly.Description.Scrub(), poly.CN);
 
                     sw.WriteLine(sb.ToString());
                 }
@@ -317,7 +318,7 @@ namespace TwoTrails.Utils
                 {
                     sb = new StringBuilder();
                     sb.AppendFormat("{0},{1},", group.Name.Scrub(), group.GroupType);
-                    sb.AppendFormat("{0},{1}", group.Description.Scrub(), group.CN);
+                    sb.AppendFormat("\"{0}\",{1}", group.Description.Scrub(), group.CN);
                     
                     sw.WriteLine(sb.ToString());
                 }
@@ -366,7 +367,7 @@ namespace TwoTrails.Utils
 
                     sb.AppendFormat("{0},{1},", meta.GpsReceiver, meta.RangeFinder);
                     sb.AppendFormat("{0},{1},", meta.Compass, meta.Crew);
-                    sb.AppendFormat("{0},{1},", meta.Comment.Scrub(), meta.CN);
+                    sb.AppendFormat("\"{0}\",{1},", meta.Comment.Scrub(), meta.CN);
 
                     sw.WriteLine(sb.ToString());
                 }
@@ -523,7 +524,7 @@ namespace TwoTrails.Utils
                 {
                     sb = new StringBuilder();
                     sb.AppendFormat("{0},{1},", img.Name.Scrub(), img.TimeCreated.ToString(Consts.DATE_FORMAT));
-                    sb.AppendFormat("{0},{1},", img.IsExternal, img.Comment.Scrub());
+                    sb.AppendFormat("{0},\"{1}\",", img.IsExternal, img.Comment.Scrub());
                     sb.AppendFormat("{0},{1},", img.PictureType.ToString(), img.Azimuth?.ToString("F2"));
                     sb.AppendFormat("{0},{1},", img.Pitch?.ToString("F2"), img.Roll?.ToString("F2"));
                     sb.AppendFormat("{0},{1}", img.CN, img.PointCN);
@@ -608,7 +609,7 @@ namespace TwoTrails.Utils
 
         public static void Shapes(ITtManager manager, TtProjectInfo projectInfo, String folderPath)
         {
-            string shapeFolderPath = Path.Combine(folderPath, $"GIS_{projectInfo.Name}");
+            string shapeFolderPath = Path.Combine(folderPath, $"GIS_{projectInfo.Name.Trim()}");
 
             foreach (TtPolygon poly in manager.GetPolygons())
             {
@@ -621,9 +622,9 @@ namespace TwoTrails.Utils
         private static string Scrub(this string text)
         {
             if (text != null)
-                return text.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace(",", ";");
+                return text.Replace("\n", "\\n").Replace("\r", "\\r").Replace("\"", "\"\"");
             return String.Empty;
-        }   
+        }
 
         private static string Scrub(this object obj)
         {

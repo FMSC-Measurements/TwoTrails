@@ -17,14 +17,14 @@ namespace TwoTrails.Utils
     {
         public static void WritePolygon(ITtManager manager, TtPolygon polygon, string folderPath)
         {
-            string polyDir = Path.Combine(folderPath, polygon.Name);
+            string polyDir = Path.Combine(folderPath, polygon.Name.Trim());
 
             if (!Directory.Exists(polyDir))
             {
                 Directory.CreateDirectory(polyDir);
             }
 
-            string baseFileName = Path.Combine(polyDir, polygon.Name);
+            string baseFileName = Path.Combine(polyDir, polygon.Name.Trim());
 
             IEnumerable<TtPoint> points = manager.GetPoints(polygon.CN).Where(p => p.OpType != OpType.WayPoint);
 
