@@ -175,6 +175,8 @@ namespace TwoTrails.ViewModels
                     if (_CurrentPolygon != null)
                     {
                         _BackupPoly = new TtPolygon(_CurrentPolygon);
+                        PolygonAccuracy = _CurrentPolygon.Accuracy;
+
                         _CurrentPolygon.PropertyChanged += Polygon_PropertyChanged;
                         _CurrentPolygon.PolygonChanged += GeneratePolygonSummary;
 
@@ -370,6 +372,7 @@ namespace TwoTrails.ViewModels
                     if (_CurrentMetadata != null)
                     {
                         _BackupMeta = new TtMetadata(_CurrentMetadata);
+                        MetadataZone = _CurrentMetadata.Zone;
                         _CurrentMetadata.PropertyChanged += Metadata_PropertyChanged;
                     }
                 });
