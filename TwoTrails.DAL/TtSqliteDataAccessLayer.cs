@@ -2659,6 +2659,82 @@ namespace TwoTrails.DAL
             return GetItemCount(TwoTrailsSchema.PointSchema.TableName, $@"{ TwoTrailsSchema.PointSchema.AdjX } IS NULL OR { TwoTrailsSchema.PointSchema.AdjY
                         } IS NULL OR { TwoTrailsSchema.PointSchema.AdjZ } IS NULL OR { TwoTrailsSchema.PointSchema.Accuracy } IS NULL") > 0;
         }
+        
+        public bool FixAndReindex()
+        {
+            bool appliedFixes = false, pointIndexesUpdated = false;
+
+            try
+            {
+                if (HasErrors())
+                {
+                    Fix();
+                    appliedFixes = true;
+
+                    Trace.WriteLine($"DAL Fixed ({FilePath}): {GetDataVersion()}");
+                }
+
+                using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                {
+                    using (SQLiteTransaction trans = conn.BeginTransaction())
+                    {
+                        using (SQLiteDataReader drPoly = _Database.ExecuteReader($"select {TwoTrailsSchema.SharedSchema.CN} from {TwoTrailsSchema.PolygonSchema.TableName}", conn))
+                        {
+                            if (drPoly != null)
+                            {
+                                while (drPoly.Read())
+                                {
+                                    string polyCN = drPoly.GetString(0);
+                                    int count = 0;
+
+                                    using (SQLiteDataReader drpoint = _Database.ExecuteReader(
+                                        $"select {TwoTrailsSchema.SharedSchema.CN},{TwoTrailsSchema.PointSchema.Index} from {TwoTrailsSchema.PointSchema.TableName} " +
+                                        $"where {TwoTrailsSchema.PointSchema.PolyCN} = '{polyCN}' order by {TwoTrailsSchema.PointSchema.Index};", conn))
+                                    {
+                                        if (drpoint != null)
+                                        {
+                                            while (drpoint.Read())
+                                            {
+                                                string cn = drpoint.GetString(0);
+                                                int index = drpoint.GetInt32(1);
+
+                                                if (index != count)
+                                                {
+                                                    _Database.ExecuteNonQuery($"update {TwoTrailsSchema.PointSchema.TableName} set {TwoTrailsSchema.PointSchema.Index} = {count} where " +
+                                                        $"{TwoTrailsSchema.SharedSchema.CN} = '{cn}';", conn, trans);
+                                                    pointIndexesUpdated = true;
+                                                }
+
+                                                count++;
+                                            }
+
+                                            drpoint.Close();
+                                        }
+                                    }
+                                }
+
+                                drPoly.Close();
+                            }
+                        }
+
+                        trans.Commit();
+                    }
+
+                    conn.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message, "TtSqliteDataAccessLayer:FixAndReindex");
+            }
+
+            if (pointIndexesUpdated)
+            {
+                Trace.WriteLine($"DAL Updated Indexes ({FilePath}): {GetDataVersion()}");
+            }
+
+            return appliedFixes || pointIndexesUpdated;
+        }
 
         protected int GetItemCount(String tableName, string where = null)
         {

@@ -1015,6 +1015,35 @@ namespace TwoTrails.Core
                 }
             }
         }
+        
+        public bool ValidatePointIndexes()
+        {
+            bool valid = true;
+
+            foreach (List<TtPoint> points in _PointsByPoly.Values)
+            {
+                int index = 0;
+                foreach (TtPoint point in points)
+                {
+                    if (point.Index != index)
+                        return false;
+                }
+            }
+
+            return valid;
+        }
+
+        public void ReindexPolygons()
+        {
+            foreach (List<TtPoint> points in _PointsByPoly.Values)
+            {
+                int index = 0;
+                foreach (TtPoint point in points)
+                    point.Index = index++;
+            }
+
+            UpdateDataAction(DataActionType.ReindexPoints);
+        }
 
         public void RebuildPolygon(TtPolygon poly, bool reindex = false)
         {
