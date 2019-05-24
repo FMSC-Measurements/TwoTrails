@@ -2668,64 +2668,94 @@ namespace TwoTrails.DAL
             {
                 if (HasErrors())
                 {
+                    File.Copy(FilePath, FilePath + ".corrupt", true);
+
                     Fix();
                     appliedFixes = true;
 
                     Trace.WriteLine($"DAL Fixed ({FilePath}): {GetDataVersion()}");
                 }
 
+                List<string> reindexPolys = new List<string>();
+
                 using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
                 {
-                    using (SQLiteTransaction trans = conn.BeginTransaction())
+                    using (SQLiteDataReader dr = _Database.ExecuteReader(
+                        $"SELECT {TwoTrailsSchema.PointSchema.PolyCN}, sum({TwoTrailsSchema.PointSchema.Index})," + 
+                        $"Count({TwoTrailsSchema.PointSchema.ID}) from {TwoTrailsSchema.PointSchema.TableName} GROUP BY {TwoTrailsSchema.PointSchema.PolyCN}", conn))
                     {
-                        using (SQLiteDataReader drPoly = _Database.ExecuteReader($"select {TwoTrailsSchema.SharedSchema.CN} from {TwoTrailsSchema.PolygonSchema.TableName}", conn))
+                        Func<int, int> sumOfN = (n) =>
                         {
-                            if (drPoly != null)
+                            int sum = 0;
+
+                            for (int num = 0; num < n; num++)
+                                sum += num;
+
+                            return sum;
+                        };
+
+                        while (dr.Read())
+                        {
+                            if (dr.GetInt32(1) != sumOfN(dr.GetInt32(2)))
                             {
-                                while (drPoly.Read())
-                                {
-                                    string polyCN = drPoly.GetString(0);
-                                    int count = 0;
-
-                                    using (SQLiteDataReader drpoint = _Database.ExecuteReader(
-                                        $"select {TwoTrailsSchema.SharedSchema.CN},{TwoTrailsSchema.PointSchema.Index} from {TwoTrailsSchema.PointSchema.TableName} " +
-                                        $"where {TwoTrailsSchema.PointSchema.PolyCN} = '{polyCN}' order by {TwoTrailsSchema.PointSchema.Index};", conn))
-                                    {
-                                        if (drpoint != null)
-                                        {
-                                            while (drpoint.Read())
-                                            {
-                                                string cn = drpoint.GetString(0);
-                                                int index = drpoint.GetInt32(1);
-
-                                                if (index != count)
-                                                {
-                                                    _Database.ExecuteNonQuery($"update {TwoTrailsSchema.PointSchema.TableName} set {TwoTrailsSchema.PointSchema.Index} = {count} where " +
-                                                        $"{TwoTrailsSchema.SharedSchema.CN} = '{cn}';", conn, trans);
-                                                    pointIndexesUpdated = true;
-                                                }
-
-                                                count++;
-                                            }
-
-                                            drpoint.Close();
-                                        }
-                                    }
-                                }
-
-                                drPoly.Close();
+                                reindexPolys.Add(dr.GetString(0));
                             }
                         }
+                    }
+                }
 
-                        trans.Commit();
+                if (reindexPolys.Count > 0)
+                {
+                    if (!appliedFixes)
+                    {
+                        File.Copy(FilePath, FilePath + ".corrupt", true);
                     }
 
-                    conn.Close();
+                    using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                    {
+                        using (SQLiteTransaction trans = conn.BeginTransaction())
+                        {
+                            foreach (string polyCN in reindexPolys)
+                            {
+                                int count = 0;
+
+                                using (SQLiteDataReader drpoint = _Database.ExecuteReader(
+                                    $"select {TwoTrailsSchema.SharedSchema.CN},{TwoTrailsSchema.PointSchema.Index} from {TwoTrailsSchema.PointSchema.TableName} " +
+                                    $"where {TwoTrailsSchema.PointSchema.PolyCN} = '{polyCN}' order by {TwoTrailsSchema.PointSchema.Index};", conn))
+                                {
+                                    if (drpoint != null)
+                                    {
+                                        while (drpoint.Read())
+                                        {
+                                            string cn = drpoint.GetString(0);
+                                            int index = drpoint.GetInt32(1);
+
+                                            if (index != count)
+                                            {
+                                                _Database.ExecuteNonQuery($"update {TwoTrailsSchema.PointSchema.TableName} set {TwoTrailsSchema.PointSchema.Index} = {count} where " +
+                                                    $"{TwoTrailsSchema.SharedSchema.CN} = '{cn}';", conn, trans);
+                                                pointIndexesUpdated = true;
+                                            }
+
+                                            count++;
+                                        }
+
+                                        drpoint.Close();
+                                    }
+                                }
+                            }
+
+                            trans.Commit();
+                        }
+
+                        conn.Close();
+                    }
                 }
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message, "TtSqliteDataAccessLayer:FixAndReindex");
+                throw e;
             }
 
             if (pointIndexesUpdated)

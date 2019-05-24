@@ -1,7 +1,6 @@
-﻿using CSUtil.ComponentModel;
+﻿using CSUtil;
+using CSUtil.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
-using FMSC.Core.Windows.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -52,11 +51,10 @@ namespace TwoTrails.ViewModels
                     {
                         _Manager.EditPointsMultiValues(points, PointProperties.INDEX, Enumerable.Range(0, points.Count));
                     }
+                    
+                    _Manager.BaseManager.UpdateDataAction(DataActionType.ReindexPoints);
 
-
-                    if (_Window.IsShownAsDialog())
-                        _Window.DialogResult = true;
-                    _Window.Close();
+                    MessageBox.Show($"Polygon '{SelectedPolygon.Name}' reindexed by {ReindexMode.GetDescription()}.", "Reindex Polyon", MessageBoxButton.OK);
                 }
                 else
                 {
@@ -73,9 +71,9 @@ namespace TwoTrails.ViewModels
     public enum ReindexMode
     {
         [Description("PID (Point ID)")]
-        PID = 0,
+        PID = 1,
         [Description("Creation Time")]
-        CreationTime = 1,
+        CreationTime = 0,
         [Description("Current Order")]
         CurrentOrder = 2
     }

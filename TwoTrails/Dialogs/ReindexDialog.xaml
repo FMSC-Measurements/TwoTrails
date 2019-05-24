@@ -8,7 +8,8 @@
         xmlns:vm="clr-namespace:TwoTrails.ViewModels"
         mc:Ignorable="d"
         Title="Reindex Points" Height="125" Width="325"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <fmsccm:EnumDescriptionConverter x:Key="enumDesc"/>
     </Window.Resources>
@@ -40,7 +41,7 @@
         </ComboBox>
 
 
-        <Button Grid.Column="0" Grid.Row="3" Content="Cancel" Click="Cancel_Click" Margin="2.5"/>
+        <Button Grid.Column="0" Grid.Row="3" Content="Close" Click="Close_Click" Margin="2.5"/>
         <Button Grid.Column="3" Grid.Row="3" Content="Reindex" Command="{Binding ReindexCommand}" Margin="2.5"
                 ToolTip="Reorders points based on their current position"/>
     </Grid>

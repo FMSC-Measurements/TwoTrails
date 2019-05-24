@@ -2367,8 +2367,6 @@ namespace TwoTrails.ViewModels
             ReindexDialog.Show(Manager, Project.MainModel.MainWindow, (result) =>
             {
                 Project.MainModel.MainWindow.IsEnabled = true;
-                if (result == true)
-                    Manager.BaseManager.UpdateDataAction(DataActionType.ReindexPoints);
             });
         }
 
