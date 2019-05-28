@@ -636,13 +636,16 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                         String.Empty,
                         MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
 
-                if (result == MessageBoxResult.Yes)
+                if (result != MessageBoxResult.Cancel)
                 {
                     try
                     {
                         foreach (TtProject proj in unsavedProjects.ToList())
                         {
-                            proj.Save();
+                            if (result == MessageBoxResult.Yes)
+                            {
+                                proj.Save();
+                            }
                             proj.Close();
                         }
                     }
@@ -653,7 +656,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                         return false;
                     }
                 }
-                else if (result == MessageBoxResult.Cancel)
+                else
                     return false;
             }
             else

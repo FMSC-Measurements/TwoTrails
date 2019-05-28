@@ -2631,31 +2631,6 @@ namespace TwoTrails.DAL
 
         public bool HasErrors()
         {
-            bool errors = false;
-
-            //check for non-adjusted points
-            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
-            {
-                SQLiteDataReader dr = _Database.ExecuteReader($@"SELECT count(*) FROM { TwoTrailsSchema.PointSchema.TableName
-                        } WHERE { TwoTrailsSchema.PointSchema.AdjX } IS NULL OR { TwoTrailsSchema.PointSchema.AdjY
-                        } IS NULL OR { TwoTrailsSchema.PointSchema.AdjZ } IS NULL OR { TwoTrailsSchema.PointSchema.Accuracy } IS NULL;", conn);
-
-                try
-                {
-                    if (dr != null && dr.Read())
-                    {
-                        errors = dr.GetInt32(0) > 0;
-                        dr.Close();
-                    }
-                }
-                catch
-                {
-                    errors = true;
-                }
-
-                conn.Close();
-            }
-
             return GetItemCount(TwoTrailsSchema.PointSchema.TableName, $@"{ TwoTrailsSchema.PointSchema.AdjX } IS NULL OR { TwoTrailsSchema.PointSchema.AdjY
                         } IS NULL OR { TwoTrailsSchema.PointSchema.AdjZ } IS NULL OR { TwoTrailsSchema.PointSchema.Accuracy } IS NULL") > 0;
         }
