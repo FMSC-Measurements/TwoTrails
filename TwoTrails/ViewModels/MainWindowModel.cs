@@ -65,7 +65,6 @@ namespace TwoTrails.ViewModels
 
         public string StatusMessage { get { return Get<string>(); } private set { Set(value); } }
         private DelayActionHandler _EndMessageDelayHandler;
-        private Action _EndMessage;
 
         public void PostMessage(string message, int delay = MESSAGE_DELAY)
         {
@@ -73,25 +72,16 @@ namespace TwoTrails.ViewModels
 
             if (_EndMessageDelayHandler == null)
             {
-                _EndMessage = () =>
+                _EndMessageDelayHandler = new DelayActionHandler(() =>
                 {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         StatusMessage = String.Empty;
                     });
-                };
+                }, MESSAGE_DELAY);
+            }
 
-                _EndMessageDelayHandler = new DelayActionHandler(_EndMessage, MESSAGE_DELAY);
-                _EndMessageDelayHandler.DelayInvoke();
-            }
-            else if (MESSAGE_DELAY != delay)
-            {
-                _EndMessageDelayHandler.DelayInvoke(_EndMessage, MESSAGE_DELAY);
-            }
-            else
-            {
-                _EndMessageDelayHandler.DelayInvoke();
-            }
+             _EndMessageDelayHandler.DelayInvoke(delay);
         }
 
 
@@ -239,8 +229,7 @@ namespace TwoTrails.ViewModels
                 }
             }
         }
-
-
+        
 
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -249,8 +238,6 @@ namespace TwoTrails.ViewModels
             else
                 CurrentTab = null;
         }
-
-
 
 
         public void BrowseProject()
@@ -571,8 +558,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             MainWindow.Title = $"TwoTrails - {CurrentProject.ProjectName}";
         }
 
-
-
+        
         private void AddProject(TtProject project)
         {
             _Tabs.Items.Add(project.ProjectTab.Tab);
@@ -620,8 +606,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                 _Tabs.Items.Remove(tab.Tab);
             }
         }
-
-
+        
 
         private bool Exit(bool closeWindow = true)
         {
@@ -675,8 +660,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             return true;
         }
 
-
-
+        
         private void UpdateRecentProjectMenu()
         {
             MenuItem miRecent = MainWindow.miRecent, item;

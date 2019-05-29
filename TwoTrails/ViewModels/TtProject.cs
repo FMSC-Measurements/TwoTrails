@@ -207,8 +207,7 @@ namespace TwoTrails.ViewModels
         {
             DAL = dal;
             _BaseManager.ReplaceDAL(DAL);
-            OnPropertyChanged(nameof(DAL));
-            OnPropertyChanged(nameof(FilePath));
+            OnPropertyChanged(nameof(DAL), nameof(FilePath));
         }
 
         public void ReplaceMAL(ITtMediaLayer mal)
