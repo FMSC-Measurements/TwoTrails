@@ -31,7 +31,7 @@ namespace TwoTrails.Converters
 
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var reflector = (BindingReflector)d;
+            BindingReflector reflector = d as BindingReflector;
             if (reflector.Source != reflector.Target)
             {
                 reflector.Target = reflector.Source;

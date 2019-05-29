@@ -233,10 +233,7 @@ namespace TwoTrails.ViewModels
 
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_Tabs.SelectedIndex > -1)
-                CurrentTab = (_Tabs.Items[_Tabs.SelectedIndex] as TabItem).DataContext as TtTabModel;
-            else
-                CurrentTab = null;
+            CurrentTab = (_Tabs.SelectedIndex > -1) ?  (_Tabs.Items[_Tabs.SelectedIndex] as TabItem).DataContext as TtTabModel : null;
         }
 
 
