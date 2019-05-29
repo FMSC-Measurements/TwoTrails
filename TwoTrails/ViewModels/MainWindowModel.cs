@@ -607,46 +607,18 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
         private bool Exit(bool closeWindow = true)
         {
-            IEnumerable<TtProject> unsavedProjects = _Projects.Values.Where(p => p.RequiresSave);
-
-            if (unsavedProjects.Any())
-            {
-                MessageBoxResult result = MessageBox.Show(
-                        unsavedProjects.Count() > 1 ?
-                            "You have open projects. Would you like to save them before closing?" :
-                            "You have an open project. Would you like to save it before closing?",
-                        String.Empty,
-                        MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
-
-                if (result != MessageBoxResult.Cancel)
-                {
-                    try
-                    {
-                        foreach (TtProject proj in unsavedProjects.ToList())
-                        {
-                            if (result == MessageBoxResult.Yes)
-                            {
-                                proj.Save();
-                            }
-                            proj.Close();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.WriteLine(ex.Message, "MWM:Exit");
-                        MessageBox.Show(ex.Message);
-                        return false;
-                    }
-                }
-                else
-                    return false;
-            }
-            else
+            try
             {
                 foreach (TtProject proj in _Projects.Values.ToList())
                 {
                     proj.Close();
                 }
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.Message, "MWM:Exit");
+                MessageBox.Show(ex.Message);
+                return false;
             }
 
             exiting = true;

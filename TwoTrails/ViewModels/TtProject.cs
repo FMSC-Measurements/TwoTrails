@@ -115,11 +115,6 @@ namespace TwoTrails.ViewModels
             ProjectInfo.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
             {
                 ProjectChanged = !_ProjectInfo.Equals(ProjectInfo);
-
-                if (e.PropertyName == nameof(ProjectInfo.Name))
-                {
-
-                }
             };
 
             RequiresSave = false;

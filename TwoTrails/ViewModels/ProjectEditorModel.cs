@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -201,6 +202,17 @@ namespace TwoTrails.ViewModels
             {
                 _Project.ProjectUpdated();
             }
+            
+            if (e.PropertyName == nameof(TtPolygon.Area))
+            {
+                if (Manager.GetPoints(CurrentPolygon.CN).GroupBy(p => p.Metadata.Zone).Count() > 1)
+                {
+                    MessageBox.Show($"Polygon '{CurrentPolygon.Name}' has points associated with more than one Metadata Zone." +
+                        "This may cause issues with area calculations. Please make sure all the points use the same zone.",
+                        "Polygon Zone Conflict", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+
         }
 
         public ICommand PolygonChangedCommand { get; }
@@ -249,7 +261,7 @@ namespace TwoTrails.ViewModels
         private void PolygonChanged(TtPolygon poly)
         {
             CurrentPolygon = poly;
-            PolygonAccuracy = poly != null ? poly.Accuracy : 6d;
+            PolygonAccuracy = poly != null ? poly.Accuracy : Consts.DEFAULT_POINT_ACCURACY;
         }
 
         private bool PolygonAccuracyChanged(string accStr)
