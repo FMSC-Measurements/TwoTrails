@@ -1,4 +1,5 @@
-﻿using CSUtil.ComponentModel;
+﻿using CSUtil;
+using CSUtil.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
@@ -8,7 +9,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -181,6 +181,8 @@ namespace TwoTrails.ViewModels
                         _CurrentPolygon.PropertyChanged += Polygon_PropertyChanged;
                         _CurrentPolygon.PolygonChanged += GeneratePolygonSummary;
 
+                        ValidatePolygon(value);
+
                         GeneratePolygonSummary(_CurrentPolygon);
                     }
                 });
@@ -202,17 +204,6 @@ namespace TwoTrails.ViewModels
             {
                 _Project.ProjectUpdated();
             }
-            
-            if (e.PropertyName == nameof(TtPolygon.Area))
-            {
-                if (Manager.GetPoints(CurrentPolygon.CN).GroupBy(p => p.Metadata.Zone).Count() > 1)
-                {
-                    MessageBox.Show($"Polygon '{CurrentPolygon.Name}' has points associated with more than one Metadata Zone." +
-                        "This may cause issues with area calculations. Please make sure all the points use the same zone.",
-                        "Polygon Zone Conflict", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-
         }
 
         public ICommand PolygonChangedCommand { get; }
@@ -256,6 +247,8 @@ namespace TwoTrails.ViewModels
 
             TotalPolygonArea = area;
             TotalPolygonPerimeter = perim;
+
+            ValidatePolygon(polygon);
         }
 
         private void PolygonChanged(TtPolygon poly)
@@ -359,6 +352,46 @@ namespace TwoTrails.ViewModels
                         sw.WriteLine(PolygonSummary.SummaryText);
                     }
                 }
+            }
+        }
+
+        private void ValidatePolygon(TtPolygon polygon)
+        {
+            if (polygon != null)
+            {
+                int zone = 0;
+                foreach (TtPoint point in Manager.GetPoints(polygon.CN))
+                {
+                    if (point is QuondamPoint qp)
+                    {
+                        if (zone == 0)
+                        {
+                            zone = qp.ParentPoint.Metadata.Zone;
+                        }
+                        else if (zone != qp.ParentPoint.Metadata.Zone)
+                        {
+                            MessageBox.Show($"Polygon '{polygon.Name}' has Quondam Points associated with more than one Metadata " +
+                                "Zone or a Zone that is not the same with other points in the polygon. " +
+                                "This may cause issues with area calculations. Please make sure all the points use the same zone.",
+                                "Polygon Zone Conflict", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (zone == 0)
+                        {
+                            zone = point.Metadata.Zone;
+                        }
+                        else if (zone != point.Metadata.Zone)
+                        {
+                            MessageBox.Show($"Polygon '{polygon.Name}' has Points associated with more than one Metadata Zone." +
+                                "This may cause issues with area calculations. Please make sure all the points use the same zone.",
+                                "Polygon Zone Conflict", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            break;
+                        }
+                    }
+                } 
             }
         }
         #endregion
