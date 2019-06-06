@@ -670,25 +670,30 @@ namespace TwoTrails.Core
         protected void AdjustAroundGpsPoint(TtPoint point)
         {
             IList<TtPoint> points = _PointsByPoly[point.PolygonCN];
-            TtPoint prev = (point.Index > 0) ? points[point.Index - 1] : null;
-            TtPoint next = (point.Index < points.Count - 1) ? points[point.Index + 1] : null;
 
-            if (prev != null && prev.OpType == OpType.Traverse)
+            if (points.Count > point.Index - 1)
             {
-                AdjustTraverseFromAfterStart(point, points);
-            }
+                TtPoint prev = (point.Index > 0) ? points[point.Index - 1] : null;
+                TtPoint next = (point.Index < points.Count - 1) ? points[point.Index + 1] : null;
 
-            if (next != null)
-            {
-                if (next.OpType == OpType.Traverse)
+                if (prev != null && prev.OpType == OpType.Traverse)
                 {
-                    AdjustTraverseFromStart(point.Index, points);
+                    AdjustTraverseFromAfterStart(point, points);
                 }
-                else if (next.OpType == OpType.SideShot)
+
+                if (next != null)
                 {
-                    AdjustSideShotsFromBasePoint(point, points);
+                    if (next.OpType == OpType.Traverse)
+                    {
+                        AdjustTraverseFromStart(point.Index, points);
+                    }
+                    else if (next.OpType == OpType.SideShot)
+                    {
+                        AdjustSideShotsFromBasePoint(point, points);
+                    }
                 }
             }
+            //else point may be moving and index rebuild should be called
         }
 
 

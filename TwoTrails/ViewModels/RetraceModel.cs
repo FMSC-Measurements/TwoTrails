@@ -18,7 +18,7 @@ namespace TwoTrails.ViewModels
 
         public ObservableCollection<Retrace> Retraces { get { return Get<ObservableCollection<Retrace>>(); } set { Set(value); } }
 
-        ICommand CommitCommand { get; }
+        public ICommand CommitCommand { get; }
 
         public List<TtPolygon> Polygons { get; }
         public TtPolygon TargetPolygon { get { return Get<TtPolygon>(); } set { Set(value, () => PolygonChanged(value)); } }
@@ -28,6 +28,10 @@ namespace TwoTrails.ViewModels
         public QuondamBoundaryMode BoundaryMode { get { return Get<QuondamBoundaryMode>(); } set { Set(value); } }
         public bool InsertBeginning { get { return Get<bool>(); } set { Set(value); } }
         public bool InsertAfter { get { return Get<bool>(); } set { Set(value); } }
+
+        public bool MovePoints { get { return Get<bool>(); } set { Set(value, () => OnPropertyChanged(nameof(TargetPolygonToolTip))); } }
+        public string TargetPolygonToolTip => MovePoints ? "The polygon in which to move the points to." : "The polygon in which to place the Quondams.";
+
 
         public RetraceModel(TtHistoryManager manager)
         {
@@ -41,6 +45,7 @@ namespace TwoTrails.ViewModels
 
             CommitCommand = new RelayCommand(x => RetracePoints());
         }
+
 
         private void PolygonChanged(TtPolygon polygon)
         {
@@ -128,8 +133,16 @@ namespace TwoTrails.ViewModels
                         }
                     }
 
-                    _Manager.CreateQuondamLinks(retracePoints, TargetPolygon, 
-                        InsertBeginning ? 0 : InsertAfter ? InsertIndex : int.MaxValue, BoundaryMode);
+                    if (MovePoints)
+                    {
+                        _Manager.MovePointsToPolygon(retracePoints, TargetPolygon,
+                            InsertBeginning ? 0 : InsertAfter ? InsertIndex : int.MaxValue);
+                    }
+                    else
+                    {
+                        _Manager.CreateQuondamLinks(retracePoints, TargetPolygon,
+                            InsertBeginning ? 0 : InsertAfter ? InsertIndex : int.MaxValue, BoundaryMode);
+                    }
 
                     return true;
                 } 
