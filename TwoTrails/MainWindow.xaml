@@ -112,9 +112,9 @@
                     <Separator/>
 
                     <MenuItem Header="Rename Points" Command="{Binding CurrentEditor.RenamePointsCommand}"
-                          Style="{StaticResource styleMiPointEdit}"/>
+                          Style="{StaticResource styleMiHiddenNullCommand}"/>
                     <MenuItem Header="{Binding CurrentEditor.ReverseTypeHeader}" Command="{Binding CurrentEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
-                          Style="{StaticResource styleMiPointEdit}"/>
+                          Style="{StaticResource styleMiHiddenNullCommand}"/>
 
                     <MenuItem Header="{Binding CurrentEditor.ConvertTypeHeader}" Command="{Binding CurrentEditor.ConvertPointsCommand}" Visibility="{Binding CurrentEditor, Converter={StaticResource NotNullVisibilityConverter}}" />
 

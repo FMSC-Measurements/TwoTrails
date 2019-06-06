@@ -42,6 +42,14 @@
         </Style.Triggers>
     </Style>
 
+    <Style x:Key="styleMiHiddenNullCommand" TargetType="{x:Type MenuItem}">
+        <Style.Triggers>
+            <Trigger Property="Command" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <SolidColorBrush x:Key="colorPriamry" Color="MediumSeaGreen" />
     <SolidColorBrush x:Key="colorPriamryLighter" Color="PaleGreen" />
     <SolidColorBrush x:Key="colorPriamryLight" Color="DarkSeaGreen" />
