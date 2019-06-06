@@ -35,13 +35,8 @@ namespace TwoTrails.ViewModels
                 Set(value, () =>
                 {
                     CurrentEditor = value?.Project.DataEditor;
-
-                    if (sbiInfoBinding != null && value == null)
-                    {
-                        BindingOperations.ClearBinding(MainWindow.sbiInfo, TextBlock.TextProperty);
-                        sbiInfoBinding = null;
-                    }
-                    else if (value != null)
+                    
+                    if (value != null)
                     {
                         sbiInfoBinding = new Binding();
                         sbiInfoBinding.Source = value;
@@ -50,12 +45,13 @@ namespace TwoTrails.ViewModels
                         sbiInfoBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
                         BindingOperations.SetBinding(MainWindow.sbiInfo, TextBlock.TextProperty, sbiInfoBinding);
                     }
+                    else if (sbiInfoBinding != null)
+                    {
+                        BindingOperations.ClearBinding(MainWindow.sbiInfo, TextBlock.TextProperty);
+                        sbiInfoBinding = null;
+                    }
 
-                    OnPropertyChanged(
-                        nameof(CurrentProject),
-                        nameof(HasOpenedProject),
-                        nameof(CurrentEditor)
-                        );
+                    OnPropertyChanged(nameof(CurrentProject), nameof(HasOpenedProject), nameof(CurrentEditor));
 
                     MainWindow.Title = $"TwoTrails{(value != null ? $" - {value.Project.ProjectName}" : String.Empty)}";
                 });
@@ -155,15 +151,15 @@ namespace TwoTrails.ViewModels
             OpenProjectCommand = new RelayCommand(x => OpenProject(x as string));
             SaveCommand = new RelayCommand(x => SaveCurrentProject());
             SaveAsCommand = new RelayCommand(x => SaveCurrentProject(true));
-            CloseProjectCommand = new RelayCommand(x => CurrentProject.Close());
+            CloseProjectCommand = new RelayCommand(x => CurrentProject?.Close());
             ExitCommand = new RelayCommand(x => Exit());
 
-            ImportCommand = new RelayCommand(x => ImportData());
-            ExportCommand = new RelayCommand(x => ExportProject());
-            ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
+            ImportCommand = new RelayCommand(x => ImportDialog.ShowDialog(CurrentProject, MainWindow));
+            ExportCommand = new RelayCommand(x => ExportDialog.ShowDialog(CurrentProject, MainWindow));
+            ViewPointDetailsCommand = new RelayCommand(x => PointDetailsDialog.ShowDialog(CurrentProject.Manager.GetPoints(), MainWindow));
             OpenInEarthCommand = new RelayCommand(x => OpenInGoogleEarth());
 
-            SettingsCommand = new RelayCommand(x => OpenSettings());
+            SettingsCommand = new RelayCommand(x => SettingsWindow.ShowDialog(App.Settings, MainWindow));
 
 
             ViewLogCommand = new RelayCommand(x => Process.Start(App.LOG_FILE_PATH));
@@ -204,29 +200,11 @@ namespace TwoTrails.ViewModels
 
         private void ParseCommandLineArgs(String[] args)
         {
-            if (args[1].ToLower() == "--export-media" && args.Length > 2)
+            foreach (String file in args.Skip(1).Select(f => f.Trim('"')))
             {
-                try
-                {
-                    string file = args[2];
-                    if (file.EndsWith(Consts.FILE_EXTENSION_MEDIA, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file))
-                        Export.MediaFiles(new TtSqliteMediaAccessLayer(file), Path.GetDirectoryName(file));
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine(ex.Message, "MainWindowModel:ParseCommandLineArgs-ExportMedia");
-                }
-
-                Exit(true);
-            }
-            else
-            {
-                foreach (String file in args.Select(f => f.Trim('"')))
-                {
-                    if (file.EndsWith(Consts.FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase) ||
-                        file.EndsWith(Consts.FILE_EXTENSION_MEDIA, StringComparison.InvariantCultureIgnoreCase))
-                        OpenProject(file);
-                }
+                if (file.EndsWith(Consts.FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase) ||
+                    file.EndsWith(Consts.FILE_EXTENSION_MEDIA, StringComparison.InvariantCultureIgnoreCase))
+                    OpenProject(file);
             }
         }
         
@@ -649,51 +627,29 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
             RecentItemsAvail = miRecent.Items.Count > 0;
         }
-
-
-        private void ImportData()
-        {
-            ImportDialog.ShowDialog(CurrentProject, MainWindow);
-        }
-
-        private void ExportProject()
-        {
-            ExportDialog.ShowDialog(CurrentProject, MainWindow);
-        }
-
-        private void ViewPointDetails()
-        {
-            PointDetailsDialog.ShowDialog(CurrentProject.Manager.GetPoints(), MainWindow);
-        }
-
+        
         private void OpenInGoogleEarth()
         {
-            Action createAndOpenKmz = () =>
-            {
-                try
-                {
-                    if (!Directory.Exists(App.TEMP_DIR))
-                        Directory.CreateDirectory(App.TEMP_DIR);
-
-                    string file = Path.Combine(App.TEMP_DIR, $"{Guid.NewGuid().ToString()}.kmz");
-                    Export.KMZ(CurrentProject.Manager, CurrentProject.ProjectInfo, file);
-
-                    if (File.Exists(file))
-                        Process.Start(file);
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine(ex.Message, "MainWindowModel:OpenInGoogleEarth");
-                    MessageBox.Show("An Error launching Google Earth has occured. Please see log file for details.");
-                }
-            };
-
             try
             {
-                //if (CoreUtils.IsApplictionInstalled("Google Earth") || CoreUtils.IsApplictionInstalled("Google Earth Pro"))
                 if (CoreUtils.IsExtensionOpenable("kmz"))
                 {
-                    createAndOpenKmz();
+                    try
+                    {
+                        if (!Directory.Exists(App.TEMP_DIR))
+                            Directory.CreateDirectory(App.TEMP_DIR);
+
+                        string file = Path.Combine(App.TEMP_DIR, $"{Guid.NewGuid().ToString()}.kmz");
+                        Export.KMZ(CurrentProject.Manager, CurrentProject.ProjectInfo, file);
+
+                        if (File.Exists(file))
+                            Process.Start(file);
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(ex.Message, "MainWindowModel:OpenInGoogleEarth");
+                        MessageBox.Show("An Error launching Google Earth has occured. Please see log file for details.");
+                    }
                 }
                 else
                 {
@@ -708,13 +664,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             {
                 Trace.WriteLine(ex.Message, "MainWindowModel:OpenInGoogleEarth");
                 MessageBox.Show("Unable to open in Google Earth. See Log file for details.");
-                //createAndOpenKmz(); //try anyway
             }
-        }
-
-        private void OpenSettings()
-        {
-            SettingsWindow.ShowDialog(App.Settings, MainWindow);
         }
 
         private void ExportReport()
@@ -745,11 +695,11 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                 using (StreamWriter sw = new StreamWriter(Path.Combine(tempDirectory, "App.Settings.txt")))
                 {
                     sw.WriteLine("--Main App.Settings--");
-                    sw.WriteLine($"{nameof(App.Settings.UserName)}: {App.Settings.UserName}");
-                    sw.WriteLine($"{nameof(App.Settings.DeviceName)}: {App.Settings.DeviceName}");
-                    sw.WriteLine($"{nameof(App.Settings.Region)}: {App.Settings.Region}");
-                    sw.WriteLine($"{nameof(App.Settings.District)}: {App.Settings.District}");
-                    sw.WriteLine($"{nameof(App.Settings.IsAdvancedMode)}: {App.Settings.IsAdvancedMode}");
+                    sw.WriteLine($"{nameof(ITtSettings.UserName)}: {App.Settings.UserName}");
+                    sw.WriteLine($"{nameof(ITtSettings.DeviceName)}: {App.Settings.DeviceName}");
+                    sw.WriteLine($"{nameof(ITtSettings.Region)}: {App.Settings.Region}");
+                    sw.WriteLine($"{nameof(ITtSettings.District)}: {App.Settings.District}");
+                    sw.WriteLine($"{nameof(TtSettings.IsAdvancedMode)}: {App.Settings.IsAdvancedMode}");
                     sw.WriteLine("Recent Projects:");
                     foreach (string rp in App.Settings.GetRecentProjects())
                         sw.WriteLine(rp);
@@ -760,13 +710,13 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                     sw.WriteLine();
 
                     sw.WriteLine("--Metadata App.Settings--");
-                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Datum)}: {App.Settings.MetadataSettings.Datum}");
-                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.DecType)}: {App.Settings.MetadataSettings.DecType}");
-                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Distance)}: {App.Settings.MetadataSettings.Distance}");
-                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Elevation)}: {App.Settings.MetadataSettings.Elevation}");
-                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.MagDec)}: {App.Settings.MetadataSettings.MagDec}");
-                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Slope)}: {App.Settings.MetadataSettings.Slope}");
-                    sw.WriteLine($"{nameof(App.Settings.MetadataSettings.Zone)}: {App.Settings.MetadataSettings.Zone}");
+                    sw.WriteLine($"{nameof(MetadataSettings.Datum)}: {App.Settings.MetadataSettings.Datum}");
+                    sw.WriteLine($"{nameof(MetadataSettings.DecType)}: {App.Settings.MetadataSettings.DecType}");
+                    sw.WriteLine($"{nameof(MetadataSettings.Distance)}: {App.Settings.MetadataSettings.Distance}");
+                    sw.WriteLine($"{nameof(MetadataSettings.Elevation)}: {App.Settings.MetadataSettings.Elevation}");
+                    sw.WriteLine($"{nameof(MetadataSettings.MagDec)}: {App.Settings.MetadataSettings.MagDec}");
+                    sw.WriteLine($"{nameof(MetadataSettings.Slope)}: {App.Settings.MetadataSettings.Slope}");
+                    sw.WriteLine($"{nameof(MetadataSettings.Zone)}: {App.Settings.MetadataSettings.Zone}");
                 }
 
                 ZipFile.CreateFromDirectory(tempDirectory, Path.GetFullPath(sfd.FileName));
@@ -798,10 +748,10 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                 {
                     MessageBox.Show("You have the most recent version of TwoTrails", "TwoTrails Update");
                 }
-                else
-                {
-                    MessageBox.Show("Checking for updates was unsuccessful.", "TwoTrails Update");
-                }
+            }
+            else
+            {
+                MessageBox.Show("Checking for updates was unsuccessful.", "TwoTrails Update");
             }
         }
     }
