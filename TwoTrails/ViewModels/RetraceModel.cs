@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
@@ -83,6 +84,20 @@ namespace TwoTrails.ViewModels
                 }
                 else
                 {
+                    bool overrideAccs = false;
+                    if (MovePoints && Retraces.Any(r => r.Points.Any(p => p.Polygon.Accuracy != TargetPolygon.Accuracy)))
+                    {
+                        var mbr = MessageBox.Show($"The Target Polygon '{TargetPolygon.Name}' has an accuracy that is different than some" +
+                            "of the polygons that the points are in. Would you like to apply a manual accuracy to the points to keep their " +
+                            "original polygon accuracy? This will not override points that already have a manual accuracy set.",
+                            "Polygon Accuracy Mismatch", MessageBoxButton.YesNoCancel, MessageBoxImage.Hand, MessageBoxResult.No);
+
+                        if (mbr == MessageBoxResult.Yes)
+                            overrideAccs = true;
+                        else if (mbr == MessageBoxResult.Cancel)
+                            return false;
+                    }
+
                     List<TtPoint> retracePoints = new List<TtPoint>();
 
                     foreach (Retrace r in Retraces)
@@ -133,10 +148,31 @@ namespace TwoTrails.ViewModels
                         }
                     }
 
+                    
+
                     if (MovePoints)
                     {
+                        bool mcStarted = false;
+                        if (overrideAccs)
+                        {
+                            TtPoint[] gpsPoints = retracePoints.Where(p => p is GpsPoint gps && gps.ManualAccuracy == null).ToArray();
+
+                            if (gpsPoints.Length > 0)
+                            {
+                                _Manager.StartMultiCommand();
+                                mcStarted = true;
+
+                                _Manager.EditPointsMultiValues(gpsPoints, PointProperties.MAN_ACC_GPS, gpsPoints.Select(p => (double?)p.Polygon.Accuracy));
+                            }
+                        }
+
                         _Manager.MovePointsToPolygon(retracePoints, TargetPolygon,
                             InsertBeginning ? 0 : InsertAfter ? InsertIndex : int.MaxValue);
+
+                        if (mcStarted)
+                        {
+                            _Manager.CommitMultiCommand();
+                        }
                     }
                     else
                     {
