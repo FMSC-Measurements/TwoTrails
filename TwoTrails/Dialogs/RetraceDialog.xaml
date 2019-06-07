@@ -31,7 +31,7 @@
     <DockPanel>
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MinWidth="100" MaxWidth="145"/>
+                <ColumnDefinition Width="Auto" MinWidth="115" MaxWidth="145"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -120,9 +120,9 @@
                  HorizontalContentAlignment="Stretch" BorderThickness="0">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid Margin="5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="105"/>
                             <ColumnDefinition Width="125"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
@@ -135,7 +135,7 @@
 
                         <ComboBox Grid.Column="0" ItemsSource="{Binding Polygons}" SelectedItem="{Binding SelectedPolygon, Mode=OneWayToSource}"
                                   ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
-                        <ComboBox Grid.Column="1" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointFrom, Mode=OneWayToSource}" Margin="0 0 5 0"
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointFrom, Mode=OneWayToSource}" Margin="5 0 5 0"
                                   ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
                         <RadioButton Grid.Column="2" GroupName="{Binding GCN}" Content="Fwd" IsChecked="{Binding DirInc, Mode=TwoWay}" ToolTip="The Quondams will be added in order from how their parent's were collected." Padding="4 0 5 0"/>
                         <RadioButton Name="rbSingle" Grid.Column="3" GroupName="{Binding GCN}" Content="Single" IsChecked="{Binding SinglePoint, Mode=OneWayToSource}" ToolTip="Only a single Quondam will be created." Padding="4 0 5 0"/>
