@@ -85,6 +85,7 @@ namespace TwoTrails.Core
         {
             Action = DataActionType.None;
             Date = DateTime.Now;
+            Notes = String.Empty;
         }
     }
 

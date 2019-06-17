@@ -2767,6 +2767,12 @@ namespace TwoTrails.DAL
 
             return count;
         }
+
+        public DalError GetErrors()
+        {
+            //TODO
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

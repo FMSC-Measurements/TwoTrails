@@ -152,7 +152,7 @@ namespace TwoTrails.Core
                 AttachPolygonEvents(poly);
             }
 
-            IEnumerable<TtPoint> points = _PointsByPoly.Values.SelectMany(l => l);
+            List<TtPoint> points = _PointsByPoly.Values.SelectMany(l => l).ToList();
 
             _Points = new ObservableCollection<TtPoint>();
 
@@ -288,15 +288,27 @@ namespace TwoTrails.Core
             {
                 point.Group = _GroupsMap[point.GroupCN];
             }
+            else
+            {
+                throw new MissingDataException(nameof(TtGroup));
+            }
 
             if (_MetadataMap.ContainsKey(point.MetadataCN))
             {
                 point.Metadata = _MetadataMap[point.MetadataCN];
             }
+            else
+            {
+                throw new MissingDataException(nameof(TtMetadata));
+            }
 
             if (_PolygonsMap.ContainsKey(point.PolygonCN))
             {
                 point.Polygon = _PolygonsMap[point.PolygonCN];
+            }
+            else
+            {
+                throw new MissingDataException(nameof(TtPolygon));
             }
 
             AttachPointEvents(point);
@@ -1854,6 +1866,16 @@ namespace TwoTrails.Core
         public void UpdateDataAction(DataActionType action, string notes = null)
         {
             _Activity.UpdateAction(action, notes);
+        }
+    }
+
+    public class MissingDataException : Exception
+    {
+        public String Data { get; }
+
+        public MissingDataException(string data = null)
+        {
+            Data = data;
         }
     }
 }

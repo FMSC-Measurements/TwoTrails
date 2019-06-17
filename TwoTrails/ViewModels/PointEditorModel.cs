@@ -310,6 +310,8 @@ namespace TwoTrails.ViewModels
 
                     if (!isPoly)
                         az = TtUtils.AzimuthOfPoint(lastCoords.X, lastCoords.Y, coords.X, coords.Y);
+
+                    lastCoords = coords;
                 }
 
                 AI_DistMt = dist;
