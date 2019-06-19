@@ -95,7 +95,7 @@ namespace TwoTrails.DAL
 
 
         #region Util
-        void Clean();
+        void FixErrors(bool removeErrors = false);
         bool HasErrors();
         DalError GetErrors();
         #endregion
@@ -104,7 +104,9 @@ namespace TwoTrails.DAL
     [Flags]
     public enum DalError
     {
-        InvalidLocation = 1 << 1,
+        None            = 0,
+        PointIndexes    = 1 << 0,
+        NullAdjLocs = 1 << 1,
         MissingPolygon  = 1 << 2,
         MissingMetadata = 1 << 3,
         MissingGroup    = 1 << 4

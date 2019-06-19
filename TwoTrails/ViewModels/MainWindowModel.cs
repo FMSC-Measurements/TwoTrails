@@ -240,18 +240,16 @@ namespace TwoTrails.ViewModels
                         {
                             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
                             TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
-
-                            if (dal.FixAndReindex())
-                            {
-                                MessageBox.Show("TwoTrails attempted to fix data errors within the project file.");
-                            }
-
+                            
                             Trace.WriteLine($"DAL Opened ({dal.FilePath}): {dal.GetDataVersion()}");
 
                             if (mal != null)
                             {
                                 Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
                             }
+
+                            if (!TtUtils.CheckAndFixErrors(dal))
+                                return;
 
                             if (dal.RequiresUpgrade)
                             {
@@ -503,26 +501,31 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
                     TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(nFile);
 
-                    if (dal.HasErrors())
-                        dal.Fix();
-
-                    project.ReplaceDAL(dal);
-
-                    if (project.MAL != null)
+                    if (!TtUtils.CheckAndFixErrors(dal))
                     {
-                        string nmFile = dialog.FileName.Replace(Consts.FILE_EXTENSION, Consts.FILE_EXTENSION_MEDIA);
-
-                        File.Copy(project.MAL.FilePath, nmFile, true);
-
-                        project.ReplaceMAL(new TtSqliteMediaAccessLayer(nmFile));
+                        File.Delete(nFile);
+                        PostMessage("Save Canceled");
                     }
+                    else
+                    {
+                        project.ReplaceDAL(dal);
 
-                    Trace.WriteLine($"Project Copied: {nFile} from {oFile}");
+                        if (project.MAL != null)
+                        {
+                            string nmFile = dialog.FileName.Replace(Consts.FILE_EXTENSION, Consts.FILE_EXTENSION_MEDIA);
 
-                    _Projects.Remove(oFile);
-                    _Projects.Add(nFile, project);
+                            File.Copy(project.MAL.FilePath, nmFile, true);
 
-                    project.Save();
+                            project.ReplaceMAL(new TtSqliteMediaAccessLayer(nmFile));
+                        }
+
+                        Trace.WriteLine($"Project Copied: {nFile} from {oFile}");
+
+                        _Projects.Remove(oFile);
+                        _Projects.Add(nFile, project);
+
+                        project.Save();
+                    }
                 }
             }
             else

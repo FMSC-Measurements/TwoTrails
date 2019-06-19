@@ -126,7 +126,7 @@ namespace TwoTrails
 
         public TtGroup CreateDefaultGroup()
         {
-            return new TtGroup(Consts.EmptyGuid, "Main Group", "Default Group", GroupType.General);
+            return new TtGroup(Consts.EmptyGuid, Consts.DefaultGroupName, Consts.DefaultGroupDesc, GroupType.General);
         }
 
         public TtProjectInfo CreateProjectInfo(Version programVersion)

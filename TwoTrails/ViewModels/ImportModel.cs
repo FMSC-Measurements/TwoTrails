@@ -138,6 +138,12 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                         IsSettingUp = true;
 
                         TtSqliteDataAccessLayer idal = new TtSqliteDataAccessLayer(fileName);
+                        
+                        if (!TtUtils.CheckAndFixErrors(idal))
+                        {
+                            IsSettingUp = false;
+                            return;
+                        }
 
                         if (idal.GetDataVersion() < TwoTrailsSchema.SchemaVersion)
                         {
@@ -157,9 +163,6 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                                 return;
                             }
                         }
-
-                        if (idal.HasErrors())
-                            idal.Fix();
 
                         ImportControl = new ImportControl(idal, true, true, true);
                         break;
