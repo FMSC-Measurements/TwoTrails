@@ -278,7 +278,7 @@ namespace TwoTrails.Utils
                 {
                     try
                     {
-                        File.Copy(dal.FilePath, $"{dal.FilePath}.corrupt");
+                        File.Copy(dal.FilePath, $"{dal.FilePath}.corrupt", true);
 
                         dal.FixErrors(mbr == MessageBoxResult.No);
                     }

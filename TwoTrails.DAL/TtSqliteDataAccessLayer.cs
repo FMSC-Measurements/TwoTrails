@@ -2619,7 +2619,7 @@ namespace TwoTrails.DAL
             {
                 if (GetPointsWithMissingPolygons().Any())
                 {
-                    TtPolygon mPoly = GetPolygons($"{TTS.SharedSchema.CN} = {Consts.EmptyGuid}").First() ??
+                    TtPolygon mPoly = GetPolygons($"{TTS.SharedSchema.CN} = {Consts.EmptyGuid}").FirstOrDefault() ??
                         new TtPolygon(Consts.EmptyGuid, "Fix Point Poly",
                             "Polygon that contains points that were fixed from having no polygon.",
                             1010, 10, DateTime.Now, Consts.DEFAULT_POINT_ACCURACY, 0, 0, 0);
