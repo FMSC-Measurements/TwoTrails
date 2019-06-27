@@ -38,9 +38,9 @@
     <PackageReference Include="NetTopologySuite" Version="1.15.2" />
     <PackageReference Include="NetTopologySuite.CoordinateSystems" Version="1.15.2" />
     <PackageReference Include="NetTopologySuite.Core" Version="1.15.2" />
-    <PackageReference Include="NetTopologySuite.Features" Version="1.15.0" />
+    <PackageReference Include="NetTopologySuite.Features" Version="1.15.1" />
     <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="1.15.3" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.110" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.111" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
     <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />

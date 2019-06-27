@@ -519,8 +519,8 @@
                                     </Grid>
                                 </GroupBox>
 
-                                <TextBlock Grid.Row="14" Text="*Such as GPS error or taping error"/>
-                                <TextBlock Grid.Row="15" Text="**Area-Error/Area to be less than 10%"/>
+                                <TextBlock Grid.Row="14" Grid.ColumnSpan="3" Text="*Such as GPS error or taping error"/>
+                                <TextBlock Grid.Row="15" Grid.ColumnSpan="3" Text="**Area-Error/Area to be less than 10%"/>
                             </Grid>
                         </ScrollViewer>
                         

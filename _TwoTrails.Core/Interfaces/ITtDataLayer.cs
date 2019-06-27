@@ -106,7 +106,7 @@ namespace TwoTrails.DAL
     {
         None            = 0,
         PointIndexes    = 1 << 0,
-        NullAdjLocs = 1 << 1,
+        NullAdjLocs     = 1 << 1,
         MissingPolygon  = 1 << 2,
         MissingMetadata = 1 << 3,
         MissingGroup    = 1 << 4

@@ -7,16 +7,19 @@
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
         mc:Ignorable="d"
-        Title="ViewSatInfoDialog" Height="450" Width="800">
+        Title="ViewSatInfoDialog" Height="450" Width="800"
+        WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <cvt:DmsToDecDegConverter x:Key="dmsToDD"/>
+        <cvt:PointCnToPIDConverter x:Key="cnToPID"/>
+        <cvt:GetDescConverter x:Key="getDesc"/>
         <fmsccm:EnumDescriptionConverter x:Key="enumDesc"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="2.5"/>
-            <ColumnDefinition Width="Auto" MinWidth="250"/>
+            <!--<ColumnDefinition Width="2.5"/>
+            <ColumnDefinition Width="Auto" MinWidth="250"/>-->
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -41,18 +44,44 @@
             IsReadOnly="True" SelectionChanged="DataGrid_SelectionChanged">
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Fix Time" Binding="{Binding FixTime}" />
+                <DataGridTextColumn Header="Point">
+                    <DataGridTextColumn.Binding>
+                        <MultiBinding Converter="{StaticResource cnToPID}">
+                            <Binding Path="PointCN"/>
+                            <Binding Path="Points" RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType=Window}"/>
+                        </MultiBinding>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
                 <DataGridTextColumn Header="Used" Binding="{Binding IsUsed}" />
+                
+                <DataGridTextColumn Header="Fix Time" Binding="{Binding FixTime}" />
                 <DataGridTextColumn Header="Latitude" Binding="{Binding Position.Latitude, Converter={StaticResource dmsToDD}}" />
                 <DataGridTextColumn Header="Longitude" Binding="{Binding Position.Longitude, Converter={StaticResource dmsToDD}}" />
                 <DataGridTextColumn Header="Elevation" Binding="{Binding Elevation}" />
                 <DataGridTextColumn Header="Elevation UOM" Binding="{Binding UomElevation, Converter={StaticResource enumDesc}}" />
 
+                <DataGridTextColumn Header="Fix" Binding="{Binding Fix, Converter={StaticResource getDesc}}"/>
+                <DataGridTextColumn Header="FixQuality" Binding="{Binding FixQuality, Converter={StaticResource getDesc}}"/>
+                <DataGridTextColumn Header="Mode" Binding="{Binding Mode}"/>
+
+                <DataGridTextColumn Header="HDOP" Binding="{Binding HDOP}"/>
+                <DataGridTextColumn Header="PDOP" Binding="{Binding PDOP}"/>
+                <DataGridTextColumn Header="VDOP" Binding="{Binding VDOP}"/>
+
+                <DataGridTextColumn Header="Used/Track/Vis Sats">
+                    <DataGridTextColumn.Binding>
+                        <MultiBinding StringFormat="{}{0}/{1}/{2}">
+                            <Binding Path="UsedSatelliteIDsCount"/>
+                            <Binding Path="TrackedSatellitesCount"/>
+                            <Binding Path="SatellitesInViewCount"/>
+                        </MultiBinding>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+
                 <DataGridTextColumn Header="MagVar" Binding="{Binding MagVar}" />
                 <DataGridTextColumn Header="MagVarDir" Binding="{Binding MagVarDir, Converter={StaticResource enumDesc}}" />
                 <DataGridTextColumn Header="TrackAngle" Binding="{Binding TrackAngle}" />
                 <DataGridTextColumn Header="GroudSpeed" Binding="{Binding GroudSpeed}" />
-
 
                 <DataGridTextColumn Header="Created" Binding="{Binding TimeCreated}" />
                 <DataGridTextColumn Header="CN" Binding="{Binding CN}" />
@@ -60,11 +89,11 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <GridSplitter Grid.Column="1"/>
+        <!--<GridSplitter Grid.Column="1"/>
 
         <Canvas Name="cvsSatInfo" Grid.Column="2">
             
-        </Canvas>
+        </Canvas>-->
 
         <Grid Grid.Row="1" Grid.Column="2">
             <Button Content="Close" Click="Close_Click" Margin="2.5" Width="75" HorizontalAlignment="Right"/>

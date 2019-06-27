@@ -232,140 +232,150 @@ namespace TwoTrails.ViewModels
         {
             if (filePath != null && File.Exists(filePath))
             {
-                if (filePath.EndsWith(Consts.FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase))
+                if (filePath.IndexOf("AppData\\Local", StringComparison.InvariantCultureIgnoreCase) > 0)
                 {
-                    if (!_Projects.Keys.Contains(filePath, StringComparer.InvariantCultureIgnoreCase))
-                    {
-                        try
-                        {
-                            TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
-                            TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
-                            
-                            Trace.WriteLine($"DAL Opened ({dal.FilePath}): {dal.GetDataVersion()}");
-
-                            if (mal != null)
-                            {
-                                Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
-                            }
-
-                            if (!TtUtils.CheckAndFixErrors(dal))
-                                return;
-
-                            if (dal.RequiresUpgrade)
-                            {
-                                if (MessageBox.Show(MainWindow, @"This is file needs to be upgraded to work with this version of TwoTrails. Upgrading will first create a backup of this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",
-                                   MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
-                                {
-                                    string oldFilePath = $"{dal.FilePath}.old";
-                                    if (File.Exists(oldFilePath) &&
-                                        MessageBox.Show($"There is already a filed named '{Path.GetFileName(oldFilePath)}'. Would you like to overwrite this file?",
-                                        "File.Old Already Exists", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
-                                    {
-                                        return;
-                                    }
-
-                                    if (Upgrade.DAL(dal, Settings))
-                                    {
-                                        AddProject(new TtProject(dal, mal, App.Settings, this));
-                                        MessageBox.Show("Upgrade Successful");
-                                    }
-                                    else
-                                    {
-                                        MessageBox.Show("There has been an error and the Upgrade has failed. Please see log file for details");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                AddProject(new TtProject(dal, mal, App.Settings, this));
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine($"{ ex.Message }\n\t{ ex.StackTrace }", "MWM:OpenProject");
-                            MessageBox.Show(MainWindow, "There is an issue opening this Project. See log file for details.", "Open Project Error");
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show(MainWindow, "Project is already opened.");
-
-                        SwitchToTab(_Projects[filePath].ProjectTab);
-                    }
-                }
-                else if (filePath.EndsWith(Consts.FILE_EXTENSION_MEDIA, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    string ttFile = filePath.Replace(Consts.FILE_EXTENSION_MEDIA, Consts.FILE_EXTENSION);
-                    if (!_Projects.Keys.Contains(ttFile, StringComparer.InvariantCultureIgnoreCase))
-                        OpenProject(ttFile);
-                }
-                else if (filePath.EndsWith(Consts.FILE_EXTENSION_V2, StringComparison.InvariantCultureIgnoreCase) && CurrentProject == null)
-                {
-                    TtV2SqliteDataAccessLayer dalv2 = new TtV2SqliteDataAccessLayer(filePath);
-
-                    if (dalv2.RequiresUpgrade)
-                    {
-                        MessageBox.Show(MainWindow, @"This TwoTrails V2 file is too old to upgrade. 
-Please Upgrade it to the most recent TT2 version before upgrading it here.", "Too old to upgrade",
-                            MessageBoxButton.OK, MessageBoxImage.Stop);
-                    }
-                    else
-                    {
-                        if (MessageBox.Show(MainWindow, @"This is a TwoTrails V2 file that needs to be upgraded into the new TTX format. 
-Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",
-                            MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
-                        {
-                            TtProjectInfo oinfo = dalv2.GetProjectInfo();
-                            TtProjectInfo info = new TtProjectInfo(
-                                oinfo.Name,
-                                oinfo.Description,
-                                oinfo.Region,
-                                oinfo.Forest,
-                                oinfo.District,
-                                AppInfo.Version.ToString(),
-                                oinfo.CreationVersion,
-                                TwoTrailsSchema.SchemaVersion,
-                                oinfo.CreationDeviceID,
-                                oinfo.CreationDate);
-
-                            string upgradedFile = Path.Combine(Path.GetDirectoryName(filePath), $"{Path.GetFileNameWithoutExtension(filePath)}{Consts.FILE_EXTENSION}");
-
-                            if (File.Exists(upgradedFile))
-                            {
-                                if (MessageBox.Show(MainWindow, $"File '{Path.GetFileName(upgradedFile)}' already exists. Would you like to overwrite it?",
-                                    "Overwrite File", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
-                                {
-                                    return;
-                                }
-                            }
-
-                            TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(upgradedFile, info);
-                            TtSqliteMediaAccessLayer mal = GetMalIfExists(upgradedFile);
-
-                            Upgrade.DAL(dal, App.Settings, dalv2);
-
-                            AddProject(new TtProject(dal, mal, App.Settings, this));
-                        }
-                    }
-                }
-                else if (TtUtils.IsImportableFileType(filePath))
-                {
-                    if (CurrentProject != null)
-                    {
-                        ImportDialog.ShowDialog(CurrentProject, MainWindow, filePath);
-                    }
-                    else
-                    {
-                        if (MessageBox.Show($"Would you like to create a project from this {TtUtils.GetFileTypeName(filePath)} file?", "Create Project from importable file.",
-                            MessageBoxButton.YesNo, MessageBoxImage.Hand, MessageBoxResult.No) == MessageBoxResult.Yes)
-                        {
-                            CreateAndOpenProjectFromImportable(null, filePath);
-                        }
-                    }
+                    MessageBox.Show("Project is attempting to be opened from a temporary directory. Please move the project out of this directory before editing.\n" +
+                        $"File: {filePath}",
+                        "Unauthorized File Access Location", MessageBoxButton.OK, MessageBoxImage.Stop);
                 }
                 else
                 {
-                    MessageBox.Show(MainWindow, $"File '{filePath}' is not a compatible project type.");
+                    if (filePath.EndsWith(Consts.FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        if (!_Projects.Keys.Contains(filePath, StringComparer.InvariantCultureIgnoreCase))
+                        {
+                            try
+                            {
+
+                                TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
+                                TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
+
+                                Trace.WriteLine($"DAL Opened ({dal.FilePath}): {dal.GetDataVersion()}");
+
+                                if (mal != null)
+                                {
+                                    Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
+                                }
+
+                                if (!TtUtils.CheckAndFixErrors(dal))
+                                    return;
+
+                                if (dal.RequiresUpgrade)
+                                {
+                                    if (MessageBox.Show(MainWindow, @"This is file needs to be upgraded to work with this version of TwoTrails. Upgrading will first create a backup of this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",
+                                       MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
+                                    {
+                                        string oldFilePath = $"{dal.FilePath}.old";
+                                        if (File.Exists(oldFilePath) &&
+                                            MessageBox.Show($"There is already a filed named '{Path.GetFileName(oldFilePath)}'. Would you like to overwrite this file?",
+                                            "File.Old Already Exists", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
+                                        {
+                                            return;
+                                        }
+
+                                        if (Upgrade.DAL(dal, Settings))
+                                        {
+                                            AddProject(new TtProject(dal, mal, App.Settings, this));
+                                            MessageBox.Show("Upgrade Successful");
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("There has been an error and the Upgrade has failed. Please see log file for details");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    AddProject(new TtProject(dal, mal, App.Settings, this));
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Trace.WriteLine($"{ ex.Message }\n\t{ ex.StackTrace }", "MWM:OpenProject");
+                                MessageBox.Show(MainWindow, "There is an issue opening this Project. See log file for details.", "Open Project Error");
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show(MainWindow, "Project is already opened.");
+
+                            SwitchToTab(_Projects[filePath].ProjectTab);
+                        }
+                    }
+                    else if (filePath.EndsWith(Consts.FILE_EXTENSION_MEDIA, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        string ttFile = filePath.Replace(Consts.FILE_EXTENSION_MEDIA, Consts.FILE_EXTENSION);
+                        if (!_Projects.Keys.Contains(ttFile, StringComparer.InvariantCultureIgnoreCase))
+                            OpenProject(ttFile);
+                    }
+                    else if (filePath.EndsWith(Consts.FILE_EXTENSION_V2, StringComparison.InvariantCultureIgnoreCase) && CurrentProject == null)
+                    {
+                        TtV2SqliteDataAccessLayer dalv2 = new TtV2SqliteDataAccessLayer(filePath);
+
+                        if (dalv2.RequiresUpgrade)
+                        {
+                            MessageBox.Show(MainWindow, @"This TwoTrails V2 file is too old to upgrade. 
+Please Upgrade it to the most recent TT2 version before upgrading it here.", "Too old to upgrade",
+                                MessageBoxButton.OK, MessageBoxImage.Stop);
+                        }
+                        else
+                        {
+                            if (MessageBox.Show(MainWindow, @"This is a TwoTrails V2 file that needs to be upgraded into the new TTX format. 
+Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",
+                                MessageBoxButton.YesNo, MessageBoxImage.Stop) == MessageBoxResult.Yes)
+                            {
+                                TtProjectInfo oinfo = dalv2.GetProjectInfo();
+                                TtProjectInfo info = new TtProjectInfo(
+                                    oinfo.Name,
+                                    oinfo.Description,
+                                    oinfo.Region,
+                                    oinfo.Forest,
+                                    oinfo.District,
+                                    AppInfo.Version.ToString(),
+                                    oinfo.CreationVersion,
+                                    TwoTrailsSchema.SchemaVersion,
+                                    oinfo.CreationDeviceID,
+                                    oinfo.CreationDate);
+
+                                string upgradedFile = Path.Combine(Path.GetDirectoryName(filePath), $"{Path.GetFileNameWithoutExtension(filePath)}{Consts.FILE_EXTENSION}");
+
+                                if (File.Exists(upgradedFile))
+                                {
+                                    if (MessageBox.Show(MainWindow, $"File '{Path.GetFileName(upgradedFile)}' already exists. Would you like to overwrite it?",
+                                        "Overwrite File", MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
+                                    {
+                                        return;
+                                    }
+                                }
+
+                                TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(upgradedFile, info);
+                                TtSqliteMediaAccessLayer mal = GetMalIfExists(upgradedFile);
+
+                                Upgrade.DAL(dal, App.Settings, dalv2);
+
+                                AddProject(new TtProject(dal, mal, App.Settings, this));
+                            }
+                        }
+                    }
+                    else if (TtUtils.IsImportableFileType(filePath))
+                    {
+                        if (CurrentProject != null)
+                        {
+                            ImportDialog.ShowDialog(CurrentProject, MainWindow, filePath);
+                        }
+                        else
+                        {
+                            if (MessageBox.Show($"Would you like to create a project from this {TtUtils.GetFileTypeName(filePath)} file?", "Create Project from importable file.",
+                                MessageBoxButton.YesNo, MessageBoxImage.Hand, MessageBoxResult.No) == MessageBoxResult.Yes)
+                            {
+                                CreateAndOpenProjectFromImportable(null, filePath);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show(MainWindow, $"File '{filePath}' is not a compatible project type.");
+                    }
                 }
             }
             else
