@@ -35,9 +35,9 @@
     <PackageReference Include="GeoAPI.CoordinateSystems" Version="1.7.5" />
     <PackageReference Include="GeoAPI.Core" Version="1.7.5" />
     <PackageReference Include="Microsoft.Maps.MapControl.WPF" Version="1.0.0.3" />
-    <PackageReference Include="NetTopologySuite" Version="1.15.2" />
-    <PackageReference Include="NetTopologySuite.CoordinateSystems" Version="1.15.2" />
-    <PackageReference Include="NetTopologySuite.Core" Version="1.15.2" />
+    <PackageReference Include="NetTopologySuite" Version="1.15.3" />
+    <PackageReference Include="NetTopologySuite.CoordinateSystems" Version="1.15.3" />
+    <PackageReference Include="NetTopologySuite.Core" Version="1.15.3" />
     <PackageReference Include="NetTopologySuite.Features" Version="1.15.1" />
     <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="1.15.3" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.111" />
