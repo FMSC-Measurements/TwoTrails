@@ -24,7 +24,7 @@ namespace TwoTrails.Core.Points
         public Int32 Index
         {
             get { return _Index; }
-            set { SetField(ref _Index, value); }
+            set { SetField(ref _Index, value, OnLocationChanged); }
         }
 
         private Int32 _PID;

@@ -88,15 +88,17 @@ namespace TwoTrails.ViewModels
         public ICommand ResetPointCommand { get; }
         public ICommand ResetPointFieldCommand { get; }
         public ICommand DeleteCommand { get; }
-
-        public ICommand CreatePointCommand { get; }
-        public ICommand CreateQuondamsCommand { get; }
-        public ICommand ConvertPointsCommand { get; }
-        public ICommand MovePointsCommand { get; }
-        public ICommand RetraceCommand { get; }
-        public ICommand CreatePlotsCommand { get; }
-        public ICommand CreateCorridorCommand { get; }
-        public ICommand ModifyDataDictionaryCommand { get; }
+        
+        public RelayCommand CreatePointCommand { get; }
+        public RelayCommand CreateQuondamsCommand { get; }
+        public RelayCommand ConvertPointsCommand { get; }
+        public RelayCommand MovePointsCommand { get; }
+        public RelayCommand RetraceCommand { get; }
+        public RelayCommand ReindexCommand { get; }
+        public RelayCommand CreatePlotsCommand { get; }
+        public RelayCommand CreateSubsampleCommand { get; }
+        public RelayCommand CreateCorridorCommand { get; }
+        public RelayCommand ModifyDataDictionaryCommand { get; }
         
         public ICommand SelectAlternateCommand { get; }
         public ICommand SelectGpsCommand { get; }
@@ -304,6 +306,8 @@ namespace TwoTrails.ViewModels
 
                     if (!isPoly)
                         az = TtUtils.AzimuthOfPoint(lastCoords.X, lastCoords.Y, coords.X, coords.Y);
+
+                    lastCoords = coords;
                 }
 
                 AI_DistMt = dist;
@@ -946,6 +950,10 @@ namespace TwoTrails.ViewModels
 
             RetraceCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPoint>>(
                 x => Retrace(), x => Manager.Points.Count > 0,
+                Manager.Points, x => x.Count);
+
+            ReindexCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPoint>>(
+                x => Reindex(), x => Manager.Points.Count > 0,
                 Manager.Points, x => x.Count);
 
             CreatePlotsCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
@@ -2001,12 +2009,62 @@ namespace TwoTrails.ViewModels
 
         private void ResetPoint()
         {
+            Func<TtPoint, bool> hasConflict = (currPoint) =>
+            {
+                TtPoint origPoint = Manager.BaseManager.GetOriginalPoint(currPoint.CN);
+                return currPoint.Index != origPoint.Index || currPoint.PolygonCN != origPoint.PolygonCN;
+            };
+
             if (HasSelection)
             {
                 if (MultipleSelections)
-                    Manager.ResetPoints(SelectedPoints.Cast<TtPoint>());
+                {
+                    TtPoint[] points = SelectedPoints.Cast<TtPoint>().Where(p => Manager.BaseManager.HasOriginalPoint(p.CN)).ToArray();
+
+                    if (points.Any(hasConflict))
+                    {
+                        MessageBoxResult result = MessageBox.Show("One or more of the points has a different Index or is in a different Polygon and resetting those points may cause issues "+
+                            "to the order of the points within polygons. Would you like to exclude the index and polygon from the resetting process to " +
+                            "mitigate ordering problems?",
+                            "Point Index and Polygon Conflicts", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            Manager.ResetPoints(points, true);
+                        }
+                        else if (result == MessageBoxResult.No)
+                        {
+                            Manager.ResetPoints(points, false);
+                        }
+                    }
+                    else
+                    {
+                        Manager.ResetPoints(points);
+                    }
+                }
                 else
-                    Manager.ResetPoint(SelectedPoint);
+                {
+                    if (hasConflict(SelectedPoint))
+                    {
+                        MessageBoxResult result = MessageBox.Show("The selected point has a different Index or is in a different Polygon and resetting this point may cause issues " +
+                            "to the order of the points within polygons. Would you like to exclude the index and polygon from the resetting process to " +
+                            "mitigate ordering problems?",
+                            "Point Index and Polygon Conflict", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            Manager.ResetPoint(SelectedPoint, true);
+                        }
+                        else if (result == MessageBoxResult.No)
+                        {
+                            Manager.ResetPoint(SelectedPoint, false);
+                        }
+                    }
+                    else
+                    {
+                        Manager.ResetPoint(SelectedPoint);
+                    }
+                }
             }
         }
 
@@ -2030,7 +2088,6 @@ namespace TwoTrails.ViewModels
                         switch (binding.Path.Path)
                         {
                             case nameof(TtPoint.PID):
-                            case nameof(TtPoint.Polygon):
                             case nameof(TtPoint.Group):
                             case nameof(TtPoint.Metadata):
                             case nameof(TtPoint.Comment):
@@ -2058,6 +2115,7 @@ namespace TwoTrails.ViewModels
                                 isManAcc = true;
                                 break;
                             case nameof(TtPoint.Index):
+                            case nameof(TtPoint.Polygon):
                             case nameof(TtPoint.OpType):
                             case nameof(TtPoint.TimeCreated):
                             case nameof(TtPoint.AdjX):
@@ -2142,10 +2200,36 @@ namespace TwoTrails.ViewModels
 
         private void DeletePoint()
         {
-            if (MultipleSelections)
-                Manager.DeletePoints(SelectedPoints.Cast<TtPoint>());
+            if (Project.Settings.DeviceSettings.DeletePointWarning)
+            {
+                if (MultipleSelections)
+                    Manager.DeletePoints(SelectedPoints.Cast<TtPoint>());
+                else
+                {
+                    TtPoint point = SelectedPoints.Cast<TtPoint>().First();
+                    if (point.OpType == OpType.Quondam)
+                    {
+
+                    }
+                    else if (point.OpType != OpType.SideShot)
+                    {
+                        TtPoint next = Manager.GetNextPoint(point);
+                        if (next != null && next.IsTravType())
+                        {
+
+                        }
+                    }
+
+                    Manager.DeletePoint(point);
+                }
+            }
             else
-                Manager.DeletePoint(SelectedPoints.Cast<TtPoint>().First());
+            {
+                if (MultipleSelections)
+                    Manager.DeletePoints(SelectedPoints.Cast<TtPoint>());
+                else
+                    Manager.DeletePoint(SelectedPoints.Cast<TtPoint>().First());
+            }
         }
         
 
@@ -2270,6 +2354,21 @@ namespace TwoTrails.ViewModels
             });
         }
 
+        private void Reindex()
+        {
+            Project.MainModel.MainWindow.IsEnabled = false;
+            ReindexDialog.Show(Manager, Project.MainModel.MainWindow, (result) =>
+            {
+                Project.MainModel.MainWindow.IsEnabled = true;
+            });
+        }
+
+        private void SwapPoints()
+        {
+            Manager.EditPointsMultiValues(SelectedPoints.Cast<TtPoint>().Take(2), PointProperties.INDEX,
+                new int[] { (SelectedPoints[1] as TtPoint).Index, (SelectedPoints[0] as TtPoint).Index });
+        }
+        
         private void CreatePlots()
         {
             //Project.MainModel.MainWindow.IsEnabled = false;

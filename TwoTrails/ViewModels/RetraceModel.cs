@@ -18,7 +18,7 @@ namespace TwoTrails.ViewModels
 
         public ObservableCollection<Retrace> Retraces { get { return Get<ObservableCollection<Retrace>>(); } set { Set(value); } }
 
-        ICommand CommitCommand { get; }
+        public ICommand CommitCommand { get; }
 
         public List<TtPolygon> Polygons { get; }
         public TtPolygon TargetPolygon { get { return Get<TtPolygon>(); } set { Set(value, () => PolygonChanged(value)); } }
@@ -26,8 +26,12 @@ namespace TwoTrails.ViewModels
         public List<TtPoint> AfterPoints { get { return Get<List<TtPoint>>(); } set { Set(value); } }
 
         public QuondamBoundaryMode BoundaryMode { get { return Get<QuondamBoundaryMode>(); } set { Set(value); } }
-        public bool InsertBegining { get { return Get<bool>(); } set { Set(value); } }
+        public bool InsertBeginning { get { return Get<bool>(); } set { Set(value); } }
         public bool InsertAfter { get { return Get<bool>(); } set { Set(value); } }
+
+        public bool MovePoints { get { return Get<bool>(); } set { Set(value, () => OnPropertyChanged(nameof(TargetPolygonToolTip))); } }
+        public string TargetPolygonToolTip => MovePoints ? "The polygon in which to move the points to." : "The polygon in which to place the Quondams.";
+
 
         public RetraceModel(TtHistoryManager manager)
         {
@@ -41,6 +45,7 @@ namespace TwoTrails.ViewModels
 
             CommitCommand = new RelayCommand(x => RetracePoints());
         }
+
 
         private void PolygonChanged(TtPolygon polygon)
         {
@@ -78,6 +83,20 @@ namespace TwoTrails.ViewModels
                 }
                 else
                 {
+                    bool overrideAccs = false;
+                    if (MovePoints && Retraces.Any(r => r.Points.Any(p => p.Polygon.Accuracy != TargetPolygon.Accuracy)))
+                    {
+                        var mbr = MessageBox.Show($"The Target Polygon '{TargetPolygon.Name}' has an accuracy that is different than some" +
+                            "of the polygons that the points are in. Would you like to apply a manual accuracy to the points to keep their " +
+                            "original polygon accuracy? This will not override points that already have a manual accuracy set.",
+                            "Polygon Accuracy Mismatch", MessageBoxButton.YesNoCancel, MessageBoxImage.Hand, MessageBoxResult.No);
+
+                        if (mbr == MessageBoxResult.Yes)
+                            overrideAccs = true;
+                        else if (mbr == MessageBoxResult.Cancel)
+                            return false;
+                    }
+
                     List<TtPoint> retracePoints = new List<TtPoint>();
 
                     foreach (Retrace r in Retraces)
@@ -127,9 +146,36 @@ namespace TwoTrails.ViewModels
                             }
                         }
                     }
+                    
+                    if (MovePoints)
+                    {
+                        bool mcStarted = false;
+                        if (overrideAccs)
+                        {
+                            TtPoint[] gpsPoints = retracePoints.Where(p => p is GpsPoint gps && gps.ManualAccuracy == null).ToArray();
 
-                    _Manager.CreateQuondamLinks(retracePoints, TargetPolygon, 
-                        InsertBegining ? 0 : InsertAfter ? InsertIndex : int.MaxValue, BoundaryMode);
+                            if (gpsPoints.Length > 0)
+                            {
+                                _Manager.StartMultiCommand();
+                                mcStarted = true;
+
+                                _Manager.EditPointsMultiValues(gpsPoints, PointProperties.MAN_ACC_GPS, gpsPoints.Select(p => (double?)p.Polygon.Accuracy));
+                            }
+                        }
+
+                        _Manager.MovePointsToPolygon(retracePoints, TargetPolygon,
+                            InsertBeginning ? 0 : InsertAfter ? InsertIndex : int.MaxValue);
+
+                        if (mcStarted)
+                        {
+                            _Manager.CommitMultiCommand();
+                        }
+                    }
+                    else
+                    {
+                        _Manager.CreateQuondamLinks(retracePoints, TargetPolygon,
+                            InsertBeginning ? 0 : InsertAfter ? InsertIndex : int.MaxValue, BoundaryMode);
+                    }
 
                     return true;
                 } 

@@ -115,11 +115,6 @@ namespace TwoTrails.ViewModels
             ProjectInfo.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
             {
                 ProjectChanged = !_ProjectInfo.Equals(ProjectInfo);
-
-                if (e.PropertyName == nameof(ProjectInfo.Name))
-                {
-
-                }
             };
 
             RequiresSave = false;
@@ -204,9 +199,8 @@ namespace TwoTrails.ViewModels
         public void ReplaceDAL(ITtDataLayer dal)
         {
             DAL = dal;
-            Manager.ReplaceDAL(DAL);
-            OnPropertyChanged(nameof(DAL));
-            OnPropertyChanged(nameof(FilePath));
+            _BaseManager.ReplaceDAL(DAL);
+            OnPropertyChanged(nameof(DAL), nameof(FilePath));
         }
 
         public void ReplaceMAL(ITtMediaLayer mal)

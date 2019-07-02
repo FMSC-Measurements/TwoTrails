@@ -22,12 +22,13 @@ namespace TwoTrails.Dialogs
     /// </summary>
     public partial class ViewSatInfoDialog : Window
     {
-        public List<TtNmeaBurst> Bursts { get; set; }
-
+        public List<TtNmeaBurst> Bursts { get; }
+        public List<TtPoint> Points { get; }
 
         public ViewSatInfoDialog(ITtManager manager, IEnumerable<TtPoint> points)
         {
-            Bursts = manager.GetNmeaBursts(points.Select(p => p.CN));
+            Points = points.ToList();
+            Bursts = manager.GetNmeaBursts(Points.Select(p => p.CN));
             DataContext = this;
             InitializeComponent();
         }
@@ -50,41 +51,41 @@ namespace TwoTrails.Dialogs
         {
             if (dgNmea.SelectedItem is TtNmeaBurst burst)
             {
-                DrawSatInfo(burst);
+                //DrawSatInfo(burst);
             }
         }
 
-        private void DrawSatInfo(TtNmeaBurst burst)
-        {
-            cvsSatInfo.Children.Clear();
+        //private void DrawSatInfo(TtNmeaBurst burst)
+        //{
+        //    cvsSatInfo.Children.Clear();
 
-            double width = cvsSatInfo.Width, height = cvsSatInfo.Height;
-
-
-            if (burst.SatellitesInView != null)
-            {
-
-                foreach (Satellite sat in burst.SatellitesInView)
-                {
-                    if (sat.Azimuth != null && sat.Elevation != null)
-                    {
-                        Image image = new Image();
-
-                        cvsSatInfo.Children.Add(image);
-
-                        Canvas.SetTop(image, 0);
-                        Canvas.SetLeft(image, 0);
-                    }
+        //    double width = cvsSatInfo.Width, height = cvsSatInfo.Height;
 
 
-                    if (sat.SRN != null)
-                    {
+        //    if (burst.SatellitesInView != null)
+        //    {
 
-                    }
-                }
-            }
+        //        foreach (Satellite sat in burst.SatellitesInView)
+        //        {
+        //            if (sat.Azimuth != null && sat.Elevation != null)
+        //            {
+        //                Image image = new Image();
+
+        //                cvsSatInfo.Children.Add(image);
+
+        //                Canvas.SetTop(image, 0);
+        //                Canvas.SetLeft(image, 0);
+        //            }
 
 
-        }
+        //            if (sat.SRN != null)
+        //            {
+
+        //            }
+        //        }
+        //    }
+
+
+        //}
     }
 }

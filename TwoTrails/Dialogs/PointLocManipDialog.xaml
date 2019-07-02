@@ -82,7 +82,7 @@
                     </Grid.RowDefinitions>
 
                     <RadioButton Content="End" Grid.Column="0" Grid.Row="0" Name="rbInsEnd" IsChecked="True"/>
-                    <RadioButton Content="Begining" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" Name="rbInsBeg"/>
+                    <RadioButton Content="Beginning" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" Name="rbInsBeg"/>
                     <RadioButton Content="After Point" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Name="rbInsAft"/>
 
                     <ComboBox Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2"

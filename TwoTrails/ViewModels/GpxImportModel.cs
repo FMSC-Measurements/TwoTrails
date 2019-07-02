@@ -1,12 +1,14 @@
-﻿using FMSC.Core.Windows.ComponentModel.Commands;
+﻿using CSUtil.ComponentModel;
+using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.Windows.Input;
+using TwoTrails.Core.Interfaces;
 using TwoTrails.DAL;
 using static TwoTrails.DAL.TtGpxDataAccessLayer;
 
 namespace TwoTrails.ViewModels
 {
-    public class GpxImportModel
+    public class GpxImportModel : NotifyPropertyChangedEx, IFileImportModel
     {
         private Action<TtGpxDataAccessLayer> OnSetup { get; }
 

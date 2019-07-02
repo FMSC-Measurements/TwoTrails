@@ -334,7 +334,8 @@
                                 </Grid.Resources>
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentPolygon.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentPolygon.Name, UpdateSourceTrigger=PropertyChanged}"
+                                         PreviewTextInput="TextHasRestrictedCharacters"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy (Meters)*" />
                                 <Grid Grid.Column="0" Grid.Row="3">
@@ -420,7 +421,7 @@
                                     </Grid>
                                 </GroupBox>
 
-                                <GroupBox Header="Poly Line Perimeter" Grid.Column="2" Grid.Row="8" Grid.RowSpan="4" VerticalAlignment="Stretch">
+                                <GroupBox Header="Poly Line Length" Grid.Column="2" Grid.Row="8" Grid.RowSpan="4" VerticalAlignment="Stretch">
                                     <Grid Margin="5,0,5,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="40"/>
@@ -518,8 +519,8 @@
                                     </Grid>
                                 </GroupBox>
 
-                                <TextBlock Grid.Row="14" Text="*Such as GPS error or taping error"/>
-                                <TextBlock Grid.Row="15" Text="**Area-Error/Area to be less than 10%"/>
+                                <TextBlock Grid.Row="14" Grid.ColumnSpan="3" Text="*Such as GPS error or taping error"/>
+                                <TextBlock Grid.Row="15" Grid.ColumnSpan="3" Text="**Area-Error/Area to be less than 10%"/>
                             </Grid>
                         </ScrollViewer>
                         
@@ -641,7 +642,8 @@
                                 </Grid.Resources>
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentMetadata.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentMetadata.Name, UpdateSourceTrigger=PropertyChanged}"
+                                         PreviewTextInput="TextHasRestrictedCharacters"/>
 
                                 <TextBlock Grid.Column="2" Grid.Row="0" Text="UTM Zone" />
                                 <Grid Grid.Column="2" Grid.Row="1">
@@ -831,7 +833,8 @@
                                 </Grid.Resources>
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentGroup.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding GroupFieldIsEditable}"/>
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentGroup.Name, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding GroupFieldIsEditable}"
+                                         PreviewTextInput="TextHasRestrictedCharacters"/>
 
                                 <TextBlock Grid.Column="2" Grid.Row="0" Text="Group Type" />
                                 <ComboBox Grid.Column="2" Grid.Row="1"

@@ -20,6 +20,7 @@ namespace TwoTrails.Core
 
         bool PointExists(String pointCN);
         TtPoint GetPoint(String pointCN);
+        TtPoint GetNextPoint(TtPoint point);
         List<TtPoint> GetPoints(String polyCN = null);
         void AddPoint(TtPoint point);
         void AddPoints(IEnumerable<TtPoint> points);

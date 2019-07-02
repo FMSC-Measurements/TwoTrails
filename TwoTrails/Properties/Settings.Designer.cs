@@ -270,5 +270,17 @@ namespace TwoTrails.Properties {
                 this["LogDeckVoid"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DeletePointWarning {
+            get {
+                return ((bool)(this["DeletePointWarning"]));
+            }
+            set {
+                this["DeletePointWarning"] = value;
+            }
+        }
     }
 }

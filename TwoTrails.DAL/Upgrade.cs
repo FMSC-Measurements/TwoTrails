@@ -13,7 +13,7 @@ namespace TwoTrails.DAL
     public static class Upgrade
     {
         //Old TTX Files
-        public static bool DAL(TtSqliteDataAccessLayer dal)
+        public static bool DAL(TtSqliteDataAccessLayer dal, ITtSettings settings)
         {
             String file = dal.FilePath;
             String oldfile = $"{file}.old";
@@ -47,6 +47,8 @@ namespace TwoTrails.DAL
                             }, null, conn, trans);
 
                         trans.Commit();
+
+                        dal.InsertActivity(new TtUserAction("Upgrader", settings.DeviceName, DateTime.Now, DataActionType.ProjectUpgraded, $"{oldVersion} -> {TwoTrailsSchema.SchemaVersion}"));
 
                         Trace.WriteLine($"Upgrade ({oldVersion} -> {TwoTrailsSchema.SchemaVersion}): {file}");
                     }

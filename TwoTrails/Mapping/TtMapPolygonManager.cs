@@ -345,7 +345,7 @@ namespace TwoTrails.Mapping
         private void BuildExtents()
         {
             Extent.Builder builder = new Extent.Builder();
-            foreach (TtMapPoint p in Points)
+            foreach (TtMapPoint p in Points.Where(p => p.IsBndPoint))
                 builder.Include(p.AdjLocation.Latitude, p.AdjLocation.Longitude);
             Extents = builder.HasPositions ? builder.Build() : null;
         }
@@ -410,6 +410,7 @@ namespace TwoTrails.Mapping
                     {
                         adjBndLocs.Add(p.AdjLocation);
                         unadjBndLocs.Add(p.UnAdjLocation);
+
                         builder.Include(p.AdjLocation.Latitude, p.AdjLocation.Longitude);
                     }
 

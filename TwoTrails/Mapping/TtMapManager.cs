@@ -4,7 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
@@ -19,14 +22,14 @@ namespace TwoTrails.Mapping
         private ReadOnlyObservableCollection<TtPolygon> _Polygons;
         private Map _Map;
 
-        private TtPoint _LastPoint;
-        private List<TtPoint> _SelectedPoints { get; } =  new List<TtPoint>();
+        //private TtPoint _LastPoint;
+        //private List<TtPoint> _SelectedPoints { get; } =  new List<TtPoint>();
 
         public ObservableCollection<TtMapPolygonManager> PolygonManagers { get; } = new ObservableCollection<TtMapPolygonManager>();
         
         private IObservableTtManager _Manager;
 
-
+        private bool CtrlKeyPressed, SettingVisibilities;
 
 
         public TtMapManager(Map map, IObservableTtManager manager)
@@ -48,7 +51,18 @@ namespace TwoTrails.Mapping
             {
                 point.PolygonChanged += Point_PolygonChanged;
             }
+
+            EventManager.RegisterClassHandler(typeof(Control), Control.KeyDownEvent, new KeyEventHandler((s, e) => {
+                if (e.Key == Key.LeftCtrl)
+                    CtrlKeyPressed = true;
+            }), true);
+
+            EventManager.RegisterClassHandler(typeof(Control), Control.KeyUpEvent, new KeyEventHandler((s, e) => {
+                if (e.Key == Key.LeftCtrl)
+                    CtrlKeyPressed = false;
+            }), true);
         }
+
 
         private void CreateMapPolygon(TtPolygon polygon)
         {
@@ -66,75 +80,95 @@ namespace TwoTrails.Mapping
             _PolygonManagers.Add(polygon.CN, mpm);
             PolygonManagers.Add(mpm);
 
-            mpm.PointSelected += PointSelected;
+            //mpm.PointSelected += PointSelected;
+            mpm.PropertyChanged += TtMapPolygonManager_PropertyChanged;
         }
 
-        private void PointSelected(TtMapPoint mapPoint, Boolean adjusted)
+        private void TtMapPolygonManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            TtPoint point = mapPoint.Point;
-
-            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+            if (!SettingVisibilities && CtrlKeyPressed && e.PropertyName == nameof(TtMapPolygonManager.Visible) &&
+                sender is TtMapPolygonManager mapPolyManager)
             {
-                _SelectedPoints.Clear();
-                IList<TtPoint> points = _PointsByPolys[point.PolygonCN];
+                SettingVisibilities = true;
 
-                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                foreach (TtMapPolygonManager m in PolygonManagers.Where(ttmpm => ttmpm != mapPolyManager))
                 {
-                    if (_LastPoint.Index < point.Index)
-                    {
-                        for (int i = point.Index; i < points.Count; i++)
-                        {
-                            _SelectedPoints.Add(points[i]);
-                        }
-
-                        for (int i = 0; i <= _LastPoint.Index; i++)
-                        {
-                            _SelectedPoints.Add(points[i]);
-                        }
-                    }
-                    else
-                    {
-                        for (int i = _LastPoint.Index; i <= point.Index; i++)
-                        {
-                            _SelectedPoints.Add(points[i]);
-                        }
-                    }
+                    m.Visible = false;
                 }
-                else
-                {
-                    if (_LastPoint.Index < point.Index)
-                    {
-                        for (int i = _LastPoint.Index; i <= point.Index; i++)
-                        {
-                            _SelectedPoints.Add(points[i]);
-                        }
-                    }
-                    else
-                    {
-                        for (int i = point.Index; i < points.Count; i++)
-                        {
-                            _SelectedPoints.Add(points[i]);
-                        }
 
-                        for (int i = 0; i <= _LastPoint.Index; i++)
-                        {
-                            _SelectedPoints.Add(points[i]);
-                        }
-                    }
-                }
+                mapPolyManager.Visible = true;
+
+                SettingVisibilities = false;
             }
-            else if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-            {
-                _SelectedPoints.Add(point);
-            }
-            else
-            {
-                _SelectedPoints.Clear();
-                _SelectedPoints.Add(point);
-            }
-            
-            _LastPoint = point;
         }
+
+
+        //private void PointSelected(TtMapPoint mapPoint, Boolean adjusted)
+        //{
+        //    TtPoint point = mapPoint.Point;
+
+        //    if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+        //    {
+        //        _SelectedPoints.Clear();
+        //        IList<TtPoint> points = _PointsByPolys[point.PolygonCN];
+
+        //        if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+        //        {
+        //            if (_LastPoint.Index < point.Index)
+        //            {
+        //                for (int i = point.Index; i < points.Count; i++)
+        //                {
+        //                    _SelectedPoints.Add(points[i]);
+        //                }
+
+        //                for (int i = 0; i <= _LastPoint.Index; i++)
+        //                {
+        //                    _SelectedPoints.Add(points[i]);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                for (int i = _LastPoint.Index; i <= point.Index; i++)
+        //                {
+        //                    _SelectedPoints.Add(points[i]);
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (_LastPoint.Index < point.Index)
+        //            {
+        //                for (int i = _LastPoint.Index; i <= point.Index; i++)
+        //                {
+        //                    _SelectedPoints.Add(points[i]);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                for (int i = point.Index; i < points.Count; i++)
+        //                {
+        //                    _SelectedPoints.Add(points[i]);
+        //                }
+
+        //                for (int i = 0; i <= _LastPoint.Index; i++)
+        //                {
+        //                    _SelectedPoints.Add(points[i]);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+        //    {
+        //        _SelectedPoints.Add(point);
+        //    }
+        //    else
+        //    {
+        //        _SelectedPoints.Clear();
+        //        _SelectedPoints.Add(point);
+        //    }
+            
+        //    _LastPoint = point;
+        //}
 
         private void RemoveMapPolygon(TtPolygon polygon)
         {

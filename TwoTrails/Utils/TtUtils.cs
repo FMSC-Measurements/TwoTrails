@@ -3,12 +3,15 @@ using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.DAL;
 
 namespace TwoTrails.Utils
 {
@@ -22,29 +25,31 @@ namespace TwoTrails.Utils
             {
                 string res = new WebClient().DownloadString(Consts.URL_TWOTRAILS_UPDATE);
 
-
                 if (res != null)
                 {
-                    string[] tokens = res.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] tokens = res.Split('\n').Select(l => l.Trim('\r', ' ')).ToArray();
 
                     if (tokens.Length > 0)
                     {
                         status.CheckStatus = new Version(tokens[0].Trim()) > Assembly.GetExecutingAssembly().GetName().Version;
 
-                        if (tokens.Length > 1)
+                        if (status.CheckStatus == true && tokens.Length > 1)
                         {
                             UpdateType updateType = UpdateType.None;
-                            string updateStr = tokens[1];
 
-                            for (int i = 0; i < 5 && i < updateStr.Length; i++)
-                            {
-                                if (updateStr[i] != '0')
-                                    updateType |= (UpdateType)(1 << i);
-                            }
+                            //for (int r = 1; r < tokens.Length; r += 3)
+                            //{
+                                string updateStr = tokens[1];
+                                for (int i = 0; i < 5 && i < updateStr.Length; i++)
+                                {
+                                    if (updateStr[i] != '0')
+                                        updateType |= (UpdateType)(1 << (i + 1));
+                                }
+                            //}
 
                             status.UpdateType = updateType;
 
-                            status.UpdateMessage = (tokens.Length > 2) ? String.Join(Environment.NewLine, tokens.Skip(2)) : String.Empty;
+                            status.UpdateMessage = (tokens.Length > 2) ? tokens[2] : String.Empty;
 
                         }
                     }
@@ -104,11 +109,11 @@ namespace TwoTrails.Utils
             }
         }
 
-        public static Point GetLatLon(TtPoint point, bool adjusted = true)
+        public static FMSC.Core.Point GetLatLon(TtPoint point, bool adjusted = true)
         {
             if (point is GpsPoint gps && gps.HasLatLon)
             {
-                return new Point((double)gps.Longitude, (double)gps.Latitude);
+                return new FMSC.Core.Point((double)gps.Longitude, (double)gps.Latitude);
             }
             else
             {
@@ -122,14 +127,14 @@ namespace TwoTrails.Utils
         }
 
 
-        public static Point GetFarthestCorner(double pX, double pY, double top, double bottom, double left, double right)
+        public static FMSC.Core.Point GetFarthestCorner(double pX, double pY, double top, double bottom, double left, double right)
         {
-            Point fp;
+            FMSC.Core.Point fp;
 
             double dist, temp;
 
             dist = MathEx.Distance(pX, pY, left, top);
-            fp = new Point(left, top);
+            fp = new FMSC.Core.Point(left, top);
 
             temp = MathEx.Distance(pX, pY, right, top);
 
@@ -236,6 +241,57 @@ namespace TwoTrails.Utils
             }
 
             return String.Empty;
+        }
+
+
+        public static bool CheckAndFixErrors(TtSqliteDataAccessLayer dal)
+        {
+            DalError errors = dal.GetErrors();
+
+            if (errors > 0)
+            {
+                List<string> errList = new List<string>();
+
+                if (errors.HasFlag(DalError.PointIndexes))
+                    errList.Add("Skipped Point Indexes");
+                if (errors.HasFlag(DalError.NullAdjLocs))
+                    errList.Add("Invalid Point Locations");
+                if (errors.HasFlag(DalError.MissingPolygon))
+                    errList.Add("Missing Polygons");
+                if (errors.HasFlag(DalError.MissingMetadata))
+                    errList.Add("Missing Metadata");
+                if (errors.HasFlag(DalError.MissingGroup))
+                    errList.Add("Missing Groups");
+
+                bool hardErrors = errors.HasFlag(DalError.MissingGroup) || errors.HasFlag(DalError.MissingMetadata) || errors.HasFlag(DalError.MissingPolygon);
+
+                MessageBoxResult mbr =  MessageBox.Show(
+                    $"It appears part of the TwoTrails file is corrupt. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(", ", errList)}. " +
+                    (hardErrors ? $"Would you like to try and fix the file by moving and editing the data (Yes) or removing invalid data (No)?" :
+                    "Would you like to fix the data?"),
+                    "Data is corrupted",
+                    hardErrors ? MessageBoxButton.YesNoCancel : MessageBoxButton.OKCancel, MessageBoxImage.Error, MessageBoxResult.Cancel);
+
+                if (mbr == MessageBoxResult.Cancel)
+                    return false;
+                else
+                {
+                    try
+                    {
+                        File.Copy(dal.FilePath, $"{dal.FilePath}.corrupt", true);
+
+                        dal.FixErrors(mbr == MessageBoxResult.No);
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.WriteLine(e.Message);
+                        MessageBox.Show("Error fixing file.");
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
         }
     }
 

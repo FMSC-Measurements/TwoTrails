@@ -7,7 +7,9 @@
         xmlns:ttcmh="clr-namespace:TwoTrails.Core.ComponentModel.History;assembly=TwoTrails.DAL"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Retrace" Height="350" Width="600" MinHeight="350" MaxHeight="600" MinWidth="600" MaxWidth="600">
+        Title="Retrace"
+        Height="350" MinHeight="350" MaxHeight="600"
+        Width="675" MinWidth="675" MaxWidth="675">
     
     <Window.Resources>
         <fmsccm:EnumDescriptionConverter x:Key="edc"/>
@@ -29,14 +31,16 @@
     <DockPanel>
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="115" MaxWidth="145"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto" MinWidth="150"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
-            
+
             <GroupBox Grid.Column="0" Header="Target Polygon">
-                <ComboBox Width="100" ItemsSource="{Binding Polygons, Mode=OneWay}" SelectedItem="{Binding TargetPolygon, Mode=OneWayToSource}"
-                          ToolTip="The polygon in which to place the Quondams"/>
+                <ComboBox MaxWidth="125" ItemsSource="{Binding Polygons, Mode=OneWay}" SelectedItem="{Binding TargetPolygon, Mode=OneWayToSource}"
+                          ToolTip="{Binding TargetPolygonToolTip}"/>
             </GroupBox>
 
             <GroupBox Header="Insert Location" Grid.Column="1">
@@ -48,20 +52,35 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <RadioButton Content="End" Grid.Column="0" Name="rbInsEnd" IsChecked="True"/>
-                    <RadioButton Content="Begining" Grid.Column="1" HorizontalAlignment="Center" Name="rbInsBeg" IsChecked="{Binding InsertBegining}"/>
-                    <RadioButton Content="After Point" Grid.Column="2" Name="rbInsAft" IsChecked="{Binding InsertAfter}"/>
+                    <RadioButton Content="End" Grid.Column="0" Name="rbInsEnd" IsChecked="True" Padding="4 0 5 0" ToolTip="Inserts points at the end of the polygon."/>
+                    <RadioButton Content="Beginning" Grid.Column="1" HorizontalAlignment="Center" Name="rbInsBeg" IsChecked="{Binding InsertBeginning}"
+                                 ToolTip="Inserts points at the beginning of the polygon." Padding="4 0 5 0"/>
+                    <RadioButton Content="After Point" Grid.Column="2" Name="rbInsAft" IsChecked="{Binding InsertAfter}"
+                                 ToolTip="Inserts points after the selected point."/>
 
                     <ComboBox Grid.Column="3"
                               Width="85"
                               VerticalAlignment="Top"
                               IsEnabled="{Binding ElementName=rbInsAft, Path=IsChecked}"
                               ItemsSource="{Binding AfterPoints, Mode=OneWay}"
-                              SelectedIndex="{Binding InsertIndex, Mode=OneWayToSource}"/>
+                              SelectedIndex="{Binding InsertIndex, Mode=OneWayToSource}"
+                              ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
                 </Grid>
             </GroupBox>
 
-            <GroupBox Grid.Column="2" Header="Boundary">
+            <GroupBox Grid.Column="3" Header="Mode">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <RadioButton x:Name="rbRetrace" Grid.Column="0" Content="Retrace" IsChecked="True" ToolTip="Points will be Quondamed" Padding="4 0 5 0"/>
+                    <RadioButton Grid.Column="1" Content="Move" IsChecked="{Binding MovePoints, Mode=OneWayToSource}" ToolTip="Points will be Moved"/>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Grid.Column="4" Header="Boundary">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -69,18 +88,15 @@
                         <ColumnDefinition Width="*"/>-->
                     </Grid.ColumnDefinitions>
 
-                    <ComboBox SelectedIndex="0" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcmh:QuondamBoundaryMode}}">
+                    <ComboBox SelectedIndex="1" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcmh:QuondamBoundaryMode}}"
+                              IsEnabled="{Binding ElementName=rbRetrace, Path=IsChecked}"
+                              ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}, Converter={StaticResource edc}}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <ListBoxItem Content="{Binding}" ToolTip="{Binding Converter={StaticResource edc}}" />
+                                <ListBoxItem Content="{Binding}" ToolTip="{Binding Converter={StaticResource edc}}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    
-                    <!--<RadioButton Grid.Column="0" Content="OBO" IsChecked="{Binding OnBoundary, Mode=OneWayToSource}" ToolTip="Quondam will only be created for On Boundary Points"/>
-                    <RadioButton Grid.Column="1" Content="Inherit" IsChecked="True" ToolTip="Quondam inherits the parents OnBoundary"/>
-                    <RadioButton Grid.Column="2" Content="On" IsChecked="{Binding OnBoundary, Mode=OneWayToSource}" ToolTip="Quondam will be On the Boundary"/>
-                    <RadioButton Grid.Column="3" Content="Off" IsChecked="{Binding OnBoundary, Mode=OneWayToSource}" ToolTip="Quondam will be Off the Boundary"/>-->
                 </Grid>
             </GroupBox>
         </Grid>
@@ -100,35 +116,38 @@
             </Border>
         </Grid>
 
-        <ListBox DockPanel.Dock="Top" ItemsSource="{Binding Retraces}" Margin="0"
+        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Retraces}" Margin="0"
                  HorizontalContentAlignment="Stretch" BorderThickness="0">
-            <ListBox.ItemTemplate>
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid Margin="5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="105"/>
+                            <ColumnDefinition Width="125"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="125"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        
-                        <ComboBox Grid.Column="0" ItemsSource="{Binding Polygons}" SelectedItem="{Binding SelectedPolygon, Mode=OneWayToSource}"/>
-                        <ComboBox Grid.Column="1" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointFrom, Mode=OneWayToSource}"/>
-                        <RadioButton Grid.Column="2" GroupName="{Binding GCN}" Content="Fwd" IsChecked="{Binding DirInc, Mode=TwoWay}" ToolTip="The Quondams will be added in order from how their parent's were collected."/>
-                        <RadioButton Name="rbSingle" Grid.Column="3" GroupName="{Binding GCN}" Content="Single" IsChecked="{Binding SinglePoint, Mode=OneWayToSource}" ToolTip="Only a single Quondam will be created."/>
-                        <RadioButton Grid.Column="4" GroupName="{Binding GCN}" Content="Rev" Padding="0, 0, 5, 0" ToolTip="The Quondams will be added in the reverse order from how their parent's were collected."/>
-                        <ComboBox Grid.Column="5" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointTo, Mode=OneWayToSource}" IsEnabled="{Binding ElementName=rbSingle, Path=IsChecked, Converter={StaticResource IBC}}"/>
+
+                        <ComboBox Grid.Column="0" ItemsSource="{Binding Polygons}" SelectedItem="{Binding SelectedPolygon, Mode=OneWayToSource}"
+                                  ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointFrom, Mode=OneWayToSource}" Margin="5 0 5 0"
+                                  ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
+                        <RadioButton Grid.Column="2" GroupName="{Binding GCN}" Content="Fwd" IsChecked="{Binding DirInc, Mode=TwoWay}" ToolTip="The Quondams will be added in order from how their parent's were collected." Padding="4 0 5 0"/>
+                        <RadioButton Name="rbSingle" Grid.Column="3" GroupName="{Binding GCN}" Content="Single" IsChecked="{Binding SinglePoint, Mode=OneWayToSource}" ToolTip="Only a single Quondam will be created." Padding="4 0 5 0"/>
+                        <RadioButton Grid.Column="4" GroupName="{Binding GCN}" Content="Rev" ToolTip="The Quondams will be added in the reverse order from how their parent's were collected." Padding="4 0 5 0"/>
+                        <ComboBox Grid.Column="5" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointTo, Mode=OneWayToSource}" IsEnabled="{Binding ElementName=rbSingle, Path=IsChecked, Converter={StaticResource IBC}}"
+                                  ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
                         
                         <Button Grid.Column="7" Width="30" Content="+" Margin="2" Click="Add_Click" ToolTip="Add New Retrace"/>
                         <Button Grid.Column="8" Width="30" Content="-" Margin="2" Click="Delete_Click" ToolTip="Delete Retrace"/>
                     </Grid>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </DockPanel>
 </Window>

@@ -1,4 +1,5 @@
 ﻿using CSUtil.ComponentModel;
+using FMSC.Core.Utilities;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
@@ -12,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
+using TwoTrails.Core.Interfaces;
 using TwoTrails.Core.Points;
 using TwoTrails.DAL;
 using TwoTrails.Utils;
@@ -21,13 +23,24 @@ namespace TwoTrails.ViewModels
     public class ImportModel : NotifyPropertyChangedEx
     {
         public ICommand BrowseFileCommand { get; }
-        public ICommand ImportCommand { get; }
+
+        private ICommand _ImportCommand;
+        public ICommand ImportCommand => (MainContent is IFileParseControl fpc) ? fpc.Model.SetupImportCommand : _ImportCommand;
+
+        public String ImportBtnText => (MainContent is IFileParseControl) ? "Continue" : "Import";
+
         public ICommand CancelCommand { get; }
 
         private Window _Window;
-        private ITtManager _Manager;
+        private ITtManager _Manager => _Project.Manager;
+        private TtProject _Project;
 
-        public Control MainContent { get { return Get<Control>(); } set { Set(value, () => OnPropertyChanged(nameof(HasMainContent), nameof(CloseText))); } }
+        public Control MainContent
+        {
+            get => Get<Control>();
+            set => Set(value, () => OnPropertyChanged(nameof(HasMainContent), nameof(CloseText), nameof(ImportCommand), nameof(ImportBtnText)));
+        }
+
         public Visibility HasMainContent { get { return MainContent != null ? Visibility.Visible : Visibility.Collapsed; } }
 
         public string CloseText { get { return MainContent == null ? "Close" : "Cancel"; } }
@@ -60,17 +73,17 @@ namespace TwoTrails.ViewModels
         private bool _AutoCloseOnImport;
 
 
-        public ImportModel(Window window, ITtManager manager, string fileName = null, bool autoCloseOnImport = false)
+        public ImportModel(Window window, TtProject project, string fileName = null, bool autoCloseOnImport = false)
         {
             _Window = window;
-            _Manager = manager;
+            _Project = project;
             MainContent = null;
             CurrentFile = null;
 
             BrowseFileCommand = new BindedRelayCommand<ImportModel>(x => BrowseFile(), x => !IsImporting,
                 this, m => m.IsImporting);
 
-            ImportCommand = new BindedRelayCommand<ImportModel>(x => ImportData(), x => CanImport, this, m => m.CanImport);
+            _ImportCommand = new BindedRelayCommand<ImportModel>(x => ImportData(), x => CanImport, this, m => m.CanImport);
 
             CancelCommand = new RelayCommand(x => Cancel());
 
@@ -113,152 +126,204 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
         public void SetupImport(string fileName)
         {
-            switch (Path.GetExtension(fileName).ToLower())
+            if (FileUtils.IsFileLocked(fileName))
             {
-                case Consts.FILE_EXTENSION:
-                    IsSettingUp = true;
-
-                    TtSqliteDataAccessLayer idal = new TtSqliteDataAccessLayer(fileName);
-                    
-                    if (idal.HasErrors())
-                        idal.Fix();
-
-                    ImportControl = new ImportControl(idal, true, true, true);
-                    break;
-                case Consts.FILE_EXTENSION_V2:
-                    IsSettingUp = true;
-                    ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), true, true, true);
-                    break;
-                case Consts.CSV_EXT:
-                case Consts.TEXT_EXT:
-                    IsSettingUp = true;
-                    MainContent = new CsvParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
-                    {
-                        try
+                MessageBox.Show($"File '{Path.GetFileName(fileName)}' is currently locked. Make sure it is not in use by any other programs.");
+            }
+            else
+            {
+                switch (Path.GetExtension(fileName).ToLower())
+                {
+                    case Consts.FILE_EXTENSION:
+                        IsSettingUp = true;
+                        
+                        TtSqliteDataAccessLayer idal = new TtSqliteDataAccessLayer(fileName);
+                        
+                        if (!TtUtils.CheckAndFixErrors(idal))
                         {
-                            MainContent = new TtProgressControl();
+                            IsSettingUp = false;
+                            return;
+                        }
 
-                            Task.Run(() =>
+                        if (idal.GetDataVersion() < TwoTrailsSchema.SchemaVersion)
+                        {
+                            if (MessageBox.Show("The importing file needs to be upgraded before import. Do you want to upgrade it now?",
+                                "File Requires Upgrade", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                             {
-                                dal.Parse();
-                                MainContent.Dispatcher.Invoke(() =>
+                                if (!Upgrade.DAL(idal, _Project.Settings))
                                 {
-                                    ImportControl = new ImportControl(dal, false, dal.GetGroups().Any(), false);
-                                });
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine(ex.Message, "ImportModel:SetupImport:CSV");
-                            MessageBox.Show("A parsing error has occured. Please check your fields correctly. See log file for details.",
-                                "Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    });
-                    break;
-                case Consts.GPX_EXT:
-                    IsSettingUp = true;
-                    MainContent = new GpxParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
-                    {
-                        try
-                        {
-                            MainContent = new TtProgressControl();
-
-                            Task.Run(() =>
+                                    MessageBox.Show("File Failed to Upgrade. See Log File for details.");
+                                    IsSettingUp = false;
+                                    return;
+                                }
+                            }
+                            else
                             {
-                                dal.Parse();
-                                MainContent.Dispatcher.Invoke(() =>
-                                {
-                                    ImportControl = new ImportControl(dal, false, false, false);
-                                });
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine(ex.Message, "ImportModel:SetupImport:GPX");
-                            MessageBox.Show("A parsing error has occured. Please check your fields correctly. See log file for details.",
-                                "Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    });
-                    break;
-                case Consts.KML_EXT:
-                case Consts.KMZ_EXT:
-                    {
-                        try
-                        {
-                            ImportControl = new ImportControl(
-                                new TtKmlDataAccessLayer(
-                                    new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true, startPolyNumber: _Manager.PolygonCount)
-                            ), false, false, false);
-
-                            IsSettingUp = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message, "Earth File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                IsSettingUp = false;
+                                return;
+                            }
                         }
 
+                        ImportControl = new ImportControl(idal, true, true, true);
                         break;
-                    }
-                case Consts.SHAPE_EXT:
-                case Consts.SHAPE_PRJ_EXT:
-                case Consts.SHAPE_SHX_EXT:
-                case Consts.SHAPE_DBF_EXT:
-                    switch (TtShapeFileDataAccessLayer.ValidateShapePackage(fileName, _Manager.DefaultMetadata.Zone))
-                    {
-                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.Valid:
+                    case Consts.FILE_EXTENSION_V2:
+                        IsSettingUp = true;
+                        ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), true, true, true);
+                        break;
+                    case Consts.CSV_EXT:
+                    case Consts.TEXT_EXT:
+                        IsSettingUp = true;
+                        try
+                        {
+                            MainContent = new CsvParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
+                            {
+                                try
+                                {
+                                    MainContent = new TtProgressControl();
+
+                                    Task.Run(() =>
+                                    {
+                                        dal.Parse();
+                                        MainContent.Dispatcher.Invoke(() =>
+                                        {
+                                            ImportControl = new ImportControl(dal, false, dal.GetGroups().Any(), false);
+                                        });
+                                    });
+                                }
+                                catch (Exception ex)
+                                {
+                                    Trace.WriteLine(ex.Message, "ImportModel:SetupImport:CSV");
+                                    MessageBox.Show("A parsing error has occured. Please check your fields correctly. See log file for details.",
+                                        "Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                }
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Error try to parse CSV file.");
+                            Trace.WriteLine("ImportModel:SetupImport:CSV", ex.Message);
+                        }
+                        break;
+                    case Consts.GPX_EXT:
+                        IsSettingUp = true;
+                        try
+                        {
+                            MainContent = new GpxParseControl(fileName, _Manager.DefaultMetadata.Zone, (dal) =>
+                            {
+                                try
+                                {
+                                    MainContent = new TtProgressControl();
+
+                                    Task.Run(() =>
+                                    {
+                                        dal.Parse();
+                                        MainContent.Dispatcher.Invoke(() =>
+                                        {
+                                            ImportControl = new ImportControl(dal, false, false, false);
+                                        });
+                                    });
+                                }
+                                catch (Exception ex)
+                                {
+                                    Trace.WriteLine(ex.Message, "ImportModel:SetupImport:GPX");
+                                    MessageBox.Show("A parsing error has occured. Please check your fields correctly. See log file for details.",
+                                        "Parse Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                }
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Error try to parse GPX file.");
+                            Trace.WriteLine("ImportModel:SetupImport:GPX", ex.Message);
+                        }
+                        break;
+                    case Consts.KML_EXT:
+                    case Consts.KMZ_EXT:
+                        {
+                            try
                             {
                                 ImportControl = new ImportControl(
-                                    new TtShapeFileDataAccessLayer(
-                                        new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
-                                    ), false, false, false
-                                );
+                                    new TtKmlDataAccessLayer(
+                                        new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true, startPolyNumber: _Manager.PolygonCount)
+                                ), false, false, false);
+
                                 IsSettingUp = true;
-                                break;
                             }
-                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.MissingFiles:
-                            MessageBox.Show("Missing one many of the 'shp', 'prj', 'dbf', or 'shx' files.");
+                            catch (Exception ex)
+                            {
+                                Trace.WriteLine(ex.Message, "ImportModel:SetupImport:KMZ");
+                                MessageBox.Show(ex.Message, "Google Earth File Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
                             break;
-                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.NotNAD83:
-                            MessageBox.Show("Shape File is not in the NAD83 format.");
-                            break;
-                        case TtShapeFileDataAccessLayer.ShapeFileValidityResult.MismatchZone:
-                            MessageBox.Show($"Shape File is not in zone {_Manager.DefaultMetadata.Zone}.");
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                default:
-                    MessageBox.Show("File type not supported.");
-                    break;
+                        }
+                    case Consts.SHAPE_EXT:
+                    case Consts.SHAPE_PRJ_EXT:
+                    case Consts.SHAPE_SHX_EXT:
+                    case Consts.SHAPE_DBF_EXT:
+                        switch (TtShapeFileDataAccessLayer.ValidateShapePackage(fileName, _Manager.DefaultMetadata.Zone))
+                        {
+                            case TtShapeFileDataAccessLayer.ShapeFileValidityResult.Valid:
+                                {
+                                    ImportControl = new ImportControl(
+                                        new TtShapeFileDataAccessLayer(
+                                            new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
+                                        ), false, false, false
+                                    );
+                                    IsSettingUp = true;
+                                    break;
+                                }
+                            case TtShapeFileDataAccessLayer.ShapeFileValidityResult.MissingFiles:
+                                MessageBox.Show("Missing one many of the 'shp', 'prj', 'dbf', or 'shx' files.");
+                                break;
+                            case TtShapeFileDataAccessLayer.ShapeFileValidityResult.NotNAD83:
+                                MessageBox.Show("Shape File is not in the NAD83 format.");
+                                break;
+                            case TtShapeFileDataAccessLayer.ShapeFileValidityResult.MismatchZone:
+                                MessageBox.Show($"Shape File is not in zone {_Manager.DefaultMetadata.Zone}.");
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        MessageBox.Show("File type not supported.");
+                        break;
+                }
             }
         }
 
         public void SetupShapeFiles(IEnumerable<string> shapefiles)
         {
-            List<TtShapeFileDataAccessLayer.ShapeFileValidityResult> invalids =
-                shapefiles.Select(sf => TtShapeFileDataAccessLayer.ValidateShapePackage(sf, _Manager.DefaultMetadata.Zone))
-                .Where(r => r != TtShapeFileDataAccessLayer.ShapeFileValidityResult.Valid).ToList();
-
-            if (invalids.Count > 0)
+            if (shapefiles.All(f => !FileUtils.IsFileLocked(f)))
             {
-                if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.MissingFiles))
-                    MessageBox.Show("Missing one many of the 'shp', 'prj', 'dbf', or 'shx' files.");
-                else if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.NotNAD83))
-                    MessageBox.Show("Shape File is not in the NAD83 format.");
-                else if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.MismatchZone))
-                    MessageBox.Show($"Shape File is not in zone {_Manager.DefaultMetadata.Zone}.");
+                List<TtShapeFileDataAccessLayer.ShapeFileValidityResult> invalids =
+                        shapefiles.Select(sf => TtShapeFileDataAccessLayer.ValidateShapePackage(sf, _Manager.DefaultMetadata.Zone))
+                        .Where(r => r != TtShapeFileDataAccessLayer.ShapeFileValidityResult.Valid).ToList();
+
+                if (invalids.Count > 0)
+                {
+                    if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.MissingFiles))
+                        MessageBox.Show("Missing one many of the 'shp', 'prj', 'dbf', or 'shx' files.");
+                    else if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.NotNAD83))
+                        MessageBox.Show("Shape File is not in the NAD83 format.");
+                    else if (invalids.Contains(TtShapeFileDataAccessLayer.ShapeFileValidityResult.MismatchZone))
+                        MessageBox.Show($"Shape File is not in zone {_Manager.DefaultMetadata.Zone}.");
+                    else
+                        MessageBox.Show("Issue with shapefile(s).");
+                }
                 else
-                    MessageBox.Show("Issue with shapefile(s).");
+                {
+                    ImportControl = new ImportControl(
+                                new TtShapeFileDataAccessLayer(
+                                    new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
+                                )
+                            );
+                    IsSettingUp = true;
+                } 
             }
             else
             {
-                ImportControl = new ImportControl(
-                            new TtShapeFileDataAccessLayer(
-                                new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
-                            )
-                        );
-                IsSettingUp = true;
+                MessageBox.Show("One or more of the shapefiles is locked. Make sure they are not in use by any other programs.");
             }
         }
 

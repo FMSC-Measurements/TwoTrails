@@ -136,7 +136,15 @@ namespace TwoTrails
                 StreamWriter logWriter = null;
                 if (SingleInstance<App>.CheckIfFirstInstance(ID))
                     logWriter = new StreamWriter(LOG_FILE_PATH, true);
-                
+
+                Action<string> writeMessage = (message) =>
+                {
+                    if (logWriter != null)
+                        logWriter.WriteLine(message);
+                    else
+                        SingleInstance<App>.SendMessageToFirstInstance(ID, new string[] { "LOG", message });
+                };
+
                 try
                 {
                     switch (Path.GetExtension(file))
@@ -144,13 +152,8 @@ namespace TwoTrails
                         case Consts.FILE_EXTENSION:
                             {
                                 Export.All(file, new TtSettings(new DeviceSettings(), new MetadataSettings(), new TtPolygonGraphicSettings()));
-
-                                string message = $"[{DateTime.Now}] Exported Project: {file}";
-
-                                if (logWriter != null)
-                                    logWriter.WriteLine(message);
-                                else
-                                    SingleInstance<App>.SendMessageToFirstInstance(ID, new string[] { "LOG", message });
+                                
+                                writeMessage($"[{DateTime.Now}] Exported Project: {file}");
 
                                 MessageBox.Show("Project Exported");
                                 break;
@@ -159,14 +162,9 @@ namespace TwoTrails
                             {
                                 TtSqliteMediaAccessLayer mal = new TtSqliteMediaAccessLayer(file);
                                 Export.MediaFiles(mal, Path.Combine(Path.GetDirectoryName(mal.FilePath), Path.GetFileNameWithoutExtension(mal.FilePath)).Trim());
+                                
+                                writeMessage($"[{DateTime.Now}] Exported Media: {file}");
 
-                                string message = $"[{DateTime.Now}] Exported Media: {file}";
-
-                                if (logWriter != null)
-                                    logWriter.WriteLine(message);
-                                else
-                                    SingleInstance<App>.SendMessageToFirstInstance(ID, new string[] { "LOG", message });
-                                    
                                 MessageBox.Show("Media Exported");
                                 break;
                             }
@@ -177,13 +175,8 @@ namespace TwoTrails
                 }
                 catch (Exception ex)
                 {
-                    string message = $"[{DateTime.Now}] [Export Error]: {ex.Message}";
-
-                    if (logWriter != null)
-                        logWriter.WriteLine(message);
-                    else
-                        SingleInstance<App>.SendMessageToFirstInstance(ID, new string[] { "LOG", message });
-                        
+                    writeMessage($"[{DateTime.Now}] [Export Error]: {ex.Message}");
+                    
                     MessageBox.Show("An error has occured. Please view the log file for details");
                 }
 

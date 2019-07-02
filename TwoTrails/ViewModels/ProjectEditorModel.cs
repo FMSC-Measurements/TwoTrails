@@ -1,4 +1,5 @@
-﻿using CSUtil.ComponentModel;
+﻿using CSUtil;
+using CSUtil.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
@@ -166,8 +167,12 @@ namespace TwoTrails.ViewModels
                     if (_CurrentPolygon != null)
                     {
                         _BackupPoly = new TtPolygon(_CurrentPolygon);
+                        PolygonAccuracy = _CurrentPolygon.Accuracy;
+
                         _CurrentPolygon.PropertyChanged += Polygon_PropertyChanged;
                         _CurrentPolygon.PolygonChanged += GeneratePolygonSummary;
+
+                        ValidatePolygon(value);
 
                         GeneratePolygonSummary(_CurrentPolygon);
                     }
@@ -233,12 +238,14 @@ namespace TwoTrails.ViewModels
 
             TotalPolygonArea = area;
             TotalPolygonPerimeter = perim;
+
+            ValidatePolygon(polygon);
         }
 
         private void PolygonChanged(TtPolygon poly)
         {
             CurrentPolygon = poly;
-            PolygonAccuracy = poly != null ? poly.Accuracy : 6d;
+            PolygonAccuracy = poly != null ? poly.Accuracy : Consts.DEFAULT_POINT_ACCURACY;
         }
 
         private bool PolygonAccuracyChanged(string accStr)
@@ -332,9 +339,50 @@ namespace TwoTrails.ViewModels
                 {
                     using (StreamWriter sw = new StreamWriter(sfd.FileName))
                     {
+                        sw.Write(HaidLogic.GenerateSummaryHeader(ProjectInfo, _Project.FilePath));
                         sw.WriteLine(PolygonSummary.SummaryText);
                     }
                 }
+            }
+        }
+
+        private void ValidatePolygon(TtPolygon polygon)
+        {
+            if (polygon != null)
+            {
+                int zone = 0;
+                foreach (TtPoint point in Manager.GetPoints(polygon.CN))
+                {
+                    if (point is QuondamPoint qp)
+                    {
+                        if (zone == 0)
+                        {
+                            zone = qp.ParentPoint.Metadata.Zone;
+                        }
+                        else if (zone != qp.ParentPoint.Metadata.Zone)
+                        {
+                            MessageBox.Show($"Polygon '{polygon.Name}' has Quondam Points associated with more than one Metadata " +
+                                "Zone or a Zone that is not the same with other points in the polygon. " +
+                                "This may cause issues with area calculations. Please make sure all the points use the same zone.",
+                                "Polygon Zone Conflict", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (zone == 0)
+                        {
+                            zone = point.Metadata.Zone;
+                        }
+                        else if (zone != point.Metadata.Zone)
+                        {
+                            MessageBox.Show($"Polygon '{polygon.Name}' has Points associated with more than one Metadata Zone." +
+                                "This may cause issues with area calculations. Please make sure all the points use the same zone.",
+                                "Polygon Zone Conflict", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            break;
+                        }
+                    }
+                } 
             }
         }
         #endregion
@@ -360,6 +408,7 @@ namespace TwoTrails.ViewModels
                     if (_CurrentMetadata != null)
                     {
                         _BackupMeta = new TtMetadata(_CurrentMetadata);
+                        MetadataZone = _CurrentMetadata.Zone;
                         _CurrentMetadata.PropertyChanged += Metadata_PropertyChanged;
                     }
                 });

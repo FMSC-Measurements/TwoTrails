@@ -22,8 +22,8 @@ namespace TwoTrails.Core
         public ReadOnlyObservableCollection<TtGroup> Groups { get { return BaseManager.Groups; } }
         public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get { return BaseManager.MediaInfo; } }
 
-        private Stack<ITtCommand> _UndoStack = new Stack<ITtCommand>();
-        private Stack<ITtCommand> _RedoStack = new Stack<ITtCommand>();
+        private readonly Stack<ITtCommand> _UndoStack = new Stack<ITtCommand>();
+        private readonly Stack<ITtCommand> _RedoStack = new Stack<ITtCommand>();
         
 
         public bool CanUndo { get { return _UndoStack.Count > 0; } }
@@ -215,7 +215,17 @@ namespace TwoTrails.Core
         {
             return BaseManager.GetPoints(polyCN);
         }
+        
+        public TtPoint GetNextPoint(TtPoint point)
+        {
+            return BaseManager.GetNextPoint(point);
+        }
 
+        public bool PolygonExists(string polyCN)
+        {
+            return BaseManager.PolygonExists(polyCN);
+        }
+        
         public TtPolygon GetPolygon(string polyCN)
         {
             return BaseManager.GetPolygon(polyCN);
@@ -315,7 +325,7 @@ namespace TwoTrails.Core
 
         public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, bool reverse)
         {
-            MovePointsToPolygon(reverse? points.Reverse() : points, targetPolygon, insertIndex);
+            AddCommand(new MovePointsCommand(reverse ? points.Reverse() : points, BaseManager, targetPolygon, insertIndex));
         }
 
 
@@ -353,14 +363,14 @@ namespace TwoTrails.Core
         }
 
 
-        public void ResetPoint(TtPoint point)
+        public void ResetPoint(TtPoint point, bool keepIndexAndPoly = false)
         {
-            AddCommand(new ResetTtPointCommand(point, BaseManager));
+            AddCommand(new ResetTtPointCommand(point, BaseManager, keepIndexAndPoly));
         }
 
-        public void ResetPoints(IEnumerable<TtPoint> points)
+        public void ResetPoints(IEnumerable<TtPoint> points, bool keepIndexAndPoly = false)
         {
-            AddCommand(new ResetTtPointsCommand(points, BaseManager));
+            AddCommand(new ResetTtPointsCommand(points, BaseManager, keepIndexAndPoly));
         }
 
         #endregion
@@ -434,17 +444,17 @@ namespace TwoTrails.Core
 
         public List<TtImage> GetImages(string pointCN)
         {
-            throw new NotImplementedException();
+            return BaseManager.GetImages(pointCN);
         }
 
         public void InsertMedia(TtMedia media)
         {
-            throw new NotImplementedException();
+            InsertMedia(media);
         }
 
         public void DeleteMedia(TtMedia media)
         {
-            throw new NotImplementedException();
+            DeleteMedia(media);
         }
 
 
@@ -454,7 +464,7 @@ namespace TwoTrails.Core
         }
 
 
-        void ITtManager.UpdateDataAction(DataActionType action, string notes = null)
+        void ITtManager.UpdateDataAction(DataActionType action, string notes)
         {
             BaseManager.UpdateDataAction(action, notes);
         }

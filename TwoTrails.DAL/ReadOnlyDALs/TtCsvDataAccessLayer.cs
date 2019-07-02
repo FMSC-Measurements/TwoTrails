@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using CsvHelper.Configuration;
 using FMSC.Core;
 using System;
 using System.Collections.Generic;
@@ -112,8 +113,8 @@ namespace TwoTrails.DAL
             int fOp = GetFieldColumn(mapping, PointTextFieldType.OPTYPE, useAdvParsing);
             int fGroupName = GetFieldColumn(mapping, PointTextFieldType.GROUP_NAME, hasGroupNames);
             int fGroupCN = GetFieldColumn(mapping, PointTextFieldType.GROUP_CN, hasGroupNames);
-            int fUnAjX = mapping[PointTextFieldType.UNADJX];
-            int fUnAjY = mapping[PointTextFieldType.UNADJY];
+            int fUnAjX = GetFieldColumn(mapping, PointTextFieldType.UNADJX, _Options.Mode != ParseMode.LatLon); //mapping[PointTextFieldType.UNADJX];
+            int fUnAjY = GetFieldColumn(mapping, PointTextFieldType.UNADJY, _Options.Mode != ParseMode.LatLon); //mapping[PointTextFieldType.UNADJY];
             int fUnAjZ = GetFieldColumn(mapping, PointTextFieldType.UNADJZ, hasUnAdjZ);
             int fLat = GetFieldColumn(mapping, PointTextFieldType.LATITUDE, hasLatLon);
             int fLon = GetFieldColumn(mapping, PointTextFieldType.LONGITUDE, hasLatLon);
@@ -136,264 +137,279 @@ namespace TwoTrails.DAL
 
             List<Tuple<string, QuondamPoint>> quondams = new List<Tuple<string, QuondamPoint>>();
 
-            CsvReader reader = new CsvReader(new StreamReader(_Options.PointsFile));
+            CsvReader reader = new CsvReader(new StreamReader(_Options.PointsFile),
+                new Configuration()
+                {
+                    AllowComments = true,
+                    ShouldSkipRecord = r =>
+                    {
+                        return r.All(c => String.IsNullOrEmpty(c));
+                    }
+                });
 
             reader.Read();
 
             TtPoint prevPoint = null;
-            
-            while (reader.Read())
+
+            try
             {
-                TtPoint point;
-
-                if (useAdvParsing)
+                while(reader.Read())
                 {
-                    OpType op = TtTypes.ParseOpType(reader.GetField<string>(fOp));
+                    TtPoint point;
 
-                    point = TtCoreUtils.GetPointByType(op);
-
-                    point.CN = reader.GetField<string>(fCN);
-
-                    if (point.IsGpsType())
+                    if (useAdvParsing)
                     {
-                        GpsPoint gps = point as GpsPoint;
+                        OpType op = TtTypes.ParseOpType(reader.GetField<string>(fOp));
 
-                        if (hasLatLon)
+                        point = TtCoreUtils.GetPointByType(op);
+
+                        point.CN = reader.GetField<string>(fCN);
+
+                        if (point.IsGpsType())
                         {
-                            gps.Latitude = reader.GetField<double?>(fLat);
-                            gps.Longitude = reader.GetField<double?>(fLon);
+                            GpsPoint gps = point as GpsPoint;
+
+                            if (hasLatLon)
+                            {
+                                gps.Latitude = reader.GetField<double?>(fLat);
+                                gps.Longitude = reader.GetField<double?>(fLon);
+                            }
+
+                            if (hasElevation)
+                                gps.Elevation = reader.GetField<double?>(fElev);
+
+                            if (hasRMSEr)
+                                gps.RMSEr = reader.GetField<double?>(fRmser);
+
+                        }
+                        else if (point.IsTravType())
+                        {
+                            TravPoint trav = point as TravPoint;
+
+                            if (hasFwdAz)
+                                trav.FwdAzimuth = reader.GetField<double?>(fFwdAz);
+
+                            if (hasBkAz)
+                                trav.BkAzimuth = reader.GetField<double?>(fBkAz);
+
+                            if (trav.FwdAzimuth == null && trav.BkAzimuth == null)
+                                throw new Exception("Invalid Traverse");
+
+                            double temp = reader.GetField<double>(fSlopeDist);
+                            Distance dType = Types.ParseDistance(reader.GetField<string>(fSlopeDType));
+                            trav.SlopeDistance = FMSC.Core.Convert.Distance(temp, Distance.Meters, dType);
+
+                            temp = reader.GetField<double>(fSlopeAng);
+                            Slope sType = Types.ParseSlope(reader.GetField<string>(fSlopeAngType));
+                            trav.SlopeDistance = FMSC.Core.Convert.Angle(temp, Slope.Percent, sType);
+                        }
+                        else if (point.OpType == OpType.Quondam)
+                        {
+                            QuondamPoint qp = point as QuondamPoint;
+                            quondams.Add(Tuple.Create(reader.GetField<string>(fPCN), qp));
                         }
 
-                        if (hasElevation)
-                            gps.Elevation = reader.GetField<double?>(fElev);
-
-                        if (hasRMSEr)
-                            gps.RMSEr = reader.GetField<double?>(fRmser);
-
-                    }
-                    else if (point.IsTravType())
-                    {
-                        TravPoint trav = point as TravPoint;
-
-                        if (hasFwdAz)
-                            trav.FwdAzimuth = reader.GetField<double?>(fFwdAz);
-
-                        if (hasBkAz)
-                            trav.BkAzimuth = reader.GetField<double?>(fBkAz);
-
-                        if (trav.FwdAzimuth == null && trav.BkAzimuth == null)
-                            throw new Exception("Invalid Traverse");
-
-                        double temp = reader.GetField<double>(fSlopeDist);
-                        Distance dType = Types.ParseDistance(reader.GetField<string>(fSlopeDType));
-                        trav.SlopeDistance = FMSC.Core.Convert.Distance(temp, Distance.Meters, dType);
-
-                        temp = reader.GetField<double>(fSlopeAng);
-                        Slope sType = Types.ParseSlope(reader.GetField<string>(fSlopeAngType));
-                        trav.SlopeDistance = FMSC.Core.Convert.Angle(temp, Slope.Percent, sType);
-                    }
-                    else if (point.OpType == OpType.Quondam)
-                    {
-                        QuondamPoint qp = point as QuondamPoint;
-                        quondams.Add(Tuple.Create(reader.GetField<string>(fPCN), qp));
-                    }
-
-                    if (hasManAcc && point is IManualAccuracy)
-                    {
-                        ((IManualAccuracy)point).ManualAccuracy = reader.GetField<double?>(fManAcc);
-                    }
-                }
-                else
-                {
-                    point = new GpsPoint();
-                }
-
-                if (_Options.Mode == ParseMode.LatLon)
-                {
-                    ((GpsPoint)point).SetUnAdjLocation(
-                        reader.GetField<double>(fLat),
-                        reader.GetField<double>(fLon),
-                        _Options.TargetZone,
-                        hasElevation ? reader.GetField<double?>(fElev) ?? 0 : 0);
-                }
-                else
-                {
-                    point.SetUnAdjLocation(
-                        reader.GetField<double>(fUnAjX),
-                        reader.GetField<double>(fUnAjY),
-                        hasUnAdjZ ? reader.GetField<double>(fUnAjZ) : 0);
-                }
-
-                //Time
-                if (hasTime)
-                    point.TimeCreated = TtCoreUtils.ParseTime(reader.GetField<string>(fTime));
-                else
-                    point.TimeCreated = DateTime.Now;
-
-
-                #region Polygons
-                if (hasPolyCN)
-                {
-                    string cn = reader.GetField<string>(fPolyCN);
-                    if (!_Polygons.ContainsKey(cn))
-                    {
-                        TtPolygon poly = new TtPolygon()
+                        if (hasManAcc && point is IManualAccuracy)
                         {
-                            CN = cn,
-                            Name = hasPolyNames ?
-                                reader.GetField<string>(fPolyName) : $"Poly {++polyInc}",
-                            PointStartIndex = _Polygons.Count * polyInc + 10,
-                            TimeCreated = _ProjectInfo.CreationDate.AddSeconds(secondsInc++)
-                        };
-
-                        _Polygons.Add(cn, poly);
+                            ((IManualAccuracy)point).ManualAccuracy = reader.GetField<double?>(fManAcc);
+                        }
                     }
-
-                    point.PolygonCN = cn;
-                }
-                else if (hasPolyNames)
-                {
-                    string name = reader.GetField<string>(fPolyName);
-
-                    if (polyNameToCN.ContainsKey(name))
-                        point.PolygonCN = polyNameToCN[name];
                     else
                     {
-                        TtPolygon poly = new TtPolygon()
-                        {
-                            Name = reader.GetField<string>(fPolyName),
-                            PointStartIndex = _Polygons.Count * 1000 + 1010,
-                            TimeCreated = _ProjectInfo.CreationDate.AddHours(secondsInc++)
-                        };
+                        point = new GpsPoint();
+                    }
 
-                        _Polygons.Add(poly.CN, poly);
+                    if (_Options.Mode == ParseMode.LatLon)
+                    {
+                        ((GpsPoint)point).SetUnAdjLocation(
+                            reader.GetField<double>(fLat),
+                            reader.GetField<double>(fLon),
+                            _Options.TargetZone,
+                            hasElevation ? reader.GetField<double?>(fElev) ?? 0 : 0);
+                    }
+                    else
+                    {
+                        point.SetUnAdjLocation(
+                            reader.GetField<double>(fUnAjX),
+                            reader.GetField<double>(fUnAjY),
+                            hasUnAdjZ ? reader.GetField<double>(fUnAjZ) : 0);
+                    }
+
+                    //Time
+                    if (hasTime)
+                        point.TimeCreated = TtCoreUtils.ParseTime(reader.GetField<string>(fTime));
+                    else
+                        point.TimeCreated = DateTime.Now;
+
+
+                    #region Polygons
+                    if (hasPolyCN)
+                    {
+                        string cn = reader.GetField<string>(fPolyCN);
+                        if (!_Polygons.ContainsKey(cn))
+                        {
+                            TtPolygon poly = new TtPolygon()
+                            {
+                                CN = cn,
+                                Name = hasPolyNames ?
+                                    reader.GetField<string>(fPolyName) : $"Poly {++polyInc}",
+                                PointStartIndex = _Polygons.Count * polyInc + 10,
+                                TimeCreated = _ProjectInfo.CreationDate.AddMilliseconds(milliSecondsInc++)
+                            };
+
+                            _Polygons.Add(cn, poly);
+                        }
+
+                        point.PolygonCN = cn;
+                    }
+                    else if (hasPolyNames)
+                    {
+                        string name = reader.GetField<string>(fPolyName);
+
+                        if (polyNameToCN.ContainsKey(name))
+                            point.PolygonCN = polyNameToCN[name];
+                        else
+                        {
+                            TtPolygon poly = new TtPolygon()
+                            {
+                                Name = reader.GetField<string>(fPolyName),
+                                PointStartIndex = _Polygons.Count * 1000 + 1010,
+                                TimeCreated = _ProjectInfo.CreationDate.AddMilliseconds(milliSecondsInc++)
+                            };
+
+                            _Polygons.Add(poly.CN, poly);
+                            point.PolygonCN = poly.CN;
+                        }
+                    }
+                    else
+                    {
+                        TtPolygon poly;
+                        if (_Polygons.Count < 1)
+                        {
+                            poly = new TtPolygon()
+                            {
+                                Name = "Poly 1"
+                            };
+
+                            _Polygons.Add(poly.CN, poly);
+                        }
+                        else
+                        {
+                            poly = _Polygons.Values.First();
+                        }
+
                         point.PolygonCN = poly.CN;
                     }
-                }
-                else
-                {
-                    TtPolygon poly;
-                    if (_Polygons.Count < 1)
+                    #endregion
+
+                    #region Groups
+                    if (hasGroupCN)
                     {
-                        poly = new TtPolygon()
-                        {
-                            Name = "Poly 1"
-                        };
-
-                        _Polygons.Add(poly.CN, poly);
-                    }
-                    else
-                    {
-                        poly = _Polygons.Values.First();
-                    }
-
-                    point.PolygonCN = poly.CN;
-                }
-                #endregion
-
-                #region Groups
-                if (hasGroupCN)
-                {
-                    string cn = reader.GetField<string>(fGroupCN);
-                    if (cn != Consts.EmptyGuid && !_Groups.ContainsKey(cn))
-                    {
-                        TtGroup group = new TtGroup()
-                        {
-                            CN = cn,
-                            Name = hasGroupNames ?
-                                reader.GetField<string>(fGroupName) :
-                                $"Group {_Groups.Count + 1}"
-                        };
-
-                        _Groups.Add(cn, group);
-                    }
-
-                    point.GroupCN = cn;
-                }
-                else if (hasGroupNames)
-                {
-                    string name = reader.GetField<string>(fGroupName);
-
-                    if (name != "Main Group")
-                    {
-                        if (groupNameToCN.ContainsKey(name))
-                            point.GroupCN = groupNameToCN[name];
-                        else
+                        string cn = reader.GetField<string>(fGroupCN);
+                        if (cn != Consts.EmptyGuid && !_Groups.ContainsKey(cn))
                         {
                             TtGroup group = new TtGroup()
                             {
-                                Name = name
+                                CN = cn,
+                                Name = hasGroupNames ?
+                                    reader.GetField<string>(fGroupName) :
+                                    $"Group {_Groups.Count + 1}"
                             };
 
-                            _Groups.Add(group.CN, group);
-
-                            point.GroupCN = group.CN;
+                            _Groups.Add(cn, group);
                         }
+
+                        point.GroupCN = cn;
+                    }
+                    else if (hasGroupNames)
+                    {
+                        string name = reader.GetField<string>(fGroupName);
+
+                        if (name != "Main Group")
+                        {
+                            if (groupNameToCN.ContainsKey(name))
+                                point.GroupCN = groupNameToCN[name];
+                            else
+                            {
+                                TtGroup group = new TtGroup()
+                                {
+                                    Name = name
+                                };
+
+                                _Groups.Add(group.CN, group);
+
+                                point.GroupCN = group.CN;
+                            }
+                        }
+                        else
+                            point.GroupCN = Consts.EmptyGuid;
                     }
                     else
+                    {
                         point.GroupCN = Consts.EmptyGuid;
-                }
-                else
-                {
-                    point.GroupCN = Consts.EmptyGuid;
-                }
-                #endregion
+                    }
+                    #endregion
 
-                if (hasMetaCN)
-                {
-                    string cn = reader.GetField<string>(fMetaCN);
-                    if (_Metadata.ContainsKey(cn))
-                        point.MetadataCN = cn;
+                    if (hasMetaCN)
+                    {
+                        string cn = reader.GetField<string>(fMetaCN);
+                        if (_Metadata.ContainsKey(cn))
+                            point.MetadataCN = cn;
+                        else
+                            point.MetadataCN = Consts.EmptyGuid;
+                    }
                     else
+                    {
                         point.MetadataCN = Consts.EmptyGuid;
-                }
-                else
-                {
-                    point.MetadataCN = Consts.EmptyGuid;
-                }
+                    }
 
 
-                if (hasPIDs)
-                {
-                    point.PID = reader.GetField<int>(fPID);
-                }
-                else
-                {
-                    if (prevPoint != null)
+                    if (hasPIDs)
                     {
-                        TtPolygon poly = _Polygons[point.PolygonCN];
-
-                        point.PID = (prevPoint.PolygonCN == poly.CN) ?
-                            PointNamer.NamePoint(poly, prevPoint) :
-                            PointNamer.NamePoint(poly);
+                        point.PID = reader.GetField<int>(fPID);
                     }
                     else
-                        PointNamer.NamePoint(_Polygons[point.PolygonCN]);
-                }
-
-                if (hasIndex)
-                {
-                    point.Index = reader.GetField<int>(fIndex);
-                }
-                else
-                {
-                    if (prevPoint != null)
                     {
-                        point.Index = (prevPoint.PolygonCN == point.PolygonCN) ?
-                            prevPoint.Index + 1 : 0;
+                        if (prevPoint != null)
+                        {
+                            TtPolygon poly = _Polygons[point.PolygonCN];
+
+                            point.PID = (prevPoint.PolygonCN == poly.CN) ?
+                                PointNamer.NamePoint(poly, prevPoint) :
+                                PointNamer.NamePoint(poly);
+                        }
+                        else
+                            PointNamer.NamePoint(_Polygons[point.PolygonCN]);
+                    }
+
+                    if (hasIndex)
+                    {
+                        point.Index = reader.GetField<int>(fIndex);
                     }
                     else
-                        point.Index = 0;
+                    {
+                        if (prevPoint != null)
+                        {
+                            point.Index = (prevPoint.PolygonCN == point.PolygonCN) ?
+                                prevPoint.Index + 1 : 0;
+                        }
+                        else
+                            point.Index = 0;
+                    }
+
+                    point.OnBoundary = hasBnd ? reader.GetField<bool>(fBnd) : true;
+
+                    if (hasComment)
+                        point.Comment = reader.GetField<string>(fCmt).UnScrub();
+
+                    _Points.Add(point.CN, point);
+
+                    prevPoint = point;
                 }
-
-                point.OnBoundary = hasBnd ? reader.GetField<bool>(fBnd) : true;
-
-                if (hasComment)
-                    point.Comment = reader.GetField<string>(fCmt);
-
-                _Points.Add(point.CN, point);
-
-                prevPoint = point;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error parsing points", ex);
             }
 
             if (useAdvParsing)
@@ -809,4 +825,13 @@ namespace TwoTrails.DAL
         }
     }
 
+    internal static class CsvParseExts
+    {
+        internal static string UnScrub(this string text)
+        {
+            if (text != null)
+                return text.Replace("\\n", "\n").Replace("\\r", "\r").Replace("\"\"", "\"");
+            return String.Empty;
+        }
+    }
 }

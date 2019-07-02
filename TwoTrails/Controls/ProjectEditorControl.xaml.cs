@@ -17,7 +17,13 @@ namespace TwoTrails.Controls
             this.DataContext = projectEditor;
 
             InitializeComponent();
+            
+            lbMetadata.SelectedIndex = 0;
+            lbGroups.SelectedIndex = 0;
 
+            if (lbPolys.Items.Count > 0)
+                lbPolys.SelectedIndex = 0;
+                
             SwitchToTab(tab);
         }
 
@@ -34,6 +40,11 @@ namespace TwoTrails.Controls
         private void TextIsDouble(object sender, TextCompositionEventArgs e)
         {
             e.Handled = ControlUtils.TextIsDouble(sender, e);
+        }
+
+        private void TextHasRestrictedCharacters(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = ControlUtils.TextHasRestrictedCharacters(sender, e);
         }
     }
 

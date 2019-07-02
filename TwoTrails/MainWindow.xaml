@@ -112,9 +112,9 @@
                     <Separator/>
 
                     <MenuItem Header="Rename Points" Command="{Binding CurrentEditor.RenamePointsCommand}"
-                          Style="{StaticResource styleMiPointEdit}"/>
-                    <MenuItem Header="Reverse Points" Command="{Binding CurrentEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
-                          Style="{StaticResource styleMiPointEdit}"/>
+                          Style="{StaticResource styleMiHiddenNullCommand}"/>
+                    <MenuItem Header="{Binding CurrentEditor.ReverseTypeHeader}" Command="{Binding CurrentEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
+                          Style="{StaticResource styleMiHiddenNullCommand}"/>
 
                     <MenuItem Header="{Binding CurrentEditor.ConvertTypeHeader}" Command="{Binding CurrentEditor.ConvertPointsCommand}" Visibility="{Binding CurrentEditor, Converter={StaticResource NotNullVisibilityConverter}}" />
 
@@ -138,7 +138,7 @@
                     <MenuItem Header="View Point Details Table" Command="{Binding ViewPointDetailsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
 
                     <MenuItem Header="View Sattelite Info" Command="{Binding CurrentEditor.ViewSatInfoCommand}"
-                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" Visibility="Collapsed"/>
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" Visibility="Visible"/>
 
                     <MenuItem Header="Open in Google Earth" Command="{Binding OpenInEarthCommand}" IsEnabled="{Binding HasOpenedProject}" />
                 </MenuItem>
@@ -151,6 +151,7 @@
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+L"/>
 
                     <Separator/>
+
                     <MenuItem Header="Create New Point" Style="{StaticResource styleHasPolygons}">
 
                         <MenuItem Header="GPS" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.GPS}"/>
@@ -167,6 +168,8 @@
                         Style="{StaticResource ResourceKey=styleMiPointEdit}" InputGestureText="Ctrl+Alt+M"/>
                     <MenuItem Header="Retrace Points" Command="{Binding CurrentEditor.RetraceCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+Alt+R"/>
+                    <MenuItem Header="Reindex Points" Command="{Binding CurrentEditor.ReindexCommand}"
+                        Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
 
                     <Separator/>
 
@@ -218,9 +221,14 @@
             </StatusBar>
 
             <Grid Margin="0" Drop="FilesDrop" AllowDrop="True" DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="53*"/>
+                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="891*"/>
+                </Grid.ColumnDefinitions>
                 <TabControl x:Name="tabControl"
-                    Margin="0" Padding="0" AllowDrop="True" BorderThickness="0"
-                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+                    Margin="0,0,-0.4,0.4" Padding="0" AllowDrop="True" BorderThickness="0"
+                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Grid.ColumnSpan="3">
 
                     <TabControl.Resources>
                         <Style TargetType="{x:Type TabItem}">
@@ -310,8 +318,8 @@
                         </Style>
                     </TabControl.Resources>
                 </TabControl>
-
-                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Center" Opacity="0.5" Margin="0 -100 0 0" Visibility="{Binding HasOpenedProject, Converter={StaticResource InverseBoolToVis}}">
+                
+                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Center" Opacity="0.5" Margin="0,193,-0.4,292.4" Visibility="{Binding HasOpenedProject, Converter={StaticResource InverseBoolToVis}}" Grid.ColumnSpan="3">
                     <Image Source="{StaticResource ImgTwoTrailsIcon}" Width="200"/>
                     <TextBlock Text="TwoTrails" FontSize="50" HorizontalAlignment="Center" Margin="0 -30 0 0" VerticalAlignment="Center"/>
                 </StackPanel>

@@ -207,7 +207,11 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Viewbox Margin="-1">
-                                <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}"/>
+                                <CheckBox IsChecked="{Binding IsChecked}">
+                                    <CheckBox.Content>
+                                        <TextBlock Text="{Binding Path=Item.Name}"/>
+                                    </CheckBox.Content>
+                                </CheckBox>
                             </Viewbox>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -230,7 +234,11 @@
                 <ListBox Grid.Column="2" Grid.Row="1" ItemsSource="{Binding Groups}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
+                            <CheckBox IsChecked="{Binding IsChecked}">
+                                <CheckBox.Content>
+                                    <TextBlock Text="{Binding Path=Item.Name}"/>
+                                </CheckBox.Content>
+                            </CheckBox>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -241,7 +249,11 @@
                 <ListBox Grid.Column="3" Grid.Row="1" ItemsSource="{Binding Metadatas}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Path=Item.Name}" />
+                            <CheckBox IsChecked="{Binding IsChecked}">
+                                <CheckBox.Content>
+                                    <TextBlock Text="{Binding Path=Item.Name}"/>
+                                </CheckBox.Content>
+                            </CheckBox>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
@@ -380,6 +392,7 @@
                 <DataGrid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}"/>
+                        <MenuItem Header="View Sattelite Info" Command="{Binding ViewSatInfoCommand}"/>
 
                         <MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
 								  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
@@ -397,9 +410,8 @@
                         <Separator/>
 
                         <MenuItem Header="Rename" Command="{Binding RenamePointsCommand}" />
-                        <MenuItem Header="{Binding ConvertTypeHeader}" Command="{Binding ConvertPointsCommand}">
-
-                        </MenuItem>
+                        <MenuItem Header="{Binding ConvertTypeHeader}" Command="{Binding ConvertPointsCommand}" />
+                        <MenuItem Header="{Binding ReverseTypeHeader}" Command="{Binding ReverseSelectedCommand}" />
 
                         <Separator/>
 
@@ -667,8 +679,17 @@
                             <Button Grid.Row="14" Grid.Column="1" Margin="0, 2.5, 0, 2.5" VerticalContentAlignment="Center"
 								cp:CustomProperties.BackgroundEnabled="{Binding SameParentPoint, Converter={StaticResource IBC}}"
 								Height="25"
-								Content="{Binding ParentPoint.PID}"
 								Command="{Binding ChangeQuondamParentCommand}">
+                                <Button.Content>
+                                    <TextBlock FontSize="12">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} ({1})">
+                                                <Binding Path="ParentPoint.PID" />
+                                                <Binding Path="ParentPoint.Polygon" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </Button.Content>
                                 <Button.ToolTip>
                                     <TextBlock>
                                         <TextBlock.Text>

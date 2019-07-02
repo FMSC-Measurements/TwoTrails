@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.Utils;
@@ -51,30 +52,37 @@ namespace TwoTrails
 
             if (files != null && files.Length > 0)
             {
-                if (MainModel.CurrentProject == null)
+                Task.Run(() => //Done so not to lock up file explorer from drag/drop
                 {
-                    if (files.All(file => TtUtils.IsImportableFileType(file) && !file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase)))
+                    Dispatcher.Invoke(() =>
                     {
-                        MainModel.CreateAndOpenProjectFromImportable(null, files);
-                    }
-                    else
-                    {
-                        foreach (string file in files)
+                        if (MainModel.CurrentProject == null)
                         {
-                            if (file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase))
-                                MainModel.OpenProject(file);
-                            else if (TtUtils.IsImportableFileType(file))
-                                MainModel.CreateAndOpenProjectFromImportable(null, file);
+                            if (files.All(file => TtUtils.IsImportableFileType(file) && !file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase)))
+                            {
+                                MainModel.CreateAndOpenProjectFromImportable(null, files);
+                            }
+                            else
+                            {
+                                foreach (string file in files)
+                                {
+                                    if (file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase) ||
+                                        file.EndsWith(Consts.FILE_EXTENSION_MEDIA, System.StringComparison.InvariantCultureIgnoreCase))
+                                        MainModel.OpenProject(file);
+                                    else if (TtUtils.IsImportableFileType(file))
+                                        MainModel.CreateAndOpenProjectFromImportable(null, file);
+                                }
+                            }
                         }
-                    }
-                }
-                else
-                {
-                    foreach (string file in files)
-                    {
-                        MainModel.OpenProject(file);
-                    }
-                }
+                        else
+                        {
+                            foreach (string file in files)
+                            {
+                                MainModel.OpenProject(file);
+                            }
+                        }
+                    });
+                });
             }
         }
     }

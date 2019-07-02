@@ -10,12 +10,13 @@
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
         Title="Create Grid Sample Points"
-        Height="300" Width="500"
-        MinHeight="300" MinWidth="500"
+        Height="300" Width="510"
+        MinHeight="300" MinWidth="510"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <cvt:MultiBooleanConverter x:Key="MultiBoolConverter"/>
         <cvt:InverseBooleanConverter x:Key="ibc"/>
+        <BooleanToVisibilityConverter x:Key="btv"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -59,7 +60,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Column="0" Grid.Row="1" Text="Start Point" />
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Start Point (Optional)" />
                 <ComboBox  Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Points}" SelectedItem="{Binding SelectedPoint}"/>
 
                 <TextBlock Grid.Column="0" Grid.Row="2" Text="UOM Distance" />
@@ -129,12 +130,14 @@
                         <ColumnDefinition Width="75"/>
                     </Grid.ColumnDefinitions>
 
-                    <CheckBox Name="cbBuffer" Grid.Column="0" Content="Boundary Buffer" IsChecked="{Binding BoundaryBuffer}" IsEnabled="False" VerticalAlignment="Center"/>
+                    <CheckBox Name="cbBuffer" Grid.Column="0" Content="Boundary Buffer" IsChecked="{Binding BoundaryBuffer}" VerticalAlignment="Center"
+                              Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource btv}}"/>
                     
                     <TextBox Grid.Column="4"  Margin="0, 2.5, 0, 2.5"
                          IsEnabled="{Binding ElementName=cbBuffer, Path=IsChecked}"
                          Text="{Binding BufferAmount}"
-                         PreviewTextInput="TextIsUnsignedInteger"/>
+                         PreviewTextInput="TextIsUnsignedInteger"
+                         Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource btv}}"/>
                 </Grid>
 
 

@@ -22,10 +22,8 @@ namespace TwoTrails.Core.Points
             get { return _UnAdjX; }
             set
             {
-                if (SetField(ref _UnAdjX, value))
-                {
-                    AdjX = _UnAdjX;
-                }
+                SetField(ref _UnAdjX, value);
+                AdjX = _UnAdjX;
             }
         }
 
@@ -34,10 +32,8 @@ namespace TwoTrails.Core.Points
             get { return _UnAdjY; }
             set
             {
-                if (SetField(ref _UnAdjY, value))
-                {
-                    AdjY = _UnAdjY;
-                }
+                SetField(ref _UnAdjY, value);
+                AdjY = _UnAdjY;
             }
         }
 
@@ -46,10 +42,8 @@ namespace TwoTrails.Core.Points
             get { return _UnAdjZ; }
             set
             {
-                if (SetField(ref _UnAdjZ, value))
-                {
-                    AdjZ = _UnAdjZ;
-                }
+                SetField(ref _UnAdjZ, value);
+                AdjZ = _UnAdjZ;
             }
         }
 
@@ -165,7 +159,7 @@ namespace TwoTrails.Core.Points
         internal void Adjust()
         {
             if (HasLatLon)
-                SetUnAdjLocation((double)Latitude, (double)Longitude, Metadata.Zone, Elevation ?? 0);
+                SetUnAdjLocation((double)Latitude, (double)Longitude, Metadata.Zone, Elevation ?? UnAdjZ);
             else
                 SetUnAdjLocation(this);
 
