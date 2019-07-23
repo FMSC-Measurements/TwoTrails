@@ -174,6 +174,16 @@ namespace TwoTrails.Utils
                 aPoints[qp.ParentPointCN].AddLinkedPoint(qp);
             }
 
+            //reindex points
+            foreach (TtPolygon poly in aPolys.Values)
+            {
+                int index = 0;
+                foreach (TtPoint point in aPoints.Values.Where(p => p.PolygonCN == poly.CN).OrderBy(p => p.Index))
+                {
+                    point.Index = index++;
+                }
+            }
+
             TtHistoryManager hm = manager as TtHistoryManager;
             if (hm != null)
                 hm.StartMultiCommand();

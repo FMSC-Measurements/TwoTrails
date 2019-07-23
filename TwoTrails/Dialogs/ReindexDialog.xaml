@@ -7,7 +7,7 @@
         xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
         xmlns:vm="clr-namespace:TwoTrails.ViewModels"
         mc:Ignorable="d"
-        Title="Reindex Points" Height="125" Width="325"
+        Title="Reindex Points" Height="130" Width="325"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner">
     <Window.Resources>

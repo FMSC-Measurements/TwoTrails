@@ -128,6 +128,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="125"/>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
@@ -142,9 +143,10 @@
                         <RadioButton Grid.Column="4" GroupName="{Binding GCN}" Content="Rev" ToolTip="The Quondams will be added in the reverse order from how their parent's were collected." Padding="4 0 5 0"/>
                         <ComboBox Grid.Column="5" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointTo, Mode=OneWayToSource}" IsEnabled="{Binding ElementName=rbSingle, Path=IsChecked, Converter={StaticResource IBC}}"
                                   ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
-                        
-                        <Button Grid.Column="7" Width="30" Content="+" Margin="2" Click="Add_Click" ToolTip="Add New Retrace"/>
-                        <Button Grid.Column="8" Width="30" Content="-" Margin="2" Click="Delete_Click" ToolTip="Delete Retrace"/>
+                        <!--<Image Grid.Column="6" Width="25" Height="25" Source="/Resources/ic_loop_black.png" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5 0 0 0"/>-->
+
+                        <Button Grid.Column="8" Width="30" Content="+" Margin="2" Click="Add_Click" ToolTip="Add New Retrace"/>
+                        <Button Grid.Column="9" Width="30" Content="-" Margin="2" Click="Delete_Click" ToolTip="Delete Retrace"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

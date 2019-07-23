@@ -126,11 +126,11 @@ namespace TwoTrails.DAL
                 TTS.GpsPointSchema.SelectItemsNoCN,     //2
                 TTS.TravPointSchema.SelectItemsNoCN,    //3
                 TTS.QuondamPointSchema.SelectItemsNoCN, //4
-                ddQuerySelect,                                      //5
+                ddQuerySelect,                          //5
                 TTS.GpsPointSchema.TableName,           //6
                 TTS.TravPointSchema.TableName,          //7
                 TTS.QuondamPointSchema.TableName,       //8
-                ddQueryTable,                                       //9
+                ddQueryTable,                           //9
                 TTS.SharedSchema.CN,                    //10
                 where != null ? $" where {where}" : String.Empty,   //11
                 TTS.PointSchema.Index                   //12

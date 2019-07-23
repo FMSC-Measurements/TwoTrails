@@ -21,6 +21,8 @@
     <BitmapImage x:Key="ImgCloseWhite" UriSource="Resources/close_white.png" />
     <BitmapImage x:Key="ImgCloseBlack" UriSource="Resources/close_black.png" />
 
+    <BitmapImage x:Key="ic_loop_black" UriSource="Resources/ic_loop_black.png" />
+
     <BitmapImage x:Key="ic_polygon_black" UriSource="Resources/ic_polygon_black_36dp.png" />
     <BitmapImage x:Key="ic_polygon_pts_black" UriSource="Resources/ic_polygon_pts_black_36dp.png" />
     <BitmapImage x:Key="ic_polygon_pts_white" UriSource="Resources/ic_polygon_pts_white_36dp.png" />

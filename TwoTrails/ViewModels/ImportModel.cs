@@ -338,8 +338,6 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
                 foreach (string polyCN in selectedPolys)
                 {
-                    IEnumerable<TtPoint> points = ImportControl.DAL.GetPoints(polyCN, true).Where(p => p.OpType == OpType.Quondam);
-
                     foreach (QuondamPoint qp in ImportControl.DAL.GetPoints(polyCN, true)
                         .Where(p => p.OpType == OpType.Quondam).Cast<QuondamPoint>())
                     {
