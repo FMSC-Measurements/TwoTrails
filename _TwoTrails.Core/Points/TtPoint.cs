@@ -434,24 +434,31 @@ namespace TwoTrails.Core.Points
             if (other == null)
                 return 1;
 
-            int val = @this.Polygon.CompareTo(other.Polygon);
+            int val = @this.Polygon.TimeCreated.CompareTo(other.Polygon.TimeCreated);
 
             if (val != 0)
                 return val;
             else
             {
-                val = @this.Index.CompareTo(other.Index);
+                val = @this.PolygonCN.CompareTo(other.PolygonCN);
 
                 if (val != 0)
                     return val;
                 else
                 {
-                    val = @this.PID.CompareTo(other.PID);
+                    val = @this.Index.CompareTo(other.Index);
 
                     if (val != 0)
                         return val;
                     else
-                        return @this.CN.CompareTo(other.CN);
+                    {
+                        val = @this.PID.CompareTo(other.PID);
+
+                        if (val != 0)
+                            return val;
+                        else
+                            return @this.CN.CompareTo(other.CN);
+                    }
                 }
             }
         }

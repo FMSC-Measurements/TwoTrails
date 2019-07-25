@@ -35,7 +35,7 @@ namespace TwoTrails.Core.Points
         
         public static bool IsMiscPoint(this TtPoint point)
         {
-            return point.OpType == OpType.SideShot && !point.OnBoundary;
+            return (point.OpType == OpType.SideShot || point.OpType == OpType.Quondam) && !point.OnBoundary;
         }
 
         public static bool IsWayPointAtBase(this TtPoint point)

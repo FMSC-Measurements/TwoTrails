@@ -338,10 +338,13 @@ namespace TwoTrails.Mapping
                 {
                     if (Extents == null)
                         BuildExtents();
-                    Map.SetView(
-                        new LocationRect(
-                            new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BOUNDARY_ZOOM_MARGIN),
-                            new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN)));
+                    if (Extents != null)
+                    {
+                        Map.SetView(
+                            new LocationRect(
+                                new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BOUNDARY_ZOOM_MARGIN),
+                                new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN))); 
+                    }
                 }
             });
         }
@@ -349,8 +352,10 @@ namespace TwoTrails.Mapping
         private void BuildExtents()
         {
             Extent.Builder builder = new Extent.Builder();
-            foreach (TtMapPoint p in Points.Where(p => p.IsBndPoint))
+
+            foreach (TtMapPoint p in Points.All(p => p.Point.OpType == OpType.WayPoint) ? Points : Points.Where(p => p.IsBndPoint))
                 builder.Include(p.AdjLocation.Latitude, p.AdjLocation.Longitude);
+
             Extents = builder.HasPositions ? builder.Build() : null;
         }
 
