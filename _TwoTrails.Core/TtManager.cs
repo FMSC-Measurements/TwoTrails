@@ -166,19 +166,23 @@ namespace TwoTrails.Core
                 AttachPoint(point);
             }
 
-            foreach (TtPoint point in points.Where(p => p.OpType == OpType.Quondam))
+            foreach (QuondamPoint qp in points.Where(p => p.OpType == OpType.Quondam))
             {
-                if (point is QuondamPoint qp)
+                if (_PointsMap.ContainsKey(qp.ParentPointCN))
                 {
-                    qp.ParentPoint = _PointsMap[qp.ParentPointCN];
+                    qp.ParentPoint = _PointsMap[qp.ParentPointCN]; 
+                }
+                else
+                {
+                    throw new Exception("Foreign Quondam");
                 }
 
-                _PointsMap.Add(point.CN, point);
-                _PointsMapOrig.Add(point.CN, point.DeepCopy());
+                _PointsMap.Add(qp.CN, qp);
+                _PointsMapOrig.Add(qp.CN, qp.DeepCopy());
 
-                _Points.Add(point);
+                _Points.Add(qp);
 
-                AttachPoint(point);
+                AttachPoint(qp);
             }
 
             Points = new ReadOnlyObservableCollection<TtPoint>(_Points);

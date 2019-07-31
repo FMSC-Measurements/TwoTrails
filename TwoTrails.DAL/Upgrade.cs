@@ -103,7 +103,7 @@ namespace TwoTrails.DAL
                 foreach (TtPolygon poly in polys)
                 {
                     int i = 0;
-                    points.AddRange(odal.GetPoints(poly.CN).Select(p => { p.Index = i++; return p; }));
+                    points.AddRange(odal.GetPoints(poly.CN, true).Select(p => { p.Index = i++; return p; }));
                 }
 
                 if (points.Any())

@@ -122,7 +122,8 @@ namespace TwoTrails.Utils
             if (convertForeignQuondams)
             {
                 foreach(QuondamPoint qpoint in aPoints.Values
-                    .Where(p => p.OpType == OpType.Quondam && !aPolys.ContainsKey((p as QuondamPoint).ParentPoint.PolygonCN)).ToList())
+                    .Where(p => p.OpType == OpType.Quondam && p is QuondamPoint qp && (!aPoints.ContainsKey(qp.ParentPointCN) ||
+                    !aPolys.ContainsKey(qp.ParentPoint.PolygonCN))).ToList())
                 {
                     aPoints[qpoint.CN] = convertQuondam(qpoint);
                 }
@@ -164,7 +165,7 @@ namespace TwoTrails.Utils
                     }
                     else
                     {
-                        throw new Exception("Foriegn Quondam");
+                        throw new Exception("Foreign Quondam");
                     }
                 }
             }

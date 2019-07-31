@@ -337,6 +337,14 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                                     oinfo.CreationDeviceID,
                                     oinfo.CreationDate);
 
+                                //check for v2 errors and ask for fix
+                                DalError errors = dalv2.GetErrors();
+                                if (errors > 0 && (errors.HasFlag(DalError.OrphanedQuondams) || errors.HasFlag(DalError.MissingGroup) ||
+                                    errors.HasFlag(DalError.MissingPolygon) || errors.HasFlag(DalError.MissingMetadata)))
+                                {
+
+                                }
+
                                 string upgradedFile = Path.Combine(Path.GetDirectoryName(filePath), $"{Path.GetFileNameWithoutExtension(filePath)}{Consts.FILE_EXTENSION}");
 
                                 if (File.Exists(upgradedFile))

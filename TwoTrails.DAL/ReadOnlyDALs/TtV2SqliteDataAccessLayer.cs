@@ -10,6 +10,7 @@ using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
+using TTV2S = TwoTrails.DAL.TwoTrailsV2Schema;
 
 namespace TwoTrails.DAL
 {
@@ -24,7 +25,7 @@ namespace TwoTrails.DAL
             {
                 if (_Version == null)
                     _Version = GetDataVersion();
-                return _Version < TwoTrailsV2Schema.RequiredSchemaVersion;
+                return _Version < TTV2S.RequiredSchemaVersion;
             }
         }
 
@@ -51,7 +52,7 @@ namespace TwoTrails.DAL
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
                 using (SQLiteDataReader dr = database.ExecuteReader(
-                    $"select {TwoTrailsV2Schema.ProjectInfoSchema.TtDbSchemaVersion} from {TwoTrailsV2Schema.ProjectInfoSchema.TableName}", conn))
+                    $"select {TTV2S.ProjectInfoSchema.TtDbSchemaVersion} from {TTV2S.ProjectInfoSchema.TableName}", conn))
                 {
                     if (dr != null)
                     {
@@ -76,21 +77,21 @@ namespace TwoTrails.DAL
             CheckVersion();
 
             String query = String.Format("SELECT {0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13} from {14} ",
-                TwoTrailsV2Schema.MetaDataSchema.CN, //0
-                TwoTrailsV2Schema.MetaDataSchema.Comment,//1
-                TwoTrailsV2Schema.MetaDataSchema.Compass, //2
-                TwoTrailsV2Schema.MetaDataSchema.Crew,    //3
-                TwoTrailsV2Schema.MetaDataSchema.Datum,   //4
-                TwoTrailsV2Schema.MetaDataSchema.DeclinationType, //5
-                TwoTrailsV2Schema.MetaDataSchema.ID,      //6
-                TwoTrailsV2Schema.MetaDataSchema.Laser,   //7
-                TwoTrailsV2Schema.MetaDataSchema.MagDec,  //8
-                TwoTrailsV2Schema.MetaDataSchema.Receiver,    //9
-                TwoTrailsV2Schema.MetaDataSchema.UomDistance,     //10
-                TwoTrailsV2Schema.MetaDataSchema.UomElevation,    //11
-                TwoTrailsV2Schema.MetaDataSchema.UomSlope,        //12
-                TwoTrailsV2Schema.MetaDataSchema.UtmZone,         //13
-                TwoTrailsV2Schema.MetaDataSchema.TableName);
+                TTV2S.MetaDataSchema.CN, //0
+                TTV2S.MetaDataSchema.Comment,//1
+                TTV2S.MetaDataSchema.Compass, //2
+                TTV2S.MetaDataSchema.Crew,    //3
+                TTV2S.MetaDataSchema.Datum,   //4
+                TTV2S.MetaDataSchema.DeclinationType, //5
+                TTV2S.MetaDataSchema.ID,      //6
+                TTV2S.MetaDataSchema.Laser,   //7
+                TTV2S.MetaDataSchema.MagDec,  //8
+                TTV2S.MetaDataSchema.Receiver,    //9
+                TTV2S.MetaDataSchema.UomDistance,     //10
+                TTV2S.MetaDataSchema.UomElevation,    //11
+                TTV2S.MetaDataSchema.UomSlope,        //12
+                TTV2S.MetaDataSchema.UtmZone,         //13
+                TTV2S.MetaDataSchema.TableName);
 
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
@@ -141,15 +142,15 @@ namespace TwoTrails.DAL
             CheckVersion();
             
             string query = String.Format("SELECT {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7} from {8} ",
-                TwoTrailsV2Schema.SharedSchema.CN,
-                TwoTrailsV2Schema.PolygonSchema.PolyID,
-                TwoTrailsV2Schema.PolygonSchema.Description,
-                TwoTrailsV2Schema.PolygonSchema.Accuracy,
-                TwoTrailsV2Schema.PolygonSchema.Area,
-                TwoTrailsV2Schema.PolygonSchema.Perimeter,
-                TwoTrailsV2Schema.PolygonSchema.IncrementBy,
-                TwoTrailsV2Schema.PolygonSchema.PointStartIndex,
-                TwoTrailsV2Schema.PolygonSchema.TableName);
+                TTV2S.SharedSchema.CN,
+                TTV2S.PolygonSchema.PolyID,
+                TTV2S.PolygonSchema.Description,
+                TTV2S.PolygonSchema.Accuracy,
+                TTV2S.PolygonSchema.Area,
+                TTV2S.PolygonSchema.Perimeter,
+                TTV2S.PolygonSchema.IncrementBy,
+                TTV2S.PolygonSchema.PointStartIndex,
+                TTV2S.PolygonSchema.TableName);
 
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
@@ -194,7 +195,7 @@ namespace TwoTrails.DAL
         
         public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
         {
-            return GetTtPoints(polyCN != null ? $"{TwoTrailsV2Schema.PointSchema.PolyCN} = '{polyCN}'" : null, linked);
+            return GetTtPoints(polyCN != null ? $"{TTV2S.PointSchema.PolyCN} = '{polyCN}'" : null, linked);
         }
 
         private IEnumerable<TtPoint> GetTtPoints(String where = null, bool linkPoints = true, int limit = 0)
@@ -202,21 +203,30 @@ namespace TwoTrails.DAL
             CheckVersion();
             String query = String.Format(@"select {0}.{1}, {2}, {3}, {4} from {0} left join {5} on {5}.{8} = {0}.{8} 
 left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order by {10} asc{11}",
-                TwoTrailsV2Schema.PointSchema.TableName,              //0
-                TwoTrailsV2Schema.PointSchema.SelectItems,            //1
-                TwoTrailsV2Schema.GpsPointSchema.SelectItemsNoCN,     //2
-                TwoTrailsV2Schema.TravPointSchema.SelectItemsNoCN,    //3
-                TwoTrailsV2Schema.QuondamPointSchema.SelectItemsNoCN, //4
-                TwoTrailsV2Schema.GpsPointSchema.TableName,           //5
-                TwoTrailsV2Schema.TravPointSchema.TableName,          //6
-                TwoTrailsV2Schema.QuondamPointSchema.TableName,       //7
-                TwoTrailsV2Schema.SharedSchema.CN,                    //8
+                TTV2S.PointSchema.TableName,              //0
+                TTV2S.PointSchema.SelectItems,            //1
+                TTV2S.GpsPointSchema.SelectItemsNoCN,     //2
+                TTV2S.TravPointSchema.SelectItemsNoCN,    //3
+                TTV2S.QuondamPointSchema.SelectItemsNoCN, //4
+                TTV2S.GpsPointSchema.TableName,           //5
+                TTV2S.TravPointSchema.TableName,          //6
+                TTV2S.QuondamPointSchema.TableName,       //7
+                TTV2S.SharedSchema.CN,                    //8
                 where != null ? $" where {where}" : String.Empty,
-                TwoTrailsV2Schema.PointSchema.Order,
+                TTV2S.PointSchema.Order,
                 limit > 0 ? $" limit {limit}" : String.Empty
             );
 
-            Dictionary<string, TtPolygon> polygons = GetPolygons().ToDictionary(p => p.CN, p => p);
+            Dictionary<string, TtPolygon> polygons = null;
+            Dictionary<string, TtMetadata> metadata = null;
+            Dictionary<string, TtGroup> groups = null;
+
+            if (linkPoints)
+            {
+                polygons = GetPolygons().ToDictionary(p => p.CN, p => p);
+                metadata = GetMetadata().ToDictionary(m => m.CN, m => m);
+                groups = GetGroups().ToDictionary(g => g.CN, g => g); 
+            }
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
@@ -258,16 +268,11 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                             unadjy = dr.GetDouble(14);
                             unadjz = dr.GetDouble(15);
 
-                            //acc = dr.GetDouble(16);
-
                             qlinks = dr.GetStringN(16);
 
 
                             if (op.IsGpsType())
                             {
-                                //lat = dr.GetDoubleN(18);
-                                //lon = dr.GetDoubleN(19);
-                                //elev = dr.GetDoubleN(20);
                                 manacc = dr.GetDoubleN(17);
                                 rmser = dr.GetDoubleN(18);
 
@@ -293,6 +298,13 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                                                     comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
                                                     Consts.DEFAULT_POINT_ACCURACY, qlinks, null, null, null, manacc, rmser);
                                         break;
+                                }
+
+                                if (linkPoints)
+                                {
+                                    point.Polygon = polygons[point.PolygonCN];
+                                    point.Metadata = metadata[point.MetadataCN];
+                                    point.Group = groups[point.GroupCN];
                                 }
                             }
                             else if (op.IsTravType())
@@ -322,12 +334,13 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
 
                                 point = new QuondamPoint(cn, index, pid, time, polycn, metacn, groupcn,
                                                 comment, onbnd, adjx, adjy, adjz, unadjx, unadjy, unadjz,
-                                                Consts.DEFAULT_POINT_ACCURACY, qlinks, pcn, manacc);
+                                                Consts.DEFAULT_POINT_ACCURACY, qlinks, pcn,
+                                                (manacc == 0d) ? null : manacc);
 
                                 if (linkPoints)
                                 {
                                     QuondamPoint qp = point as QuondamPoint;
-                                    qp.ParentPoint = GetTtPoints($"{TwoTrailsV2Schema.PointSchema.TableName}.{TwoTrailsV2Schema.SharedSchema.CN} = '{qp.ParentPointCN}'", false).FirstOrDefault();
+                                    qp.ParentPoint = GetTtPoints($"{TTV2S.PointSchema.TableName}.{TTV2S.SharedSchema.CN} = '{qp.ParentPointCN}'", false).FirstOrDefault();
                                 }
                             }
                             
@@ -348,11 +361,11 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
             CheckVersion();
 
             String query = String.Format("SELECT {0}, {1}, {2}, {3} from {4} ",
-                TwoTrailsV2Schema.GroupSchema.CN,
-                TwoTrailsV2Schema.GroupSchema.Name,
-                TwoTrailsV2Schema.GroupSchema.Description,
-                TwoTrailsV2Schema.GroupSchema.Type,
-                TwoTrailsV2Schema.GroupSchema.TableName);
+                TTV2S.GroupSchema.CN,
+                TTV2S.GroupSchema.Name,
+                TTV2S.GroupSchema.Description,
+                TTV2S.GroupSchema.Type,
+                TTV2S.GroupSchema.TableName);
 
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
@@ -392,7 +405,7 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
         {
             CheckVersion();
 
-            String query = $@"select {TwoTrailsV2Schema.TtNmeaSchema.SelectItems} from {TwoTrailsV2Schema.TtNmeaSchema.TableName} 
+            String query = $@"select {TTV2S.TtNmeaSchema.SelectItems} from {TTV2S.TtNmeaSchema.TableName} 
             { (pointCNs == null ? String.Empty : $" where { String.Join(" OR ", pointCNs.Select(pcn => $"{TwoTrailsSchema.TtNmeaSchema.PointCN} = '{pcn}'"))}")}";
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
@@ -464,15 +477,15 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
             CheckVersion();
 
             String query = String.Format("SELECT {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7} from {8}",
-                TwoTrailsV2Schema.ProjectInfoSchema.ID,
-                TwoTrailsV2Schema.ProjectInfoSchema.Description,
-                TwoTrailsV2Schema.ProjectInfoSchema.Region,
-                TwoTrailsV2Schema.ProjectInfoSchema.Forest,
-                TwoTrailsV2Schema.ProjectInfoSchema.District,
-                TwoTrailsV2Schema.ProjectInfoSchema.TtVersion,
-                TwoTrailsV2Schema.ProjectInfoSchema.DeviceID,
-                TwoTrailsV2Schema.ProjectInfoSchema.Year,
-                TwoTrailsV2Schema.ProjectInfoSchema.TableName);
+                TTV2S.ProjectInfoSchema.ID,
+                TTV2S.ProjectInfoSchema.Description,
+                TTV2S.ProjectInfoSchema.Region,
+                TTV2S.ProjectInfoSchema.Forest,
+                TTV2S.ProjectInfoSchema.District,
+                TTV2S.ProjectInfoSchema.TtVersion,
+                TTV2S.ProjectInfoSchema.DeviceID,
+                TTV2S.ProjectInfoSchema.Year,
+                TTV2S.ProjectInfoSchema.TableName);
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
@@ -540,30 +553,148 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
             throw new NotImplementedException();
         }
 
+        
 
-        public bool HasPolygons()
+        protected int GetItemCount(String tableName, string where = null)
         {
-            CheckVersion();
+            int count = -1;
 
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = database.ExecuteReader($"select count(*) from {TwoTrailsV2Schema.PolygonSchema.TableName}", conn))
-                {
-                    if (dr != null)
-                    {
-                        if (dr.Read())
-                        {
-                            return dr.GetInt32(0) > 0;
-                        }
+                SQLiteDataReader dr = database.ExecuteReader($@"SELECT count(*) FROM { tableName }{(where != null ? $" WHERE { where }" : String.Empty)};", conn);
 
+                try
+                {
+                    if (dr != null && dr.Read())
+                    {
+                        count = dr.GetInt32(0);
                         dr.Close();
                     }
+                }
+                catch
+                {
+                    //
                 }
 
                 conn.Close();
             }
 
-            throw new Exception("Unable to get polygon count.");
+            return count;
+        }
+
+        protected IEnumerable<string> GetItemList(string tableName, string field, string where = null)
+        {
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = database.ExecuteReader(
+                    $"SELECT {field} from {tableName}{(where != null ? $" where {where}" : String.Empty)};", conn))
+                {
+                    while (dr.Read())
+                    {
+                        yield return dr.GetString(0);
+                    }
+                }
+            }
+        }
+
+
+        public bool HasPolygons()
+        {
+            CheckVersion();
+
+            return GetItemCount(TTV2S.PolygonSchema.TableName) > 0;
+        }
+
+        
+        public DalError GetErrors()
+        {
+            DalError errors = DalError.None;
+
+            if (GetPolysInNeedOfReindex().Any())
+            {
+                errors |= DalError.PointIndexes;
+            }
+
+            if (GetPointsWithMissingMetadata().Any())
+            {
+                errors |= DalError.MissingMetadata;
+            }
+
+            if (GetPointsWithMissingPolygons().Any())
+            {
+                errors |= DalError.MissingPolygon;
+            }
+
+            if (GetPointsWithMissingMetadata().Any())
+            {
+                errors |= DalError.MissingGroup;
+            }
+
+            if (GetOrphanedQuondams().Any())
+            {
+                errors |= DalError.OrphanedQuondams;
+            }
+
+            return errors;
+        }
+
+        public bool HasErrors()
+        {
+            return GetErrors() > 0;
+        }
+        
+
+        public IEnumerable<string> GetPolysInNeedOfReindex()
+        {
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = database.ExecuteReader(
+                    $"SELECT {TTV2S.PointSchema.PolyCN}, sum({TTV2S.PointSchema.Order})," +
+                    $"Count({TTV2S.PointSchema.ID}) from {TTV2S.PointSchema.TableName} GROUP BY {TTV2S.PointSchema.PolyCN}", conn))
+                {
+                    Func<int, int> sumOfN = (n) =>
+                    {
+                        int sum = 0;
+
+                        for (int num = 0; num < n; num++)
+                            sum += num;
+
+                        return sum;
+                    };
+
+                    while (dr.Read())
+                    {
+                        if (dr.GetInt32(1) != sumOfN(dr.GetInt32(2)))
+                        {
+                            yield return dr.GetString(0);
+                        }
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<string> GetPointsWithMissingMetadata()
+        {
+            return GetItemList(TTV2S.PointSchema.TableName, TTV2S.SharedSchema.CN,
+                $"{TTV2S.PointSchema.MetaDataID} not in (select distinct {TTV2S.SharedSchema.CN} from {TTV2S.MetaDataSchema.TableName})");
+        }
+
+        public IEnumerable<string> GetPointsWithMissingPolygons()
+        {
+            return GetItemList(TTV2S.PointSchema.TableName, TTV2S.SharedSchema.CN,
+                $"{TTV2S.PointSchema.PolyCN} not in (select distinct {TTV2S.SharedSchema.CN} from {TTV2S.PolygonSchema.TableName})");
+        }
+
+        public IEnumerable<string> GetPointsWithMissingGroups()
+        {
+            return GetItemList(TTV2S.PointSchema.TableName, TTV2S.SharedSchema.CN,
+                $"{TTV2S.PointSchema.GroupCN} not in (select distinct {TTV2S.SharedSchema.CN} from {TTV2S.GroupSchema.TableName})");
+        }
+
+        public IEnumerable<string> GetOrphanedQuondams()
+        {
+            return GetItemList(TTV2S.QuondamPointSchema.TableName, TTV2S.SharedSchema.CN,
+                $"{TTV2S.QuondamPointSchema.ParentPointCN} not in (select distinct {TTV2S.SharedSchema.CN} from {TTV2S.PointSchema.TableName})");
         }
     }
 }

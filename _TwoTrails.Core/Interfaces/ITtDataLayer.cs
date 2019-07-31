@@ -109,6 +109,7 @@ namespace TwoTrails.DAL
         NullAdjLocs     = 1 << 1,
         MissingPolygon  = 1 << 2,
         MissingMetadata = 1 << 3,
-        MissingGroup    = 1 << 4
+        MissingGroup    = 1 << 4,
+        OrphanedQuondams= 1 << 5
     }
 }

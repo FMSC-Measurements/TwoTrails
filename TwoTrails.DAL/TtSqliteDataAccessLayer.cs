@@ -2716,7 +2716,12 @@ namespace TwoTrails.DAL
             {
                 errors |= DalError.MissingGroup;
             }
-            
+
+            if (GetOrphanedQuondams().Any())
+            {
+                errors |= DalError.OrphanedQuondams;
+            }
+
             return errors;
         }
 
@@ -2772,7 +2777,12 @@ namespace TwoTrails.DAL
                 $"{TTS.PointSchema.GroupCN} not in (select distinct {TTS.SharedSchema.CN} from {TTS.GroupSchema.TableName})");
         }
 
-        
+        public IEnumerable<string> GetOrphanedQuondams()
+        {
+            return GetItemList(TTS.QuondamPointSchema.TableName, TTS.SharedSchema.CN,
+                $"{TTS.QuondamPointSchema.ParentPointCN} not in (select distinct {TTS.SharedSchema.CN} from {TTS.PointSchema.TableName})");
+        }
+
         protected bool ReindexPolygons()
         {
             bool pointIndexesUpdated = false;
