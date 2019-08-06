@@ -82,13 +82,13 @@ namespace TwoTrails.DAL
 
         #region Points
         #region Get Points
-        public TtPoint GetPoint(String pointCN)
+        public TtPoint GetPoint(String pointCN, bool linked = false)
         {
             return GetPoints(
                 $"{TTS.PointSchema.TableName}.{TTS.SharedSchema.CN} = '{pointCN}'",
                 1,
-                false
-            ).First();
+                linked
+            ).FirstOrDefault();
         }
 
         public IEnumerable<TtPoint> GetPoints(string polyCN = null, bool linked = false)

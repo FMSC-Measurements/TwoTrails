@@ -160,7 +160,7 @@ namespace TwoTrails.DAL
                     if (reader != null)
                     {
                         TtPolygon poly;
-                        int seconds = 0;
+                        int milliSeconds = 0;
 
                         while (reader.Read())
                         {
@@ -180,7 +180,7 @@ namespace TwoTrails.DAL
                             if (!reader.IsDBNull(7))
                                 poly.PointStartIndex = reader.GetInt32(7);
 
-                            poly.TimeCreated = DateTime.Now.AddMilliseconds(seconds++);
+                            poly.TimeCreated = DateTime.Now.AddMilliseconds(milliSeconds++);
 
                             yield return poly;
                         }
@@ -193,6 +193,11 @@ namespace TwoTrails.DAL
             }
         }
         
+        public TtPoint GetPoint(String cn, bool linked = false)
+        {
+            return GetTtPoints($"{TTV2S.PointSchema.TableName}.{TTV2S.SharedSchema.CN} = '{cn}'", linked).FirstOrDefault();
+        }
+
         public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
         {
             return GetTtPoints(polyCN != null ? $"{TTV2S.PointSchema.PolyCN} = '{polyCN}'" : null, linked);
@@ -540,17 +545,17 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
 
         public DataDictionaryTemplate GetDataDictionaryTemplate()
         {
-            throw new NotImplementedException();
+            return new DataDictionaryTemplate();
         }
 
         public DataDictionary GetExtendedDataForPoint(string pointCN)
         {
-            throw new NotImplementedException();
+            return new DataDictionary(pointCN);
         }
 
         public IEnumerable<DataDictionary> GetExtendedData()
         {
-            throw new NotImplementedException();
+            return new List<DataDictionary>();
         }
 
         

@@ -108,9 +108,16 @@ namespace TwoTrails.Utils
 
             Func<QuondamPoint, GpsPoint> convertQuondam = (qpoint) =>
             {
-                GpsPoint gpsPoint = new GpsPoint(qpoint)
+                TtPoint cPoint = dal.GetPoint(qpoint.ParentPointCN) ?? qpoint;
+
+                GpsPoint gpsPoint = new GpsPoint(cPoint)
                 {
-                    Comment = string.IsNullOrWhiteSpace(qpoint.Comment) ? qpoint.ParentPoint.Comment : qpoint.Comment,
+                    CN = qpoint.CN,
+                    Polygon = qpoint.Polygon,
+                    Metadata = qpoint.Metadata,
+                    Group = qpoint.Group,
+                    Comment = string.IsNullOrWhiteSpace(qpoint.Comment) ?
+                        (cPoint.OpType == OpType.Quondam ? qpoint.ParentPoint.Comment : cPoint.Comment) : qpoint.Comment,
                     TimeCreated = DateTime.Now
                 };
 
@@ -121,9 +128,8 @@ namespace TwoTrails.Utils
 
             if (convertForeignQuondams)
             {
-                foreach(QuondamPoint qpoint in aPoints.Values
-                    .Where(p => p.OpType == OpType.Quondam && p is QuondamPoint qp && (!aPoints.ContainsKey(qp.ParentPointCN) ||
-                    !aPolys.ContainsKey(qp.ParentPoint.PolygonCN))).ToList())
+                foreach (QuondamPoint qpoint in aPoints.Values
+                    .Where(p => p.OpType == OpType.Quondam && p is QuondamPoint qp && !aPoints.ContainsKey(qp.ParentPointCN)).ToList())
                 {
                     aPoints[qpoint.CN] = convertQuondam(qpoint);
                 }

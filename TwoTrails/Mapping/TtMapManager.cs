@@ -76,6 +76,12 @@ namespace TwoTrails.Mapping
                 mpm.AdjBndPointsVisible = false;
                 mpm.WayPointsVisible = true;
             }
+            else if (ocPoints.All(p => p.IsMiscPoint()))
+            {
+                mpm.AdjBndVisible = false;
+                mpm.AdjBndPointsVisible = false;
+                mpm.AdjMiscPointsVisible = true;
+            }
 
             _PolygonManagers.Add(polygon.CN, mpm);
             PolygonManagers.Add(mpm);

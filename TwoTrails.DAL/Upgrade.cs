@@ -106,6 +106,28 @@ namespace TwoTrails.DAL
                     points.AddRange(odal.GetPoints(poly.CN, true).Select(p => { p.Index = i++; return p; }));
                 }
 
+                foreach (QuondamPoint qpoint in points.Where(p => p.OpType == OpType.Quondam).ToList())
+                {
+                    if (!points.Any(p => p.CN == qpoint.ParentPointCN))
+                    {
+                        TtPoint cPoint = ndal.GetPoint(qpoint.ParentPointCN) ?? qpoint;
+
+                        GpsPoint gpsPoint = new GpsPoint(cPoint)
+                        {
+                            CN = qpoint.CN,
+                            Polygon = qpoint.Polygon,
+                            Metadata = qpoint.Metadata,
+                            Group = qpoint.Group,
+                            Comment = string.IsNullOrWhiteSpace(qpoint.Comment) ?
+                                (cPoint.OpType == OpType.Quondam ? qpoint.ParentPoint.Comment : cPoint.Comment) : qpoint.Comment,
+                            TimeCreated = DateTime.Now
+                        };
+
+                        points.Remove(qpoint);
+                        points.Add(gpsPoint);
+                    }
+                }
+
                 if (points.Any())
                 {
                     ndal.InsertPoints(points);

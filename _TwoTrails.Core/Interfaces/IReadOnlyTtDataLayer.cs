@@ -12,6 +12,7 @@ namespace TwoTrails.DAL
         String FilePath { get; }
 
         #region Points
+        TtPoint GetPoint(String cn = null, bool linked = false);
         IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false);
         #endregion
 

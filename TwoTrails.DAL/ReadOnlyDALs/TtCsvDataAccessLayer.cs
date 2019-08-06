@@ -495,6 +495,12 @@ namespace TwoTrails.DAL
                 File.GetCreationTime(filePath));
         }
         
+        public TtPoint GetPoint(String cn, bool linked = false)
+        {
+            Parse();
+
+            return _Points.ContainsKey(cn) ? (linked ? GetLinkedPoints(new TtPoint[] { _Points[cn] }).First() : _Points[cn]) : null;
+        }
 
         public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
         {

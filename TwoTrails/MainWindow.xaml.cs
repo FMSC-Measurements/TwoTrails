@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using CSUtil;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -58,20 +61,31 @@ namespace TwoTrails
                     {
                         if (MainModel.CurrentProject == null)
                         {
-                            if (files.All(file => TtUtils.IsImportableFileType(file) && !file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase)))
+                            if (files.HasAtLeast(2))
                             {
-                                MainModel.CreateAndOpenProjectFromImportable(null, files);
+                                if (MessageBox.Show("Would you like to import all of the files into one project?", "Multi File Import",
+                                MessageBoxButton.YesNo, MessageBoxImage.Hand) == MessageBoxResult.Yes)
+                                {
+                                    MainModel.CreateAndOpenProjectFromImportable(null, files);
+                                }
+                                else
+                                {
+                                    foreach (string file in files)
+                                    {
+                                        if (file.EndsWith(Consts.FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase) ||
+                                            file.EndsWith(Consts.FILE_EXTENSION_MEDIA, StringComparison.InvariantCultureIgnoreCase) ||
+                                            file.EndsWith(Consts.FILE_EXTENSION_V2, StringComparison.InvariantCultureIgnoreCase))
+                                            MainModel.OpenProject(file);
+                                        else if (TtUtils.IsImportableFileType(file))
+                                            MainModel.CreateAndOpenProjectFromImportable(null, file);
+                                        else
+                                            MessageBox.Show($"File '{Path.GetFileName(file)}' is not a valid openable or importable type.", "Invalid File Type", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    }
+                                }
                             }
                             else
                             {
-                                foreach (string file in files)
-                                {
-                                    if (file.EndsWith(Consts.FILE_EXTENSION, System.StringComparison.InvariantCultureIgnoreCase) ||
-                                        file.EndsWith(Consts.FILE_EXTENSION_MEDIA, System.StringComparison.InvariantCultureIgnoreCase))
-                                        MainModel.OpenProject(file);
-                                    else if (TtUtils.IsImportableFileType(file))
-                                        MainModel.CreateAndOpenProjectFromImportable(null, file);
-                                }
+                                MainModel.OpenProject(files[0]);
                             }
                         }
                         else
