@@ -93,8 +93,8 @@ namespace TwoTrails.Core
                     if (TotalGpsError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
                         sb.AppendFormat("GPS area-error Contribution: {0:0.000} Ha ({1:0.00} ac){2}",
-                            Math.Round(FMSC.Core.Convert.MetersSquaredToHa(TotalGpsError), 2),
-                            Math.Round(FMSC.Core.Convert.MetersSquaredToAcres(TotalGpsError), 2),
+                            Math.Round(FMSC.Core.Convert.ToHectare(TotalGpsError, Area.MeterSq), 2),
+                            Math.Round(FMSC.Core.Convert.ToAcre(TotalGpsError, Area.MeterSq), 2),
                             Environment.NewLine);
 
                         GpsAreaError = TotalGpsError / polygon.Area * 100.0;
@@ -106,8 +106,8 @@ namespace TwoTrails.Core
                     if (TotalTraverseError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
                         sb.AppendFormat("Traverse Contribution: {0:0.000} Ha ({1:0.00} ac){2}",
-                            Math.Round(FMSC.Core.Convert.MetersSquaredToHa(TotalTraverseError), 2),
-                            Math.Round(FMSC.Core.Convert.MetersSquaredToAcres(TotalTraverseError), 2),
+                            Math.Round(FMSC.Core.Convert.ToHectare(TotalTraverseError, Area.MeterSq), 2),
+                            Math.Round(FMSC.Core.Convert.ToAcre(TotalTraverseError, Area.MeterSq), 2),
                             Environment.NewLine);
 
                         TraverseAreaError = TotalTraverseError / polygon.Area * 100.0;
