@@ -90,7 +90,7 @@ namespace TwoTrails.ViewModels
             var fpt = points[0];
 
             foreach (var pt in points)
-                LzPoints.Add(new Point(pt.AdjZ, MathEx.Distance(fpt.AdjX, fpt.AdjY, pt.AdjX, pt.AdjY)));
+                LzPoints.Add(new Point(MathEx.Distance(fpt.AdjX, fpt.AdjY, pt.AdjX, pt.AdjY), pt.AdjZ));
 
             LzPoints.Add(LzPoints[0]);
 
@@ -116,10 +116,25 @@ namespace TwoTrails.ViewModels
         {
             if (DeckPolygon != null)
             {
+                //Func<Distance, double, double> distToArea = (distType, dist) =>
+                //{
+                //    switch (distType)
+                //    {
+                //        case Distance.FeetTenths: 
+                //        case Distance.Meters:
+                //            break;
+                //        case Distance.Chains:
+                //            break;
+                //        case Distance.Yards:
+                //            break;
+                //    }
+                //};
 
-                double faceAreaMt = Convert.Distance(CollarWidth, Distance.Meters, Distance) * Perimeter;
-                Area = Convert.Distance(areaMt, Distance, Distance.Meters);
-                FaceArea = Area + Convert.Distance(faceAreaMt, Distance, Distance.Meters);
+                Area areaType = (Distance == Distance.Meters) ? FMSC.Core.Area.MeterSq : FMSC.Core.Area.FeetSq;
+
+                double faceAreaMt = areaMt + Convert.Distance(CollarWidth, Distance.Meters, Distance) * Perimeter;
+                Area = Convert.Area(areaMt, areaType, FMSC.Core.Area.MeterSq);
+                FaceArea = Convert.Area(faceAreaMt, areaType, FMSC.Core.Area.MeterSq);
                 GrossVolume = Convert.Volume(faceAreaMt * Convert.Distance(LogLength, Distance.Meters, Distance), Volume, Volume.CubicMeter);
                 NetVolume = GrossVolume * (1 - (Defect + Void) / 100d);
             }
