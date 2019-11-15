@@ -147,13 +147,12 @@ namespace TwoTrails.Core
                 case OpType.Walk:
                 case OpType.WayPoint:
                     {
+                        if (traversing)
+                            CloseTraverse(sbPoints, point);
+
                         if (point.OnBoundary)
                         {
-                            if (traversing)
-                            {
-                                CloseTraverse(sbPoints, point);
-                            }
-                            else if (_LastTtBndPt != null)
+                            if (_LastTtBndPt != null)
                                 _Legs.Add(new TtLeg(_LastTtBndPt, point));
 
                             _LastTtBndPt = point;
