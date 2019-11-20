@@ -51,7 +51,7 @@ namespace TwoTrails.Converters
                         case MetadataPropertyName.Distance:
                             return FMSC.Core.Convert.Distance((double)value, Metadata.Distance, Distance.Meters);
                         case MetadataPropertyName.SlopeAngle:
-                            return FMSC.Core.Convert.Angle((double)value, Metadata.Slope, Slope.Degrees);
+                            return FMSC.Core.Convert.Angle((double)value, Metadata.Slope, Slope.Percent);
                     }
                 }
             }
@@ -74,7 +74,7 @@ namespace TwoTrails.Converters
                             case MetadataPropertyName.Distance:
                                 return FMSC.Core.Convert.Distance(dval, Distance.Meters, Metadata.Distance);
                             case MetadataPropertyName.SlopeAngle:
-                                return FMSC.Core.Convert.Angle(dval, Slope.Degrees, Metadata.Slope);
+                                return FMSC.Core.Convert.Angle(dval, Slope.Percent, Metadata.Slope);
                         }
                     }
                 }

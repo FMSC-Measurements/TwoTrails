@@ -162,7 +162,7 @@ namespace TwoTrails.Utils
                         sb.Append($"{trav.FwdAzimuth},{trav.BkAzimuth},");
                         sb.Append($"{FMSC.Core.Convert.Distance(trav.HorizontalDistance, trav.Metadata.Distance, Distance.Meters)},");
                         sb.Append($"{FMSC.Core.Convert.Distance(trav.SlopeDistance, trav.Metadata.Distance, Distance.Meters)},{trav.Metadata.Distance},");
-                        sb.Append($"{FMSC.Core.Convert.Angle(trav.SlopeAngle, trav.Metadata.Slope, Slope.Degrees)},{trav.Metadata.Slope},");
+                        sb.Append($"{FMSC.Core.Convert.Angle(trav.SlopeAngle, trav.Metadata.Slope, Slope.Percent)},{trav.Metadata.Slope},");
                     }
                     else
                         sb.Append(",,,,,,,");

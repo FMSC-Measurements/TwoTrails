@@ -191,7 +191,7 @@ namespace TwoTrails.Core.Points
 
                 x = prevX + (HorizontalDistance * Math.Cos(azInRadians));
                 y = prevY + (HorizontalDistance * Math.Sin(azInRadians));
-                z = prevZ + (SlopeDistance * Math.Sin(FMSC.Core.Convert.DegreesToRadians(SlopeAngle)));
+                z = prevZ + (SlopeDistance * Math.Sin(FMSC.Core.Convert.PercentToRadians(SlopeAngle)));
 
                 if (isPrevAdjusted)
                 {

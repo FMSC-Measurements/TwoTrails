@@ -24,7 +24,7 @@ namespace TwoTrails
 
         public double MagDec { get; set; } = 0;
 
-        public Slope Slope { get; set; } = Slope.Degrees;
+        public Slope Slope { get; set; } = Slope.Percent;
 
         public int Zone { get; set; } = 13;
 
