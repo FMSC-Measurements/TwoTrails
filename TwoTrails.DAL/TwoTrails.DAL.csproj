@@ -4,19 +4,19 @@
     <Authors>Fortest Management Service Center</Authors>
     <Copyright>Copyright © USDA Forest Service 2019</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <DebugSymbols>false</DebugSymbols>
-    <DebugType>none</DebugType>
-    <AssemblyVersion>1.1.8.0</AssemblyVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <AssemblyVersion>1.1.9.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <Version>1.1.8</Version>
+    <Version>1.1.9</Version>
   </PropertyGroup>
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="12.1.2" />
+    <PackageReference Include="CsvHelper" Version="12.2.1" />
     <PackageReference Include="NetTopologySuite.Core" Version="1.15.3" />
-    <PackageReference Include="NetTopologySuite.Features" Version="1.15.1" />
-    <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="1.15.3" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.111" />
+    <PackageReference Include="NetTopologySuite.Features" Version="2.0.0" />
+    <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.0.0" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.112" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="CSUtilSlim">

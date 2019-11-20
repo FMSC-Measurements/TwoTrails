@@ -136,7 +136,7 @@ namespace TwoTrails.DAL
                             foreach (Feature feat in features)
                             {
                                 //if features is only a point there should only be 1 coord
-                                foreach (Coordinate coord in feat.Geometry.Coordinates)
+                                foreach (NetTopologySuite.Geometries.Coordinate coord in feat.Geometry.Coordinates)
                                 {
                                     gps = new GpsPoint()
                                     {
@@ -234,7 +234,7 @@ namespace TwoTrails.DAL
 
                                 index = 0;
 
-                                foreach (Coordinate coord in feat.Geometry.Coordinates)
+                                foreach (NetTopologySuite.Geometries.Coordinate coord in feat.Geometry.Coordinates)
                                 {
                                     gps = new GpsPoint()
                                     {

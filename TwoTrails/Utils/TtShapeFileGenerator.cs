@@ -45,14 +45,14 @@ namespace TwoTrails.Utils
 
                     if (p.IsBndPoint())
                     {
-                        bndAdjCoords.Add(new Coordinate(adj.X, adj.Y));
-                        bndUnAdjCoords.Add(new Coordinate(unadj.X, unadj.Y));
+                        bndAdjCoords.Add(new NetTopologySuite.Geometries.Coordinate(adj.X, adj.Y));
+                        bndUnAdjCoords.Add(new NetTopologySuite.Geometries.Coordinate(unadj.X, unadj.Y));
                     }
 
                     if (p.IsNavPoint())
                     {
-                        navAdjCoords.Add(new Coordinate(adj.X, adj.Y));
-                        navUnAdjCoords.Add(new Coordinate(unadj.X, unadj.Y));
+                        navAdjCoords.Add(new NetTopologySuite.Geometries.Coordinate(adj.X, adj.Y));
+                        navUnAdjCoords.Add(new NetTopologySuite.Geometries.Coordinate(unadj.X, unadj.Y));
                     }
                 }
 
