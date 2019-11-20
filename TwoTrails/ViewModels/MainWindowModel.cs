@@ -105,9 +105,9 @@ namespace TwoTrails.ViewModels
 
         
         private bool exiting = false;
-        public bool CanExit
+        public bool ShouldExit()
         {
-            get { return exiting || Exit(false); }
+            return exiting || Exit(false);
         }
 
 

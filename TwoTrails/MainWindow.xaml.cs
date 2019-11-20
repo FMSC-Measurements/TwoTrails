@@ -46,7 +46,7 @@ namespace TwoTrails
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            e.Cancel = MainModel != null ? !MainModel.CanExit : false;
+            e.Cancel = MainModel != null ? !MainModel.ShouldExit() : false;
         }
 
         private void FilesDrop(object sender, DragEventArgs e)
