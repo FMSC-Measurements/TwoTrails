@@ -175,7 +175,7 @@ namespace TwoTrails.Core.Points
 
         protected void AdjustSlope()
         {
-            SetField(ref _HorizontalDistance, _SlopeDistance * Math.Cos(_SlopeAngle * (Math.PI / 180d)), OnPositionChanged, nameof(HorizontalDistance));
+            SetField(ref _HorizontalDistance, _SlopeDistance * Math.Cos(FMSC.Core.Convert.PercentToRadians(SlopeAngle)), OnPositionChanged, nameof(HorizontalDistance));
         }
 
 
