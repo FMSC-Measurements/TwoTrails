@@ -500,7 +500,7 @@ namespace TwoTrails.DAL
                 {
                     _Database.Delete(TTS.TravPointSchema.TableName, where, conn, transaction);
                 }
-                else
+                else if (oldPoint.OpType == OpType.Quondam)
                 {
                     _Database.Delete(TTS.QuondamPointSchema.TableName, where, conn, transaction);
                 }
@@ -748,7 +748,9 @@ namespace TwoTrails.DAL
 
                             if (count == 50)
                             {
-                                if (!DeleteBasePoints(sb.ToString(), conn, trans))
+                                where = sb.ToString();
+                                where = where.Remove(where.Length - 4);
+                                if (!DeleteBasePoints(where, conn, trans))
                                 {
                                     trans.Rollback();
                                     return -1;

@@ -995,44 +995,47 @@ namespace TwoTrails.Core
         {
             lock (locker)
             {
-                List<TtPoint> points = _PointsByPoly[polygon.CN].Where(p => p.IsBndPoint()).ToList();
-
-                if (points.Count > 2)
+                if (_PointsByPoly.ContainsKey(polygon.CN))
                 {
-                    double perim = 0, linePerim = 0, area = 0;
+                    List<TtPoint> points = _PointsByPoly[polygon.CN].Where(p => p.IsBndPoint()).ToList();
 
-                    TtPoint p1 = points[0], fBndPt = null, lBndPt = null;
-                    TtPoint p2 = points[points.Count - 1];
-
-                    lBndPt = p1;
-
-                    for (int i = 0; i < points.Count - 1; i++)
+                    if (points.Count > 2)
                     {
-                        p1 = points[i];
-                        p2 = points[i + 1];
+                        double perim = 0, linePerim = 0, area = 0;
 
-                        if (fBndPt == null)
-                            fBndPt = p1;
+                        TtPoint p1 = points[0], fBndPt = null, lBndPt = null;
+                        TtPoint p2 = points[points.Count - 1];
 
-                        lBndPt = p2;
+                        lBndPt = p1;
 
-                        perim += MathEx.Distance(p1.AdjX, p1.AdjY, p2.AdjX, p2.AdjY);
-                        area += (p2.AdjX - p1.AdjX) * (p2.AdjY + p1.AdjY);
+                        for (int i = 0; i < points.Count - 1; i++)
+                        {
+                            p1 = points[i];
+                            p2 = points[i + 1];
+
+                            if (fBndPt == null)
+                                fBndPt = p1;
+
+                            lBndPt = p2;
+
+                            perim += MathEx.Distance(p1.AdjX, p1.AdjY, p2.AdjX, p2.AdjY);
+                            area += (p2.AdjX - p1.AdjX) * (p2.AdjY + p1.AdjY);
+                        }
+
+                        linePerim = perim;
+
+                        if (!fBndPt.HasSameAdjLocation(lBndPt))
+                        {
+                            perim += MathEx.Distance(fBndPt.AdjX, fBndPt.AdjY, lBndPt.AdjX, lBndPt.AdjY);
+                            area += (fBndPt.AdjX - lBndPt.AdjX) * (fBndPt.AdjY + lBndPt.AdjY);
+                        }
+
+                        polygon.Update(Math.Abs(area) / 2, perim, linePerim);
                     }
-
-                    linePerim = perim;
-
-                    if (!fBndPt.HasSameAdjLocation(lBndPt))
+                    else
                     {
-                        perim += MathEx.Distance(fBndPt.AdjX, fBndPt.AdjY, lBndPt.AdjX, lBndPt.AdjY);
-                        area += (fBndPt.AdjX - lBndPt.AdjX) * (fBndPt.AdjY + lBndPt.AdjY);
+                        polygon.Update(0, 0, 0);
                     }
-
-                    polygon.Update(Math.Abs(area) / 2, perim, linePerim);
-                }
-                else
-                {
-                    polygon.Update(0, 0, 0);
                 }
             }
         }

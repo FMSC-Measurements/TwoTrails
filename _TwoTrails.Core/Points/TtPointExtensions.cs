@@ -106,6 +106,7 @@ namespace TwoTrails.Core.Points
         {
             TtPoint conversion = point.ParentPoint.DeepCopy();
 
+            conversion.CN = point.CN;
             conversion.PID = point.PID;
             conversion.Index = point.Index;
             conversion.Polygon = point.Polygon;

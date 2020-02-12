@@ -472,6 +472,7 @@ namespace TwoTrails.Core.Points
         public bool Equals(TtPoint point)
         {
             return base.Equals(point) &&
+                OpType == point.OpType &&
                 _Index == point._Index &&
                 _OnBoundary == point._OnBoundary &&
                 _AdjX == point._AdjX &&
