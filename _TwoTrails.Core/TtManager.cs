@@ -1878,11 +1878,11 @@ namespace TwoTrails.Core
 
     public class MissingDataException : Exception
     {
-        public String Data { get; }
+        public String PropertyName { get; }
 
-        public MissingDataException(string data = null)
+        public MissingDataException(string propertyName = null)
         {
-            Data = data;
+            PropertyName = propertyName;
         }
     }
 }

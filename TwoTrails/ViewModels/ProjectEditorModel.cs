@@ -322,7 +322,20 @@ namespace TwoTrails.ViewModels
         {
             if (CurrentPolygon != null)
             {
-                if (MessageBox.Show($"Confirm Delete Polygon '{CurrentPolygon.Name}'", "Delete Polygon",
+                string delSupMsg = "";
+
+                List<TtPoint> points = Manager.GetPoints(CurrentPolygon.CN);
+                if (points.Count > 0)
+                {
+                    int qlpts = points.Count(p => p.HasQuondamLinks);
+                    int rpts = points.Count - qlpts;
+
+
+                    delSupMsg = $"\n{rpts} point{(rpts > 1 ? "s" : String.Empty)} will be deleted" +
+                        $"{(qlpts > 0 ? $" and {qlpts} will be moved to replace quondams" : String.Empty)}.";
+                }
+
+                if (MessageBox.Show($"Confirm Delete Polygon '{CurrentPolygon.Name}'.{delSupMsg}", "Delete Polygon",
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
                     Manager.DeletePolygon(CurrentPolygon);
