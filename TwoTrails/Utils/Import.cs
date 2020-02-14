@@ -32,7 +32,7 @@ namespace TwoTrails.Utils
             includeMetadata &= iMeta.Count > 0;
             includeGroups &= iGroups.Count > 0;
 
-            foreach (TtPolygon poly in iPolys.Values)
+            foreach (TtPolygon poly in iPolys.Values.DeepCopy())
             {
                 poly.Name = $"{poly.Name}_Import";
 
@@ -46,14 +46,14 @@ namespace TwoTrails.Utils
                 aPolys.Add(poly.CN, poly);
             }
 
-            aPoints = aPolys.Values.SelectMany(p => dal.GetPoints(p.CN, convertForeignQuondams)).ToDictionary(p => p.CN, p => p);
+            aPoints = iPolys.Values.SelectMany(p => dal.GetPoints(p.CN, convertForeignQuondams)).ToDictionary(p => p.CN, p => p);
 
             foreach (string metaCN in aPoints.Values.Select(p => p.MetadataCN).Distinct())
             {
                 if (metaCN == null)
                     continue;
                 
-                TtMetadata meta = iMeta.ContainsKey(metaCN) ? iMeta[metaCN]: manager.DefaultMetadata;
+                TtMetadata meta = iMeta.ContainsKey(metaCN) ? iMeta[metaCN].DeepCopy(): manager.DefaultMetadata;
 
                 if (metadata.ContainsKey(metaCN))
                 {
@@ -80,7 +80,7 @@ namespace TwoTrails.Utils
 
                 if (includeGroups)
                 {
-                    TtGroup group = iGroups.ContainsKey(groupCN) ? iGroups[groupCN] : manager.MainGroup;
+                    TtGroup group = iGroups.ContainsKey(groupCN) ? iGroups[groupCN].DeepCopy() : manager.MainGroup;
 
                     if (groups.ContainsKey(groupCN))
                     {
@@ -140,7 +140,7 @@ namespace TwoTrails.Utils
                 if (polyMap.ContainsKey(p.PolygonCN))
                     p.PolygonCN = polyMap[p.PolygonCN];
 
-                p.Polygon = iPolys[p.PolygonCN];
+                p.Polygon = aPolys[p.PolygonCN];
 
                 if (!includeMetadata && p is GpsPoint gps)
                 {
