@@ -48,7 +48,7 @@ namespace TwoTrails.Core.ComponentModel.History
                         Index = index++,
                         ParentPoint = point.OpType == OpType.Quondam ? ((QuondamPoint)point).ParentPoint : point,
                         Polygon = TargetPolygon,
-                        Metadata = pointsManager.DefaultMetadata,
+                        Metadata = point.Metadata,
                         Group = pointsManager.MainGroup,
                         OnBoundary = (bndMode == QuondamBoundaryMode.Inherit) ? point.OnBoundary : (bndMode != QuondamBoundaryMode.Off)
                     };

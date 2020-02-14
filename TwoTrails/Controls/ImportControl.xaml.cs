@@ -65,7 +65,7 @@ namespace TwoTrails.Controls
             public SelectablePolygon(TtPolygon polygon)
             {
                 Polygon = polygon;
-                IsSelected = false;
+                IsSelected = true;
             }
         }
     }

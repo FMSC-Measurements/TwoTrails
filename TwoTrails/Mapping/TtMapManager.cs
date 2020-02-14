@@ -70,13 +70,14 @@ namespace TwoTrails.Mapping
             _PointsByPolys.Add(polygon.CN, ocPoints);
 
             TtMapPolygonManager mpm = new TtMapPolygonManager(_Map, polygon, ocPoints, _Manager.GetPolygonGraphicOption(polygon.CN));
-            if (polygon.Name.IndexOf("_plt", StringComparison.InvariantCultureIgnoreCase) > 0)
+            if (polygon.Name.IndexOf("_plt", StringComparison.InvariantCultureIgnoreCase) > 0 || 
+                (ocPoints.Count > 0 && ocPoints.All(p => p.OpType == OpType.WayPoint)))
             {
                 mpm.AdjBndVisible = false;
                 mpm.AdjBndPointsVisible = false;
                 mpm.WayPointsVisible = true;
             }
-            else if (ocPoints.All(p => p.IsMiscPoint()))
+            else if (ocPoints.Count > 0 && ocPoints.All(p => p.IsMiscPoint()))
             {
                 mpm.AdjBndVisible = false;
                 mpm.AdjBndPointsVisible = false;
