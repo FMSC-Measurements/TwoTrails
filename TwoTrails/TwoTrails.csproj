@@ -8,17 +8,17 @@
     <AssemblyTitle>TwoTrails</AssemblyTitle>
     <Company>Fortest Management Service Center</Company>
     <Product>TwoTrails</Product>
-    <Copyright>Copyright © USDA Forest Service 2019</Copyright>
+    <Copyright>Copyright © USDA Forest Service 2020</Copyright>
     <FileVersion>1.0.0.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
     <StartupObject />
     <Win32Resource>App.res</Win32Resource>
-    <AssemblyVersion>1.1.9.0</AssemblyVersion>
+    <AssemblyVersion>1.1.10.0</AssemblyVersion>
     <PackageProjectUrl>https://www.fs.fed.us/forestmanagement/products/measurement/area-determination/twotrails/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FMSC-Measurements/TwoTrails</RepositoryUrl>
     <Description>TwoTrails is a timber cruising and timber sales admin surveying package. It is maintained and developed by the Forest Management Service Center. Though it is specifically written for USDA forestry personnel, it is freely available to anyone.</Description>
-    <Version>1.1.9</Version>
+    <Version>1.1.10</Version>
     <Authors>Fortest Management Service Center</Authors>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>

@@ -2,13 +2,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Fortest Management Service Center</Authors>
-    <Copyright>Copyright © USDA Forest Service 2019</Copyright>
+    <Copyright>Copyright © USDA Forest Service 2020</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <AssemblyVersion>1.1.9.0</AssemblyVersion>
+    <AssemblyVersion>1.1.10.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <Version>1.1.9</Version>
+    <Version>1.1.10</Version>
   </PropertyGroup>
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
   <ItemGroup>

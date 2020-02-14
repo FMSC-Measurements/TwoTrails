@@ -116,20 +116,6 @@ namespace TwoTrails.ViewModels
         {
             if (DeckPolygon != null)
             {
-                //Func<Distance, double, double> distToArea = (distType, dist) =>
-                //{
-                //    switch (distType)
-                //    {
-                //        case Distance.FeetTenths: 
-                //        case Distance.Meters:
-                //            break;
-                //        case Distance.Chains:
-                //            break;
-                //        case Distance.Yards:
-                //            break;
-                //    }
-                //};
-
                 Area areaType = (Distance == Distance.Meters) ? FMSC.Core.Area.MeterSq : FMSC.Core.Area.FeetSq;
 
                 double faceAreaMt = areaMt + Convert.Distance(CollarWidth, Distance.Meters, Distance) * Perimeter;

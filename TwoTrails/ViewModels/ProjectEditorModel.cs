@@ -133,6 +133,8 @@ namespace TwoTrails.ViewModels
                     };
 
                     MapWindow.Show();
+
+                    _Project.ProjectTab.SwitchToTab(ProjectStartupTab.Points);
                 }
             });
 
