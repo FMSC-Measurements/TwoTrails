@@ -7,6 +7,8 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         public bool RequireRefresh { get; protected set; } = true;
 
+        public Type DataType => Point.GetType();
+
         protected TtPoint Point;
 
         public ITtPointCommand(TtPoint point)

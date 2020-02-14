@@ -57,7 +57,7 @@ namespace TwoTrails.Core
                     case nameof(TtMetadata.Slope):
                     case nameof(TtMetadata.Distance):
                     case nameof(TtMetadata.Elevation):
-                        OnHistoryChanged(HistoryEventType.Reset, true);
+                        OnHistoryChanged(HistoryEventType.Reset, typeof(TtMetadata), true);
                         break;
                 }
             };
@@ -71,7 +71,7 @@ namespace TwoTrails.Core
                 BaseManager.Save();
                 _UndoStack.Clear();
                 _RedoStack.Clear();
-                OnHistoryChanged(HistoryEventType.Reset, true);
+                OnHistoryChanged(HistoryEventType.Reset, null, true);
             }
             catch (Exception ex)
             {
@@ -95,7 +95,7 @@ namespace TwoTrails.Core
                 }
                 _UndoStack.Push(command);
                 _RedoStack.Clear();
-                OnHistoryChanged(HistoryEventType.Redone, command.RequireRefresh);
+                OnHistoryChanged(HistoryEventType.Commit, command.DataType, command.RequireRefresh);
             }
         }
 
@@ -134,7 +134,7 @@ namespace TwoTrails.Core
                 _RedoStack.Push(command);
                 command.Undo();
 
-                OnHistoryChanged(HistoryEventType.Undone, command.RequireRefresh);
+                OnHistoryChanged(HistoryEventType.Undone, command.DataType, command.RequireRefresh);
             }
         }
 
@@ -142,7 +142,7 @@ namespace TwoTrails.Core
         {
             if (CanUndo)
             {
-                ITtCommand command;
+                ITtCommand command = null;
                 bool requireRefresh = false;
 
                 for (int i = 0; i < levels && CanUndo; i++)
@@ -153,8 +153,7 @@ namespace TwoTrails.Core
                     command.Undo();
                 }
 
-
-                OnHistoryChanged(HistoryEventType.Undone, requireRefresh);
+                OnHistoryChanged(HistoryEventType.Undone, command?.DataType, requireRefresh);
             }
         }
 
@@ -163,10 +162,10 @@ namespace TwoTrails.Core
             if (CanRedo)
             {
                 ITtCommand command = _RedoStack.Pop();
-                _UndoStack.Push(command);   //AddCommand(command);
+                _UndoStack.Push(command);
                 command.Redo();
 
-                OnHistoryChanged(HistoryEventType.Undone, command.RequireRefresh);
+                OnHistoryChanged(HistoryEventType.Redone, command.DataType, command.RequireRefresh);
             }
         }
 
@@ -174,18 +173,18 @@ namespace TwoTrails.Core
         {
             if (CanRedo)
             {
-                ITtCommand command;
+                ITtCommand command = null;
                 bool requireRefresh = false;
 
                 for (int i = 0; i < levels && CanRedo; i++)
                 {
                     command = _RedoStack.Pop();
                     requireRefresh |= command.RequireRefresh;
-                    _UndoStack.Push(command);   //AddCommand(command);
+                    _UndoStack.Push(command);
                     command.Redo();
                 }
 
-                OnHistoryChanged(HistoryEventType.Undone, requireRefresh);
+                OnHistoryChanged(HistoryEventType.Redone, command?.DataType, requireRefresh);
             }
         }
 
@@ -196,9 +195,9 @@ namespace TwoTrails.Core
             OnPropertyChanged(nameof(CanUndo), nameof(CanRedo));
         }
 
-        private void OnHistoryChanged(HistoryEventType historyEventType, bool requireRefresh)
+        private void OnHistoryChanged(HistoryEventType historyEventType, Type dataType, bool requireRefresh)
         {
-            HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, requireRefresh));
+            HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, dataType, requireRefresh));
             OnPropertyChanged(nameof(CanUndo), nameof(CanRedo));
         }
         #endregion
@@ -398,11 +397,17 @@ namespace TwoTrails.Core
         #endregion
 
         #region Metadata
-
+        public void EditMetadata<T>(TtMetadata metadata, PropertyInfo property, T newValue)
+        {
+            AddCommand(new EditTtMetadataCommand<T>(metadata, property, newValue));
+        }
         #endregion
 
         #region Groups
-
+        public void EditGroup<T>(TtGroup group, PropertyInfo property, T newValue)
+        {
+            AddCommand(new EditTtGroupCommand<T>(group, property, newValue));
+        }
         #endregion
         #endregion
 
@@ -503,6 +508,7 @@ namespace TwoTrails.Core
 
     public enum HistoryEventType
     {
+        Commit,
         Undone,
         Redone,
         Reset
@@ -510,13 +516,15 @@ namespace TwoTrails.Core
 
     public class HistoryEventArgs : EventArgs
     {
-        public bool RequireRefresh { get; }
         public HistoryEventType HistoryEventType { get; }
+        public Type DataType { get; }
+        public bool RequireRefresh { get; }
 
-        public HistoryEventArgs(HistoryEventType historyEventType, bool requireRefresh)
+        public HistoryEventArgs(HistoryEventType historyEventType, Type dataType, bool requireRefresh)
         {
-            RequireRefresh = requireRefresh;
             HistoryEventType = historyEventType;
+            DataType = dataType;
+            RequireRefresh = requireRefresh;
         }
     }
 }

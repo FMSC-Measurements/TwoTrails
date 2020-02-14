@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -49,14 +50,12 @@ namespace TwoTrails.ViewModels
             DataController = new PointEditorControl(project.DataEditor, new DataStyleModel(project));
 
             PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtPolygon));
-            NewPolygonCommand = new RelayCommand(x => NewPolygon(x as ListBox));
-            DeletePolygonCommand = new RelayCommand(x => DeletePolygon());
-
-            PolygonAccuracyChangedCommand = new RelayCommand(x => PolygonAccuracyChanged(x as string));
+            CreatePolygonCommand = new RelayCommand(x => CreatePolygon(x as ListBox));
+            DeletePolygonCommand = new RelayCommand(x => DeletePolygon(x as ListBox));
 
             PolygonUpdateAccCommand = new BindedRelayCommand<ProjectEditorModel>(
                 x => UpdatePolygonAcc(),
-                x => CurrentPolygon != null && CurrentPolygon.Accuracy != PolygonAccuracy,
+                x => CurrentPolygon != null && CurrentPolygon.Accuracy != _PolygonAccuracy,
                 this,
                 x => new { x.PolygonAccuracy, CurrentPolygon.Accuracy });
 
@@ -137,6 +136,25 @@ namespace TwoTrails.ViewModels
                 }
             });
 
+            Manager.HistoryChanged += (s, e) =>
+            {
+                if (e.DataType != null && e.HistoryEventType == HistoryEventType.Undone || e.HistoryEventType == HistoryEventType.Redone)
+                {
+                    if (e.DataType == PolygonProperties.DataType)
+                    {
+                        BindPolygonValues(CurrentPolygon);
+                    }
+                    else if (e.DataType == GroupProperties.DataType)
+                    {
+                        
+                    }
+                    else if (e.DataType == MetadataProperties.DataType)
+                    {
+                        
+                    }
+                }
+            };
+
             CurrentMetadata = Metadata[0];
             CurrentGroup = Groups[0];
 
@@ -153,12 +171,17 @@ namespace TwoTrails.ViewModels
         }
 
         #region Polygon
-        public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
-        public double TotalPolygonPerimeter { get { return Get<double>(); } set { Set(value); } }
 
-        public double PolygonAccuracy { get { return Get<double>(); } set { Set(value); } }
+        #region Commands
+        public ICommand PolygonChangedCommand { get; }
+        public ICommand CreatePolygonCommand { get; }
+        public ICommand DeletePolygonCommand { get; }
+        public ICommand PolygonUpdateAccCommand { get; }
+        public ICommand PolygonAccuracyLookupCommand { get; }
+        public ICommand SavePolygonSummary { get; }
+        #endregion
 
-        private TtPolygon _BackupPoly;
+        #region Properties
         private TtPolygon _CurrentPolygon;
         public TtPolygon CurrentPolygon
         {
@@ -170,16 +193,13 @@ namespace TwoTrails.ViewModels
                 SetField(ref _CurrentPolygon, value, () => {
                     if (old != null)
                     {
-                        old.PropertyChanged -= Polygon_PropertyChanged;
                         old.PolygonChanged -= GeneratePolygonSummary;
                     }
 
+                    BindPolygonValues(value);
+
                     if (_CurrentPolygon != null)
                     {
-                        _BackupPoly = new TtPolygon(_CurrentPolygon);
-                        PolygonAccuracy = _CurrentPolygon.Accuracy;
-
-                        _CurrentPolygon.PropertyChanged += Polygon_PropertyChanged;
                         _CurrentPolygon.PolygonChanged += GeneratePolygonSummary;
 
                         ValidatePolygon(value);
@@ -188,8 +208,107 @@ namespace TwoTrails.ViewModels
                     }
                 });
 
+
             }
         }
+
+        private string _PolygonName = String.Empty;
+        public string PolygonName
+        {
+            get => _PolygonName;
+            set => EditPolygonValue(ref _PolygonName, value, PolygonProperties.NAME);
+        }
+
+        private double _PolygonAccuracy;
+        public double PolygonAccuracy
+        {
+            get => _PolygonAccuracy;
+            set {
+                _PolygonAccuracy = value;
+                OnPropertyChanged(nameof(PolygonAccuracy));
+            }
+        }
+
+        private string _PolygonDescription = String.Empty;
+        public string PolygonDescription
+        {
+            get => _PolygonDescription;
+            set => EditPolygonValue(ref _PolygonDescription, value, PolygonProperties.DESCRIPTION);
+        }
+
+        private int? _PolygonPointStartIndex;
+        public int? PolygonPointStartIndex
+        {
+            get => _PolygonPointStartIndex;
+            set => EditPolygonValue(ref _PolygonPointStartIndex, value, PolygonProperties.POINT_START_INDEX);
+        }
+
+        private int? _PolygonIncrement;
+        public int? PolygonIncrement
+        {
+            get => _PolygonIncrement;
+            set => EditPolygonValue(ref _PolygonIncrement, value, PolygonProperties.INCREMENT);
+        }
+
+        public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
+        public double TotalPolygonPerimeter { get { return Get<double>(); } set { Set(value); } }
+
+
+        private void EditPolygonValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
+        {
+            if (!origValue.Equals(newValue))
+            {
+                origValue = newValue;
+
+                if (allowNull || newValue != null)
+                {
+                    Manager.EditPolygon(CurrentPolygon, property, newValue);
+                }
+            }
+        }
+
+        private void EditPolygonValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
+        {
+            if (!origValue.Equals(newValue))
+            {
+                origValue = newValue;
+
+                if (allowNull || newValue != null)
+                {
+                    Manager.EditPolygon(CurrentPolygon, property, newValue);
+                }
+            }
+        }
+        #endregion
+
+
+        private void BindPolygonValues(TtPolygon polygon)
+        {
+            if (polygon != null)
+            {
+                _PolygonName = polygon.Name;
+                _PolygonAccuracy = polygon.Accuracy;
+                _PolygonPointStartIndex = polygon.PointStartIndex;
+                _PolygonIncrement = polygon.Increment;
+                _PolygonDescription = polygon.Description;
+            }
+            else
+            {
+                _PolygonName = String.Empty;
+                _PolygonAccuracy = Consts.DEFAULT_POINT_ACCURACY;
+                _PolygonPointStartIndex = Consts.DEFAULT_POINT_START_INDEX;
+                _PolygonIncrement = Consts.DEFAULT_POINT_INCREMENT;
+                _PolygonDescription = String.Empty;
+            }
+
+            OnPropertyChanged(
+                nameof(PolygonName),
+                nameof(PolygonAccuracy),
+                nameof(PolygonPointStartIndex),
+                nameof(PolygonIncrement),
+                nameof(PolygonDescription));
+        }
+
 
         private void GeneratePolygonSummary(TtPolygon polygon)
         {
@@ -198,22 +317,6 @@ namespace TwoTrails.ViewModels
 
         public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
 
-
-        private void Polygon_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (!(sender as TtPolygon).Equals(_BackupPoly))
-            {
-                _Project.ProjectUpdated();
-            }
-        }
-
-        public ICommand PolygonChangedCommand { get; }
-        public ICommand NewPolygonCommand { get; }
-        public ICommand DeletePolygonCommand { get; }
-        public ICommand PolygonUpdateAccCommand { get; }
-        public ICommand PolygonAccuracyLookupCommand { get; }
-        public ICommand PolygonAccuracyChangedCommand { get; }
-        public ICommand SavePolygonSummary { get; }
 
         private void PolygonCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -255,26 +358,16 @@ namespace TwoTrails.ViewModels
         private void PolygonChanged(TtPolygon poly)
         {
             CurrentPolygon = poly;
-            PolygonAccuracy = poly != null ? poly.Accuracy : Consts.DEFAULT_POINT_ACCURACY;
         }
 
-        private bool PolygonAccuracyChanged(string accStr)
-        {
-            if (accStr != null)
-            {
-                if (double.TryParse(accStr, out double acc))
-                {
-                    PolygonAccuracy = acc;
-                    return true;
-                }
-            }
-
-            return false;
-        }
 
         private void UpdatePolygonAcc()
         {
-            CurrentPolygon.Accuracy = PolygonAccuracy;
+            if (!_PolygonAccuracy.Equals(CurrentPolygon.Accuracy))
+            {
+                Manager.EditPolygon(CurrentPolygon, PolygonProperties.ACCURACY, _PolygonAccuracy);
+            }
+
             OnPropertyChanged(nameof(PolygonAccuracy));
         }
 
@@ -297,7 +390,7 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void NewPolygon(ListBox listBox)
+        private void CreatePolygon(ListBox listBox)
         {
             Manager.AddPolygon(CreatePolygon());
             listBox.SelectedIndex = listBox.Items.Count - 1;
@@ -315,11 +408,11 @@ namespace TwoTrails.ViewModels
             return new TtPolygon()
             {
                 Name = name ?? $"Poly {num}",
-                PointStartIndex = pointStartIndex > 0 ? pointStartIndex : num * 1000 + 10
+                PointStartIndex = pointStartIndex > 0 ? pointStartIndex : num * 1000 + Consts.DEFAULT_POINT_INCREMENT
             };
         }
 
-        private void DeletePolygon()
+        private void DeletePolygon(ListBox listBox)
         {
             if (CurrentPolygon != null)
             {
@@ -339,9 +432,21 @@ namespace TwoTrails.ViewModels
                 if (MessageBox.Show($"Confirm Delete Polygon '{CurrentPolygon.Name}'.{delSupMsg}", "Delete Polygon",
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
+                    int oldIndex = listBox.SelectedIndex;
+
                     Manager.DeletePolygon(CurrentPolygon);
 
-                    _Project.ProjectUpdated();
+                    if (Polygons.Count > 0 && listBox.SelectedIndex < 0)
+                    {
+                        if (oldIndex >= Polygons.Count)
+                        {
+                            listBox.SelectedItem = Polygons.Last();
+                        }
+                        else
+                        {
+                            listBox.SelectedIndex = oldIndex;
+                        }
+                    }
                 }
             }
         }

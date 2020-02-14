@@ -6,6 +6,8 @@ namespace TwoTrails.Core
 {
     public static class PointProperties
     {
+        public static readonly Type DataType = typeof(TtPoint);
+
         public static readonly PropertyInfo INDEX;
         public static readonly PropertyInfo PID;
         public static readonly PropertyInfo TIME_CREATED;
@@ -39,29 +41,28 @@ namespace TwoTrails.Core
 
         static PointProperties()
         {
-            Type tt = typeof(TtPoint);
             Type gps = typeof(GpsPoint);
             Type trav = typeof(TravPoint);
             Type qp = typeof(QuondamPoint);
             BindingFlags bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
 
-            INDEX = tt.GetProperty(nameof(TtPoint.Index), bf);
-            PID = tt.GetProperty(nameof(TtPoint.PID), bf);
-            TIME_CREATED = tt.GetProperty(nameof(TtPoint.TimeCreated), bf);
-            POLY = tt.GetProperty(nameof(TtPoint.Polygon), bf);
-            GROUP = tt.GetProperty(nameof(TtPoint.Group), bf);
-            META = tt.GetProperty(nameof(TtPoint.Metadata), bf);
-            COMMENT = tt.GetProperty(nameof(TtPoint.Comment), bf);
-            BOUNDARY = tt.GetProperty(nameof(TtPoint.OnBoundary), bf);
-            ADJX = tt.GetProperty(nameof(TtPoint.AdjX), bf);
-            ADJY = tt.GetProperty(nameof(TtPoint.AdjY), bf);
-            ADJZ = tt.GetProperty(nameof(TtPoint.AdjZ), bf);
-            UNADJX = tt.GetProperty(nameof(TtPoint.UnAdjX), bf);
-            UNADJY = tt.GetProperty(nameof(TtPoint.UnAdjY), bf);
-            UNADJZ = tt.GetProperty(nameof(TtPoint.UnAdjZ), bf);
-            ACCURACY = tt.GetProperty(nameof(TtPoint.Accuracy), bf);
-            QLINKS = tt.GetProperty(nameof(TtPoint.LinkedPoints), bf);
-            EXTENDED_DATA = tt.GetProperty(nameof(TtPoint.ExtendedData), bf);
+            INDEX = DataType.GetProperty(nameof(TtPoint.Index), bf);
+            PID = DataType.GetProperty(nameof(TtPoint.PID), bf);
+            TIME_CREATED = DataType.GetProperty(nameof(TtPoint.TimeCreated), bf);
+            POLY = DataType.GetProperty(nameof(TtPoint.Polygon), bf);
+            GROUP = DataType.GetProperty(nameof(TtPoint.Group), bf);
+            META = DataType.GetProperty(nameof(TtPoint.Metadata), bf);
+            COMMENT = DataType.GetProperty(nameof(TtPoint.Comment), bf);
+            BOUNDARY = DataType.GetProperty(nameof(TtPoint.OnBoundary), bf);
+            ADJX = DataType.GetProperty(nameof(TtPoint.AdjX), bf);
+            ADJY = DataType.GetProperty(nameof(TtPoint.AdjY), bf);
+            ADJZ = DataType.GetProperty(nameof(TtPoint.AdjZ), bf);
+            UNADJX = DataType.GetProperty(nameof(TtPoint.UnAdjX), bf);
+            UNADJY = DataType.GetProperty(nameof(TtPoint.UnAdjY), bf);
+            UNADJZ = DataType.GetProperty(nameof(TtPoint.UnAdjZ), bf);
+            ACCURACY = DataType.GetProperty(nameof(TtPoint.Accuracy), bf);
+            QLINKS = DataType.GetProperty(nameof(TtPoint.LinkedPoints), bf);
+            EXTENDED_DATA = DataType.GetProperty(nameof(TtPoint.ExtendedData), bf);
 
             LAT = gps.GetProperty(nameof(GpsPoint.Latitude), bf);
             LON = gps.GetProperty(nameof(GpsPoint.Longitude), bf);

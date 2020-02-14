@@ -100,7 +100,7 @@ namespace TwoTrails.DAL
 
             TtPolygon poly = new TtPolygon();
             poly.Name = String.IsNullOrWhiteSpace(folder.Name) ? $"Poly {polyCount} ({parentFolderName})" : folder.Name;
-            poly.PointStartIndex = polyCount * 1000 + 10;
+            poly.PointStartIndex = polyCount * 1000 + Consts.DEFAULT_POINT_INCREMENT;
             poly.Description = folder.Desctription;
             poly.TimeCreated = DateTime.Now.AddMilliseconds(polyCount);
 
@@ -131,7 +131,7 @@ namespace TwoTrails.DAL
 
                     TtPolygon poly = new TtPolygon();
                     poly.Name = String.IsNullOrWhiteSpace(kpoly.Name) ? $"Poly {polyCount} ({parentFolderName})" : kpoly.Name;
-                    poly.PointStartIndex = polyCount * 1000 + 10;
+                    poly.PointStartIndex = polyCount * 1000 + Consts.DEFAULT_POINT_INCREMENT;
                     poly.Description = placemark.Desctription;
                     poly.TimeCreated = DateTime.Now.AddMilliseconds(polyCount);
 

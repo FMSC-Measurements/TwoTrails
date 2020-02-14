@@ -6,6 +6,8 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         public bool RequireRefresh { get; } = false;
 
+        public Type DataType => PolygonProperties.DataType;
+
         protected TtPolygon Polygon;
 
         public ITtPolygonCommand(TtPolygon polygon)

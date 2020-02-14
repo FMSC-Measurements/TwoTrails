@@ -19,6 +19,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtGroupCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtMetadataCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtPointCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtGroupCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtMetadataCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPolygonCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPointsMultiPropertyMultiValueCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MovePointsCommand.cs" />
@@ -52,6 +54,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionaryTemplate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtObjectExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MetadataProperties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GroupProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PolygonProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Points\IAccuracy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IDeviceSettings.cs" />

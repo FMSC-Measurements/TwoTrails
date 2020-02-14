@@ -11,12 +11,12 @@
 
         public override void Redo()
         {
-            pointsManager.DeleteGroup(group);
+            pointsManager.DeleteGroup(Group);
         }
 
         public override void Undo()
         {
-            pointsManager.AddGroup(group);
+            pointsManager.AddGroup(Group);
         }
     }
 }

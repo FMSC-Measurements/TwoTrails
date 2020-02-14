@@ -182,7 +182,7 @@ namespace TwoTrails.ViewModels
                     poly = new TtPolygon()
                     {
                         Name = gPolyName,
-                        PointStartIndex = (++polyCount) * 1000 + 10,
+                        PointStartIndex = (++polyCount) * 1000 + Consts.DEFAULT_POINT_INCREMENT,
                         Increment = 1,
                         Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, {created}"
                     };
@@ -291,7 +291,7 @@ namespace TwoTrails.ViewModels
                     poly = new TtPolygon()
                     {
                         Name = gPolyName,
-                        PointStartIndex = (polygons.Count + 1) * 1000 + 10,
+                        PointStartIndex = (polygons.Count + 1) * 1000 + Consts.DEFAULT_POINT_INCREMENT,
                         Increment = 1
                     };
 

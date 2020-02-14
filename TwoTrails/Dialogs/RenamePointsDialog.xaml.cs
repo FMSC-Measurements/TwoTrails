@@ -12,8 +12,8 @@ namespace TwoTrails.Dialogs
     /// </summary>
     public partial class RenamePointsDialog : Window
     {
-        public int StartIndex { get; set; } = 1010;
-        public int Increment { get; set; } = 10;
+        public int StartIndex { get; set; } = Consts.DEFAULT_POINT_START_INDEX;
+        public int Increment { get; set; } = Consts.DEFAULT_POINT_INCREMENT;
 
         public RenamePointsDialog(ITtManager manager)
         {

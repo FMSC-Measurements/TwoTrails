@@ -334,7 +334,7 @@
                                 </Grid.Resources>
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding CurrentPolygon.Name, UpdateSourceTrigger=PropertyChanged}"
+                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding PolygonName, UpdateSourceTrigger=PropertyChanged, Delay=500}"
                                          PreviewTextInput="TextHasRestrictedCharacters"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy (Meters)*" />
@@ -347,14 +347,8 @@
 
                                     <TextBox Grid.Column="0"
                                      Name="txtPolyAcc"
-                                     Text="{Binding CurrentPolygon.Accuracy, Mode=OneWay}"
+                                     Text="{Binding PolygonAccuracy, UpdateSourceTrigger=PropertyChanged}"
                                      PreviewTextInput="TextIsDouble">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="TextChanged">
-                                                <i:InvokeCommandAction Command="{Binding PolygonAccuracyChangedCommand}"
-                                                CommandParameter="{Binding ElementName=txtPolyAcc, Path=Text}" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
                                     </TextBox>
                                     <Button Grid.Column="1" Width="75" Command="{Binding PolygonUpdateAccCommand}" Content="Update"/>
                                     <Button Grid.Column="2" Width="100" Command="{Binding PolygonAccuracyLookupCommand}" Content="Acc Lookup"/> <!-- Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource BoolToVis}}" -->
@@ -362,12 +356,12 @@
 
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Start Index" />
                                 <TextBox Grid.Column="0" Grid.Row="5"
-                                 Text="{Binding CurrentPolygon.PointStartIndex, UpdateSourceTrigger=PropertyChanged}"
+                                 Text="{Binding PolygonPointStartIndex, UpdateSourceTrigger=PropertyChanged, Delay=500}"
                                  PreviewTextInput="TextIsUnsignedInteger"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="6" Text="Increment" />
                                 <TextBox Grid.Column="0" Grid.Row="7"
-                                 Text="{Binding CurrentPolygon.Increment, UpdateSourceTrigger=PropertyChanged}"
+                                 Text="{Binding PolygonIncrement, UpdateSourceTrigger=PropertyChanged, Delay=500}"
                                  PreviewTextInput="TextIsUnsignedInteger"/>
 
                                 <StackPanel Grid.Column="0" Grid.Row="9" Orientation="Horizontal">
@@ -377,7 +371,7 @@
 
                                 <TextBlock Grid.Column="0" Grid.Row="11" Text="Description" />
                                 <TextBox Grid.Column="0" Grid.Row="12" Grid.ColumnSpan="3" MinLines="3" MaxLines="5"
-                                Text="{Binding CurrentPolygon.Description, UpdateSourceTrigger=PropertyChanged}" />
+                                Text="{Binding PolygonDescription, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
 
                                 <GroupBox Header="Area" Grid.Column="2" Grid.Row="0" Grid.RowSpan="4" VerticalAlignment="Stretch">
                                     <Grid Margin="5,0,5,0">
@@ -540,9 +534,10 @@
                             </Grid.Resources>
 
                             <Button Grid.Column="0" Margin="0, 0, 5, 0" Content="Delete"
-                                    Command="{Binding DeletePolygonCommand}"
-                                 IsEnabled="{Binding ElementName=lbPolys, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" />
-                            <Button Grid.Column="3" Content="New" Command="{Binding NewPolygonCommand}" CommandParameter="{Binding ElementName=lbPolys}" />
+                                 Command="{Binding DeletePolygonCommand}"
+                                 IsEnabled="{Binding ElementName=lbPolys, Path=SelectedItem, Converter={StaticResource NotNullConverter}}"
+                                 CommandParameter="{Binding ElementName=lbPolys}" />
+                            <Button Grid.Column="3" Content="Create" Command="{Binding CreatePolygonCommand}" CommandParameter="{Binding ElementName=lbPolys}" />
                         </Grid>
                     </Grid>
                 </Border>

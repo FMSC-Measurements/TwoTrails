@@ -94,7 +94,7 @@ namespace TwoTrails.DAL
                                                     poly = new TtPolygon()
                                                     {
                                                         Name = $"Poly {++polyInc}",
-                                                        PointStartIndex = 1000 * polyInc + 10,
+                                                        PointStartIndex = 1000 * polyInc + Consts.DEFAULT_POINT_INCREMENT,
                                                         TimeCreated = DateTime.Now.AddMilliseconds(milliSecondsInc++)
                                                     };
 

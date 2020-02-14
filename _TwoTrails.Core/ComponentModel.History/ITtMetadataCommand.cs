@@ -6,11 +6,13 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         public bool RequireRefresh { get; } = false;
 
-        protected TtMetadata metadata;
+        public Type DataType => MetadataProperties.DataType;
+
+        protected TtMetadata Metadata;
 
         public ITtMetadataCommand(TtMetadata metadata)
         {
-            this.metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
+            this.Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
         }
 
         public abstract void Redo();

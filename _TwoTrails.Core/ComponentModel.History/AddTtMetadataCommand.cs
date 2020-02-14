@@ -11,12 +11,12 @@
 
         public override void Redo()
         {
-            pointsManager.AddMetadata(metadata);
+            pointsManager.AddMetadata(Metadata);
         }
 
         public override void Undo()
         {
-            pointsManager.DeleteMetadata(metadata);
+            pointsManager.DeleteMetadata(Metadata);
         }
     }
 }

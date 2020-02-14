@@ -253,7 +253,7 @@ namespace TwoTrails.DAL
                                 CN = cn,
                                 Name = hasPolyNames ?
                                     reader.GetField<string>(fPolyName) : $"Poly {++polyInc}",
-                                PointStartIndex = _Polygons.Count * polyInc + 10,
+                                PointStartIndex = _Polygons.Count * polyInc + Consts.DEFAULT_POINT_INCREMENT,
                                 TimeCreated = _ProjectInfo.CreationDate.AddMilliseconds(milliSecondsInc++)
                             };
 
@@ -273,7 +273,7 @@ namespace TwoTrails.DAL
                             TtPolygon poly = new TtPolygon()
                             {
                                 Name = reader.GetField<string>(fPolyName),
-                                PointStartIndex = _Polygons.Count * 1000 + 1010,
+                                PointStartIndex = (_Polygons.Count + 1) * 1000 + Consts.DEFAULT_POINT_INCREMENT,
                                 TimeCreated = _ProjectInfo.CreationDate.AddMilliseconds(milliSecondsInc++)
                             };
 

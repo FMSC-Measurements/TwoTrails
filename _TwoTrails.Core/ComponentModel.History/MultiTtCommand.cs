@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace TwoTrails.Core.ComponentModel.History
@@ -10,6 +11,8 @@ namespace TwoTrails.Core.ComponentModel.History
         private List<ITtCommand> _Commands = new List<ITtCommand>();
 
         public int NumberOfCommands => _Commands.Count;
+
+        public Type DataType => null;
 
         public MultiTtCommand(IEnumerable<ITtCommand> commands)
         {

@@ -6,11 +6,13 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         public bool RequireRefresh { get; } = false;
 
-        protected TtGroup group;
+        public Type DataType => GroupProperties.DataType;
+
+        protected TtGroup Group;
 
         public ITtGroupCommand(TtGroup group)
         {
-            this.group = group ?? throw new ArgumentNullException(nameof(group));
+            this.Group = group ?? throw new ArgumentNullException(nameof(group));
         }
 
         public abstract void Redo();

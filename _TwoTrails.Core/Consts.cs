@@ -11,7 +11,9 @@ namespace TwoTrails.Core
 
         public const double MINIMUM_POINT_DIGIT_ACCURACY = 0.000001d;
         public const double DEFAULT_POINT_ACCURACY = 6.01d;
-        
+        public const int DEFAULT_POINT_START_INDEX = 1010;
+        public const int DEFAULT_POINT_INCREMENT = 10;
+
         public const String DefaultGroupName = "Main Group";
         public const String DefaultGroupDesc = "Default Group";
 

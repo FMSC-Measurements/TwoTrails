@@ -126,7 +126,7 @@ namespace TwoTrails.DAL
                         {
                             poly = new TtPolygon()
                             {
-                                PointStartIndex = 1000 * ++polyInc + 10,
+                                PointStartIndex = 1000 * ++polyInc + Consts.DEFAULT_POINT_INCREMENT,
                                 Name = file.Name,
                                 TimeCreated = DateTime.Now.AddMilliseconds(milliSecondsInc++)
                             };
@@ -192,7 +192,7 @@ namespace TwoTrails.DAL
 
                                 poly = new TtPolygon()
                                 {
-                                    PointStartIndex = 1000 * ++polyInc + 10,
+                                    PointStartIndex = 1000 * ++polyInc + Consts.DEFAULT_POINT_INCREMENT,
                                     Name = features.Count < 2 ? file.Name :
                                         $"{fidInc++}-{file.Name}",
                                     TimeCreated = DateTime.Now.AddMilliseconds(milliSecondsInc++)

@@ -28,14 +28,14 @@ namespace TwoTrails.Core
             set { SetField(ref _Description, value); }
         }
 
-        protected Int32 _PointStartIndex = 1010;
+        protected Int32 _PointStartIndex = Consts.DEFAULT_POINT_START_INDEX;
         public Int32 PointStartIndex
         {
             get { return _PointStartIndex; }
             set { SetField(ref _PointStartIndex, value); }
         }
 
-        protected Int32 _Increment = 10;
+        protected Int32 _Increment = Consts.DEFAULT_POINT_INCREMENT;
         public Int32 Increment
         {
             get { return _Increment; }
