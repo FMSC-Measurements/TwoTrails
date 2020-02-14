@@ -1116,10 +1116,6 @@ namespace TwoTrails.ViewModels
                         }
                         else
                         {
-
-
-
-
                             //if (!SelectedPoint.ExtendedData[e.PropertyName].Equals(_ExtendedData[e.PropertyName]))
                             //{
                             //    if (MultipleSelections)
@@ -1131,11 +1127,7 @@ namespace TwoTrails.ViewModels
                             //        //Manager.EditPoint(SelectedPoint, property, newValue);
                             //    }
                             //}
-
-
-
-
-
+                            
                             Manager.EditPoint(SelectedPoint, PointProperties.EXTENDED_DATA, new Core.DataDictionary(SelectedPoint.CN, _ExtendedData));
                             //SelectedPoint.ExtendedData[e.PropertyName] = _ExtendedData[e.PropertyName];
                         }

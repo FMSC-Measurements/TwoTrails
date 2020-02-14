@@ -81,7 +81,7 @@ namespace TwoTrails.Core
 
 
         #region History Management
-        internal void AddCommand(ITtCommand command)
+        internal void AddCommand(ITtCommand command, bool runCommand = true)
         {
             if (ComplexActionStarted)
             {
@@ -89,7 +89,10 @@ namespace TwoTrails.Core
             }
             else
             {
-                command.Redo();
+                if (runCommand)
+                {
+                    command.Redo();
+                }
                 _UndoStack.Push(command);
                 _RedoStack.Clear();
                 OnHistoryChanged(HistoryEventType.Redone, command.RequireRefresh);
@@ -200,7 +203,7 @@ namespace TwoTrails.Core
         }
         #endregion
 
-
+        #region Get / CheckExists
         public bool PointExists(string pointCN)
         {
             return BaseManager.PointExists(pointCN);
@@ -257,7 +260,7 @@ namespace TwoTrails.Core
         {
             return BaseManager.GetGroups();
         }
-
+        #endregion
 
         #region Adding and Deleting
         public void AddPoint(TtPoint point)
@@ -343,6 +346,7 @@ namespace TwoTrails.Core
 
         #region Editing
 
+        #region Points
         public void EditPoint<T>(TtPoint point, PropertyInfo property, T newValue)
         {
             AddCommand(new EditTtPointCommand<T>(point, property, newValue));
@@ -384,9 +388,24 @@ namespace TwoTrails.Core
         {
             AddCommand(new ResetTtPointsCommand(points, BaseManager, keepIndexAndPoly));
         }
+        #endregion
+
+        #region Polygons
+        public void EditPolygon<T>(TtPolygon polygon, PropertyInfo property, T newValue)
+        {
+            AddCommand(new EditTtPolygonCommand<T>(polygon, property, newValue));
+        }
+        #endregion
+
+        #region Metadata
 
         #endregion
-        
+
+        #region Groups
+
+        #endregion
+        #endregion
+
 
         public void ReplacePoint(TtPoint point)
         {

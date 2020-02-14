@@ -2,21 +2,21 @@
 {
     public class AddTtPolygonCommand : ITtPolygonCommand
     {
-        private ITtManager pointsManager;
+        private ITtManager Manager;
 
-        public AddTtPolygonCommand(TtPolygon polygon, ITtManager pointsManager) : base(polygon)
+        public AddTtPolygonCommand(TtPolygon polygon, ITtManager manager) : base(polygon)
         {
-            this.pointsManager = pointsManager;
+            this.Manager = manager;
         }
 
         public override void Redo()
         {
-            pointsManager.AddPolygon(polygon);
+            Manager.AddPolygon(Polygon);
         }
 
         public override void Undo()
         {
-            pointsManager.DeletePolygon(polygon);
+            Manager.DeletePolygon(Polygon);
         }
     }
 }

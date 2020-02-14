@@ -6,11 +6,11 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         public bool RequireRefresh { get; } = false;
 
-        protected TtPolygon polygon;
+        protected TtPolygon Polygon;
 
         public ITtPolygonCommand(TtPolygon polygon)
         {
-            this.polygon = polygon ?? throw new ArgumentNullException(nameof(polygon));
+            this.Polygon = polygon ?? throw new ArgumentNullException(nameof(polygon));
         }
 
         public abstract void Redo();

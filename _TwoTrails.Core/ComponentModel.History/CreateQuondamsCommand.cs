@@ -7,7 +7,6 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class CreateQuondamsCommand : ITtPointsCommand
     {
-        private ITtManager pointsManager;
         private TtPolygon TargetPolygon;
         private int StartIndex;
 
@@ -17,8 +16,6 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public CreateQuondamsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
         {
-            this.pointsManager = pointsManager;
-
             TargetPolygon = targetPoly;
 
             List<TtPoint> polyPoints = pointsManager.GetPoints(TargetPolygon.CN);

@@ -16,12 +16,12 @@ namespace TwoTrails.Core.ComponentModel.History
         public override void Redo()
         {
             dpc.Redo();
-            pointsManager.DeletePolygon(polygon);
+            pointsManager.DeletePolygon(Polygon);
         }
 
         public override void Undo()
         {
-            pointsManager.AddPolygon(polygon);
+            pointsManager.AddPolygon(Polygon);
             dpc.Undo();
         }
     }
