@@ -24,6 +24,9 @@ namespace TwoTrails.ViewModels
     public class ProjectEditorModel : NotifyPropertyChangedEx
     {
         public ICommand OpenMapWindowCommand { get; }
+        public ICommand UndoCommand { get; set; }
+        public ICommand RedoCommand { get; set; }
+
 
         private TtProject _Project;
 
@@ -108,6 +111,36 @@ namespace TwoTrails.ViewModels
             MediaSelectedCommand = new RelayCommand(x => MediaSelected(x as TtMediaInfo));
             HideMediaViewerCommand = new RelayCommand(x => MediaViewerVisible = false);
 
+
+            Func<ProjectTabSection, Type, bool> doesTabAndDataMatch = (tab, type) =>
+            {
+                if (type == null)
+                    return true;
+                switch (tab)
+                {
+                    case ProjectTabSection.Project: return type == ProjectProperties.DataType;
+                    case ProjectTabSection.Points: return type.IsAssignableFrom(PointProperties.DataType);
+                    case ProjectTabSection.Polygons: return type == PolygonProperties.DataType;
+                    case ProjectTabSection.Metadata: return type == MetadataProperties.DataType;
+                    case ProjectTabSection.Groups: return type == GroupProperties.DataType;
+                    case ProjectTabSection.Media: return type == PointProperties.DataType;
+                    case ProjectTabSection.Map:
+                    default: return false;
+                }
+            };
+
+            UndoCommand = new BindedRelayCommand<TtHistoryManager>(
+                x => Manager.Undo(),
+                x => Manager.CanUndo && doesTabAndDataMatch(_Project.ProjectTab.CurrentTabSection, Manager.UndoCommandType),
+                Manager,
+                x => x.CanUndo);
+
+            RedoCommand = new BindedRelayCommand<TtHistoryManager>(
+                x => Manager.Redo(),
+                x => Manager.CanRedo && doesTabAndDataMatch(_Project.ProjectTab.CurrentTabSection, Manager.RedoCommandType),
+                Manager,
+                x => x.CanRedo);
+
             OpenMapWindowCommand = new RelayCommand(x =>
             {
                 if (x is Grid grid)
@@ -132,7 +165,7 @@ namespace TwoTrails.ViewModels
 
                     MapWindow.Show();
 
-                    _Project.ProjectTab.SwitchToTab(ProjectStartupTab.Points);
+                    _Project.ProjectTab.SwitchToTabSection(ProjectTabSection.Points);
                 }
             });
 

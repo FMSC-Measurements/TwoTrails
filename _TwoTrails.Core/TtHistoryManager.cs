@@ -26,8 +26,11 @@ namespace TwoTrails.Core
         private readonly Stack<ITtCommand> _RedoStack = new Stack<ITtCommand>();
         
 
-        public bool CanUndo { get { return _UndoStack.Count > 0; } }
-        public bool CanRedo { get { return _RedoStack.Count > 0; } }
+        public bool CanUndo => _UndoStack.Any();
+        public bool CanRedo => _RedoStack.Any();
+
+        public Type UndoCommandType => CanUndo ? _UndoStack.Peek().DataType : null;
+        public Type RedoCommandType => CanRedo ? _RedoStack.Peek().DataType : null;
 
 
         public bool HasDataDictionary { get { return BaseManager.HasDataDictionary; } }

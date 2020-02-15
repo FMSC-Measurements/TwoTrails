@@ -12,7 +12,14 @@
              xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800"
-             Background="{StaticResource colorBackground}">
+             Background="{StaticResource colorBackground}"
+             PreviewKeyDown="CommandInterceptor">
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding UndoCommand}" Key="Z" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
+    </UserControl.InputBindings>
+
     <UserControl.Resources>
         <cvt:M2Converter x:Key="M2Converter"/>
         <cvt:MetersToFeetConverter x:Key="MtoFConverter"/>
@@ -244,7 +251,7 @@
                 </Border>
             </TabItem>
 
-            <TabItem Header="Polygons">
+            <TabItem Header="Polygons" PreviewKeyDown="CommandInterceptor">
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -335,7 +342,7 @@
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
                                 <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding PolygonName, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                                         PreviewTextInput="TextHasRestrictedCharacters"/>
+                                         PreviewTextInput="TextHasRestrictedCharacters" IsUndoEnabled="False"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy (Meters)*" />
                                 <Grid Grid.Column="0" Grid.Row="3">
@@ -357,12 +364,12 @@
                                 <TextBlock Grid.Column="0" Grid.Row="4" Text="Start Index" />
                                 <TextBox Grid.Column="0" Grid.Row="5"
                                  Text="{Binding PolygonPointStartIndex, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                                 PreviewTextInput="TextIsUnsignedInteger"/>
+                                 PreviewTextInput="TextIsUnsignedInteger" IsUndoEnabled="False"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="6" Text="Increment" />
                                 <TextBox Grid.Column="0" Grid.Row="7"
                                  Text="{Binding PolygonIncrement, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                                 PreviewTextInput="TextIsUnsignedInteger"/>
+                                 PreviewTextInput="TextIsUnsignedInteger" IsUndoEnabled="False"/>
 
                                 <StackPanel Grid.Column="0" Grid.Row="9" Orientation="Horizontal">
                                     <TextBlock Text="Created On: "/>
@@ -371,7 +378,7 @@
 
                                 <TextBlock Grid.Column="0" Grid.Row="11" Text="Description" />
                                 <TextBox Grid.Column="0" Grid.Row="12" Grid.ColumnSpan="3" MinLines="3" MaxLines="5"
-                                Text="{Binding PolygonDescription, UpdateSourceTrigger=PropertyChanged, Delay=500}" />
+                                Text="{Binding PolygonDescription, UpdateSourceTrigger=PropertyChanged, Delay=500}" IsUndoEnabled="False" />
 
                                 <GroupBox Header="Area" Grid.Column="2" Grid.Row="0" Grid.RowSpan="4" VerticalAlignment="Stretch">
                                     <Grid Margin="5,0,5,0">

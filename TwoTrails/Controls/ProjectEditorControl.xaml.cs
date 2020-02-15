@@ -12,7 +12,7 @@ namespace TwoTrails.Controls
     /// </summary>
     public partial class ProjectEditorControl : UserControl
     {
-        public ProjectEditorControl(ProjectEditorModel projectEditor, ProjectStartupTab tab = ProjectStartupTab.Project)
+        public ProjectEditorControl(ProjectEditorModel projectEditor, ProjectTabSection tab = ProjectTabSection.Project)
         {
             this.DataContext = projectEditor;
 
@@ -27,7 +27,7 @@ namespace TwoTrails.Controls
             SwitchToTab(tab);
         }
 
-        public void SwitchToTab(ProjectStartupTab tab)
+        public void SwitchToTab(ProjectTabSection tab)
         {
             tabControl.SelectedIndex = (int)tab;
         }
@@ -46,15 +46,52 @@ namespace TwoTrails.Controls
         {
             e.Handled = ControlUtils.TextHasRestrictedCharacters(sender, e);
         }
+
+        private void CommandInterceptor(object sender, KeyEventArgs e)
+        {
+            foreach (InputBinding inputBinding in this.InputBindings)
+            {
+                KeyGesture keyGesture = inputBinding.Gesture as KeyGesture;
+                if (keyGesture != null && keyGesture.Key == e.Key && keyGesture.Modifiers == Keyboard.Modifiers)
+                {
+                    if (inputBinding.Command != null)
+                    {
+                        if (inputBinding.Command.CanExecute(0))
+                        {
+                            inputBinding.Command.Execute(0);
+                        }
+                        e.Handled = true;
+                    }
+                }
+            }
+
+            foreach (CommandBinding cb in this.CommandBindings)
+            {
+                RoutedCommand command = cb.Command as RoutedCommand;
+                if (command != null)
+                {
+                    foreach (InputGesture inputGesture in command.InputGestures)
+                    {
+                        KeyGesture keyGesture = inputGesture as KeyGesture;
+                        if (keyGesture != null && keyGesture.Key == e.Key && keyGesture.Modifiers == Keyboard.Modifiers)
+                        {
+                            command.Execute(0, this);
+                            e.Handled = true;
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    public enum ProjectStartupTab
+    public enum ProjectTabSection
     {
         Project = 0,
         Points = 1,
         Polygons = 2,
         Metadata = 3,
         Groups = 4,
-        Media = 5
+        Media = 5,
+        Map = 6
     }
 }

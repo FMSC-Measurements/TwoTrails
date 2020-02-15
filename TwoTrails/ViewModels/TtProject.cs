@@ -134,10 +134,10 @@ namespace TwoTrails.ViewModels
             ViewUserActivityCommand = new RelayCommand(x => ViewUserActivityTab());
             
             EditProjectCommand = new RelayCommand(x => OpenProjectTab());
-            EditPointsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Points));
-            EditPolygonsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Polygons));
-            EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Metadata));
-            EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectStartupTab.Groups));
+            EditPointsCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Points));
+            EditPolygonsCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Polygons));
+            EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Metadata));
+            EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Groups));
             
             RecalculateAllPolygonsCommand = new RelayCommand(x => { Manager.RecalculatePolygons(); DataChanged |= true; });
             CalculateLogDeckCommand = new RelayCommand(x =>
@@ -277,7 +277,7 @@ namespace TwoTrails.ViewModels
             }
         }
         
-        private void OpenProjectTab(ProjectStartupTab tab = ProjectStartupTab.Project)
+        private void OpenProjectTab(ProjectTabSection tab = ProjectTabSection.Project)
         {
             if (ProjectTab == null)
             {
@@ -289,7 +289,7 @@ namespace TwoTrails.ViewModels
                 MainModel.SwitchToTab(ProjectTab);
             }
 
-            ProjectTab.SwitchToTab(tab);
+            ProjectTab.SwitchToTabSection(tab);
         }
 
         private void OpenMapTab()

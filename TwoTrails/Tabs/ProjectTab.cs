@@ -66,15 +66,26 @@ namespace TwoTrails
             }
         }
 
+        public ProjectTabSection CurrentTabSection { get { return Get<ProjectTabSection>(); } protected set { Set(value); } }
 
         public ProjectTab(TtProject project) : base(project)
         {
-            _ProjectEditorControl = new ProjectEditorControl(_ProjectEditorModel = new ProjectEditorModel(project), ProjectStartupTab.Points);
+            _ProjectEditorControl = new ProjectEditorControl(_ProjectEditorModel = new ProjectEditorModel(project), ProjectTabSection.Points);
             Tab.Content = _ProjectEditorControl;
 
             _ProjectEditorControl.tabControl.SelectionChanged += (object sender, SelectionChangedEventArgs e) =>
             {
-                IsEditingPoints = _ProjectEditorControl.tabControl.SelectedIndex == 1;
+                switch (_ProjectEditorControl.tabControl.SelectedIndex)
+                {
+                    case 0: CurrentTabSection = ProjectTabSection.Project; break;
+                    case 1: IsEditingPoints = true; CurrentTabSection = ProjectTabSection.Points; break;
+                    case 2: CurrentTabSection = ProjectTabSection.Polygons; break;
+                    case 3: CurrentTabSection = ProjectTabSection.Metadata; break;
+                    case 4: CurrentTabSection = ProjectTabSection.Groups; break;
+                    case 5: CurrentTabSection = ProjectTabSection.Media; break;
+                    case 6: CurrentTabSection = ProjectTabSection.Map; break;
+                }
+
                 OnPropertyChanged(nameof(TabInfo));
             };
 
@@ -87,7 +98,7 @@ namespace TwoTrails
             };
         }
 
-        public void SwitchToTab(ProjectStartupTab tab)
+        public void SwitchToTabSection(ProjectTabSection tab)
         {
             _ProjectEditorControl.SwitchToTab(tab);
         }
