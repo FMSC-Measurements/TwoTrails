@@ -185,7 +185,7 @@ namespace TwoTrails.Core.Points
 
             if (az > -1)
             {
-                az = 90 - Azimuth + Declination;
+                az = 90 - Azimuth - Declination;
 
                 double x, y, z, azInRadians = FMSC.Core.Convert.DegreesToRadians(az);
 

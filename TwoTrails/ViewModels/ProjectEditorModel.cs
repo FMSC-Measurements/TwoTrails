@@ -705,6 +705,7 @@ namespace TwoTrails.ViewModels
             {
                 _MetadataName = metadata.Name;
                 _MetadataComment = metadata.Comment;
+                _MetadataMagDec = metadata.MagDec;
                 _MetadataDecType = metadata.DecType;
                 _MetadataDatum = metadata.Datum;
                 _MetadataZone = metadata.Zone;
@@ -720,6 +721,7 @@ namespace TwoTrails.ViewModels
             {
                 _MetadataName = String.Empty;
                 _MetadataComment = String.Empty;
+                _MetadataMagDec = Settings.MetadataSettings.MagDec;
                 _MetadataDecType = Settings.MetadataSettings.DecType;
                 _MetadataDatum = Settings.MetadataSettings.Datum;
                 _MetadataZone = Settings.MetadataSettings.Zone;
