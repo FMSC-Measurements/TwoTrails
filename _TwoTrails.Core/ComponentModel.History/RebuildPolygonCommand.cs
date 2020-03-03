@@ -53,6 +53,8 @@ namespace TwoTrails.Core.ComponentModel.History
             {
                 addFromLinks(point);
             }
+
+            Points.AddRange(addPoints);
         }
 
         public Type DataType => PointProperties.DataType;
