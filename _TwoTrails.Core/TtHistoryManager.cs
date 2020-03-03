@@ -205,6 +205,7 @@ namespace TwoTrails.Core
         }
         #endregion
 
+
         #region Get / CheckExists
         public bool PointExists(string pointCN)
         {
@@ -428,7 +429,7 @@ namespace TwoTrails.Core
         
         public void RebuildPolygon(TtPolygon polygon, bool reindex = false)
         {
-            BaseManager.RebuildPolygon(polygon, reindex);
+            AddCommand(new RebuildPolygonCommand(polygon, reindex, BaseManager));
         }
 
         public void RecalculatePolygons()

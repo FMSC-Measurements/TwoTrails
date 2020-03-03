@@ -460,7 +460,7 @@ namespace TwoTrails.ViewModels
         public int? Index
         {
             get { return _Index; }
-            set { EditValue(ref _Index, value, PointProperties.INDEX); Manager.RebuildPolygon(SelectedPoint.Polygon); }
+            set { EditValue(ref _Index, value, PointProperties.INDEX); Manager.BaseManager.RebuildPolygon(SelectedPoint.Polygon); }
         }
 
 
