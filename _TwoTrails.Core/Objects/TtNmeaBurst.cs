@@ -134,10 +134,10 @@ namespace TwoTrails.Core
 
 
 
-        public TtNmeaBurst(TtNmeaBurst burst)
+        public TtNmeaBurst(TtNmeaBurst burst, string pointCN = null)
         {
             TimeCreated = burst.TimeCreated;
-            PointCN = burst.PointCN;
+            PointCN = pointCN ?? burst.PointCN;
             IsUsed = burst.IsUsed;
 
             _Position = new GeoPosition(burst.Position);

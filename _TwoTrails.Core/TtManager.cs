@@ -429,6 +429,8 @@ namespace TwoTrails.Core
                 _Activity.UpdateAction(DataActionType.DeletedPoints);
             }
 
+            //todo NMEA
+
             _PointsMapOrig = _PointsMap.Values.ToDictionary(p => p.CN, p => p.DeepCopy());
         }
 

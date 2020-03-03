@@ -10,6 +10,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private TtManager pointsManager;
 
         private List<Tuple<TtPoint, QuondamPoint, TtPoint>> _ConvertedPoints = null;
+        private List<TtNmeaBurst> _AddNmea = new List<TtNmeaBurst>();
 
 
         public DeleteTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager) : base(points)
@@ -31,6 +32,12 @@ namespace TwoTrails.Core.ComponentModel.History
                             child = pointsManager.GetPoint(ccn) as QuondamPoint;
 
                             _ConvertedPoints.Add(Tuple.Create(point, child, child.ConvertQuondam()));
+
+                            if (point.IsGpsType())
+                            {
+
+                                _AddNmea.AddRange(pointsManager.GetNmeaBursts(point.CN).Select(n => new TtNmeaBurst(n, child.CN)));
+                            }
                         }
                     }
                 } 
@@ -46,9 +53,13 @@ namespace TwoTrails.Core.ComponentModel.History
                     pointsManager.ReplacePoint(tuple.Item3);
                     tuple.Item1.RemoveLinkedPoint(tuple.Item2);
                 }
+                
+                pointsManager.AddNmeaBursts(_AddNmea);
             }
 
             pointsManager.DeletePoints(Points);
+
+            //delete nmea of gps points
         }
 
         public override void Undo()
@@ -59,10 +70,14 @@ namespace TwoTrails.Core.ComponentModel.History
                 {
                     pointsManager.ReplacePoint(tuple.Item2);
                     tuple.Item1.AddLinkedPoint(tuple.Item2);
+
+                    pointsManager.DeleteNmeaBursts(tuple.Item3.CN);
                 }
             }
 
             pointsManager.AddPoints(Points);
+
+            //add nmea points that were removed
         }
     }
 }
