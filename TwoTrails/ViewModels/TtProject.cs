@@ -45,7 +45,6 @@ namespace TwoTrails.ViewModels
         private MapTab MapTab { get; set; }
         private MapWindow MapWindow { get; set; }
         
-        //TODO remove mapwindow from TtProject
         public bool ProjectTabIsOpen { get { return ProjectTab != null; } }
         public bool MapTabIsOpen { get { return MapTab != null; } }
         public bool UserActivityTabIsOpen { get { return UserActivityTab != null; } }
@@ -62,19 +61,12 @@ namespace TwoTrails.ViewModels
         
         public bool RequiresSave
         {
-            get { return Get<bool>() || DataChanged || ProjectChanged; }
+            get { return Get<bool>() || ProjectChanged; }
             private set { Set(value); }
         }
 
 
         public bool RequiresUpgrade { get; private set; }
-
-        //property changes to polys/meta/groups
-        public bool DataChanged
-        {
-            get { return Get<bool>(); }
-            private set { Set(value, () => OnPropertyChanged(nameof(RequiresSave))); }
-        }
 
         //changes to project fields
         public bool ProjectChanged
@@ -153,8 +145,8 @@ namespace TwoTrails.ViewModels
             EditPolygonsCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Polygons));
             EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Metadata));
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Groups));
-            
-            RecalculateAllPolygonsCommand = new RelayCommand(x => { Manager.RecalculatePolygons(); DataChanged |= true; });
+
+            RecalculateAllPolygonsCommand = new RelayCommand(x => { Manager.RecalculatePolygons(); });// DataChanged |= true; });
             CalculateLogDeckCommand = new RelayCommand(x =>
             {
                 if (_BaseManager.PolygonCount > 0)
@@ -180,12 +172,6 @@ namespace TwoTrails.ViewModels
             RequiresSave = Manager.CanUndo;
         }
 
-
-        public void ProjectUpdated()
-        {
-            DataChanged |= true;
-        }
-
         public void Save()
         {
             if (RequiresSave)
@@ -201,7 +187,7 @@ namespace TwoTrails.ViewModels
 
                     _BaseManager.Save();
                     Manager.ClearHistory();
-                    RequiresSave = DataChanged = ProjectChanged = false;
+                    RequiresSave = ProjectChanged = false;
                     MessagePosted?.Invoke(this, $"Project '{ProjectName}' Saved");
                 }
                 catch (Exception ex)

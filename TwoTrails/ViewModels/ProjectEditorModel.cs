@@ -180,11 +180,11 @@ namespace TwoTrails.ViewModels
                     }
                     else if (e.DataType == GroupProperties.DataType)
                     {
-                        
+                        BindGroupValues(CurrentGroup);
                     }
                     else if (e.DataType == MetadataProperties.DataType)
                     {
-                        
+                        BindMetadataValues(CurrentMetadata);
                     }
                 }
             };
@@ -563,7 +563,7 @@ namespace TwoTrails.ViewModels
         public TtMetadata CurrentMetadata
         {
             get => _CurrentMetadata;
-            private set => SetField(ref _CurrentMetadata, value, BindMetadataValues);
+            private set => SetField(ref _CurrentMetadata, value, () => BindMetadataValues(value));
         }
 
 
@@ -579,6 +579,13 @@ namespace TwoTrails.ViewModels
         {
             get => _MetadataComment;
             set => EditMetadataValue(ref _MetadataComment, value, MetadataProperties.COMMENT);
+        }
+
+        private double _MetadataMagDec;
+        public double MetadataMagDec
+        {
+            get => _MetadataMagDec;
+            set => EditMetadataValue(ref _MetadataMagDec, value, MetadataProperties.MAG_DEC);
         }
 
         private DeclinationType _MetadataDecType;
@@ -656,6 +663,16 @@ namespace TwoTrails.ViewModels
         }
 
 
+        private void EditMetadataValue<T>(ref T origValue, T newValue, PropertyInfo property) where T : struct, IEquatable<T>
+        {
+            if (!origValue.Equals(newValue))
+            {
+                origValue = newValue;
+
+                Manager.EditMetadata(CurrentMetadata, property, newValue);
+            }
+        }
+
         private void EditMetadataValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
         {
             if (!origValue.Equals(newValue))
@@ -682,22 +699,22 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void BindMetadataValues()
+        private void BindMetadataValues(TtMetadata metadata)
         {
             if (CurrentMetadata != null)
             {
-                _MetadataName = CurrentMetadata.Name;
-                _MetadataComment = CurrentMetadata.Comment;
-                _MetadataDecType = CurrentMetadata.DecType;
-                _MetadataDatum = CurrentMetadata.Datum;
-                _MetadataZone = CurrentMetadata.Zone;
-                _MetadataDistance = CurrentMetadata.Distance;
-                _MetadataElevation = CurrentMetadata.Elevation;
-                _MetadataSlope = CurrentMetadata.Slope;
-                _MetadataGpsReceiver = CurrentMetadata.GpsReceiver;
-                _MetadataRangeFinder = CurrentMetadata.RangeFinder;
-                _MetadataCompass = CurrentMetadata.Compass;
-                _MetadataCrew = CurrentMetadata.Crew;
+                _MetadataName = metadata.Name;
+                _MetadataComment = metadata.Comment;
+                _MetadataDecType = metadata.DecType;
+                _MetadataDatum = metadata.Datum;
+                _MetadataZone = metadata.Zone;
+                _MetadataDistance = metadata.Distance;
+                _MetadataElevation = metadata.Elevation;
+                _MetadataSlope = metadata.Slope;
+                _MetadataGpsReceiver = metadata.GpsReceiver;
+                _MetadataRangeFinder = metadata.RangeFinder;
+                _MetadataCompass = metadata.Compass;
+                _MetadataCrew = metadata.Crew;
             }
             else
             {
@@ -808,8 +825,6 @@ namespace TwoTrails.ViewModels
                     }
 
                     Manager.DeleteMetadata(CurrentMetadata);
-
-                    _Project.ProjectUpdated();
                 }
             }
         }
@@ -826,49 +841,41 @@ namespace TwoTrails.ViewModels
         #region Properties
         public bool GroupFieldIsEditable { get { return Get<bool>(); } set { Set(value); } }
 
-        private TtGroup _BackupGroup;
         private TtGroup _CurrentGroup;
         public TtGroup CurrentGroup
         {
-            get { return _CurrentGroup; }
+            get => _CurrentGroup;
             private set
             {
-                TtGroup old = _CurrentGroup;
-
                 SetField(ref _CurrentGroup, value, () => {
-                    if (old != null)
-                    {
-                        old.PropertyChanged -= Group_PropertyChanged;
-                    }
-
-                    if (_CurrentGroup != null)
-                    {
-                        _BackupGroup = new TtGroup(value);
-                        GroupFieldIsEditable = value.CN != Consts.EmptyGuid;
-                        _CurrentGroup.PropertyChanged += Group_PropertyChanged;
-                    }
-                    else
-                        GroupFieldIsEditable = false;
+                    BindGroupValues(value);
+                    GroupFieldIsEditable = value != null && value.CN != Consts.EmptyGuid;
                 });
-
             }
         }
 
-
-
-        private void EditGroupValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
+        private String _GroupName = String.Empty;
+        public String GroupName
         {
-            if (!origValue.Equals(newValue))
-            {
-                origValue = newValue;
-
-                if (allowNull || newValue != null)
-                {
-                    Manager.EditGroup(CurrentGroup, property, newValue);
-                }
-            }
+            get => _GroupName;
+            set => EditGroupValue(ref _GroupName, value, GroupProperties.NAME);
         }
 
+        private String _GroupDescription = String.Empty;
+        public String GroupDescription
+        {
+            get => _GroupDescription;
+            set => EditGroupValue(ref _GroupDescription, value, GroupProperties.DESCRIPTION);
+        }
+
+        private GroupType _GroupType;
+        public GroupType GroupType
+        {
+            get => _GroupType;
+            set => EditGroupEnum(ref _GroupType, value, GroupProperties.GROUP_TYPE);
+        }
+
+        
         private void EditGroupValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
         {
             if (!origValue.Equals(newValue))
@@ -881,15 +888,41 @@ namespace TwoTrails.ViewModels
                 }
             }
         }
-        #endregion
 
-        private void Group_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void EditGroupEnum<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : Enum
         {
-            if (!(sender as TtGroup).Equals(_BackupGroup))
+            if (!origValue.Equals(newValue))
             {
-                _Project.ProjectUpdated();
+                origValue = newValue;
+
+                if (allowNull || newValue != null)
+                {
+                    Manager.EditGroup(CurrentGroup, property, newValue);
+                }
             }
         }
+        
+        private void BindGroupValues(TtGroup group)
+        {
+            if (group != null)
+            {
+                _GroupName = group.Name;
+                _GroupDescription = group.Description;
+                _GroupType = group.GroupType;
+            }
+            else
+            {
+                _GroupName = String.Empty;
+                _GroupDescription = String.Empty;
+                _GroupType = GroupType.General;
+            }
+
+            OnPropertyChanged(
+                nameof(GroupName),
+                nameof(GroupDescription),
+                nameof(GroupType));
+        }
+        #endregion
 
 
         private void GroupChanged(TtGroup group)
@@ -921,8 +954,6 @@ namespace TwoTrails.ViewModels
                     MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
                     Manager.DeleteGroup(CurrentGroup);
-
-                    _Project.ProjectUpdated();
                 }
             }
         }

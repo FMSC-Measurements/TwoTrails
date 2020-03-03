@@ -25,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPointsMultiPropertyMultiValueCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MovePointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MultiTtCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\RecalculatePolygonsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ResetTtPointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ReplaceTtPointsCommand.cs" />

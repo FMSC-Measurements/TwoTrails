@@ -433,7 +433,7 @@ namespace TwoTrails.Core
 
         public void RecalculatePolygons()
         {
-            BaseManager.RecalculatePolygons();
+            AddCommand(new RecalculatePolygonsCommand(BaseManager));
         }
 
 
