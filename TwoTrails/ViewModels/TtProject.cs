@@ -32,6 +32,7 @@ namespace TwoTrails.ViewModels
 
         public ICommand UndoCommand { get; set; }
         public ICommand RedoCommand { get; set; }
+        public ICommand HistoryCommand { get; set; }
 
         public ICommand DiscardChangesCommand { get; }
         #endregion
@@ -128,6 +129,20 @@ namespace TwoTrails.ViewModels
 
             RedoCommand = new BindedRelayCommand<TtHistoryManager>(
                 x => Manager.Redo(), x => Manager.CanRedo, Manager, x => x.CanRedo);
+
+            HistoryCommand = new BindedRelayCommand<TtHistoryManager>(
+                x =>
+                {
+                    mainModel.MainWindow.IsEnabled = false;
+                    HistoryDialog.ShowDialog(Manager, mainModel.MainWindow, (onClose) =>
+                    {
+                        mainModel.MainWindow.IsEnabled = true;
+                        mainModel.MainWindow.Activate();
+                    });
+                },
+                x => Manager.CanRedo || Manager.CanUndo, 
+               Manager,
+                x => new { x.CanRedo, x.CanUndo });
 
             DiscardChangesCommand = new RelayCommand(x => _BaseManager.Reset());
 

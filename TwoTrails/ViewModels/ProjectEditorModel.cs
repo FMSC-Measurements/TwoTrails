@@ -548,9 +548,18 @@ namespace TwoTrails.ViewModels
         }
         #endregion
 
-        #region Metadata
-        public int MetadataZone { get { return Get<int>(); } set { Set(value); } }
 
+        #region Metadata
+        #region Commands
+        public ICommand MetadataChangedCommand { get; }
+        public ICommand NewMetadataCommand { get; }
+        public ICommand DeleteMetadataCommand { get; }
+        public ICommand MetadataZoneChangedCommand { get; }
+        public ICommand MetadataUpdateZoneCommand { get; }
+        public ICommand SetDefaultMetadataCommand { get; }
+        #endregion
+
+        #region Properties
         private TtMetadata _BackupMeta;
         private TtMetadata _CurrentMetadata;
         public TtMetadata CurrentMetadata
@@ -577,6 +586,37 @@ namespace TwoTrails.ViewModels
             }
         }
 
+        public int MetadataZone { get { return Get<int>(); } set { Set(value); } }
+
+
+        private void EditMetadataValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
+        {
+            if (!origValue.Equals(newValue))
+            {
+                origValue = newValue;
+
+                if (allowNull || newValue != null)
+                {
+                    Manager.EditMetadata(CurrentMetadata, property, newValue);
+                }
+            }
+        }
+
+        private void EditMetadataValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
+        {
+            if (!origValue.Equals(newValue))
+            {
+                origValue = newValue;
+
+                if (allowNull || newValue != null)
+                {
+                    Manager.EditMetadata(CurrentMetadata, property, newValue);
+                }
+            }
+        }
+        #endregion
+
+
         private void Metadata_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (!(sender as TtMetadata).Equals(_BackupMeta))
@@ -585,12 +625,6 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        public ICommand MetadataChangedCommand { get; }
-        public ICommand NewMetadataCommand { get; }
-        public ICommand DeleteMetadataCommand { get; }
-        public ICommand MetadataZoneChangedCommand { get; }
-        public ICommand MetadataUpdateZoneCommand { get; }
-        public ICommand SetDefaultMetadataCommand { get; }
 
         private void MetadataChanged(TtMetadata meta)
         {
@@ -674,7 +708,17 @@ namespace TwoTrails.ViewModels
         }
         #endregion
 
+
         #region Group
+        #region Commands
+        public ICommand GroupChangedCommand { get; }
+        public ICommand NewGroupCommand { get; }
+        public ICommand DeleteGroupCommand { get; }
+        #endregion
+
+        #region Properties
+        public bool GroupFieldIsEditable { get { return Get<bool>(); } set { Set(value); } }
+
         private TtGroup _BackupGroup;
         private TtGroup _CurrentGroup;
         public TtGroup CurrentGroup
@@ -703,7 +747,34 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        public bool GroupFieldIsEditable { get { return Get<bool>(); } set { Set(value); } }
+
+
+        private void EditGroupValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
+        {
+            if (!origValue.Equals(newValue))
+            {
+                origValue = newValue;
+
+                if (allowNull || newValue != null)
+                {
+                    Manager.EditGroup(CurrentGroup, property, newValue);
+                }
+            }
+        }
+
+        private void EditGroupValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
+        {
+            if (!origValue.Equals(newValue))
+            {
+                origValue = newValue;
+
+                if (allowNull || newValue != null)
+                {
+                    Manager.EditGroup(CurrentGroup, property, newValue);
+                }
+            }
+        }
+        #endregion
 
         private void Group_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -713,9 +784,6 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        public ICommand GroupChangedCommand { get; }
-        public ICommand NewGroupCommand { get; }
-        public ICommand DeleteGroupCommand { get; }
 
         private void GroupChanged(TtGroup group)
         {
@@ -752,6 +820,7 @@ namespace TwoTrails.ViewModels
             }
         }
         #endregion
+
 
         #region Media
         public ObservableCollection<ImageTile> Tiles { get; }

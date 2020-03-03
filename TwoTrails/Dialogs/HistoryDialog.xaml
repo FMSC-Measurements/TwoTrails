@@ -1,0 +1,16 @@
+﻿<Window x:Class="TwoTrails.Dialogs.HistoryDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TwoTrails.Dialogs"
+        xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
+        mc:Ignorable="d"
+        Title="History" Height="200" Width="150"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        WindowStartupLocation="Manual"
+        Loaded="Window_Loaded">
+    <ListBox Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0" ItemsSource="{Binding HistoryItems}"
+             Background="LightGray"/>
+</Window>

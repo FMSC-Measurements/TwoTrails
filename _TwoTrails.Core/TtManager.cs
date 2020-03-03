@@ -366,6 +366,7 @@ namespace TwoTrails.Core
                     SaveMetadata();
                     SavePolygons();
                     SavePoints();
+                    SaveProjectInfo();
 
                     _DAL.InsertActivity(_Activity);
                     _Activity.Reset();
@@ -378,6 +379,11 @@ namespace TwoTrails.Core
             }
 
             return true;
+        }
+
+        private void SaveProjectInfo()
+        {
+
         }
 
         private void SavePoints()

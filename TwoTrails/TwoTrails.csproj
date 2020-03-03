@@ -78,11 +78,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </Page>
+    <None Remove="Dialogs\HistoryDialog.xaml" />
     <None Remove="Dialogs\ReindexDialog.xaml" />
     <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />
 
     <!-- Resources -->
     <EmbeddedResource Update="Properties\Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
+    <Compile Update="Dialogs\HistoryDialog.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
     <Compile Update="Dialogs\ReindexDialog.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
