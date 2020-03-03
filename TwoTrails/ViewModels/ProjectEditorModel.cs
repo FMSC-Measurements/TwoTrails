@@ -1,4 +1,5 @@
 ﻿using CSUtil.ComponentModel;
+using FMSC.Core;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
@@ -81,7 +82,7 @@ namespace TwoTrails.ViewModels
                 this,
                 x => x.CurrentMetadata);
 
-            MetadataZoneChangedCommand = new RelayCommand(x => MetadataZoneChanged(x as string));
+            MetadataZoneTextboxEditedCommand = new RelayCommand(x => MetadataZoneTextboxEdited(x as string));
 
             MetadataUpdateZoneCommand = new BindedRelayCommand<ProjectEditorModel>(
                 x => UpdateMetadataZone(),
@@ -203,8 +204,8 @@ namespace TwoTrails.ViewModels
             MapWindow?.Close();
         }
 
-        #region Polygon
 
+        #region Polygons
         #region Commands
         public ICommand PolygonChangedCommand { get; }
         public ICommand CreatePolygonCommand { get; }
@@ -240,8 +241,6 @@ namespace TwoTrails.ViewModels
                         GeneratePolygonSummary(_CurrentPolygon);
                     }
                 });
-
-
             }
         }
 
@@ -554,53 +553,108 @@ namespace TwoTrails.ViewModels
         public ICommand MetadataChangedCommand { get; }
         public ICommand NewMetadataCommand { get; }
         public ICommand DeleteMetadataCommand { get; }
-        public ICommand MetadataZoneChangedCommand { get; }
+        public ICommand MetadataZoneTextboxEditedCommand { get; }
         public ICommand MetadataUpdateZoneCommand { get; }
         public ICommand SetDefaultMetadataCommand { get; }
         #endregion
 
         #region Properties
-        private TtMetadata _BackupMeta;
         private TtMetadata _CurrentMetadata;
         public TtMetadata CurrentMetadata
         {
-            get { return _CurrentMetadata; }
-            private set
-            {
-                TtMetadata old = _CurrentMetadata;
-
-                SetField(ref _CurrentMetadata, value, () => {
-                    if (old != null)
-                    {
-                        old.PropertyChanged -= Metadata_PropertyChanged;
-                    }
-
-                    if (_CurrentMetadata != null)
-                    {
-                        _BackupMeta = new TtMetadata(_CurrentMetadata);
-                        MetadataZone = _CurrentMetadata.Zone;
-                        _CurrentMetadata.PropertyChanged += Metadata_PropertyChanged;
-                    }
-                });
-
-            }
+            get => _CurrentMetadata;
+            private set => SetField(ref _CurrentMetadata, value, BindMetadataValues);
         }
 
-        public int MetadataZone { get { return Get<int>(); } set { Set(value); } }
 
-
-        private void EditMetadataValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
+        private string _MetadataName = String.Empty;
+        public string MetadataName
         {
-            if (!origValue.Equals(newValue))
-            {
-                origValue = newValue;
+            get => _MetadataName;
+            set => EditMetadataValue(ref _MetadataName, value, MetadataProperties.NAME);
+        }
 
-                if (allowNull || newValue != null)
-                {
-                    Manager.EditMetadata(CurrentMetadata, property, newValue);
-                }
+        private string _MetadataComment = String.Empty;
+        public string MetadataComment
+        {
+            get => _MetadataComment;
+            set => EditMetadataValue(ref _MetadataComment, value, MetadataProperties.COMMENT);
+        }
+
+        private DeclinationType _MetadataDecType;
+        public DeclinationType MetadataDecType
+        {
+            get => _MetadataDecType;
+            set => EditMetadataEnum(ref _MetadataDecType, value, MetadataProperties.DEC_TYPE);
+        }
+
+        private Datum _MetadataDatum;
+        public Datum MetadataDatum
+        {
+            get => _MetadataDatum;
+            set => EditMetadataEnum(ref _MetadataDatum, value, MetadataProperties.DATUM);
+        }
+
+        private int _MetadataZone;
+        public int MetadataZone
+        {
+            get => _MetadataZone;
+            set
+            {
+                _MetadataZone = value;
+                OnPropertyChanged(nameof(MetadataZone));
             }
         }
+
+        private Distance _MetadataDistance;
+        public Distance MetadataDistance
+        {
+            get => _MetadataDistance;
+            set => EditMetadataEnum(ref _MetadataDistance, value, MetadataProperties.DISTANCE);
+        }
+
+        private Distance _MetadataElevation;
+        public Distance MetadataElevation
+        {
+            get => _MetadataElevation;
+            set => EditMetadataEnum(ref _MetadataElevation, value, MetadataProperties.ELEVATION);
+        }
+        
+        private Slope _MetadataSlope;
+        public Slope MetadataSlope
+        {
+            get => _MetadataSlope;
+            set => EditMetadataEnum(ref _MetadataSlope, value, MetadataProperties.SLOPE);
+        }
+
+        private string _MetadataGpsReceiver = String.Empty;
+        public string MetadataGpsReceiver
+        {
+            get => _MetadataGpsReceiver;
+            set => EditMetadataValue(ref _MetadataGpsReceiver, value, MetadataProperties.GPS_RECEIVER);
+        }
+
+        private string _MetadataRangeFinder = String.Empty;
+        public string MetadataRangeFinder
+        {
+            get => _MetadataRangeFinder;
+            set => EditMetadataValue(ref _MetadataRangeFinder, value, MetadataProperties.RANGE_FINDER);
+        }
+
+        private string _MetadataCompass = String.Empty;
+        public string MetadataCompass
+        {
+            get => _MetadataCompass;
+            set => EditMetadataValue(ref _MetadataCompass, value, MetadataProperties.COMPASS);
+        }
+
+        private string _MetadataCrew = String.Empty;
+        public string MetadataCrew
+        {
+            get => _MetadataCrew;
+            set => EditMetadataValue(ref _MetadataCrew, value, MetadataProperties.CREW);
+        }
+
 
         private void EditMetadataValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
         {
@@ -614,16 +668,68 @@ namespace TwoTrails.ViewModels
                 }
             }
         }
-        #endregion
 
-
-        private void Metadata_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void EditMetadataEnum<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : Enum
         {
-            if (!(sender as TtMetadata).Equals(_BackupMeta))
+            if (!origValue.Equals(newValue))
             {
-                _Project.ProjectUpdated();
+                origValue = newValue;
+
+                if (allowNull || newValue != null)
+                {
+                    Manager.EditMetadata(CurrentMetadata, property, newValue);
+                }
             }
         }
+
+        private void BindMetadataValues()
+        {
+            if (CurrentMetadata != null)
+            {
+                _MetadataName = CurrentMetadata.Name;
+                _MetadataComment = CurrentMetadata.Comment;
+                _MetadataDecType = CurrentMetadata.DecType;
+                _MetadataDatum = CurrentMetadata.Datum;
+                _MetadataZone = CurrentMetadata.Zone;
+                _MetadataDistance = CurrentMetadata.Distance;
+                _MetadataElevation = CurrentMetadata.Elevation;
+                _MetadataSlope = CurrentMetadata.Slope;
+                _MetadataGpsReceiver = CurrentMetadata.GpsReceiver;
+                _MetadataRangeFinder = CurrentMetadata.RangeFinder;
+                _MetadataCompass = CurrentMetadata.Compass;
+                _MetadataCrew = CurrentMetadata.Crew;
+            }
+            else
+            {
+                _MetadataName = String.Empty;
+                _MetadataComment = String.Empty;
+                _MetadataDecType = Settings.MetadataSettings.DecType;
+                _MetadataDatum = Settings.MetadataSettings.Datum;
+                _MetadataZone = Settings.MetadataSettings.Zone;
+                _MetadataDistance = Settings.MetadataSettings.Distance;
+                _MetadataElevation = Settings.MetadataSettings.Elevation;
+                _MetadataSlope = Settings.MetadataSettings.Slope;
+                _MetadataGpsReceiver = String.Empty;
+                _MetadataRangeFinder = String.Empty;
+                _MetadataCompass = String.Empty;
+                _MetadataCrew = String.Empty;
+            }
+
+            OnPropertyChanged(
+                nameof(MetadataName),
+                nameof(MetadataComment),
+                nameof(MetadataDecType),
+                nameof(MetadataDatum),
+                nameof(MetadataZone),
+                nameof(MetadataDistance),
+                nameof(MetadataElevation),
+                nameof(MetadataSlope),
+                nameof(MetadataGpsReceiver),
+                nameof(MetadataRangeFinder),
+                nameof(MetadataCompass),
+                nameof(MetadataCrew));
+        }
+        #endregion
 
 
         private void MetadataChanged(TtMetadata meta)
@@ -632,7 +738,7 @@ namespace TwoTrails.ViewModels
             CurrentMetadata = meta;
         }
 
-        private bool MetadataZoneChanged(string zoneStr)
+        private bool MetadataZoneTextboxEdited(string zoneStr)
         {
             if (zoneStr != null)
             {
@@ -650,7 +756,11 @@ namespace TwoTrails.ViewModels
         {
             if (MessageBox.Show("Are you sure you want to change the metadata's zone?", "Confirm zone change.", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
-                CurrentMetadata.Zone = MetadataZone;
+                if (!_MetadataZone.Equals(CurrentMetadata.Zone))
+                {
+                    Manager.EditMetadata(CurrentMetadata, MetadataProperties.ZONE, _MetadataZone);
+                }
+
                 OnPropertyChanged(nameof(MetadataZone));
             }
         }
@@ -688,11 +798,8 @@ namespace TwoTrails.ViewModels
                 if (MessageBox.Show($"Confirm Delete Metadata '{CurrentMetadata.Name}'", "Delete Metadata",
                 MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
                 {
-                    ITtManager manager = Manager;
-
-                    IEnumerable<TtPoint> points = manager.GetPoints().Where(p => p.MetadataCN == CurrentMetadata.CN);
-
-                    if (CurrentMetadata.Zone != manager.DefaultMetadata.Zone && points.Any())
+                    if (CurrentMetadata.Zone != Manager.DefaultMetadata.Zone &&
+                        Manager.GetPoints().Where(p => p.MetadataCN == CurrentMetadata.CN).Any())
                     {
                         if (MessageBox.Show(
                             String.Format("Metdata '{0}' does not have the same zone as the Default Metadata. All the points that use {0} will have their zone converted.", CurrentMetadata),
@@ -700,7 +807,7 @@ namespace TwoTrails.ViewModels
                             return;
                     }
 
-                    manager.DeleteMetadata(CurrentMetadata);
+                    Manager.DeleteMetadata(CurrentMetadata);
 
                     _Project.ProjectUpdated();
                 }
