@@ -53,7 +53,10 @@ namespace TwoTrails.Core.ComponentModel.History
 
             pointsManager.DeletePoint(Point);
 
-            //delete nmea if gps point
+            if (Point.IsGpsType())
+            {
+                pointsManager.DeleteNmeaBursts(Point.CN);
+            }
         }
 
         public override void Undo()
@@ -70,7 +73,10 @@ namespace TwoTrails.Core.ComponentModel.History
 
             pointsManager.AddPoint(Point);
 
-            //add nmea if gps point
+            if (Point.IsGpsType())
+            {
+                pointsManager.RestoreNmeaBurts(Point.CN);
+            }
         }
     }
 }

@@ -35,7 +35,6 @@ namespace TwoTrails.Core.ComponentModel.History
 
                             if (point.IsGpsType())
                             {
-
                                 _AddNmea.AddRange(pointsManager.GetNmeaBursts(point.CN).Select(n => new TtNmeaBurst(n, child.CN)));
                             }
                         }
@@ -59,7 +58,10 @@ namespace TwoTrails.Core.ComponentModel.History
 
             pointsManager.DeletePoints(Points);
 
-            //delete nmea of gps points
+            foreach (TtPoint point in Points.Where(p => p.IsGpsType()))
+            {
+                pointsManager.DeleteNmeaBursts(point.CN);
+            }
         }
 
         public override void Undo()
@@ -77,7 +79,10 @@ namespace TwoTrails.Core.ComponentModel.History
 
             pointsManager.AddPoints(Points);
 
-            //add nmea points that were removed
+            foreach (TtPoint point in Points.Where(p => p.IsGpsType()))
+            {
+                pointsManager.RestoreNmeaBurts(point.CN);
+            }
         }
     }
 }

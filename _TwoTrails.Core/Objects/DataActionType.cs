@@ -28,7 +28,9 @@ namespace TwoTrails.Core
         ReindexPoints       = 1 << 19,
         ConvertPoints       = 1 << 20,
         ModifiedDataDictionary  = 1 << 21,
-        DataImported = 1 << 22,
-        ProjectUpgraded = 1 << 23
+        DataImported        = 1 << 22,
+        ProjectUpgraded     = 1 << 23,
+        InsertedNmea        = 1 << 24,
+        DeletedNmea         = 1 << 25
     }
 }

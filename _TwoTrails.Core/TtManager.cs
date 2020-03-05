@@ -28,9 +28,11 @@ namespace TwoTrails.Core
         private Dictionary<String, TtMetadata> _MetadataMap, _MetadataMapOrig;
         private Dictionary<String, TtGroup> _GroupsMap, _GroupsMapOrig;
         private Dictionary<String, PolygonGraphicOptions> _PolyGraphicOpts, _PolyGraphicOptsOrig;
-        private Dictionary<String, DelayActionHandler> _PolygonUpdateHandlers;
-
+        private Dictionary<String, TtNmeaBurst> _AddNmea;
+        private List<String> _DeleteNmeaByPointCNs, _OrigNmeaCNs;
         private Dictionary<String, TtMediaInfo> _MediaMap, _MediaMapOrig;
+
+        private Dictionary<String, DelayActionHandler> _PolygonUpdateHandlers;
 
         private ObservableCollection<TtPoint> _Points;
         private ObservableCollection<TtPolygon> _Polygons;
@@ -55,8 +57,8 @@ namespace TwoTrails.Core
         public bool IgnorePointEvents { get; protected set; }
 
         public int PolygonCount => _Polygons.Count;
-
         public int PointCount => _Points.Count;
+
 
         private readonly object locker = new object();
 
@@ -82,6 +84,7 @@ namespace TwoTrails.Core
         {
             _MAL = mal;
         }
+
 
         #region Load & Attaching
         private void Load()
@@ -109,6 +112,9 @@ namespace TwoTrails.Core
             _PolyGraphicOptsOrig = _PolyGraphicOpts.Values.ToDictionary(p => p.CN, p => new PolygonGraphicOptions(p.CN, p));
 
             _PolygonUpdateHandlers = new Dictionary<string, DelayActionHandler>();
+
+            _AddNmea = new Dictionary<string, TtNmeaBurst>();
+            _DeleteNmeaByPointCNs = new List<string>();
 
             MainGroup = null;
             DefaultMetadata = null;
@@ -320,7 +326,6 @@ namespace TwoTrails.Core
 
         protected void AttachPointEvents(TtPoint point)
         {
-
             if (point.IsTravType())
             {
                 ((TravPoint)point).PositionChanged += TravPoint_PositionChanged;
@@ -366,6 +371,7 @@ namespace TwoTrails.Core
                     SaveMetadata();
                     SavePolygons();
                     SavePoints();
+                    SaveNmea();
                     SaveProjectInfo();
 
                     _DAL.InsertActivity(_Activity);
@@ -429,9 +435,28 @@ namespace TwoTrails.Core
                 _Activity.UpdateAction(DataActionType.DeletedPoints);
             }
 
-            //todo NMEA
-
             _PointsMapOrig = _PointsMap.Values.ToDictionary(p => p.CN, p => p.DeepCopy());
+        }
+
+        private void SaveNmea()
+        {
+            if (_AddNmea.Count > 0)
+            {
+                _DAL.InsertNmeaBursts(_AddNmea.Values);
+                _Activity.UpdateAction(DataActionType.InsertedNmea);
+            }
+
+            if (_DeleteNmeaByPointCNs.Count > 0)
+            {
+                foreach (string pointCN in _DeleteNmeaByPointCNs)
+                {
+                    _DAL.DeleteNmeaBursts(pointCN);
+                }
+                _Activity.UpdateAction(DataActionType.DeletedNmea);
+            }
+
+            _AddNmea.Clear();
+            _DeleteNmeaByPointCNs.Clear();
         }
 
         private void SavePolygons()
@@ -1100,10 +1125,15 @@ namespace TwoTrails.Core
         {
             Load();
         }
+
+        public void UpdateDataAction(DataActionType action, string notes = null)
+        {
+            _Activity.UpdateAction(action, notes);
+        }
         #endregion
 
 
-        #region Get Objects
+        #region Points
         public bool PointExists(String pointCN)
         {
             return _PointsMap.ContainsKey(pointCN);
@@ -1152,48 +1182,6 @@ namespace TwoTrails.Core
         }
 
 
-        public bool PolygonExists(string polyCN)
-        {
-            return _PolygonsMap.ContainsKey(polyCN);
-        }
-
-        public TtPolygon GetPolygon(string polyCN)
-        {
-            if (_PolygonsMap.ContainsKey(polyCN))
-                return _PolygonsMap[polyCN];
-            throw new Exception("Polygon Not Found");
-        }
-
-        public List<TtPolygon> GetPolygons()
-        {
-            return _PolygonsMap.Values.ToList();
-        }
-
-
-        public bool MetadataExists(string metaCN)
-        {
-            return _MetadataMap.ContainsKey(metaCN);
-        }
-
-        public List<TtMetadata> GetMetadata()
-        {
-            return _MetadataMap.Values.ToList();
-        }
-
-
-        public bool GroupExists(string groupCN)
-        {
-            return _GroupsMap.ContainsKey(groupCN);
-        }
-
-        public List<TtGroup> GetGroups()
-        {
-            return _GroupsMap.Values.ToList();
-        }
-        #endregion
-
-
-        #region Creation, Adding Moving, and Deleting
         /// <summary>
         /// Create a new Point with polygon, metadata and group attached
         /// </summary>
@@ -1371,6 +1359,7 @@ namespace TwoTrails.Core
                     _PolygonUpdateHandlers[cn].DelayInvoke();
             }
         }
+
 
         /// <summary>
         /// Repalces a point in a polygon which a new point
@@ -1596,6 +1585,7 @@ namespace TwoTrails.Core
             }
         }
 
+
         public void DeletePointsInPolygon(string polyCN)
         {
             lock (locker)
@@ -1618,6 +1608,26 @@ namespace TwoTrails.Core
                     _PointsByPoly[polyCN].Clear();
                 }
             }
+        }
+        #endregion
+
+
+        #region Polygons
+        public bool PolygonExists(string polyCN)
+        {
+            return _PolygonsMap.ContainsKey(polyCN);
+        }
+
+        public TtPolygon GetPolygon(string polyCN)
+        {
+            if (_PolygonsMap.ContainsKey(polyCN))
+                return _PolygonsMap[polyCN];
+            throw new Exception("Polygon Not Found");
+        }
+
+        public List<TtPolygon> GetPolygons()
+        {
+            return _PolygonsMap.Values.ToList();
         }
 
 
@@ -1711,6 +1721,67 @@ namespace TwoTrails.Core
                 _Polygons.Remove(polygon);
             }
         }
+        #endregion
+
+
+        #region Groups
+        public bool GroupExists(string groupCN)
+        {
+            return _GroupsMap.ContainsKey(groupCN);
+        }
+
+        public List<TtGroup> GetGroups()
+        {
+            return _GroupsMap.Values.ToList();
+        }
+
+
+        /// <summary>
+        /// Adds a group to the project
+        /// </summary>
+        /// <param name="group">Group to be added to the project</param>
+        public void AddGroup(TtGroup group)
+        {
+            if (group.CN == Consts.EmptyGuid)
+                throw new Exception("Default Group Already Exists");
+
+            lock (locker)
+            {
+                if (_GroupsMap.ContainsKey(group.CN))
+                    throw new Exception("Group already exists");
+                _GroupsMap.Add(group.CN, group);
+                _Groups.Add(group);
+            }
+        }
+
+        /// <summary>
+        /// Removes a group from the project
+        /// </summary>
+        /// <param name="group">Group to add to the project</param>
+        public void DeleteGroup(TtGroup group)
+        {
+            lock (locker)
+            {
+                foreach (TtPoint point in _PointsMap.Values.Where(p => p.GroupCN == group.CN))
+                    point.Group = MainGroup;
+
+                _GroupsMap.Remove(group.CN);
+                _Groups.Remove(group);
+            }
+        }
+        #endregion
+
+
+        #region Metadata
+        public bool MetadataExists(string metaCN)
+        {
+            return _MetadataMap.ContainsKey(metaCN);
+        }
+
+        public List<TtMetadata> GetMetadata()
+        {
+            return _MetadataMap.Values.ToList();
+        }
 
 
         /// <summary>
@@ -1766,44 +1837,60 @@ namespace TwoTrails.Core
                 DetachMetadataEvents(metadata);
             }
         }
+        #endregion
 
 
-        /// <summary>
-        /// Adds a group to the project
-        /// </summary>
-        /// <param name="group">Group to be added to the project</param>
-        public void AddGroup(TtGroup group)
+        #region NMEA
+        public List<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
-            if (group.CN == Consts.EmptyGuid)
-                throw new Exception("Default Group Already Exists");
+            return (pointCN != null && _DeleteNmeaByPointCNs.Contains(pointCN)) ?
+                new List<TtNmeaBurst>() :
+                _DAL.GetNmeaBursts(pointCN)
+                    .Concat(_AddNmea.Values.Where(n => pointCN == null || n.PointCN == pointCN)).ToList();
+        }
 
-            lock (locker)
+        public List<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
+        {
+            return _DAL.GetNmeaBursts(pointCNs)
+                .Where(n => !_DeleteNmeaByPointCNs.Contains(n.PointCN))
+                .Concat(_AddNmea.Values.Where(n => pointCNs.Contains(n.PointCN))).ToList();
+        }
+
+
+        public void AddNmeaBurst(TtNmeaBurst burst)
+        {
+            _AddNmea.Add(burst.CN, burst);
+        }
+
+        public void AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts)
+        {
+            foreach (TtNmeaBurst burst in bursts)
             {
-                if (_GroupsMap.ContainsKey(group.CN))
-                    throw new Exception("Group already exists");
-                _GroupsMap.Add(group.CN, group);
-                _Groups.Add(group);
+                AddNmeaBurst(burst);
             }
         }
 
-        /// <summary>
-        /// Removes a group from the project
-        /// </summary>
-        /// <param name="group">Group to add to the project</param>
-        public void DeleteGroup(TtGroup group)
+        public void RestoreNmeaBurts(string pointCN)
         {
-            lock (locker)
-            {
-                foreach (TtPoint point in _PointsMap.Values.Where(p => p.GroupCN == group.CN))
-                    point.Group = MainGroup;
+            _DeleteNmeaByPointCNs.Remove(pointCN);
+        }
 
-                _GroupsMap.Remove(group.CN);
-                _Groups.Remove(group);
+        public void DeleteNmeaBursts(string pointCN)
+        {
+            foreach (string cn in _AddNmea.Values.Where(n => n.PointCN == pointCN).Select(n => n.CN).ToList())
+            {
+                _AddNmea.Remove(cn);
+            }
+
+            if (_PointsMapOrig.ContainsKey(pointCN))
+            {
+                _DeleteNmeaByPointCNs.Add(pointCN);
             }
         }
         #endregion
 
 
+        #region Polygon Graphic Options
         public PolygonGraphicOptions GetPolygonGraphicOption(string polyCN)
         {
             if (_PolyGraphicOpts.ContainsKey(polyCN))
@@ -1825,34 +1912,10 @@ namespace TwoTrails.Core
         {
             return _Settings.PolygonGraphicSettings.CreatePolygonGraphicOptions(null);
         }
+        #endregion
 
 
-        public List<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
-        {
-            return _DAL.GetNmeaBursts(pointCN).ToList();
-        }
-
-        public List<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
-        {
-            return _DAL.GetNmeaBursts(pointCNs).ToList();
-        }
-
-        public void AddNmeaBurst(TtNmeaBurst burst)
-        {
-            _DAL.InsertNmeaBurst(burst);
-        }
-
-        public void AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts)
-        {
-            _DAL.InsertNmeaBursts(bursts);
-        }
-
-        public void DeleteNmeaBursts(string pointCN)
-        {
-            _DAL.DeleteNmeaBursts(pointCN);
-        }
-
-
+        #region Images
         public List<TtImage> GetImages(string pointCN = null)
         {
             return _MediaMap == null ? new List<TtImage>() :
@@ -1870,18 +1933,15 @@ namespace TwoTrails.Core
             //todo delete media
             throw new NotImplementedException();
         }
+        #endregion
 
 
+        #region Data Dictionary
         public DataDictionaryTemplate GetDataDictionaryTemplate()
         {
             return _DAL.GetDataDictionaryTemplate();
         }
-
-
-        public void UpdateDataAction(DataActionType action, string notes = null)
-        {
-            _Activity.UpdateAction(action, notes);
-        }
+        #endregion
     }
 
     public class MissingDataException : Exception
