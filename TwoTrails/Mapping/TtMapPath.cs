@@ -1,7 +1,9 @@
-﻿using Microsoft.Maps.MapControl.WPF;
+﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
 using TwoTrails.Core;
+using TwoTrails.Utils;
+using Windows.Devices.Geolocation;
+using Windows.UI.Xaml.Controls.Maps;
 
 namespace TwoTrails.Mapping
 {
@@ -15,33 +17,38 @@ namespace TwoTrails.Mapping
         public override bool Visible
         {
             get { return _Visible; }
-            set { SetField(ref _Visible, value, () => MapPolyline.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed); }
+            set { SetField(ref _Visible, value, () => MapPolyline.Visible = _Visible); }
         }
 
         public bool IsEditing { get; set; }
 
-        public TtMapPath(Map map, TtPolygon polygon, LocationCollection locations, PolygonGraphicOptions pgo, bool adjusted, bool visible) : base(map, polygon, locations, pgo)
+        public TtMapPath(MapControl map, TtPolygon polygon, IEnumerable<BasicGeoposition> locations, PolygonGraphicOptions pgo, bool adjusted, bool visible) : base(map, polygon, locations, pgo)
         {
             _Polygon = polygon;
             _Visible = visible;
 
-            MapPolyline.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
-            MapPolyline.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed;
+            MapPolyline.StrokeColor = TtUtils.GetColor(pgo.AdjBndColor);
+            //MapPolyline.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
+            MapPolyline.Visible = _Visible;
+            //MapPolyline.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed;
 
             MapPolyline.StrokeThickness = adjusted ?
                 pgo.AdjWidth : pgo.UnAdjWidth;
 
-            MapPolyline.Locations = locations;
+            MapPolyline.Path = new Geopath(locations);
+            //MapPolyline.Locations = locations;
 
             pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, int color) =>
             {
                 switch (code)
                 {
                     case GraphicCode.ADJNAV_COLOR:
-                        MapPolyline.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjNavColor));
+                        MapPolyline.StrokeColor = TtUtils.GetColor(pgo.AdjNavColor);
+                        //MapPolyline.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjNavColor));
                         break;
                     case GraphicCode.UNADJNAV_COLOR:
-                        MapPolyline.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.UnAdjNavColor));
+                        MapPolyline.StrokeColor = TtUtils.GetColor(pgo.UnAdjNavColor);
+                        //MapPolyline.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.UnAdjNavColor));
                         break;
                 }
             };
@@ -49,12 +56,14 @@ namespace TwoTrails.Mapping
             map.Children.Add(MapPolyline);
         }
 
-        protected override void UpdateShape(LocationCollection locations)
+        protected override void UpdateShape(IEnumerable<BasicGeoposition> locations)
         {
             Application.Current.Dispatcher.Invoke(() => {
-                MapPolyline.Locations = locations;
+                MapPolyline.Path = new Geopath(locations);
+                //MapPolyline.Locations = locations;
 
-                Map.Refresh();
+                Map.UpdateLayout();
+                //Map.Refresh();
             });
         }
 

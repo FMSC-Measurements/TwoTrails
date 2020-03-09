@@ -35,7 +35,7 @@ namespace TwoTrails.ViewModels
         public TtHistoryManager Manager { get { return _Project.Manager; } }
         public TtSettings Settings { get { return _Project.Settings; } }
         
-        public MapControl MapControl { get; set; }
+        public TtMapControl MapControl { get; set; }
         public MapWindow MapWindow { get; set; }
         public bool IsMapWindowOpen { get { return MapWindow != null; } }
         
@@ -146,7 +146,7 @@ namespace TwoTrails.ViewModels
             {
                 if (x is Grid grid)
                 {
-                    MapControl = grid.Children[0] as MapControl;
+                    MapControl = grid.Children[0] as TtMapControl;
 
                     grid.Children.Remove(MapControl);
 

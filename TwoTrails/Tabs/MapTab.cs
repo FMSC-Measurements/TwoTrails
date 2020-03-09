@@ -10,7 +10,7 @@ namespace TwoTrails
 
         public override ICommand OpenInWinndowCommand { get; }
 
-        public MapControl MapControl { get; set; }
+        public TtMapControl MapControl { get; set; }
 
         public override string TabTitle
         {
@@ -19,7 +19,7 @@ namespace TwoTrails
 
         public MapTab(TtProject project) : base(project)
         {
-            MapControl = new MapControl(project.Manager);
+            MapControl = new TtMapControl(project.Manager);
             Tab.Content = MapControl;
 
             OpenInWinndowCommand = Project.OpenMapWindowCommand;

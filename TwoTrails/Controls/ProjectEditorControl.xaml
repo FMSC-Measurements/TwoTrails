@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TwoTrails.Controls"
+             xmlns:controls="clr-namespace:TwoTrails.Controls"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
              xmlns:ttl="clr-namespace:TwoTrails"
@@ -1050,7 +1050,7 @@
 
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid x:Name="MapContainer">
-                        <local:MapControl x:Name="MapControl" Manager="{Binding Manager, Mode=OneWay}"/>
+                        <controls:TtMapControl x:Name="MapControl" Manager="{Binding Manager, Mode=OneWay}"/>
                     </Grid>
                 </Border>
             </TabItem>

@@ -1,6 +1,5 @@
 ﻿using CSUtil.ComponentModel;
 using FMSC.Core.Collections;
-using Microsoft.Maps.MapControl.WPF;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System;
@@ -10,6 +9,9 @@ using System.Linq;
 using System.Windows.Input;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial;
+using Windows.UI.Xaml.Controls.Maps;
+using Windows.Devices.Geolocation;
+using System.Collections.Generic;
 
 namespace TwoTrails.Mapping
 {
@@ -37,7 +39,7 @@ namespace TwoTrails.Mapping
 
         public Extent Extents { get; private set; }
 
-        private Map Map { get; }
+        private MapControl Map { get; }
 
         #region Visibility
         private bool _Visible;
@@ -277,11 +279,11 @@ namespace TwoTrails.Mapping
         #endregion
 
 
-        public TtMapPolygonManager(Map map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo) :
+        public TtMapPolygonManager(MapControl map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo) :
             this(map, polygon, points, pgo, true, true, true, false, false, false, false, false, false, false, false, false)
         { }
 
-        public TtMapPolygonManager(Map map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo,
+        public TtMapPolygonManager(MapControl map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo,
             bool vis, bool adjBndVis, bool adjBndPtsVis, bool unadjBndVis, bool unadjBndPtsVis,
             bool adjNavVis, bool adjNavPtsVis, bool unadjNavVis, bool unadjNavPtsVis,
             bool adjMiscPtsVis, bool unadjMiscPtsVis, bool wayPtsVis)
@@ -309,10 +311,10 @@ namespace TwoTrails.Mapping
 
             polygon.PolygonChanged += UpdatePolygonShape;
 
-            AdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, true, _AdjBndVisible);
-            UnAdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, false, _UnAdjBndVisible);
-            AdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, true, _AdjNavVisible);
-            UnAdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, false, _UnAdjNavVisible);
+            AdjBoundary = new TtMapPolygon(map, polygon, new List<BasicGeoposition>(), Graphics, true, _AdjBndVisible);
+            UnAdjBoundary = new TtMapPolygon(map, polygon, new List<BasicGeoposition>(), Graphics, false, _UnAdjBndVisible);
+            AdjNavigation = new TtMapPath(map, polygon, new List<BasicGeoposition>(), Graphics, true, _AdjNavVisible);
+            UnAdjNavigation = new TtMapPath(map, polygon, new List<BasicGeoposition>(), Graphics, false, _UnAdjNavVisible);
 
             Points = new ObservableConvertedCollection<TtPoint, TtMapPoint>(
                 points,
@@ -340,10 +342,18 @@ namespace TwoTrails.Mapping
                         BuildExtents();
                     if (Extents != null)
                     {
-                        Map.SetView(
-                            new LocationRect(
-                                new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BOUNDARY_ZOOM_MARGIN),
-                                new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN))); 
+                        MapScene scene = MapScene.CreateFromLocations(new Geopoint[] {
+                            new Geopoint(
+                                new BasicGeoposition() { Latitude = Extents.North + BOUNDARY_ZOOM_MARGIN, Longitude = Extents.West - BOUNDARY_ZOOM_MARGIN }),
+                            new Geopoint(
+                                new BasicGeoposition() { Latitude = Extents.South + BOUNDARY_ZOOM_MARGIN, Longitude = Extents.East - BOUNDARY_ZOOM_MARGIN })
+                        });
+                        _ = Map.TrySetSceneAsync(scene);
+
+                        //Map.SetView(
+                        //    new LocationRect(
+                        //        new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BsOUNDARY_ZOOM_MARGIN),
+                        //        new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN))); 
                     }
                 }
             });
@@ -406,10 +416,10 @@ namespace TwoTrails.Mapping
         {
             lock (locker)
             {
-                LocationCollection adjBndLocs = new LocationCollection();
-                LocationCollection unadjBndLocs = new LocationCollection();
-                LocationCollection adjNavLocs = new LocationCollection();
-                LocationCollection unadjNavLocs = new LocationCollection();
+                List<BasicGeoposition> adjBndLocs = new List<BasicGeoposition>();
+                List<BasicGeoposition> unadjBndLocs = new List<BasicGeoposition>();
+                List<BasicGeoposition> adjNavLocs = new List<BasicGeoposition>();
+                List<BasicGeoposition> unadjNavLocs = new List<BasicGeoposition>();
 
                 Extent.Builder builder = new Extent.Builder();
 

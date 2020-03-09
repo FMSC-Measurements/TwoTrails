@@ -1,5 +1,4 @@
-﻿using Microsoft.Maps.MapControl.WPF;
-using System;
+﻿using System;
 using TwoTrails.Core.Points;
 using System.Windows;
 using FMSC.GeoSpatial.UTM;
@@ -11,6 +10,8 @@ using System.ComponentModel;
 using TwoTrails.Core;
 using System.Windows.Controls;
 using Point = FMSC.Core.Point;
+using Windows.Devices.Geolocation;
+using Windows.UI.Xaml.Controls.Maps;
 
 namespace TwoTrails.Mapping
 {
@@ -22,12 +23,12 @@ namespace TwoTrails.Mapping
         public event MapPointEvent LocationChanged;
         public event MapPointSelectedEvent PointSelected;
 
-        public Pushpin AdjPushpin { get; } = new Pushpin();
-        public Pushpin UnAdjPushpin { get; } = new Pushpin();
+        //public Pushpin AdjPushpin { get; } = new Pushpin();
+        //public Pushpin UnAdjPushpin { get; } = new Pushpin();
 
-        private Location _AdjLoc, _UnAdjLoc;
-        public Location AdjLocation { get { return _AdjLoc; } private set { SetField(ref _AdjLoc, value); } }
-        public Location UnAdjLocation { get { return _UnAdjLoc; } private set { SetField(ref _UnAdjLoc, value); } }
+        private BasicGeoposition _AdjLoc, _UnAdjLoc;
+        public BasicGeoposition AdjLocation { get { return _AdjLoc; } private set { SetField(ref _AdjLoc, value); } }
+        public BasicGeoposition UnAdjLocation { get { return _UnAdjLoc; } private set { SetField(ref _UnAdjLoc, value); } }
 
         public TtPoint Point { get; }
         public bool IsBndPoint { get { return Point.IsBndPoint(); } }
@@ -35,7 +36,7 @@ namespace TwoTrails.Mapping
         public bool IsMiscPoint { get { return Point.IsMiscPoint(); } }
         public int Index { get { return Point.Index; } }
 
-        private Map _Map;
+        private MapControl _Map;
         
         private object locker = new object();
 
@@ -51,11 +52,11 @@ namespace TwoTrails.Mapping
                     {
                         _Editing = value;
 
-                        UnAdjPushpin.IsEnabled = !_Editing;
-                        UnAdjPushpin.Background = new SolidColorBrush(UnAdjColor)
-                        {
-                            Opacity = _Editing ? 0.7d : 1
-                        };
+                        //UnAdjPushpin.IsEnabled = !_Editing;
+                        //UnAdjPushpin.Background = new SolidColorBrush(UnAdjColor)
+                        //{
+                        //    Opacity = _Editing ? 0.7d : 1
+                        //};
                     }
                 }
             }
@@ -88,21 +89,21 @@ namespace TwoTrails.Mapping
 
         private void UpdateColor()
         {
-            if (Point.IsWayPointAtBase())
-            {
-                UnAdjPushpin.Background = new SolidColorBrush(WayPointColor)
-                {
-                    Opacity = _Editing ? 0.7d : 1
-                };
-            }
-            else
-            {
-                AdjPushpin.Background = new SolidColorBrush(AdjColor);
-                UnAdjPushpin.Background = new SolidColorBrush(UnAdjColor)
-                {
-                    Opacity = _Editing ? 0.7d : 1
-                };
-            }
+            //if (Point.IsWayPointAtBase())
+            //{
+            //    UnAdjPushpin.Background = new SolidColorBrush(WayPointColor)
+            //    {
+            //        Opacity = _Editing ? 0.7d : 1
+            //    };
+            //}
+            //else
+            //{
+            //    AdjPushpin.Background = new SolidColorBrush(AdjColor);
+            //    UnAdjPushpin.Background = new SolidColorBrush(UnAdjColor)
+            //    {
+            //        Opacity = _Editing ? 0.7d : 1
+            //    };
+            //}
         }
         #endregion
 
@@ -171,51 +172,51 @@ namespace TwoTrails.Mapping
 
         private void UpdateVisibility()
         {
-            lock (locker)
-            {
-                if (_Visible)
-                {
-                    AdjPushpin.Visibility =
-                        ((AdjBndVisible && Point.IsBndPoint()) ||
-                        (AdjNavVisible && IsNavPoint) ||
-                        (AdjMiscVisible && Point.IsMiscPoint())) ?
-                        Visibility.Visible : Visibility.Collapsed;
+            //lock (locker)
+            //{
+            //    if (_Visible)
+            //    {
+            //        AdjPushpin.Visibility =
+            //            ((AdjBndVisible && Point.IsBndPoint()) ||
+            //            (AdjNavVisible && IsNavPoint) ||
+            //            (AdjMiscVisible && Point.IsMiscPoint())) ?
+            //            Visibility.Visible : Visibility.Collapsed;
 
-                    UnAdjPushpin.Visibility =
-                        ((UnAdjBndVisible && Point.IsBndPoint()) ||
-                        (UnAdjNavVisible && IsNavPoint) ||
-                        (UnAdjMiscVisible && Point.IsMiscPoint())) ||
-                        (WayPointVisible && Point.IsWayPointAtBase()) ?
-                        Visibility.Visible : Visibility.Collapsed;
-                }
-                else
-                {
-                    AdjPushpin.Visibility = Visibility.Collapsed;
-                    UnAdjPushpin.Visibility = Visibility.Collapsed;
-                } 
-            }
+            //        UnAdjPushpin.Visibility =
+            //            ((UnAdjBndVisible && Point.IsBndPoint()) ||
+            //            (UnAdjNavVisible && IsNavPoint) ||
+            //            (UnAdjMiscVisible && Point.IsMiscPoint())) ||
+            //            (WayPointVisible && Point.IsWayPointAtBase()) ?
+            //            Visibility.Visible : Visibility.Collapsed;
+            //    }
+            //    else
+            //    {
+            //        AdjPushpin.Visibility = Visibility.Collapsed;
+            //        UnAdjPushpin.Visibility = Visibility.Collapsed;
+            //    } 
+            //}
         }
         #endregion
 
 
-        public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo)
+        public TtMapPoint(MapControl map, TtPoint point, PolygonGraphicOptions pgo)
         {
             Point = point;
 
-            AdjPushpin.Visibility = Visibility.Collapsed;
-            UnAdjPushpin.Visibility = Visibility.Collapsed;
+            //AdjPushpin.Visibility = Visibility.Collapsed;
+            //UnAdjPushpin.Visibility = Visibility.Collapsed;
 
-            AdjPushpin.MouseLeftButtonDown += AdjPushpin_MouseLeftButtonDown;
-            UnAdjPushpin.MouseLeftButtonDown += UnAdjPushpin_MouseLeftButtonDown;
+            //AdjPushpin.MouseLeftButtonDown += AdjPushpin_MouseLeftButtonDown;
+            //UnAdjPushpin.MouseLeftButtonDown += UnAdjPushpin_MouseLeftButtonDown;
 
-            AdjPushpin.ToolTipOpening += LoadAdjToolTip;
-            UnAdjPushpin.ToolTipOpening += LoadUnAdjToolTip;
+            //AdjPushpin.ToolTipOpening += LoadAdjToolTip;
+            //UnAdjPushpin.ToolTipOpening += LoadUnAdjToolTip;
 
-            AdjPushpin.ToolTip = String.Empty;
-            UnAdjPushpin.ToolTip = String.Empty;
+            //AdjPushpin.ToolTip = String.Empty;
+            //UnAdjPushpin.ToolTip = String.Empty;
 
-            ToolTipService.SetShowDuration(AdjPushpin, 60000);
-            ToolTipService.SetShowDuration(UnAdjPushpin, 60000);
+            //ToolTipService.SetShowDuration(AdjPushpin, 60000);
+            //ToolTipService.SetShowDuration(UnAdjPushpin, 60000);
 
 
             AdjColor = MediaTools.GetColor(pgo.AdjPtsColor);
@@ -251,11 +252,11 @@ namespace TwoTrails.Mapping
 
             _Map = map;
 
-            _Map.Children.Add(UnAdjPushpin);
-            _Map.Children.Add(AdjPushpin);
+            //_Map.Children.Add(UnAdjPushpin);
+            //_Map.Children.Add(AdjPushpin);
         }
 
-        public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo, bool visible,
+        public TtMapPoint(MapControl map, TtPoint point, PolygonGraphicOptions pgo, bool visible,
             bool adjBndVis, bool unadjBndVis, bool adjNavVis,
             bool unadjNavVis, bool adjMiscVis, bool unadjMiscVis,
             bool wayVis) : this(map, point, pgo)
@@ -281,8 +282,8 @@ namespace TwoTrails.Mapping
             }
             else if (e.PropertyName == nameof(TtPoint.PID))
             {
-                UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
-                AdjPushpin.ToolTip = new PointInfoBox(this, true);
+                //UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
+                //AdjPushpin.ToolTip = new PointInfoBox(this, true);
             }
         }
 
@@ -292,16 +293,16 @@ namespace TwoTrails.Mapping
             {
                 if (gps.HasLatLon)
                 {
-                    AdjPushpin.Location = AdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
-                    UnAdjPushpin.Location = UnAdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
+                    //AdjPushpin.Location = AdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
+                    //UnAdjPushpin.Location = UnAdjLocation = new Location((double)gps.Latitude, (double)gps.Longitude);
 
                     LocationChanged?.Invoke(this);
                 }
                 else if (point.Metadata != null)
                 {
                     Point loc = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone);
-                    AdjPushpin.Location = AdjLocation = new Location(loc.Y, loc.X);
-                    UnAdjPushpin.Location = UnAdjLocation = new Location(loc.Y, loc.X);
+                    //AdjPushpin.Location = AdjLocation = new Location(loc.Y, loc.X);
+                    //UnAdjPushpin.Location = UnAdjLocation = new Location(loc.Y, loc.X);
 
                     LocationChanged?.Invoke(this);
                 }
@@ -315,10 +316,10 @@ namespace TwoTrails.Mapping
                 if (point.Metadata != null)
                 {
                     Point adj = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone);
-                    AdjPushpin.Location = AdjLocation = new Location(adj.Y, adj.X);
+                    //AdjPushpin.Location = AdjLocation = new Location(adj.Y, adj.X);
 
                     Point unadj = UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
-                    UnAdjPushpin.Location = UnAdjLocation = new Location(unadj.Y, unadj.X);
+                    //UnAdjPushpin.Location = UnAdjLocation = new Location(unadj.Y, unadj.X);
 
                     LocationChanged?.Invoke(this);
                 }
@@ -331,14 +332,14 @@ namespace TwoTrails.Mapping
 
         private void LoadUnAdjToolTip(Object sender, ToolTipEventArgs e)
         {
-            if (!(UnAdjPushpin.ToolTip is PointInfoBox))
-                UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
+            //if (!(UnAdjPushpin.ToolTip is PointInfoBox))
+            //    UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
         }
 
         private void LoadAdjToolTip(Object sender, ToolTipEventArgs e)
         {
-            if (!(AdjPushpin.ToolTip is PointInfoBox))
-                AdjPushpin.ToolTip = new PointInfoBox(this, true);
+            //if (!(AdjPushpin.ToolTip is PointInfoBox))
+            //    AdjPushpin.ToolTip = new PointInfoBox(this, true);
         }
 
         private void AdjPushpin_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -355,11 +356,11 @@ namespace TwoTrails.Mapping
         
         public void Detach()
         {
-            if (_Map != null)
-            {
-                _Map.Children.Remove(AdjPushpin);
-                _Map.Children.Remove(UnAdjPushpin);
-            }
+            //if (_Map != null)
+            //{
+            //    _Map.Children.Remove(AdjPushpin);
+            //    _Map.Children.Remove(UnAdjPushpin);
+            //}
         }
 
         public override string ToString()

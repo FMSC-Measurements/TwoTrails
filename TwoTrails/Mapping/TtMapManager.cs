@@ -1,6 +1,4 @@
-﻿using FMSC.GeoSpatial.UTM;
-using Microsoft.Maps.MapControl.WPF;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -11,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using Windows.UI.Xaml.Controls.Maps;
 
 namespace TwoTrails.Mapping
 {
@@ -20,7 +19,7 @@ namespace TwoTrails.Mapping
         private Dictionary<string, TtMapPolygonManager> _PolygonManagers = new Dictionary<string, TtMapPolygonManager>();
         private ReadOnlyObservableCollection<TtPoint> _Points;
         private ReadOnlyObservableCollection<TtPolygon> _Polygons;
-        private Map _Map;
+        private MapControl _Map;
 
         //private TtPoint _LastPoint;
         //private List<TtPoint> _SelectedPoints { get; } =  new List<TtPoint>();
@@ -32,7 +31,7 @@ namespace TwoTrails.Mapping
         private bool CtrlKeyPressed, SettingVisibilities;
 
 
-        public TtMapManager(Map map, IObservableTtManager manager)
+        public TtMapManager(MapControl map, IObservableTtManager manager)
         {
             _Map = map;
             _Manager = manager;

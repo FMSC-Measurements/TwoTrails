@@ -12,6 +12,7 @@ using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.DAL;
+using Windows.UI;
 
 namespace TwoTrails.Utils
 {
@@ -292,6 +293,34 @@ namespace TwoTrails.Utils
             }
             
             return true;
+        }
+
+
+
+
+        public static Color GetColor(int argb)
+        {
+            return Color.FromArgb(GetAlpha(argb), GetRed(argb), GetGreen(argb), GetBlue(argb));
+        }
+
+        public static byte GetAlpha(int color)
+        {
+            return (byte)((color >> 24) & 255);
+        }
+
+        public static byte GetRed(int color)
+        {
+            return (byte)((color >> 16) & 255);
+        }
+
+        public static byte GetGreen(int color)
+        {
+            return (byte)((color >> 8) & 255);
+        }
+
+        public static byte GetBlue(int color)
+        {
+            return (byte)(color & 255);
         }
     }
 

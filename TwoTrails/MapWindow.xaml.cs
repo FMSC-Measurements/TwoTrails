@@ -10,14 +10,14 @@ namespace TwoTrails
     /// </summary>
     public partial class MapWindow : Window
     {
-        public MapControl MapControl { get; private set; }
+        public TtMapControl MapControl { get; private set; }
 
 
         public MapWindow(TtProject project) :
-            this($"Map - {project.ProjectName}", new MapControl(project.Manager))
+            this($"Map - {project.ProjectName}", new TtMapControl(project.Manager))
         { }
 
-        public MapWindow(string projectName, MapControl mapControl)
+        public MapWindow(string projectName, TtMapControl mapControl)
         {
             InitializeComponent();
 

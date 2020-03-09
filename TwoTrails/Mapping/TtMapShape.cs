@@ -1,6 +1,8 @@
 ﻿using CSUtil.ComponentModel;
-using Microsoft.Maps.MapControl.WPF;
+using System.Collections.Generic;
 using TwoTrails.Core;
+using Windows.Devices.Geolocation;
+using Windows.UI.Xaml.Controls.Maps;
 
 namespace TwoTrails.Mapping
 {
@@ -8,20 +10,20 @@ namespace TwoTrails.Mapping
     {
         public abstract bool Visible { get; set; }
 
-        protected Map Map { get; }
+        protected MapControl Map { get; }
 
 
-        public TtMapShape(Map map, TtPolygon polygon, LocationCollection locations, PolygonGraphicOptions pgo)
+        public TtMapShape(MapControl map, TtPolygon polygon, IEnumerable<BasicGeoposition> locations, PolygonGraphicOptions pgo)
         {
             this.Map = map;
         }
 
-        public void UpdateLocations(LocationCollection locations)
+        public void UpdateLocations(IEnumerable<BasicGeoposition> locations)
         {
             UpdateShape(locations);
         }
 
-        protected abstract void UpdateShape(LocationCollection locations);
+        protected abstract void UpdateShape(IEnumerable<BasicGeoposition> locations);
 
         public abstract void Detach();
     }
