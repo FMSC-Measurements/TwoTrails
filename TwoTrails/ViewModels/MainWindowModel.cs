@@ -17,6 +17,7 @@ using TwoTrails.DAL;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
 using FMSC.Core.Windows.Utilities;
+using System.Net.Mail;
 
 namespace TwoTrails.ViewModels
 {
@@ -122,6 +123,7 @@ namespace TwoTrails.ViewModels
 
         public ICommand ImportCommand { get; private set; }
         public ICommand ExportCommand { get; private set; }
+        public ICommand EmailReportCommand { get; private set; }
         public ICommand ViewPointDetailsCommand { get; private set; }
         public ICommand OpenInEarthCommand { get; private set; }
 
@@ -164,6 +166,7 @@ namespace TwoTrails.ViewModels
 
             ViewLogCommand = new RelayCommand(x => Process.Start(App.LOG_FILE_PATH));
             ExportReportCommand = new RelayCommand(x => ExportReport());
+            EmailReportCommand = new RelayCommand(x => ExportReport(true));
             CheckForUpdatesCommand = new RelayCommand(x => CheckForUpdates());
             AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(MainWindow));
 
@@ -688,62 +691,68 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             }
         }
 
-        private void ExportReport()
+        private void ExportReport(bool sendToDev = false)
         {
             string name = $"ExportReport_{DateTime.Now.ToString().Replace(':', '.').Replace('/','-')}";
-            
+
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.AddExtension = true;
             sfd.OverwritePrompt = true;
             sfd.DefaultExt = "zip";
-            sfd.Filter =  "Zip files (*.zip)|*.zip|All files (*.*)|*.*";
+            sfd.Filter = "Zip files (*.zip)|*.zip|All files (*.*)|*.*";
             sfd.FileName = $"{name}.zip";
             sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-            if (sfd.ShowDialog() == true)
+            if (sfd.ShowDialog() != true)
+                return;
+
+            string tempDirectory = Path.Combine(App.TEMP_DIR, name);
+            Directory.CreateDirectory(tempDirectory);
+
+            File.Copy(App.LOG_FILE_PATH, Path.Combine(tempDirectory, App.LOG_FILE_NAME));
+            foreach (TtProject proj in _Projects.Values)
             {
-                string tempDirectory = Path.Combine(App.TEMP_DIR, name);
-                Directory.CreateDirectory(tempDirectory);
+                File.Copy(proj.DAL.FilePath, Path.Combine(tempDirectory, Path.GetFileName(proj.DAL.FilePath)));
+                if (proj.MAL != null)
+                    File.Copy(proj.MAL.FilePath, Path.Combine(tempDirectory, Path.GetFileName(proj.MAL.FilePath)));
+            }
 
-                File.Copy(App.LOG_FILE_PATH, Path.Combine(tempDirectory, App.LOG_FILE_NAME));
-                foreach (TtProject proj in _Projects.Values)
-                {
-                    File.Copy(proj.DAL.FilePath, Path.Combine(tempDirectory, Path.GetFileName(proj.DAL.FilePath)));
-                    if (proj.MAL != null)
-                        File.Copy(proj.MAL.FilePath, Path.Combine(tempDirectory, Path.GetFileName(proj.MAL.FilePath)));
-                }
+            using (StreamWriter sw = new StreamWriter(Path.Combine(tempDirectory, "App.Settings.txt")))
+            {
+                sw.WriteLine("--Main App.Settings--");
+                sw.WriteLine($"{nameof(ITtSettings.UserName)}: {App.Settings.UserName}");
+                sw.WriteLine($"{nameof(ITtSettings.DeviceName)}: {App.Settings.DeviceName}");
+                sw.WriteLine($"{nameof(ITtSettings.Region)}: {App.Settings.Region}");
+                sw.WriteLine($"{nameof(ITtSettings.District)}: {App.Settings.District}");
+                sw.WriteLine($"{nameof(TtSettings.IsAdvancedMode)}: {App.Settings.IsAdvancedMode}");
+                sw.WriteLine("Recent Projects:");
+                foreach (string rp in App.Settings.GetRecentProjects())
+                    sw.WriteLine(rp);
+                sw.WriteLine();
 
-                using (StreamWriter sw = new StreamWriter(Path.Combine(tempDirectory, "App.Settings.txt")))
-                {
-                    sw.WriteLine("--Main App.Settings--");
-                    sw.WriteLine($"{nameof(ITtSettings.UserName)}: {App.Settings.UserName}");
-                    sw.WriteLine($"{nameof(ITtSettings.DeviceName)}: {App.Settings.DeviceName}");
-                    sw.WriteLine($"{nameof(ITtSettings.Region)}: {App.Settings.Region}");
-                    sw.WriteLine($"{nameof(ITtSettings.District)}: {App.Settings.District}");
-                    sw.WriteLine($"{nameof(TtSettings.IsAdvancedMode)}: {App.Settings.IsAdvancedMode}");
-                    sw.WriteLine("Recent Projects:");
-                    foreach (string rp in App.Settings.GetRecentProjects())
-                        sw.WriteLine(rp);
-                    sw.WriteLine();
+                sw.WriteLine("--Device App.Settings--");
+                sw.WriteLine($"{nameof(App.Settings.DeviceSettings.DeleteExistingPlots)}: {App.Settings.DeviceSettings.DeleteExistingPlots}");
+                sw.WriteLine();
 
-                    sw.WriteLine("--Device App.Settings--");
-                    sw.WriteLine($"{nameof(App.Settings.DeviceSettings.DeleteExistingPlots)}: {App.Settings.DeviceSettings.DeleteExistingPlots}");
-                    sw.WriteLine();
+                sw.WriteLine("--Metadata App.Settings--");
+                sw.WriteLine($"{nameof(MetadataSettings.Datum)}: {App.Settings.MetadataSettings.Datum}");
+                sw.WriteLine($"{nameof(MetadataSettings.DecType)}: {App.Settings.MetadataSettings.DecType}");
+                sw.WriteLine($"{nameof(MetadataSettings.Distance)}: {App.Settings.MetadataSettings.Distance}");
+                sw.WriteLine($"{nameof(MetadataSettings.Elevation)}: {App.Settings.MetadataSettings.Elevation}");
+                sw.WriteLine($"{nameof(MetadataSettings.MagDec)}: {App.Settings.MetadataSettings.MagDec}");
+                sw.WriteLine($"{nameof(MetadataSettings.Slope)}: {App.Settings.MetadataSettings.Slope}");
+                sw.WriteLine($"{nameof(MetadataSettings.Zone)}: {App.Settings.MetadataSettings.Zone}");
+            }
 
-                    sw.WriteLine("--Metadata App.Settings--");
-                    sw.WriteLine($"{nameof(MetadataSettings.Datum)}: {App.Settings.MetadataSettings.Datum}");
-                    sw.WriteLine($"{nameof(MetadataSettings.DecType)}: {App.Settings.MetadataSettings.DecType}");
-                    sw.WriteLine($"{nameof(MetadataSettings.Distance)}: {App.Settings.MetadataSettings.Distance}");
-                    sw.WriteLine($"{nameof(MetadataSettings.Elevation)}: {App.Settings.MetadataSettings.Elevation}");
-                    sw.WriteLine($"{nameof(MetadataSettings.MagDec)}: {App.Settings.MetadataSettings.MagDec}");
-                    sw.WriteLine($"{nameof(MetadataSettings.Slope)}: {App.Settings.MetadataSettings.Slope}");
-                    sw.WriteLine($"{nameof(MetadataSettings.Zone)}: {App.Settings.MetadataSettings.Zone}");
-                }
+            ZipFile.CreateFromDirectory(tempDirectory, Path.GetFullPath(sfd.FileName));
 
-                ZipFile.CreateFromDirectory(tempDirectory, Path.GetFullPath(sfd.FileName));
+            if (Directory.Exists(tempDirectory))
+                Directory.Delete(tempDirectory, true);
 
-                if (Directory.Exists(tempDirectory))
-                    Directory.Delete(tempDirectory, true);
+            if (sendToDev)
+            {
+                MessageBox.Show($"Please attach the following file to the Report Email: {sfd.FileName}");
+                Process.Start($"mailto:{Consts.DEV_EMAIL}?subject={Consts.EMAIL_SUBJECT}&body={Consts.EMAIL_BODY}");
             }
         }
     

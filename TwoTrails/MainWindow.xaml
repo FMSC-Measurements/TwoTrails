@@ -193,6 +193,7 @@
 
                 <MenuItem Header="_Help">
                     <MenuItem Header="View Log File" Command="{Binding ViewLogCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
+                    <MenuItem Header="Email Error Report" Command="{Binding EmailReportCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                     <MenuItem Header="Export Error Report" Command="{Binding ExportReportCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                     <MenuItem Header="View User Activity" Command="{Binding CurrentProject.ViewUserActivityCommand}"
                         Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource ResourceKey=BoolToVis}}"

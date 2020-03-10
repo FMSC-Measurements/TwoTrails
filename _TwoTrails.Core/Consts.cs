@@ -2,7 +2,7 @@
 
 namespace TwoTrails.Core
 {
-    public static class Consts
+    public static partial class Consts
     {
         public const String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.FFF";
 
@@ -43,5 +43,8 @@ namespace TwoTrails.Core
         public const string URL_TWOTRAILS_UPDATE = @"https://www.fs.fed.us/fmsc/ftp/measure/geospatial/TwoTrails/twotrails.version";
         public const string URL_TWOTRAILS = @"https://www.fs.fed.us/forestmanagement/products/measurement/area-determination/twotrails/";
         public const string URL_FMSC = @"https://www.fs.fed.us/forestmanagement/products/measurement/";
+
+        public const String EMAIL_SUBJECT = "TwoTrails Error Report";
+        public const String EMAIL_BODY = "I am experiencing issues in TwoTrails Android and would like to report it to the development team.%0A%0ANotes: ";
     }
 }
