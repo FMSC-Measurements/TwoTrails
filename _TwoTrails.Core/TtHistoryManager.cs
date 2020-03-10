@@ -430,7 +430,19 @@ namespace TwoTrails.Core
         {
             AddCommand(new ReplaceTtPointsCommand(points, BaseManager));
         }
-        
+
+
+        public void ConvertQuondam(QuondamPoint point)
+        {
+            AddCommand(new ConvertQuondamCommand(point, BaseManager));
+        }
+
+        public void ConvertQuondams(IEnumerable<QuondamPoint> points)
+        {
+            AddCommand(new ConvertQuondamsCommand(points, BaseManager));
+        }
+
+
         public void RebuildPolygon(TtPolygon polygon, bool reindex = false)
         {
             AddCommand(new RebuildPolygonCommand(polygon, reindex, BaseManager));

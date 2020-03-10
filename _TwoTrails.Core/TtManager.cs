@@ -397,6 +397,7 @@ namespace TwoTrails.Core
             List<TtPoint> pointsToAdd = new List<TtPoint>();
             List<Tuple<TtPoint, TtPoint>> pointsToUpdate = new List<Tuple<TtPoint, TtPoint>>();
             TtPoint old;
+            bool pointsConverted = false;
 
             foreach (TtPoint point in _PointsMap.Values)
             {
@@ -407,6 +408,11 @@ namespace TwoTrails.Core
                     if (!point.Equals(old))
                     {
                         pointsToUpdate.Add(Tuple.Create(point, old));
+
+                        if (old.OpType != point.OpType)
+                        {
+                            pointsConverted = true;
+                        }
                     }
                 }
                 else
@@ -433,6 +439,11 @@ namespace TwoTrails.Core
             {
                 _DAL.DeletePoints(pointsToRemove);
                 _Activity.UpdateAction(DataActionType.DeletedPoints);
+            }
+
+            if (pointsConverted)
+            {
+                _Activity.UpdateAction(DataActionType.ConvertPoints);
             }
 
             _PointsMapOrig = _PointsMap.Values.ToDictionary(p => p.CN, p => p.DeepCopy());

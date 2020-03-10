@@ -2305,25 +2305,10 @@ namespace TwoTrails.ViewModels
 
         private void ConvertQuondams()
         {
-            GpsPoint convertPoint(QuondamPoint q)
-            {
-                GpsPoint gps = new GpsPoint(q)
-                {
-                    Comment = string.IsNullOrWhiteSpace(q.Comment) ? q.ParentPoint.Comment : q.Comment,
-                    TimeCreated = DateTime.Now
-                };
-
-                gps.SetAccuracy(q.Polygon.Accuracy);
-
-                return gps;
-            }
-
             if (MultipleSelections)
-                Manager.ReplacePoints(GetSortedSelectedPoints().Select(p => convertPoint(p as QuondamPoint)));
+                Manager.ConvertQuondams(SelectedPoints.Cast<QuondamPoint>());
             else
-                Manager.ReplacePoint(convertPoint(SelectedPoint as QuondamPoint));
-
-            Manager.BaseManager.UpdateDataAction(DataActionType.ConvertPoints);
+                Manager.ReplacePoint(SelectedPoint as QuondamPoint);
         }
 
         private void ConvertTravTypes()

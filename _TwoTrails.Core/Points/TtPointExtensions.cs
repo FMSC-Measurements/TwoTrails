@@ -104,7 +104,7 @@ namespace TwoTrails.Core.Points
 
         public static TtPoint ConvertQuondam(this QuondamPoint point)
         {
-            TtPoint conversion = point.ParentPoint.DeepCopy();
+            TtPoint conversion = point.IsGpsAtBase() ? point.ParentPoint.DeepCopy() : new GpsPoint(point.ParentPoint);
 
             conversion.CN = point.CN;
             conversion.PID = point.PID;
