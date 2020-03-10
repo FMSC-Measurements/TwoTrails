@@ -42,6 +42,7 @@ namespace TwoTrails.ViewModels
             nameof(OnlyManAccTypes),
             nameof(OnlyQuondams),
             nameof(HasPossibleCorridor),
+            nameof(HasPossibleDoubleSidedCorridor),
             nameof(ConvertTypeHeader),
             nameof(PID),
             nameof(SamePID),
@@ -99,6 +100,7 @@ namespace TwoTrails.ViewModels
         public RelayCommand CreatePlotsCommand { get; }
         public RelayCommand CreateSubsampleCommand { get; }
         public RelayCommand CreateCorridorCommand { get; }
+        public RelayCommand CreateDoubleSidedCorridorCommand { get; }
         public RelayCommand ModifyDataDictionaryCommand { get; }
         
         public ICommand SelectAlternateCommand { get; }
@@ -172,6 +174,7 @@ namespace TwoTrails.ViewModels
         public bool OnlyGpsTypes { get; private set; }
         public bool OnlyQuondams { get; private set; }
         public bool HasPossibleCorridor { get; private set; }
+        public bool HasPossibleDoubleSidedCorridor { get; private set; }
 
         private bool ignoreSelectionChange = false, settingFields = false;
         
@@ -973,6 +976,10 @@ namespace TwoTrails.ViewModels
                 x => CreateCorridor(), x => HasPossibleCorridor,
                 this, x => x.HasPossibleCorridor);
 
+            CreateDoubleSidedCorridorCommand = new BindedRelayCommand<PointEditorModel>(
+                x => CreateDoubleSidedCorridor(), x => HasPossibleDoubleSidedCorridor,
+                this, x => x.HasPossibleDoubleSidedCorridor);
+
             ModifyDataDictionaryCommand = new RelayCommand(x => ModifyDataDictionary());
 
             DeselectCommand = new RelayCommand(x => DeselectAll());
@@ -1384,12 +1391,13 @@ namespace TwoTrails.ViewModels
             HasTravTypes = false;
             HasQndms = false;
             HasPossibleCorridor = false;
+            HasPossibleDoubleSidedCorridor = false;
 
             bool ddAvailable = _ExtendedData != null;
 
             if (ddAvailable)
             {
-                foreach (string id in _ExtendedDataSame.Keys.ToArray())
+                foreach (string id in _ExtendedDataSame.Keys.ToList())
                     _ExtendedDataSame[id] = true;
                 _ExtendedData.ClearValues();
             }
@@ -1612,7 +1620,24 @@ namespace TwoTrails.ViewModels
                     _Group = group;
                     _SameGroup = group != null;
 
-                    HasPossibleCorridor = HasGpsTypes && hasSsOnBnd && !HasQndms && !hasTrav && _SamePolygon;
+                    HasPossibleCorridor = hasSsOnBnd && !HasQndms && HasGpsTypes && !hasTrav && _SamePolygon;
+
+                    if (HasPossibleCorridor)
+                    {
+                        int idx = 0;
+                        HasPossibleDoubleSidedCorridor = true;
+                        foreach (TtPoint p in GetSortedSelectedPoints())
+                        {
+                            int idxv = idx % 3;
+                            if ((idxv == 0 && !p.IsGpsType()) ||
+                                (idxv != 0 && p.OpType != OpType.SideShot))
+                            {
+                                HasPossibleDoubleSidedCorridor = false;
+                                break;
+                            }
+                            idx++;
+                        }
+                    }
 
                     if (hasOnbnd ^ hasOffBnd)
                     {
@@ -1858,6 +1883,7 @@ namespace TwoTrails.ViewModels
                     nameof(OnlyManAccTypes),
                     nameof(OnlyQuondams),
                     nameof(HasPossibleCorridor),
+                    nameof(HasPossibleDoubleSidedCorridor),
                     nameof(ConvertTypeHeader),
                     nameof(ReverseTypeHeader),
                     nameof(PID),
@@ -2408,6 +2434,10 @@ namespace TwoTrails.ViewModels
         private void CreateCorridor()
         {
             Manager.CreateCorridor(GetSortedSelectedPoints().Where(p => p.OnBoundary), Polygon);
+        }
+        private void CreateDoubleSidedCorridor()
+        {
+            Manager.CreateDoubleSidedCorridor(GetSortedSelectedPoints().Where(p => p.OnBoundary), Polygon);
         }
 
         private void IsPointInPolygon()

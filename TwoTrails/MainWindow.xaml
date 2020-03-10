@@ -180,6 +180,8 @@
                     <MenuItem Header="Create Subsample" Command="{Binding CurrentEditor.CreateSubsampleCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
                           Style="{StaticResource styleMiPointEdit}" InputGestureText="Ctrl+Alt+C"/>
+                    <MenuItem Header="Create Double Sided Corridor" Command="{Binding CurrentEditor.CreateDoubleSidedCorridorCommand}"
+                          Style="{StaticResource styleMiPointEdit}"/>
 
                     <Separator Visibility="Collapsed"/>
 

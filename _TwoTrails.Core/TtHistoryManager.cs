@@ -335,6 +335,10 @@ namespace TwoTrails.Core
         {
             AddCommand(new CreateCorridorCommand(points, targetPolygon, BaseManager));
         }
+        public void CreateDoubleSidedCorridor(IEnumerable<TtPoint> points, TtPolygon targetPolygon)
+        {
+            AddCommand(new CreateCorridorDoubleSidedCommand(points, targetPolygon, BaseManager));
+        }
 
         public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex)
         {
