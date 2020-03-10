@@ -12,7 +12,7 @@
   </PropertyGroup>
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="12.2.1" />
+    <PackageReference Include="CsvHelper" Version="15.0.1" />
     <PackageReference Include="NetTopologySuite.Core" Version="1.15.3" />
     <PackageReference Include="NetTopologySuite.Features" Version="2.0.0" />
     <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.0.0" />

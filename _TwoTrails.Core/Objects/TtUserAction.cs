@@ -11,36 +11,42 @@ namespace TwoTrails.Core
         public DataActionType Action { get; private set; }
         public String Notes { get; private set; }
         
-        public bool ProjectModified { get { return Action.HasFlag(DataActionType.ModifiedProject); } }
+        public bool ProjectModified => Action.HasFlag(DataActionType.ModifiedProject);
 
-        public bool PointsInserted { get { return Action.HasFlag(DataActionType.InsertedPoints); } }
-        public bool PointsModified { get { return Action.HasFlag(DataActionType.ModifiedPoints); } }
-        public bool PointsDeleted { get { return Action.HasFlag(DataActionType.DeletedPoints); } }
+        public bool PointsInserted => Action.HasFlag(DataActionType.InsertedPoints);
+        public bool PointsModified => Action.HasFlag(DataActionType.ModifiedPoints);
+        public bool PointsDeleted => Action.HasFlag(DataActionType.DeletedPoints);
 
-        public bool PolygonsInserted { get { return Action.HasFlag(DataActionType.InsertedPolygons); } }
-        public bool PolygonsModified { get { return Action.HasFlag(DataActionType.ModifiedPolygons); } }
-        public bool PolygonsDeleted { get { return Action.HasFlag(DataActionType.DeletedPolygons); } }
+        public bool PolygonsInserted => Action.HasFlag(DataActionType.InsertedPolygons);
+        public bool PolygonsModified => Action.HasFlag(DataActionType.ModifiedPolygons);
+        public bool PolygonsDeleted => Action.HasFlag(DataActionType.DeletedPolygons);
 
-        public bool MetadataInserted { get { return Action.HasFlag(DataActionType.InsertedMetadata); } }
-        public bool MetadataModified { get { return Action.HasFlag(DataActionType.ModifiedMetadata); } }
-        public bool MetadataDeleted { get { return Action.HasFlag(DataActionType.DeletedMetadata); } }
+        public bool MetadataInserted => Action.HasFlag(DataActionType.InsertedMetadata);
+        public bool MetadataModified => Action.HasFlag(DataActionType.ModifiedMetadata);
+        public bool MetadataDeleted => Action.HasFlag(DataActionType.DeletedMetadata);
 
-        public bool GroupsInserted { get { return Action.HasFlag(DataActionType.InsertedGroups); } }
-        public bool GroupsModified { get { return Action.HasFlag(DataActionType.ModifiedGroups); } }
-        public bool GroupsDeleted { get { return Action.HasFlag(DataActionType.DeletedGroups); } }
+        public bool GroupsInserted => Action.HasFlag(DataActionType.InsertedGroups);
+        public bool GroupsModified => Action.HasFlag(DataActionType.ModifiedGroups);
+        public bool GroupsDeleted => Action.HasFlag(DataActionType.DeletedGroups);
 
-        public bool MediaInserted { get { return Action.HasFlag(DataActionType.InsertedMedia); } }
-        public bool MediaModified { get { return Action.HasFlag(DataActionType.ModifiedMedia); } }
-        public bool MediaDeleted { get { return Action.HasFlag(DataActionType.DeletedMedia); } }
+        public bool MediaInserted => Action.HasFlag(DataActionType.InsertedMedia);
+        public bool MediaModified => Action.HasFlag(DataActionType.ModifiedMedia);
+        public bool MediaDeleted => Action.HasFlag(DataActionType.DeletedMedia);
 
-        public bool ManualCreatedPoints { get { return Action.HasFlag(DataActionType.ManualPointCreation); } }
-        public bool PointsMoved { get { return Action.HasFlag(DataActionType.MovePoints); } }
-        public bool PointsRetraced { get { return Action.HasFlag(DataActionType.RetracePoints); } }
-        public bool PointsReindexed { get { return Action.HasFlag(DataActionType.ReindexPoints); } }
-        public bool PointsConverted { get { return Action.HasFlag(DataActionType.ConvertPoints); } }
+        public bool InsertedNmea => Action.HasFlag(DataActionType.InsertedNmea);
+        public bool DeletedNmea => Action.HasFlag(DataActionType.DeletedNmea);
+
+        public bool ManualCreatedPoints => Action.HasFlag(DataActionType.ManualPointCreation);
+        public bool PointsMoved => Action.HasFlag(DataActionType.MovePoints);
+        public bool PointsRetraced => Action.HasFlag(DataActionType.RetracePoints);
+        public bool PointsReindexed => Action.HasFlag(DataActionType.ReindexPoints);
+        public bool PointsConverted => Action.HasFlag(DataActionType.ConvertPoints);
         
-        public bool DataImported { get { return Action.HasFlag(DataActionType.DataImported); } }
-        public bool ModifiedDataDictionary { get { return Action.HasFlag(DataActionType.ModifiedDataDictionary); } }
+        public bool DataImported => Action.HasFlag(DataActionType.DataImported);
+        public bool ModifiedDataDictionary => Action.HasFlag(DataActionType.ModifiedDataDictionary);
+
+        public bool ProjectUpgraded => Action.HasFlag(DataActionType.ProjectUpgraded);
+
 
         public TtUserAction(String userName, String deviceName) :
             this(userName, deviceName, DateTime.Now, DataActionType.None)

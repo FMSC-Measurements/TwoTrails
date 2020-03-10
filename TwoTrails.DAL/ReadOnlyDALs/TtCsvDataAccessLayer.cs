@@ -4,6 +4,7 @@ using FMSC.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using TwoTrails.Core;
@@ -138,7 +139,7 @@ namespace TwoTrails.DAL
             List<Tuple<string, QuondamPoint>> quondams = new List<Tuple<string, QuondamPoint>>();
 
             CsvReader reader = new CsvReader(new StreamReader(_Options.PointsFile),
-                new Configuration()
+                new CsvConfiguration(CultureInfo.CurrentCulture)
                 {
                     AllowComments = true,
                     ShouldSkipRecord = r =>
