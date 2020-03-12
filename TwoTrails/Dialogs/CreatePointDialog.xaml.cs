@@ -16,7 +16,7 @@ namespace TwoTrails.Dialogs
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private ITtManager _Manager;
+        private TtHistoryManager _Manager;
         private OpType _OpType;
         
         public String Txt1Watermark
@@ -48,7 +48,7 @@ namespace TwoTrails.Dialogs
         public bool IsGpsType { get { return _OpType.IsGpsType(); } }
 
 
-        public CreateGpsPointDialog(ITtManager manager, TtPolygon target = null, OpType opType = OpType.GPS)
+        public CreateGpsPointDialog(TtHistoryManager manager, TtPolygon target = null, OpType opType = OpType.GPS)
         {
             if (opType == OpType.Quondam)
                 throw new Exception("Invalid Operation: Cannot create quondam");
@@ -261,7 +261,7 @@ namespace TwoTrails.Dialogs
                                 if (_OpType == OpType.SideShot)
                                     point = new SideShotPoint(point);
 
-                                _Manager.AddPoint(point);
+                                _Manager.CreatePoint(point);
                             }
 
                             if (this.IsShownAsDialog())
@@ -286,7 +286,7 @@ namespace TwoTrails.Dialogs
             }
         }
 
-        public static bool? ShowDialog(ITtManager manager, TtPolygon target = null, OpType opType = OpType.GPS, Window owner = null)
+        public static bool? ShowDialog(TtHistoryManager manager, TtPolygon target = null, OpType opType = OpType.GPS, Window owner = null)
         {
             CreateGpsPointDialog cpd = new CreateGpsPointDialog(manager, target, opType);
             if (owner != null)

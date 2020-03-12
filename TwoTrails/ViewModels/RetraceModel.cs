@@ -173,7 +173,7 @@ namespace TwoTrails.ViewModels
                     }
                     else
                     {
-                        _Manager.CreateQuondamLinks(retracePoints, TargetPolygon,
+                        _Manager.CreateRetrace(retracePoints, TargetPolygon,
                             InsertBeginning ? 0 : InsertAfter ? InsertIndex : int.MaxValue, BoundaryMode);
                     }
 

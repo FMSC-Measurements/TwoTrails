@@ -109,13 +109,15 @@ namespace TwoTrails.Core
             _ComplexActionCommands = new List<ITtCommand>();
         }
 
-        public void CommitMultiCommand()
+        public void CommitMultiCommand(ITtCommand commitCommand = null)
         {
             if (_ComplexActionCommands == null)
                 throw new Exception("Complex Action not started");
 
             if (_ComplexActionCommands.Count > 0)
             {
+                _ComplexActionCommands.Add(commitCommand);
+
                 MultiTtCommand command = new MultiTtCommand(_ComplexActionCommands);
                 _ComplexActionCommands = null;
                 AddCommand(command);
@@ -276,6 +278,11 @@ namespace TwoTrails.Core
             AddCommand(new AddTtPointsCommand(points, BaseManager));
         }
 
+        public void CreatePoint(TtPoint point)
+        {
+            AddCommand(new CreateTtPointCommand(point, BaseManager));
+        }
+
         public void DeletePoint(TtPoint point)
         {
             AddCommand(new DeleteTtPointCommand(point, BaseManager));
@@ -331,6 +338,12 @@ namespace TwoTrails.Core
             AddCommand(new CreateQuondamsCommand(reverse ? points.Reverse() : points, BaseManager, targetPolygon, insertIndex, bndMode));
         }
 
+        public void CreateRetrace(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit, bool reverse = false)
+        {
+            AddCommand(new RetraceCommand(reverse ? points.Reverse() : points, this, targetPolygon, insertIndex, bndMode));
+        }
+
+
         public void CreateCorridor(IEnumerable<TtPoint> points, TtPolygon targetPolygon)
         {
             AddCommand(new CreateCorridorCommand(points, targetPolygon, BaseManager));
@@ -339,6 +352,7 @@ namespace TwoTrails.Core
         {
             AddCommand(new CreateCorridorDoubleSidedCommand(points, targetPolygon, BaseManager));
         }
+
 
         public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex)
         {
@@ -517,12 +531,6 @@ namespace TwoTrails.Core
         public DataDictionaryTemplate GetDataDictionaryTemplate()
         {
             return BaseManager.GetDataDictionaryTemplate();
-        }
-
-
-        void ITtManager.UpdateDataAction(DataActionType action, string notes)
-        {
-            BaseManager.UpdateDataAction(action, notes);
         }
     }
 

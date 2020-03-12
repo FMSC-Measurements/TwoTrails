@@ -51,8 +51,6 @@ namespace TwoTrails.ViewModels
                     {
                         _Manager.EditPointsMultiValues(points, PointProperties.INDEX, Enumerable.Range(0, points.Count));
                     }
-                    
-                    _Manager.BaseManager.UpdateDataAction(DataActionType.ReindexPoints);
 
                     MessageBox.Show($"Polygon '{SelectedPolygon.Name}' reindexed by {ReindexMode.GetDescription()}.", "Reindex Polyon", MessageBoxButton.OK);
                 }

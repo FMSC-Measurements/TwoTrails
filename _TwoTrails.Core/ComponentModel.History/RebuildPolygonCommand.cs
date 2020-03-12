@@ -9,7 +9,7 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         private TtManager pointsManager;
 
-        private List<TtPoint> Points;
+        private List<TtPoint> _Points;
 
         private TtPolygon Polygon;
         private bool Reindex;
@@ -21,7 +21,7 @@ namespace TwoTrails.Core.ComponentModel.History
             this.Polygon = polygon;
             this.Reindex = reindex;
 
-            Points = pointsManager.GetPoints(polygon.CN).Select(pt => pt.DeepCopy()).ToList();
+            _Points = pointsManager.GetPoints(polygon.CN).Select(pt => pt.DeepCopy()).ToList();
 
             List<string> polyCNs = new List<string>() { polygon.CN };
             List<TtPoint> addPoints = new List<TtPoint>();
@@ -49,12 +49,12 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
 
-            foreach (TtPoint point in Points)
+            foreach (TtPoint point in _Points)
             {
                 addFromLinks(point);
             }
 
-            Points.AddRange(addPoints);
+            _Points.AddRange(addPoints);
         }
 
         public Type DataType => PointProperties.DataType;
@@ -68,7 +68,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public void Undo()
         {
-            foreach (TtPoint point in Points)
+            foreach (TtPoint point in _Points)
             {
                 pointsManager.ReplacePoint(point);
             }

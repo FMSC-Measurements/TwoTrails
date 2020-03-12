@@ -29,8 +29,10 @@ namespace TwoTrails.Core
         private Dictionary<String, TtGroup> _GroupsMap, _GroupsMapOrig;
         private Dictionary<String, PolygonGraphicOptions> _PolyGraphicOpts, _PolyGraphicOptsOrig;
         private Dictionary<String, TtNmeaBurst> _AddNmea;
-        private List<String> _DeleteNmeaByPointCNs, _OrigNmeaCNs;
+        private List<String> _DeleteNmeaByPointCNs;
         private Dictionary<String, TtMediaInfo> _MediaMap, _MediaMapOrig;
+
+        private Stack<Tuple<DataActionType, string>> _DataActions = new Stack<Tuple<DataActionType, string>>();
 
         private Dictionary<String, DelayActionHandler> _PolygonUpdateHandlers;
 
@@ -397,7 +399,7 @@ namespace TwoTrails.Core
             List<TtPoint> pointsToAdd = new List<TtPoint>();
             List<Tuple<TtPoint, TtPoint>> pointsToUpdate = new List<Tuple<TtPoint, TtPoint>>();
             TtPoint old;
-            bool pointsConverted = false;
+            bool pointsConverted = false, pointsMoved = false, pointsIndexChanged = false;
 
             foreach (TtPoint point in _PointsMap.Values)
             {
@@ -412,6 +414,16 @@ namespace TwoTrails.Core
                         if (old.OpType != point.OpType)
                         {
                             pointsConverted = true;
+                        }
+
+                        if (old.PolygonCN != point.PolygonCN)
+                        {
+                            pointsMoved = true;
+                        }
+
+                        if (old.Index != point.Index)
+                        {
+                            pointsIndexChanged = true;
                         }
                     }
                 }
@@ -443,7 +455,17 @@ namespace TwoTrails.Core
 
             if (pointsConverted)
             {
-                _Activity.UpdateAction(DataActionType.ConvertPoints);
+                _Activity.UpdateAction(DataActionType.ConvertedPoints);
+            }
+
+            if (pointsMoved)
+            {
+                _Activity.UpdateAction(DataActionType.MovedPoints);
+            }
+
+            if (pointsIndexChanged)
+            {
+                _Activity.UpdateAction(DataActionType.ReindexPoints);
             }
 
             _PointsMapOrig = _PointsMap.Values.ToDictionary(p => p.CN, p => p.DeepCopy());
@@ -1109,8 +1131,6 @@ namespace TwoTrails.Core
                 foreach (TtPoint point in points)
                     point.Index = index++;
             }
-
-            UpdateDataAction(DataActionType.ReindexPoints);
         }
 
         public void RebuildPolygon(TtPolygon poly, bool reindex = false)
@@ -1122,8 +1142,6 @@ namespace TwoTrails.Core
                 int index = 0;
                 foreach (TtPoint point in points)
                     point.Index = index++;
-
-                UpdateDataAction(DataActionType.ReindexPoints);
             }
 
             _PointsByPoly[poly.CN] = points;
@@ -1137,9 +1155,14 @@ namespace TwoTrails.Core
             Load();
         }
 
-        public void UpdateDataAction(DataActionType action, string notes = null)
+        public void AddAction(DataActionType action, string notes = null)
         {
-            _Activity.UpdateAction(action, notes);
+            _DataActions.Push(Tuple.Create(action, notes));
+        }
+
+        public void RemoveLastAction()
+        {
+            _DataActions.Pop();
         }
         #endregion
 
@@ -1511,8 +1534,6 @@ namespace TwoTrails.Core
                         TtPolygon poly = _PolygonsMap[ripoly];
                         AdjustAllTravTypesInPolygon(poly);
                         UpdatePolygonStats(poly);
-
-                        UpdateDataAction(DataActionType.ReindexPoints);
                     }
                 }
 

@@ -37,10 +37,10 @@ namespace TwoTrails.Core
         public bool DeletedNmea => Action.HasFlag(DataActionType.DeletedNmea);
 
         public bool ManualCreatedPoints => Action.HasFlag(DataActionType.ManualPointCreation);
-        public bool PointsMoved => Action.HasFlag(DataActionType.MovePoints);
+        public bool PointsMoved => Action.HasFlag(DataActionType.MovedPoints);
         public bool PointsRetraced => Action.HasFlag(DataActionType.RetracePoints);
         public bool PointsReindexed => Action.HasFlag(DataActionType.ReindexPoints);
-        public bool PointsConverted => Action.HasFlag(DataActionType.ConvertPoints);
+        public bool PointsConverted => Action.HasFlag(DataActionType.ConvertedPoints);
         
         public bool DataImported => Action.HasFlag(DataActionType.DataImported);
         public bool ModifiedDataDictionary => Action.HasFlag(DataActionType.ModifiedDataDictionary);

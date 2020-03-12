@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using TwoTrails.Core;
+using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 using TwoTrails.DAL;
 
@@ -225,10 +226,10 @@ namespace TwoTrails.Utils
                     manager.AddNmeaBursts(aPoints.Values.Where(p => p.IsGpsType()).SelectMany(p => dal.GetNmeaBursts(p.CN)));
                 }
 
-                manager.UpdateDataAction(DataActionType.DataImported, dal.FilePath);
-
                 if (hm != null)
-                    hm.CommitMultiCommand();
+                {
+                    hm.CommitMultiCommand(new AddDataActionCommand(DataActionType.DataImported, hm.BaseManager, dal.FilePath));
+                }
             }
             catch (Exception e)
             {

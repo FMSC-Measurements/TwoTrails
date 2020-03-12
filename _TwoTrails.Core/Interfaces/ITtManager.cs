@@ -66,8 +66,5 @@ namespace TwoTrails.Core
         List<PolygonGraphicOptions> GetPolygonGraphicOptions();
 
         PolygonGraphicOptions GetDefaultPolygonGraphicOption();
-
-
-        void UpdateDataAction(DataActionType action, string notes = null);
     }
 }
