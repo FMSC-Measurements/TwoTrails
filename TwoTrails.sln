@@ -16,6 +16,8 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		_TwoTrails.Core\_TwoTrails.Core.projitems*{3b159637-9999-4e86-88c5-035a96f5ac72}*SharedItemsImports = 13
+		_TwoTrails.Core\_TwoTrails.Core.projitems*{e5fbbace-023e-4602-86c9-3675a304d6e9}*SharedItemsImports = 5
+		_TwoTrails.Core\_TwoTrails.Core.projitems*{ecfd5466-2d67-4f3f-b095-811a8bc47f76}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

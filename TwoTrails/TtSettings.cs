@@ -12,6 +12,7 @@ namespace TwoTrails
         private const String REGION = "Region";
         private const String RECENT_PROJECTS = "RecentProjects";
         private const String ADVANCED_MODE = "AdvancedMode";
+        private const String OPEN_FOLDER_ON_EXPORT = "OpenFolderOnExport";
         private const String LAST_UPDATE_CHECK = "LastUpdateCheck";
         private const String UPGRADE_REQUIRED = "UpgradeRequired";
 
@@ -45,6 +46,19 @@ namespace TwoTrails
             {
                 SetField(ref _District, value);
                 Properties.Settings.Default[DISTRICT] = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        private bool? _OpenFolderOnExport;
+        public bool OpenFolderOnExport
+        {
+            get { return _OpenFolderOnExport ?? (bool)(_OpenFolderOnExport = (bool?)Properties.Settings.Default[OPEN_FOLDER_ON_EXPORT]); }
+
+            set
+            {
+                SetField(ref _OpenFolderOnExport, value);
+                Properties.Settings.Default[OPEN_FOLDER_ON_EXPORT] = value;
                 Properties.Settings.Default.Save();
             }
         }

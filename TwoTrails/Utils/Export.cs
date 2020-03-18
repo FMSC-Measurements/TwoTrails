@@ -270,7 +270,7 @@ namespace TwoTrails.Utils
                 #region Columns
                 StringBuilder sb = new StringBuilder();
                 sb.Append("Name,");
-                sb.Append("Accuracy,");
+                sb.Append("Accuracy_M,");
                 sb.Append("Area_MtSq,");
                 sb.Append("Perimeter_M,");
                 sb.Append("Line_Perimeter_M,");

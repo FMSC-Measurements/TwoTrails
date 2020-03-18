@@ -140,6 +140,11 @@ namespace TwoTrails.ViewModels
                         Window.Close();
 
                         Project.MainModel.PostMessage($"Project Exported to: '{path}'");
+
+                        if (Project.Settings.OpenFolderOnExport)
+                        {
+                            Process.Start(path);
+                        }
                     }
                     catch (Exception ex)
                     {

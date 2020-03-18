@@ -391,7 +391,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             }
             else
             {
-                MessageBox.Show(MainWindow, "File not found");
+                MessageBox.Show(MainWindow, "File not found", "", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 App.Settings.RemoveRecentProject(filePath);
                 UpdateRecentProjectMenu();
