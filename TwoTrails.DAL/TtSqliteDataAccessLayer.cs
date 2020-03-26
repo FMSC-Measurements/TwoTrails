@@ -659,7 +659,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         String where = $"{TTS.SharedSchema.CN} = '{point.CN}'";
-                        if (DeleteBasePoints(where, conn, trans))
+                        if (DeleteBasePoint(where, conn, trans))
                         {
                             if (HasDataDictionary)
                                 DeleteExtendedData(where, conn, trans);
@@ -703,14 +703,9 @@ namespace TwoTrails.DAL
             return false;
         }
 
-        //todo optimize
         public int DeletePoints(IEnumerable<TtPoint> points)
         {
-            StringBuilder sb = new StringBuilder();
-            int remaining = points.Count();
-            int count = 0;
-
-            String where = String.Empty;
+            int deleted = 0;
 
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -720,10 +715,10 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtPoint point in points)
                         {
-                            count++;
-                            where = $"{TTS.SharedSchema.CN} = '{point.CN}'";
-                            
-                            sb.Append($"{where}{(count < remaining ? " or " : String.Empty)}");
+                            String where = $"{TTS.SharedSchema.CN} = '{point.CN}'";
+
+                            if (DeleteBasePoint(where, conn, trans))
+                                deleted++;
 
                             if (HasDataDictionary)
                                 DeleteExtendedData(where, conn, trans);
@@ -745,28 +740,7 @@ namespace TwoTrails.DAL
                                     DeleteQndmPointData(where, conn, trans);
                                     break;
                             }
-
-                            if (count == 50)
-                            {
-                                where = sb.ToString();
-                                where = where.Remove(where.Length - 4);
-                                if (!DeleteBasePoints(where, conn, trans))
-                                {
-                                    trans.Rollback();
-                                    return -1;
-                                }
-
-                                sb.Clear();
-
-                                remaining -= 50;
-                                count = 0;
-                            }
                         }
-
-                        where = sb.ToString();
-
-                        if (!String.IsNullOrEmpty(where))
-                            DeleteBasePoints(where, conn, trans);
 
                         trans.Commit();
                     }
@@ -783,11 +757,11 @@ namespace TwoTrails.DAL
                 } 
             }
 
-            return remaining;
+            return deleted;
         } 
 
 
-        private bool DeleteBasePoints(String where, SQLiteConnection conn, SQLiteTransaction transaction)
+        private bool DeleteBasePoint(String where, SQLiteConnection conn, SQLiteTransaction transaction)
         {
             return _Database.Delete(TTS.PointSchema.TableName, where, conn, transaction) > 0;
         }
