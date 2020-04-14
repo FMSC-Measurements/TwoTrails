@@ -16,8 +16,6 @@ namespace TwoTrails.DAL
         bool UpdatePoint(Tuple<TtPoint, TtPoint> point);
         int UpdatePoints(IEnumerable<Tuple<TtPoint, TtPoint>> points);
 
-        bool ChangePointOp(TtPoint point, TtPoint oldPoint);
-
         bool DeletePoint(TtPoint point);
         int DeletePoints(IEnumerable<TtPoint> points);
         #endregion

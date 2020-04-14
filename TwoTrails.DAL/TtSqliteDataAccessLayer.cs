@@ -540,10 +540,6 @@ namespace TwoTrails.DAL
             }
         }
 
-        public bool ChangePointOp(TtPoint point, TtPoint oldPoint)
-        {
-            return UpdatePoint(point, oldPoint);
-        }
 
 
         private Dictionary<string, object> GetBasePointValues(TtPoint point)
