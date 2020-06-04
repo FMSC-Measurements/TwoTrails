@@ -6,7 +6,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
