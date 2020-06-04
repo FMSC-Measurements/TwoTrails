@@ -375,7 +375,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                 MessageBox.Show($"{selectedPolys.Count()} Polygons Imported",
                     String.Empty, MessageBoxButton.OK, MessageBoxImage.None);
             }
-            catch (Exception ex) when (!_AutoCloseOnImport)
+            catch (Exception ex) //when (!_AutoCloseOnImport)
             {
                 Trace.WriteLine(ex.Message, "ImportModel:ImportData");
                 MessageBox.Show("Import Failed. See log file for details.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Error);

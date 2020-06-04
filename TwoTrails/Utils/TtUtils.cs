@@ -311,6 +311,5 @@ namespace TwoTrails.Utils
         CriticalBugFixes = 1 << 3,
         Optimiztions = 1 << 4,
         FeatureUpdates = 1 << 5
-
     }
 }

@@ -146,7 +146,7 @@ namespace TwoTrails.ViewModels
             EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Metadata));
             EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Groups));
 
-            RecalculateAllPolygonsCommand = new RelayCommand(x => { Manager.RecalculatePolygons(); });// DataChanged |= true; });
+            RecalculateAllPolygonsCommand = new RelayCommand(x => { Manager.RecalculatePolygons(); });
             CalculateLogDeckCommand = new RelayCommand(x =>
             {
                 if (_BaseManager.PolygonCount > 0)

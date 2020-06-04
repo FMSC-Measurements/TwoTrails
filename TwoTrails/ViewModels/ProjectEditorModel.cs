@@ -737,6 +737,7 @@ namespace TwoTrails.ViewModels
             OnPropertyChanged(
                 nameof(MetadataName),
                 nameof(MetadataComment),
+                nameof(MetadataMagDec),
                 nameof(MetadataDecType),
                 nameof(MetadataDatum),
                 nameof(MetadataZone),

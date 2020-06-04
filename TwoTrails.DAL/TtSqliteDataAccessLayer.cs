@@ -1641,8 +1641,8 @@ namespace TwoTrails.DAL
                                     dr.GetDouble(9), (UomElevation)dr.GetInt32(10)
                                 ),
                                 TtCoreUtils.ParseTime(dr.GetString(4)),
-                                dr.GetDouble(22),
-                                dr.GetDouble(23),
+                                dr.GetDoubleN(22),
+                                dr.GetDoubleN(23),
                                 dr.GetDoubleN(11), (EastWest?)dr.GetInt32N(12),
                                 (Mode)dr.GetInt32(15), (Fix)dr.GetInt32(13),
                                 ParseIds(dr.GetStringN(27)),

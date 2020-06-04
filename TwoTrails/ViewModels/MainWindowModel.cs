@@ -17,7 +17,6 @@ using TwoTrails.DAL;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
 using FMSC.Core.Windows.Utilities;
-using System.Net.Mail;
 
 namespace TwoTrails.ViewModels
 {
@@ -249,7 +248,6 @@ namespace TwoTrails.ViewModels
                         {
                             try
                             {
-
                                 TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
                                 TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
 

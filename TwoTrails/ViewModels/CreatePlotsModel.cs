@@ -313,7 +313,7 @@ namespace TwoTrails.ViewModels
             double gridX = FMSC.Core.Convert.Distance(GridX, Distance.Meters, UomDistance);
             double gridY = FMSC.Core.Convert.Distance(GridY, Distance.Meters, UomDistance);
 
-            double angle = Tilt * -1;
+            double angle = FMSC.Core.Convert.DegreesToRadians(Tilt * -1);
 
             poly.Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon{(IncludedPolygons.Count > 1 ? $"s {String.Join(", ", IncludedPolygons)}" : $" {IncludedPolygons.First().Name}")}";
 

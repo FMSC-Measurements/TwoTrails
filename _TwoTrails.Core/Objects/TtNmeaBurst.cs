@@ -23,8 +23,8 @@ namespace TwoTrails.Core
         public double? MagVar { get; }
         public EastWest? MagVarDir { get; }
 
-        public double TrackAngle { get; }
-        public double GroundSpeed { get; }
+        public double? TrackAngle { get; }
+        public double? GroundSpeed { get; }
 
 
         private GeoPosition _Position;
@@ -170,7 +170,7 @@ namespace TwoTrails.Core
         }
 
         private TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
-                       GeoPosition position, DateTime fixTime, double groundSpeed, double trackAngle,
+                       GeoPosition position, DateTime fixTime, double? groundSpeed, double? trackAngle,
                        double? magVar, EastWest? magVarDir, Mode mode, Fix fix,
                        List<int> satsUsed, double pdop, double hdop, double vdop, GpsFixType fixQuality,
                        int trackedSatellites, double horizDilution, double geoidHeight, UomElevation geoUom,
@@ -205,7 +205,7 @@ namespace TwoTrails.Core
         }
 
         public TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
-                       GeoPosition position, DateTime fixTime, double groundSpeed, double trackAngle,
+                       GeoPosition position, DateTime fixTime, double? groundSpeed, double? trackAngle,
                        double? magVar, EastWest? magVarDir, Mode mode, Fix fix,
                        List<int> satsUsed, double pdop, double hdop, double vdop, GpsFixType fixQuality,
                        int trackedSatellites, double horizDilution, double geoidHeight, UomElevation geoUom,
@@ -218,7 +218,7 @@ namespace TwoTrails.Core
         }
 
         public TtNmeaBurst(String cn, DateTime timeCreated, String pointCN, bool used,
-                       GeoPosition position, DateTime fixTime, double groundSpeed, double trackAngle,
+                       GeoPosition position, DateTime fixTime, double? groundSpeed, double? trackAngle,
                        double? magVar, EastWest? magVarDir, Mode mode, Fix fix,
                        List<int> satsUsed, double pdop, double hdop, double vdop, GpsFixType fixQuality,
                        int trackedSatellites, double horizDilution, double geoidHeight, UomElevation geoUom,

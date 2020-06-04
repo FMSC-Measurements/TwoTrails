@@ -134,7 +134,7 @@ namespace TwoTrails.ViewModels
                                 Export.KMZ(Project.Manager, Project.ProjectInfo, Path.Combine(path, $"{Project.ProjectName.Trim()}.kmz"));
 
                             if (ExportShapes)
-                                Export.Shapes(Project.Manager, Project.ProjectInfo, Path.Combine(path));
+                                Export.Shapes(Project.Manager, Project.ProjectInfo, path);
                         }
 
                         Window.Close();
