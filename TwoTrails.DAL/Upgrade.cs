@@ -135,7 +135,8 @@ namespace TwoTrails.DAL
                 }
             }
 
-            IEnumerable<TtNmeaBurst> nmea = odal.GetNmeaBursts();
+            
+            List<TtNmeaBurst> nmea = odal.GetNmeaBursts().ToList();
             if (nmea.Any())
             {
                 ndal.InsertNmeaBursts(nmea);

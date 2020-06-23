@@ -65,12 +65,12 @@ namespace TwoTrails.Core
             throw new Exception("Polygon Not Found");
         }
 
-        public static bool IsIslandPolygon(this ITtManager manager, string polyCN)
+        public static bool IsPolygonAnIsland(this ITtManager manager, string polyCN)
         {
-            return IsIslandPolygon(manager.GetPoints(polyCN));
+            return IsPolygonAnIsland(manager.GetPoints(polyCN));
         }
 
-        public static bool IsIslandPolygon(IEnumerable<TtPoint> points)
+        public static bool IsPolygonAnIsland(IEnumerable<TtPoint> points)
         {
             if (points.HasAtLeast(3, pt => pt.OnBoundary))
             {

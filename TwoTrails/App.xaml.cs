@@ -110,6 +110,8 @@ namespace TwoTrails
                 
                 _Listener.WriteLine($"{ex.Message}\n\t{ex.StackTrace}", "[UnhandledException]");
                 _Listener.Flush();
+
+                MessageBox.Show("An Unexpected Error has Occured. Please See log file for details.");
             };
         }
 

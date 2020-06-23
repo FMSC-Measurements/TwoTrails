@@ -403,7 +403,7 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
 
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
-            return GetNmeaBursts(new string[] { pointCN });
+            return GetNmeaBursts(pointCN != null ? new string[] { pointCN } : null);
         }
 
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<String> pointCNs)
@@ -436,7 +436,9 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                         while (dr.Read())
                         {
                             DateTime time = TtCoreUtils.ParseTime(dr.GetString(3));
-                            
+
+                            Func<int?, Fix> parseFix = (val) => val == null ? Fix.NoFix : (Fix)(val + 1);
+
                             yield return new TtNmeaBurst(
                                 dr.GetString(0),
                                 time,
@@ -453,7 +455,7 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                                 dr.GetDouble(10),
                                 EastWestExtentions.Parse(dr.GetString(11)),
                                 (Mode)(dr.GetInt32N(12) ?? 0),
-                                (Fix)(dr.GetInt32(14) - 1),     //converts from real value
+                                parseFix(dr.GetInt32(14) - 1),     //converts from real value
                                 ParseIds(dr.GetString(25)),
                                 dr.GetDouble(15),
                                 dr.GetDouble(16),
