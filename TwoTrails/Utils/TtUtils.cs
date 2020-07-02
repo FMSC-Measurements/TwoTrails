@@ -275,7 +275,7 @@ namespace TwoTrails.Utils
 
                 MessageBoxResult mbr =  MessageBox.Show(
                     $"It appears part of the TwoTrails data is corrupt. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(", ", errList)}. " +
-                    (hardErrors ? $"Would you like to try and fix the data by moving and editing (Yes) or removing invalid (No)?" :
+                    (hardErrors ? $"Would you like to try and fix the data by recreating, moving and editing (Yes) or removing invalid (No)?" :
                     "Would you like to fix the data?"),
                     "Data is corrupted",
                     hardErrors ? MessageBoxButton.YesNoCancel : MessageBoxButton.OKCancel, MessageBoxImage.Error, MessageBoxResult.Cancel);
