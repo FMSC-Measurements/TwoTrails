@@ -2646,7 +2646,7 @@ namespace TwoTrails.DAL
 
                 _Database.Update(TTS.PointSchema.TableName,
                         new Dictionary<string, string> { [TTS.PointSchema.GroupCN] = Consts.EmptyGuid, [TTS.PointSchema.GroupName] = Consts.DefaultGroupName },
-                        $"{TTS.PointSchema.PolyCN} not in (select {TTS.SharedSchema.CN} from {TTS.GroupSchema.TableName});");
+                        $"{TTS.PointSchema.GroupCN} not in (select {TTS.SharedSchema.CN} from {TTS.GroupSchema.TableName});");
             }
 
             FixNullAdjLocs();
