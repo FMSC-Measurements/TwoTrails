@@ -1625,7 +1625,6 @@ namespace TwoTrails.DAL
                         (index + QUERY_MAX) < pointCNsQueue.Count ? QUERY_MAX : pointCNsQueue.Count - index)
                     ));
 
-
                     index += QUERY_MAX;
                 }
 
@@ -1645,18 +1644,9 @@ namespace TwoTrails.DAL
                     if (dr != null)
                     {
                         Func<string, List<int>> ParseIds = s =>
-                        {
-                            List<int> ids = new List<int>();
-                            if (s != null)
-                            {
-                                foreach (string prn in s.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries))
-                                {
-                                    ids.Add(Int32.Parse(prn));
-                                }
-                            }
-
-                            return ids;
-                        };
+                            s != null ?
+                                s.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries).Select(Int32.Parse).ToList() :
+                                new List<int>();
 
                         while (dr.Read())
                         {
