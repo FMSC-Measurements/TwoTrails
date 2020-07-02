@@ -2609,18 +2609,35 @@ namespace TwoTrails.DAL
             }
             else
             {
-                if (GetPointsWithMissingPolygons().Any())
+                List<Tuple<string, TtPoint>> missingPointsByPolygons = GetPointsWithMissingPolygons()
+                    .Select(pointCN => GetPoint(pointCN, true))
+                    .GroupBy(p => p.PolygonCN)
+                    .Select(g => Tuple.Create(g.Key, g.First())).ToList();
+
+
+                if (missingPointsByPolygons.Any())
                 {
-                    TtPolygon mPoly = GetPolygons($"{TTS.SharedSchema.CN} = {Consts.EmptyGuid}").FirstOrDefault() ??
-                        new TtPolygon(Consts.EmptyGuid, "Fix Point Poly",
-                            "Polygon that contains points that were fixed from having no polygon.",
-                            Consts.DEFAULT_POINT_START_INDEX, 10, DateTime.Now, Consts.DEFAULT_POINT_ACCURACY, 0, 0, 0);
+                    int index = 1;
 
-                    InsertPolygon(mPoly);
+                    foreach (Tuple<string, TtPoint> pointGroup in missingPointsByPolygons)
+                    {
+                        TtPoint firstPoint = pointGroup.Item2;
 
-                    _Database.Update(TTS.PointSchema.TableName,
-                        new Dictionary<string, string> { [TTS.PointSchema.PolyCN] = mPoly.CN, [TTS.PointSchema.PolyName] = mPoly.Name },
-                        $"{TTS.PointSchema.PolyCN} not in (select {TTS.SharedSchema.CN} from {TTS.PolygonSchema.TableName});");
+                        string polyName = GetItemList(TTS.PointSchema.TableName, TTS.PointSchema.PolyName, $"{TTS.SharedSchema.CN} = '{firstPoint.CN}'").FirstOrDefault();
+
+                        TtPolygon mPoly = new TtPolygon(pointGroup.Item1, String.IsNullOrEmpty(polyName) ? $"Fix Point Poly {index++}" : polyName,
+                            "Polygon that was rebuild from points which had a missing or corrupt polygon.",
+                            firstPoint.PID, 10, firstPoint.TimeCreated,
+                            (firstPoint is IManualAccuracy imanpt) ?
+                                (firstPoint is QuondamPoint qp && qp.ParentPoint.IsGpsType() ?
+                                    (imanpt.ManualAccuracy == null ?
+                                        firstPoint.Accuracy : Consts.DEFAULT_POINT_ACCURACY) :
+                                    Consts.DEFAULT_POINT_ACCURACY) :
+                                Consts.DEFAULT_POINT_ACCURACY,
+                            0, 0, 0);
+
+                        InsertPolygon(mPoly);
+                    }
                 }
 
                 _Database.Update(TTS.PointSchema.TableName,
@@ -2681,6 +2698,9 @@ namespace TwoTrails.DAL
 
         public DalError GetErrors()
         {
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                if (_Database.ExecuteScalar("PRAGMA integrity_check;", conn) as string != "ok") return DalError.CorruptDatabase;
+
             DalError errors = DalError.None;
 
             if (GetItemCount(TTS.PointSchema.TableName, $@"{ TTS.PointSchema.AdjX } IS NULL OR { TTS.PointSchema.AdjY

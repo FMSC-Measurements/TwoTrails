@@ -248,7 +248,15 @@ namespace TwoTrails.Utils
         {
             DalError errors = dal.GetErrors();
 
-            if (errors > 0)
+            if (errors.HasFlag(DalError.CorruptDatabase))
+            {
+                MessageBox.Show("It appears that the TwoTrails file is physically corrupted possibly due to a hardware or operating system error. " +
+                    "Please contact the development team for support.",
+                    "File is physically corrupted", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return false;
+            }
+            else if (errors > 0)
             {
                 List<string> errList = new List<string>();
 
@@ -266,8 +274,8 @@ namespace TwoTrails.Utils
                 bool hardErrors = errors.HasFlag(DalError.MissingGroup) || errors.HasFlag(DalError.MissingMetadata) || errors.HasFlag(DalError.MissingPolygon);
 
                 MessageBoxResult mbr =  MessageBox.Show(
-                    $"It appears part of the TwoTrails file is corrupt. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(", ", errList)}. " +
-                    (hardErrors ? $"Would you like to try and fix the file by moving and editing the data (Yes) or removing invalid data (No)?" :
+                    $"It appears part of the TwoTrails data is corrupt. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(", ", errList)}. " +
+                    (hardErrors ? $"Would you like to try and fix the data by moving and editing (Yes) or removing invalid (No)?" :
                     "Would you like to fix the data?"),
                     "Data is corrupted",
                     hardErrors ? MessageBoxButton.YesNoCancel : MessageBoxButton.OKCancel, MessageBoxImage.Error, MessageBoxResult.Cancel);
@@ -290,7 +298,7 @@ namespace TwoTrails.Utils
                     }
                 }
             }
-            
+
             return true;
         }
     }
