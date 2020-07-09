@@ -356,7 +356,7 @@
                                     <TextBox Grid.Column="0"
                                      Name="txtPolyAcc"
                                      Text="{Binding PolygonAccuracy, UpdateSourceTrigger=PropertyChanged, Delay=750}"
-                                     PreviewTextInput="TextIsDouble">
+                                     PreviewTextInput="TextIsDouble" IsUndoEnabled="False">
                                     </TextBox>
                                     <Button Grid.Column="1" Width="75" Command="{Binding PolygonUpdateAccCommand}" Content="Update"/>
                                     <Button Grid.Column="2" Width="100" Command="{Binding PolygonAccuracyLookupCommand}" Content="Acc Lookup"/>
@@ -658,15 +658,8 @@
 
                                     <TextBox Grid.Column="0"
                                      Name="txtMetaZone"
-                                     Text="{Binding MetadataZone, Mode=OneWay}"
-                                     PreviewTextInput="TextIsUnsignedInteger" IsUndoEnabled="False">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="TextChanged">
-                                                <i:InvokeCommandAction Command="{Binding MetadataZoneTextboxEditedCommand}"
-                                                CommandParameter="{Binding ElementName=txtMetaZone, Path=Text}" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </TextBox>
+                                     Text="{Binding MetadataZone, UpdateSourceTrigger=PropertyChanged, Delay=750}"
+                                     PreviewTextInput="TextIsUnsignedInteger" IsUndoEnabled="False"/>
                                     <Button Grid.Column="1" Width="75" Command="{Binding MetadataUpdateZoneCommand}" Content="Update"/>
                                 </Grid>
 

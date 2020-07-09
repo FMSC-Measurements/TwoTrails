@@ -1327,6 +1327,8 @@ namespace TwoTrails.DAL
                             trans.Rollback();
                             return -1;
                         }
+
+                        trans.Commit();
                     }
                     catch (Exception ex)
                     {

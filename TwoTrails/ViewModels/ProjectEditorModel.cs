@@ -82,13 +82,11 @@ namespace TwoTrails.ViewModels
                 this,
                 x => x.CurrentMetadata);
 
-            MetadataZoneTextboxEditedCommand = new RelayCommand(x => MetadataZoneTextboxEdited(x as string));
-
             MetadataUpdateZoneCommand = new BindedRelayCommand<ProjectEditorModel>(
                 x => UpdateMetadataZone(),
                 x => CurrentMetadata != null && CurrentMetadata.Zone != MetadataZone,
                 this,
-                x => x.MetadataZone);
+                x => new { x.MetadataZone, CurrentMetadata.Zone });
 
 
             GroupChangedCommand = new RelayCommand(x => GroupChanged(x as TtGroup));
@@ -553,7 +551,6 @@ namespace TwoTrails.ViewModels
         public ICommand MetadataChangedCommand { get; }
         public ICommand NewMetadataCommand { get; }
         public ICommand DeleteMetadataCommand { get; }
-        public ICommand MetadataZoneTextboxEditedCommand { get; }
         public ICommand MetadataUpdateZoneCommand { get; }
         public ICommand SetDefaultMetadataCommand { get; }
         #endregion
@@ -608,8 +605,7 @@ namespace TwoTrails.ViewModels
             get => _MetadataZone;
             set
             {
-                _MetadataZone = value;
-                OnPropertyChanged(nameof(MetadataZone));
+                SetField(ref _MetadataZone, value, nameof(MetadataZone));
             }
         }
 
@@ -699,8 +695,11 @@ namespace TwoTrails.ViewModels
             }
         }
 
+        bool isEdting = false;
+
         private void BindMetadataValues(TtMetadata metadata)
         {
+            isEdting = true;
             if (CurrentMetadata != null)
             {
                 _MetadataName = metadata.Name;
@@ -748,28 +747,15 @@ namespace TwoTrails.ViewModels
                 nameof(MetadataRangeFinder),
                 nameof(MetadataCompass),
                 nameof(MetadataCrew));
+
+            isEdting = false;
         }
         #endregion
 
 
         private void MetadataChanged(TtMetadata meta)
         {
-            MetadataZone = meta != null ? meta.Zone : 13;
             CurrentMetadata = meta;
-        }
-
-        private bool MetadataZoneTextboxEdited(string zoneStr)
-        {
-            if (zoneStr != null)
-            {
-                if (int.TryParse(zoneStr, out int zone))
-                {
-                    MetadataZone = zone;
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private void UpdateMetadataZone()

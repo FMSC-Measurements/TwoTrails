@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -85,7 +86,8 @@ namespace TwoTrails.ViewModels
 
         public Style GetRowStyle(TtPoint point)
         {
-            return point.Index % 2 == 0 ? _PolygonStyles[point.PolygonCN] : _PolygonStylesAlt[point.PolygonCN];
+            return point == null ? _PolygonStyles.Values.First() : 
+                (point.Index % 2 == 0 ? _PolygonStyles[point.PolygonCN] : _PolygonStylesAlt[point.PolygonCN]);
         }
     }
 }
