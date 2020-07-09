@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 
@@ -17,14 +18,14 @@ namespace TwoTrails.Utils
     {
         public static void WritePolygon(ITtManager manager, TtPolygon polygon, string folderPath)
         {
-            string polyDir = Path.Combine(folderPath, polygon.Name.Trim());
+            string polyDir = Path.Combine(folderPath, polygon.Name.Sanitize());
 
             if (!Directory.Exists(polyDir))
             {
                 Directory.CreateDirectory(polyDir);
             }
 
-            string baseFileName = Path.Combine(polyDir, polygon.Name.Trim());
+            string baseFileName = Path.Combine(polyDir, polygon.Name.Sanitize());
 
             IEnumerable<TtPoint> points = manager.GetPoints(polygon.CN).Where(p => p.OpType != OpType.WayPoint);
 
@@ -401,6 +402,11 @@ namespace TwoTrails.Utils
         private static string ToStringEx<T>(this T? obj) where T : struct
         {
             return obj == null ? String.Empty : obj.ToString();
+        }
+
+        private static string Sanitize(this string text)
+        {
+            return Regex.Replace(text.Replace(" ", "_"), "[^a-zA-Z0-9_]", "").Trim();
         }
     }
 }
