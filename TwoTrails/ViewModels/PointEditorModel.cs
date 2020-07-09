@@ -102,6 +102,8 @@ namespace TwoTrails.ViewModels
         public RelayCommand CreateCorridorCommand { get; }
         public RelayCommand CreateDoubleSidedCorridorCommand { get; }
         public RelayCommand ModifyDataDictionaryCommand { get; }
+
+        public RelayCommand RezonePointsCommand { get; }
         
         public ICommand SelectAlternateCommand { get; }
         public ICommand SelectGpsCommand { get; }
@@ -993,6 +995,9 @@ namespace TwoTrails.ViewModels
             SelectInverseCommand = new RelayCommand(x => SelectInverse());
 
             UpdateAdvInfo = new RelayCommand(x => UpdateAdvInfoItems());
+
+            RezonePointsCommand = new RelayCommand(x => DataCorrectionModel.RezonePoints(Manager,
+                GetSortedSelectedPoints().Where(p => p.IsGpsType()).Cast<GpsPoint>()));
             #endregion
 
             //BindingOperations.EnableCollectionSynchronization(_SelectedPoints, _lock);

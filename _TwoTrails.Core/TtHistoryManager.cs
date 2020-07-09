@@ -365,6 +365,11 @@ namespace TwoTrails.Core
         }
 
 
+        public void RezonePoints(IEnumerable<GpsPoint> points)
+        {
+            AddCommand(new RezonePointsCommand(points));
+        }
+
         #region Editing
 
         #region Points

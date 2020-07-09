@@ -155,7 +155,6 @@
                     <Separator/>
 
                     <MenuItem Header="Create New Point" Style="{StaticResource styleHasPolygons}">
-
                         <MenuItem Header="GPS" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.GPS}"/>
                         <MenuItem Header="WayPoint" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.WayPoint}"/>
                         <Separator/>
@@ -164,6 +163,7 @@
                         <Separator/>
                         <MenuItem Header="Quondam" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.Quondam}"/>
                     </MenuItem>
+                    
                     <MenuItem Header="Create Quondams" Command="{Binding CurrentEditor.CreateQuondamsCommand}"
                         Style="{StaticResource ResourceKey=styleMiPointEdit}" InputGestureText="Ctrl+Alt+Q"/>
                     <MenuItem Header="Move Points" Command="{Binding CurrentEditor.MovePointsCommand}"
@@ -187,6 +187,13 @@
 
                     <MenuItem Header="Modify Data Dictionary" Command="{Binding CurrentEditor.ModifyDataDictionaryCommand}" IsEnabled="{Binding HasOpenedProject}"
                               Style="{StaticResource styleMiDisableNullCommand}" />
+
+                    <Separator/>
+
+                    <MenuItem Header="Data Correction" IsEnabled="{Binding HasOpenedProject}">
+                        <MenuItem Header="Analyze Data"/>
+                        <MenuItem Header="Rezone Points" Command="{Binding CurrentEditor.RezonePointsCommand}"/>
+                    </MenuItem>
 
                     <Separator/>
 

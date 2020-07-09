@@ -70,7 +70,7 @@ namespace TwoTrails.DAL
         //TwoTrails V2 Files
         public static void DAL(ITtDataLayer ndal, ITtSettings settings, TtV2SqliteDataAccessLayer odal)
         {
-            TtUserAction activity = new TtUserAction("Upgrader", settings.DeviceName);
+            TtUserAction activity = new TtUserAction("Upgrader", settings.DeviceName, DateTime.Now, DataActionType.ProjectUpgraded, $"TwoTrailsV2 {odal.GetDataVersion()} -> {TwoTrailsSchema.SchemaVersion}");
 
             IEnumerable<TtMetadata> meta = odal.GetMetadata();
             if (meta.Any())
@@ -140,6 +140,7 @@ namespace TwoTrails.DAL
             if (nmea.Any())
             {
                 ndal.InsertNmeaBursts(nmea);
+                activity.UpdateAction(DataActionType.InsertedNmea);
             }
 
             ndal.InsertActivity(activity);

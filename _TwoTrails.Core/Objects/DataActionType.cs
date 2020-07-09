@@ -31,6 +31,7 @@ namespace TwoTrails.Core
         DataImported        = 1 << 22,
         ProjectUpgraded     = 1 << 23,
         InsertedNmea        = 1 << 24,
-        DeletedNmea         = 1 << 25
+        DeletedNmea         = 1 << 25,
+        RezonedPoints       = 1 << 26
     }
 }

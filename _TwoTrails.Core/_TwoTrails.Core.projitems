@@ -50,6 +50,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtPointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtPolygonCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ReplaceTtPointCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\RezonePointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consts-Secure.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectProperties\ProjectProperties.cs" />
