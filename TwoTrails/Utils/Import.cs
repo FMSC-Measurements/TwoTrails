@@ -234,7 +234,7 @@ namespace TwoTrails.Utils
             catch (Exception e)
             {
                 if (hm != null)
-                    hm.RevertMultiCommand();
+                    hm.ResetMultiCommand();
                 throw e;
             }
         }

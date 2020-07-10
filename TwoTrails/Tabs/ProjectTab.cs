@@ -11,7 +11,6 @@ namespace TwoTrails
     public class ProjectTab : TtTabModel
     {
         private ProjectEditorControl _ProjectEditorControl;
-        private ProjectEditorModel _ProjectEditorModel;
 
         public override bool IsDetachable { get; } = false;
 
@@ -30,7 +29,7 @@ namespace TwoTrails
                 switch (_ProjectEditorControl.tabControl.SelectedIndex)
                 {
                     case 1:
-                        return $"{Project.DataEditor.SelectedPoints.Count}/{Project.DataEditor.Points.Count}";
+                        return $"{Project.PointEditor.SelectedPoints.Count}/{Project.PointEditor.Points.Count}";
                     case 2:
                         {
                             if (_ProjectEditorControl.lbPolys.SelectedItem is TtPolygon poly)
@@ -70,7 +69,7 @@ namespace TwoTrails
 
         public ProjectTab(TtProject project) : base(project)
         {
-            _ProjectEditorControl = new ProjectEditorControl(_ProjectEditorModel = new ProjectEditorModel(project), ProjectTabSection.Points);
+            _ProjectEditorControl = new ProjectEditorControl(Project.ProjectEditor, ProjectTabSection.Points);
             Tab.Content = _ProjectEditorControl;
 
             _ProjectEditorControl.tabControl.SelectionChanged += (object sender, SelectionChangedEventArgs e) =>
@@ -89,9 +88,9 @@ namespace TwoTrails
                 OnPropertyChanged(nameof(TabInfo));
             };
 
-            Project.DataEditor.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
+            Project.PointEditor.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
             {
-                if (e.PropertyName == nameof(Project.DataEditor.SelectedPoints))
+                if (e.PropertyName == nameof(Project.PointEditor.SelectedPoints))
                 {
                     OnPropertyChanged(nameof(TabInfo));
                 }
@@ -107,7 +106,7 @@ namespace TwoTrails
         {
             base.Close();
 
-            _ProjectEditorModel.CloseWindows();
+            Project.ProjectEditor.CloseWindows();
         }
     }
 }

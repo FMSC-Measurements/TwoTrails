@@ -84,7 +84,7 @@ namespace TwoTrails.Core
 
 
         #region History Management
-        internal void AddCommand(ITtCommand command, bool runCommand = true)
+        private void AddCommand(ITtCommand command, bool runCommand = true)
         {
             if (ComplexActionStarted)
             {
@@ -112,21 +112,22 @@ namespace TwoTrails.Core
         public void CommitMultiCommand(ITtCommand commitCommand = null)
         {
             if (_ComplexActionCommands == null)
-                throw new Exception("Complex Action not started");
+                throw new Exception("Complex Action not started!");
 
             if (_ComplexActionCommands.Count > 0)
             {
-                _ComplexActionCommands.Add(commitCommand);
+                if (commitCommand != null)
+                    _ComplexActionCommands.Add(commitCommand);
 
                 MultiTtCommand command = new MultiTtCommand(_ComplexActionCommands);
                 _ComplexActionCommands = null;
                 AddCommand(command);
             }
-            else
-                _ComplexActionCommands = null;
+                
+            _ComplexActionCommands = null;
         }
 
-        public void RevertMultiCommand()
+        public void ResetMultiCommand()
         {
             _ComplexActionCommands = null;
         }
@@ -471,7 +472,6 @@ namespace TwoTrails.Core
         {
             AddCommand(new RecalculatePolygonsCommand(BaseManager));
         }
-
 
 
 

@@ -2,6 +2,7 @@
 using FMSC.Core;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
+using NetTopologySuite.IO.GML2;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +16,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
+using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
@@ -24,93 +26,71 @@ namespace TwoTrails.ViewModels
 {
     public class ProjectEditorModel : NotifyPropertyChangedEx
     {
+        #region Commands
         public ICommand OpenMapWindowCommand { get; }
         public ICommand UndoCommand { get; set; }
         public ICommand RedoCommand { get; set; }
 
+        #region Polygons
+        public ICommand PolygonChangedCommand { get; }
+        public ICommand CreatePolygonCommand { get; }
+        public ICommand DeletePolygonCommand { get; }
+        public ICommand PolygonUpdateAccCommand { get; }
+        public ICommand PolygonAccuracyLookupCommand { get; }
+        public ICommand SavePolygonSummary { get; }
+        #endregion
+
+        #region Metadata
+        public ICommand MetadataChangedCommand { get; }
+        public ICommand NewMetadataCommand { get; }
+        public ICommand DeleteMetadataCommand { get; }
+        public ICommand MetadataUpdateZoneCommand { get; }
+        public ICommand SetDefaultMetadataCommand { get; }
+        #endregion
+
+        #region Groups
+        public ICommand GroupChangedCommand { get; }
+        public ICommand NewGroupCommand { get; }
+        public ICommand DeleteGroupCommand { get; }
+        #endregion
+
+        #region Cleanup
+        public RelayCommand RemoveDuplicateMetadataCommand { get; }
+        public RelayCommand RemoveUnusedPolygonsCommand { get; }
+        public RelayCommand RemoveUnusedMetadataCommand { get; }
+        public RelayCommand RemoveUnusedGroupsCommand { get; }
+        #endregion
+
+        #region Advanced
+        public RelayCommand AnalyzeProjectCommand { get; }
+        #endregion
+        #endregion
 
         private TtProject _Project;
 
-        public TtProjectInfo ProjectInfo { get { return _Project.ProjectInfo; } }
-        public TtHistoryManager Manager { get { return _Project.Manager; } }
-        public TtSettings Settings { get { return _Project.Settings; } }
+        public TtProjectInfo ProjectInfo => _Project.ProjectInfo;
+        public TtHistoryManager Manager => _Project.Manager;
+        public TtSettings Settings => _Project.Settings;
         
-        public MapControl MapControl { get; set; }
-        public MapWindow MapWindow { get; set; }
-        public bool IsMapWindowOpen { get { return MapWindow != null; } }
+        public MapControl MapControl { get; private set; }
+        public MapWindow MapWindow { get; private set; }
+        public bool IsMapWindowOpen => MapWindow != null;
         
         public PointEditorControl DataController { get; }
 
-        public ReadOnlyObservableCollection<TtPolygon> Polygons { get { return Manager.Polygons; } }
-        public ReadOnlyObservableCollection<TtMetadata> Metadata { get { return Manager.Metadata; } }
-        public ReadOnlyObservableCollection<TtGroup> Groups { get { return Manager.Groups; } }
-        public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get { return Manager.MediaInfo; } }
+        public ReadOnlyObservableCollection<TtPolygon> Polygons => Manager.Polygons;
+        public ReadOnlyObservableCollection<TtMetadata> Metadata => Manager.Metadata;
+        public ReadOnlyObservableCollection<TtGroup> Groups => Manager.Groups;
+        public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo => Manager.MediaInfo;
         
 
         public ProjectEditorModel(TtProject project)
         {
             _Project = project;
 
-            DataController = new PointEditorControl(project.DataEditor, new DataStyleModel(project));
+            DataController = new PointEditorControl(project.PointEditor, new DataStyleModel(project));
 
-            PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtPolygon));
-            CreatePolygonCommand = new RelayCommand(x => CreatePolygon(x as ListBox));
-            DeletePolygonCommand = new RelayCommand(x => DeletePolygon(x as ListBox));
-
-            PolygonUpdateAccCommand = new BindedRelayCommand<ProjectEditorModel>(
-                x => UpdatePolygonAcc(),
-                x => CurrentPolygon != null && CurrentPolygon.Accuracy != _PolygonAccuracy,
-                this,
-                x => new { x.PolygonAccuracy, CurrentPolygon.Accuracy });
-
-            PolygonAccuracyLookupCommand = new BindedRelayCommand<ProjectEditorModel>(
-                x => AccuracyLookup(),
-                x => CurrentPolygon != null,
-                this,
-                x => x.CurrentPolygon);
-
-            SavePolygonSummary = new BindedRelayCommand<ProjectEditorModel>(
-                x => SavePolygonsummary(),
-                x => CurrentPolygon != null, this, x => x.CurrentPolygon);
-
-            MetadataChangedCommand = new RelayCommand(x => MetadataChanged(x as TtMetadata));
-            NewMetadataCommand = new RelayCommand(x => NewMetadata(x as ListBox));
-            SetDefaultMetadataCommand = new RelayCommand(x => SetMetadataDefault());
-            DeleteMetadataCommand = new BindedRelayCommand<ProjectEditorModel>(
-                x => DeleteMetadata(),
-                x => x != null && (x as TtMetadata).CN != Consts.EmptyGuid,
-                this,
-                x => x.CurrentMetadata);
-
-            MetadataUpdateZoneCommand = new BindedRelayCommand<ProjectEditorModel>(
-                x => UpdateMetadataZone(),
-                x => CurrentMetadata != null && CurrentMetadata.Zone != MetadataZone,
-                this,
-                x => new { x.MetadataZone, CurrentMetadata.Zone });
-
-
-            GroupChangedCommand = new RelayCommand(x => GroupChanged(x as TtGroup));
-            NewGroupCommand = new RelayCommand(x => NewGroup(x as ListBox));
-            DeleteGroupCommand = new BindedRelayCommand<ProjectEditorModel>(
-                x => DeleteGroup(),
-                x => x != null && (x as TtGroup).CN != Consts.EmptyGuid,
-                this,
-                x => x.CurrentGroup);
-
-            PolygonShapeChanged(null);
-
-            foreach (TtPolygon poly in Manager.Polygons)
-                poly.PolygonChanged += PolygonShapeChanged;
-
-            ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += PolygonCollectionChanged;
-
-
-            Tiles = new ObservableCollection<ImageTile>();
-            MediaInfoChangedCommand = new RelayCommand(x => MediaInfoChanged(x as TtMediaInfo));
-            MediaSelectedCommand = new RelayCommand(x => MediaSelected(x as TtMediaInfo));
-            HideMediaViewerCommand = new RelayCommand(x => MediaViewerVisible = false);
-
-
+            #region Commands
             Func<ProjectTabSection, Type, bool> doesTabAndDataMatch = (tab, type) =>
             {
                 if (type == null)
@@ -168,6 +148,83 @@ namespace TwoTrails.ViewModels
                 }
             });
 
+            #region Polygons
+            PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtPolygon));
+            CreatePolygonCommand = new RelayCommand(x => CreatePolygon(x as ListBox));
+            DeletePolygonCommand = new RelayCommand(x => DeletePolygon(x as ListBox));
+
+            PolygonUpdateAccCommand = new BindedRelayCommand<ProjectEditorModel>(
+                x => UpdatePolygonAcc(),
+                x => CurrentPolygon != null && CurrentPolygon.Accuracy != _PolygonAccuracy,
+                this,
+                x => new { x.PolygonAccuracy, CurrentPolygon.Accuracy });
+
+            PolygonAccuracyLookupCommand = new BindedRelayCommand<ProjectEditorModel>(
+                x => AccuracyLookup(),
+                x => CurrentPolygon != null,
+                this,
+                x => x.CurrentPolygon);
+
+            SavePolygonSummary = new BindedRelayCommand<ProjectEditorModel>(
+                x => SavePolygonsummary(),
+                x => CurrentPolygon != null, this, x => x.CurrentPolygon);
+            #endregion
+
+            #region Metadata
+            MetadataChangedCommand = new RelayCommand(x => MetadataChanged(x as TtMetadata));
+            NewMetadataCommand = new RelayCommand(x => NewMetadata(x as ListBox));
+            SetDefaultMetadataCommand = new RelayCommand(x => SetMetadataDefault());
+            DeleteMetadataCommand = new BindedRelayCommand<ProjectEditorModel>(
+                x => DeleteMetadata(),
+                x => x != null && (x as TtMetadata).CN != Consts.EmptyGuid,
+                this,
+                x => x.CurrentMetadata);
+
+            MetadataUpdateZoneCommand = new BindedRelayCommand<ProjectEditorModel>(
+                x => UpdateMetadataZone(),
+                x => CurrentMetadata != null && CurrentMetadata.Zone != MetadataZone,
+                this,
+                x => new { x.MetadataZone, CurrentMetadata.Zone });
+            #endregion
+
+            #region Groups
+            GroupChangedCommand = new RelayCommand(x => GroupChanged(x as TtGroup));
+            NewGroupCommand = new RelayCommand(x => NewGroup(x as ListBox));
+            DeleteGroupCommand = new BindedRelayCommand<ProjectEditorModel>(
+                x => DeleteGroup(),
+                x => x != null && (x as TtGroup).CN != Consts.EmptyGuid,
+                this,
+                x => x.CurrentGroup);
+            #endregion
+
+            #region Media
+            Tiles = new ObservableCollection<ImageTile>();
+            MediaInfoChangedCommand = new RelayCommand(x => MediaInfoChanged(x as TtMediaInfo));
+            MediaSelectedCommand = new RelayCommand(x => MediaSelected(x as TtMediaInfo));
+            HideMediaViewerCommand = new RelayCommand(x => MediaViewerVisible = false);
+            #endregion
+
+            #region Cleanup
+            RemoveDuplicateMetadataCommand = new RelayCommand(x => RemoveDuplicateMetadata());
+            RemoveUnusedPolygonsCommand = new RelayCommand(x => RemoveUnusedPolygons());
+            RemoveUnusedMetadataCommand = new RelayCommand(x => RemoveUnusedMetadata());
+            RemoveUnusedGroupsCommand = new RelayCommand(x => RemoveUnusedGroups());
+            #endregion
+
+            #region Advanced
+            AnalyzeProjectCommand = new RelayCommand(x => AnalyzeProject());
+            #endregion
+
+            #endregion
+
+
+            PolygonShapeChanged(null);
+
+            foreach (TtPolygon poly in Manager.Polygons)
+                poly.PolygonChanged += PolygonShapeChanged;
+
+            ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += PolygonCollectionChanged;
+
             Manager.HistoryChanged += (s, e) =>
             {
                 if (e.DataType != null && e.HistoryEventType == HistoryEventType.Undone || e.HistoryEventType == HistoryEventType.Redone)
@@ -204,14 +261,6 @@ namespace TwoTrails.ViewModels
 
 
         #region Polygons
-        #region Commands
-        public ICommand PolygonChangedCommand { get; }
-        public ICommand CreatePolygonCommand { get; }
-        public ICommand DeletePolygonCommand { get; }
-        public ICommand PolygonUpdateAccCommand { get; }
-        public ICommand PolygonAccuracyLookupCommand { get; }
-        public ICommand SavePolygonSummary { get; }
-        #endregion
 
         #region Properties
         private TtPolygon _CurrentPolygon;
@@ -547,13 +596,6 @@ namespace TwoTrails.ViewModels
 
 
         #region Metadata
-        #region Commands
-        public ICommand MetadataChangedCommand { get; }
-        public ICommand NewMetadataCommand { get; }
-        public ICommand DeleteMetadataCommand { get; }
-        public ICommand MetadataUpdateZoneCommand { get; }
-        public ICommand SetDefaultMetadataCommand { get; }
-        #endregion
 
         #region Properties
         private TtMetadata _CurrentMetadata;
@@ -821,11 +863,6 @@ namespace TwoTrails.ViewModels
 
 
         #region Group
-        #region Commands
-        public ICommand GroupChangedCommand { get; }
-        public ICommand NewGroupCommand { get; }
-        public ICommand DeleteGroupCommand { get; }
-        #endregion
 
         #region Properties
         public bool GroupFieldIsEditable { get { return Get<bool>(); } set { Set(value); } }
@@ -999,6 +1036,127 @@ namespace TwoTrails.ViewModels
                         new ImageTile(iar.ImageInfo, iar.Image, (x) => MediaViewerVisible = true)
                     )
                 );
+        }
+        #endregion
+
+
+        #region Cleanup
+        private void RemoveDuplicateMetadata()
+        {
+            List<Tuple<TtMetadata,List<TtMetadata>>> dupMetaList = Manager.GetMetadata()
+                .GroupBy(meta => new {
+                    meta.Zone, meta.Comment, meta.Compass, meta.Crew, meta.Datum, meta.DecType,
+                    meta.Distance, meta.Elevation, meta.GpsReceiver, meta.MagDec, meta.RangeFinder, meta.Slope })
+                .Select(g => Tuple.Create(g.First(), g.Skip(1).ToList()))
+                .Where(ml => ml.Item2.Count > 0)
+                .ToList();
+
+            if (dupMetaList.Count > 0)
+            {
+                int removedMetaCount = dupMetaList.Sum(ml => ml.Item2.Count);
+
+                if (MessageBox.Show($"{removedMetaCount} metadata will be deleted and {(removedMetaCount > 1 ? "their" : "its")} associated points merged into existing identical metadata.",
+                    "Remove Duplicate Metadata", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.OK)
+                {
+                    Manager.StartMultiCommand();
+
+                    foreach (var ml in dupMetaList)
+                    {
+                        //set all points who have a duplicate meta to be set to the first meta that will be kept
+                        Manager.EditPoints(Manager.Points.Where(p => ml.Item2.Any(m => p.MetadataCN == m.CN)), PointProperties.META, ml.Item1);
+
+                        foreach (var delMeta in ml.Item2)
+                            Manager.DeleteMetadata(delMeta);
+                    }
+                    Manager.CommitMultiCommand();
+                }
+            }
+            else
+            {
+                MessageBox.Show("There is no duplicate Metadata.", "");
+            }
+        }
+
+        private void RemoveUnusedPolygons()
+        {
+            List<TtPolygon> delPolys = Manager.Polygons.Where(poly => !Manager.GetPoints(poly.CN).Any()).ToList();
+
+            if (delPolys.Count > 0)
+            {
+                if (MessageBox.Show($"{delPolys.Count} polygon{(delPolys.Count > 1 ? "s" : String.Empty)} will be deleted for containing no points.",
+                    "Remove Empty Polygons", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.OK)
+                {
+                    Manager.StartMultiCommand();
+
+                    foreach (var poly in delPolys)
+                    {
+                        Manager.DeletePolygon(poly);
+                    }
+
+                    Manager.CommitMultiCommand();
+                }
+            }
+            else
+            {
+                MessageBox.Show("There are 0 empty poylgons.");
+            }
+        }
+
+        private void RemoveUnusedMetadata()
+        {
+            List<TtMetadata> delMeta = Manager.Metadata.Where(meta => !Manager.Points.Any(p => p.MetadataCN == meta.CN)).ToList();
+
+            if (delMeta.Count > 0)
+            {
+                if (MessageBox.Show($"{delMeta.Count} metadata will be deleted for having no associated points.",
+                        "Remove Unassocaited Metadata", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.OK)
+                {
+                    Manager.StartMultiCommand();
+
+                    foreach (var meta in delMeta)
+                    {
+                        Manager.DeleteMetadata(meta);
+                    }
+
+                    Manager.CommitMultiCommand();
+                }
+            }
+            else
+            {
+                MessageBox.Show("There are 0 metadata with unassociated points.");
+            }
+        }
+
+        private void RemoveUnusedGroups()
+        {
+            List<TtGroup> delGroups = Manager.Groups.Where(group => !Manager.Points.Any(p => p.GroupCN == group.CN)).ToList();
+
+            if (delGroups.Count > 0)
+            {
+                if (MessageBox.Show($"{delGroups.Count} group{(delGroups.Count > 1 ? "s" : String.Empty)} will be deleted for having no associated points.",
+                    "Remove Empty Groups", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.OK)
+                {
+                    Manager.StartMultiCommand();
+
+                    foreach (var group in delGroups)
+                    {
+                        Manager.DeleteGroup(group);
+                    }
+
+                    Manager.CommitMultiCommand();
+                }
+            }
+            else
+            {
+                MessageBox.Show("There are 0 groups with unassociated points.");
+            }
+        }
+        #endregion
+
+        #region Advanced
+        private void AnalyzeProject()
+        {
+            
         }
         #endregion
     }

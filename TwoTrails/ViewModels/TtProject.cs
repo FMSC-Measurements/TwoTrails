@@ -84,10 +84,16 @@ namespace TwoTrails.ViewModels
         private TtManager _BaseManager { get; }
         public TtHistoryManager Manager { get; }
 
-        private PointEditorModel _DataEditor;
-        public PointEditorModel DataEditor
+        private PointEditorModel _PointEditor;
+        public PointEditorModel PointEditor
         {
-            get { return _DataEditor ?? (_DataEditor = new PointEditorModel(this)); }
+            get { return _PointEditor ?? (_PointEditor = new PointEditorModel(this)); }
+        }
+
+        private ProjectEditorModel _ProjectEditor;
+        public ProjectEditorModel ProjectEditor
+        {
+            get { return _ProjectEditor ?? (_ProjectEditor = new ProjectEditorModel(this)); }
         }
 
         public MainWindowModel MainModel { get; private set; }

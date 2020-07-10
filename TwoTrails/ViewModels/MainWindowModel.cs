@@ -24,18 +24,40 @@ namespace TwoTrails.ViewModels
     {
         private const int MESSAGE_DELAY = 5000;
 
-        private Dictionary<String, TtProject> _Projects = new Dictionary<String, TtProject>();
+        #region Commands
+        public ICommand NewCommand { get; private set; }
+        public ICommand OpenCommand { get; private set; }
+        public ICommand OpenProjectCommand { get; private set; }
+        public ICommand SaveCommand { get; private set; }
+        public ICommand SaveAsCommand { get; private set; }
+        public ICommand CloseProjectCommand { get; private set; }
+        public ICommand ExitCommand { get; private set; }
+
+        public ICommand ImportCommand { get; private set; }
+        public ICommand ExportCommand { get; private set; }
+        public ICommand EmailReportCommand { get; private set; }
+        public ICommand ViewPointDetailsCommand { get; private set; }
+        public ICommand OpenInEarthCommand { get; private set; }
+
+        public ICommand SettingsCommand { get; private set; }
+
+        public ICommand ViewLogCommand { get; private set; }
+        public ICommand ExportReportCommand { get; private set; }
+        public ICommand CheckForUpdatesCommand { get; private set; }
+        public ICommand AboutCommand { get; private set; }
+        #endregion
+
+        private readonly Dictionary<String, TtProject> _Projects = new Dictionary<String, TtProject>();
 
         private Binding sbiInfoBinding;
+        private TtTabModel _CurrentTab;
         public TtTabModel CurrentTab
         {
-            get { return Get<TtTabModel>(); }
+            get => _CurrentTab;
             set {
-                
-                Set(value, () =>
-                {
-                    CurrentEditor = value?.Project.DataEditor;
-                    
+                SetField(ref _CurrentTab, value, () => {
+                    CurrentProject = value?.Project;
+
                     if (value != null)
                     {
                         sbiInfoBinding = new Binding();
@@ -51,13 +73,12 @@ namespace TwoTrails.ViewModels
                         sbiInfoBinding = null;
                     }
 
-                    OnPropertyChanged(nameof(CurrentProject), nameof(HasOpenedProject), nameof(CurrentEditor));
+                    OnPropertyChanged(nameof(CurrentProject), nameof(HasOpenedProject), nameof(PointEditor), nameof(ProjectEditor));
 
                     MainWindow.Title = $"TwoTrails{(value != null ? $" - {value.Project.ProjectName}" : String.Empty)}";
                 });
             }
         }
-
 
         public string StatusMessage { get { return Get<string>(); } private set { Set(value); } }
         private DelayActionHandler _EndMessageDelayHandler;
@@ -80,22 +101,18 @@ namespace TwoTrails.ViewModels
              _EndMessageDelayHandler.DelayInvoke(delay);
         }
 
-
-        public TtProject CurrentProject { get { return CurrentTab?.Project; } }
-        
-        public PointEditorModel CurrentEditor { get; private set; }
+        public TtProject CurrentProject { get; private set; }
+        public PointEditorModel PointEditor => CurrentProject?.PointEditor;
+        public ProjectEditorModel ProjectEditor => CurrentProject?.ProjectEditor;
 
         public TtSettings Settings { get; }
 
-        public bool HasOpenedProject { get { return CurrentTab != null; } }
-        public bool HasPolygons { get { return CurrentEditor != null && CurrentEditor.Manager.Polygons.Count > 0; } }
-        
-        
+        public bool HasOpenedProject => CurrentTab != null;
+        public bool HasPolygons => PointEditor != null && PointEditor.Manager.Polygons.Count > 0;
         public bool HasUnsavedProjects
         {
             get { return _Projects.Values.Any(p => p.RequiresSave); }
         }
-
 
         public bool RecentItemsAvail
         {
@@ -103,37 +120,11 @@ namespace TwoTrails.ViewModels
             set { Set(value); }
         }
 
-        
         private bool exiting = false;
         public bool ShouldExit()
         {
             return exiting || Exit(false);
         }
-
-
-        #region Commands
-        public ICommand NewCommand { get; private set; }
-        public ICommand OpenCommand { get; private set; }
-        public ICommand OpenProjectCommand { get; private set; }
-        public ICommand SaveCommand { get; private set; }
-        public ICommand SaveAsCommand { get; private set; }
-        public ICommand CloseProjectCommand { get; private set; }
-        public ICommand ExitCommand { get; private set; }
-
-        public ICommand ImportCommand { get; private set; }
-        public ICommand ExportCommand { get; private set; }
-        public ICommand EmailReportCommand { get; private set; }
-        public ICommand ViewPointDetailsCommand { get; private set; }
-        public ICommand OpenInEarthCommand { get; private set; }
-
-        public ICommand SettingsCommand { get; private set; }
-        
-        public ICommand ViewLogCommand { get; private set; }
-        public ICommand ExportReportCommand { get; private set; }
-        public ICommand CheckForUpdatesCommand { get; private set; }
-        public ICommand AboutCommand { get; private set; }
-        #endregion
-
 
         private TabControl _Tabs;
         public MainWindow MainWindow { get; }

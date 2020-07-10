@@ -84,19 +84,20 @@ namespace TwoTrails.ViewModels
         #region Commands
         public ICommand RefreshPoints { get; }
 
-        public ICommand ChangeQuondamParentCommand { get; }
-        public ICommand RenamePointsCommand { get; }
-        public ICommand ReverseSelectedCommand { get; }
-        public ICommand ResetPointCommand { get; }
-        public ICommand ResetPointFieldCommand { get; }
-        public ICommand DeleteCommand { get; }
-
         public RelayCommand CreatePointCommand { get; }
         public RelayCommand CreateQuondamsCommand { get; }
+        public RelayCommand DeleteCommand { get; }
+        public RelayCommand RenamePointsCommand { get; }
         public RelayCommand ConvertPointsCommand { get; }
+        public RelayCommand ResetPointCommand { get; }
+        public RelayCommand ResetPointFieldCommand { get; }
+        public RelayCommand ChangeQuondamParentCommand { get; }
+
         public RelayCommand MovePointsCommand { get; }
-        public RelayCommand RetraceCommand { get; }
+        public RelayCommand ReverseSelectedCommand { get; }
         public RelayCommand ReindexCommand { get; }
+        public RelayCommand RetraceCommand { get; }
+
         public RelayCommand CreatePlotsCommand { get; }
         public RelayCommand CreateSubsampleCommand { get; }
         public RelayCommand CreateCorridorCommand { get; }
@@ -104,7 +105,7 @@ namespace TwoTrails.ViewModels
         public RelayCommand ModifyDataDictionaryCommand { get; }
 
         public RelayCommand RezonePointsCommand { get; }
-        
+
         public ICommand SelectAlternateCommand { get; }
         public ICommand SelectGpsCommand { get; }
         public ICommand SelectTravCommand { get; }
@@ -900,45 +901,7 @@ namespace TwoTrails.ViewModels
             #region Init Commands
             RefreshPoints = new RelayCommand(x => Points.Refresh());
 
-            CopyCellValueCommand = new BindedRelayCommand<PointEditorModel>(
-                x => CopyCellValue(x as DataGrid), x => HasSelection,
-                this, x => x.HasSelection);
-
-            ExportValuesCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ExportValues(x as DataGrid), x => HasSelection,
-                this, x => x.HasSelection);
-
-            ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
-
-            ViewSatInfoCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ViewSafeInfo(), x => _SelectedPoints.Cast<TtPoint>().Any(pt => pt.IsGpsType()),
-                this, x => x.SelectedPoints);
-
-            ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ChangeQuondamParent(), x => OnlyQuondams && !MultipleSelections,
-                this, x => new { x.OnlyQuondams, x.MultipleSelections });
-
-            RenamePointsCommand = new BindedRelayCommand<PointEditorModel>(
-                x => RenamePoints(), x => MultipleSelections && SamePolygon,
-                this, x => x.MultipleSelections);
-
-            ReverseSelectedCommand = new BindedRelayCommand<PointEditorModel>(
-                x => { if (SelectedPoints.Count > 2) ReverseSelection(); else SwapPoints(); },
-                x => MultipleSelections && SamePolygon,
-                this, x => x.MultipleSelections);
-
-            ResetPointCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ResetPoint(), x => HasSelection,
-                this, x => x.HasSelection);
-
-            ResetPointFieldCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ResetPointField(x as DataGrid), x => HasSelection,
-                this, x => x.HasSelection);
-
-            DeleteCommand = new BindedRelayCommand<PointEditorModel>(
-                x => DeletePoint(), x => HasSelection,
-                this, x => x.HasSelection);
-
+            #region Create Edit Delete Reset
             CreatePointCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
                 x => CreateNewPoint(x != null ? (OpType)x : OpType.GPS),
                 x => Manager.Polygons.Count > 0,
@@ -948,22 +911,51 @@ namespace TwoTrails.ViewModels
                 x => CreateQuondams(), x => HasSelection,
                 this, x => x.HasSelection);
 
+            DeleteCommand = new BindedRelayCommand<PointEditorModel>(
+                x => DeletePoint(), x => HasSelection,
+                this, x => x.HasSelection);
+
+            RenamePointsCommand = new BindedRelayCommand<PointEditorModel>(
+                x => RenamePoints(), x => MultipleSelections && SamePolygon,
+                this, x => x.MultipleSelections);
+
             ConvertPointsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ConvertPoints(), x => OnlyQuondams || OnlyTravTypes,
                 this, x => new { x.OnlyQuondams, x.OnlyTravTypes });
 
+            ResetPointCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ResetPoint(), x => HasSelection,
+                this, x => x.HasSelection);
+
+            ResetPointFieldCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ResetPointField(x as DataGrid), x => HasSelection,
+                this, x => x.HasSelection);
+
+            ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ChangeQuondamParent(), x => OnlyQuondams && !MultipleSelections,
+                this, x => new { x.OnlyQuondams, x.MultipleSelections });
+            #endregion
+
+            #region Move Reverse Reindex Retrace
             MovePointsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => MovePoints(), x => HasSelection,
                 this, x => x.HasSelection);
 
-            RetraceCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPoint>>(
-                x => Retrace(), x => Manager.Points.Count > 0,
-                Manager.Points, x => x.Count);
+            ReverseSelectedCommand = new BindedRelayCommand<PointEditorModel>(
+                x => { if (SelectedPoints.Count > 2) ReverseSelection(); else SwapPoints(); },
+                x => MultipleSelections && SamePolygon,
+                this, x => x.MultipleSelections);
 
             ReindexCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPoint>>(
                 x => Reindex(), x => Manager.Points.Count > 0,
                 Manager.Points, x => x.Count);
 
+            RetraceCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPoint>>(
+                x => Retrace(), x => Manager.Points.Count > 0,
+                Manager.Points, x => x.Count);
+            #endregion
+
+            #region Plot Corridors DataDictionary
             CreatePlotsCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
                 x => CreatePlots(),
                 x => Manager.Polygons.Count > 0 && !PlotToolInUse,
@@ -983,9 +975,17 @@ namespace TwoTrails.ViewModels
                 this, x => x.HasPossibleDoubleSidedCorridor);
 
             ModifyDataDictionaryCommand = new RelayCommand(x => ModifyDataDictionary());
+            #endregion
 
-            DeselectCommand = new RelayCommand(x => DeselectAll());
+            #region Advanced
+            RezonePointsCommand = new BindedRelayCommand<PointEditorModel>(
+                x => RezonePoints(),
+                x => HasSelection,
+                this, x => x.HasSelection);
 
+            #endregion
+
+            #region Selections
             SelectAlternateCommand = new RelayCommand(x => SelectAlternate());
 
             SelectGpsCommand = new RelayCommand(x => SelectGps());
@@ -994,10 +994,27 @@ namespace TwoTrails.ViewModels
 
             SelectInverseCommand = new RelayCommand(x => SelectInverse());
 
-            UpdateAdvInfo = new RelayCommand(x => UpdateAdvInfoItems());
+            DeselectCommand = new RelayCommand(x => DeselectAll());
+            #endregion
 
-            RezonePointsCommand = new RelayCommand(x => DataCorrectionModel.RezonePoints(Manager,
-                GetSortedSelectedPoints().Where(p => p.IsGpsType()).Cast<GpsPoint>()));
+            #region Copy Export Info
+            CopyCellValueCommand = new BindedRelayCommand<PointEditorModel>(
+                x => CopyCellValue(x as DataGrid), x => HasSelection,
+                this, x => x.HasSelection);
+
+            ExportValuesCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ExportValues(x as DataGrid), x => HasSelection,
+                this, x => x.HasSelection);
+
+            ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
+
+            ViewSatInfoCommand = new BindedRelayCommand<PointEditorModel>(
+                x => ViewSafeInfo(), x => _SelectedPoints.Cast<TtPoint>().Any(pt => pt.IsGpsType()),
+                this, x => x.SelectedPoints);
+
+            UpdateAdvInfo = new RelayCommand(x => UpdateAdvInfoItems());
+            #endregion
+
             #endregion
 
             //BindingOperations.EnableCollectionSynchronization(_SelectedPoints, _lock);
@@ -1954,7 +1971,7 @@ namespace TwoTrails.ViewModels
         }
 
 
-        #region Actions
+        #region Create/Delete/Edit
         private void ChangeQuondamParent()
         {
             if (!MultipleSelections || MessageBox.Show("Multiple Quondams are selected. Do you wish to change all of their ParentPoints to a new Point?",
@@ -2178,15 +2195,15 @@ namespace TwoTrails.ViewModels
                         }
                         else if (isGps)
                         {
-                            points = GetSortedSelectedPoints().Where(p => p.IsGpsType());
+                            points = GetSortedSelectedPoints(p => p.IsGpsType());
                         }
                         else if (isTrav)
                         {
-                            points = GetSortedSelectedPoints().Where(p => p.IsTravType());
+                            points = GetSortedSelectedPoints(p => p.IsTravType());
                         }
                         else if (isManAcc)
                         {
-                            points = GetSortedSelectedPoints().Where(p => p.IsManualAccType());
+                            points = GetSortedSelectedPoints(p => p.IsManualAccType());
                         }
                         else
                         {
@@ -2418,21 +2435,11 @@ namespace TwoTrails.ViewModels
 
         private void CreateCorridor()
         {
-            Manager.CreateCorridor(GetSortedSelectedPoints().Where(p => p.OnBoundary), Polygon);
+            Manager.CreateCorridor(GetSortedSelectedPoints(p => p.OnBoundary), Polygon);
         }
         private void CreateDoubleSidedCorridor()
         {
-            Manager.CreateDoubleSidedCorridor(GetSortedSelectedPoints().Where(p => p.OnBoundary), Polygon);
-        }
-
-        private void IsPointInPolygon()
-        {
-            //TODO
-        }
-
-        private void GetDistanceToPolygonEdge()
-        {
-            //TODO
+            Manager.CreateDoubleSidedCorridor(GetSortedSelectedPoints(p => p.OnBoundary), Polygon);
         }
 
         private void ModifyDataDictionary()
@@ -2457,12 +2464,24 @@ namespace TwoTrails.ViewModels
                 {
                     Manager.Save();
                     Manager.BaseManager.Reload();
-                    
+
                     Points = CollectionViewSource.GetDefaultView(Manager.Points) as ListCollectionView;
 
                     SetupUI();
                 }
             });
+        }
+        #endregion
+
+        #region Info Tools
+        private void IsPointInPolygon()
+        {
+            //TODO
+        }
+
+        private void GetDistanceToPolygonEdge()
+        {
+            //TODO
         }
 
 
@@ -2549,6 +2568,7 @@ namespace TwoTrails.ViewModels
             Clipboard.SetText(clipData.ToString());
         }
 
+
         private void ViewPointDetails()
         {
             PointDetailsDialog.ShowDialog(SelectedPoints.Cast<TtPoint>().ToList(), Project.MainModel.MainWindow);
@@ -2562,6 +2582,23 @@ namespace TwoTrails.ViewModels
                 ViewSatInfoDialog.ShowDialog(GetSortedSelectedPoints(), Manager, Project.MainModel.MainWindow);
             else
                 MessageBox.Show("No GPS type points selected");
+        }
+        #endregion
+
+
+        #region Advanced
+        private void RezonePoints()
+        {
+            List<GpsPoint> points = GetSortedSelectedPoints(x => x.IsGpsType()).Cast<GpsPoint>().ToList();
+
+            if (points.Count > 0)
+            {
+                Manager.RezonePoints(points);
+            }
+            else
+            {
+                MessageBox.Show("Only GPS type points can be rezoned.");
+            }
         }
         #endregion
 
