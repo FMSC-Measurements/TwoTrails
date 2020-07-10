@@ -2,9 +2,9 @@
 {
     public class AddTtMetadataCommand : ITtMetadataCommand
     {
-        private ITtManager pointsManager;
+        private TtManager pointsManager;
 
-        public AddTtMetadataCommand(TtMetadata metadata, ITtManager pointsManager) : base(metadata)
+        public AddTtMetadataCommand(TtMetadata metadata, TtManager pointsManager) : base(metadata)
         {
             this.pointsManager = pointsManager;
         }

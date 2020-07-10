@@ -9,7 +9,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private EditTtPointsCommand editPoints;
         private CreateQuondamsCommand createQuondams;
 
-        public CreateCorridorDoubleSidedCommand(IEnumerable<TtPoint> points, TtPolygon targetPolygon, ITtManager pointsManager) : base(points)
+        public CreateCorridorDoubleSidedCommand(IEnumerable<TtPoint> points, TtPolygon targetPolygon, TtManager pointsManager) : base(points)
         {
             IEnumerable<TtPoint> ssPoints = points.Where(p => p.OpType == OpType.SideShot);
             List<TtPoint> s2ssPoints = new List<TtPoint>();

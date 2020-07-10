@@ -2,9 +2,9 @@
 {
     public class DeleteTtMetadataCommand : ITtMetadataCommand
     {
-        private ITtManager pointsManager;
+        private TtManager pointsManager;
 
-        public DeleteTtMetadataCommand(TtMetadata metadata, ITtManager pointsManager) : base(metadata)
+        public DeleteTtMetadataCommand(TtMetadata metadata, TtManager pointsManager) : base(metadata)
         {
             this.pointsManager = pointsManager;
         }

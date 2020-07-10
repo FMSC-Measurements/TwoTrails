@@ -2,9 +2,9 @@
 {
     public class AddTtGroupCommand : ITtGroupCommand
     {
-        private ITtManager pointsManager;
+        private TtManager pointsManager;
 
-        public AddTtGroupCommand(TtGroup group, ITtManager pointsManager) : base(group)
+        public AddTtGroupCommand(TtGroup group, TtManager pointsManager) : base(group)
         {
             this.pointsManager = pointsManager;
         }

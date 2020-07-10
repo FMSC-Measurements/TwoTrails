@@ -85,6 +85,8 @@ namespace TwoTrails.Core
                 else
                     Notes += $"|{notes}"; 
             }
+
+            Date = DateTime.Now;
         }
 
         public void Reset()

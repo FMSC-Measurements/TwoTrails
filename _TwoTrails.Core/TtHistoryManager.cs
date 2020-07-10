@@ -340,7 +340,7 @@ namespace TwoTrails.Core
 
         public void CreateRetrace(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit, bool reverse = false)
         {
-            AddCommand(new RetraceCommand(reverse ? points.Reverse() : points, this, targetPolygon, insertIndex, bndMode));
+            AddCommand(new RetraceCommand(reverse ? points.Reverse() : points, this.BaseManager, targetPolygon, insertIndex, bndMode));
         }
 
 
@@ -367,7 +367,7 @@ namespace TwoTrails.Core
 
         public void RezonePoints(IEnumerable<GpsPoint> points)
         {
-            AddCommand(new RezonePointsCommand(points));
+            AddCommand(new RezonePointsCommand(points, this.BaseManager));
         }
 
         #region Editing
@@ -536,6 +536,11 @@ namespace TwoTrails.Core
         public DataDictionaryTemplate GetDataDictionaryTemplate()
         {
             return BaseManager.GetDataDictionaryTemplate();
+        }
+
+        public void AddAction(DataActionType action, string notes = null)
+        {
+            AddCommand(new AddDataActionCommand(action, this.BaseManager, notes));
         }
     }
 

@@ -6,7 +6,7 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class MovePointsCommand : ITtPointsCommand
     {
-        private ITtManager pointsManager;
+        private TtManager pointsManager;
         private TtPolygon TargetPolygon;
         private int InsertIndex;
 
@@ -16,7 +16,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private Dictionary<String, TtPoint> EditedPoints = new Dictionary<String, TtPoint>();
         private Dictionary<String, TtPolygon> PolygonsToBuild = new Dictionary<String, TtPolygon>();
 
-        public MovePointsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex) : base(points)
+        public MovePointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex) : base(points)
         {
             this.pointsManager = pointsManager;
 

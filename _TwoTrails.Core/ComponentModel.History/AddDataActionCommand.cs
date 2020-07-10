@@ -10,8 +10,9 @@ namespace TwoTrails.Core.ComponentModel.History
         public Type DataType => null;
         public bool RequireRefresh => false;
 
-        private DataActionType _DataActionType;
-        private string _Notes;
+        private readonly DataActionType _DataActionType;
+        private readonly string _Notes;
+        private readonly Guid _ID = Guid.NewGuid();
 
 
         public AddDataActionCommand(DataActionType dataAction, TtManager manager, string notes = null)
@@ -23,12 +24,12 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public void Redo()
         {
-            _Manager.AddAction(_DataActionType, _Notes);
+            _Manager.AddAction(_DataActionType, _Notes, _ID);
         }
 
         public void Undo()
         {
-            _Manager.RemoveLastAction();
+            _Manager.RemoveAction(_ID);
         }
     }
 }

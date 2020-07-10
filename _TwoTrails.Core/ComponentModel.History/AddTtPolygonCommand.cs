@@ -2,9 +2,9 @@
 {
     public class AddTtPolygonCommand : ITtPolygonCommand
     {
-        private ITtManager Manager;
+        private TtManager Manager;
 
-        public AddTtPolygonCommand(TtPolygon polygon, ITtManager manager) : base(polygon)
+        public AddTtPolygonCommand(TtPolygon polygon, TtManager manager) : base(polygon)
         {
             this.Manager = manager;
         }

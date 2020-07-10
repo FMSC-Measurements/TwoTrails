@@ -9,11 +9,15 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class RezonePointsCommand : ITtPointsCommand
     {
+        private TtManager _Manager;
         private List<Tuple<GpsPoint, double, double>> NewValues = new List<Tuple<GpsPoint, double, double>>();
         private List<Tuple<GpsPoint, double, double>> OldValues = new List<Tuple<GpsPoint, double, double>>();
+        private readonly Guid _ID = Guid.NewGuid();
 
-        public RezonePointsCommand(IEnumerable<GpsPoint> points) : base(points)
+        public RezonePointsCommand(IEnumerable<GpsPoint> points, TtManager manager) : base(points)
         {
+            _Manager = manager;
+
             foreach (GpsPoint point in Points)
             {
                 //get real lat and lon
@@ -36,6 +40,8 @@ namespace TwoTrails.Core.ComponentModel.History
                 PointProperties.UNADJX.SetValue(tup.Item1, tup.Item2);
                 PointProperties.UNADJY.SetValue(tup.Item1, tup.Item3);
             }
+
+            _Manager.AddAction(DataActionType.RezonedPoints, null, _ID);
         }
 
         public override void Undo()
@@ -45,6 +51,8 @@ namespace TwoTrails.Core.ComponentModel.History
                 PointProperties.UNADJX.SetValue(tup.Item1, tup.Item2);
                 PointProperties.UNADJY.SetValue(tup.Item1, tup.Item3);
             }
+
+            _Manager.RemoveAction(_ID);
         }
     }
 }

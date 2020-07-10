@@ -5,9 +5,9 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class AddTtPointsCommand : ITtPointsCommand
     {
-        private ITtManager pointsManager;
+        private TtManager pointsManager;
 
-        public AddTtPointsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager) : base(points)
+        public AddTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager) : base(points)
         {
             this.pointsManager = pointsManager;
         }

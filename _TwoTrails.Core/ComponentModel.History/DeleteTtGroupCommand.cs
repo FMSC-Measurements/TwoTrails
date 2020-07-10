@@ -2,9 +2,9 @@
 {
     public class DeleteTtGroupCommand : ITtGroupCommand
     {
-        private ITtManager pointsManager;
+        private TtManager pointsManager;
 
-        public DeleteTtGroupCommand(TtGroup group, ITtManager pointsManager) : base(group)
+        public DeleteTtGroupCommand(TtGroup group, TtManager pointsManager) : base(group)
         {
             this.pointsManager = pointsManager;
         }

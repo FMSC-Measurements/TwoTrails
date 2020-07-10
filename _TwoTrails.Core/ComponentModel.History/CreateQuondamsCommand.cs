@@ -13,7 +13,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private EditTtPointsMultiValueCommand<int> editPointsCmd = null;
         private AddTtPointsCommand addPointsCmd;
 
-        public CreateQuondamsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
+        public CreateQuondamsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
         {
             TargetPolygon = targetPoly;
 

@@ -32,7 +32,8 @@ namespace TwoTrails.Core
         private List<String> _DeleteNmeaByPointCNs;
         private Dictionary<String, TtMediaInfo> _MediaMap, _MediaMapOrig;
 
-        private Stack<Tuple<DataActionType, string>> _DataActions = new Stack<Tuple<DataActionType, string>>();
+        //private Stack<Tuple<DataActionType, string>> _DataActions = new Stack<Tuple<DataActionType, string>>();
+        private Dictionary<Guid, Tuple<DataActionType, string>> _DataActions = new Dictionary<Guid, Tuple<DataActionType, string>>();
 
         private Dictionary<String, DelayActionHandler> _PolygonUpdateHandlers;
 
@@ -376,8 +377,18 @@ namespace TwoTrails.Core
                     SaveNmea();
                     SaveProjectInfo();
 
+                    foreach (var da in _DataActions.Values)
+                    {
+                        _Activity.UpdateAction(da.Item1);
+                        if (!String.IsNullOrWhiteSpace(da.Item2))
+                        {
+                            _Activity.UpdateNotes(da.Item2);
+                        }
+                    }
+
                     _DAL.InsertActivity(_Activity);
                     _Activity.Reset();
+                    _DataActions.Clear();
                 }
                 catch (Exception ex)
                 {
@@ -1155,14 +1166,23 @@ namespace TwoTrails.Core
             Load();
         }
 
-        public void AddAction(DataActionType action, string notes = null)
+        /// <summary>
+        /// Adds an action type to UserActivity
+        /// </summary>
+        /// <param name="action">Type of Action</param>
+        /// <param name="notes">Optional Notes of the action taken</param>
+        /// <param name="guid">Optional action ID</param>
+        public void AddAction(DataActionType action, string notes = null, Guid? guid = null)
         {
-            _DataActions.Push(Tuple.Create(action, notes));
+            _DataActions.Add(guid ?? Guid.NewGuid(), Tuple.Create(action, notes));
         }
-
-        public void RemoveLastAction()
+        /// <summary>
+        /// Removes an Action by ID
+        /// </summary>
+        /// <param name="guid">Action ID</param>
+        public void RemoveAction(Guid guid)
         {
-            _DataActions.Pop();
+            _DataActions.Remove(guid);
         }
         #endregion
 
