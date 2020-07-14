@@ -298,6 +298,7 @@ namespace TwoTrails.Utils
                             dal.FixErrors(true);
 
                             action.UpdateAction(DataActionType.DeletedPoints);
+                            action.UpdateAction(DataActionType.ReindexPoints);
                         }
                         else
                         {
@@ -309,8 +310,11 @@ namespace TwoTrails.Utils
                                 action.UpdateAction(DataActionType.ModifiedPoints);
                         }
 
-                        if (errors.HasFlag(DalError.NullAdjLocs) || errors.HasFlag(DalError.PointIndexes))
+                        if (errors.HasFlag(DalError.NullAdjLocs))
                             action.UpdateAction(DataActionType.ModifiedPoints);
+
+                        if (errors.HasFlag(DalError.PointIndexes))
+                            action.UpdateAction(DataActionType.ReindexPoints);
 
                         dal.InsertActivity(action);
                     }
