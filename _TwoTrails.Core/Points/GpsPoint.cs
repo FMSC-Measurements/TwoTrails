@@ -92,6 +92,9 @@ namespace TwoTrails.Core.Points
         {
             if (point is GpsPoint gps)
                 CopyGpsValues(gps);
+
+            if (point is IManualAccuracy imanacc)
+                _ManualAccuracy = imanacc.ManualAccuracy;
         }
 
         public GpsPoint(GpsPoint point) : base(point)

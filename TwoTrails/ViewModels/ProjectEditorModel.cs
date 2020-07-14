@@ -737,11 +737,8 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        bool isEdting = false;
-
         private void BindMetadataValues(TtMetadata metadata)
         {
-            isEdting = true;
             if (CurrentMetadata != null)
             {
                 _MetadataName = metadata.Name;
@@ -789,8 +786,6 @@ namespace TwoTrails.ViewModels
                 nameof(MetadataRangeFinder),
                 nameof(MetadataCompass),
                 nameof(MetadataCrew));
-
-            isEdting = false;
         }
         #endregion
 

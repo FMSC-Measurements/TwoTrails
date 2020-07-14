@@ -249,7 +249,7 @@ namespace TwoTrails.ViewModels
                                     Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
                                 }
 
-                                if (!TtUtils.CheckAndFixErrors(dal))
+                                if (!TtUtils.CheckAndFixErrors(dal, Settings))
                                     return;
 
                                 if (dal.RequiresUpgrade)
@@ -267,7 +267,7 @@ namespace TwoTrails.ViewModels
 
                                         if (Upgrade.DAL(dal, Settings))
                                         {
-                                            AddProject(new TtProject(dal, mal, App.Settings, this));
+                                            AddProject(new TtProject(dal, mal, Settings, this));
                                             MessageBox.Show("Upgrade Successful");
                                         }
                                         else
@@ -278,7 +278,7 @@ namespace TwoTrails.ViewModels
                                 }
                                 else
                                 {
-                                    AddProject(new TtProject(dal, mal, App.Settings, this));
+                                    AddProject(new TtProject(dal, mal, Settings, this));
                                 }
                             }
                             catch (Exception ex)
@@ -511,7 +511,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
                     TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(nFile);
 
-                    if (!TtUtils.CheckAndFixErrors(dal))
+                    if (!TtUtils.CheckAndFixErrors(dal, Settings))
                     {
                         File.Delete(nFile);
                         PostMessage("Save Canceled");

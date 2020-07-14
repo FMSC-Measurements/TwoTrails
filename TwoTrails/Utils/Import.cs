@@ -117,6 +117,7 @@ namespace TwoTrails.Utils
                     Polygon = qpoint.Polygon,
                     Metadata = qpoint.Metadata,
                     Group = qpoint.Group,
+                    ManualAccuracy = qpoint.ManualAccuracy ?? (cPoint.IsManualAccType() ? (cPoint as IManualAccuracy).ManualAccuracy : null),
                     Comment = string.IsNullOrWhiteSpace(qpoint.Comment) ?
                         (cPoint.OpType == OpType.Quondam ? qpoint.ParentPoint.Comment : cPoint.Comment) : qpoint.Comment,
                     TimeCreated = DateTime.Now

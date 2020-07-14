@@ -244,7 +244,7 @@ namespace TwoTrails.Utils
         }
 
 
-        public static bool CheckAndFixErrors(TtSqliteDataAccessLayer dal)
+        public static bool CheckAndFixErrors(TtSqliteDataAccessLayer dal, ITtSettings settings)
         {
             DalError errors = dal.GetErrors();
 
@@ -260,6 +260,8 @@ namespace TwoTrails.Utils
             {
                 List<string> errList = new List<string>();
 
+                if (errors.HasFlag(DalError.OrphanedQuondams))
+                    errList.Add("Orphaned Quondams");
                 if (errors.HasFlag(DalError.PointIndexes))
                     errList.Add("Skipped Point Indexes");
                 if (errors.HasFlag(DalError.NullAdjLocs))
@@ -271,13 +273,14 @@ namespace TwoTrails.Utils
                 if (errors.HasFlag(DalError.MissingGroup))
                     errList.Add("Missing Groups");
 
-                bool hardErrors = errors.HasFlag(DalError.MissingGroup) || errors.HasFlag(DalError.MissingMetadata) || errors.HasFlag(DalError.MissingPolygon);
+                bool hardErrors = errors.HasFlag(DalError.OrphanedQuondams) || errors.HasFlag(DalError.MissingGroup) ||
+                    errors.HasFlag(DalError.MissingMetadata) || errors.HasFlag(DalError.MissingPolygon);
 
-                MessageBoxResult mbr =  MessageBox.Show(
-                    $"It appears part of the TwoTrails data is corrupt. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(", ", errList)}. " +
-                    (hardErrors ? $"Would you like to try and fix the data by recreating, moving and editing (Yes) or removing invalid (No)?" :
+                MessageBoxResult mbr = MessageBox.Show(
+                    $"It appears part of the TwoTrails data {(hardErrors ? "is corrupt" : "needs adjusting")}. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(" | ", errList)}. " +
+                    (hardErrors ? $"Would you like to try and fix the data by recreating, moving and modifing (Yes) or removing invalid (No)?" :
                     "Would you like to fix the data?"),
-                    "Data is corrupted",
+                    (hardErrors ? "Data is corrupted" : "Data needs adjusting"),
                     hardErrors ? MessageBoxButton.YesNoCancel : MessageBoxButton.OKCancel, MessageBoxImage.Error, MessageBoxResult.Cancel);
 
                 if (mbr == MessageBoxResult.Cancel)
@@ -288,7 +291,28 @@ namespace TwoTrails.Utils
                     {
                         File.Copy(dal.FilePath, $"{dal.FilePath}.corrupt", true);
 
-                        dal.FixErrors(mbr == MessageBoxResult.No);
+                        TtUserAction action = new TtUserAction("Fixer", settings.DeviceName, DateTime.Now, DataActionType.None, String.Join(", ", errList));
+
+                        if (mbr == MessageBoxResult.No)
+                        {
+                            dal.FixErrors(true);
+
+                            action.UpdateAction(DataActionType.DeletedPoints);
+                        }
+                        else
+                        {
+                            dal.FixErrors(false);
+
+                            if (errors.HasFlag(DalError.MissingPolygon))
+                                action.UpdateAction(DataActionType.InsertedPolygons);
+                            if (errors.HasFlag(DalError.OrphanedQuondams) || errors.HasFlag(DalError.MissingMetadata) || errors.HasFlag(DalError.MissingGroup))
+                                action.UpdateAction(DataActionType.ModifiedPoints);
+                        }
+
+                        if (errors.HasFlag(DalError.NullAdjLocs) || errors.HasFlag(DalError.PointIndexes))
+                            action.UpdateAction(DataActionType.ModifiedPoints);
+
+                        dal.InsertActivity(action);
                     }
                     catch (Exception e)
                     {

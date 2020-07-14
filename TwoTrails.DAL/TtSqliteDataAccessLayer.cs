@@ -2605,9 +2605,13 @@ namespace TwoTrails.DAL
             {
                 List<string> badPointCns = GetPointsWithMissingPolygons()
                     .Union(GetPointsWithMissingMetadata())
-                    .Union(GetPointsWithMissingGroups()).ToList();
+                    .Union(GetPointsWithMissingGroups())
+                    .Union(GetOrphanedQuondams()).ToList();
 
                 DeletePoints(GetPoints().Where(p => badPointCns.Contains(p.CN)));
+
+                FixNullAdjLocs();
+                ReindexPolygons();
             }
             else
             {
@@ -2616,6 +2620,9 @@ namespace TwoTrails.DAL
                     .GroupBy(p => p.PolygonCN)
                     .Select(g => Tuple.Create(g.Key, g.First())).ToList();
 
+                List<QuondamPoint> orphanedQuondams = GetOrphanedQuondams()
+                    .Select(cn => GetPoint(cn) as QuondamPoint)
+                    .ToList();
 
                 if (missingPointsByPolygons.Any())
                 {
@@ -2642,6 +2649,32 @@ namespace TwoTrails.DAL
                     }
                 }
 
+                FixNullAdjLocs();
+
+                if (orphanedQuondams.Any())
+                {
+                    foreach (QuondamPoint qpoint in orphanedQuondams)
+                    {
+                        if (qpoint.UnAdjX == 0 && qpoint.UnAdjY == 0)
+                        {
+                            DeletePoint(qpoint);
+                        }
+                        else
+                        {
+                            GpsPoint gpsPoint = new GpsPoint(qpoint)
+                            {
+                                Comment = String.IsNullOrWhiteSpace(qpoint.Comment) ?
+                                    "Converted from Quondam Point" :
+                                    qpoint.Comment + "Converted from Quondam Point"
+                            };
+
+                            UpdatePoint(gpsPoint, qpoint);
+                        }
+                    }
+                }
+
+                ReindexPolygons();
+
                 _Database.Update(TTS.PointSchema.TableName,
                         new Dictionary<string, string> { [TTS.PointSchema.MetadataCN] = Consts.EmptyGuid },
                         $"{TTS.PointSchema.MetadataCN} not in (select {TTS.SharedSchema.CN} from {TTS.MetadataSchema.TableName});");
@@ -2651,8 +2684,6 @@ namespace TwoTrails.DAL
                         $"{TTS.PointSchema.GroupCN} not in (select {TTS.SharedSchema.CN} from {TTS.GroupSchema.TableName});");
             }
 
-            FixNullAdjLocs();
-            ReindexPolygons();
         }
 
         protected int GetItemCount(String tableName, string where = null)
