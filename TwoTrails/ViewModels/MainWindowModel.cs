@@ -249,7 +249,7 @@ namespace TwoTrails.ViewModels
                                     Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
                                 }
 
-                                if (!TtUtils.CheckAndFixErrors(dal, Settings))
+                                if (!DataHelper.CheckAndFixErrors(dal, Settings))
                                     return;
 
                                 if (dal.RequiresUpgrade)
@@ -511,7 +511,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
                     TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(nFile);
 
-                    if (!TtUtils.CheckAndFixErrors(dal, Settings))
+                    if (!DataHelper.CheckAndFixErrors(dal, Settings))
                     {
                         File.Delete(nFile);
                         PostMessage("Save Canceled");

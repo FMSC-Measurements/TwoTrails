@@ -139,7 +139,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
                         TtSqliteDataAccessLayer idal = new TtSqliteDataAccessLayer(fileName);
                         
-                        if (!TtUtils.CheckAndFixErrors(idal, _Project.Settings))
+                        if (!DataHelper.CheckAndFixErrors(idal, _Project.Settings))
                         {
                             IsSettingUp = false;
                             return;

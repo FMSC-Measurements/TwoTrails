@@ -145,7 +145,23 @@
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" Visibility="Visible"/>
 
                     <Separator/>
-                    
+
+                    <MenuItem Header="Analyze Project" IsEnabled="{Binding HasOpenedProject}" Command="{Binding ProjectEditor.AnalyzeProjectCommand}"/>
+
+                    <MenuItem Header="Cleanup" IsEnabled="{Binding HasOpenedProject}">
+                        <MenuItem Header="Remove Duplicate Metadata" Command="{Binding ProjectEditor.RemoveDuplicateMetadataCommand}"/>
+
+                        <Separator/>
+
+                        <MenuItem Header="Remove Empty Polygons" Command="{Binding ProjectEditor.RemoveUnusedPolygonsCommand}"/>
+
+                        <MenuItem Header="Remove Unused Metadata" Command="{Binding ProjectEditor.RemoveUnusedMetadataCommand}"/>
+
+                        <MenuItem Header="Remove Unused Groups" Command="{Binding ProjectEditor.RemoveUnusedGroupsCommand}"/>
+                    </MenuItem>
+
+                    <Separator/>
+
                     <MenuItem Header="Open in Google Earth" Command="{Binding OpenInEarthCommand}" IsEnabled="{Binding HasOpenedProject}" />
                 </MenuItem>
 
@@ -194,23 +210,7 @@
 
                     <Separator/>
 
-                    <MenuItem Header="Cleanup" IsEnabled="{Binding HasOpenedProject}">
-                        <MenuItem Header="Remove Duplicate Metadata" Command="{Binding ProjectEditor.RemoveDuplicateMetadataCommand}"/>
-
-                        <Separator/>
-
-                        <MenuItem Header="Remove Empty Polygons" Command="{Binding ProjectEditor.RemoveUnusedPolygonsCommand}"/>
-
-                        <MenuItem Header="Remove Unused Metadata" Command="{Binding ProjectEditor.RemoveUnusedMetadataCommand}"/>
-
-                        <MenuItem Header="Remove Unused Groups" Command="{Binding ProjectEditor.RemoveUnusedGroupsCommand}"/>
-                    </MenuItem>
-
                     <MenuItem Header="Advanced" IsEnabled="{Binding HasOpenedProject}">
-                        <MenuItem Header="Analyze Project" Command="{Binding ProjectEditor.AnalyzeProjectCommand}"/>
-
-                        <Separator/>
-
                         <MenuItem Header="Rezone Points" Command="{Binding PointEditor.RezonePointsCommand}"/>
                     </MenuItem>
 

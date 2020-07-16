@@ -79,6 +79,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </Page>
+    <None Remove="AnalyzeProjectWindow.xaml" />
     <None Remove="Dialogs\HistoryDialog.xaml" />
     <None Remove="Dialogs\ReindexDialog.xaml" />
     <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />

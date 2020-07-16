@@ -212,7 +212,7 @@ namespace TwoTrails.ViewModels
             #endregion
 
             #region Advanced
-            AnalyzeProjectCommand = new RelayCommand(x => AnalyzeProject());
+            AnalyzeProjectCommand = new RelayCommand(x => AnalyzeProjectDialog.ShowDialog(_Project, _Project.MainModel.MainWindow));
             #endregion
 
             #endregion
@@ -1145,13 +1145,6 @@ namespace TwoTrails.ViewModels
             {
                 MessageBox.Show("There are 0 groups with unassociated points.");
             }
-        }
-        #endregion
-
-        #region Advanced
-        private void AnalyzeProject()
-        {
-            
         }
         #endregion
     }
