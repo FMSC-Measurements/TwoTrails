@@ -41,7 +41,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 PointProperties.UNADJY.SetValue(tup.Item1, tup.Item3);
             }
 
-            _Manager.AddAction(DataActionType.RezonedPoints, null, _ID);
+            _Manager.AddAction(DataActionType.RezonedPoints, $"{NewValues.Count} points rezoned.", _ID);
         }
 
         public override void Undo()

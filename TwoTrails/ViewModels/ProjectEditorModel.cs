@@ -1063,7 +1063,7 @@ namespace TwoTrails.ViewModels
                         foreach (var delMeta in ml.Item2)
                             Manager.DeleteMetadata(delMeta);
                     }
-                    Manager.CommitMultiCommand();
+                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {removedMetaCount} duplicate metadata."));
                 }
             }
             else
@@ -1088,7 +1088,7 @@ namespace TwoTrails.ViewModels
                         Manager.DeletePolygon(poly);
                     }
 
-                    Manager.CommitMultiCommand();
+                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delPolys.Count} empty polygons."));
                 }
             }
             else
@@ -1113,7 +1113,7 @@ namespace TwoTrails.ViewModels
                         Manager.DeleteMetadata(meta);
                     }
 
-                    Manager.CommitMultiCommand();
+                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delMeta.Count} unused metadata."));
                 }
             }
             else
@@ -1138,7 +1138,7 @@ namespace TwoTrails.ViewModels
                         Manager.DeleteGroup(group);
                     }
 
-                    Manager.CommitMultiCommand();
+                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delGroups} unused groups."));
                 }
             }
             else
