@@ -33,22 +33,27 @@ namespace TwoTrails.ViewModels
                 HasMiszonnedPoints = DataHelper.AnalyzeMiszonedPoints(project.Manager);
                 ProgressComplete = 30;
                 OnPropertyChanged(nameof(HasMiszonnedPoints), nameof(ProgressComplete));
+                Thread.Sleep(100);
 
                 HasOrphanedQuondams = DataHelper.AnalyzeOrphanedQuondams(project.Manager);
                 ProgressComplete = 52;
                 OnPropertyChanged(nameof(HasOrphanedQuondams), nameof(ProgressComplete));
+                Thread.Sleep(100);
 
                 HasEmptyPolygons = DataHelper.AnalyzeEmptyPolygons(project.Manager);
                 ProgressComplete = 64;
                 OnPropertyChanged(nameof(HasEmptyPolygons), nameof(ProgressComplete));
+                Thread.Sleep(100);
 
                 HasUnusedMetadata = DataHelper.AnalyzeUnusedMetadata(project.Manager);
                 ProgressComplete = 76;
                 OnPropertyChanged(nameof(HasUnusedMetadata), nameof(ProgressComplete));
+                Thread.Sleep(100);
 
                 HasUnusedGroups = DataHelper.AnalyzeUnusedGroups(project.Manager);
                 ProgressComplete = 88;
                 OnPropertyChanged(nameof(HasUnusedGroups), nameof(ProgressComplete));
+                Thread.Sleep(100);
 
                 HasDuplicateMetadata = DataHelper.AnalyzeDuplicateMetadata(project.Manager);
                 ProgressComplete = 100;
@@ -59,7 +64,7 @@ namespace TwoTrails.ViewModels
                 AnalyzationText = (HasMiszonnedPoints || HasOrphanedQuondams || HasEmptyPolygons || 
                     HasUnusedMetadata || HasUnusedGroups || HasDuplicateMetadata) ? "Issues Found" : "No Issues Found.";
                 Analyzing = false;
-                OnPropertyChanged(nameof(ProgressComplete), nameof(Analyzing));
+                OnPropertyChanged(nameof(ProgressComplete), nameof(Analyzing), nameof(AnalyzationText));
             }).Start();
         }
     }
