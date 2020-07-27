@@ -2344,7 +2344,6 @@ namespace TwoTrails.ViewModels
                 return new SideShotPoint(trav);
             }
 
-
             if (MultipleSelections)
             {
                 List<TtPoint> points = GetSortedSelectedPoints();
@@ -2402,13 +2401,12 @@ namespace TwoTrails.ViewModels
         {
             if (Manager.Polygons.Any(poly => Manager.GetPoints(poly.CN).HasAtLeast(3, p => p.IsBndPoint())))
             {
-                //Project.MainModel.MainWindow.IsEnabled = false;
                 PlotToolInUse = true;
                 CreatePlotsDialog.Show(Project, Project.MainModel.MainWindow, () =>
                 {
                     PlotToolInUse = false;
                     Project.MainModel.MainWindow.Activate();
-                });//, () => Project.MainModel.MainWindow.IsEnabled = true);
+                });
             }
             else
             {
@@ -2449,7 +2447,8 @@ namespace TwoTrails.ViewModels
                 if (MessageBox.Show("This project has unsaved changes. In order to modify the DataDictionary all data must first be saved. Would you like to save now?",
                     "Project Needs Saving", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel) == MessageBoxResult.Yes)
                 {
-                    Project.Save();
+                    if (!Project.Save())
+                        return;
                 }
                 else
                     return;

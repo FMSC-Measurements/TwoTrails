@@ -178,7 +178,7 @@ namespace TwoTrails.ViewModels
             RequiresSave = Manager.CanUndo;
         }
 
-        public void Save()
+        public bool Save()
         {
             if (RequiresSave)
             {
@@ -201,8 +201,11 @@ namespace TwoTrails.ViewModels
                     Trace.WriteLine(ex.Message, "TtProject:Save");
                     MessagePosted?.Invoke(this, "Error Saving Project");
                     MessageBox.Show("Error Saving Project. See Log for details.", "Project Save Error");
+                    return false;
                 }
             }
+
+            return true;
         }
 
         public void ReplaceDAL(ITtDataLayer dal)
