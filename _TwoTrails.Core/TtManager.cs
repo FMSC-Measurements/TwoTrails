@@ -794,13 +794,13 @@ namespace TwoTrails.Core
             }
         }
 
-        protected void AdjustSideShot(SideShotPoint point)
+        protected void AdjustSideShot(SideShotPoint point, IList<TtPoint> points = null)
         {
-            AdjustSideShot(point, _PointsByPoly[point.PolygonCN]);
-        }
+            if (points == null)
+            {
+                points = _PointsByPoly[point.PolygonCN];
+            }
 
-        protected void AdjustSideShot(SideShotPoint point, IList<TtPoint> points)
-        {
             if (point.Index > 0)
             {
                 TtPoint prev;
@@ -832,13 +832,13 @@ namespace TwoTrails.Core
             IgnorePointEvents = false;
         }
 
-        protected void AdjustTraverseFromAfterStart(TtPoint point)
+        private void AdjustTraverseFromAfterStart(TtPoint point, IList<TtPoint> points = null)
         {
-            AdjustTraverseFromAfterStart(point, _PointsByPoly[point.PolygonCN]);
-        }
+            if (points == null)
+            {
+                points = _PointsByPoly[point.PolygonCN];
+            }
 
-        private void AdjustTraverseFromAfterStart(TtPoint point, IList<TtPoint> points)
-        {
             if (point.Index < points.Count - 1 || point.IsGpsAtBase()) // make sure traverse isnt at end
             {
                 for (int i = point.Index - 1; i > -1; i--)
@@ -867,7 +867,6 @@ namespace TwoTrails.Core
         {
             RecalculatePolygons(true);
         }
-
 
         public void RecalculatePolygons(bool waitForUpdates = true)
         {
