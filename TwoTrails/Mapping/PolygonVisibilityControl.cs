@@ -10,7 +10,7 @@ using TwoTrails.Core;
 
 namespace TwoTrails.Mapping
 {
-    public class PolygonVisibilityControl : NotifyPropertyChangedEx
+    public class PolygonVisibilityControl : NotifyPropertyChangedEx, IDisposable
     {
         private ObservableCollection<TtMapPolygonManager> PolygonManagers { get; set; }
 
@@ -195,6 +195,21 @@ namespace TwoTrails.Mapping
         }
 
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposed)
+        {
+            foreach (TtMapPolygonManager pm in PolygonManagers)
+            {
+                pm.PropertyChanged -= PolyManager_PropertyChanged;
+            }
+
+            PolygonManagers.CollectionChanged -= PolygonManagers_CollectionChanged;
+        }
 
         private object locker = new object();
         

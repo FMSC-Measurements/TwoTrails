@@ -13,7 +13,7 @@ using FMSC.GeoSpatial;
 
 namespace TwoTrails.Mapping
 {
-    public class TtMapPolygonManager : NotifyPropertyChangedEx
+    public class TtMapPolygonManager : NotifyPropertyChangedEx, IDisposable
     {
         private const double BOUNDARY_ZOOM_MARGIN = 0.00035;
 
@@ -307,7 +307,7 @@ namespace TwoTrails.Mapping
             _WayPointsVisible = wayPtsVis;
 
 
-            polygon.PolygonChanged += UpdatePolygonShape;
+            Polygon.PolygonChanged += UpdatePolygonShape;
 
             AdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, true, _AdjBndVisible);
             UnAdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, false, _UnAdjBndVisible);
@@ -451,6 +451,24 @@ namespace TwoTrails.Mapping
             foreach (TtMapPoint p in Points)
             {
                 p.Detach();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposed)
+        {
+            Polygon.PolygonChanged -= UpdatePolygonShape;
+
+            ((INotifyCollectionChanged)Points).CollectionChanged -= Points_CollectionChanged;
+
+            foreach (TtMapPoint p in Points)
+            {
+                p.PointSelected -= MapPointSelected;
             }
         }
     }

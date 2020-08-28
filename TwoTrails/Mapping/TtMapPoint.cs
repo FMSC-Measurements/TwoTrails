@@ -17,7 +17,7 @@ namespace TwoTrails.Mapping
     public delegate void MapPointEvent(TtMapPoint point);
     public delegate void MapPointSelectedEvent(TtMapPoint point, bool adjusted);
 
-    public class TtMapPoint : NotifyPropertyChangedEx
+    public class TtMapPoint : NotifyPropertyChangedEx, IDisposable
     {
         public event MapPointEvent LocationChanged;
         public event MapPointSelectedEvent PointSelected;
@@ -365,6 +365,22 @@ namespace TwoTrails.Mapping
         public override string ToString()
         {
             return $"Point {Point.PID}";
+        }
+
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposed)
+        {
+            AdjPushpin.MouseLeftButtonDown -= AdjPushpin_MouseLeftButtonDown;
+            UnAdjPushpin.MouseLeftButtonDown -= UnAdjPushpin_MouseLeftButtonDown;
+
+            AdjPushpin.ToolTipOpening -= LoadAdjToolTip;
+            UnAdjPushpin.ToolTipOpening -= LoadUnAdjToolTip;
         }
     }
 }

@@ -2,12 +2,10 @@
 using FMSC.Core;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
-using NetTopologySuite.IO.GML2;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;

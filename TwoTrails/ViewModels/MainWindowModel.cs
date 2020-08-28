@@ -566,6 +566,8 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                 _Projects.Remove(project.FilePath);
                 project.MessagePosted -= Project_MessagePosted;
             }
+
+            GC.Collect();
         }
 
         private void Project_MessagePosted(Object sender, String message)

@@ -9,13 +9,15 @@ namespace TwoTrails.Mapping
     {
         private TtPolygon _Polygon { get; }
 
-        private MapPolygon MapPolygon { get; } = new MapPolygon();
+        private MapPolygon _MapPolygon { get; } = new MapPolygon();
+
+        private PolygonGraphicOptions _PGO { get; }
 
         private bool _Visible;
         public override bool Visible
         {
             get { return _Visible; }
-            set { SetField(ref _Visible, value, () => MapPolygon.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed); }
+            set { SetField(ref _Visible, value, () => _MapPolygon.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed); }
         }
 
         public bool IsEditing { get; set; }
@@ -24,35 +26,38 @@ namespace TwoTrails.Mapping
         {
             _Polygon = polygon;
             _Visible = visible;
+            _PGO = pgo;
 
-            MapPolygon.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
-            MapPolygon.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed;
+            _MapPolygon.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
+            _MapPolygon.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed;
 
-            MapPolygon.StrokeThickness = adjusted ?
+            _MapPolygon.StrokeThickness = adjusted ?
                 pgo.AdjWidth : pgo.UnAdjWidth;
 
-            MapPolygon.Locations = locations;
+            _MapPolygon.Locations = locations;
 
-            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, int color) =>
+            _PGO.ColorChanged += OnColorChanged;
+
+            map.Children.Add(_MapPolygon);
+        }
+
+        private void OnColorChanged(PolygonGraphicOptions pgo, GraphicCode code, int color)
+        {
+            switch (code)
             {
-                switch (code)
-                {
-                    case GraphicCode.ADJBND_COLOR:
-                        MapPolygon.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
-                        break;
-                    case GraphicCode.UNADJBND_COLOR:
-                        MapPolygon.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.UnAdjBndColor));
-                        break;
-                }
-            };
-
-            map.Children.Add(MapPolygon);
+                case GraphicCode.ADJBND_COLOR:
+                    _MapPolygon.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
+                    break;
+                case GraphicCode.UNADJBND_COLOR:
+                    _MapPolygon.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.UnAdjBndColor));
+                    break;
+            }
         }
 
         protected override void UpdateShape(LocationCollection locations)
         {
             Application.Current.Dispatcher.Invoke(() => {
-                MapPolygon.Locations = locations;
+                _MapPolygon.Locations = locations;
 
                 Map.Refresh();
             });
@@ -60,7 +65,8 @@ namespace TwoTrails.Mapping
 
         public override void Detach()
         {
-            Map.Children.Remove(MapPolygon);
+            _PGO.ColorChanged -= OnColorChanged;
+            Map.Children.Remove(_MapPolygon);
         }
     }
 }

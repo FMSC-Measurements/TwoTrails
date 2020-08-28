@@ -12,9 +12,12 @@ namespace TwoTrails.Controls
     /// </summary>
     public partial class ProjectEditorControl : UserControl
     {
+        private ProjectEditorModel _ProjectEditor;
+
         public ProjectEditorControl(ProjectEditorModel projectEditor, ProjectTabSection tab = ProjectTabSection.Project)
         {
-            this.DataContext = projectEditor;
+            _ProjectEditor = projectEditor;
+            this.DataContext = _ProjectEditor;
 
             InitializeComponent();
 

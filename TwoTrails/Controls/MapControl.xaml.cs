@@ -1,6 +1,7 @@
 ﻿using FMSC.Core.Utilities;
 using FMSC.GeoSpatial.UTM;
 using Microsoft.Maps.MapControl.WPF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -46,45 +47,64 @@ namespace TwoTrails.Controls
             
             map.Mode = new AerialMode();
 
-            map.Loaded += (s, e) =>
-            {
-                if (map.ActualHeight > 0 && MapManager != null)
-                {
-                    IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
-                    if (locs.Any())
-                        map.SetView(locs, new Thickness(30), 0);
-                }
-            };
+            map.Loaded += OnMapLoaded;
+            map.MouseMove += OnMouseMove;
 
-            map.MouseMove += (s, e) =>
-            {
-                Location loc = map.ViewportPointToLocation(e.GetPosition(map));
+            this.Loaded += OnLoaded;
+            this.Unloaded += (s, e) => {
+                map.MouseMove -= OnMouseMove;
 
-                if (IsLatLon)
-                    tbLoc.Text = $"Lat: { loc.Latitude.ToString("F6") }  Lon: { loc.Longitude.ToString("F6") }";
-                else
-                {
-                    UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(loc.Latitude, loc.Longitude,
-                        HasManager ? Manager.DefaultMetadata.Zone : 0);
+                if (PolygonVisibilityControl != null)
+                    PolygonVisibilityControl.Dispose();
 
-                    tbLoc.Text = $"[{ coords.Zone }]  X: { coords.X.ToString("F2") }  Y: { coords.Y.ToString("F2") }";
-                }
-            };
-
-            this.Loaded += (s, e) =>
-            {
-                if (Manager != null && MapManager == null)
-                {
-                    MapManager = new TtMapManager(map, Manager);
-                    PolygonVisibilityControl = new PolygonVisibilityControl(MapManager.PolygonManagers, new PolygonGraphicBrushOptions(null, Manager.GetDefaultPolygonGraphicOption()));
-                    DataContext = this;
-                }
+                if (MapManager != null)
+                    MapManager.Dispose();
             };
         }
+
 
         public MapControl(IObservableTtManager manager) : this()
         {
             Manager = manager;
+        }
+
+        private void OnLoaded(object sender, EventArgs e)
+        {
+            if (Manager != null && MapManager == null)
+            {
+                MapManager = new TtMapManager(map, Manager);
+                PolygonVisibilityControl = new PolygonVisibilityControl(MapManager.PolygonManagers, new PolygonGraphicBrushOptions(null, Manager.GetDefaultPolygonGraphicOption()));
+                DataContext = this;
+            }
+
+            this.Loaded -= OnLoaded;
+        }
+
+        private void OnMapLoaded(object sender, EventArgs e)
+        {
+            if (map.ActualHeight > 0 && MapManager != null)
+            {
+                IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
+                if (locs.Any())
+                    map.SetView(locs, new Thickness(30), 0);
+
+                map.Loaded -= OnMapLoaded;
+            }
+        }
+
+        private void OnMouseMove(object sender, MouseEventArgs e)
+        {
+            Location loc = map.ViewportPointToLocation(e.GetPosition(map));
+
+            if (IsLatLon)
+                tbLoc.Text = $"Lat: { loc.Latitude:F6}  Lon: { loc.Longitude:F6}";
+            else
+            {
+                UTMCoords coords = UTMTools.ConvertLatLonSignedDecToUTM(loc.Latitude, loc.Longitude,
+                    HasManager ? Manager.DefaultMetadata.Zone : 0);
+
+                tbLoc.Text = $"[{ coords.Zone }]  X: { coords.X:F2}  Y: { coords.Y:F2}";
+            }
         }
 
 

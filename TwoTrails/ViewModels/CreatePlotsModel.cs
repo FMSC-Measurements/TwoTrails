@@ -30,7 +30,7 @@ namespace TwoTrails.ViewModels
         public ICommand ExclusionPolygonsSelectedCommand { get; }
 
 
-        public ObservableFilteredCollection<TtPolygon> InclusionPolygons { get; }
+        public ObservableFilteredSortableCollection<TtPolygon, string> InclusionPolygons { get; }
         public ObservableCollection<TtPolygon> ExclusionPolygons { get; }
 
         public List<TtPolygon> IncludedPolygons;
@@ -91,8 +91,10 @@ namespace TwoTrails.ViewModels
             InclusionPolygonsSelectedCommand = new RelayCommand(x => InclusionPolygonsSelected(x as IList));
             ExclusionPolygonsSelectedCommand = new RelayCommand(x => ExclusionPolygonsSelected(x as IList));
             
-            InclusionPolygons = new ObservableFilteredCollection<TtPolygon>(
-                project.Manager.Polygons, p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint()));
+            InclusionPolygons = new ObservableFilteredSortableCollection<TtPolygon, string>(
+                project.Manager.Polygons,
+                p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint()),
+                p => p.Name);
 
             ExclusionPolygons = new ObservableCollection<TtPolygon>();
             

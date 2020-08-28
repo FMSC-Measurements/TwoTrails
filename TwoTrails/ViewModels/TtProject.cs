@@ -12,7 +12,7 @@ using TwoTrails.Dialogs;
 
 namespace TwoTrails.ViewModels
 {
-    public class TtProject : NotifyPropertyChangedEx
+    public class TtProject : NotifyPropertyChangedEx, IDisposable
     {
         public event EventHandler<string> MessagePosted;
 
@@ -111,10 +111,7 @@ namespace TwoTrails.ViewModels
             ProjectInfo = dal.GetProjectInfo();
             _ProjectInfo = new TtProjectInfo(ProjectInfo);
 
-            ProjectInfo.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
-            {
-                ProjectChanged = !_ProjectInfo.Equals(ProjectInfo);
-            };
+            ProjectInfo.PropertyChanged += ProjectInfoChanged;
 
             RequiresSave = false;
 
@@ -171,6 +168,11 @@ namespace TwoTrails.ViewModels
             OpenMapWindowCommand = new RelayCommand(x => OpenMapWindow());
 
             ProjectTab = new ProjectTab(this);
+        }
+
+        private void ProjectInfoChanged(object sender, PropertyChangedEventArgs e)
+        {
+            ProjectChanged = !_ProjectInfo.Equals(ProjectInfo);
         }
 
         private void Manager_HistoryChanged(object sender, EventArgs e)
@@ -353,6 +355,17 @@ namespace TwoTrails.ViewModels
             {
                 MainModel.SwitchToTab(UserActivityTab);
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposed)
+        {
+            ProjectInfo.PropertyChanged -= ProjectInfoChanged;
         }
     }
 }

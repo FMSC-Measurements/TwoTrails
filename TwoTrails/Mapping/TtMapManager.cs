@@ -14,7 +14,7 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.Mapping
 {
-    public class TtMapManager
+    public class TtMapManager : IDisposable
     {
         private Dictionary<string, ObservableCollection<TtPoint>> _PointsByPolys = new Dictionary<string, ObservableCollection<TtPoint>>();
         private Dictionary<string, TtMapPolygonManager> _PolygonManagers = new Dictionary<string, TtMapPolygonManager>();
@@ -180,7 +180,10 @@ namespace TwoTrails.Mapping
         private void RemoveMapPolygon(TtPolygon polygon)
         {
             TtMapPolygonManager mpm = _PolygonManagers[polygon.CN];
+
+            mpm.PropertyChanged -= TtMapPolygonManager_PropertyChanged;
             mpm.Detach();
+
             PolygonManagers.Remove(mpm);
             _PolygonManagers.Remove(polygon.CN);
             _PointsByPolys.Remove(polygon.CN);
@@ -252,6 +255,32 @@ namespace TwoTrails.Mapping
                 points.Insert(point.Index, point);
             else
                 points.Add(point);
+        }
+
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposed)
+        {
+            if (_Points != null)
+                ((INotifyCollectionChanged)_Points).CollectionChanged -= Points_CollectionChanged;
+            if (_Polygons != null)
+                ((INotifyCollectionChanged)_Polygons).CollectionChanged -= Polygons_CollectionChanged;
+
+            foreach (TtMapPolygonManager mpm in _PolygonManagers.Values)
+            {
+                mpm.PropertyChanged -= TtMapPolygonManager_PropertyChanged;
+                mpm.Detach();
+            }
+
+            foreach (TtPoint point in _Points)
+            {
+                point.PolygonChanged -= Point_PolygonChanged;
+            }
         }
     }
 }
