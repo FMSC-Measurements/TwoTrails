@@ -45,6 +45,6 @@ namespace TwoTrails.Core
         public const string URL_FMSC = @"https://www.fs.fed.us/forestmanagement/products/measurement/";
 
         public const String EMAIL_SUBJECT = "TwoTrails Error Report";
-        public const String EMAIL_BODY = "I am experiencing issues in TwoTrails Android and would like to report it to the development team.%0A%0ANotes: ";
+        public const String EMAIL_BODY = "I am experiencing issues in TwoTrails PC Android Support and would like to report it to the development team.%0A%0ANotes: ";
     }
 }
