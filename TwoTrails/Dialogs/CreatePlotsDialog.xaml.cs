@@ -35,8 +35,6 @@ namespace TwoTrails.Dialogs
 
             if (owner != null)
                 dialog.Owner = owner;
-            else
-                dialog.Owner = project.MainModel.MainWindow;
 
             return dialog.ShowDialog();
         }
@@ -47,8 +45,6 @@ namespace TwoTrails.Dialogs
 
             if (owner != null)
                 dialog.Owner = owner;
-            else
-                dialog.Owner = project.MainModel.MainWindow;
 
             if (onClose != null)
             {

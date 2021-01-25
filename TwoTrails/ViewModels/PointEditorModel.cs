@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -78,34 +79,32 @@ namespace TwoTrails.ViewModels
             nameof(Comment),
             nameof(SameComment)
         };
-        
-        private bool CtrlKeyPressed { get; set; }
         #endregion
 
         #region Commands
         public ICommand RefreshPoints { get; }
 
-        public RelayCommand CreatePointCommand { get; }
-        public RelayCommand CreateQuondamsCommand { get; }
-        public RelayCommand DeleteCommand { get; }
-        public RelayCommand RenamePointsCommand { get; }
-        public RelayCommand ConvertPointsCommand { get; }
-        public RelayCommand ResetPointCommand { get; }
-        public RelayCommand ResetPointFieldCommand { get; }
-        public RelayCommand ChangeQuondamParentCommand { get; }
+        public BindedRelayCommand<PointEditorModel> CreatePointCommand { get; }
+        public BindedRelayCommand<PointEditorModel> CreateQuondamsCommand { get; }
+        public BindedRelayCommand<PointEditorModel> DeleteCommand { get; }
+        public BindedRelayCommand<PointEditorModel> RenamePointsCommand { get; }
+        public BindedRelayCommand<PointEditorModel> ConvertPointsCommand { get; }
+        public BindedRelayCommand<PointEditorModel> ResetPointCommand { get; }
+        public BindedRelayCommand<PointEditorModel> ResetPointFieldCommand { get; }
+        public BindedRelayCommand<PointEditorModel> ChangeQuondamParentCommand { get; }
 
-        public RelayCommand MovePointsCommand { get; }
-        public RelayCommand ReverseSelectedCommand { get; }
-        public RelayCommand ReindexCommand { get; }
-        public RelayCommand RetraceCommand { get; }
+        public BindedRelayCommand<PointEditorModel> MovePointsCommand { get; }
+        public BindedRelayCommand<PointEditorModel> ReverseSelectedCommand { get; }
+        public BindedRelayCommand<PointEditorModel> ReindexCommand { get; }
+        public BindedRelayCommand<PointEditorModel> RetraceCommand { get; }
 
-        public RelayCommand CreatePlotsCommand { get; }
-        public RelayCommand CreateSubsampleCommand { get; }
-        public RelayCommand CreateCorridorCommand { get; }
-        public RelayCommand CreateDoubleSidedCorridorCommand { get; }
+        public BindedRelayCommand<PointEditorModel> CreatePlotsCommand { get; }
+        public BindedRelayCommand<PointEditorModel> CreateSubsampleCommand { get; }
+        public BindedRelayCommand<PointEditorModel> CreateCorridorCommand { get; }
+        public BindedRelayCommand<PointEditorModel> CreateDoubleSidedCorridorCommand { get; }
         public RelayCommand ModifyDataDictionaryCommand { get; }
 
-        public RelayCommand RezonePointsCommand { get; }
+        public BindedRelayCommand<PointEditorModel> RezonePointsCommand { get; }
 
         public RelayCommand SelectAlternateCommand { get; }
         public RelayCommand SelectGpsCommand { get; }
@@ -115,8 +114,8 @@ namespace TwoTrails.ViewModels
         public RelayCommand SelectNon3DPointsCommand { get; }
         public RelayCommand SelectGpsPointsWithoutNmeaCommand { get; }
 
-        public ICommand CopyCellValueCommand { get; }
-        public ICommand ExportValuesCommand { get; }
+        public BindedRelayCommand<PointEditorModel> CopyCellValueCommand { get; }
+        public BindedRelayCommand<PointEditorModel> ExportValuesCommand { get; }
         public ICommand ViewPointDetailsCommand { get; }
         public ICommand ViewSatInfoCommand { get; }
         public ICommand UpdateAdvInfo { get; }
@@ -132,7 +131,10 @@ namespace TwoTrails.ViewModels
 
         public TtProject Project { get; }
         public TtHistoryManager Manager { get; }
-        
+
+        private readonly ProjectEditorModel _ProjectEditor;
+        private MainWindowModel MainModel => _ProjectEditor.MainModel;
+
         public bool HasSelection
         {
             get { return SelectedPoints != null && SelectedPoints.Count > 0; }
@@ -161,8 +163,11 @@ namespace TwoTrails.ViewModels
         {
             if (_SelectionChanged)
             {
-                _SortedSelectedPoints = _SelectedPoints.Cast<TtPoint>().ToList();
-                _SortedSelectedPoints.Sort();
+                if (_SelectedPoints != null)
+                {
+                    _SortedSelectedPoints = _SelectedPoints.Cast<TtPoint>().ToList();
+                    _SortedSelectedPoints.Sort();
+                }
                 _SelectionChanged = false;
             }
 
@@ -183,7 +188,9 @@ namespace TwoTrails.ViewModels
         public bool HasPossibleDoubleSidedCorridor { get; private set; }
 
         private bool ignoreSelectionChange = false, settingFields = false;
-        
+
+        private TtPolygon _TargetPolygon { get; set; }
+
         public String ConvertTypeHeader
         {
             get
@@ -231,7 +238,7 @@ namespace TwoTrails.ViewModels
             private set { SetField(ref _VisibleFields, value); }
         }
 
-        public ObservableCollection<MenuItem> AdvInfoItems { get; }
+        public ObservableCollection<MenuItem> AdvInfoItems { get; private set; }
 
         #region ToolsProperties
         public bool PlotToolInUse
@@ -364,12 +371,12 @@ namespace TwoTrails.ViewModels
 
         private MenuItem[] GenerateAdvInfoItems()
         {
-            MenuItem GenerateAdvInfoMenuItem(string headerStringFormat, string propertyName, Action action)
+            MenuItem GenerateAdvInfoMenuItem(string headerStringFormat, string propertyName, Action<object> action)
             {
                 MenuItem mi = new MenuItem()
                 {
                     HeaderStringFormat = headerStringFormat,
-                    Command = new RelayCommand(x => action()),
+                    Command = new RelayCommand(action),
                 };
 
                 BindingOperations.SetBinding(mi, MenuItem.HeaderProperty, new Binding()
@@ -392,14 +399,14 @@ namespace TwoTrails.ViewModels
 
             return new MenuItem[]
             {
-                GenerateAdvInfoMenuItem("Dist (Ft):      {0:#,0.0000}", nameof(AI_DistFt), () => Clipboard.SetText(AI_DistFt.ToString())),
-                GenerateAdvInfoMenuItem("Dist (Mt):      {0:#,0.0000}", nameof(AI_DistMt), () => Clipboard.SetText(AI_DistMt.ToString())),
-                GenerateAdvInfoMenuItem("Azimuth (Mag):  {0:#,0.00}", nameof(AI_Az), () => Clipboard.SetText(AI_Az.ToString())),
-                GenerateAdvInfoMenuItem("Azimuth (True): {0:#,0.00}", nameof(AI_AzTrue), () => Clipboard.SetText(AI_AzTrue.ToString())),
-                GenerateAdvInfoMenuItem("Center (L/L):   {0}", nameof(AI_CenterLL), () => Clipboard.SetText(AI_CenterLL)),
-                GenerateAdvInfoMenuItem("Center (UTM):   {0}", nameof(AI_CenterUTM), () => Clipboard.SetText(AI_CenterUTM)),
-                GenerateAdvInfoMenuItem("Average (L/L):  {0}", nameof(AI_AverageLL), () => Clipboard.SetText(AI_AverageLL)),
-                GenerateAdvInfoMenuItem("Average (UTM):  {0}", nameof(AI_AverageUTM), () => Clipboard.SetText(AI_AverageUTM))
+                GenerateAdvInfoMenuItem("Dist (Ft):      {0:#,0.0000}", nameof(AI_DistFt), x => Clipboard.SetText(AI_DistFt.ToString())),
+                GenerateAdvInfoMenuItem("Dist (Mt):      {0:#,0.0000}", nameof(AI_DistMt), x => Clipboard.SetText(AI_DistMt.ToString())),
+                GenerateAdvInfoMenuItem("Azimuth (Mag):  {0:#,0.00}", nameof(AI_Az), x => Clipboard.SetText(AI_Az.ToString())),
+                GenerateAdvInfoMenuItem("Azimuth (True): {0:#,0.00}", nameof(AI_AzTrue), x => Clipboard.SetText(AI_AzTrue.ToString())),
+                GenerateAdvInfoMenuItem("Center (L/L):   {0}", nameof(AI_CenterLL), x => Clipboard.SetText(AI_CenterLL)),
+                GenerateAdvInfoMenuItem("Center (UTM):   {0}", nameof(AI_CenterUTM), x => Clipboard.SetText(AI_CenterUTM)),
+                GenerateAdvInfoMenuItem("Average (L/L):  {0}", nameof(AI_AverageLL), x => Clipboard.SetText(AI_AverageLL)),
+                GenerateAdvInfoMenuItem("Average (UTM):  {0}", nameof(AI_AverageUTM), x => Clipboard.SetText(AI_AverageUTM))
             };
         }
         
@@ -803,26 +810,18 @@ namespace TwoTrails.ViewModels
         #endregion
 
 
-        public PointEditorModel(TtProject project)
+        public PointEditorModel(TtProject project, ProjectEditorModel projectEditor)
         {
-            EventManager.RegisterClassHandler(typeof(Control), Control.KeyDownEvent, new KeyEventHandler((s, e) => {
-                if (e.Key == Key.LeftCtrl)
-                    CtrlKeyPressed = true;
-            }), true);
-            
-            EventManager.RegisterClassHandler(typeof(Control), Control.KeyUpEvent, new KeyEventHandler((s, e) => {
-                if (e.Key == Key.LeftCtrl)
-                    CtrlKeyPressed = false;
-            }), true);
-
             Project = project;
-            Manager = project.Manager;
-            Manager.HistoryChanged += (s, e) =>
-            {
-                if (e.RequireRefresh)
-                    Points.Refresh();
-                OnSelectionChanged();
-            };
+            _ProjectEditor = projectEditor;
+
+            Manager = project.HistoryManager;
+            Manager.HistoryChanged += Manager_HistoryChanged;
+
+            //EventManager.RegisterClassHandler(typeof(Control), Control.KeyDownEvent, new KeyEventHandler(OnKeyDown), true);
+            
+            //EventManager.RegisterClassHandler(typeof(Control), Control.KeyUpEvent, new KeyEventHandler(OnKeyUp), true);
+
 
             #region Setup Filters
             CheckedListItem<TtPolygon> tmpPoly;
@@ -860,13 +859,13 @@ namespace TwoTrails.ViewModels
             CheckedListItem<TtGroup> tmpGroup;
             tmpGroup = new CheckedListItem<TtGroup>(new TtGroup() { Name = "All", CN = Consts.FullGuid }, true);
             _Groups.Add(tmpGroup);
-            tmpGroup.ItemCheckedChanged += Group_ItemCheckedChanged;
+            tmpGroup.ItemCheckedChanged += Groups_ItemCheckedChanged;
 
             foreach (TtGroup group in Manager.Groups)
             {
                 tmpGroup = new CheckedListItem<TtGroup>(group, true);
                 _Groups.Add(tmpGroup);
-                tmpGroup.ItemCheckedChanged += Group_ItemCheckedChanged;
+                tmpGroup.ItemCheckedChanged += Groups_ItemCheckedChanged;
                 _CheckedGroups.Add(group.CN, true);
             }
 
@@ -905,14 +904,14 @@ namespace TwoTrails.ViewModels
             RefreshPoints = new RelayCommand(x => Points.Refresh());
 
             #region Create Edit Delete Reset
-            CreatePointCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
+            CreatePointCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CreateNewPoint(x != null ? (OpType)x : OpType.GPS),
                 x => Manager.Polygons.Count > 0,
-                Manager.Polygons, x => x.Count);
+                this, m => m.Polygons.Count);
 
             CreateQuondamsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CreateQuondams(), x => HasSelection,
-                this, x => x.HasSelection);
+                this, m => m.HasSelection);
 
             DeleteCommand = new BindedRelayCommand<PointEditorModel>(
                 x => DeletePoint(), x => HasSelection,
@@ -920,71 +919,151 @@ namespace TwoTrails.ViewModels
 
             RenamePointsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => RenamePoints(), x => MultipleSelections && SamePolygon,
-                this, x => x.MultipleSelections);
+                this, m => m.MultipleSelections);
 
             ConvertPointsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ConvertPoints(), x => OnlyQuondams || OnlyTravTypes,
-                this, x => new { x.OnlyQuondams, x.OnlyTravTypes });
+                this, m => new { m.OnlyQuondams, m.OnlyTravTypes });
 
             ResetPointCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ResetPoint(), x => HasSelection,
-                this, x => x.HasSelection);
+                this, m => m.HasSelection);
 
             ResetPointFieldCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ResetPointField(x as DataGrid), x => HasSelection,
-                this, x => x.HasSelection);
+                this, m => m.HasSelection);
 
             ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ChangeQuondamParent(), x => OnlyQuondams && !MultipleSelections,
-                this, x => new { x.OnlyQuondams, x.MultipleSelections });
+                this, m => new { OnlyQuondams, MultipleSelections });
+
+
+
+            //CreatePointCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.CreateNewPoint(x != null ? (OpType)x : OpType.GPS),
+            //    (x, m) => m.Manager.Polygons.Count > 0,
+            //    this, m => m.Manager.Polygons.Count);
+
+            //CreateQuondamsCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => CreateQuondams(), (x, m) => m.HasSelection,
+            //    this, m => m.HasSelection);
+
+            //DeleteCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => DeletePoint(), (x, m) => m.HasSelection,
+            //    this, x => x.HasSelection);
+
+            //RenamePointsCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.RenamePoints(), (x, m) => m.MultipleSelections && m.SamePolygon,
+            //    this, m => m.MultipleSelections);
+
+            //ConvertPointsCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.ConvertPoints(), (x, m) => m.OnlyQuondams || m.OnlyTravTypes,
+            //    this, m => new { m.OnlyQuondams, m.OnlyTravTypes });
+
+            //ResetPointCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.ResetPoint(), (x, m) => m.HasSelection,
+            //    this, m => m.HasSelection);
+
+            //ResetPointFieldCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.ResetPointField(x as DataGrid), (x, m) => m.HasSelection,
+            //    this, m => m.HasSelection);
+
+            //ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.ChangeQuondamParent(), (x, m) => m.OnlyQuondams && !m.MultipleSelections,
+            //    this, m => new { m.OnlyQuondams, m.MultipleSelections });
             #endregion
 
             #region Move Reverse Reindex Retrace
             MovePointsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => MovePoints(), x => HasSelection,
-                this, x => x.HasSelection);
+                this, m => m.HasSelection);
 
             ReverseSelectedCommand = new BindedRelayCommand<PointEditorModel>(
                 x => { if (SelectedPoints.Count > 2) ReverseSelection(); else SwapPoints(); },
                 x => MultipleSelections && SamePolygon,
-                this, x => x.MultipleSelections);
+                this, m => m.MultipleSelections);
 
-            ReindexCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPoint>>(
+            ReindexCommand = new BindedRelayCommand<PointEditorModel>(
                 x => Reindex(), x => Manager.Points.Count > 0,
-                Manager.Points, x => x.Count);
+                this, m => m.Manager.Points.Count);
 
-            RetraceCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPoint>>(
+            RetraceCommand = new BindedRelayCommand<PointEditorModel>(
                 x => Retrace(), x => Manager.Points.Count > 0,
-                Manager.Points, x => x.Count);
+                this, m => m.Manager.Points.Count);
+
+
+            //MovePointsCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.MovePoints(), (x, m) => m.HasSelection,
+            //    this, m => m.HasSelection);
+
+            //ReverseSelectedCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => { if (m.SelectedPoints.Count > 2) m.ReverseSelection(); else m.SwapPoints(); },
+            //    (x, m) => m.MultipleSelections && m.SamePolygon,
+            //    this, m => m.MultipleSelections);
+
+            //ReindexCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.Reindex(), (x, m) => m.Manager.Points.Count > 0,
+            //    this, m => m.Manager.Points.Count);
+
+            //RetraceCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.Retrace(), (x, m) => m.Manager.Points.Count > 0,
+            //    this, m => m.Manager.Points.Count);
             #endregion
 
             #region Plot Corridors DataDictionary
-            CreatePlotsCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
+            CreatePlotsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CreatePlots(),
                 x => Manager.Polygons.Count > 0 && !PlotToolInUse,
-                Manager.Polygons, x => x.Count);
+                this, m => m.Manager.Polygons.Count);
 
-            CreateSubsampleCommand = new BindedRelayCommand<ReadOnlyObservableCollection<TtPolygon>>(
+            CreateSubsampleCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CreateSubsample(),
                 x => Manager.Polygons.Count > 0 && !PlotToolInUse,
-                Manager.Polygons, x => x.Count);
+                this, m => m.Manager.Polygons.Count);
 
             CreateCorridorCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CreateCorridor(), x => HasPossibleCorridor,
-                this, x => x.HasPossibleCorridor);
+                this, m => m.HasPossibleCorridor);
 
             CreateDoubleSidedCorridorCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CreateDoubleSidedCorridor(), x => HasPossibleDoubleSidedCorridor,
-                this, x => x.HasPossibleDoubleSidedCorridor);
+                this, m => m.HasPossibleDoubleSidedCorridor);
+
+
+
+            //CreatePlotsCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.CreatePlots(),
+            //    (x, m) => m.Manager.Polygons.Count > 0 && !m.PlotToolInUse,
+            //    this, m => m.Manager.Polygons.Count);
+
+            //CreateSubsampleCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.CreateSubsample(),
+            //    (x, m) => m.Manager.Polygons.Count > 0 && !m.PlotToolInUse,
+            //    this, m => m.Manager.Polygons.Count);
+
+            //CreateCorridorCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.CreateCorridor(), (x, m) => m.HasPossibleCorridor,
+            //    this, m => m.HasPossibleCorridor);
+
+            //CreateDoubleSidedCorridorCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.CreateDoubleSidedCorridor(), (x, m) => m.HasPossibleDoubleSidedCorridor,
+            //    this, m => m.HasPossibleDoubleSidedCorridor);
+
+
 
             ModifyDataDictionaryCommand = new RelayCommand(x => ModifyDataDictionary());
             #endregion
 
             #region Advanced
             RezonePointsCommand = new BindedRelayCommand<PointEditorModel>(
-                x => RezonePoints(),
-                x => HasSelection,
-                this, x => x.HasSelection);
+                x => RezonePoints(), x => HasSelection,
+                this, m => m.HasSelection);
+
+
+
+            //RezonePointsCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.RezonePoints(), (x, m) => m.HasSelection,
+            //    this, m => m.HasSelection);
 
             #endregion
 
@@ -1007,17 +1086,33 @@ namespace TwoTrails.ViewModels
             #region Copy Export Info
             CopyCellValueCommand = new BindedRelayCommand<PointEditorModel>(
                 x => CopyCellValue(x as DataGrid), x => HasSelection,
-                this, x => x.HasSelection);
+                this, m => m.HasSelection);
 
             ExportValuesCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ExportValues(x as DataGrid), x => HasSelection,
-                this, x => x.HasSelection);
+                this, m => m.HasSelection);
 
             ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
 
             ViewSatInfoCommand = new BindedRelayCommand<PointEditorModel>(
-                x => ViewSafeInfo(), x => _SelectedPoints.Cast<TtPoint>().Any(pt => pt.IsGpsType()),
-                this, x => x.SelectedPoints);
+                x => ViewSafeInfo(), x => GetSortedSelectedPoints().Any(pt => pt.IsGpsType()),
+                this, m => m.SelectedPoints);
+
+
+            //CopyCellValueCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.CopyCellValue(x as DataGrid), (x, m) => m.HasSelection,
+            //    this, m => m.HasSelection);
+
+            //ExportValuesCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.ExportValues(x as DataGrid), (x, m) => m.HasSelection,
+            //    this, m => m.HasSelection);
+
+            //ViewPointDetailsCommand = new RelayCommand(x => ViewPointDetails());
+
+            //ViewSatInfoCommand = new BindedRelayCommand<PointEditorModel>(
+            //    (x, m) => m.ViewSafeInfo(), (x, m) => m.GetSortedSelectedPoints().Any(pt => pt.IsGpsType()),
+            //    this, m => m.SelectedPoints);
+
 
             UpdateAdvInfo = new RelayCommand(x => UpdateAdvInfoItems());
             #endregion
@@ -1030,7 +1125,6 @@ namespace TwoTrails.ViewModels
 
             SetupUI();
         }
-
 
         private void SetupUI()
         {
@@ -1074,38 +1168,22 @@ namespace TwoTrails.ViewModels
                 new MenuItem()
                 {
                     Header = "Default Fields",
-                    Command = new RelayCommand(x =>
-                    {
-                        foreach (DataGridTextColumn col in DataColumns)
-                            col.Visibility = IsDefaultField((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
-                    })
+                    Command = new RelayCommand(x => ShowDefaultFields())
                 },
                 new MenuItem()
                 {
                     Header = "Extended Fields",
-                    Command = new RelayCommand(x =>
-                    {
-                        foreach (DataGridTextColumn col in DataColumns)
-                            col.Visibility = IsExtendedField((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
-                    })
+                    Command = new RelayCommand(x => ShowExtendedFields())
                 },
                 new MenuItem()
                 {
                     Header = "Default + Extended Fields",
-                    Command = new RelayCommand(x =>
-                    {
-                        foreach (DataGridTextColumn col in DataColumns)
-                            col.Visibility = IsDefaultOrExtendedField((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
-                    })
+                    Command = new RelayCommand(x => ShowDefaultAndExtendedFields())
                 },
                 new MenuItem()
                 {
                     Header = "All Fields",
-                    Command = new RelayCommand(x =>
-                    {
-                        foreach (DataGridTextColumn col in DataColumns)
-                            col.Visibility = Visibility.Visible;
-                    })
+                    Command = new RelayCommand(x => ShowAllFields())
                 },
                 new Separator()
             });
@@ -1138,43 +1216,139 @@ namespace TwoTrails.ViewModels
 
             if (ExtendedData != null)
             {
-                ExtendedData.PropertyChanged += (sender, e) =>
-                {
-                    if (!settingFields)
-                    {
-                        if (MultipleSelections)
-                        {
-                            _ExtendedDataSame[e.PropertyName] = true;
-
-                            object val = _ExtendedData[e.PropertyName];
-                            foreach (TtPoint point in SelectedPoints)
-                                point.ExtendedData[e.PropertyName] = val;
-                        }
-                        else
-                        {
-                            //if (!SelectedPoint.ExtendedData[e.PropertyName].Equals(_ExtendedData[e.PropertyName]))
-                            //{
-                            //    if (MultipleSelections)
-                            //    {
-                            //        //Manager.EditPoints(SelectedPoints.Cast<TtPoint>(), property, newValue);
-                            //    }
-                            //    else
-                            //    {
-                            //        //Manager.EditPoint(SelectedPoint, property, newValue);
-                            //    }
-                            //}
-                            
-                            Manager.EditPoint(SelectedPoint, PointProperties.EXTENDED_DATA, new Core.DataDictionary(SelectedPoint.CN, _ExtendedData));
-                            //SelectedPoint.ExtendedData[e.PropertyName] = _ExtendedData[e.PropertyName];
-                        }
-                    }
-
-                    OnPropertyChanged(e.PropertyName);
-                }; 
+                ExtendedData.PropertyChanged += ExtendedData_PropertyChanged;
             }
             #endregion
 
             UpdateAdvInfoItems();
+        }
+
+
+        protected override void Dispose(bool disposing)
+        {
+            Manager.HistoryChanged -= Manager_HistoryChanged;
+
+            ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged -= Polygons_CollectionChanged;
+            foreach (CheckedListItem<TtPolygon> poly in _Polygons)
+            {
+                poly.ItemCheckedChanged -= Polygon_ItemCheckedChanged;
+            }
+
+            ((INotifyCollectionChanged)Manager.Metadata).CollectionChanged -= Metadata_CollectionChanged;
+            foreach (CheckedListItem<TtMetadata> meta in _Metadatas)
+            {
+                meta.ItemCheckedChanged -= Metadata_ItemCheckedChanged;
+            }
+
+            ((INotifyCollectionChanged)Manager.Groups).CollectionChanged -= Groups_CollectionChanged;
+            foreach (CheckedListItem<TtGroup> group in _Groups)
+            {
+                group.ItemCheckedChanged -= Groups_ItemCheckedChanged;
+            }
+
+            foreach (CheckedListItem<string> opt in _OpTypes)
+            {
+                opt.ItemCheckedChanged -= OpType_ItemCheckedChanged;
+            }
+
+            if (ExtendedData != null)
+            {
+                ExtendedData.PropertyChanged -= ExtendedData_PropertyChanged;
+            }
+
+            foreach (MenuItem mi in AdvInfoItems)
+            {
+                BindingOperations.ClearAllBindings(mi);
+            }
+            AdvInfoItems = null;
+
+            foreach (MenuItem mi in VisibleFields.Where(vf => vf is MenuItem))
+            {
+                BindingOperations.ClearAllBindings(mi);
+            }
+            VisibleFields = null;
+
+            foreach (DataGridColumn dgc in DataColumns)
+            {
+                BindingOperations.ClearAllBindings(dgc);
+            }
+            DataColumns = null;
+
+            //Points = null;
+
+            //AdvInfoItems.Clear();
+            //VisibleFields.Clear();
+            //DataColumns.Clear();
+
+            CreatePointCommand.Dispose();
+            CreateQuondamsCommand.Dispose();
+            DeleteCommand.Dispose();
+            RenamePointsCommand.Dispose();
+            ConvertPointsCommand.Dispose();
+            ResetPointCommand.Dispose();
+            ResetPointFieldCommand.Dispose();
+            ChangeQuondamParentCommand.Dispose();
+
+            MovePointsCommand.Dispose();
+            ReverseSelectedCommand.Dispose();
+            ReindexCommand.Dispose();
+            RetraceCommand.Dispose();
+
+            CreatePlotsCommand.Dispose();
+            CreateSubsampleCommand.Dispose();
+            CreateCorridorCommand.Dispose();
+            CreateDoubleSidedCorridorCommand.Dispose();
+
+            CopyCellValueCommand.Dispose();
+            RezonePointsCommand.Dispose();
+
+            ExtendedDataFields.Clear();
+
+            _Polygons.Clear();
+            _Metadatas.Clear();
+            _Groups.Clear();
+        }
+
+
+        private void Manager_HistoryChanged(object sender, HistoryEventArgs e)
+        {
+            if (e.RequireRefresh)
+                Points.Refresh();
+            OnSelectionChanged();
+        }
+
+        private void ExtendedData_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!settingFields)
+            {
+                if (MultipleSelections)
+                {
+                    _ExtendedDataSame[e.PropertyName] = true;
+
+                    object val = _ExtendedData[e.PropertyName];
+                    foreach (TtPoint point in SelectedPoints)
+                        point.ExtendedData[e.PropertyName] = val;
+                }
+                else
+                {
+                    //if (!SelectedPoint.ExtendedData[e.PropertyName].Equals(_ExtendedData[e.PropertyName]))
+                    //{
+                    //    if (MultipleSelections)
+                    //    {
+                    //        //Manager.EditPoints(SelectedPoints.Cast<TtPoint>(), property, newValue);
+                    //    }
+                    //    else
+                    //    {
+                    //        //Manager.EditPoint(SelectedPoint, property, newValue);
+                    //    }
+                    //}
+
+                    Manager.EditPoint(SelectedPoint, PointProperties.EXTENDED_DATA, new Core.DataDictionary(SelectedPoint.CN, _ExtendedData));
+                    //SelectedPoint.ExtendedData[e.PropertyName] = _ExtendedData[e.PropertyName];
+                }
+            }
+
+            OnPropertyChanged(e.PropertyName);
         }
 
 
@@ -1201,6 +1375,7 @@ namespace TwoTrails.ViewModels
                     {
                         if (_Polygons[i].Item == polygon)
                         {
+                            _Polygons[i].ItemCheckedChanged -= Polygon_ItemCheckedChanged;
                             _Polygons.RemoveAt(i);
                             _CheckedPolygons.Remove(polygon.CN);
                             break;
@@ -1212,7 +1387,7 @@ namespace TwoTrails.ViewModels
 
         private void Polygon_ItemCheckedChanged(object sender, EventArgs e)
         {
-            if (CtrlKeyPressed)
+            if (_ProjectEditor.CtrlKeyPressed)
                 OnlyCheckThisItem(sender, ref _CheckedPolygons, ref _Polygons);
             else
                 UpdateCheckedItems(sender, ref _CheckedPolygons, ref _Polygons);
@@ -1240,6 +1415,7 @@ namespace TwoTrails.ViewModels
                     {
                         if (_Metadatas[i].Item == Metadata)
                         {
+                            _Metadatas[i].ItemCheckedChanged -= Metadata_ItemCheckedChanged;
                             _Metadatas.RemoveAt(i);
                             _CheckedMetadata.Remove(Metadata.CN);
                             break;
@@ -1251,7 +1427,7 @@ namespace TwoTrails.ViewModels
 
         private void Metadata_ItemCheckedChanged(object sender, EventArgs e)
         {
-            if (CtrlKeyPressed)
+            if (_ProjectEditor.CtrlKeyPressed)
                 OnlyCheckThisItem(sender, ref _CheckedMetadata, ref _Metadatas);
             else
                 UpdateCheckedItems(sender, ref _CheckedMetadata, ref _Metadatas);
@@ -1268,7 +1444,7 @@ namespace TwoTrails.ViewModels
                     tmp = new CheckedListItem<TtGroup>(Group, true);
                     _Groups.Add(tmp);
                     _CheckedGroups.Add(Group.CN, true);
-                    tmp.ItemCheckedChanged += Group_ItemCheckedChanged;
+                    tmp.ItemCheckedChanged += Groups_ItemCheckedChanged;
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -1279,6 +1455,7 @@ namespace TwoTrails.ViewModels
                     {
                         if (_Groups[i].Item == Group)
                         {
+                            _Groups[i].ItemCheckedChanged -= Groups_ItemCheckedChanged;
                             _Groups.RemoveAt(i);
                             _CheckedGroups.Remove(Group.CN);
                             break;
@@ -1288,9 +1465,9 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void Group_ItemCheckedChanged(object sender, EventArgs e)
+        private void Groups_ItemCheckedChanged(object sender, EventArgs e)
         {
-            if (CtrlKeyPressed)
+            if (_ProjectEditor.CtrlKeyPressed)
                 OnlyCheckThisItem(sender, ref _CheckedGroups, ref _Groups);
             else
                 UpdateCheckedItems(sender, ref _CheckedGroups, ref _Groups);
@@ -1366,7 +1543,7 @@ namespace TwoTrails.ViewModels
             {
                 if (cp.Item != "All")
                 {
-                    if (CtrlKeyPressed)
+                    if (_ProjectEditor.CtrlKeyPressed)
                     {
                         foreach (CheckedListItem<string> item in _OpTypes)
                         {
@@ -1988,7 +2165,7 @@ namespace TwoTrails.ViewModels
                     !MultipleSelections && (SelectedPoint is QuondamPoint sp) ? sp.ParentPoint : null,
                     new List<TtPoint>(SelectedPoints.Cast<TtPoint>()))
                 {
-                    Owner = Project.MainModel.MainWindow
+                    Owner = MainModel.MainWindow
                 };
 
                 if (spd.ShowDialog() == true)
@@ -2011,11 +2188,11 @@ namespace TwoTrails.ViewModels
         }
 
 
-        private void RenamePoints()
+        public void RenamePoints()
         {
             RenamePointsDialog dialog = new RenamePointsDialog(Manager)
             {
-                Owner = Project.MainModel.MainWindow
+                Owner = MainModel.MainWindow
             };
 
             if (dialog.ShowDialog() == true)
@@ -2029,7 +2206,7 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void ReverseSelection()
+        public void ReverseSelection()
         {
             if (MultipleSelections && SamePolygon)
             {
@@ -2063,7 +2240,7 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void ResetPoint()
+        public void ResetPoint()
         {
             Func<TtPoint, bool> hasConflict = (currPoint) =>
             {
@@ -2124,7 +2301,7 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void ResetPointField(DataGrid dataGrid)
+        public void ResetPointField(DataGrid dataGrid)
         {
             if (dataGrid != null)
             {
@@ -2254,7 +2431,7 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void DeletePoint()
+        public void DeletePoint()
         {
             if (Project.Settings.DeviceSettings.DeletePointWarning)
             {
@@ -2289,7 +2466,7 @@ namespace TwoTrails.ViewModels
         }
         
 
-        private void CreateNewPoint(OpType optype)
+        public void CreateNewPoint(OpType optype)
         {
             if (Manager.Polygons.Count > 0)
             {
@@ -2300,7 +2477,7 @@ namespace TwoTrails.ViewModels
                     case OpType.SideShot:
                     case OpType.WayPoint:
                         {
-                            CreateGpsPointDialog.ShowDialog(Manager, null, optype, Project.MainModel.MainWindow);
+                            CreateGpsPointDialog.ShowDialog(Manager, null, optype, MainModel.MainWindow);
                             break;
                         }
                     case OpType.Quondam: Retrace(); break;
@@ -2312,18 +2489,18 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void CreateQuondams()
+        public void CreateQuondams()
         {
-            Project.MainModel.MainWindow.IsEnabled = false;
-            PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), true, false, SessionData.TargetPolygon, Project.MainModel.MainWindow,
+            MainModel.MainWindow.IsEnabled = false;
+            PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), true, false, _TargetPolygon, MainModel.MainWindow,
                 (target) =>
                 {
-                    Project.MainModel.MainWindow.IsEnabled = true;
-                    SessionData.TargetPolygon = target;
+                    MainModel.MainWindow.IsEnabled = true;
+                    _TargetPolygon = target;
                 });
         }
 
-        private void ConvertPoints()
+        public void ConvertPoints()
         {
             if (OnlyQuondams)
                 ConvertQuondams();
@@ -2331,7 +2508,7 @@ namespace TwoTrails.ViewModels
                 ConvertTravTypes();
         }
 
-        private void ConvertQuondams()
+        public void ConvertQuondams()
         {
             if (MultipleSelections)
                 Manager.ConvertQuondams(SelectedPoints.Cast<QuondamPoint>());
@@ -2339,7 +2516,7 @@ namespace TwoTrails.ViewModels
                 Manager.ReplacePoint(SelectedPoint as QuondamPoint);
         }
 
-        private void ConvertTravTypes()
+        public void ConvertTravTypes()
         {
             TtPoint convertToTrav(TtPoint ss)
             {
@@ -2369,50 +2546,50 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void MovePoints()
+        public void MovePoints()
         {
-            Project.MainModel.MainWindow.IsEnabled = false;
-            PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), false, false, SessionData.TargetPolygon, Project.MainModel.MainWindow,
+            MainModel.MainWindow.IsEnabled = false;
+            PointLocManipDialog.Show(Manager, GetSortedSelectedPoints(), false, false, _TargetPolygon, MainModel.MainWindow,
                 (target) =>
                 {
-                    Project.MainModel.MainWindow.IsEnabled = true;
-                    SessionData.TargetPolygon = target;
+                    MainModel.MainWindow.IsEnabled = true;
+                    _TargetPolygon = target;
                 });
         }
 
-        private void Retrace()
+        public void Retrace()
         {
-            Project.MainModel.MainWindow.IsEnabled = false;
-            RetraceDialog.Show(Manager, Project.MainModel.MainWindow, (result) =>
+            MainModel.MainWindow.IsEnabled = false;
+            RetraceDialog.Show(Manager, MainModel.MainWindow, (result) =>
             {
-                Project.MainModel.MainWindow.IsEnabled = true;
+                MainModel.MainWindow.IsEnabled = true;
             });
         }
 
-        private void Reindex()
+        public void Reindex()
         {
-            Project.MainModel.MainWindow.IsEnabled = false;
-            ReindexDialog.Show(Manager, Project.MainModel.MainWindow, (result) =>
+            MainModel.MainWindow.IsEnabled = false;
+            ReindexDialog.Show(Manager, MainModel.MainWindow, (result) =>
             {
-                Project.MainModel.MainWindow.IsEnabled = true;
+                MainModel.MainWindow.IsEnabled = true;
             });
         }
 
-        private void SwapPoints()
+        public void SwapPoints()
         {
             Manager.EditPointsMultiValues(SelectedPoints.Cast<TtPoint>().Take(2), PointProperties.INDEX,
                 new int[] { (SelectedPoints[1] as TtPoint).Index, (SelectedPoints[0] as TtPoint).Index });
         }
 
-        private void CreatePlots()
+        public void CreatePlots()
         {
             if (Manager.Polygons.Any(poly => Manager.GetPoints(poly.CN).HasAtLeast(3, p => p.IsBndPoint())))
             {
                 PlotToolInUse = true;
-                CreatePlotsDialog.Show(Project, Project.MainModel.MainWindow, () =>
+                CreatePlotsDialog.Show(Project, MainModel.MainWindow, () =>
                 {
                     PlotToolInUse = false;
-                    Project.MainModel.MainWindow.Activate();
+                    MainModel.MainWindow.Activate();
                 });
             }
             else
@@ -2421,15 +2598,15 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void CreateSubsample()
+        public void CreateSubsample()
         {
             if (Manager.Polygons.Any(poly => Manager.GetPoints(poly.CN).All(p => p.IsWayPointAtBase())))
             {
                 PlotToolInUse = true;
-                CreateSubsetDialog.Show(Project, Project.MainModel.MainWindow, () =>
+                CreateSubsetDialog.Show(Project, MainModel.MainWindow, () =>
                 {
                     PlotToolInUse = false;
-                    Project.MainModel.MainWindow.Activate();
+                    MainModel.MainWindow.Activate();
                 });
             }
             else
@@ -2438,16 +2615,16 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void CreateCorridor()
+        public void CreateCorridor()
         {
             Manager.CreateCorridor(GetSortedSelectedPoints(p => p.OnBoundary), Polygon);
         }
-        private void CreateDoubleSidedCorridor()
+        public void CreateDoubleSidedCorridor()
         {
             Manager.CreateDoubleSidedCorridor(GetSortedSelectedPoints(p => p.OnBoundary), Polygon);
         }
 
-        private void ModifyDataDictionary()
+        public void ModifyDataDictionary()
         {
             if (Project.RequiresSave)
             {
@@ -2461,10 +2638,10 @@ namespace TwoTrails.ViewModels
                     return;
             }
 
-            Project.MainModel.MainWindow.IsEnabled = false;
-            DataDictionaryEditorDialog.ShowDialog(Project, Project.MainModel.MainWindow, (result) =>
+            MainModel.MainWindow.IsEnabled = false;
+            DataDictionaryEditorDialog.ShowDialog(Project, MainModel.MainWindow, (result) =>
             {
-                Project.MainModel.MainWindow.IsEnabled = true;
+                MainModel.MainWindow.IsEnabled = true;
 
                 if (result == true)
                 {
@@ -2577,7 +2754,7 @@ namespace TwoTrails.ViewModels
 
         private void ViewPointDetails()
         {
-            PointDetailsDialog.ShowDialog(SelectedPoints.Cast<TtPoint>().ToList(), Project.MainModel.MainWindow);
+            PointDetailsDialog.ShowDialog(SelectedPoints.Cast<TtPoint>().ToList(), MainModel.MainWindow);
         }
 
         private void ViewSafeInfo()
@@ -2585,7 +2762,7 @@ namespace TwoTrails.ViewModels
             List<TtPoint> points = GetSortedSelectedPoints(pt => pt.IsGpsType());
 
             if (points.Count > 0)
-                ViewSatInfoDialog.ShowDialog(GetSortedSelectedPoints(), Manager, Project.MainModel.MainWindow);
+                ViewSatInfoDialog.ShowDialog(GetSortedSelectedPoints(), Manager, MainModel.MainWindow);
             else
                 MessageBox.Show("No GPS type points selected");
         }
@@ -2754,7 +2931,7 @@ namespace TwoTrails.ViewModels
         }
         #endregion
 
-
+        #region Collumns & Fields
         private Tuple<DataGridTextColumn, string>[] CreateDefaultColumns()
         {
             string defaultNumberFormat = "{0:0.###}";
@@ -2810,14 +2987,21 @@ namespace TwoTrails.ViewModels
                 Binding = new Binding(binding ?? name) { StringFormat = stringFormat, Converter = converter }
             };
 
-            dataGridTextColumn.Header = new ColumnHeader()
-            {
-                Column = dataGridTextColumn,
-                Name = name,
-                HideColumn = new RelayCommand(x => dataGridTextColumn.Visibility = Visibility.Collapsed),
-                CopyColumnValues = new RelayCommand(x => CopyColumnValues(binding ?? name)),
-                VisibleFields = VisibleFields
-            };
+            dataGridTextColumn.Header = new ColumnHeader(
+                dataGridTextColumn,
+                name,
+                VisibleFields,
+                new RelayCommand(x => dataGridTextColumn.Visibility = Visibility.Collapsed),
+                new RelayCommand(x => CopyColumnValues(binding ?? name)));
+
+            //dataGridTextColumn.Header = new ColumnHeader()
+            //{
+            //    Column = dataGridTextColumn,
+            //    Name = name,
+            //    HideColumn = new RelayCommand(x => dataGridTextColumn.Visibility = Visibility.Collapsed),
+            //    CopyColumnValues = new RelayCommand(x => CopyColumnValues(binding ?? name)),
+            //    VisibleFields = VisibleFields
+            //};
 
             return Tuple.Create(dataGridTextColumn, name);
         }
@@ -2854,13 +3038,49 @@ namespace TwoTrails.ViewModels
         }
 
 
-        public class ColumnHeader
+        private void ShowDefaultFields()
         {
-            public DataGridTextColumn Column { get; set; }
-            public String Name { get; set; }
-            public ICommand HideColumn { get; set; }
-            public ICommand CopyColumnValues { get; set; }
-            public ObservableCollection<Control> VisibleFields { get; set; }
+            foreach (DataGridTextColumn col in DataColumns)
+                col.Visibility = IsDefaultField((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
         }
+
+        private void ShowExtendedFields()
+        {
+            foreach (DataGridTextColumn col in DataColumns)
+                col.Visibility = IsExtendedField((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void ShowDefaultAndExtendedFields()
+        {
+            foreach (DataGridTextColumn col in DataColumns)
+                col.Visibility = IsDefaultOrExtendedField((col.Header as ColumnHeader).Name) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void ShowAllFields()
+        {
+            foreach (DataGridTextColumn col in DataColumns)
+                col.Visibility = Visibility.Visible;
+        }
+
+
+        public class ColumnHeader : NotifyPropertyChangedEx
+        {
+            public DataGridTextColumn Column { get; }
+            public String Name { get; }
+            public ICommand HideColumn { get; }
+            public ICommand CopyColumnValues { get; }
+            public ObservableCollection<Control> VisibleFields { get; }
+
+            public ColumnHeader(DataGridTextColumn column, string name, ObservableCollection<Control> visibleFields, ICommand hideColumn, ICommand copyColumnValues)
+            {
+                Column = column;
+                Name = name;
+                HideColumn = hideColumn;
+                CopyColumnValues = copyColumnValues;
+                VisibleFields = visibleFields;
+            }
+        }
+
+        #endregion
     }
 }

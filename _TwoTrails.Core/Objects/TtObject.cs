@@ -36,6 +36,5 @@ namespace TwoTrails.Core
         {
             return CN.GetHashCode();
         }
-
     }
 }

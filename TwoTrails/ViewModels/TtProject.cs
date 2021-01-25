@@ -3,6 +3,7 @@ using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Controls;
@@ -12,45 +13,13 @@ using TwoTrails.Dialogs;
 
 namespace TwoTrails.ViewModels
 {
-    public class TtProject : NotifyPropertyChangedEx, IDisposable
+    public class TtProject : NotifyPropertyChangedEx
     {
         public event EventHandler<string> MessagePosted;
 
-        #region Commands
-        public ICommand OpenMapCommand { get; }
-        public ICommand OpenMapWindowCommand { get; }
-        public ICommand ViewUserActivityCommand { get; set; }
-
-        public ICommand EditProjectCommand { get; }
-        public ICommand EditPointsCommand { get; }
-        public ICommand EditPolygonsCommand { get; }
-        public ICommand EditGroupsCommand { get; }
-        public ICommand EditMetadataCommand { get; }
-
-        public ICommand RecalculateAllPolygonsCommand { get; }
-        public ICommand CalculateLogDeckCommand { get; }
-
-        public ICommand UndoCommand { get; set; }
-        public ICommand RedoCommand { get; set; }
-        public ICommand HistoryCommand { get; set; }
-
-        public ICommand DiscardChangesCommand { get; }
-        #endregion
-
         #region Properties
         public String FilePath { get { return DAL.FilePath; } }
-
-        public ProjectTab ProjectTab { get; private set; }
-        private UserActivityTab UserActivityTab { get; set; }
-        private MapTab MapTab { get; set; }
-        private MapWindow MapWindow { get; set; }
         
-        public bool ProjectTabIsOpen { get { return ProjectTab != null; } }
-        public bool MapTabIsOpen { get { return MapTab != null; } }
-        public bool UserActivityTabIsOpen { get { return UserActivityTab != null; } }
-        public bool MapWindowIsOpen { get { return MapWindow != null; } }
-        
-
         private TtProjectInfo _ProjectInfo;
         public TtProjectInfo ProjectInfo { get; }
         
@@ -81,32 +50,16 @@ namespace TwoTrails.ViewModels
 
         public TtSettings Settings { get; private set; }
 
-        private TtManager _BaseManager { get; }
-        public TtHistoryManager Manager { get; }
-
-        private PointEditorModel _PointEditor;
-        public PointEditorModel PointEditor
-        {
-            get { return _PointEditor ?? (_PointEditor = new PointEditorModel(this)); }
-        }
-
-        private ProjectEditorModel _ProjectEditor;
-        public ProjectEditorModel ProjectEditor
-        {
-            get { return _ProjectEditor ?? (_ProjectEditor = new ProjectEditorModel(this)); }
-        }
-
-        public MainWindowModel MainModel { get; private set; }
+        private TtManager Manager { get; }
+        public TtHistoryManager HistoryManager { get; }
         #endregion
 
 
-        public TtProject(ITtDataLayer dal, ITtMediaLayer mal, TtSettings settings, MainWindowModel mainModel)
+        public TtProject(ITtDataLayer dal, ITtMediaLayer mal, TtSettings settings)
         {
             DAL = dal;
             MAL = mal;
             Settings = settings;
-
-            MainModel = mainModel;
 
             ProjectInfo = dal.GetProjectInfo();
             _ProjectInfo = new TtProjectInfo(ProjectInfo);
@@ -115,59 +68,9 @@ namespace TwoTrails.ViewModels
 
             RequiresSave = false;
 
-            _BaseManager = new TtManager(dal, mal, settings);
-            Manager = new TtHistoryManager(_BaseManager);
-            Manager.HistoryChanged += Manager_HistoryChanged;
-            
-            UndoCommand = new BindedRelayCommand<TtHistoryManager>(
-                x => Manager.Undo(), x => Manager.CanUndo, Manager, x => x.CanUndo);
-
-            RedoCommand = new BindedRelayCommand<TtHistoryManager>(
-                x => Manager.Redo(), x => Manager.CanRedo, Manager, x => x.CanRedo);
-
-            HistoryCommand = new BindedRelayCommand<TtHistoryManager>(
-                x =>
-                {
-                    mainModel.MainWindow.IsEnabled = false;
-                    HistoryDialog.ShowDialog(Manager, mainModel.MainWindow, (onClose) =>
-                    {
-                        mainModel.MainWindow.IsEnabled = true;
-                        mainModel.MainWindow.Activate();
-                    });
-                },
-                x => Manager.CanRedo || Manager.CanUndo, 
-               Manager,
-                x => new { x.CanRedo, x.CanUndo });
-
-            DiscardChangesCommand = new RelayCommand(x => _BaseManager.Reset());
-
-            ViewUserActivityCommand = new RelayCommand(x => ViewUserActivityTab());
-            
-            EditProjectCommand = new RelayCommand(x => OpenProjectTab());
-            EditPointsCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Points));
-            EditPolygonsCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Polygons));
-            EditMetadataCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Metadata));
-            EditGroupsCommand = new RelayCommand(x => OpenProjectTab(ProjectTabSection.Groups));
-
-            RecalculateAllPolygonsCommand = new RelayCommand(x => { Manager.RecalculatePolygons(); });
-            CalculateLogDeckCommand = new RelayCommand(x =>
-            {
-                if (_BaseManager.PolygonCount > 0)
-                {
-                    MainModel.MainWindow.IsEnabled = false;
-                    LogDeckCalculatorDialog.Show(this, this.MainModel.MainWindow, () =>
-                    {
-                        MainModel.MainWindow.IsEnabled = true;
-                    });
-                }
-                else
-                    MessageBox.Show("No Polygons in Project.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Stop);
-            });
-
-            OpenMapCommand = new RelayCommand(x => OpenMapTab());
-            OpenMapWindowCommand = new RelayCommand(x => OpenMapWindow());
-
-            ProjectTab = new ProjectTab(this);
+            Manager = new TtManager(dal, mal, settings);
+            HistoryManager = new TtHistoryManager(Manager);
+            HistoryManager.HistoryChanged += Manager_HistoryChanged;
         }
 
         private void ProjectInfoChanged(object sender, PropertyChangedEventArgs e)
@@ -177,7 +80,7 @@ namespace TwoTrails.ViewModels
 
         private void Manager_HistoryChanged(object sender, EventArgs e)
         {
-            RequiresSave = Manager.CanUndo;
+            RequiresSave = HistoryManager.CanUndo;
         }
 
         public bool Save()
@@ -193,8 +96,8 @@ namespace TwoTrails.ViewModels
                         _ProjectInfo = new TtProjectInfo(ProjectInfo);
                     }
 
-                    _BaseManager.Save();
-                    Manager.ClearHistory();
+                    Manager.Save();
+                    HistoryManager.ClearHistory();
                     RequiresSave = ProjectChanged = false;
                     MessagePosted?.Invoke(this, $"Project '{ProjectName}' Saved");
                 }
@@ -213,159 +116,25 @@ namespace TwoTrails.ViewModels
         public void ReplaceDAL(ITtDataLayer dal)
         {
             DAL = dal;
-            _BaseManager.ReplaceDAL(DAL);
+            Manager.ReplaceDAL(DAL);
             OnPropertyChanged(nameof(DAL), nameof(FilePath));
         }
 
         public void ReplaceMAL(ITtMediaLayer mal)
         {
             MAL = mal;
-            _BaseManager.ReplaceMAL(MAL);
+            Manager.ReplaceMAL(MAL);
             OnPropertyChanged(nameof(MAL));
         }
 
-        public void Close()
-        {
-            if (RequiresSave)
-            {
-                MessageBoxResult result = MessageBox.Show("Would you like to save before closing this project?",
-                                             String.Empty,
-                                             MessageBoxButton.YesNoCancel, MessageBoxImage.Warning, MessageBoxResult.Cancel);
 
-                if (result == MessageBoxResult.Yes)
-                {
-                    try
-                    {
-                        Save();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
-                }
-                else if (result == MessageBoxResult.Cancel)
-                {
-                    return;
-                }
-            }
-
-            CloseViews();
-            MainModel.RemoveProject(this);
-        }
-
-        private void CloseViews()
-        {
-            if (ProjectTab != null)
-                MainModel.CloseTab(ProjectTab);
-
-            if (MapTab != null)
-                MainModel.CloseTab(MapTab);
-
-            if (UserActivityTab != null)
-                MainModel.CloseTab(UserActivityTab);
-
-            MapWindow?.Close();
-        }
-
-        public void CloseTab(TtTabModel tab)
-        {
-            if (tab is ProjectTab)
-            {
-                //warn closing project
-                Close();
-            }
-            else
-            {
-                if (tab is MapTab)
-                {
-                    MainModel.CloseTab(tab);
-                    MapTab = null;
-                }
-                else if (tab is UserActivityTab)
-                {
-                    MainModel.CloseTab(tab);
-                    UserActivityTab = null;
-                }
-            }
-        }
-        
-        private void OpenProjectTab(ProjectTabSection tab = ProjectTabSection.Project)
-        {
-            if (ProjectTab == null)
-            {
-                ProjectTab = new ProjectTab(this);
-                MainModel.AddTab(ProjectTab);
-            }
-            else
-            {
-                MainModel.SwitchToTab(ProjectTab);
-            }
-
-            ProjectTab.SwitchToTabSection(tab);
-        }
-
-        private void OpenMapTab()
-        {
-            if (MapTab == null)
-            {
-                if (MapWindow != null)
-                {
-                    MapTab = new MapTab(this, MapWindow);
-                    MapWindow.Close();
-                    MapWindow = null;
-                }
-                else
-                {
-                    MapTab = new MapTab(this);
-                }
-
-                MainModel.AddTab(MapTab);
-            }
-
-            MainModel.SwitchToTab(MapTab);
-        }
-
-        private void OpenMapWindow()
-        {
-            if (MapWindow == null)
-            {
-
-                if (MapTab != null)
-                {
-                    MapWindow = new MapWindow(_ProjectInfo.Name, MapTab.MapControl);
-                    CloseTab(MapTab);
-                }
-                else
-                {
-                    MapWindow = new MapWindow(this);
-                }
-            }
-            
-            MapWindow.Show();
-        }
-
-        private void ViewUserActivityTab()
-        {
-            if (UserActivityTab == null)
-            {
-                UserActivityTab = new UserActivityTab(this);
-                MainModel.AddTab(UserActivityTab);
-            }
-            else
-            {
-                MainModel.SwitchToTab(UserActivityTab);
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposed)
+        protected override void Dispose(bool disposing)
         {
             ProjectInfo.PropertyChanged -= ProjectInfoChanged;
+            HistoryManager.HistoryChanged -= Manager_HistoryChanged;
+
+            HistoryManager.Dispose();
+            Manager.Dispose();
         }
     }
 }

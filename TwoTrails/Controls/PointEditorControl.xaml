@@ -148,10 +148,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
-
-
-
     </UserControl.Resources>
 
     <UserControl.InputBindings>
@@ -285,12 +281,11 @@
             <cc:DataGridEx x:Name="dgPoints"
 				Grid.Column="0"
 				BorderThickness="0"
-				ItemsSource="{Binding Points}"
+				ItemsSource="{Binding Points, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
 				AutoGenerateColumns="False"
 				CanUserReorderColumns="True" CanUserResizeColumns="True" 
 				CanUserResizeRows="False" CanUserSortColumns="False"
 				CanUserDeleteRows="False" CanUserAddRows="False"
-				LoadingRow="DataGrid_OnLoadingRow"
 				EnableRowVirtualization="True"
 				EnableColumnVirtualization="True"
 				VirtualizingStackPanel.IsVirtualizing="True"
@@ -299,9 +294,8 @@
 				SelectionUnit="FullRow"
 				IsReadOnly="True"
 				VisibleItemsList="{Binding VisiblePoints, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
-				SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-				BindableColumns="{Binding DataColumns}"
-                PreviewMouseRightButtonUp="dgPoints_PreviewMouseRightButtonUp">
+				SelectedItemsList="{Binding SelectedPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <!--BindableColumns="{Binding DataColumns}">-->
 
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SeaGreen"/>

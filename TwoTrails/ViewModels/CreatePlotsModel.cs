@@ -85,14 +85,14 @@ namespace TwoTrails.ViewModels
 
         public CreatePlotsModel(TtProject project, Window window)
         {
-            _Manager = project.Manager;
+            _Manager = project.HistoryManager;
             Settings = project.Settings;
 
             InclusionPolygonsSelectedCommand = new RelayCommand(x => InclusionPolygonsSelected(x as IList));
             ExclusionPolygonsSelectedCommand = new RelayCommand(x => ExclusionPolygonsSelected(x as IList));
             
             InclusionPolygons = new ObservableFilteredSortableCollection<TtPolygon, string>(
-                project.Manager.Polygons,
+                project.HistoryManager.Polygons,
                 p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint()),
                 p => p.Name);
 
@@ -117,7 +117,6 @@ namespace TwoTrails.ViewModels
             GenerateCommand = new RelayCommand(x => ValidateSettings());
             CloseCommand = new RelayCommand(x => window.Close());
         }
-
 
         private void InclusionPolygonsSelected(IList selectedItems)
         {
@@ -623,6 +622,16 @@ namespace TwoTrails.ViewModels
 
             MessageBox.Show($"{addPoints.Sum(p => p.Value.Item2.Count)} WayPoints Created");
             IsGenerating = false;
+        }
+
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!Disposed)
+            {
+                if (InclusionPolygons != null)
+                    InclusionPolygons.Dispose();
+            }
         }
     }
 

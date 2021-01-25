@@ -24,8 +24,13 @@ namespace TwoTrails.ViewModels
         public int StartupSelectedTabIndex { get; }
         public bool HasGpsAccuracyReport { get; }
 
+        public Window Window { get; private set; }
+
+
         public AccuracyDataModel(GpsAccuracyReport report, double? accuracy, string make, string model, Window window)
         {
+            Window = window;
+
             if (report == null)
             {
                 StartupSelectedTabIndex = 1;
@@ -46,8 +51,14 @@ namespace TwoTrails.ViewModels
             ModelID = model;
 
             OkCommand = new BindedRelayCommand<AccuracyDataModel>(
-                x => { window.DialogResult = true; window.Close(); },
-                x => Accuracy > 0, this, x => x.Accuracy);
+                x => { Window.DialogResult = true; Window.Close(); },
+                x => Accuracy > 0,
+                this, m => m.Accuracy);
+
+            //OkCommand = new BindedRelayCommand<AccuracyDataModel>(
+            //    (x, m) => { m.Window.DialogResult = true; m.Window.Close(); },
+            //    (x, m) => m.Accuracy > 0,
+            //    this, m => m.Accuracy);
 
             CancelCommand = new RelayCommand(x => window.Close());
 

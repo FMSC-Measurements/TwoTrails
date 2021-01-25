@@ -12,8 +12,9 @@ namespace TwoTrails.ViewModels
 {
     public class ExportProjectModel : NotifyPropertyChangedEx
     {
-        private TtProject Project;
-        private Window Window;
+        private readonly TtProject _Project;
+        private readonly Window _Window;
+        private readonly MainWindowModel _MainModel;
 
         public string FolderLocation { get { return Get<string>(); } set { Set(value); } }
 
@@ -39,17 +40,24 @@ namespace TwoTrails.ViewModels
         public bool ExportMediaFiles { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
 
 
-        public bool DataDictionaryEnabled { get { return Project.Manager.HasDataDictionary; } }
+        public bool DataDictionaryEnabled { get { return _Project.HistoryManager.HasDataDictionary; } }
 
 
-        public ExportProjectModel(Window window, TtProject project)
+        public ExportProjectModel(Window window, TtProject project, MainWindowModel mainWindowModel)
         {
-            this.Window = window;
-            this.Project = project;
+            this._Window = window;
+            this._Project = project;
+            _MainModel = mainWindowModel;
+
             FolderLocation = Path.GetDirectoryName(project.FilePath);
 
             BrowseCommand = new RelayCommand(x => BrowseFolder());
-            ExportCommand = new BindedRelayCommand<ExportProjectModel>(x => CreateFiles(), x => IsCheckAll != false, this, x => x.IsCheckAll);
+            ExportCommand = new BindedRelayCommand<ExportProjectModel>(
+                x => CreateFiles(), x => IsCheckAll != false,
+                this, m => m.IsCheckAll);
+            //ExportCommand = new BindedRelayCommand<ExportProjectModel>(
+            //    (x, m) => m.CreateFiles(), (x, m) => m.IsCheckAll != false,
+            //    this, m => m.IsCheckAll);
             CancelCommand = new RelayCommand(x => Cancel());
             CheckAllCommand = new RelayCommand(x => CheckAll((bool?)x));
 
@@ -75,7 +83,7 @@ namespace TwoTrails.ViewModels
             {
                 if (Directory.Exists(FolderLocation))
                 {
-                    string path = Path.Combine(FolderLocation, Path.GetFileNameWithoutExtension(Project.DAL.FilePath)).Trim();
+                    string path = Path.Combine(FolderLocation, Path.GetFileNameWithoutExtension(_Project.DAL.FilePath)).Trim();
 
                     if (Directory.Exists(path))
                     {
@@ -91,57 +99,57 @@ namespace TwoTrails.ViewModels
                     {
                         if (IsCheckAll == true)
                         {
-                            Export.All(Project.Manager, Project.MAL, Project.ProjectInfo, Project.FilePath, path);
+                            Export.All(_Project.HistoryManager, _Project.MAL, _Project.ProjectInfo, _Project.FilePath, path);
                         }
                         else
                         {
                             Export.CheckCreateFolder(path);
 
                             if (ExportPoints)
-                                Export.Points(Project.Manager, Path.Combine(path, "Points.csv"));
+                                Export.Points(_Project.HistoryManager, Path.Combine(path, "Points.csv"));
 
                             if (ExportDataDictionary)
-                                Export.DataDictionary(Project.Manager, Path.Combine(path, "DataDictionary.csv"));
+                                Export.DataDictionary(_Project.HistoryManager, Path.Combine(path, "DataDictionary.csv"));
 
                             if (ExportNMEA)
-                                Export.TtNmea(Project.Manager, Path.Combine(path, "TTNmea.csv"));
+                                Export.TtNmea(_Project.HistoryManager, Path.Combine(path, "TTNmea.csv"));
 
                             if (ExportPolygons)
-                                Export.Polygons(Project.Manager, Path.Combine(path, "Polygons.csv"));
+                                Export.Polygons(_Project.HistoryManager, Path.Combine(path, "Polygons.csv"));
 
                             if (ExportMetadata)
-                                Export.Metadata(Project.Manager, Path.Combine(path, "Metadata.csv"));
+                                Export.Metadata(_Project.HistoryManager, Path.Combine(path, "Metadata.csv"));
 
                             if (ExportGroups)
-                                Export.Groups(Project.Manager, Path.Combine(path, "Groups.csv"));
+                                Export.Groups(_Project.HistoryManager, Path.Combine(path, "Groups.csv"));
 
-                            if (ExportMediaInfo && Project.MAL != null)
-                                Export.ImageInfo(Project.Manager, Path.Combine(path, "ImageInfo.csv"));
+                            if (ExportMediaInfo && _Project.MAL != null)
+                                Export.ImageInfo(_Project.HistoryManager, Path.Combine(path, "ImageInfo.csv"));
 
-                            if (ExportMediaFiles && Project.MAL != null)
-                                Export.MediaFiles(Project.MAL, path);
+                            if (ExportMediaFiles && _Project.MAL != null)
+                                Export.MediaFiles(_Project.MAL, path);
 
                             if (ExportProject)
-                                Export.Project(Project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));
+                                Export.Project(_Project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));
 
                             if (ExportSummary)
-                                Export.Summary(Project.Manager, Project.ProjectInfo, Project.FilePath, Path.Combine(path, "Summary.txt"));
+                                Export.Summary(_Project.HistoryManager, _Project.ProjectInfo, _Project.FilePath, Path.Combine(path, "Summary.txt"));
 
                             if (ExportGPX)
-                                Export.GPX(Project.Manager, Project.ProjectInfo, Path.Combine(path, $"{Project.ProjectName.Trim()}.gpx"));
+                                Export.GPX(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, $"{_Project.ProjectName.Trim()}.gpx"));
 
                             if (ExportKMZ)
-                                Export.KMZ(Project.Manager, Project.ProjectInfo, Path.Combine(path, $"{Project.ProjectName.Trim()}.kmz"));
+                                Export.KMZ(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, $"{_Project.ProjectName.Trim()}.kmz"));
 
                             if (ExportShapes)
-                                Export.Shapes(Project.Manager, Project.ProjectInfo, path);
+                                Export.Shapes(_Project.HistoryManager, _Project.ProjectInfo, path);
                         }
 
-                        Window.Close();
+                        _Window.Close();
 
-                        Project.MainModel.PostMessage($"Project Exported to: '{path}'");
+                        _MainModel.PostMessage($"Project Exported to: '{path}'");
 
-                        if (Project.Settings.OpenFolderOnExport)
+                        if (_Project.Settings.OpenFolderOnExport)
                         {
                             Process.Start(path);
                         }
@@ -159,7 +167,7 @@ namespace TwoTrails.ViewModels
 
         private void Cancel()
         {
-            Window.Close();
+            _Window.Close();
         }
 
         private void CheckAll(bool? isChecked)

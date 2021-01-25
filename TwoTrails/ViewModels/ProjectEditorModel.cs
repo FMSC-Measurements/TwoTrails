@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
@@ -24,32 +25,41 @@ namespace TwoTrails.ViewModels
 {
     public class ProjectEditorModel : NotifyPropertyChangedEx
     {
+
+        public string TestText => "Test";
+
         #region Commands
         public ICommand OpenMapWindowCommand { get; }
-        public ICommand UndoCommand { get; set; }
-        public ICommand RedoCommand { get; set; }
+        public BindedRelayCommand<ProjectEditorModel> HistoryCommand { get; set; }
+
+        public ICommand RecalculateAllPolygonsCommand { get; }
+        public ICommand CalculateLogDeckCommand { get; }
+
+        //public ICommand UndoCommand { get; set; }
+        //public ICommand RedoCommand { get; set; }
+        public ICommand DiscardChangesCommand { get; }
 
         #region Polygons
         public ICommand PolygonChangedCommand { get; }
         public ICommand CreatePolygonCommand { get; }
         public ICommand DeletePolygonCommand { get; }
-        public ICommand PolygonUpdateAccCommand { get; }
-        public ICommand PolygonAccuracyLookupCommand { get; }
-        public ICommand SavePolygonSummary { get; }
+        public BindedRelayCommand<ProjectEditorModel> PolygonUpdateAccCommand { get; }
+        public BindedRelayCommand<ProjectEditorModel> PolygonAccuracyLookupCommand { get; }
+        public BindedRelayCommand<ProjectEditorModel> SavePolygonSummary { get; }
         #endregion
 
         #region Metadata
         public ICommand MetadataChangedCommand { get; }
         public ICommand NewMetadataCommand { get; }
-        public ICommand DeleteMetadataCommand { get; }
-        public ICommand MetadataUpdateZoneCommand { get; }
+        public BindedRelayCommand<ProjectEditorModel> DeleteMetadataCommand { get; }
+        public BindedRelayCommand<ProjectEditorModel> MetadataUpdateZoneCommand { get; }
         public ICommand SetDefaultMetadataCommand { get; }
         #endregion
 
         #region Groups
         public ICommand GroupChangedCommand { get; }
         public ICommand NewGroupCommand { get; }
-        public ICommand DeleteGroupCommand { get; }
+        public BindedRelayCommand<ProjectEditorModel> DeleteGroupCommand { get; }
         #endregion
 
         #region Cleanup
@@ -64,29 +74,45 @@ namespace TwoTrails.ViewModels
         #endregion
         #endregion
 
+        public MainWindowModel MainModel { get; private set; }
+
         private TtProject _Project;
+        public ProjectEditorControl ProjectEditorControl { get; set; }
+
+        public PointEditorModel PointEditor { get; }
+        public PointEditorControl PointEditorControl { get; }
+
+        private DataStyleModel DataStyle { get; }
 
         public TtProjectInfo ProjectInfo => _Project.ProjectInfo;
-        public TtHistoryManager Manager => _Project.Manager;
+        public TtHistoryManager Manager => _Project.HistoryManager;
         public TtSettings Settings => _Project.Settings;
         
         public MapControl MapControl { get; private set; }
         public MapWindow MapWindow { get; private set; }
         public bool IsMapWindowOpen => MapWindow != null;
-        
-        public PointEditorControl DataController { get; }
+
+
+        private readonly KeyEventHandler KeyDownHandler, KeyUpHandler;
+        public bool CtrlKeyPressed { get; private set; }
+
 
         public ReadOnlyObservableCollection<TtPolygon> Polygons => Manager.Polygons;
         public ReadOnlyObservableCollection<TtMetadata> Metadata => Manager.Metadata;
         public ReadOnlyObservableCollection<TtGroup> Groups => Manager.Groups;
         public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo => Manager.MediaInfo;
-        
 
-        public ProjectEditorModel(TtProject project)
+
+        public ProjectEditorModel(TtProject project, MainWindowModel mainWindowModel)
         {
             _Project = project;
+            MainModel = mainWindowModel;
 
-            DataController = new PointEditorControl(project.PointEditor, new DataStyleModel(project));
+            DataStyle = new DataStyleModel(project.HistoryManager.Polygons);
+            PointEditor = new PointEditorModel(project, this);
+            PointEditorControl = new PointEditorControl(PointEditor, DataStyle);
+
+            MapControl = new MapControl(project.HistoryManager);
 
             #region Commands
             Func<ProjectTabSection, Type, bool> doesTabAndDataMatch = (tab, type) =>
@@ -106,45 +132,75 @@ namespace TwoTrails.ViewModels
                 }
             };
 
-            UndoCommand = new BindedRelayCommand<TtHistoryManager>(
-                x => Manager.Undo(),
-                x => Manager.CanUndo && doesTabAndDataMatch(_Project.ProjectTab.CurrentTabSection, Manager.UndoCommandType),
-                Manager,
-                x => x.CanUndo);
-
-            RedoCommand = new BindedRelayCommand<TtHistoryManager>(
-                x => Manager.Redo(),
-                x => Manager.CanRedo && doesTabAndDataMatch(_Project.ProjectTab.CurrentTabSection, Manager.RedoCommandType),
-                Manager,
-                x => x.CanRedo);
-
             OpenMapWindowCommand = new RelayCommand(x =>
             {
-                if (x is Grid grid)
+                if (ProjectEditorControl != null)
                 {
-                    MapControl = grid.Children[0] as MapControl;
-
-                    grid.Children.Remove(MapControl);
-
-                    MapWindow = MapControl != null ? new MapWindow(_Project.ProjectName, MapControl) : new MapWindow(_Project);
-                    OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
-
-                    MapWindow.Closed += (s, e) =>
+                    if (MapControl != null)
                     {
-                        MapWindow = null;
+                        MapWindow = new MapWindow(_Project.ProjectName, MapControl);
+                        ProjectEditorControl.MapContainer.Children.Remove(MapControl);
+                    }
+                    else
+                        throw new Exception("MapControl Not Found");
 
-                        grid.Dispatcher.Invoke(() =>
-                        {
-                            grid.Children.Add(MapControl);
-                            OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
-                        });
-                    };
+                    MapWindow.Closing += MapWindow_Closing;
 
                     MapWindow.Show();
 
-                    _Project.ProjectTab.SwitchToTabSection(ProjectTabSection.Points);
+                    OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
+
+                    ProjectEditorControl.SwitchToTab(ProjectTabSection.Points);
+
+                    MapWindow.Show();
                 }
+                else
+                    throw new Exception("ProjectEditorControl Not Loaded");
+
+                //if (x is Grid grid)
+                //{
+                //MapControl mapControl = grid.Children[0] as MapControl;
+
+                //grid.Children.Remove(mapControl);
+
+                //MapWindow = mapControl != null ? new MapWindow(_Project.ProjectName, mapControl) : new MapWindow(_Project);
+                //OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
+
+                //MapWindow.Closed += (s, e) =>
+                //{
+                //    MapWindow = null;
+
+                //    grid.Dispatcher.Invoke(() =>
+                //    {
+                //        grid.Children.Add(mapControl);
+                //        OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
+                //    });
+                //};
+
+                //MapWindow.Show();
+                //}
             });
+
+            HistoryCommand = new BindedRelayCommand<ProjectEditorModel>(
+                x => OpenHistoryManager(),
+                x => Manager != null ? Manager.CanRedo || Manager.CanRedo : false,
+                this, m => new { m.Manager.CanRedo, m.Manager.CanUndo });
+
+            //HistoryCommand = new BindedRelayCommand<ProjectEditorModel>(
+            //    (x, m) => m.OpenHistoryManager(),
+            //    (x, m) => m.Manager != null ? m.Manager.CanRedo || m.Manager.CanRedo : false,
+            //    this, m => new { m.Manager.CanRedo, m.Manager.CanUndo });
+
+            DiscardChangesCommand = new RelayCommand(x => Manager.BaseManager.Reset());
+
+            RecalculateAllPolygonsCommand = new RelayCommand(x => Manager.RecalculatePolygons());
+            CalculateLogDeckCommand = new RelayCommand(x => CalculateLogDeck());
+
+            //UndoCommand = new BindedRelayCommand<TtHistoryManager>(
+            //    x => Manager.Undo(), x => Manager.CanUndo, Manager, x => x.CanUndo);
+
+            //RedoCommand = new BindedRelayCommand<TtHistoryManager>(
+            //    x => Manager.Redo(), x => Manager.CanRedo, Manager, x => x.CanRedo);
 
             #region Polygons
             PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtPolygon));
@@ -155,17 +211,33 @@ namespace TwoTrails.ViewModels
                 x => UpdatePolygonAcc(),
                 x => CurrentPolygon != null && CurrentPolygon.Accuracy != _PolygonAccuracy,
                 this,
-                x => new { x.PolygonAccuracy, CurrentPolygon.Accuracy });
+                m => new { m.PolygonAccuracy, m.CurrentPolygon.Accuracy });
 
             PolygonAccuracyLookupCommand = new BindedRelayCommand<ProjectEditorModel>(
                 x => AccuracyLookup(),
                 x => CurrentPolygon != null,
                 this,
-                x => x.CurrentPolygon);
+                m => m.CurrentPolygon);
 
             SavePolygonSummary = new BindedRelayCommand<ProjectEditorModel>(
-                x => SavePolygonsummary(),
-                x => CurrentPolygon != null, this, x => x.CurrentPolygon);
+                x => SavePolygonsummary(), x => CurrentPolygon != null,
+                this, m => m.CurrentPolygon);
+
+            //PolygonUpdateAccCommand = new BindedRelayCommand<ProjectEditorModel>(
+            //    (x, m) => m.UpdatePolygonAcc(),
+            //    (x, m) => m.CurrentPolygon != null && m.CurrentPolygon.Accuracy != m._PolygonAccuracy,
+            //    this,
+            //    m => new { m.PolygonAccuracy, m.CurrentPolygon.Accuracy });
+
+            //PolygonAccuracyLookupCommand = new BindedRelayCommand<ProjectEditorModel>(
+            //    (x, m) => m.AccuracyLookup(),
+            //    (x, m) => m.CurrentPolygon != null,
+            //    this,
+            //    m => m.CurrentPolygon);
+
+            //SavePolygonSummary = new BindedRelayCommand<ProjectEditorModel>(
+            //    (x, m) => m.SavePolygonsummary(), (x, m) => m.CurrentPolygon != null,
+            //    this, m => m.CurrentPolygon);
             #endregion
 
             #region Metadata
@@ -176,13 +248,25 @@ namespace TwoTrails.ViewModels
                 x => DeleteMetadata(),
                 x => x != null && (x as TtMetadata).CN != Consts.EmptyGuid,
                 this,
-                x => x.CurrentMetadata);
+                m => m.CurrentMetadata);
 
             MetadataUpdateZoneCommand = new BindedRelayCommand<ProjectEditorModel>(
                 x => UpdateMetadataZone(),
                 x => CurrentMetadata != null && CurrentMetadata.Zone != MetadataZone,
                 this,
-                x => new { x.MetadataZone, CurrentMetadata.Zone });
+                m => new { m.MetadataZone, m.CurrentMetadata.Zone });
+
+
+            //DeleteMetadataCommand = new BindedRelayCommand<ProjectEditorModel>(
+            //    (x, m) => m.DeleteMetadata(),
+            //    (x, m) => x != null && (x as TtMetadata).CN != Consts.EmptyGuid,
+            //    this,
+            //    m => m.CurrentMetadata);
+
+            //MetadataUpdateZoneCommand = new BindedRelayCommand<ProjectEditorModel>(
+            //    (x, m) => m.UpdateMetadataZone(),
+            //    (x, m) => m.CurrentMetadata != null && m.CurrentMetadata.Zone != m.MetadataZone,
+            //    this,
             #endregion
 
             #region Groups
@@ -192,7 +276,14 @@ namespace TwoTrails.ViewModels
                 x => DeleteGroup(),
                 x => x != null && (x as TtGroup).CN != Consts.EmptyGuid,
                 this,
-                x => x.CurrentGroup);
+                m => m.CurrentGroup);
+
+
+            //DeleteGroupCommand = new BindedRelayCommand<ProjectEditorModel>(
+            //    (x, m) => m.DeleteGroup(),
+            //    (x, m) => x != null && (x as TtGroup).CN != Consts.EmptyGuid,
+            //    this,
+            //    m => m.CurrentGroup);
             #endregion
 
             #region Media
@@ -210,7 +301,7 @@ namespace TwoTrails.ViewModels
             #endregion
 
             #region Advanced
-            AnalyzeProjectCommand = new RelayCommand(x => AnalyzeProjectDialog.ShowDialog(_Project, _Project.MainModel.MainWindow));
+            AnalyzeProjectCommand = new RelayCommand(x => AnalyzeProjectDialog.ShowDialog(_Project, MainModel.MainWindow));
             #endregion
 
             #endregion
@@ -223,24 +314,7 @@ namespace TwoTrails.ViewModels
 
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += PolygonCollectionChanged;
 
-            Manager.HistoryChanged += (s, e) =>
-            {
-                if (e.DataType != null && e.HistoryEventType == HistoryEventType.Undone || e.HistoryEventType == HistoryEventType.Redone)
-                {
-                    if (e.DataType == PolygonProperties.DataType)
-                    {
-                        BindPolygonValues(CurrentPolygon);
-                    }
-                    else if (e.DataType == GroupProperties.DataType)
-                    {
-                        BindGroupValues(CurrentGroup);
-                    }
-                    else if (e.DataType == MetadataProperties.DataType)
-                    {
-                        BindMetadataValues(CurrentMetadata);
-                    }
-                }
-            };
+            Manager.HistoryChanged += Manager_HistoryChanged;
 
             CurrentMetadata = Metadata[0];
             CurrentGroup = Groups[0];
@@ -250,11 +324,142 @@ namespace TwoTrails.ViewModels
 
             if (MediaInfo != null && MediaInfo.Count > 0)
                 CurrentMediaInfo = MediaInfo[0];
+
+            
+            KeyDownHandler = new KeyEventHandler(OnKeyDown);
+            KeyUpHandler = new KeyEventHandler(OnKeyUp);
+
+            PointEditorControl.AddHandler(PointEditorControl.KeyDownEvent, KeyDownHandler);
+            PointEditorControl.AddHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
         }
 
-        public void CloseWindows()
+        protected override void Dispose(bool disposing)
+        {
+            PolygonSummary = null;
+
+            HistoryCommand.Dispose();
+            PolygonUpdateAccCommand.Dispose();
+            PolygonAccuracyLookupCommand.Dispose();
+            SavePolygonSummary.Dispose();
+
+            DeleteMetadataCommand.Dispose();
+            MetadataUpdateZoneCommand.Dispose();
+
+            DeleteGroupCommand.Dispose();
+
+
+            CloseWindows();
+
+            ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged -= PolygonCollectionChanged;
+
+            foreach (TtPolygon poly in Manager.Polygons)
+                poly.PolygonChanged -= PolygonShapeChanged;
+
+            Manager.HistoryChanged -= Manager_HistoryChanged;
+
+            if (_CurrentPolygon != null)
+                _CurrentPolygon.PolygonChanged -= GeneratePolygonSummary;
+
+            PointEditorControl.RemoveHandler(PointEditorControl.KeyDownEvent, KeyDownHandler);
+            PointEditorControl.RemoveHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
+
+            PointEditorControl.Dispose();
+
+            BindingOperations.ClearAllBindings(ProjectEditorControl);
+
+
+            ClearBasePropertyValues();
+
+
+            DataStyle.Dispose();
+            PointEditor.Dispose();
+
+            if (MapControl != null)
+                MapControl.Dispose();
+
+
+            ProjectEditorControl = null;
+
+            Delegate[] connections = GetEvents();
+
+            if (connections.Length > 0)
+            {
+
+            }
+        }
+
+
+        private void MapWindow_Closing(object sender, EventArgs e)
+        {
+            ProjectEditorControl.MapContainer.Children.Add(MapWindow.MapControl);
+
+            MapWindow.Closing -= MapWindow_Closing;
+            MapWindow = null;
+
+            OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
+        }
+
+        private void Manager_HistoryChanged(object sender, HistoryEventArgs e)
+        {
+            if (e.DataType != null && e.HistoryEventType == HistoryEventType.Undone || e.HistoryEventType == HistoryEventType.Redone)
+            {
+                if (e.DataType == PolygonProperties.DataType)
+                {
+                    BindPolygonValues(CurrentPolygon);
+                }
+                else if (e.DataType == GroupProperties.DataType)
+                {
+                    BindGroupValues(CurrentGroup);
+                }
+                else if (e.DataType == MetadataProperties.DataType)
+                {
+                    BindMetadataValues(CurrentMetadata);
+                }
+            }
+        }
+
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftCtrl)
+                CtrlKeyPressed = true;
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftCtrl)
+                CtrlKeyPressed = false;
+        }
+
+
+        private void CloseWindows()
         {
             MapWindow?.Close();
+        }
+
+
+        private void OpenHistoryManager()
+        {
+            MainModel.MainWindow.IsEnabled = false;
+            HistoryDialog.ShowDialog(Manager, MainModel.MainWindow, (onClose) =>
+            {
+                MainModel.MainWindow.IsEnabled = true;
+                MainModel.MainWindow.Activate();
+            });
+        }
+
+        private void CalculateLogDeck()
+        {
+            if (Manager.BaseManager.PolygonCount > 0)
+            {
+                MainModel.MainWindow.IsEnabled = false;
+                LogDeckCalculatorDialog.Show(_Project, this.MainModel.MainWindow, () =>
+                {
+                    MainModel.MainWindow.IsEnabled = true;
+                });
+            }
+            else
+                MessageBox.Show("No Polygons in Project.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Stop);
         }
 
 
@@ -409,10 +614,6 @@ namespace TwoTrails.ViewModels
                     break;
                 case NotifyCollectionChangedAction.Replace:
                 case NotifyCollectionChangedAction.Reset:
-                    foreach (TtPolygon poly in e.NewItems)
-                        poly.PolygonChanged += PolygonShapeChanged;
-                    foreach (TtPolygon poly in e.OldItems)
-                        poly.PolygonChanged -= PolygonShapeChanged;
                     break;
             }
         }
@@ -454,7 +655,7 @@ namespace TwoTrails.ViewModels
 
             AccuracyDataDialog dialog = new AccuracyDataDialog(SessionData.GpsAccuracyReport, _CurrentPolygon.Accuracy, SessionData.MakeID, SessionData.ModelID)
             {
-                Owner = _Project.MainModel.MainWindow
+                Owner = MainModel.MainWindow
             };
 
             if (dialog.ShowDialog() == true)
@@ -1024,7 +1225,7 @@ namespace TwoTrails.ViewModels
         private void ImageLoaded(IAsyncResult res)
         {
             if (res is ImageAsyncResult iar)
-                _Project.MainModel.MainWindow.Dispatcher.Invoke(
+                MainModel.MainWindow.Dispatcher.Invoke(
                     () => Tiles.Add(
                         new ImageTile(iar.ImageInfo, iar.Image, (x) => MediaViewerVisible = true)
                     )

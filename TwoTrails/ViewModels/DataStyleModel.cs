@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
@@ -10,22 +11,29 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.ViewModels
 {
-    public class DataStyleModel
+    public class DataStyleModel : IDisposable
     {
+        private readonly ReadOnlyObservableCollection<TtPolygon> _Polygons;
         private Dictionary<String, Style> _PolygonStyles, _PolygonStylesAlt;
+        public bool Disposed { get; private set; }
 
-
-        public DataStyleModel(TtProject project)
+        public DataStyleModel(ReadOnlyObservableCollection<TtPolygon> polygons)
         {
+            _Polygons = polygons;
             _PolygonStyles = new Dictionary<string, Style>();
             _PolygonStylesAlt = new Dictionary<string, Style>();
 
             CreatePolygonStyle(new TtPolygon() { CN = Consts.EmptyGuid });
 
-            foreach (TtPolygon poly in project.Manager.GetPolygons())
+            foreach (TtPolygon poly in _Polygons)
                 CreatePolygonStyle(poly);
 
-            ((INotifyCollectionChanged)project.Manager.Polygons).CollectionChanged += DataStyleModel_CollectionChanged;
+            ((INotifyCollectionChanged)_Polygons).CollectionChanged += DataStyleModel_CollectionChanged;
+        }
+
+        ~DataStyleModel()
+        {
+            Dispose(false);
         }
 
         private void DataStyleModel_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -91,6 +99,24 @@ namespace TwoTrails.ViewModels
             string id = point == null || !_PolygonStyles.ContainsKey(point.CN) ? Consts.EmptyGuid : point.PolygonCN;
 
             return (point == null ? 0 : point.Index) % 2 == 0 ? _PolygonStyles[id] : _PolygonStylesAlt[id];
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!Disposed)
+            {
+                ((INotifyCollectionChanged)_Polygons).CollectionChanged -= DataStyleModel_CollectionChanged;
+
+                _PolygonStyles.Clear();
+                _PolygonStylesAlt.Clear();
+
+                Disposed = true;
+            }
         }
     }
 }

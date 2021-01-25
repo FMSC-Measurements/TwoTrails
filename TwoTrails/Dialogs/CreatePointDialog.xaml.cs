@@ -239,7 +239,7 @@ namespace TwoTrails.Dialogs
 
                                 point.SetAccuracy(poly.Accuracy);
 
-                                _Manager.AddPoint(point);
+                                _Manager.CreatePoint(point);
                             }
                             else
                             {

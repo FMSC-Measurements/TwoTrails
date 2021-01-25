@@ -84,12 +84,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtPanorama.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtPhotoShpere.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataActionType.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\HaidSummary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\PolygonSummary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\PolygonGraphicOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtProjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\SideShotSegment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TraverseSegment.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtVersion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtVersionOld.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtNmeaBurst.cs" />

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{38E886B8-3FCA-4A41-A465-8FD5746E47EF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>TwoTrails</AssemblyTitle>
@@ -21,6 +21,7 @@
     <Version>1.2.1</Version>
     <Authors>Fortest Management Service Center</Authors>
     <Platforms>AnyCPU</Platforms>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -79,6 +80,8 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </Page>
+    <Compile Remove="Tabs\MapTab.cs" />
+    <Compile Remove="Tabs\UserActivityTab.cs" />
     <None Remove="AnalyzeProjectWindow.xaml" />
     <None Remove="Dialogs\HistoryDialog.xaml" />
     <None Remove="Dialogs\ReindexDialog.xaml" />
@@ -122,6 +125,8 @@
     <Resource Include="Resources\ic_ttpoint_way_black.png" />
     <Resource Include="Resources\ic_ttpoint_way_white.png" />
     <None Include="Resources\TwoTrailsIcon.ico" />
+    <None Include="Tabs\MapTab.cs" />
+    <None Include="Tabs\UserActivityTab.cs" />
     <Resource Include="Resources\TwoTrailsIcon.png" />
     <None Include="Resources\Icon_TTMPX.ico" />
     <None Include="Resources\Icon_TTX.ico" />
@@ -138,7 +143,7 @@
     <ProjectReference Include="..\TwoTrails.DAL\TwoTrails.DAL.csproj" />
   </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86\rc.exe&quot; /v &quot;$(ProjectDir)App.rc&quot;" />
+    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\rc.exe&quot; /v &quot;$(ProjectDir)App.rc&quot;" />
   </Target>
   <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
