@@ -3,6 +3,7 @@ using CSUtil.ComponentModel;
 using FMSC.Core;
 using FMSC.Core.Windows.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
+using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.GeoSpatial.UTM;
 using Microsoft.Win32;
 using System;
@@ -106,11 +107,13 @@ namespace TwoTrails.ViewModels
 
         public RelayCommand RezonePointsCommand { get; }
 
-        public ICommand SelectAlternateCommand { get; }
-        public ICommand SelectGpsCommand { get; }
-        public ICommand SelectTravCommand { get; }
-        public ICommand SelectInverseCommand { get; }
-        public ICommand DeselectCommand { get; }
+        public RelayCommand SelectAlternateCommand { get; }
+        public RelayCommand SelectGpsCommand { get; }
+        public RelayCommand SelectTravCommand { get; }
+        public RelayCommand SelectInverseCommand { get; }
+        public RelayCommand DeselectCommand { get; }
+        public RelayCommand SelectNon3DPointsCommand { get; }
+        public RelayCommand SelectGpsPointsWithoutNmeaCommand { get; }
 
         public ICommand CopyCellValueCommand { get; }
         public ICommand ExportValuesCommand { get; }
@@ -995,6 +998,10 @@ namespace TwoTrails.ViewModels
             SelectInverseCommand = new RelayCommand(x => SelectInverse());
 
             DeselectCommand = new RelayCommand(x => DeselectAll());
+
+            SelectNon3DPointsCommand = new RelayCommand(x => SelectNon3DPoints());
+
+            SelectGpsPointsWithoutNmeaCommand = new RelayCommand(x => SelectGpsPointsWithoutNmea());
             #endregion
 
             #region Copy Export Info
@@ -2701,8 +2708,52 @@ namespace TwoTrails.ViewModels
 
             OnSelectionChanged();
         }
+
+        private void SelectNon3DPoints()
+        {
+            List<TtPoint> points = (MultipleSelections ? SelectedPoints : VisiblePoints)
+                .Cast<TtPoint>().Where(p => p.IsGpsType()).ToList();
+
+            ignoreSelectionChange = true;
+
+            SelectedPoints.Clear();
+
+            foreach (GpsPoint point in points)
+            {
+                if (Manager.BaseManager.GetNmeaBursts(point.CN).Any(b => b.IsUsed && b.Fix != Fix._3D))
+                {
+                    SelectedPoints.Add(point);
+                }
+            }
+
+            ignoreSelectionChange = false;
+
+            OnSelectionChanged();
+        }
+
+        private void SelectGpsPointsWithoutNmea()
+        {
+            List<TtPoint> points = (MultipleSelections ? SelectedPoints : VisiblePoints)
+                .Cast<TtPoint>().Where(p => p.IsGpsType()).ToList();
+
+            ignoreSelectionChange = true;
+
+            SelectedPoints.Clear();
+
+            foreach (GpsPoint point in points)
+            {
+                if (Manager.BaseManager.GetNmeaBursts(point.CN).Count < 1)
+                {
+                    SelectedPoints.Add(point);
+                }
+            }
+
+            ignoreSelectionChange = false;
+
+            OnSelectionChanged();
+        }
         #endregion
-        
+
 
         private Tuple<DataGridTextColumn, string>[] CreateDefaultColumns()
         {

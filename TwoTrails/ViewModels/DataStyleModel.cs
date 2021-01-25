@@ -20,6 +20,8 @@ namespace TwoTrails.ViewModels
             _PolygonStyles = new Dictionary<string, Style>();
             _PolygonStylesAlt = new Dictionary<string, Style>();
 
+            CreatePolygonStyle(new TtPolygon() { CN = Consts.EmptyGuid });
+
             foreach (TtPolygon poly in project.Manager.GetPolygons())
                 CreatePolygonStyle(poly);
 
@@ -86,8 +88,9 @@ namespace TwoTrails.ViewModels
 
         public Style GetRowStyle(TtPoint point)
         {
-            return point == null ? _PolygonStyles.Values.First() : 
-                (point.Index % 2 == 0 ? _PolygonStyles[point.PolygonCN] : _PolygonStylesAlt[point.PolygonCN]);
+            string id = point == null || !_PolygonStyles.ContainsKey(point.CN) ? Consts.EmptyGuid : point.PolygonCN;
+
+            return (point == null ? 0 : point.Index) % 2 == 0 ? _PolygonStyles[id] : _PolygonStylesAlt[id];
         }
     }
 }

@@ -160,6 +160,11 @@
                         <MenuItem Header="Remove Unused Groups" Command="{Binding ProjectEditor.RemoveUnusedGroupsCommand}"/>
                     </MenuItem>
 
+                    <MenuItem Header="Selections" IsEnabled="{Binding HasOpenedProject}">
+                        <MenuItem Header="Non-3D Points" Command="{Binding PointEditor.SelectNon3DPointsCommand}"/>
+                        <MenuItem Header="Gps Points w/o NMEA" Command="{Binding PointEditor.SelectGpsPointsWithoutNmeaCommand}" />
+                    </MenuItem>
+
                     <Separator/>
 
                     <MenuItem Header="Open in Google Earth" Command="{Binding OpenInEarthCommand}" IsEnabled="{Binding HasOpenedProject}" />

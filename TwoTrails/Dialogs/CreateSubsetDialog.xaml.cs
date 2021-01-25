@@ -157,7 +157,7 @@ namespace TwoTrails.Dialogs
                     Group = _Project.Manager.MainGroup,
                     Metadata = p.Metadata,
                     Index = index++,
-                    Comment = "Generated Point",
+                    Comment = $"Generated from {p.PID} : {p.Polygon.Name}",
                     PID = PointNamer.NamePoint(poly, prev)
                 };
 
@@ -175,7 +175,7 @@ namespace TwoTrails.Dialogs
 
         public String GeneratePolyName(TtPolygon poly, int rev = 1)
         {
-            return $"{poly.Name}_Plts_Sample{(rev > 1 ? $"_{rev.ToString()}" : String.Empty)}";
+            return $"{poly.Name}_Sample{(rev > 1 ? $"_{rev}" : String.Empty)}";
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)

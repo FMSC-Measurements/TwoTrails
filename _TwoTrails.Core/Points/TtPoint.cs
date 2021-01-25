@@ -138,6 +138,7 @@ namespace TwoTrails.Core.Points
 
 
         protected Double _AdjX;
+        internal Double __AdjX => _AdjX;
         public virtual Double AdjX
         {
             get { return _AdjX; }
@@ -145,6 +146,7 @@ namespace TwoTrails.Core.Points
         }
 
         protected Double _AdjY;
+        internal Double __AdjY => _AdjY;
         public virtual Double AdjY
         {
             get { return _AdjY; }
@@ -152,6 +154,7 @@ namespace TwoTrails.Core.Points
         }
 
         protected Double _AdjZ;
+        internal Double __AdjZ => _AdjZ;
         public virtual Double AdjZ
         {
             get { return _AdjZ; }

@@ -2655,7 +2655,7 @@ namespace TwoTrails.DAL
                 {
                     foreach (QuondamPoint qpoint in orphanedQuondams)
                     {
-                        if (qpoint.UnAdjX == 0 && qpoint.UnAdjY == 0)
+                        if (qpoint.__AdjX == 0 && qpoint.__AdjY == 0)
                         {
                             DeletePoint(qpoint);
                         }
