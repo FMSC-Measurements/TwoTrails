@@ -242,16 +242,15 @@ namespace TwoTrails.ViewModels
                                 TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
                                 TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
 
+                                if (!DataHelper.CheckAndFixErrors(dal, Settings))
+                                    return;
+
                                 Trace.WriteLine($"DAL Opened ({dal.FilePath}): {dal.GetDataVersion()}");
 
                                 if (mal != null)
                                 {
                                     Trace.WriteLine($"MAL Opened ({mal.FilePath}): {mal.GetDataVersion()}");
                                 }
-
-                                if (!DataHelper.CheckAndFixErrors(dal, Settings))
-                                    return;
-
                                 if (dal.RequiresUpgrade)
                                 {
                                     if (MessageBox.Show(MainWindow, @"This is file needs to be upgraded to work with this version of TwoTrails. Upgrading will first create a backup of this file. Would you like to upgrade it now?", "Upgrade TwoTrails file",

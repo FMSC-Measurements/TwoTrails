@@ -2731,8 +2731,16 @@ namespace TwoTrails.DAL
 
         public DalError GetErrors()
         {
-            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
-                if (_Database.ExecuteScalar("PRAGMA integrity_check;", conn) as string != "ok") return DalError.CorruptDatabase;
+            try
+            {
+                using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                    if (_Database.ExecuteScalar("PRAGMA integrity_check;", conn) as string != "ok") return DalError.CorruptDatabase;
+            }
+            catch
+            {
+                return DalError.CriticalIssue;
+            }
+
 
             DalError errors = DalError.None;
 

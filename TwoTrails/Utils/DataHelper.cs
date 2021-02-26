@@ -99,11 +99,19 @@ namespace TwoTrails.Utils
         {
             DalError errors = dal.GetErrors();
 
-            if (errors.HasFlag(DalError.CorruptDatabase))
+            if (errors.HasFlag(DalError.CriticalIssue))
             {
-                MessageBox.Show("It appears that the TwoTrails file is physically corrupted possibly due to a hardware or operating system error. " +
-                    "Please contact the development team for support.",
-                    "File is physically corrupted", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("It appears that the TwoTrails file is physically corrupted beyond the repair capabilities of the the program, possibly due to a hardware or operating system error. " +
+                   "If the file is from a mobile device try copyping it over to the computer again. Please contact the development team for support for further assistance.",
+                   "File is physically corrupted ", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return false;
+            }
+            else if (errors.HasFlag(DalError.CorruptDatabase))
+            {
+                MessageBox.Show("It appears that the TwoTrails file is physically corrupted, possibly due to a hardware or operating system error. " +
+                   "If the file is from a mobile device try copyping it over to the computer again. Please contact the development team for support for further assistance.",
+                   "File is physically corrupted", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 return false;
             }

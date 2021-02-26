@@ -20,10 +20,11 @@ namespace TwoTrails.ViewModels
             _PolygonStyles = new Dictionary<string, Style>();
             _PolygonStylesAlt = new Dictionary<string, Style>();
 
-            CreatePolygonStyle(new TtPolygon() { CN = Consts.EmptyGuid });
-
             foreach (TtPolygon poly in project.Manager.GetPolygons())
                 CreatePolygonStyle(poly);
+
+            if (!_PolygonStyles.ContainsKey(Consts.EmptyGuid))
+                CreatePolygonStyle(new TtPolygon() { CN = Consts.EmptyGuid });
 
             ((INotifyCollectionChanged)project.Manager.Polygons).CollectionChanged += DataStyleModel_CollectionChanged;
         }
