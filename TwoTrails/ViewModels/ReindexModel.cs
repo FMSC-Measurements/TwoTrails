@@ -27,7 +27,13 @@ namespace TwoTrails.ViewModels
         {
             _Window = window;
             _Manager = manager;
-            ReindexCommand = new BindedRelayCommand<ReindexModel>(x => Reindex(), x => SelectedPolygon != null, this, x => new { x.SelectedPolygon, x.ReindexMode });
+            ReindexCommand = new BindedRelayCommand<ReindexModel>(
+                x=> Reindex(), x=> SelectedPolygon != null,
+                this, m => new { m.SelectedPolygon, m.ReindexMode });
+
+            //ReindexCommand = new BindedRelayCommand<ReindexModel>(
+            //    (x, m) => m.Reindex(), (x, m) => m.SelectedPolygon != null,
+            //    this, m => new { m.SelectedPolygon, m.ReindexMode });
         }
 
 

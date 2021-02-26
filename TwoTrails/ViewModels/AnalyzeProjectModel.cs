@@ -30,32 +30,32 @@ namespace TwoTrails.ViewModels
 
             new Thread(() =>
             {
-                HasMiszonnedPoints = DataHelper.AnalyzeMiszonedPoints(project.Manager);
+                HasMiszonnedPoints = DataHelper.AnalyzeMiszonedPoints(project.HistoryManager);
                 ProgressComplete = 30;
                 OnPropertyChanged(nameof(HasMiszonnedPoints), nameof(ProgressComplete));
                 Thread.Sleep(100);
 
-                HasOrphanedQuondams = DataHelper.AnalyzeOrphanedQuondams(project.Manager);
+                HasOrphanedQuondams = DataHelper.AnalyzeOrphanedQuondams(project.HistoryManager);
                 ProgressComplete = 52;
                 OnPropertyChanged(nameof(HasOrphanedQuondams), nameof(ProgressComplete));
                 Thread.Sleep(100);
 
-                HasEmptyPolygons = DataHelper.AnalyzeEmptyPolygons(project.Manager);
+                HasEmptyPolygons = DataHelper.AnalyzeEmptyPolygons(project.HistoryManager);
                 ProgressComplete = 64;
                 OnPropertyChanged(nameof(HasEmptyPolygons), nameof(ProgressComplete));
                 Thread.Sleep(100);
 
-                HasUnusedMetadata = DataHelper.AnalyzeUnusedMetadata(project.Manager);
+                HasUnusedMetadata = DataHelper.AnalyzeUnusedMetadata(project.HistoryManager);
                 ProgressComplete = 76;
                 OnPropertyChanged(nameof(HasUnusedMetadata), nameof(ProgressComplete));
                 Thread.Sleep(100);
 
-                HasUnusedGroups = DataHelper.AnalyzeUnusedGroups(project.Manager);
+                HasUnusedGroups = DataHelper.AnalyzeUnusedGroups(project.HistoryManager);
                 ProgressComplete = 88;
                 OnPropertyChanged(nameof(HasUnusedGroups), nameof(ProgressComplete));
                 Thread.Sleep(100);
 
-                HasDuplicateMetadata = DataHelper.AnalyzeDuplicateMetadata(project.Manager);
+                HasDuplicateMetadata = DataHelper.AnalyzeDuplicateMetadata(project.HistoryManager);
                 ProgressComplete = 100;
                 OnPropertyChanged(nameof(HasDuplicateMetadata), nameof(ProgressComplete));
 

@@ -170,7 +170,11 @@ namespace TwoTrails.ViewModels
 
             OnSetup = onSetup;
 
-            SetupImportCommand = new BindedRelayCommand<CsvImportModel>(x => SetupImport(), x => CanImport, this, x => x.CanImport);
+            SetupImportCommand = new BindedRelayCommand<CsvImportModel>(
+                x => SetupImport(), x => CanImport, this, m => m.CanImport);
+
+            //SetupImportCommand = new BindedRelayCommand<CsvImportModel>(
+            //    (x, m) => m.SetupImport(), (x, m) => m.CanImport, this, m => m.CanImport);
 
             Options = new ParseOptions(fileName, zone, startPolyNumber: startPolyNumber);
 

@@ -17,6 +17,7 @@ using TwoTrails.DAL;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
 using FMSC.Core.Windows.Utilities;
+using System.Threading;
 
 namespace TwoTrails.ViewModels
 {
@@ -56,7 +57,22 @@ namespace TwoTrails.ViewModels
             get => _CurrentTab;
             set {
                 SetField(ref _CurrentTab, value, () => {
-                    CurrentProject = value?.Project;
+                    if (value is ProjectTab projectTab)
+                    {
+                        CurrentProject = projectTab.Project;
+                        ProjectEditor = projectTab.ProjectEditor;
+                    }
+                    else
+                    {
+                        CurrentProject = null;
+                        ProjectEditor = null;
+                    }
+
+                    if (sbiInfoBinding != null)
+                    {
+                        BindingOperations.ClearBinding(MainWindow.sbiInfo, TextBlock.TextProperty);
+                        sbiInfoBinding = null;
+                    }
 
                     if (value != null)
                     {
@@ -67,18 +83,17 @@ namespace TwoTrails.ViewModels
                         sbiInfoBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
                         BindingOperations.SetBinding(MainWindow.sbiInfo, TextBlock.TextProperty, sbiInfoBinding);
                     }
-                    else if (sbiInfoBinding != null)
-                    {
-                        BindingOperations.ClearBinding(MainWindow.sbiInfo, TextBlock.TextProperty);
-                        sbiInfoBinding = null;
-                    }
 
-                    OnPropertyChanged(nameof(CurrentProject), nameof(HasOpenedProject), nameof(PointEditor), nameof(ProjectEditor));
+                    OnPropertyChanged(nameof(CurrentProject), nameof(HasOpenedProject), nameof(ProjectEditor), nameof(PointEditor));
 
-                    MainWindow.Title = $"TwoTrails{(value != null ? $" - {value.Project.ProjectName}" : String.Empty)}";
+                    MainWindow.Title = $"TwoTrails{(CurrentProject != null ? $" - {CurrentProject.ProjectName}" : String.Empty)}";
                 });
             }
         }
+
+        public TtProject CurrentProject { get; private set; }
+        public ProjectEditorModel ProjectEditor { get; private set; }
+        public PointEditorModel PointEditor => ProjectEditor?.PointEditor;
 
         public string StatusMessage { get { return Get<string>(); } private set { Set(value); } }
         private DelayActionHandler _EndMessageDelayHandler;
@@ -100,10 +115,6 @@ namespace TwoTrails.ViewModels
 
              _EndMessageDelayHandler.DelayInvoke(delay);
         }
-
-        public TtProject CurrentProject { get; private set; }
-        public PointEditorModel PointEditor => CurrentProject?.PointEditor;
-        public ProjectEditorModel ProjectEditor => CurrentProject?.ProjectEditor;
 
         public TtSettings Settings { get; }
 
@@ -143,12 +154,12 @@ namespace TwoTrails.ViewModels
             OpenProjectCommand = new RelayCommand(x => OpenProject(x as string));
             SaveCommand = new RelayCommand(x => SaveCurrentProject());
             SaveAsCommand = new RelayCommand(x => SaveCurrentProject(true));
-            CloseProjectCommand = new RelayCommand(x => CurrentProject?.Close());
+            CloseProjectCommand = new RelayCommand(x => (x as TtTabModel)?.CloseTab());
             ExitCommand = new RelayCommand(x => Exit());
 
-            ImportCommand = new RelayCommand(x => ImportDialog.ShowDialog(CurrentProject, MainWindow));
-            ExportCommand = new RelayCommand(x => ExportDialog.ShowDialog(CurrentProject, MainWindow));
-            ViewPointDetailsCommand = new RelayCommand(x => PointDetailsDialog.ShowDialog(CurrentProject.Manager.GetPoints(), MainWindow));
+            ImportCommand = new RelayCommand(x => ImportDialog.ShowDialog(CurrentProject, this));
+            ExportCommand = new RelayCommand(x => ExportDialog.ShowDialog(CurrentProject, this));
+            ViewPointDetailsCommand = new RelayCommand(x => PointDetailsDialog.ShowDialog(CurrentProject.HistoryManager.GetPoints(), MainWindow));
             OpenInEarthCommand = new RelayCommand(x => OpenInGoogleEarth());
 
             SettingsCommand = new RelayCommand(x => SettingsWindow.ShowDialog(App.Settings, MainWindow));
@@ -182,7 +193,7 @@ namespace TwoTrails.ViewModels
                 {
                     if (File.Exists(filePath))
                     {
-                        OpenProject(filePath);
+                        //OpenProject(filePath);
                         break;
                     }
                 }
@@ -266,7 +277,7 @@ namespace TwoTrails.ViewModels
 
                                         if (Upgrade.DAL(dal, Settings))
                                         {
-                                            AddProject(new TtProject(dal, mal, Settings, this));
+                                            AddProject(new TtProject(dal, mal, Settings));
                                             MessageBox.Show("Upgrade Successful");
                                         }
                                         else
@@ -277,7 +288,7 @@ namespace TwoTrails.ViewModels
                                 }
                                 else
                                 {
-                                    AddProject(new TtProject(dal, mal, Settings, this));
+                                    AddProject(new TtProject(dal, mal, Settings));
                                 }
                             }
                             catch (Exception ex)
@@ -290,7 +301,11 @@ namespace TwoTrails.ViewModels
                         {
                             MessageBox.Show(MainWindow, "Project is already opened.");
 
-                            SwitchToTab(_Projects[filePath].ProjectTab);
+                            foreach (TabItem tab in _Tabs.Items)
+                            {
+                                if (tab.DataContext is ProjectTab projTab && projTab.Project.FilePath == filePath)
+                                    SwitchToTab(tab);
+                            }
                         }
                     }
                     else if (filePath.EndsWith(Consts.FILE_EXTENSION_MEDIA, StringComparison.InvariantCultureIgnoreCase))
@@ -352,7 +367,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
                                 Upgrade.DAL(dal, App.Settings, dalv2);
 
-                                AddProject(new TtProject(dal, mal, App.Settings, this));
+                                AddProject(new TtProject(dal, mal, App.Settings));
                             }
                         }
                     }
@@ -360,7 +375,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                     {
                         if (CurrentProject != null)
                         {
-                            ImportDialog.ShowDialog(CurrentProject, MainWindow, filePath);
+                            ImportDialog.ShowDialog(CurrentProject, this, MainWindow, filePath);
                         }
                         else
                         {
@@ -407,7 +422,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                 TtProjectInfo info = dialog.ProjectInfo;
 
                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
-                TtProject proj = new TtProject(dal, null, App.Settings, this);
+                TtProject proj = new TtProject(dal, null, App.Settings);
                 Trace.WriteLine($"Project Created ({dal.GetDataVersion()}): {dal.FilePath}");
 
                 AddProject(proj);
@@ -436,7 +451,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                 TtProjectInfo info = dialog.ProjectInfo;
 
                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
-                TtProject proj = new TtProject(dal, null, App.Settings, this);
+                TtProject proj = new TtProject(dal, null, App.Settings);
 
                 Trace.WriteLine($"Import Project Created ({dal.GetDataVersion()}): {dal.FilePath}");
                 
@@ -455,22 +470,22 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                             case Consts.FILE_EXTENSION_V2: idal = new TtV2SqliteDataAccessLayer(file); break;
                             case Consts.GPX_EXT:
                                 idal = new TtGpxDataAccessLayer(
-                                    new TtGpxDataAccessLayer.ParseOptions(file, proj.Manager.DefaultMetadata.Zone, startPolyNumber: proj.Manager.PolygonCount + 1)); break;
+                                    new TtGpxDataAccessLayer.ParseOptions(file, proj.HistoryManager.DefaultMetadata.Zone, startPolyNumber: proj.HistoryManager.PolygonCount + 1)); break;
                             case Consts.KML_EXT:
                             case Consts.KMZ_EXT:
                                 idal = new TtKmlDataAccessLayer(
-                                    new TtKmlDataAccessLayer.ParseOptions(file, proj.Manager.DefaultMetadata.Zone, startPolyNumber: proj.Manager.PolygonCount + 1)); break;
+                                    new TtKmlDataAccessLayer.ParseOptions(file, proj.HistoryManager.DefaultMetadata.Zone, startPolyNumber: proj.HistoryManager.PolygonCount + 1)); break;
                             case Consts.SHAPE_EXT:
                                 idal = new TtShapeFileDataAccessLayer(
-                                    new TtShapeFileDataAccessLayer.ParseOptions(file, proj.Manager.DefaultMetadata.Zone, proj.Manager.PolygonCount + 1)); break;
+                                    new TtShapeFileDataAccessLayer.ParseOptions(file, proj.HistoryManager.DefaultMetadata.Zone, proj.HistoryManager.PolygonCount + 1)); break;
                             case Consts.TEXT_EXT:
-                            case Consts.CSV_EXT: ImportDialog.ShowDialog(proj, this.MainWindow, file, true); break;
+                            case Consts.CSV_EXT: ImportDialog.ShowDialog(proj, this, this.MainWindow, file, true); break;
                             default: idal = null; break;
                         }
 
                         if (idal != null)
                         {
-                            Import.DAL(proj.Manager, idal);
+                            Import.DAL(proj.HistoryManager, idal);
                             proj.Save();
                         }
                     }
@@ -548,7 +563,9 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
         
         private void AddProject(TtProject project)
         {
-            _Tabs.Items.Add(project.ProjectTab.Tab);
+            CurrentTab = new ProjectTab(project, this);
+
+            _Tabs.Items.Add(CurrentTab.Tab);
             _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
 
             _Projects.Add(project.FilePath, project);
@@ -558,14 +575,39 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             project.MessagePosted += Project_MessagePosted;
         }
 
-        public void RemoveProject(TtProject project)
+        private void RemoveProject(TtProject project)
         {
             if (project != null)
             {
+                if (project.RequiresSave)
+                {
+                    MessageBoxResult result = MessageBox.Show($"{project.ProjectName} has unsaved data. Would you like to save before closing this project?",
+                                                String.Empty,
+                                                MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Cancel);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        try
+                        {
+                            project.Save();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                            return;
+                        }
+                    }
+                }
+
                 _Projects.Remove(project.FilePath);
                 project.MessagePosted -= Project_MessagePosted;
+                project.Dispose();
             }
 
+            project = null;
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             GC.Collect();
         }
 
@@ -580,19 +622,28 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
         }
 
-        public void SwitchToTab(TtTabModel tab)
+        public void SwitchToTab(TabItem tab)
         {
-            _Tabs.SelectedItem = tab.Tab;
-            tab.Tab.Focus();
+            _Tabs.SelectedItem = tab;
+            tab.Focus();
         }
 
 
-        public void CloseTab(TtTabModel tab)
+        public void RemoveTab(TtTabModel tab)
         {
             if (tab != null)
             {
-                tab.Close();
                 _Tabs.Items.Remove(tab.Tab);
+                if (tab is ProjectTab projTab)
+                {
+                    TtProject proj = projTab.Project;
+                    tab.Dispose();
+                    RemoveProject(proj);
+                }
+                else
+                {
+                    _Tabs.Items.Remove(tab.Tab);
+                }
             }
         }
         
@@ -603,7 +654,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             {
                 foreach (TtProject proj in _Projects.Values.ToList())
                 {
-                    proj.Close();
+                    RemoveProject(proj);
                 }
             }
             catch (Exception ex)
@@ -654,7 +705,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                             Directory.CreateDirectory(App.TEMP_DIR);
 
                         string file = Path.Combine(App.TEMP_DIR, $"{Guid.NewGuid().ToString()}.kmz");
-                        Export.KMZ(CurrentProject.Manager, CurrentProject.ProjectInfo, file);
+                        Export.KMZ(CurrentProject.HistoryManager, CurrentProject.ProjectInfo, file);
 
                         if (File.Exists(file))
                             Process.Start(file);

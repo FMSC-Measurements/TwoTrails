@@ -33,13 +33,20 @@ namespace TwoTrails.Dialogs
         {
             _Project = project;
 
-            PlotPolygons = new ObservableFilteredCollection<TtPolygon>(_Project.Manager.Polygons,
-                poly => _Project.Manager.GetPoints(poly.CN).All(p => p.IsWayPointAtBase()));
+            PlotPolygons = new ObservableFilteredCollection<TtPolygon>(_Project.HistoryManager.Polygons,
+                poly => _Project.HistoryManager.GetPoints(poly.CN).All(p => p.IsWayPointAtBase()));
+
+            this.Unloaded += CreateSubsetDialog_Unloaded;
 
             InitializeComponent();
             this.DataContext = this;
         }
 
+        private void CreateSubsetDialog_Unloaded(object sender, RoutedEventArgs e)
+        {
+            this.Unloaded -= CreateSubsetDialog_Unloaded;
+            PlotPolygons.Dispose();
+        }
 
         private void CreateSubset()
         {
@@ -62,7 +69,7 @@ namespace TwoTrails.Dialogs
             }
             
             
-            List<TtPolygon> polygons = _Project.Manager.GetPolygons();
+            List<TtPolygon> polygons = _Project.HistoryManager.GetPolygons();
             string gPolyName = GeneratePolyName(SelectedPlotPolygon);
 
             TtPolygon poly = null;
@@ -102,23 +109,23 @@ namespace TwoTrails.Dialogs
                                     Increment = 1
                                 };
 
-                                _Project.Manager.AddPolygon(poly);
+                                _Project.HistoryManager.AddPolygon(poly);
                                 break;
                             }
                         }
-                        _Project.Manager.StartMultiCommand();
+                        _Project.HistoryManager.StartMultiCommand();
                     }
                     else return;
                 }
                 else
                 {
-                    _Project.Manager.StartMultiCommand();
-                    _Project.Manager.DeletePointsInPolygon(poly.CN);
+                    _Project.HistoryManager.StartMultiCommand();
+                    _Project.HistoryManager.DeletePointsInPolygon(poly.CN);
                 }
             }
             else
             {
-                _Project.Manager.StartMultiCommand();
+                _Project.HistoryManager.StartMultiCommand();
 
                 poly = new TtPolygon()
                 {
@@ -127,10 +134,10 @@ namespace TwoTrails.Dialogs
                     Increment = 1
                 };
 
-                _Project.Manager.AddPolygon(poly);
+                _Project.HistoryManager.AddPolygon(poly);
             }
 
-            List<TtPoint> points = _Project.Manager.GetPoints(SelectedPlotPolygon.CN);
+            List<TtPoint> points = _Project.HistoryManager.GetPoints(SelectedPlotPolygon.CN);
 
             int maxPoints = IsPercentMode ? (int)((SubsetValue / 100.0) * points.Count) : SubsetValue > points.Count ? points.Count : SubsetValue;
             Random rand = new Random(DateTime.Now.Millisecond);
@@ -154,7 +161,7 @@ namespace TwoTrails.Dialogs
                     UnAdjX = p.UnAdjX,
                     UnAdjY = p.UnAdjY,
                     Polygon = poly,
-                    Group = _Project.Manager.MainGroup,
+                    Group = _Project.HistoryManager.MainGroup,
                     Metadata = p.Metadata,
                     Index = index++,
                     Comment = $"Generated from {p.PID} : {p.Polygon.Name}",
@@ -165,9 +172,9 @@ namespace TwoTrails.Dialogs
                 prev = curr;
             }
 
-            _Project.Manager.AddPoints(wayPoints);
+            _Project.HistoryManager.AddPoints(wayPoints);
             
-            _Project.Manager.CommitMultiCommand();
+            _Project.HistoryManager.CommitMultiCommand();
 
             MessageBox.Show($"{points.Count} WayPoints Created");
         }
@@ -201,8 +208,6 @@ namespace TwoTrails.Dialogs
 
             if (owner != null)
                 dialog.Owner = owner;
-            else
-                dialog.Owner = project.MainModel.MainWindow;
 
             return dialog.ShowDialog();
         }
@@ -213,8 +218,6 @@ namespace TwoTrails.Dialogs
 
             if (owner != null)
                 dialog.Owner = owner;
-            else
-                dialog.Owner = project.MainModel.MainWindow;
 
             if (onClose != null)
             {

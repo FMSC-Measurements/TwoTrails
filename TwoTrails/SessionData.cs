@@ -75,8 +75,6 @@ namespace TwoTrails
                 return false;
             }
         }
-
-        public static TtPolygon TargetPolygon { get; set; }
     }
 
     public enum GpsReportStatus

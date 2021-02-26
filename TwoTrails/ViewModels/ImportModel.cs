@@ -32,7 +32,7 @@ namespace TwoTrails.ViewModels
         public ICommand CancelCommand { get; }
 
         private Window _Window;
-        private ITtManager _Manager => _Project.Manager;
+        private ITtManager _Manager => _Project.HistoryManager;
         private TtProject _Project;
 
         public Control MainContent
@@ -73,17 +73,28 @@ namespace TwoTrails.ViewModels
         private bool _AutoCloseOnImport;
 
 
-        public ImportModel(Window window, TtProject project, string fileName = null, bool autoCloseOnImport = false)
+        public ImportModel(TtProject project, MainWindowModel mainWindowModel, Window window, string fileName = null, bool autoCloseOnImport = false)
         {
             _Window = window;
             _Project = project;
             MainContent = null;
             CurrentFile = null;
 
-            BrowseFileCommand = new BindedRelayCommand<ImportModel>(x => BrowseFile(), x => !IsImporting,
+            BrowseFileCommand = new BindedRelayCommand<ImportModel>(
+                x => BrowseFile(), x => !IsImporting,
                 this, m => m.IsImporting);
 
-            _ImportCommand = new BindedRelayCommand<ImportModel>(x => ImportData(), x => CanImport, this, m => m.CanImport);
+            _ImportCommand = new BindedRelayCommand<ImportModel>(
+                x => ImportData(), x => CanImport,
+                this, m => m.CanImport);
+
+            //BrowseFileCommand = new BindedRelayCommand<ImportModel>(
+            //    (x, m) => m.BrowseFile(), (x, m) => !m.IsImporting,
+            //    this, m => m.IsImporting);
+
+            //_ImportCommand = new BindedRelayCommand<ImportModel>(
+            //    (x, m) => m.ImportData(), (x, m) => m.CanImport,
+            //    this, m => m.CanImport);
 
             CancelCommand = new RelayCommand(x => Cancel());
 

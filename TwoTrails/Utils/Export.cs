@@ -591,7 +591,7 @@ namespace TwoTrails.Utils
 
         public static void KMZ(IEnumerable<TtProject> projects, String fileName)
         {
-            KmlDocument doc = TtKmlGenerator.Generate(projects.Select(p => p.Manager), "MultiProject");
+            KmlDocument doc = TtKmlGenerator.Generate(projects.Select(p => p.HistoryManager), "MultiProject");
 
             string kmlName = "multiproject.kml";
             string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);

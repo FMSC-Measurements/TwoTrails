@@ -10,62 +10,40 @@ namespace TwoTrails
 {
     public abstract class TtTabModel : NotifyPropertyChangedEx
     {
+        public ICommand CloseTabCommand { get; }
+        public virtual ICommand OpenInWinndowCommand { get; } = null;
+
+
         public TabItem Tab { get; private set; }
 
-        public virtual String TabTitle
-        {
-            get { return $"{Project.ProjectName}{(Project.RequiresSave ? "*" : String.Empty)}"; }
-        }
-
-        public virtual String TabInfo { get { return String.Empty; } }
-
-        public TtProject Project { get; private set; }
-
-        public virtual String ToolTip { get { return Project.FilePath; } } 
+        public abstract String TabTitle { get; }
 
         public abstract bool IsDetachable { get; }
 
-        public bool IsEditingPoints { get { return Get<bool>(); } protected set { Set(value); } }
+        public virtual String TabInfo => String.Empty;
 
-        public ICommand CloseTabCommand { get; }
-        public ICommand SaveCommand { get; }
-        public virtual ICommand OpenInWinndowCommand { get; } = null;
-        
-        public TtTabModel(TtProject project) : base()
+        public virtual String ToolTip => String.Empty;
+
+
+        public TtTabModel() : base()
         {
-            Project = project;
-
             this.Tab = new TabItem();
             
-            SaveCommand = new RelayCommand(x => Project.Save());
-            CloseTabCommand = new RelayCommand(x => Project.CloseTab(this));
-
-            Project.PropertyChanged += Project_PropertyChanged;
+            CloseTabCommand = new RelayCommand(x => OnTabClose());
 
             Tab.DataContext = this;
-
-            IsEditingPoints = false;
         }
 
-        private void Project_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "ProjectName" || e.PropertyName == "RequiresSave")
-            {
-                Tab.Dispatcher.Invoke(() =>
-                {
-                    Tab.Header = TabTitle;
-                });
-                OnPropertyChanged(nameof(TabTitle));
-            }
-            else if (e.PropertyName == "DAL")
-            {
-                OnPropertyChanged(nameof(ToolTip));
-            }
-        }
 
-        public virtual void Close()
-        {
+        public void CloseTab() => OnTabClose();
 
+        protected abstract void OnTabClose();
+
+        protected override void Dispose(bool dispoing)
+        {
+            base.Dispose(dispoing);
+
+            Tab.DataContext = null;
         }
     }
 }

@@ -11,8 +11,8 @@
         WindowStartupLocation="CenterScreen">
 
     <Window.InputBindings>
-        <KeyBinding Command="{Binding CurrentProject.UndoCommand}" Key="Z" Modifiers="Ctrl"/>
-        <KeyBinding Command="{Binding CurrentProject.RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
+        <KeyBinding Command="{Binding CurrentTab.UndoCommand}" Key="Z" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding CurrentTab.RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
         <KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SaveAsCommand}" Key="S" Modifiers="Ctrl+Alt"/>
@@ -92,7 +92,7 @@
 
                     <Separator/>
 
-                    <MenuItem Header="Close Project" Command="{Binding CloseProjectCommand}" CommandParameter="{Binding CurrentProject}"
+                    <MenuItem Header="Close Project" Command="{Binding CloseProjectCommand}" CommandParameter="{Binding CurrentTab}"
                           IsEnabled="{Binding Path=HasOpenedProject}"/>
                     <MenuItem Header="Recent Projects" Name="miRecent" IsEnabled="{Binding Path=RecentItemsAvail}" />
 
@@ -102,11 +102,11 @@
                 </MenuItem>
 
                 <MenuItem Header="_Edit">
-                    <MenuItem Header="Undo" Command="{Binding CurrentProject.UndoCommand}" InputGestureText="Ctrl+Z"
+                    <MenuItem Header="Undo" Command="{Binding CurrentTab.UndoCommand}" InputGestureText="Ctrl+Z"
                           Style="{StaticResource styleMiPointEdit}">
                         <!-- Menu for action history -->
                     </MenuItem>
-                    <MenuItem Header="Redo" Command="{Binding CurrentProject.RedoCommand}" InputGestureText="Ctrl+Shift+Z"
+                    <MenuItem Header="Redo" Command="{Binding CurrentTab.RedoCommand}" InputGestureText="Ctrl+Shift+Z"
                           Style="{StaticResource styleMiPointEdit}"/>
 
                     <MenuItem Header="History" Command="{Binding CurrentProject.HistoryCommand}" InputGestureText="Ctrl+H"
@@ -124,7 +124,7 @@
 
                     <MenuItem Header="Reset Point" Command="{Binding PointEditor.ResetPointCommand}" InputGestureText="Ctrl+R"
                           Style="{StaticResource ResourceKey=styleMiPointEdit}"/>
-                    <MenuItem Header="Discard All Changes" Command="{Binding Project.DiscardChangesCommand}"
+                    <MenuItem Header="Discard All Changes" Command="{Binding CurrentProject.DiscardChangesCommand}"
                           Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
 
                     <Separator/>
