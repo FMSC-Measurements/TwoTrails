@@ -47,7 +47,7 @@ namespace TwoTrails.Core.Points
                     if (oldParent != null)
                     {
                         oldParent.LocationChanged -= ParentPoint_LocationChanged;
-                        _ParentPoint.OnAccuracyChanged -= ParentPoint_OnAccuracyChanged;
+                        oldParent.OnAccuracyChanged -= ParentPoint_OnAccuracyChanged;
                         oldParent.RemoveLinkedPoint(this);
 
                         if (_ParentPoint != null && !oldParent.HasSameAdjLocation(_ParentPoint))
@@ -102,7 +102,7 @@ namespace TwoTrails.Core.Points
         private void CopyQndmValues(QuondamPoint point)
         {
             _ManualAccuracy = point._ManualAccuracy;
-            ParentPoint = point.ParentPoint;
+            _ParentPoint = point.ParentPoint;
         }
 
 

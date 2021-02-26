@@ -363,29 +363,7 @@ namespace TwoTrails.ViewModels
             PointEditorControl.RemoveHandler(PointEditorControl.KeyDownEvent, KeyDownHandler);
             PointEditorControl.RemoveHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
 
-            PointEditorControl.Dispose();
-
             BindingOperations.ClearAllBindings(ProjectEditorControl);
-
-
-            ClearBasePropertyValues();
-
-
-            DataStyle.Dispose();
-            PointEditor.Dispose();
-
-            if (MapControl != null)
-                MapControl.Dispose();
-
-
-            ProjectEditorControl = null;
-
-            Delegate[] connections = GetEvents();
-
-            if (connections.Length > 0)
-            {
-
-            }
         }
 
 

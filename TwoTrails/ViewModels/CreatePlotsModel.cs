@@ -623,16 +623,6 @@ namespace TwoTrails.ViewModels
             MessageBox.Show($"{addPoints.Sum(p => p.Value.Item2.Count)} WayPoints Created");
             IsGenerating = false;
         }
-
-
-        protected override void Dispose(bool disposing)
-        {
-            if (!Disposed)
-            {
-                if (InclusionPolygons != null)
-                    InclusionPolygons.Dispose();
-            }
-        }
     }
 
 

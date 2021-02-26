@@ -262,20 +262,11 @@ namespace TwoTrails.Core.Points
             _PID = point._PID;
             _TimeCreated = point._TimeCreated;
 
-            if (point._Polygon != null)
-                Polygon = point._Polygon;
-            else
-                _PolyCN = point._PolyCN;
+            _PolyCN = point._PolyCN;
 
-            if (point._Group != null)
-                Group = point._Group;
-            else
-                _GroupCN = point._GroupCN;
+            _GroupCN = point._GroupCN;
 
-            if (point._Metadata != null)
-                Metadata = point._Metadata;
-            else
-                _MetadataCN = point._MetadataCN;
+            _MetadataCN = point._MetadataCN;
 
             _Comment = point._Comment;
             _OnBoundary = point._OnBoundary;
@@ -290,7 +281,7 @@ namespace TwoTrails.Core.Points
 
             _Accuracy = point._Accuracy;
 
-            ExtendedData = new DataDictionary(point._ExtendedData);
+            _ExtendedData = new DataDictionary(point._ExtendedData);
         }
 
         public TtPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,

@@ -18,22 +18,16 @@ namespace TwoTrails.Controls
     /// </summary>
     public partial class MapControl : UserControl
     {
-        public static readonly DependencyProperty ManagerProperty =
-                DependencyProperty.Register(nameof(Manager), typeof(IObservableTtManager), typeof(MapControl));
-        
-        public IObservableTtManager Manager
-        {
-            get { return (IObservableTtManager)this.GetValue(ManagerProperty); }
-            set
-            {
-                this.SetValue(ManagerProperty, value);
-                HasManager = value != null;
-            }
-        }
+        public IObservableTtManager Manager { get; set; }
 
-        public PolygonVisibilityControl PolygonVisibilityControl { get; set; }
+        public PolygonVisibilityControl PolygonVisibilityControl { get; private set; }
+        public PolygonGraphicBrushOptions DefaultPolygonGraphicBrushOptions { get; private set; }
 
-        public bool HasManager { get; set; }
+
+        private readonly KeyEventHandler KeyDownHandler, KeyUpHandler;
+        public bool CtrlKeyPressed { get; private set; }
+
+        public bool HasManager => Manager != null;
 
         public TtMapManager MapManager { get; private set; }
 
@@ -42,43 +36,51 @@ namespace TwoTrails.Controls
 
         public MapControl()
         {
+            this.Loaded += OnLoaded;
+            this.Unloaded += OnUnloaded;
+
             InitializeComponent();
-            map.CredentialsProvider = new ApplicationIdCredentialsProvider(APIKeys.BING_MAPS_API_KEY);
-            
-            map.Mode = new AerialMode();
 
             map.Loaded += OnMapLoaded;
             map.MouseMove += OnMouseMove;
 
-            this.Loaded += OnLoaded;
-            this.Unloaded += (s, e) => {
-                map.MouseMove -= OnMouseMove;
+            map.CredentialsProvider = new ApplicationIdCredentialsProvider(APIKeys.BING_MAPS_API_KEY);
+            map.Mode = new AerialMode();
 
-                if (PolygonVisibilityControl != null)
-                    PolygonVisibilityControl.Dispose();
-
-                if (MapManager != null)
-                    MapManager.Dispose();
-            };
+            KeyDownHandler = new KeyEventHandler(OnKeyDown);
+            KeyUpHandler = new KeyEventHandler(OnKeyUp);
         }
-
 
         public MapControl(IObservableTtManager manager) : this()
         {
             Manager = manager;
         }
 
+
         private void OnLoaded(object sender, EventArgs e)
         {
             if (Manager != null && MapManager == null)
             {
-                MapManager = new TtMapManager(map, Manager);
-                PolygonVisibilityControl = new PolygonVisibilityControl(MapManager.PolygonManagers, new PolygonGraphicBrushOptions(null, Manager.GetDefaultPolygonGraphicOption()));
+                MapManager = new TtMapManager(this, map, Manager);
+                DefaultPolygonGraphicBrushOptions = new PolygonGraphicBrushOptions(null, Manager.GetDefaultPolygonGraphicOption());
+                PolygonVisibilityControl = new PolygonVisibilityControl(MapManager.PolygonManagers, DefaultPolygonGraphicBrushOptions);
                 DataContext = this;
+
+                AddHandler(MapControl.KeyDownEvent, KeyDownHandler);
+                AddHandler(MapControl.KeyUpEvent, KeyUpHandler);
             }
 
             this.Loaded -= OnLoaded;
         }
+
+        private void OnUnloaded(object sender, EventArgs e)
+        {
+            RemoveHandler(MapControl.KeyDownEvent, KeyDownHandler);
+            RemoveHandler(MapControl.KeyUpEvent, KeyUpHandler);
+
+            this.Unloaded -= OnUnloaded;
+        }
+
 
         private void OnMapLoaded(object sender, EventArgs e)
         {
@@ -105,6 +107,19 @@ namespace TwoTrails.Controls
 
                 tbLoc.Text = $"[{ coords.Zone }]  X: { coords.X:F2}  Y: { coords.Y:F2}";
             }
+        }
+
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftCtrl)
+                CtrlKeyPressed = true;
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftCtrl)
+                CtrlKeyPressed = false;
         }
 
 

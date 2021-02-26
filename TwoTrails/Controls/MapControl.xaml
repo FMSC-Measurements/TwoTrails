@@ -403,7 +403,7 @@
             <ListBox x:Name="lvPolygons" Grid.Row="1" Background="LightGray"
                       ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Visible"
                       ScrollViewer.CanContentScroll="False"
-                      ItemsSource="{Binding MapManager.PolygonManagers, UpdateSourceTrigger=PropertyChanged}">
+                      ItemsSource="{Binding MapManager.PolygonManagers, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Background" Value="White" />
@@ -453,7 +453,12 @@
                                                     </Grid>
                                                 </Image.ToolTip>
                                                 <Image.InputBindings>
-                                                    <MouseBinding Gesture="LeftClick" Command="{Binding ZoomToPolygonCommand}" />
+                                                    <MouseBinding Gesture="LeftClick" Command="{Binding   
+                                                        Path=MapManager.ZoomToPolygonCommand,   
+                                                        RelativeSource={RelativeSource AncestorType=UserControl},  
+                                                        Mode=Default}"
+                                                        CommandParameter="{Binding Polygon}" />
+														<!--Command="{Binding ZoomToPolygonCommand}" />-->
                                                 </Image.InputBindings>
                                             </Image>
                                         </Grid>

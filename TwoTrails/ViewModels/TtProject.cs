@@ -126,15 +126,5 @@ namespace TwoTrails.ViewModels
             Manager.ReplaceMAL(MAL);
             OnPropertyChanged(nameof(MAL));
         }
-
-
-        protected override void Dispose(bool disposing)
-        {
-            ProjectInfo.PropertyChanged -= ProjectInfoChanged;
-            HistoryManager.HistoryChanged -= Manager_HistoryChanged;
-
-            HistoryManager.Dispose();
-            Manager.Dispose();
-        }
     }
 }

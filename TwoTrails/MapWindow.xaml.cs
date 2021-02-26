@@ -13,10 +13,6 @@ namespace TwoTrails
         public MapControl MapControl { get; private set; }
 
 
-        public MapWindow(TtProject project) :
-            this($"Map - {project.ProjectName}", new MapControl(project.Manager))
-        { }
-
         public MapWindow(string projectName, MapControl mapControl)
         {
             InitializeComponent();
@@ -24,6 +20,7 @@ namespace TwoTrails
             Title = $"Map - {projectName}";
             cc.Content = MapControl = mapControl;
         }
+
 
         protected override void OnClosing(CancelEventArgs e)
         {

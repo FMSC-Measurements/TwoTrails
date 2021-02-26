@@ -1,4 +1,5 @@
 ﻿using FMSC.Core.Windows.Controls;
+using System;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.ViewModels;
@@ -19,6 +20,8 @@ namespace TwoTrails.Controls
             _ProjectEditor = projectEditor;
             this.DataContext = _ProjectEditor;
 
+            this.Loaded += ProjectEditorControl_Loaded;
+
             InitializeComponent();
 
             lbMetadata.SelectedIndex = 0;
@@ -30,10 +33,20 @@ namespace TwoTrails.Controls
             SwitchToTab(tab);
         }
 
+        private void ProjectEditorControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            this.Loaded -= ProjectEditorControl_Loaded;
+
+            if (_ProjectEditor.MapControl != null)
+                MapContainer.Children.Add(_ProjectEditor.MapControl);
+        }
+
+
         public void SwitchToTab(ProjectTabSection tab)
         {
             tabControl.SelectedIndex = (int)tab;
         }
+
 
         private void TextIsUnsignedInteger(object sender, TextCompositionEventArgs e)
         {
@@ -49,6 +62,7 @@ namespace TwoTrails.Controls
         {
             e.Handled = ControlUtils.TextHasRestrictedCharacters(sender, e);
         }
+
 
         private void CommandInterceptor(object sender, KeyEventArgs e)
         {

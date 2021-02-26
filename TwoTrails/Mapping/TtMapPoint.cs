@@ -17,7 +17,7 @@ namespace TwoTrails.Mapping
     public delegate void MapPointEvent(TtMapPoint point);
     public delegate void MapPointSelectedEvent(TtMapPoint point, bool adjusted);
 
-    public class TtMapPoint : NotifyPropertyChangedEx, IDisposable
+    public class TtMapPoint : NotifyPropertyChangedEx
     {
         public event MapPointEvent LocationChanged;
         public event MapPointSelectedEvent PointSelected;
@@ -34,6 +34,8 @@ namespace TwoTrails.Mapping
         public bool IsNavPoint { get; }
         public bool IsMiscPoint { get { return Point.IsMiscPoint(); } }
         public int Index { get { return Point.Index; } }
+
+        private PolygonGraphicOptions _PGO { get; }
 
         private Map _Map;
         
@@ -201,6 +203,7 @@ namespace TwoTrails.Mapping
         public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo)
         {
             Point = point;
+            _PGO = pgo;
 
             AdjPushpin.Visibility = Visibility.Collapsed;
             UnAdjPushpin.Visibility = Visibility.Collapsed;
@@ -218,35 +221,19 @@ namespace TwoTrails.Mapping
             ToolTipService.SetShowDuration(UnAdjPushpin, 60000);
 
 
-            AdjColor = MediaTools.GetColor(pgo.AdjPtsColor);
-            UnAdjColor = MediaTools.GetColor(pgo.UnAdjPtsColor);
-            WayPointColor = MediaTools.GetColor(pgo.WayPtsColor);
+            AdjColor = MediaTools.GetColor(_PGO.AdjPtsColor);
+            UnAdjColor = MediaTools.GetColor(_PGO.UnAdjPtsColor);
+            WayPointColor = MediaTools.GetColor(_PGO.WayPtsColor);
 
-            IsNavPoint = point.IsNavPoint();
+            IsNavPoint = Point.IsNavPoint();
 
-            pgo.ColorChanged += (PolygonGraphicOptions _pgo, GraphicCode code, int color) =>
-            {
-                switch (code)
-                {
-                    case GraphicCode.ADJPTS_COLOR:
-                        AdjColor = MediaTools.GetColor(color);
-                        break;
-                    case GraphicCode.UNADJPTS_COLOR:
-                        UnAdjColor = MediaTools.GetColor(color);
-                        break;
-                    case GraphicCode.WAYPTS_COLOR:
-                        WayPointColor = MediaTools.GetColor(color);
-                        break;
-                    default:
-                        break;
-                }
-            };
+            _PGO.ColorChanged += PGO_ColorChanged;
 
-            point.PropertyChanged += Point_PropertyChanged;
-            if (point is QuondamPoint qp)
+            Point.PropertyChanged += Point_PropertyChanged;
+            if (Point is QuondamPoint qp)
                 qp.ParentPoint.PropertyChanged += Point_PropertyChanged;
 
-            point.LocationChanged += UpdateLocation;
+            Point.LocationChanged += UpdateLocation;
             UpdateLocation(point);
 
             _Map = map;
@@ -285,6 +272,25 @@ namespace TwoTrails.Mapping
                 AdjPushpin.ToolTip = new PointInfoBox(this, true);
             }
         }
+
+        private void PGO_ColorChanged(PolygonGraphicOptions _pgo, GraphicCode code, int color)
+        {
+            switch (code)
+            {
+                case GraphicCode.ADJPTS_COLOR:
+                    AdjColor = MediaTools.GetColor(color);
+                    break;
+                case GraphicCode.UNADJPTS_COLOR:
+                    UnAdjColor = MediaTools.GetColor(color);
+                    break;
+                case GraphicCode.WAYPTS_COLOR:
+                    WayPointColor = MediaTools.GetColor(color);
+                    break;
+                default:
+                    break;
+            }
+        }
+
 
         private void UpdateLocation(TtPoint point)
         {
@@ -352,35 +358,10 @@ namespace TwoTrails.Mapping
                 PointSelected?.Invoke(this, false);
         }
 
-        
-        public void Detach()
-        {
-            if (_Map != null)
-            {
-                _Map.Children.Remove(AdjPushpin);
-                _Map.Children.Remove(UnAdjPushpin);
-            }
-        }
 
         public override string ToString()
         {
             return $"Point {Point.PID}";
-        }
-
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposed)
-        {
-            AdjPushpin.MouseLeftButtonDown -= AdjPushpin_MouseLeftButtonDown;
-            UnAdjPushpin.MouseLeftButtonDown -= UnAdjPushpin_MouseLeftButtonDown;
-
-            AdjPushpin.ToolTipOpening -= LoadAdjToolTip;
-            UnAdjPushpin.ToolTipOpening -= LoadUnAdjToolTip;
         }
     }
 }

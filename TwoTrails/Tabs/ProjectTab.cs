@@ -243,8 +243,6 @@ namespace TwoTrails
             ProjectEditor.PointEditor.PropertyChanged -= PointEditor_PropertyChanged;
             _ProjectEditorControl.Loaded -= ProjectEditorControl_Loaded;
             _ProjectEditorControl.tabControl.SelectionChanged -= ProjectEditor_TabSelectionChanged;
-
-            ProjectEditor.Dispose();
         }
     }
 }

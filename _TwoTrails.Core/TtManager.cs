@@ -56,7 +56,7 @@ namespace TwoTrails.Core
 
         public TtMetadata DefaultMetadata { get; private set; }
 
-        public bool IgnorePointEvents { get; protected set; }
+        public bool IgnorePointEvents { get; protected set; } = true;
 
         public int PolygonCount => _Polygons.Count;
         public int PointCount => _Points.Count;
@@ -75,6 +75,9 @@ namespace TwoTrails.Core
 
             Load();
             LoadMedia();
+			
+			IgnorePointEvents = false;
+			RecalculatePolygons();
         }
 
         public void ReplaceDAL(ITtDataLayer dal)
@@ -245,8 +248,13 @@ namespace TwoTrails.Core
 
         public void Reload()
         {
+			IgnorePointEvents = true;
+			
             Load();
             LoadMedia();
+			
+			IgnorePointEvents = false;
+			RecalculatePolygons();
         }
 
         protected void AttachMetadataEvents(TtMetadata meta)
@@ -288,8 +296,10 @@ namespace TwoTrails.Core
 
             if (_PolygonUpdateHandlers.ContainsKey(poly.CN))
             {
-                _PolygonUpdateHandlers[poly.CN].Cancel();
+				DelayActionHandler dah = _PolygonUpdateHandlers[poly.CN];
+                //_PolygonUpdateHandlers[poly.CN].Cancel();
                 _PolygonUpdateHandlers.Remove(poly.CN);
+				dah.Dispose();
             }
         }
 
@@ -1234,41 +1244,41 @@ namespace TwoTrails.Core
         /// <param name="metadata">The Point's Metadata</param>
         /// <param name="group">The Group the Point is in. default:MainGroup</param>
         /// <returns>New Point</returns>
-        public TtPoint CreatePoint(OpType op, TtPolygon polygon, TtMetadata metadata = null, TtGroup group = null)
-        {
-            TtPoint point = null;
+        //public TtPoint CreatePoint(OpType op, TtPolygon polygon, TtMetadata metadata = null, TtGroup group = null)
+        //{
+        //    TtPoint point = null;
+		//
+        //    switch (op)
+        //    {
+        //        case OpType.GPS:
+        //            point = new GpsPoint();
+        //            break;
+        //        case OpType.Take5:
+        //            point = new Take5Point();
+        //            break;
+        //        case OpType.Traverse:
+        //            point = new TravPoint();
+        //            break;
+        //        case OpType.SideShot:
+        //            point = new SideShotPoint();
+        //            break;
+        //        case OpType.Quondam:
+        //            point = new QuondamPoint();
+        //            break;
+        //        case OpType.Walk:
+        //            point = new WalkPoint();
+        //            break;
+        //        case OpType.WayPoint:
+        //            point = new WayPoint();
+        //            break;
+        //    }
 
-            switch (op)
-            {
-                case OpType.GPS:
-                    point = new GpsPoint();
-                    break;
-                case OpType.Take5:
-                    point = new Take5Point();
-                    break;
-                case OpType.Traverse:
-                    point = new TravPoint();
-                    break;
-                case OpType.SideShot:
-                    point = new SideShotPoint();
-                    break;
-                case OpType.Quondam:
-                    point = new QuondamPoint();
-                    break;
-                case OpType.Walk:
-                    point = new WalkPoint();
-                    break;
-                case OpType.WayPoint:
-                    point = new WayPoint();
-                    break;
-            }
+        //    point.Polygon = polygon;
+        //    point.Metadata = metadata ?? DefaultMetadata;
+        //    point.Group = group ?? MainGroup;
 
-            point.Polygon = polygon;
-            point.Metadata = metadata ?? DefaultMetadata;
-            point.Group = group ?? MainGroup;
-
-            return point;
-        }
+        //    return point;
+        //}
 
         /// <summary>
         /// Add a point to a polygon

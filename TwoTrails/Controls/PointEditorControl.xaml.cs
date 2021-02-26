@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -25,32 +27,13 @@ namespace TwoTrails.Controls
             InitializeComponent();
             
             this.DataContext = (DataEditor = dataEditor);
+
+            dgPoints.PreviewMouseUp += DgPoints_PreviewMouseUp;
+            dgPoints.LoadingRow += DgPoints_LoadingRow;
+            dgPoints.BindableColumns = DataEditor.DataColumns;
         }
 
-
-
-        private void TextBox_UpdateBinding(object sender, RoutedEventArgs e)
-        {
-            if (sender is TextBox tb && tb.IsEnabled)
-            {
-                var expression = tb.GetBindingExpression(TextBox.TextProperty);
-
-                if (expression != null)
-                    expression.UpdateSource();
-            }
-        }
-
-        private void DataGrid_OnLoadingRow(object sender, DataGridRowEventArgs e)
-        {
-            Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() => AlterRow(e)));
-        }
-
-        private void AlterRow(DataGridRowEventArgs e)
-        {
-            e.Row.Style = DataStyles.GetRowStyle(e.Row.Item as TtPoint);
-        }
-
-        private void dgPoints_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        private void DgPoints_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             DependencyObject dep = (DependencyObject)e.OriginalSource;
 
@@ -75,6 +58,26 @@ namespace TwoTrails.Controls
             }
         }
 
+        private void DgPoints_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() => AlterRow(e)));
+        }
+
+        private void TextBox_UpdateBinding(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox tb && tb.IsEnabled)
+            {
+                var expression = tb.GetBindingExpression(TextBox.TextProperty);
+
+                if (expression != null)
+                    expression.UpdateSource();
+            }
+        }
+
+        private void AlterRow(DataGridRowEventArgs e)
+        {
+            e.Row.Style = DataStyles.GetRowStyle(e.Row.Item as TtPoint);
+        }
 
         private void TextIsInteger(object sender, TextCompositionEventArgs e)
         {

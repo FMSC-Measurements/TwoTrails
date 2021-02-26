@@ -601,7 +601,6 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
                 _Projects.Remove(project.FilePath);
                 project.MessagePosted -= Project_MessagePosted;
-                project.Dispose();
             }
 
             project = null;
@@ -637,7 +636,6 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                 if (tab is ProjectTab projTab)
                 {
                     TtProject proj = projTab.Project;
-                    tab.Dispose();
                     RemoveProject(proj);
                 }
                 else
