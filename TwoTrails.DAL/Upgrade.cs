@@ -40,6 +40,11 @@ namespace TwoTrails.DAL
                             _Database.ExecuteNonQuery(TwoTrailsSchema.UPGRADE_OSV_2_0_3, conn, trans);
                         }
 
+                        if (oldVersion < TwoTrailsSchema.OSV_2_1_0)
+                        {
+                            _Database.ExecuteNonQuery(TwoTrailsSchema.UPGRADE_OSV_2_1_0, conn, trans);
+                        }
+
                         _Database.Update(TwoTrailsSchema.ProjectInfoSchema.TableName,
                             new Dictionary<string, object>()
                             {
@@ -48,7 +53,7 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
 
-                        dal.InsertActivity(new TtUserAction("Upgrader", settings.DeviceName, DateTime.Now, DataActionType.ProjectUpgraded, $"{oldVersion} -> {TwoTrailsSchema.SchemaVersion}"));
+                        dal.InsertActivity(new TtUserAction("Upgrader", settings.DeviceName, $"PC: {settings.AppVersion}", DateTime.Now, DataActionType.ProjectUpgraded, $"{oldVersion} -> {TwoTrailsSchema.SchemaVersion}"));
 
                         Trace.WriteLine($"Upgrade ({oldVersion} -> {TwoTrailsSchema.SchemaVersion}): {file}");
                     }
@@ -70,7 +75,7 @@ namespace TwoTrails.DAL
         //TwoTrails V2 Files
         public static void DAL(ITtDataLayer ndal, ITtSettings settings, TtV2SqliteDataAccessLayer odal)
         {
-            TtUserAction activity = new TtUserAction("Upgrader", settings.DeviceName, DateTime.Now, DataActionType.ProjectUpgraded, $"TwoTrailsV2 {odal.GetDataVersion()} -> {TwoTrailsSchema.SchemaVersion}");
+            TtUserAction activity = new TtUserAction("Upgrader", settings.DeviceName, $"PC: {settings.AppVersion}", DateTime.Now, DataActionType.ProjectUpgraded, $"TwoTrailsV2 {odal.GetDataVersion()} -> {TwoTrailsSchema.SchemaVersion}");
 
             IEnumerable<TtMetadata> meta = odal.GetMetadata();
             if (meta.Any())

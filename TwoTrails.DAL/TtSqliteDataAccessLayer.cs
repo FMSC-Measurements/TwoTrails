@@ -2186,6 +2186,7 @@ namespace TwoTrails.DAL
             {
                 [TTS.ActivitySchema.UserName] = activity.UserName,
                 [TTS.ActivitySchema.DeviceName] = activity.DeviceName,
+                [TTS.ActivitySchema.AppVersion] = activity.AppVersion,
                 [TTS.ActivitySchema.ActivityDate] = activity.Date,
                 [TTS.ActivitySchema.ActivityType] = (int)activity.Action,
                 [TTS.ActivitySchema.ActivityNotes] = activity.Notes
@@ -2202,7 +2203,7 @@ namespace TwoTrails.DAL
                 {
                     if (dr != null)
                     {
-                        string username, devicename, notes;
+                        string username, devicename, appVersion, notes;
                         DateTime date;
                         DataActionType dat;
 
@@ -2210,11 +2211,12 @@ namespace TwoTrails.DAL
                         {
                             username = dr.GetString(0);
                             devicename = dr.GetString(1);
-                            date = TtCoreUtils.ParseTime(dr.GetString(2));
-                            dat = (DataActionType)dr.GetInt32(3);
-                            notes = dr.GetStringN(4);
+                            appVersion = dr.GetString(2);
+                            date = TtCoreUtils.ParseTime(dr.GetString(3));
+                            dat = (DataActionType)dr.GetInt32(4);
+                            notes = dr.GetStringN(5);
 
-                            yield return new TtUserAction(username, devicename, date, dat, notes);
+                            yield return new TtUserAction(username, devicename, appVersion, date, dat, notes);
                         }
 
                         dr.Close();

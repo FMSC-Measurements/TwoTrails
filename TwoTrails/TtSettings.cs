@@ -20,9 +20,11 @@ namespace TwoTrails
         public IDeviceSettings DeviceSettings { get; set; }
         public IPolygonGraphicSettings PolygonGraphicSettings { get; set; }
 
-        public String UserName { get { return Environment.UserName; } }
+        public String UserName => Environment.UserName;
 
-        public String DeviceName { get { return Environment.MachineName; } }
+        public String DeviceName => Environment.MachineName;
+
+        public String AppVersion => AppInfo.Version.ToString();
 
         private String _Region;
         public String Region

@@ -11,6 +11,7 @@ namespace TwoTrails.Core
 
         String UserName { get; }
         String DeviceName { get; }
+        String AppVersion { get; }
         
         String Region { get; set; }
         String District { get; set; }

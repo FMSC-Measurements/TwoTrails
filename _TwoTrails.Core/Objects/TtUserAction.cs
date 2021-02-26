@@ -10,6 +10,8 @@ namespace TwoTrails.Core
         public DateTime Date { get; private set; }
         public DataActionType Action { get; private set; }
         public String Notes { get; private set; }
+
+        public String AppVersion { get; private set; }
         
         public bool ProjectModified => Action.HasFlag(DataActionType.ModifiedProject);
 
@@ -48,11 +50,11 @@ namespace TwoTrails.Core
         public bool ProjectUpgraded => Action.HasFlag(DataActionType.ProjectUpgraded);
 
 
-        public TtUserAction(String userName, String deviceName) :
-            this(userName, deviceName, DateTime.Now, DataActionType.None)
+        public TtUserAction(String userName, String deviceName, String appVersion) :
+            this(userName, deviceName, appVersion, DateTime.Now, DataActionType.None)
         { }
 
-        public TtUserAction(String userName, String deviceName,
+        public TtUserAction(String userName, String deviceName, String appVersion,
             DateTime date, DataActionType action, String notes = null)
         {
             if (String.IsNullOrEmpty(userName))
@@ -61,8 +63,12 @@ namespace TwoTrails.Core
             if (String.IsNullOrEmpty(deviceName))
                 throw new ArgumentNullException(nameof(deviceName));
 
+            if (String.IsNullOrEmpty(appVersion))
+                throw new ArgumentNullException(nameof(appVersion));
+
             UserName = userName;
             DeviceName = deviceName;
+            AppVersion = appVersion;
             Date = date;
             Action = action;
             Notes = notes;

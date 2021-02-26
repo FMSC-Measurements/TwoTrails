@@ -71,7 +71,7 @@ namespace TwoTrails.Core
             _MAL = mal;
             _Settings = settings;
 
-            _Activity = new TtUserAction(_Settings.UserName, _Settings.DeviceName);
+            _Activity = new TtUserAction(_Settings.UserName, _Settings.DeviceName, $"PC: {settings.AppVersion}");
 
             Load();
             LoadMedia();

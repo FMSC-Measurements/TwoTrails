@@ -78,7 +78,7 @@ namespace TwoTrails.ViewModels.DataDictionary
                             }
                         }
 
-                        project.DAL.InsertActivity(new TtUserAction(project.Settings.UserName, project.Settings.DeviceName, DateTime.Now, DataActionType.ModifiedDataDictionary));
+                        project.DAL.InsertActivity(new TtUserAction(project.Settings.UserName, project.Settings.DeviceName, $"PC: {project.Settings.AppVersion}", DateTime.Now, DataActionType.ModifiedDataDictionary));
 
                         _Window.DialogResult = true;
                         _Window.Close();

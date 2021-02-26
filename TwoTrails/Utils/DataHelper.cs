@@ -150,7 +150,7 @@ namespace TwoTrails.Utils
                     {
                         File.Copy(dal.FilePath, $"{dal.FilePath}.corrupt", true);
 
-                        TtUserAction action = new TtUserAction("Fixer", settings.DeviceName, DateTime.Now, DataActionType.None, String.Join(", ", errList));
+                        TtUserAction action = new TtUserAction("Fixer", settings.DeviceName, $"PC: {settings.AppVersion}", DateTime.Now, DataActionType.None, String.Join(", ", errList));
 
                         if (mbr == MessageBoxResult.No)
                         {
