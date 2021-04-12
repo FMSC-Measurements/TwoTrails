@@ -638,10 +638,6 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                     TtProject proj = projTab.Project;
                     RemoveProject(proj);
                 }
-                else
-                {
-                    _Tabs.Items.Remove(tab.Tab);
-                }
             }
         }
         

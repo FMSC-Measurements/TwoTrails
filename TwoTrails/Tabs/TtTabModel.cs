@@ -13,6 +13,7 @@ namespace TwoTrails
         public ICommand CloseTabCommand { get; }
         public virtual ICommand OpenInWinndowCommand { get; } = null;
 
+        protected MainWindowModel MainModel { get; }
 
         public TabItem Tab { get; private set; }
 
@@ -25,25 +26,23 @@ namespace TwoTrails
         public virtual String ToolTip => String.Empty;
 
 
-        public TtTabModel() : base()
+        public TtTabModel(MainWindowModel mainWindowModel) : base()
         {
             this.Tab = new TabItem();
-            
-            CloseTabCommand = new RelayCommand(x => OnTabClose());
+            MainModel = mainWindowModel;
+
+            CloseTabCommand = new RelayCommand(x => CloseTab());
 
             Tab.DataContext = this;
         }
 
 
-        public void CloseTab() => OnTabClose();
+        public void CloseTab()
+        {
+            OnTabClose();
+            MainModel.RemoveTab(this);
+        }
 
         protected abstract void OnTabClose();
-
-        protected override void Dispose(bool dispoing)
-        {
-            base.Dispose(dispoing);
-
-            Tab.DataContext = null;
-        }
     }
 }

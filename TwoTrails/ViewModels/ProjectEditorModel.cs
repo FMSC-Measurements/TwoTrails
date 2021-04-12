@@ -23,7 +23,7 @@ using static TwoTrails.Core.MediaTools;
 
 namespace TwoTrails.ViewModels
 {
-    public class ProjectEditorModel : NotifyPropertyChangedEx
+    public class ProjectEditorModel : NotifyPropertyChangedEx, IDisposable
     {
 
         public string TestText => "Test";
@@ -331,6 +331,13 @@ namespace TwoTrails.ViewModels
 
             PointEditorControl.AddHandler(PointEditorControl.KeyDownEvent, KeyDownHandler);
             PointEditorControl.AddHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
+        }
+
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected override void Dispose(bool disposing)

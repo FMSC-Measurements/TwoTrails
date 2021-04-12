@@ -22,8 +22,6 @@ namespace TwoTrails
 
         private readonly ProjectEditorControl _ProjectEditorControl;
 
-        private readonly MainWindowModel _MainModel;
-
 
         public override bool IsDetachable { get; } = false;
 
@@ -78,12 +76,11 @@ namespace TwoTrails
         public ProjectTabSection CurrentTabSection { get { return Get<ProjectTabSection>(); } protected set { Set(value); } }
 
 
-        public ProjectTab(TtProject project, MainWindowModel mainWindowModel) : base()
+        public ProjectTab(TtProject project, MainWindowModel mainWindowModel) : base(mainWindowModel)
         {
             Project = project;
-            _MainModel = mainWindowModel;
 
-            ProjectEditor = new ProjectEditorModel(Project, _MainModel);
+            ProjectEditor = new ProjectEditorModel(Project, MainModel);
             _ProjectEditorControl = new ProjectEditorControl(ProjectEditor, ProjectTabSection.Points);
 
             _ProjectEditorControl.Loaded += ProjectEditorControl_Loaded;
@@ -230,7 +227,7 @@ namespace TwoTrails
                 }
             }
 
-            _MainModel.RemoveTab(this);
+            ProjectEditor.Dispose();
         }
 
         protected override void Dispose(bool dispoing)
