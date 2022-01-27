@@ -118,6 +118,11 @@
                     <MenuItem Header="{Binding PointEditor.ReverseTypeHeader}" Command="{Binding PointEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
                           Style="{StaticResource styleMiHiddenNullCommand}"/>
 
+                    <MenuItem Header="Sort Points" IsEnabled="{Binding PointEditor.MultipleSelections}">
+                        <MenuItem Header="PID" Command="{Binding PointEditor.SortSelectedByPIDCommand}"/>
+                        <MenuItem Header="Time Created" Command="{Binding PointEditor.SortSelectedByTimeCreatedCommand}"/>
+                    </MenuItem>
+
                     <MenuItem Header="{Binding PointEditor.ConvertTypeHeader}" Command="{Binding PointEditor.ConvertPointsCommand}" Visibility="{Binding CurrentEditor, Converter={StaticResource NotNullVisibilityConverter}}" />
 
                     <Separator/>
@@ -161,6 +166,14 @@
                     </MenuItem>
 
                     <MenuItem Header="Selections" IsEnabled="{Binding HasOpenedProject}">
+                        <MenuItem Header="Alternate Points" Command="{Binding PointEditor.SelectAlternateCommand}"/>
+                        <MenuItem Header="Gps Type Points" Command="{Binding PointEditor.SelectGpsCommand}"/>
+                        <MenuItem Header="Traverse &amp; Sideshot Points" Command="{Binding PointEditor.SelectTravCommand}"/>
+                        <MenuItem Header="Inverse Selection" Command="{Binding PointEditor.SelectInverseCommand}"/>
+                        <MenuItem Header="Deselect All" Command="{Binding PointEditor.DeselectCommand}"/>
+
+                        <Separator/>
+                        
                         <MenuItem Header="Non-3D Points" Command="{Binding PointEditor.SelectNon3DPointsCommand}"/>
                         <MenuItem Header="Gps Points w/o NMEA" Command="{Binding PointEditor.SelectGpsPointsWithoutNmeaCommand}" />
                     </MenuItem>
@@ -217,6 +230,7 @@
 
                     <MenuItem Header="Advanced" IsEnabled="{Binding HasOpenedProject}">
                         <MenuItem Header="Rezone Points" Command="{Binding PointEditor.RezonePointsCommand}"/>
+                        <MenuItem Header="Deweb Points" Command="{Binding PointEditor.DewebPointsCommand}"/>
                     </MenuItem>
 
                     <Separator/>
@@ -228,9 +242,9 @@
                     <MenuItem Header="View Log File" Command="{Binding ViewLogCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                     <MenuItem Header="Email Error Report" Command="{Binding EmailReportCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                     <MenuItem Header="Export Error Report" Command="{Binding ExportReportCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
-                    <MenuItem Header="View User Activity" Command="{Binding CurrentProject.ViewUserActivityCommand}"
+                    <!--<MenuItem Header="View User Activity" Command="{Binding CurrentProject.ViewUserActivityCommand}"
                         Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource ResourceKey=BoolToVis}}"
-                              Style="{StaticResource styleMiDisableNullCommand}"/>
+                              Style="{StaticResource styleMiDisableNullCommand}"/>-->
 
                     <Separator/>
 

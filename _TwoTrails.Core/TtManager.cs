@@ -75,9 +75,9 @@ namespace TwoTrails.Core
 
             Load();
             LoadMedia();
-			
-			IgnorePointEvents = false;
-			RecalculatePolygons();
+
+            IgnorePointEvents = false;
+            RecalculatePolygons();
         }
 
         public void ReplaceDAL(ITtDataLayer dal)

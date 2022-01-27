@@ -199,7 +199,7 @@
 
                 <TextBlock Text="Polygons" Grid.Column="0" Grid.Row="0" TextAlignment="Center"/>
 
-                <ListBox Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Polygons}">
+                <ListBox Name="lbPolys" Grid.Column="0" Grid.Row="1" ItemsSource="{Binding Polygons}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Viewbox Margin="-1">
@@ -264,9 +264,9 @@
                     <CheckBox Content="Has Links" Grid.Row="1" IsThreeState="True" IsChecked="{Binding HasLinks}" Command="{Binding RefreshPoints}" />
                 </Grid>
 
-                <Grid Grid.Column="5" Grid.Row="1">
-                    <!-- todo Point Location and Distance info -->
-                </Grid>
+                <!--<Grid Grid.Column="5" Grid.Row="1">
+                    todo Point Location and Distance info
+                </Grid>-->
             </Grid>
         </ScrollViewer>
         <GridSplitter Grid.Row="1" Background="Gray" Height="3" HorizontalAlignment="Stretch"/>
@@ -732,7 +732,7 @@
                                         <TextBlock Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="{Binding Name}"/>
                                         <TextBox Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}" LostFocus="TextBox_UpdateBinding"
 											Text="{Binding Value, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-											IsEnabled="{Binding DataEditor.HasSelection}"
+											IsEnabled="{Binding PointEditor.HasSelection}"
 											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="PreviewTextInput">
@@ -754,7 +754,7 @@
                                         <ComboBox Grid.Column="1" Style="{StaticResource ResourceKey=styleFieldValue}"
 											ItemsSource="{Binding Values}"
 											IsEditable="{Binding IsEditable}"
-											IsEnabled="{Binding DataEditor.HasSelection}"
+											IsEnabled="{Binding PointEditor.HasSelection}"
 											ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}"
 											Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}">
@@ -777,7 +777,7 @@
                                         <CheckBox Grid.Column="1" Content="{Binding Name}"
 											Style="{StaticResource ResourceKey=styleFieldValue}"
 											IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-											IsEnabled="{Binding DataEditor.HasSelection}"
+											IsEnabled="{Binding PointEditor.HasSelection}"
                                             IsThreeState="{Binding ValueRequired, Converter={StaticResource IBC}}"
 											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}"/>
                                     </Grid>

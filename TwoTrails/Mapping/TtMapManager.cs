@@ -28,6 +28,7 @@ namespace TwoTrails.Mapping
 
         public ObservableCollection<TtMapPolygonManager> PolygonManagers { get; } = new ObservableCollection<TtMapPolygonManager>();
         
+        
         private IObservableTtManager _Manager;
 
         private bool SettingVisibilities;
@@ -40,7 +41,7 @@ namespace TwoTrails.Mapping
             _MapControl = mapControl;
             _Map = map;
             _Manager = manager;
-            
+
             foreach (TtPolygon poly in _Manager.Polygons)
             {
                 CreateMapPolygon(poly);

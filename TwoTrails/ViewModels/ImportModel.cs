@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,6 +35,8 @@ namespace TwoTrails.ViewModels
         private Window _Window;
         private ITtManager _Manager => _Project.HistoryManager;
         private TtProject _Project;
+
+        private readonly MainWindowModel MainModel;
 
         public Control MainContent
         {
@@ -79,6 +82,8 @@ namespace TwoTrails.ViewModels
             _Project = project;
             MainContent = null;
             CurrentFile = null;
+
+            MainModel = mainWindowModel;
 
             BrowseFileCommand = new BindedRelayCommand<ImportModel>(
                 x => BrowseFile(), x => !IsImporting,
@@ -139,7 +144,13 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
         {
             if (FileUtils.IsFileLocked(fileName))
             {
-                MessageBox.Show($"File '{Path.GetFileName(fileName)}' is currently locked. Make sure it is not in use by any other programs.");
+                MessageBox.Show($"File '{Path.GetFileName(fileName)}' is currently locked. Make sure it is not in use by any other programs.",
+                    "File Locked", MessageBoxButton.OK, MessageBoxImage.Stop);
+            }
+            else if (MainModel.GetListOfOpenedProjects().Contains(fileName))
+            {
+                MessageBox.Show($"File '{Path.GetFileName(fileName)}' is currently opened in TwoTrails. Please save and close it before trying to import.",
+                    "File Locked", MessageBoxButton.OK, MessageBoxImage.Stop);
             }
             else
             {
@@ -346,18 +357,64 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
             if (ImportControl.DAL.HandlesAllPointTypes)
             {
                 List<string> neededPolys = new List<string>();
+                Dictionary<string, List<TtPoint>> dupPoints = new Dictionary<string, List<TtPoint>>();
 
                 foreach (string polyCN in selectedPolys)
                 {
-                    foreach (QuondamPoint qp in ImportControl.DAL.GetPoints(polyCN, true)
-                        .Where(p => p.OpType == OpType.Quondam).Cast<QuondamPoint>())
+                    foreach (TtPoint point in ImportControl.DAL.GetPoints(polyCN, true))
                     {
-                        if (qp.ParentPoint.PolygonCN != polyCN && !selectedPolys.Contains(qp.ParentPoint.PolygonCN) && !neededPolys.Contains(qp.ParentPoint.PolygonCN))
-                            neededPolys.Add(qp.ParentPoint.PolygonCN);
+                        if (_Project.HistoryManager.PointExists(point.CN))
+                        {
+                            if (dupPoints.ContainsKey(point.PolygonCN))
+                            {
+                                dupPoints[point.PolygonCN].Add(point);
+                            }
+                            else
+                            {
+                                dupPoints.Add(point.PolygonCN, new List<TtPoint>() { point });
+                            }
+                        }
+
+                        if (point.OpType == OpType.Quondam && point is QuondamPoint qp)
+                        {
+                            if (qp.ParentPoint.PolygonCN != polyCN && !selectedPolys.Contains(qp.ParentPoint.PolygonCN) && !neededPolys.Contains(qp.ParentPoint.PolygonCN))
+                                neededPolys.Add(qp.ParentPoint.PolygonCN);
+                        }
                     }
                 }
-                
-                if (neededPolys.Count > 0)
+
+                if (dupPoints.Count > 0)
+                {
+                    if (MessageBox.Show(@"Some points being imported already exist in this project. 
+This means a polygon being imported may already exist. Would you like to import the points anyway?",
+                    "Points Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+                    {
+                        if (MessageBox.Show("Would you like to see a list of the already existing points?", "Existing Points",
+                            MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                        {
+                            StringBuilder sb = new StringBuilder();
+
+                            sb.AppendLine("** Current Existing Points **\n");
+
+                            foreach (TtPolygon poly in ImportControl.DAL.GetPolygons())
+                            {
+                                if (dupPoints.ContainsKey(poly.CN))
+                                {
+                                    sb.AppendLine($"Polygon: {poly.Name}\n\t{String.Join("\n\t", dupPoints[poly.CN])}\n");
+                                }
+                            }
+
+                            String existingPointsFilePath = Path.Combine(Path.GetTempPath(), "dupPoints.txt");
+
+                            File.WriteAllText(existingPointsFilePath, sb.ToString());
+
+                            Process.Start(existingPointsFilePath);
+                        }
+                        
+                        return;
+                    }
+                }
+                else if (neededPolys.Count > 0)
                 {
                     MessageBoxResult res = MessageBox.Show("Some quondams are linked to points that are not within the list of improted polygons. Would you like to import these polygons (YES) or convert the points to GPS (NO)?", "Foreign Quondams",
                         MessageBoxButton.YesNoCancel, MessageBoxImage.Question);

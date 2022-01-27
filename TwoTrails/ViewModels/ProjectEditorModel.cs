@@ -25,9 +25,6 @@ namespace TwoTrails.ViewModels
 {
     public class ProjectEditorModel : NotifyPropertyChangedEx, IDisposable
     {
-
-        public string TestText => "Test";
-
         #region Commands
         public ICommand OpenMapWindowCommand { get; }
         public BindedRelayCommand<ProjectEditorModel> HistoryCommand { get; set; }
@@ -38,6 +35,8 @@ namespace TwoTrails.ViewModels
         //public ICommand UndoCommand { get; set; }
         //public ICommand RedoCommand { get; set; }
         public ICommand DiscardChangesCommand { get; }
+
+        public ICommand ViewUserActivityCommand { get; }
 
         #region Polygons
         public ICommand PolygonChangedCommand { get; }
@@ -76,17 +75,18 @@ namespace TwoTrails.ViewModels
 
         public MainWindowModel MainModel { get; private set; }
 
-        private TtProject _Project;
+        public TtProject Project { get; }
         public ProjectEditorControl ProjectEditorControl { get; set; }
+        public UserActivityControl UserActivityControl { get; set; }
 
         public PointEditorModel PointEditor { get; }
         public PointEditorControl PointEditorControl { get; }
 
         private DataStyleModel DataStyle { get; }
 
-        public TtProjectInfo ProjectInfo => _Project.ProjectInfo;
-        public TtHistoryManager Manager => _Project.HistoryManager;
-        public TtSettings Settings => _Project.Settings;
+        public TtProjectInfo ProjectInfo => Project.ProjectInfo;
+        public TtHistoryManager Manager => Project.HistoryManager;
+        public TtSettings Settings => Project.Settings;
         
         public MapControl MapControl { get; private set; }
         public MapWindow MapWindow { get; private set; }
@@ -105,14 +105,15 @@ namespace TwoTrails.ViewModels
 
         public ProjectEditorModel(TtProject project, MainWindowModel mainWindowModel)
         {
-            _Project = project;
+            Project = project;
             MainModel = mainWindowModel;
 
             DataStyle = new DataStyleModel(project.HistoryManager.Polygons);
             PointEditor = new PointEditorModel(project, this);
             PointEditorControl = new PointEditorControl(PointEditor, DataStyle);
+            UserActivityControl = new UserActivityControl(Project.DAL);
 
-            MapControl = new MapControl(project.HistoryManager);
+            MapControl = new MapControl(project);
 
             #region Commands
             Func<ProjectTabSection, Type, bool> doesTabAndDataMatch = (tab, type) =>
@@ -138,7 +139,7 @@ namespace TwoTrails.ViewModels
                 {
                     if (MapControl != null)
                     {
-                        MapWindow = new MapWindow(_Project.ProjectName, MapControl);
+                        MapWindow = new MapWindow(Project.ProjectName, MapControl);
                         ProjectEditorControl.MapContainer.Children.Remove(MapControl);
                     }
                     else
@@ -301,7 +302,7 @@ namespace TwoTrails.ViewModels
             #endregion
 
             #region Advanced
-            AnalyzeProjectCommand = new RelayCommand(x => AnalyzeProjectDialog.ShowDialog(_Project, MainModel.MainWindow));
+            AnalyzeProjectCommand = new RelayCommand(x => AnalyzeProjectDialog.ShowDialog(Project, MainModel.MainWindow));
             #endregion
 
             #endregion
@@ -370,7 +371,7 @@ namespace TwoTrails.ViewModels
             PointEditorControl.RemoveHandler(PointEditorControl.KeyDownEvent, KeyDownHandler);
             PointEditorControl.RemoveHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
 
-            BindingOperations.ClearAllBindings(ProjectEditorControl);
+            //BindingOperations.ClearAllBindings(ProjectEditorControl);
         }
 
 
@@ -438,7 +439,7 @@ namespace TwoTrails.ViewModels
             if (Manager.BaseManager.PolygonCount > 0)
             {
                 MainModel.MainWindow.IsEnabled = false;
-                LogDeckCalculatorDialog.Show(_Project, this.MainModel.MainWindow, () =>
+                LogDeckCalculatorDialog.Show(Project, this.MainModel.MainWindow, () =>
                 {
                     MainModel.MainWindow.IsEnabled = true;
                 });
@@ -730,7 +731,7 @@ namespace TwoTrails.ViewModels
                 {
                     using (StreamWriter sw = new StreamWriter(sfd.FileName))
                     {
-                        sw.Write(HaidLogic.GenerateSummaryHeader(ProjectInfo, _Project.FilePath));
+                        sw.Write(HaidLogic.GenerateSummaryHeader(ProjectInfo, Project.FilePath));
                         sw.WriteLine(PolygonSummary.SummaryText);
                     }
                 }
@@ -786,9 +787,13 @@ namespace TwoTrails.ViewModels
         public TtMetadata CurrentMetadata
         {
             get => _CurrentMetadata;
-            private set => SetField(ref _CurrentMetadata, value, () => BindMetadataValues(value));
+            private set => SetField(ref _CurrentMetadata, value, () => {
+                BindMetadataValues(value);
+                MetaFieldIsEditable = value != null && value.CN != Consts.EmptyGuid;
+            });
         }
 
+        public bool MetaFieldIsEditable { get { return Get<bool>(); } set { Set(value); } }
 
         private string _MetadataName = String.Empty;
         public string MetadataName
@@ -994,7 +999,7 @@ namespace TwoTrails.ViewModels
         
         private void SetMetadataDefault()
         {
-            _Project.Settings.MetadataSettings.SetMetadataSettings(CurrentMetadata);
+            Project.Settings.MetadataSettings.SetMetadataSettings(CurrentMetadata);
             MessageBox.Show("Metadata defaults set.");
         }
 
@@ -1191,7 +1196,7 @@ namespace TwoTrails.ViewModels
             {
                 try
                 {
-                    MediaTools.LoadImageAsync(_Project.MAL, image, new AsyncCallback(ImageLoaded));
+                    MediaTools.LoadImageAsync(Project.MAL, image, new AsyncCallback(ImageLoaded));
                 }
                 catch // (FileNotFoundException ex)
                 {
@@ -1247,7 +1252,7 @@ namespace TwoTrails.ViewModels
                         foreach (var delMeta in ml.Item2)
                             Manager.DeleteMetadata(delMeta);
                     }
-                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {removedMetaCount} duplicate metadata."));
+                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {removedMetaCount} duplicate metadata"));
                 }
             }
             else
@@ -1272,7 +1277,7 @@ namespace TwoTrails.ViewModels
                         Manager.DeletePolygon(poly);
                     }
 
-                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delPolys.Count} empty polygons."));
+                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delPolys.Count} empty polygons"));
                 }
             }
             else
@@ -1297,7 +1302,7 @@ namespace TwoTrails.ViewModels
                         Manager.DeleteMetadata(meta);
                     }
 
-                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delMeta.Count} unused metadata."));
+                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delMeta.Count} unused metadata"));
                 }
             }
             else
@@ -1322,7 +1327,7 @@ namespace TwoTrails.ViewModels
                         Manager.DeleteGroup(group);
                     }
 
-                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delGroups} unused groups."));
+                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delGroups.Count} unused groups"));
                 }
             }
             else

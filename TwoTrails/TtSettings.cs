@@ -15,6 +15,7 @@ namespace TwoTrails
         private const String OPEN_FOLDER_ON_EXPORT = "OpenFolderOnExport";
         private const String LAST_UPDATE_CHECK = "LastUpdateCheck";
         private const String UPGRADE_REQUIRED = "UpgradeRequired";
+        private const String SORT_POLYS_BY_NAME = "SortPolysByName";
 
         public IMetadataSettings MetadataSettings { get; set; }
         public IDeviceSettings DeviceSettings { get; set; }
@@ -112,6 +113,19 @@ namespace TwoTrails
             }
         }
 
+        private bool _SortPolysByName;
+        public bool SortPolysByName
+        {
+            get { return _SortPolysByName; }
+
+            set
+            {
+                SetField(ref _SortPolysByName, value);
+                Properties.Settings.Default[SORT_POLYS_BY_NAME] = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+
 
         public TtSettings(IDeviceSettings deviceSettings, IMetadataSettings metadataSettings, IPolygonGraphicSettings polyGraphicSettings)
         {
@@ -132,6 +146,8 @@ namespace TwoTrails
 #else
             _IsAdvancedMode = (bool)Properties.Settings.Default[ADVANCED_MODE];
 #endif
+
+            _SortPolysByName = (bool)Properties.Settings.Default[SORT_POLYS_BY_NAME];
         }
 
 

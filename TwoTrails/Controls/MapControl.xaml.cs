@@ -3,6 +3,7 @@ using FMSC.GeoSpatial.UTM;
 using Microsoft.Maps.MapControl.WPF;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -10,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Mapping;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails.Controls
 {
@@ -18,7 +20,10 @@ namespace TwoTrails.Controls
     /// </summary>
     public partial class MapControl : UserControl
     {
-        public IObservableTtManager Manager { get; set; }
+        private TtProject Project { get; set; }
+
+        public IObservableTtManager Manager => Project.HistoryManager;
+        public bool SortPolysByName => Project.Settings.SortPolysByName;
 
         public PolygonVisibilityControl PolygonVisibilityControl { get; private set; }
         public PolygonGraphicBrushOptions DefaultPolygonGraphicBrushOptions { get; private set; }
@@ -51,9 +56,9 @@ namespace TwoTrails.Controls
             KeyUpHandler = new KeyEventHandler(OnKeyUp);
         }
 
-        public MapControl(IObservableTtManager manager) : this()
+        public MapControl(TtProject project) : this()
         {
-            Manager = manager;
+            Project = project;
         }
 
 
@@ -71,6 +76,13 @@ namespace TwoTrails.Controls
             }
 
             this.Loaded -= OnLoaded;
+
+            SortPolys();
+
+            Project.Settings.PropertyChanged += (s, pce) =>
+            {
+                if (pce.PropertyName == nameof(TtSettings.SortPolysByName)) SortPolys();
+            };
         }
 
         private void OnUnloaded(object sender, EventArgs e)
@@ -133,6 +145,12 @@ namespace TwoTrails.Controls
             IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
             if (locs.Any())
                 map.SetView(locs, new Thickness(30), 0);
+        }
+
+        private void SortPolys()
+        {
+            lvPolygons.Items.SortDescriptions.Clear();
+            lvPolygons.Items.SortDescriptions.Add(new SortDescription($"Polygon.{(Project.Settings.SortPolysByName ? "Name" : "TimeCreated")}", ListSortDirection.Ascending));
         }
     }
 }

@@ -575,11 +575,11 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             project.MessagePosted += Project_MessagePosted;
         }
 
-        private void RemoveProject(TtProject project)
+        private void RemoveProject(TtProject project, bool checkForChanges = true)
         {
             if (project != null)
             {
-                if (project.RequiresSave)
+                if (checkForChanges && project.RequiresSave)
                 {
                     MessageBoxResult result = MessageBox.Show($"{project.ProjectName} has unsaved data. Would you like to save before closing this project?",
                                                 String.Empty,
@@ -604,10 +604,6 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             }
 
             project = null;
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
         }
 
         private void Project_MessagePosted(Object sender, String message)
@@ -632,12 +628,11 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
         {
             if (tab != null)
             {
-                _Tabs.Items.Remove(tab.Tab);
                 if (tab is ProjectTab projTab)
                 {
-                    TtProject proj = projTab.Project;
-                    RemoveProject(proj);
+                    RemoveProject(projTab.Project, false);
                 }
+                _Tabs.Items.Remove(tab.Tab);
             }
         }
         
@@ -791,6 +786,11 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             }
         }
     
+        internal IEnumerable<string> GetListOfOpenedProjects()
+        {
+            return _Projects.Values.Select(proj => proj.FilePath);
+        }
+
         private void CheckForUpdates()
         {
             UpdateStatus status = TtUtils.CheckForUpdate();

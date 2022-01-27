@@ -10,6 +10,7 @@ using System.Linq;
 using System.Windows.Input;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial;
+using System.ComponentModel;
 
 namespace TwoTrails.Mapping
 {
@@ -330,7 +331,6 @@ namespace TwoTrails.Mapping
 
             //ZoomToPolygonCommand = new RelayCommand(x => ZoomToPolygon());
         }
-
 
         private TtMapPoint CreateMapPoint(TtPoint point)
         {

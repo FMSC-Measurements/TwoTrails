@@ -137,6 +137,8 @@ namespace TwoTrails
             }
         }
 
+
+
         public DeviceSettings()
         {
             _DeleteExistingPlots = (bool)Properties.Settings.Default[DELETE_EXISTING_PLOTS];
@@ -150,7 +152,6 @@ namespace TwoTrails
 
             _LogDeckDistance = (Distance)Properties.Settings.Default[LOG_DECK_DISTANCE];
             _LogDeckVolume = (Volume)Properties.Settings.Default[LOG_DECK_VOLUME];
-
         }
     }
 }

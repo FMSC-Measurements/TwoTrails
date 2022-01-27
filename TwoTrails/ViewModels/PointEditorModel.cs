@@ -95,6 +95,8 @@ namespace TwoTrails.ViewModels
 
         public BindedRelayCommand<PointEditorModel> MovePointsCommand { get; }
         public BindedRelayCommand<PointEditorModel> ReverseSelectedCommand { get; }
+        public BindedRelayCommand<PointEditorModel> SortSelectedByPIDCommand { get; }
+        public BindedRelayCommand<PointEditorModel> SortSelectedByTimeCreatedCommand { get; }
         public BindedRelayCommand<PointEditorModel> ReindexCommand { get; }
         public BindedRelayCommand<PointEditorModel> RetraceCommand { get; }
 
@@ -105,6 +107,7 @@ namespace TwoTrails.ViewModels
         public RelayCommand ModifyDataDictionaryCommand { get; }
 
         public BindedRelayCommand<PointEditorModel> RezonePointsCommand { get; }
+        public BindedRelayCommand<PointEditorModel> DewebPointsCommand { get; }
 
         public RelayCommand SelectAlternateCommand { get; }
         public RelayCommand SelectGpsCommand { get; }
@@ -825,7 +828,7 @@ namespace TwoTrails.ViewModels
 
             #region Setup Filters
             CheckedListItem<TtPolygon> tmpPoly;
-            tmpPoly = new CheckedListItem<TtPolygon>(new TtPolygon() { Name = "All", CN = Consts.FullGuid }, true);
+            tmpPoly = new CheckedListItem<TtPolygon>(new TtPolygon() { Name = "All", CN = Consts.EmptyGuid, TimeCreated = new DateTime(0) }, true);
             _Polygons.Add(tmpPoly);
             tmpPoly.ItemCheckedChanged += Polygon_ItemCheckedChanged;
 
@@ -845,7 +848,7 @@ namespace TwoTrails.ViewModels
             _Metadatas.Add(tmpMeta);
             tmpMeta.ItemCheckedChanged += Metadata_ItemCheckedChanged;
 
-            foreach (TtMetadata metadata in Manager.Metadata)
+            foreach (TtMetadata metadata in Manager.Metadata.OrderBy(m => m.Name))
             {
                 tmpMeta = new CheckedListItem<TtMetadata>(metadata, true);
                 _Metadatas.Add(tmpMeta);
@@ -861,7 +864,7 @@ namespace TwoTrails.ViewModels
             _Groups.Add(tmpGroup);
             tmpGroup.ItemCheckedChanged += Groups_ItemCheckedChanged;
 
-            foreach (TtGroup group in Manager.Groups)
+            foreach (TtGroup group in Manager.Groups.OrderBy(g => g.Name))
             {
                 tmpGroup = new CheckedListItem<TtGroup>(group, true);
                 _Groups.Add(tmpGroup);
@@ -896,7 +899,7 @@ namespace TwoTrails.ViewModels
 
             Points = CollectionViewSource.GetDefaultView(Manager.Points) as ListCollectionView;
             
-            Points.CustomSort = new PointSorter();
+            Points.CustomSort = new PointSorter(project.Settings.SortPolysByName);
 
             Points.Filter = Filter;
             
@@ -983,6 +986,16 @@ namespace TwoTrails.ViewModels
                 x => MultipleSelections && SamePolygon,
                 this, m => m.MultipleSelections);
 
+            SortSelectedByPIDCommand = new BindedRelayCommand<PointEditorModel>(
+                x => SortByPID(),
+                x => MultipleSelections && SamePolygon,
+                this, m => m.MultipleSelections);
+
+            SortSelectedByTimeCreatedCommand = new BindedRelayCommand<PointEditorModel>(
+                x => SortByTimeCreated(),
+                x => MultipleSelections && SamePolygon,
+                this, m => m.MultipleSelections);
+
             ReindexCommand = new BindedRelayCommand<PointEditorModel>(
                 x => Reindex(), x => Manager.Points.Count > 0,
                 this, m => m.Manager.Points.Count);
@@ -1059,7 +1072,10 @@ namespace TwoTrails.ViewModels
                 x => RezonePoints(), x => HasSelection,
                 this, m => m.HasSelection);
 
-
+            DewebPointsCommand = new BindedRelayCommand<PointEditorModel>(
+                x => DewebPoints(),
+                x => MultipleSelections && SamePolygon,
+                this, m => m.MultipleSelections);
 
             //RezonePointsCommand = new BindedRelayCommand<PointEditorModel>(
             //    (x, m) => m.RezonePoints(), (x, m) => m.HasSelection,
@@ -1124,6 +1140,14 @@ namespace TwoTrails.ViewModels
             AdvInfoItems = new ObservableCollection<MenuItem>(GenerateAdvInfoItems());
 
             SetupUI();
+
+            project.Settings.PropertyChanged += (s, pce) =>
+            {
+                if (pce.PropertyName == nameof(TtSettings.SortPolysByName))
+                {
+                    Points.CustomSort = new PointSorter(project.Settings.SortPolysByName);
+                }
+            };
         }
 
         private void SetupUI()
@@ -1256,22 +1280,22 @@ namespace TwoTrails.ViewModels
                 ExtendedData.PropertyChanged -= ExtendedData_PropertyChanged;
             }
 
-            foreach (MenuItem mi in AdvInfoItems)
-            {
-                BindingOperations.ClearAllBindings(mi);
-            }
+            //foreach (MenuItem mi in AdvInfoItems)
+            //{
+            //    BindingOperations.ClearAllBindings(mi);
+            //}
             AdvInfoItems = null;
 
-            foreach (MenuItem mi in VisibleFields.Where(vf => vf is MenuItem))
-            {
-                BindingOperations.ClearAllBindings(mi);
-            }
+            //foreach (MenuItem mi in VisibleFields.Where(vf => vf is MenuItem))
+            //{
+            //    BindingOperations.ClearAllBindings(mi);
+            //}
             VisibleFields = null;
 
-            foreach (DataGridColumn dgc in DataColumns)
-            {
-                BindingOperations.ClearAllBindings(dgc);
-            }
+            //foreach (DataGridColumn dgc in DataColumns)
+            //{
+            //    BindingOperations.ClearAllBindings(dgc);
+            //}
             DataColumns = null;
 
             //Points = null;
@@ -1304,9 +1328,9 @@ namespace TwoTrails.ViewModels
 
             ExtendedDataFields.Clear();
 
-            _Polygons.Clear();
-            _Metadatas.Clear();
-            _Groups.Clear();
+            //_Polygons.Clear();
+            //_Metadatas.Clear();
+            //_Groups.Clear();
         }
 
 
@@ -2231,12 +2255,7 @@ namespace TwoTrails.ViewModels
                     }
                 }
 
-                if (updatedPoints.Count > 0)
-                {
-                    Manager.EditPointsMultiValues(updatedPoints, PointProperties.INDEX, indexes);
-                }
-
-                Points.Refresh();
+                UpdatePointIndexes(updatedPoints, indexes);
             }
         }
 
@@ -2654,19 +2673,57 @@ namespace TwoTrails.ViewModels
                 }
             });
         }
+
+
+        private void UpdatePointIndexes(List<TtPoint> updatedPoints, List<int> indexes)
+        {
+            if (updatedPoints.Count > 0)
+            {
+                Manager.EditPointsMultiValues(updatedPoints, PointProperties.INDEX, indexes);
+            }
+
+            Points.Refresh();
+        }
+        #endregion
+
+        #region Sort
+        public void SortByPID()
+        {
+            if (MultipleSelections && SamePolygon)
+            {
+                List<TtPoint> points = GetSortedSelectedPoints();
+
+                List<int> indexes = points.Select(p => p.Index).ToList();
+                List<TtPoint> updatedPoints = points.OrderBy(p => p.PID).ToList();
+
+                UpdatePointIndexes(updatedPoints, indexes);
+            }
+        }
+
+        public void SortByTimeCreated()
+        {
+            if (MultipleSelections && SamePolygon)
+            {
+                List<TtPoint> points = GetSortedSelectedPoints();
+
+                List<int> indexes = points.Select(p => p.Index).ToList();
+                List<TtPoint> updatedPoints = points.OrderBy(p => p.TimeCreated).ToList();
+
+                UpdatePointIndexes(updatedPoints, indexes);
+            }
+        }
+
+        public void DewebPoints()
+        {
+            if (MultipleSelections && SamePolygon)
+            {
+                List<TtPoint> points = GetSortedSelectedPoints();
+                Manager.MovePointsToPolygon(points.OrderBy(p => p.TimeCreated), points[0].Polygon, points[0].Index);
+            }
+        }
         #endregion
 
         #region Info Tools
-        private void IsPointInPolygon()
-        {
-            //TODO
-        }
-
-        private void GetDistanceToPolygonEdge()
-        {
-            //TODO
-        }
-
 
         private void ExportValues(DataGrid dataGrid)
         {
@@ -2784,6 +2841,7 @@ namespace TwoTrails.ViewModels
             }
         }
         #endregion
+
 
         #region Selections
         private List<TtPoint> GetEditSelectionPoints()
@@ -2930,6 +2988,7 @@ namespace TwoTrails.ViewModels
             OnSelectionChanged();
         }
         #endregion
+
 
         #region Collumns & Fields
         private Tuple<DataGridTextColumn, string>[] CreateDefaultColumns()

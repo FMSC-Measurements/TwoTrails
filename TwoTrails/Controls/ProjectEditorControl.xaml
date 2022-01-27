@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:TwoTrails.Controls"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
-             xmlns:ttl="clr-namespace:TwoTrails"
-             xmlns:tt="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
+             xmlns:tt="clr-namespace:TwoTrails"
+             xmlns:ttc="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
              xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
              xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
              mc:Ignorable="d" 
@@ -25,7 +25,7 @@
         <cvt:MetersToFeetConverter x:Key="MtoFConverter"/>
         <fmsccm:EnumDescriptionConverter x:Key="enumDesc"/>
 
-        <DataTemplate DataType="{x:Type ttl:ImageTile}">
+        <DataTemplate DataType="{x:Type tt:ImageTile}">
             <Grid Width="250">
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                     <i:Interaction.Triggers>
@@ -232,6 +232,12 @@
 
                                     <TextBlock Grid.Column="0" Grid.Row="3" Text="Groups" />
                                     <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Manager.Groups.Count}" TextAlignment="Right" />
+
+                                    <TextBlock Grid.Column="0" Grid.Row="5" Text="DAL Version" />
+                                    <TextBlock Grid.Column="2" Grid.Row="5" Text="{Binding Project.ProjectInfo.DbVersion}" TextAlignment="Right" />
+
+                                    <TextBlock Grid.Column="0" Grid.Row="6" Text="Date Created" />
+                                    <TextBlock Grid.Column="2" Grid.Row="6" Text="{Binding Project.ProjectInfo.CreationDate, StringFormat='M/d/yyyy h:mm tt (G\\MT zzz)'}" TextAlignment="Right" />
 
 
                                     <!--<TextBlock Grid.Column="0" Grid.Row="5" Text="Total Area (Ha)" />
@@ -648,7 +654,7 @@
 
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
                                 <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding MetadataName, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                                         PreviewTextInput="TextHasRestrictedCharacters" IsUndoEnabled="False"/>
+                                         PreviewTextInput="TextHasRestrictedCharacters" IsUndoEnabled="False" IsEnabled="{Binding MetaFieldIsEditable}"/>
 
                                 <TextBlock Grid.Column="2" Grid.Row="0" Text="UTM Zone" />
                                 <Grid Grid.Column="2" Grid.Row="1">
@@ -839,7 +845,7 @@
                                 <TextBlock Grid.Column="2" Grid.Row="0" Text="Group Type" />
                                 <ComboBox Grid.Column="2" Grid.Row="1"
                                           SelectedItem="{Binding GroupType}"
-                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type tt:GroupType}}"
+                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttc:GroupType}}"
                                           IsEnabled="{Binding GroupFieldIsEditable}"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Description" />
@@ -1047,6 +1053,14 @@
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid x:Name="MapContainer">
                         <!--<local:MapControl x:Name="MapControl" /> --><!--Manager="{Binding Manager, Mode=OneWay}"-->
+                    </Grid>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Activity" Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource BoolToVis}}">
+                <Border BorderBrush="Green" BorderThickness="3,0,0,0">
+                    <Grid Background="LightGray">
+                        <ContentControl Content="{Binding UserActivityControl}"/>
                     </Grid>
                 </Border>
             </TabItem>

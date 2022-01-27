@@ -24,27 +24,27 @@ namespace TwoTrails
 
         public IValueConverter Converter { get; }
 
-        public PointEditorModel DataEditor { get; }
+        public PointEditorModel PointEditor { get; }
         
-        public bool IsValueSame { get { return DataEditor.ArePropertyValuesSame(PropertyCN); } }
+        public bool IsValueSame { get { return PointEditor.ArePropertyValuesSame(PropertyCN); } }
 
         public object Value
         {
-            get { return DataEditor.ExtendedData[PropertyCN]; }
-            set { DataEditor.ExtendedData[PropertyCN] = value; }
+            get { return PointEditor.ExtendedData[PropertyCN]; }
+            set { PointEditor.ExtendedData[PropertyCN] = value; }
         }
 
-        public ExtendedDataField(DataDictionaryField field, PointEditorModel dataEditor, IValueConverter converter = null)
+        public ExtendedDataField(DataDictionaryField field, PointEditorModel PointEditor, IValueConverter converter = null)
         {
             Name = field.Name;
             PropertyCN = field.CN;
             Flags = field.Flags;
             ValueRequired = field.ValueRequired;
             DataType = field.DataType;
-            DataEditor = dataEditor;
+            PointEditor = PointEditor;
             Converter = converter;
 
-            DataEditor.PropertyChanged += (sender, e) =>
+            PointEditor.PropertyChanged += (sender, e) =>
             {
                 if (e.PropertyName == PropertyCN && PropertyChanged != null)
                 {
@@ -72,8 +72,8 @@ namespace TwoTrails
         public bool IsNumericDecimal { get; }
 
 
-        public TextBoxExtendedDataField(DataDictionaryField field, PointEditorModel dataEditor, IValueConverter converter = null) :
-            base(field, dataEditor, converter) { }
+        public TextBoxExtendedDataField(DataDictionaryField field, PointEditorModel PointEditor, IValueConverter converter = null) :
+            base(field, PointEditor, converter) { }
     }
 
     //todo implement add editable value to combobox list and save directly without notice. (as a setting)
@@ -83,8 +83,8 @@ namespace TwoTrails
 
         public bool IsEditable { get; }
 
-        public ComboBoxExtendedDataField(DataDictionaryField field, PointEditorModel dataEditor, IValueConverter converter = null) :
-            base(field, dataEditor, converter)
+        public ComboBoxExtendedDataField(DataDictionaryField field, PointEditorModel PointEditor, IValueConverter converter = null) :
+            base(field, PointEditor, converter)
         {
             IsEditable = field.Flags == 1;
             Values = field.Values ?? new List<string>();
@@ -93,7 +93,7 @@ namespace TwoTrails
 
     public class CheckBoxExtendedDataField : ExtendedDataField
     {
-        public CheckBoxExtendedDataField(DataDictionaryField field, PointEditorModel dataEditor, IValueConverter converter = null) :
-            base(field, dataEditor, converter) { }
+        public CheckBoxExtendedDataField(DataDictionaryField field, PointEditorModel PointEditor, IValueConverter converter = null) :
+            base(field, PointEditor, converter) { }
     }
 }

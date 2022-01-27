@@ -21,6 +21,7 @@ namespace TwoTrails.Controls
 
         private ITtDataLayer DAL;
 
+
         public UserActivityControl(ITtDataLayer dal)
         {
             DAL = dal;

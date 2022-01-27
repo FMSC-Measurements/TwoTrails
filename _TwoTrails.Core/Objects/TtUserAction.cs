@@ -35,17 +35,19 @@ namespace TwoTrails.Core
         public bool MediaModified => Action.HasFlag(DataActionType.ModifiedMedia);
         public bool MediaDeleted => Action.HasFlag(DataActionType.DeletedMedia);
 
-        public bool InsertedNmea => Action.HasFlag(DataActionType.InsertedNmea);
-        public bool DeletedNmea => Action.HasFlag(DataActionType.DeletedNmea);
+        public bool NmeaInserted => Action.HasFlag(DataActionType.InsertedNmea);
+        public bool NmeaDeleted => Action.HasFlag(DataActionType.DeletedNmea);
+        public bool NmeaModified => Action.HasFlag(DataActionType.ModifiedNmea);
 
         public bool ManualCreatedPoints => Action.HasFlag(DataActionType.ManualPointCreation);
         public bool PointsMoved => Action.HasFlag(DataActionType.MovedPoints);
         public bool PointsRetraced => Action.HasFlag(DataActionType.RetracePoints);
         public bool PointsReindexed => Action.HasFlag(DataActionType.ReindexPoints);
         public bool PointsConverted => Action.HasFlag(DataActionType.ConvertedPoints);
+        public bool PointsRezoned => Action.HasFlag(DataActionType.RezonedPoints);
         
         public bool DataImported => Action.HasFlag(DataActionType.DataImported);
-        public bool ModifiedDataDictionary => Action.HasFlag(DataActionType.ModifiedDataDictionary);
+        public bool DataDictionaryModified => Action.HasFlag(DataActionType.ModifiedDataDictionary);
 
         public bool ProjectUpgraded => Action.HasFlag(DataActionType.ProjectUpgraded);
 
@@ -86,10 +88,10 @@ namespace TwoTrails.Core
         {
             if (notes != null)
             {
-                if (Notes == null)
+                if (String.IsNullOrWhiteSpace(Notes))
                     Notes = notes;
                 else
-                    Notes += $"|{notes}"; 
+                    Notes += $" | {notes}"; 
             }
 
             Date = DateTime.Now;

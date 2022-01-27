@@ -2211,10 +2211,10 @@ namespace TwoTrails.DAL
                         {
                             username = dr.GetString(0);
                             devicename = dr.GetString(1);
-                            appVersion = dr.GetString(2);
+                            appVersion = dr.IsDBNull(2) ? "Unknown" : dr.GetString(2);
                             date = TtCoreUtils.ParseTime(dr.GetString(3));
                             dat = (DataActionType)dr.GetInt32(4);
-                            notes = dr.GetStringN(5);
+                            notes = dr.IsDBNull(5) ? String.Empty : dr.GetStringN(5);
 
                             yield return new TtUserAction(username, devicename, appVersion, date, dat, notes);
                         }

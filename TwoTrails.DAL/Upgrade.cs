@@ -53,9 +53,9 @@ namespace TwoTrails.DAL
 
                         trans.Commit();
 
-                        dal.InsertActivity(new TtUserAction("Upgrader", settings.DeviceName, $"PC: {settings.AppVersion}", DateTime.Now, DataActionType.ProjectUpgraded, $"{oldVersion} -> {TwoTrailsSchema.SchemaVersion}"));
+                        dal.InsertActivity(new TtUserAction("Upgrader", settings.DeviceName, $"PC: {settings.AppVersion}", DateTime.Now, DataActionType.ProjectUpgraded, $"DAL {oldVersion} -> {TwoTrailsSchema.SchemaVersion}"));
 
-                        Trace.WriteLine($"Upgrade ({oldVersion} -> {TwoTrailsSchema.SchemaVersion}): {file}");
+                        Trace.WriteLine($"Upgrade DAL ({oldVersion} -> {TwoTrailsSchema.SchemaVersion}): {file}");
                     }
                 }
             }

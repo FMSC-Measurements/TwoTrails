@@ -27,6 +27,8 @@ namespace TwoTrails
 
         public override string TabTitle => $"{Project.ProjectName}{(Project.RequiresSave ? "*" : String.Empty)}";
 
+        public override string ToolTip => Project.FilePath;
+
         public override string TabInfo
         {
             get
@@ -131,35 +133,34 @@ namespace TwoTrails
             //    x => x.CanRedo);
 
 
+            Project.PropertyChanged += Project_PropertyChanged;
             ProjectEditor.PointEditor.PropertyChanged += PointEditor_PropertyChanged;
             _ProjectEditorControl.tabControl.SelectionChanged += ProjectEditor_TabSelectionChanged;
         }
 
         static bool doesTabAndDataMatch(ProjectTabSection selectedTab, Type type)
         {
-                if (type == null)
-                    return true;
-                switch (selectedTab)
-                {
-                    case ProjectTabSection.Project: return type == ProjectProperties.DataType;
-                    case ProjectTabSection.Points: return type.IsAssignableFrom(PointProperties.DataType);
-                    case ProjectTabSection.Polygons: return type == PolygonProperties.DataType;
-                    case ProjectTabSection.Metadata: return type == MetadataProperties.DataType;
-                    case ProjectTabSection.Groups: return type == GroupProperties.DataType;
-                    case ProjectTabSection.Media: return type == PointProperties.DataType;
-                    case ProjectTabSection.Map:
-                    default: return false;
-                }
+            if (type == null)
+            {
+                return true;
+            }
+
+            switch (selectedTab)
+            {
+                case ProjectTabSection.Project: return type == ProjectProperties.DataType;
+                case ProjectTabSection.Points: return PointProperties.DataType.IsAssignableFrom(type);
+                case ProjectTabSection.Polygons: return type == PolygonProperties.DataType;
+                case ProjectTabSection.Metadata: return type == MetadataProperties.DataType;
+                case ProjectTabSection.Groups: return type == GroupProperties.DataType;
+                case ProjectTabSection.Media: return type == PointProperties.DataType;
+                case ProjectTabSection.Map:
+                default: return false;
+            }
         }
 
-
-        private void PointEditor_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Project_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ProjectEditor.PointEditor.SelectedPoints))
-            {
-                OnPropertyChanged(nameof(TabInfo));
-            }
-            else if (e.PropertyName == "ProjectName" || e.PropertyName == "RequiresSave")
+            if (e.PropertyName == nameof(TtProject.ProjectName) || e.PropertyName == nameof(TtProject.RequiresSave))
             {
                 Tab.Dispatcher.Invoke(() =>
                 {
@@ -167,9 +168,17 @@ namespace TwoTrails
                 });
                 OnPropertyChanged(nameof(TabTitle));
             }
-            else if (e.PropertyName == "DAL")
+            else if (e.PropertyName == nameof(TtProject.DAL))
             {
                 OnPropertyChanged(nameof(ToolTip));
+            }
+        }
+
+        private void PointEditor_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ProjectEditor.PointEditor.SelectedPoints))
+            {
+                OnPropertyChanged(nameof(TabInfo));
             }
         }
 
@@ -226,20 +235,27 @@ namespace TwoTrails
                     return;
                 }
             }
-
-            ProjectEditor.Dispose();
         }
 
         protected override void Dispose(bool dispoing)
         {
             base.Dispose(dispoing);
 
-            UndoCommand.Dispose();
-            RedoCommand.Dispose();
+            try
+            {
+                UndoCommand.Dispose();
+                RedoCommand.Dispose();
 
-            ProjectEditor.PointEditor.PropertyChanged -= PointEditor_PropertyChanged;
-            _ProjectEditorControl.Loaded -= ProjectEditorControl_Loaded;
-            _ProjectEditorControl.tabControl.SelectionChanged -= ProjectEditor_TabSelectionChanged;
+                ProjectEditor.PointEditor.PropertyChanged -= PointEditor_PropertyChanged;
+                _ProjectEditorControl.Loaded -= ProjectEditorControl_Loaded;
+                _ProjectEditorControl.tabControl.SelectionChanged -= ProjectEditor_TabSelectionChanged;
+
+                ProjectEditor.Dispose();
+            }
+            catch (Exception)
+            {
+                //
+            }
         }
     }
 }

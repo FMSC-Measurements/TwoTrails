@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,24 +14,37 @@ using TwoTrails.ViewModels;
 namespace TwoTrails.Controls
 {
     /// <summary>
-    /// Interaction logic for DataEditorControl.xaml
+    /// Interaction logic for PointEditorControl.xaml
     /// </summary>
     public partial class PointEditorControl : UserControl
     {
         private DataStyleModel DataStyles;
-        private PointEditorModel DataEditor;
+        private PointEditorModel PointEditor;
 
-        public PointEditorControl(PointEditorModel dataEditor, DataStyleModel dataStyles)
+        public PointEditorControl(PointEditorModel pointEditor, DataStyleModel dataStyles)
         {
             DataStyles = dataStyles;
 
             InitializeComponent();
             
-            this.DataContext = (DataEditor = dataEditor);
+            this.DataContext = PointEditor = pointEditor;
 
             dgPoints.PreviewMouseUp += DgPoints_PreviewMouseUp;
             dgPoints.LoadingRow += DgPoints_LoadingRow;
-            dgPoints.BindableColumns = DataEditor.DataColumns;
+            dgPoints.BindableColumns = PointEditor.DataColumns;
+
+            SortPolys();
+
+            pointEditor.Project.Settings.PropertyChanged += (s, pce) =>
+            {
+                if (pce.PropertyName == nameof(TtSettings.SortPolysByName)) SortPolys();
+            };
+        }
+
+        private void SortPolys()
+        {
+            lbPolys.Items.SortDescriptions.Clear();
+            lbPolys.Items.SortDescriptions.Add(new SortDescription($"Item.{(PointEditor.Project.Settings.SortPolysByName ? "Name" : "TimeCreated")}", ListSortDirection.Ascending));
         }
 
         private void DgPoints_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -49,12 +63,12 @@ namespace TwoTrails.Controls
             if (dep is DataGridColumnHeader)
             {
                 if (dep is DataGridColumnHeader columnHeader)
-                    DataEditor.SelectedColumnIndex = columnHeader.DisplayIndex;
+                    PointEditor.SelectedColumnIndex = columnHeader.DisplayIndex;
             }
             else if (dep is DataGridCell)
             {
                 if (dep is DataGridCell cell)
-                    DataEditor.SelectedColumnIndex = cell.Column.DisplayIndex;
+                    PointEditor.SelectedColumnIndex = cell.Column.DisplayIndex;
             }
         }
 
