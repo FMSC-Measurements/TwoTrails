@@ -201,10 +201,8 @@ namespace TwoTrails.Mapping
             GC.SuppressFinalize(this);
         }
 
-        protected override void Dispose(bool disposed)
+        protected void Dispose(bool disposed)
         {
-            base.Dispose(disposed);
-
             foreach (TtMapPolygonManager pm in PolygonManagers)
             {
                 pm.PropertyChanged -= PolyManager_PropertyChanged;

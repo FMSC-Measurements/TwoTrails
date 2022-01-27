@@ -237,10 +237,8 @@ namespace TwoTrails
             }
         }
 
-        protected override void Dispose(bool dispoing)
+        protected void Dispose(bool dispoing)
         {
-            base.Dispose(dispoing);
-
             try
             {
                 UndoCommand.Dispose();

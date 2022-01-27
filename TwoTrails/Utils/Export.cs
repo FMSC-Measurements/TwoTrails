@@ -15,6 +15,7 @@ using FMSC.Core.Xml.GPX;
 using TwoTrails.Core.Media;
 using TwoTrails.DAL;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace TwoTrails.Utils
 {
@@ -618,6 +619,12 @@ namespace TwoTrails.Utils
         }
 
 
+
+        private static string ScrubFileName(this string text)
+        {
+            new Regex("[^a-zA-Z0-9 _-]").Replace(text, "_");
+            return text;
+        }
 
         private static string Scrub(this string text)
         {

@@ -341,7 +341,7 @@ namespace TwoTrails.ViewModels
             GC.SuppressFinalize(this);
         }
 
-        protected override void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             PolygonSummary = null;
 

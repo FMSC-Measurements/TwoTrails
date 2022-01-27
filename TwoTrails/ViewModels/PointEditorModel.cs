@@ -1248,7 +1248,7 @@ namespace TwoTrails.ViewModels
         }
 
 
-        protected override void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             Manager.HistoryChanged -= Manager_HistoryChanged;
 

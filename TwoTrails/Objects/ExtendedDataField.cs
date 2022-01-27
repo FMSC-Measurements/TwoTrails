@@ -34,14 +34,14 @@ namespace TwoTrails
             set { PointEditor.ExtendedData[PropertyCN] = value; }
         }
 
-        public ExtendedDataField(DataDictionaryField field, PointEditorModel PointEditor, IValueConverter converter = null)
+        public ExtendedDataField(DataDictionaryField field, PointEditorModel pointEditor, IValueConverter converter = null)
         {
             Name = field.Name;
             PropertyCN = field.CN;
             Flags = field.Flags;
             ValueRequired = field.ValueRequired;
             DataType = field.DataType;
-            PointEditor = PointEditor;
+            PointEditor = pointEditor;
             Converter = converter;
 
             PointEditor.PropertyChanged += (sender, e) =>
