@@ -12,7 +12,14 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <ListBox Name="lbPolys" Grid.Column="0" Grid.Row="0" BorderThickness="0"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <CheckBox Grid.Column="0" Grid.Row="0" Margin="2" Content="All Polygons" IsChecked="{Binding AllPolysChecked}" />
+
+        <ListBox Name="lbPolys" Grid.Column="0" Grid.Row="1" BorderThickness="0"
                                     ItemsSource="{Binding Polygons, Mode=OneWay}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemTemplate>
@@ -35,7 +42,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <StackPanel Grid.Column="1" Margin="2.5, 0, 2.5, 0">
+        <StackPanel Grid.Column="1" Grid.RowSpan="2" Margin="2.5, 0, 2.5, 0">
             <CheckBox Content="Include Metadata" IsChecked="{Binding IncludeMetadata}" IsEnabled="{Binding HasMetadata}"/>
             <CheckBox Content="Include Groups" IsChecked="{Binding IncludeGroups}" IsEnabled="{Binding HasGroups}"/>
             <CheckBox Content="Include NMEA" IsChecked="{Binding IncludeNmea}" IsEnabled="{Binding HasNmea}"/>

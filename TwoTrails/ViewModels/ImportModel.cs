@@ -186,11 +186,11 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                             }
                         }
 
-                        ImportControl = new ImportControl(idal, true, true, true);
+                        ImportControl = new ImportControl(idal, _Project.Settings.SortPolysByName, true, true, true);
                         break;
                     case Consts.FILE_EXTENSION_V2:
                         IsSettingUp = true;
-                        ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), true, true, true);
+                        ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), _Project.Settings.SortPolysByName, true, true, true);
                         break;
                     case Consts.CSV_EXT:
                     case Consts.TEXT_EXT:
@@ -208,7 +208,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                                         dal.Parse();
                                         MainContent.Dispatcher.Invoke(() =>
                                         {
-                                            ImportControl = new ImportControl(dal, false, dal.GetGroups().Any(), false);
+                                            ImportControl = new ImportControl(dal, _Project.Settings.SortPolysByName, false, dal.GetGroups().Any(), false);
                                         });
                                     });
                                 }
@@ -241,7 +241,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                                         dal.Parse();
                                         MainContent.Dispatcher.Invoke(() =>
                                         {
-                                            ImportControl = new ImportControl(dal, false, false, false);
+                                            ImportControl = new ImportControl(dal, _Project.Settings.SortPolysByName, false, false, false);
                                         });
                                     });
                                 }
@@ -267,7 +267,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                                 ImportControl = new ImportControl(
                                     new TtKmlDataAccessLayer(
                                         new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true, startPolyNumber: _Manager.PolygonCount)
-                                ), false, false, false);
+                                ), _Project.Settings.SortPolysByName, false, false, false);
 
                                 IsSettingUp = true;
                             }
@@ -289,7 +289,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                                     ImportControl = new ImportControl(
                                         new TtShapeFileDataAccessLayer(
                                             new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
-                                        ), false, false, false
+                                        ), _Project.Settings.SortPolysByName, false, false, false
                                     );
                                     IsSettingUp = true;
                                     break;
@@ -338,7 +338,8 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                     ImportControl = new ImportControl(
                                 new TtShapeFileDataAccessLayer(
                                     new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
-                                )
+                                ),
+                                _Project.Settings.SortPolysByName
                             );
                     IsSettingUp = true;
                 } 

@@ -828,7 +828,7 @@ namespace TwoTrails.ViewModels
 
             #region Setup Filters
             CheckedListItem<TtPolygon> tmpPoly;
-            tmpPoly = new CheckedListItem<TtPolygon>(new TtPolygon() { Name = "All", CN = Consts.EmptyGuid, TimeCreated = new DateTime(0) }, true);
+            tmpPoly = new CheckedListItem<TtPolygon>(new TtPolygon() { Name = "All", CN = Consts.FullGuid, TimeCreated = new DateTime(0) }, true);
             _Polygons.Add(tmpPoly);
             tmpPoly.ItemCheckedChanged += Polygon_ItemCheckedChanged;
 
@@ -1506,6 +1506,17 @@ namespace TwoTrails.ViewModels
                 if (cp.Item.CN != Consts.FullGuid)
                 {
                     checkedItems[cp.Item.CN] = cp.IsChecked;
+
+                    if (checkedItems.Where(ci => ci.Key != Consts.FullGuid).All(ci => ci.Value))
+                    {
+                        items.First(i => i.Item.CN == Consts.FullGuid).SetChecked(true, false);
+                        checkedItems[Consts.FullGuid] = true;
+                    }
+                    else
+                    {
+                        items.First(i => i.Item.CN == Consts.FullGuid).SetChecked(false, false);
+                        checkedItems[Consts.FullGuid] = false;
+                    }
                 }
                 else
                 {
@@ -1585,6 +1596,15 @@ namespace TwoTrails.ViewModels
                     else
                     {
                         _CheckedOpTypes[(OpType)Enum.Parse(typeof(OpType), cp.Item)] = cp.IsChecked;
+
+                        if (OpTypes.Where(cli => cli.Item != "All").All(ci => ci.IsChecked))
+                        {
+                            OpTypes.First(cli => cli.Item == "All").SetChecked(true, false);
+                        }
+                        else
+                        {
+                            OpTypes.First(cli => cli.Item == "All").SetChecked(false, false);
+                        }
                     }
                 }
                 else
