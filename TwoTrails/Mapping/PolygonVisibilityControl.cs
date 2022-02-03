@@ -201,7 +201,7 @@ namespace TwoTrails.Mapping
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposed)
+        protected override void Dispose(bool disposed)
         {
             foreach (TtMapPolygonManager pm in PolygonManagers)
             {

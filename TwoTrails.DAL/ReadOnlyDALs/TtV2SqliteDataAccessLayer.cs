@@ -560,7 +560,6 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
             return new List<DataDictionary>();
         }
 
-        
 
         protected int GetItemCount(String tableName, string where = null)
         {
@@ -587,6 +586,18 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
             }
 
             return count;
+        }
+
+        public int GetPointCount(params string[] polyCNs)
+        {
+            if (polyCNs == null || !polyCNs.Any())
+            {
+                return GetItemCount(TwoTrailsV2Schema.PointSchema.TableName);
+            }
+            else
+            {
+                return polyCNs.Sum(cn => GetItemCount(TwoTrailsV2Schema.PointSchema.TableName, $"{TwoTrailsV2Schema.PointSchema.PolyCN} == '{cn}'"));
+            }
         }
 
         protected IEnumerable<string> GetItemList(string tableName, string field, string where = null)

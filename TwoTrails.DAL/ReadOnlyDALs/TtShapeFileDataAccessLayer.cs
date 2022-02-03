@@ -327,6 +327,19 @@ namespace TwoTrails.DAL
             return linked ? GetLinkedPoints(points).DeepCopy() : points.DeepCopy();
         }
 
+        public int GetPointCount(params string[] polyCNs)
+        {
+            if (polyCNs == null || !polyCNs.Any())
+            {
+                return _Points.Count;
+            }
+            else
+            {
+                return _Points.Values.Count(p => polyCNs.Contains(p.PolygonCN));
+            }
+        }
+
+
         public bool HasPolygons()
         {
             Parse();

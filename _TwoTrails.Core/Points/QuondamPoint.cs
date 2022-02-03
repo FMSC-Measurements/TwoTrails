@@ -108,6 +108,7 @@ namespace TwoTrails.Core.Points
 
         private void ParentPoint_LocationChanged(TtPoint point)
         {
+            OnPropertyChanged(nameof(UnAdjX), nameof(UnAdjY), nameof(UnAdjZ), nameof(AdjX), nameof(AdjY), nameof(AdjZ));
             OnLocationChanged();
         }
 

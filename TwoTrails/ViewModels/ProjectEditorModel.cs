@@ -32,8 +32,6 @@ namespace TwoTrails.ViewModels
         public ICommand RecalculateAllPolygonsCommand { get; }
         public ICommand CalculateLogDeckCommand { get; }
 
-        //public ICommand UndoCommand { get; set; }
-        //public ICommand RedoCommand { get; set; }
         public ICommand DiscardChangesCommand { get; }
 
         public ICommand ViewUserActivityCommand { get; }
@@ -157,29 +155,6 @@ namespace TwoTrails.ViewModels
                 }
                 else
                     throw new Exception("ProjectEditorControl Not Loaded");
-
-                //if (x is Grid grid)
-                //{
-                //MapControl mapControl = grid.Children[0] as MapControl;
-
-                //grid.Children.Remove(mapControl);
-
-                //MapWindow = mapControl != null ? new MapWindow(_Project.ProjectName, mapControl) : new MapWindow(_Project);
-                //OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
-
-                //MapWindow.Closed += (s, e) =>
-                //{
-                //    MapWindow = null;
-
-                //    grid.Dispatcher.Invoke(() =>
-                //    {
-                //        grid.Children.Add(mapControl);
-                //        OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
-                //    });
-                //};
-
-                //MapWindow.Show();
-                //}
             });
 
             HistoryCommand = new BindedRelayCommand<ProjectEditorModel>(
@@ -187,21 +162,13 @@ namespace TwoTrails.ViewModels
                 x => Manager != null ? Manager.CanRedo || Manager.CanRedo : false,
                 this, m => new { m.Manager.CanRedo, m.Manager.CanUndo });
 
-            //HistoryCommand = new BindedRelayCommand<ProjectEditorModel>(
-            //    (x, m) => m.OpenHistoryManager(),
-            //    (x, m) => m.Manager != null ? m.Manager.CanRedo || m.Manager.CanRedo : false,
-            //    this, m => new { m.Manager.CanRedo, m.Manager.CanUndo });
-
-            DiscardChangesCommand = new RelayCommand(x => Manager.BaseManager.Reset());
+            DiscardChangesCommand = new BindedRelayCommand<ProjectEditorModel>(
+                x => Manager.BaseManager.Reset(),
+                x => Manager.CanUndo,
+                this, m => m.Manager.CanUndo);
 
             RecalculateAllPolygonsCommand = new RelayCommand(x => Manager.RecalculatePolygons());
             CalculateLogDeckCommand = new RelayCommand(x => CalculateLogDeck());
-
-            //UndoCommand = new BindedRelayCommand<TtHistoryManager>(
-            //    x => Manager.Undo(), x => Manager.CanUndo, Manager, x => x.CanUndo);
-
-            //RedoCommand = new BindedRelayCommand<TtHistoryManager>(
-            //    x => Manager.Redo(), x => Manager.CanRedo, Manager, x => x.CanRedo);
 
             #region Polygons
             PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtPolygon));
@@ -223,22 +190,6 @@ namespace TwoTrails.ViewModels
             SavePolygonSummary = new BindedRelayCommand<ProjectEditorModel>(
                 x => SavePolygonsummary(), x => CurrentPolygon != null,
                 this, m => m.CurrentPolygon);
-
-            //PolygonUpdateAccCommand = new BindedRelayCommand<ProjectEditorModel>(
-            //    (x, m) => m.UpdatePolygonAcc(),
-            //    (x, m) => m.CurrentPolygon != null && m.CurrentPolygon.Accuracy != m._PolygonAccuracy,
-            //    this,
-            //    m => new { m.PolygonAccuracy, m.CurrentPolygon.Accuracy });
-
-            //PolygonAccuracyLookupCommand = new BindedRelayCommand<ProjectEditorModel>(
-            //    (x, m) => m.AccuracyLookup(),
-            //    (x, m) => m.CurrentPolygon != null,
-            //    this,
-            //    m => m.CurrentPolygon);
-
-            //SavePolygonSummary = new BindedRelayCommand<ProjectEditorModel>(
-            //    (x, m) => m.SavePolygonsummary(), (x, m) => m.CurrentPolygon != null,
-            //    this, m => m.CurrentPolygon);
             #endregion
 
             #region Metadata

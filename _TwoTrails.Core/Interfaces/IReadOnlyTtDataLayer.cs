@@ -66,6 +66,8 @@ namespace TwoTrails.DAL
 
         #region Util
         bool RequiresUpgrade { get; }
+
+        int GetPointCount(params string[] polyCNs);
         #endregion
     }
 }

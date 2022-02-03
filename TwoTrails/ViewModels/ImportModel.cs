@@ -71,7 +71,7 @@ namespace TwoTrails.ViewModels
 
         public string CurrentFile { get { return Get<string>(); } set { Set(value); } }
 
-        public bool CanImport { get { return ImportControl != null && ImportControl.HasSelectedPolygons && !IsImporting; } }
+        public bool CanImport { get { return ImportControl != null && ImportControl.Context.HasSelectedPolygons && !IsImporting; } }
 
         private bool _AutoCloseOnImport;
 
@@ -352,17 +352,17 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
         public void ImportData()
         {
-            IEnumerable<string> selectedPolys = ImportControl.SelectedPolygons;
+            IEnumerable<string> selectedPolys = ImportControl.Context.SelectedPolygons;
             bool convertForeignQuondams = false;
             
-            if (ImportControl.DAL.HandlesAllPointTypes)
+            if (ImportControl.Context.DAL.HandlesAllPointTypes)
             {
                 List<string> neededPolys = new List<string>();
                 Dictionary<string, List<TtPoint>> dupPoints = new Dictionary<string, List<TtPoint>>();
 
                 foreach (string polyCN in selectedPolys)
                 {
-                    foreach (TtPoint point in ImportControl.DAL.GetPoints(polyCN, true))
+                    foreach (TtPoint point in ImportControl.Context.DAL.GetPoints(polyCN, true))
                     {
                         if (_Project.HistoryManager.PointExists(point.CN))
                         {
@@ -397,7 +397,7 @@ This means a polygon being imported may already exist. Would you like to import 
 
                             sb.AppendLine("** Current Existing Points **\n");
 
-                            foreach (TtPolygon poly in ImportControl.DAL.GetPolygons())
+                            foreach (TtPolygon poly in ImportControl.Context.DAL.GetPolygons())
                             {
                                 if (dupPoints.ContainsKey(poly.CN))
                                 {
@@ -438,8 +438,8 @@ This means a polygon being imported may already exist. Would you like to import 
 
             try
             {
-                Import.DAL(_Manager, ImportControl.DAL, selectedPolys, ImportControl.IncludeMetadata,
-                    ImportControl.IncludeGroups, ImportControl.IncludeNmea, convertForeignQuondams);
+                Import.DAL(_Manager, ImportControl.Context.DAL, selectedPolys, ImportControl.Context.IncludeMetadata,
+                    ImportControl.Context.IncludeGroups, ImportControl.Context.IncludeNmea, convertForeignQuondams);
 
                 MessageBox.Show($"{selectedPolys.Count()} Polygons Imported",
                     String.Empty, MessageBoxButton.OK, MessageBoxImage.None);

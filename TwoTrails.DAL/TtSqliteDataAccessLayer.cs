@@ -2715,6 +2715,19 @@ namespace TwoTrails.DAL
             return count;
         }
 
+        public int GetPointCount(params string[] polyCNs)
+        {
+            if (polyCNs == null || !polyCNs.Any())
+            {
+                return GetItemCount(TwoTrailsSchema.PointSchema.TableName);
+            }
+            else
+            {
+                return polyCNs.Sum(cn => GetItemCount(TwoTrailsSchema.PointSchema.TableName, $"{TwoTrailsSchema.PointSchema.PolyCN} == '{cn}'"));
+            }
+        }
+
+
         protected IEnumerable<string> GetItemList(string tableName, string field, string where = null)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
