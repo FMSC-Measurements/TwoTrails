@@ -1,13 +1,13 @@
-﻿using CSUtil;
-using CSUtil.ComponentModel;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TwoTrails.Core
 {
-    public class DataDictionary : NotifyPropertyChangedEx, IEnumerable<KeyValuePair<string, object>>, IEquatable<DataDictionary>, IEqualityComparer<DataDictionary>
+    public class DataDictionary : BaseModel, IEnumerable<KeyValuePair<string, object>>, IEquatable<DataDictionary>, IEqualityComparer<DataDictionary>
     {
         private readonly Dictionary<string, object> _Data;
         

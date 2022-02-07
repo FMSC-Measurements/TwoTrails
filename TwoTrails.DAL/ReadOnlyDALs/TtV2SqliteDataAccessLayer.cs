@@ -1,5 +1,5 @@
-﻿using CSUtil.Databases;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.Core.Databases;
 using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.GeoSpatial.Types;

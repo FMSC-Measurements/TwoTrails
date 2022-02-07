@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +10,7 @@ using TwoTrails.Core.Media;
 
 namespace TwoTrails.Core
 {
-    public class TtHistoryManager : NotifyPropertyChangedEx, IObservableTtManager
+    public class TtHistoryManager : BaseModel, IObservableTtManager
     {
         public TtManager BaseManager { get; private set; }
 

@@ -11,9 +11,6 @@
   </PropertyGroup>
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
   <ItemGroup>
-    <Reference Include="CSUtilSlim">
-      <HintPath>..\..\libs\CSUtilSlim.dll</HintPath>
-    </Reference>
     <Reference Include="FMSC.Core">
       <HintPath>..\..\libs\FMSC.Core.dll</HintPath>
     </Reference>

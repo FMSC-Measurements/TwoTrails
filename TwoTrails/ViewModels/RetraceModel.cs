@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.ViewModels
 {
-    public class RetraceModel : NotifyPropertyChangedEx
+    public class RetraceModel : BaseModel
     {
         private TtHistoryManager _Manager;
 
@@ -185,7 +185,7 @@ namespace TwoTrails.ViewModels
         }
     }
 
-    public class Retrace : NotifyPropertyChangedEx
+    public class Retrace : BaseModel
     {
         public string GCN { get; } = Guid.NewGuid().ToString();
 

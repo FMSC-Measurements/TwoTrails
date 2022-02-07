@@ -1,5 +1,5 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +10,7 @@ using Convert = FMSC.Core.Convert;
 
 namespace TwoTrails.ViewModels
 {
-    public class LogDeckCalculatorModel : NotifyPropertyChangedEx
+    public class LogDeckCalculatorModel : BaseModel
     {
         private TtProject _Project;
 

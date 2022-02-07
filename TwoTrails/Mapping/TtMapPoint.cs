@@ -1,15 +1,15 @@
-﻿using Microsoft.Maps.MapControl.WPF;
-using System;
-using TwoTrails.Core.Points;
-using System.Windows;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.GeoSpatial.UTM;
-using System.Diagnostics;
-using System.Windows.Input;
-using CSUtil.ComponentModel;
-using System.Windows.Media;
+using Microsoft.Maps.MapControl.WPF;
+using System;
 using System.ComponentModel;
-using TwoTrails.Core;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using TwoTrails.Core;
+using TwoTrails.Core.Points;
 using Point = FMSC.Core.Point;
 
 namespace TwoTrails.Mapping
@@ -17,7 +17,7 @@ namespace TwoTrails.Mapping
     public delegate void MapPointEvent(TtMapPoint point);
     public delegate void MapPointSelectedEvent(TtMapPoint point, bool adjusted);
 
-    public class TtMapPoint : NotifyPropertyChangedEx
+    public class TtMapPoint : BaseModel
     {
         public event MapPointEvent LocationChanged;
         public event MapPointSelectedEvent PointSelected;

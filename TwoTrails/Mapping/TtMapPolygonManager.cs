@@ -1,20 +1,17 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core.Collections;
+﻿using FMSC.Core.Collections;
+using FMSC.Core.ComponentModel;
+using FMSC.GeoSpatial;
 using Microsoft.Maps.MapControl.WPF;
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System;
+using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
-using System.Linq;
-using System.Windows.Input;
-using FMSC.Core.Windows.ComponentModel.Commands;
-using FMSC.GeoSpatial;
-using System.ComponentModel;
 
 namespace TwoTrails.Mapping
 {
-    public class TtMapPolygonManager : NotifyPropertyChangedEx
+    public class TtMapPolygonManager : BaseModel
     {
         private const double BOUNDARY_ZOOM_MARGIN = 0.00035;
 

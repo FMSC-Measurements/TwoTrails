@@ -1,5 +1,5 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using static TwoTrails.DAL.TtCsvDataAccessLayer;
 
 namespace TwoTrails.ViewModels
 {
-    public class CsvImportModel : NotifyPropertyChangedEx, IFileImportModel
+    public class CsvImportModel : BaseModel, IFileImportModel
     {
         private Action<TtCsvDataAccessLayer> OnSetup { get; }
 

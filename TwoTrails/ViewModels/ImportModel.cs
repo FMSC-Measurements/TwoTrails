@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Utilities;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
@@ -21,7 +21,7 @@ using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
 {
-    public class ImportModel : NotifyPropertyChangedEx
+    public class ImportModel : BaseModel
     {
         public ICommand BrowseFileCommand { get; }
 

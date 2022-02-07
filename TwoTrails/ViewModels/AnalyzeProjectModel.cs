@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System.Threading;
 using System.Windows;
@@ -7,7 +7,7 @@ using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
 {
-    public class AnalyzeProjectModel : NotifyPropertyChangedEx
+    public class AnalyzeProjectModel : BaseModel
     {
         public ICommand CloseCommand { get; }
 

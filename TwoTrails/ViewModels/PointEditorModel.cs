@@ -1,6 +1,5 @@
-﻿using CSUtil;
-using CSUtil.ComponentModel;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial.NMEA.Sentences;
@@ -30,7 +29,7 @@ using Point = FMSC.Core.Point;
 
 namespace TwoTrails.ViewModels
 {
-    public class PointEditorModel : NotifyPropertyChangedEx
+    public class PointEditorModel : BaseModel
     {
         #region Vars
         private readonly string[] SelectionChangedProperties = new string[]
@@ -821,11 +820,6 @@ namespace TwoTrails.ViewModels
             Manager = project.HistoryManager;
             Manager.HistoryChanged += Manager_HistoryChanged;
 
-            //EventManager.RegisterClassHandler(typeof(Control), Control.KeyDownEvent, new KeyEventHandler(OnKeyDown), true);
-            
-            //EventManager.RegisterClassHandler(typeof(Control), Control.KeyUpEvent, new KeyEventHandler(OnKeyUp), true);
-
-
             #region Setup Filters
             CheckedListItem<TtPolygon> tmpPoly;
             tmpPoly = new CheckedListItem<TtPolygon>(new TtPolygon() { Name = "All", CN = Consts.FullGuid, TimeCreated = new DateTime(0) }, true);
@@ -1248,7 +1242,7 @@ namespace TwoTrails.ViewModels
         }
 
 
-        protected void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             Manager.HistoryChanged -= Manager_HistoryChanged;
 
@@ -1280,29 +1274,9 @@ namespace TwoTrails.ViewModels
                 ExtendedData.PropertyChanged -= ExtendedData_PropertyChanged;
             }
 
-            //foreach (MenuItem mi in AdvInfoItems)
-            //{
-            //    BindingOperations.ClearAllBindings(mi);
-            //}
             AdvInfoItems = null;
-
-            //foreach (MenuItem mi in VisibleFields.Where(vf => vf is MenuItem))
-            //{
-            //    BindingOperations.ClearAllBindings(mi);
-            //}
             VisibleFields = null;
-
-            //foreach (DataGridColumn dgc in DataColumns)
-            //{
-            //    BindingOperations.ClearAllBindings(dgc);
-            //}
             DataColumns = null;
-
-            //Points = null;
-
-            //AdvInfoItems.Clear();
-            //VisibleFields.Clear();
-            //DataColumns.Clear();
 
             CreatePointCommand.Dispose();
             CreateQuondamsCommand.Dispose();
@@ -1327,10 +1301,6 @@ namespace TwoTrails.ViewModels
             RezonePointsCommand.Dispose();
 
             ExtendedDataFields.Clear();
-
-            //_Polygons.Clear();
-            //_Metadatas.Clear();
-            //_Groups.Clear();
         }
 
 
@@ -1355,20 +1325,7 @@ namespace TwoTrails.ViewModels
                 }
                 else
                 {
-                    //if (!SelectedPoint.ExtendedData[e.PropertyName].Equals(_ExtendedData[e.PropertyName]))
-                    //{
-                    //    if (MultipleSelections)
-                    //    {
-                    //        //Manager.EditPoints(SelectedPoints.Cast<TtPoint>(), property, newValue);
-                    //    }
-                    //    else
-                    //    {
-                    //        //Manager.EditPoint(SelectedPoint, property, newValue);
-                    //    }
-                    //}
-
                     Manager.EditPoint(SelectedPoint, PointProperties.EXTENDED_DATA, new Core.DataDictionary(SelectedPoint.CN, _ExtendedData));
-                    //SelectedPoint.ExtendedData[e.PropertyName] = _ExtendedData[e.PropertyName];
                 }
             }
 
@@ -3142,7 +3099,7 @@ namespace TwoTrails.ViewModels
         }
 
 
-        public class ColumnHeader : NotifyPropertyChangedEx
+        public class ColumnHeader : BaseModel
         {
             public DataGridTextColumn Column { get; }
             public String Name { get; }

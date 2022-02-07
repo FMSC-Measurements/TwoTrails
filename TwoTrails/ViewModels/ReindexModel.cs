@@ -1,5 +1,5 @@
-﻿using CSUtil;
-using CSUtil.ComponentModel;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,10 +12,9 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.ViewModels
 {
-    public class ReindexModel : NotifyPropertyChangedEx
+    public class ReindexModel : BaseModel
     {
         private TtHistoryManager _Manager;
-        private Window _Window;
         public ReadOnlyObservableCollection<TtPolygon> Polygons => _Manager.Polygons;
         public TtPolygon SelectedPolygon { get { return Get<TtPolygon>(); } set { Set(value); } }
         public ReindexMode ReindexMode { get { return Get<ReindexMode>(); } set { Set(value); } }
@@ -23,17 +22,12 @@ namespace TwoTrails.ViewModels
         public ICommand ReindexCommand { get; }
 
 
-        public ReindexModel(Window window, TtHistoryManager manager)
+        public ReindexModel(TtHistoryManager manager)
         {
-            _Window = window;
             _Manager = manager;
             ReindexCommand = new BindedRelayCommand<ReindexModel>(
                 x=> Reindex(), x=> SelectedPolygon != null,
                 this, m => new { m.SelectedPolygon, m.ReindexMode });
-
-            //ReindexCommand = new BindedRelayCommand<ReindexModel>(
-            //    (x, m) => m.Reindex(), (x, m) => m.SelectedPolygon != null,
-            //    this, m => new { m.SelectedPolygon, m.ReindexMode });
         }
 
 

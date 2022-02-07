@@ -1,5 +1,5 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,7 +9,7 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core
 {
-    public class PolygonSummary : NotifyPropertyChangedEx
+    public class PolygonSummary : BaseModel
     {
         private TtPoint _LastTtPoint, _LastTtBndPt, _LastTravPoint, _LastGpsPoint;
 

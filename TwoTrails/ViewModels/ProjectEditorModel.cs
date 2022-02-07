@@ -1,5 +1,5 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
@@ -11,7 +11,6 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
@@ -23,7 +22,7 @@ using static TwoTrails.Core.MediaTools;
 
 namespace TwoTrails.ViewModels
 {
-    public class ProjectEditorModel : NotifyPropertyChangedEx, IDisposable
+    public class ProjectEditorModel : BaseModel, IDisposable
     {
         #region Commands
         public ICommand OpenMapWindowCommand { get; }
@@ -285,14 +284,7 @@ namespace TwoTrails.ViewModels
             PointEditorControl.AddHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
         }
 
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             PolygonSummary = null;
 
@@ -321,8 +313,6 @@ namespace TwoTrails.ViewModels
 
             PointEditorControl.RemoveHandler(PointEditorControl.KeyDownEvent, KeyDownHandler);
             PointEditorControl.RemoveHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
-
-            //BindingOperations.ClearAllBindings(ProjectEditorControl);
         }
 
 

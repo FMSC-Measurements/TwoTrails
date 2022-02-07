@@ -1,21 +1,20 @@
 ﻿using FMSC.Core;
+using FMSC.Core.Xml.GPX;
+using FMSC.Core.Xml.KML;
+using FMSC.GeoSpatial.NMEA.Sentences;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using TwoTrails.Core;
-using TwoTrails.Core.Points;
-using CSUtil;
-using TwoTrails.ViewModels;
-using FMSC.Core.Xml.KML;
-using System.IO.Compression;
-using FMSC.GeoSpatial.NMEA.Sentences;
-using FMSC.Core.Xml.GPX;
-using TwoTrails.Core.Media;
-using TwoTrails.DAL;
-using System.Xml;
 using System.Text.RegularExpressions;
+using System.Xml;
+using TwoTrails.Core;
+using TwoTrails.Core.Media;
+using TwoTrails.Core.Points;
+using TwoTrails.DAL;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails.Utils
 {

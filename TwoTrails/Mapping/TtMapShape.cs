@@ -1,10 +1,10 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using Microsoft.Maps.MapControl.WPF;
 using TwoTrails.Core;
 
 namespace TwoTrails.Mapping
 {
-    public abstract class TtMapShape : NotifyPropertyChangedEx
+    public abstract class TtMapShape : BaseModel
     {
         public abstract bool Visible { get; set; }
 

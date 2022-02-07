@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.Diagnostics;
@@ -10,7 +10,7 @@ using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
 {
-    public class ExportProjectModel : NotifyPropertyChangedEx
+    public class ExportProjectModel : BaseModel
     {
         private readonly TtProject _Project;
         private readonly Window _Window;

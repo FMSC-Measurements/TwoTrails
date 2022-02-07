@@ -1,11 +1,11 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using System;
 using TwoTrails.Core;
 
 namespace TwoTrails
 {
-    public class DeviceSettings : NotifyPropertyChangedEx, IDeviceSettings
+    public class DeviceSettings : BaseModel, IDeviceSettings
     {
         private const String DELETE_EXISTING_PLOTS = "DeleteExistingPlots";
         private const String SPLIT_INTO_INDIVIDUAL_POLYS = "SplitIntoIndividualPolys";

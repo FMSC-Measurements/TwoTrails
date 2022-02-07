@@ -12,7 +12,7 @@ namespace TwoTrails.Dialogs
     {
         public ReindexDialog(TtHistoryManager manager)
         {
-            this.DataContext = new ReindexModel(this, manager);
+            this.DataContext = new ReindexModel(manager);
             InitializeComponent();
         }
 

@@ -1,14 +1,13 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
-using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails
 {
-    public abstract class TtTabModel : NotifyPropertyChangedEx
+    public abstract class TtTabModel : BaseModel
     {
         public ICommand CloseTabCommand { get; }
         public virtual ICommand OpenInWinndowCommand { get; } = null;

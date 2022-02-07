@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.ViewModels;
@@ -90,24 +89,6 @@ namespace TwoTrails
             Tab.Content = _ProjectEditorControl;
 
 
-            //Func<ProjectTabSection, Type, bool> doesTabAndDataMatch = (selectedTab, type) =>
-            //{
-            //    if (type == null)
-            //        return true;
-            //    switch (selectedTab)
-            //    {
-            //        case ProjectTabSection.Project: return type == ProjectProperties.DataType;
-            //        case ProjectTabSection.Points: return type.IsAssignableFrom(PointProperties.DataType);
-            //        case ProjectTabSection.Polygons: return type == PolygonProperties.DataType;
-            //        case ProjectTabSection.Metadata: return type == MetadataProperties.DataType;
-            //        case ProjectTabSection.Groups: return type == GroupProperties.DataType;
-            //        case ProjectTabSection.Media: return type == PointProperties.DataType;
-            //        case ProjectTabSection.Map:
-            //        default: return false;
-            //    }
-            //};
-
-
             UndoCommand = new BindedRelayCommand<TtHistoryManager>(
                 x => Project.HistoryManager.Undo(),
                 x => Project.HistoryManager.CanUndo && doesTabAndDataMatch(CurrentTabSection, Project.HistoryManager.UndoCommandType),
@@ -119,19 +100,6 @@ namespace TwoTrails
                 x => Project.HistoryManager.CanRedo && doesTabAndDataMatch(CurrentTabSection, Project.HistoryManager.RedoCommandType),
                 Project.HistoryManager,
                 x => x.CanRedo);
-
-            //UndoCommand = new BindedRelayCommand<TtHistoryManager>(
-            //    (x, m) => m.Undo(),
-            //    (x, m) => m.CanUndo && doesTabAndDataMatch(CurrentTabSection, m.UndoCommandType),
-            //    Project.HistoryManager,
-            //    x => x.CanUndo);
-
-            //RedoCommand = new BindedRelayCommand<TtHistoryManager>(
-            //    (x, m) => m.Redo(),
-            //    (x, m) => m.CanRedo && doesTabAndDataMatch(CurrentTabSection, m.RedoCommandType),
-            //    Project.HistoryManager,
-            //    x => x.CanRedo);
-
 
             Project.PropertyChanged += Project_PropertyChanged;
             ProjectEditor.PointEditor.PropertyChanged += PointEditor_PropertyChanged;
@@ -237,8 +205,10 @@ namespace TwoTrails
             }
         }
 
-        protected void Dispose(bool dispoing)
+        protected override void Dispose(bool dispoing)
         {
+            base.Dispose(dispoing);
+
             try
             {
                 UndoCommand.Dispose();

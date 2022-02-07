@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.GeoSpatial.MTDC;
 using System;
@@ -8,7 +8,7 @@ using TwoTrails.Core;
 
 namespace TwoTrails.ViewModels
 {
-    public class AccuracyDataModel : NotifyPropertyChangedEx
+    public class AccuracyDataModel : BaseModel
     {
         public GpsAccuracyReport Report { get; }
 

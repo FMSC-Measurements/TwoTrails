@@ -1,9 +1,9 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using System;
 
 namespace TwoTrails.Core
 {
-    public class TtProjectInfo : NotifyPropertyChangedEx
+    public class TtProjectInfo : BaseModel
     {
         public String Name { get { return Get<string>(); } set { Set(value); } }
         public String Description { get { return Get<string>(); } set { Set(value); } }

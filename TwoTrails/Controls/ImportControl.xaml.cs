@@ -1,10 +1,5 @@
-﻿using CSUtil.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System;
 using System.Windows.Controls;
-using TwoTrails.Core;
 using TwoTrails.DAL;
 using TwoTrails.ViewModels;
 

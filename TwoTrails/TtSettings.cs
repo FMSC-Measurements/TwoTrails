@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using System;
 using System.Collections.Specialized;
 using TwoTrails.Core;
@@ -6,7 +6,7 @@ using TwoTrails.DAL;
 
 namespace TwoTrails
 {
-    public class TtSettings : NotifyPropertyChangedEx, ITtSettings
+    public class TtSettings : BaseModel, ITtSettings
     {
         private const String DISTRICT = "District";
         private const String REGION = "Region";

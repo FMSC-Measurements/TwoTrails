@@ -1,5 +1,4 @@
-﻿using CSUtil;
-using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core;
 using FMSC.Core.Collections;
 using FMSC.Core.Windows.ComponentModel.Commands;
@@ -18,7 +17,7 @@ using Point = FMSC.Core.Point;
 
 namespace TwoTrails.ViewModels
 {
-    public class CreatePlotsModel : NotifyPropertyChangedEx
+    public class CreatePlotsModel : BaseModel
     {
         private TtHistoryManager _Manager;
         public TtSettings Settings { get; }

@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +8,7 @@ using TwoTrails.DAL;
 
 namespace TwoTrails.ViewModels
 {
-    public class ImportControlModel : NotifyPropertyChangedEx
+    public class ImportControlModel : BaseModel
     {
         public event EventHandler PolygonSelectionChanged;
 
@@ -85,7 +85,7 @@ namespace TwoTrails.ViewModels
             HasNmea = hasNmea;
         }
 
-        public class SelectablePolygon : NotifyPropertyChangedEx
+        public class SelectablePolygon : BaseModel
         {
             public TtPolygon Polygon { get; }
             public bool IsSelected { get { return Get<bool>(); } set { Set(value); } }

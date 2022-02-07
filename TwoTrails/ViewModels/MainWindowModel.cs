@@ -1,6 +1,7 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core.Windows.ComponentModel.Commands;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Utilities;
+using FMSC.Core.Windows.ComponentModel.Commands;
+using FMSC.Core.Windows.Utilities;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -16,12 +17,10 @@ using TwoTrails.Core;
 using TwoTrails.DAL;
 using TwoTrails.Dialogs;
 using TwoTrails.Utils;
-using FMSC.Core.Windows.Utilities;
-using System.Threading;
 
 namespace TwoTrails.ViewModels
 {
-    public class MainWindowModel : NotifyPropertyChangedEx
+    public class MainWindowModel : BaseModel
     {
         private const int MESSAGE_DELAY = 5000;
 

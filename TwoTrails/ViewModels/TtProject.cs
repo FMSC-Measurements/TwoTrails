@@ -1,19 +1,14 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core.Windows.ComponentModel.Commands;
+﻿using FMSC.Core.ComponentModel;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing.Imaging;
 using System.Windows;
-using System.Windows.Input;
-using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.DAL;
-using TwoTrails.Dialogs;
 
 namespace TwoTrails.ViewModels
 {
-    public class TtProject : NotifyPropertyChangedEx
+    public class TtProject : BaseModel
     {
         public event EventHandler<string> MessagePosted;
 

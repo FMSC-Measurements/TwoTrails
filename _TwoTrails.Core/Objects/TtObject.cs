@@ -1,9 +1,9 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using System;
 
 namespace TwoTrails.Core
 {
-    public class TtObject : NotifyPropertyChangedEx
+    public class TtObject : BaseModel
     {
         private String _CN;
         public String CN
