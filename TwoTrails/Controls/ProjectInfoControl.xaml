@@ -49,6 +49,8 @@
         <TextBox Name="txtDesc" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
                  Text="{Binding Description}"
                  VerticalAlignment="Stretch" Margin="5"
-                 MinLines="2"/>
+                 MinLines="2"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"/>
     </Grid>
 </UserControl>
