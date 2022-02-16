@@ -1190,7 +1190,7 @@ namespace TwoTrails.ViewModels
                         //set all points who have a duplicate meta to be set to the first meta that will be kept
                         Manager.EditPoints(Manager.Points.Where(p => ml.Item2.Any(m => p.MetadataCN == m.CN)), PointProperties.META, ml.Item1);
 
-                        foreach (var delMeta in ml.Item2)
+                        foreach (var delMeta in ml.Item2.Where(m => m.CN != Consts.EmptyGuid))
                             Manager.DeleteMetadata(delMeta);
                     }
                     Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {removedMetaCount} duplicate metadata"));
@@ -1204,7 +1204,7 @@ namespace TwoTrails.ViewModels
 
         private void RemoveUnusedPolygons()
         {
-            List<TtPolygon> delPolys = Manager.Polygons.Where(poly => !Manager.GetPoints(poly.CN).Any()).ToList();
+            List<TtPolygon> delPolys = Manager.Polygons.Where(poly => poly.CN != Consts.EmptyGuid && !Manager.GetPoints(poly.CN).Any()).ToList();
 
             if (delPolys.Count > 0)
             {
@@ -1229,7 +1229,7 @@ namespace TwoTrails.ViewModels
 
         private void RemoveUnusedMetadata()
         {
-            List<TtMetadata> delMeta = Manager.Metadata.Where(meta => !Manager.Points.Any(p => p.MetadataCN == meta.CN)).ToList();
+            List<TtMetadata> delMeta = Manager.Metadata.Where(meta => meta.CN != Consts.EmptyGuid && !Manager.Points.Any(p => p.MetadataCN == meta.CN)).ToList();
 
             if (delMeta.Count > 0)
             {
@@ -1254,7 +1254,7 @@ namespace TwoTrails.ViewModels
 
         private void RemoveUnusedGroups()
         {
-            List<TtGroup> delGroups = Manager.Groups.Where(group => !Manager.Points.Any(p => p.GroupCN == group.CN)).ToList();
+            List<TtGroup> delGroups = Manager.Groups.Where(group => group.CN != Consts.EmptyGuid && !Manager.Points.Any(p => p.GroupCN == group.CN)).ToList();
 
             if (delGroups.Count > 0)
             {

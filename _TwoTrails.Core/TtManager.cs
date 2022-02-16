@@ -1812,6 +1812,9 @@ namespace TwoTrails.Core
         /// <param name="group">Group to add to the project</param>
         public void DeleteGroup(TtGroup group)
         {
+            if (group.CN == Consts.EmptyGuid)
+                throw new Exception("Cannot Delete Main Group");
+
             lock (locker)
             {
                 foreach (TtPoint point in _Points.Where(p => p.GroupCN == group.CN))
@@ -1862,6 +1865,9 @@ namespace TwoTrails.Core
         /// <param name="metadata">Metadata to removed from the project</param>
         public void DeleteMetadata(TtMetadata metadata)
         {
+            if (metadata.CN == Consts.EmptyGuid)
+                throw new Exception("Cannot Delete Default Metadata");
+
             lock (locker)
             {
                 Dictionary<String, TtPolygon> adjustPolygons = new Dictionary<string, TtPolygon>();

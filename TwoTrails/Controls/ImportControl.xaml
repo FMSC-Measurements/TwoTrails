@@ -47,7 +47,7 @@
 
         <Grid Grid.Column="1" Grid.RowSpan="3" Margin="2.5, 0, 2.5, 0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
