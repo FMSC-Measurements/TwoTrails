@@ -509,54 +509,62 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
         public void SaveCurrentProject(bool rename = false)
         {
-            if (rename)
+            try
             {
-                SaveFileDialog dialog = new SaveFileDialog();
-                dialog.DefaultExt = Consts.FILE_EXTENSION;
-                dialog.Filter = Consts.FILE_EXTENSION_FILTER;
-
-                if (dialog.ShowDialog() == true)
+                if (rename)
                 {
-                    TtProject project = CurrentProject;
-                    string nFile = dialog.FileName, oFile = project.DAL.FilePath;
+                    SaveFileDialog dialog = new SaveFileDialog();
+                    dialog.DefaultExt = Consts.FILE_EXTENSION;
+                    dialog.Filter = Consts.FILE_EXTENSION_FILTER;
 
-                    File.Copy(oFile, nFile, true);
-
-                    TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(nFile);
-
-                    if (!DataHelper.CheckAndFixErrors(dal, Settings))
+                    if (dialog.ShowDialog() == true)
                     {
-                        File.Delete(nFile);
-                        PostMessage("Save Canceled");
-                    }
-                    else
-                    {
-                        project.ReplaceDAL(dal);
+                        TtProject project = CurrentProject;
+                        string nFile = dialog.FileName, oFile = project.DAL.FilePath;
 
-                        if (project.MAL != null)
+                        File.Copy(oFile, nFile, true);
+
+                        TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(nFile);
+
+                        if (!DataHelper.CheckAndFixErrors(dal, Settings))
                         {
-                            string nmFile = dialog.FileName.Replace(Consts.FILE_EXTENSION, Consts.FILE_EXTENSION_MEDIA);
-
-                            File.Copy(project.MAL.FilePath, nmFile, true);
-
-                            project.ReplaceMAL(new TtSqliteMediaAccessLayer(nmFile));
+                            File.Delete(nFile);
+                            PostMessage("Save Canceled");
                         }
+                        else
+                        {
+                            project.ReplaceDAL(dal);
 
-                        Trace.WriteLine($"Project Copied: {nFile} from {oFile}");
+                            if (project.MAL != null)
+                            {
+                                string nmFile = dialog.FileName.Replace(Consts.FILE_EXTENSION, Consts.FILE_EXTENSION_MEDIA);
 
-                        _Projects.Remove(oFile);
-                        _Projects.Add(nFile, project);
+                                File.Copy(project.MAL.FilePath, nmFile, true);
 
-                        project.Save();
+                                project.ReplaceMAL(new TtSqliteMediaAccessLayer(nmFile));
+                            }
+
+                            Trace.WriteLine($"Project Copied: {nFile} from {oFile}");
+
+                            _Projects.Remove(oFile);
+                            _Projects.Add(nFile, project);
+
+                            project.Save();
+                        }
                     }
                 }
-            }
-            else
-            {
-                CurrentProject.Save();
-            }
+                else
+                {
+                    CurrentProject.Save();
+                }
 
-            MainWindow.Title = $"TwoTrails - {CurrentProject.ProjectName}";
+                MainWindow.Title = $"TwoTrails - {CurrentProject.ProjectName}";
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message, $"MainWindowModel:SaveCurrentProject({rename})");
+                MessageBox.Show("Unable to save file. Please see Log for details.", "Unable to save.", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         
