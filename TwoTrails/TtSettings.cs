@@ -23,7 +23,12 @@ namespace TwoTrails
 
         public String UserName => Environment.UserName;
 
-        public String DeviceName => Environment.MachineName;
+        public String DeviceName =>
+#if DEBUG
+            "-";
+#else
+            Environment.MachineName;
+#endif
 
         public String AppVersion => AppInfo.Version.ToString();
 

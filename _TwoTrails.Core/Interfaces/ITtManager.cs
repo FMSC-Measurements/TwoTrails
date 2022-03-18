@@ -48,6 +48,7 @@ namespace TwoTrails.Core
         void DeleteGroup(TtGroup group);
 
 
+        bool NmeaExists(string nmeaCN);
         List<TtNmeaBurst> GetNmeaBursts(string pointCN = null);
         List<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs);
         void AddNmeaBurst(TtNmeaBurst burst);

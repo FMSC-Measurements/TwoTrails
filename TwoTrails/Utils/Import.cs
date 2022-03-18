@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.ComponentModel.History;
@@ -205,7 +206,7 @@ namespace TwoTrails.Utils
                 if (includeNmea && point.IsGpsType())
                 {
                     aNmea.AddRange(oldCN == null ?
-                        dal.GetNmeaBursts(point.CN) :
+                        dal.GetNmeaBursts(point.CN).Select(nmea => manager.NmeaExists(nmea.CN) ? new TtNmeaBurst(nmea, point.CN) : nmea) :
                         dal.GetNmeaBursts(oldCN).Select(nmea => new TtNmeaBurst(nmea, point.CN)));
                 }
             }
@@ -261,9 +262,15 @@ namespace TwoTrails.Utils
 
                 if (hm != null)
                 {
+#if DEBUG
+                    string filePath = Path.GetFileName(dal.FilePath);
+#else
+                    string filePath = dal.FilePath;
+#endif
+
                     hm.CommitMultiCommand(
                         new AddDataActionCommand(DataActionType.DataImported, hm.BaseManager,
-                        $"{dal.FilePath}{(existingPointsImported > 0 ? $" ({existingPointsImported} Point CN Changes)" : String.Empty)}"));
+                        $"{filePath}{(existingPointsImported > 0 ? $" ({existingPointsImported} Point CN Changes)" : String.Empty)}"));
                 }
             }
             catch (Exception e)

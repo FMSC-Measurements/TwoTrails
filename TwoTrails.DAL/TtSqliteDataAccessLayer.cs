@@ -1599,11 +1599,32 @@ namespace TwoTrails.DAL
 
 
         #region TTNmea
+        public TtNmeaBurst GetNmeaBurst(String nmeaCN)
+        {
+            String query = $@"select {TTS.TtNmeaSchema.SelectItems} from {TTS.TtNmeaSchema.TableName} where {TTS.SharedSchema.CN} = '{nmeaCN}'";
+
+            TtNmeaBurst burst = null;
+
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
+                {
+                    if (dr != null && dr.Read())
+                    {
+                        burst = ParseNmeaBurst(dr);
+                    }
+
+                    conn.Close();
+                }
+            }
+
+            return burst;
+        }
+
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
             return GetNmeaBursts(pointCN != null ? new string[] { pointCN } : null);
         }
-
 
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
         {
@@ -1611,7 +1632,7 @@ namespace TwoTrails.DAL
 
             if (pointCNs == null || !pointCNs.HasAtLeast(QUERY_MAX))
             {
-                return GetNmeaBurstsUnlimited(pointCNs);
+                return GetNmeaBurstsUnlimitedByPointCNs(pointCNs);
             }
             else
             {
@@ -1622,7 +1643,7 @@ namespace TwoTrails.DAL
 
                 while (index < pointCNsQueue.Count)
                 {
-                    res.AddRange(GetNmeaBurstsUnlimited(pointCNsQueue.GetRange(index, 
+                    res.AddRange(GetNmeaBurstsUnlimitedByPointCNs(pointCNsQueue.GetRange(index, 
                         (index + QUERY_MAX) < pointCNsQueue.Count ? QUERY_MAX : pointCNsQueue.Count - index)
                     ));
 
@@ -1633,7 +1654,7 @@ namespace TwoTrails.DAL
             }
         }
 
-        public IEnumerable<TtNmeaBurst> GetNmeaBurstsUnlimited(IEnumerable<string> pointCNs)
+        private IEnumerable<TtNmeaBurst> GetNmeaBurstsUnlimitedByPointCNs(IEnumerable<string> pointCNs)
         {
             String query = $@"select {TTS.TtNmeaSchema.SelectItems} from {TTS.TtNmeaSchema.TableName} 
             {(pointCNs == null ? String.Empty : $" where { String.Join(" OR ", pointCNs.Select(pcn => $"{TTS.TtNmeaSchema.PointCN} = '{pcn}'"))}")}";
@@ -1644,48 +1665,49 @@ namespace TwoTrails.DAL
                 {
                     if (dr != null)
                     {
-                        Func<string, List<int>> ParseIds = s =>
-                            s != null ?
-                                s.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries).Select(Int32.Parse).ToList() :
-                                new List<int>();
-
                         while (dr.Read())
                         {
-                            yield return new TtNmeaBurst(
-                                dr.GetString(0),
-                                TtCoreUtils.ParseTime(dr.GetString(3)),
-                                dr.GetString(1),
-                                dr.GetBoolean(2),
-                                new GeoPosition(
-                                    dr.GetDouble(5), (NorthSouth)dr.GetInt32(6),
-                                    dr.GetDouble(7), (EastWest)dr.GetInt32(8),
-                                    dr.GetDouble(9), (UomElevation)dr.GetInt32(10)
-                                ),
-                                TtCoreUtils.ParseTime(dr.GetString(4)),
-                                dr.GetDoubleN(22),
-                                dr.GetDoubleN(23),
-                                dr.GetDoubleN(11), (EastWest?)dr.GetInt32N(12),
-                                (Mode)dr.GetInt32(15), (Fix)dr.GetInt32(13),
-                                ParseIds(dr.GetStringN(27)),
-                                dr.GetDouble(16),
-                                dr.GetDouble(17),
-                                dr.GetDouble(18),
-                                (GpsFixType)dr.GetInt32(14),
-                                dr.GetInt32(25),
-                                dr.GetDouble(19),
-                                dr.GetDouble(20), (UomElevation)dr.GetInt32(21),
-                                dr.GetInt32(26),
-                                dr.GetStringN(28)
-                            );
+                            yield return ParseNmeaBurst(dr);
                         }
-
-                        dr.Close();
                     }
 
                     conn.Close();
                 }
             }
         }
+
+        private List<int> ParseNmeaIds(string s) =>
+                    s != null ?
+                        s.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries).Select(Int32.Parse).ToList() :
+                        new List<int>();
+
+        private TtNmeaBurst ParseNmeaBurst(SQLiteDataReader dataReader) => 
+            new TtNmeaBurst(
+                dataReader.GetString(0),
+                TtCoreUtils.ParseTime(dataReader.GetString(3)),
+                dataReader.GetString(1),
+                dataReader.GetBoolean(2),
+                new GeoPosition(
+                    dataReader.GetDouble(5), (NorthSouth)dataReader.GetInt32(6),
+                    dataReader.GetDouble(7), (EastWest)dataReader.GetInt32(8),
+                    dataReader.GetDouble(9), (UomElevation)dataReader.GetInt32(10)
+                ),
+                TtCoreUtils.ParseTime(dataReader.GetString(4)),
+                dataReader.GetDoubleN(22),
+                dataReader.GetDoubleN(23),
+                dataReader.GetDoubleN(11), (EastWest?)dataReader.GetInt32N(12),
+                (Mode)dataReader.GetInt32(15), (Fix)dataReader.GetInt32(13),
+                ParseNmeaIds(dataReader.GetStringN(27)),
+                dataReader.GetDouble(16),
+                dataReader.GetDouble(17),
+                dataReader.GetDouble(18),
+                (GpsFixType)dataReader.GetInt32(14),
+                dataReader.GetInt32(25),
+                dataReader.GetDouble(19),
+                dataReader.GetDouble(20), (UomElevation)dataReader.GetInt32(21),
+                dataReader.GetInt32(26),
+                dataReader.GetStringN(28)
+            );
 
         public bool InsertNmeaBurst(TtNmeaBurst burst)
         {

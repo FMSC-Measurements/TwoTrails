@@ -35,6 +35,7 @@ namespace TwoTrails.DAL
 
 
         #region TTNmeaBurst
+        TtNmeaBurst GetNmeaBurst(String nmeaCN);
         IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null);
         IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<String> pointCNs);
         #endregion

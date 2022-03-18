@@ -242,6 +242,11 @@ namespace TwoTrails.DAL
             return new List<TtGroup>();
         }
 
+        public TtNmeaBurst GetNmeaBurst(string nmeaCN)
+        {
+            throw new NotImplementedException(nameof(GetNmeaBurst));
+        }
+
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
         {
             return new List<TtNmeaBurst>();

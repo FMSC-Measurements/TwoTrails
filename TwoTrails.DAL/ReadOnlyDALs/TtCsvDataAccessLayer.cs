@@ -552,6 +552,13 @@ namespace TwoTrails.DAL
             return _Groups.Values.DeepCopy();
         }
 
+        public TtNmeaBurst GetNmeaBurst(string nmeaCN)
+        {
+            Parse();
+
+            return _Nmea.Values.Where(n => n.CN == nmeaCN).FirstOrDefault()?.DeepCopy();
+        }
+
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)
         {
             Parse();

@@ -65,14 +65,11 @@ namespace TwoTrails.ViewModels
                 {
                     if (e.PropertyName == nameof(SelectablePolygon.IsSelected))
                     {
-                        if (ignoreSelectionChange)
-                        {
-                            PolygonSelectionChanged?.Invoke(this, new EventArgs());
-                        }
-                        else
+                        if (!ignoreSelectionChange)
                         {
                             _AllPolysChecked = Polygons.All(p => p.IsSelected);
-                            OnPropertyChanged(nameof(AllPolysChecked));
+                            OnPropertyChanged(nameof(AllPolysChecked), nameof(HasSelectedPolygons));
+                            PolygonSelectionChanged?.Invoke(this, new EventArgs());
                         }
 
                         OnPropertyChanged(nameof(TotalPoints));

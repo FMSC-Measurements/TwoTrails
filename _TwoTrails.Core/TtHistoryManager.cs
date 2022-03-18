@@ -490,6 +490,10 @@ namespace TwoTrails.Core
             return BaseManager.GetDefaultPolygonGraphicOption();
         }
 
+        bool ITtManager.NmeaExists(string nmeaCN)
+        {
+            return BaseManager.NmeaExists(nmeaCN);
+        }
 
         List<TtNmeaBurst> ITtManager.GetNmeaBursts(string pointCN)
         {

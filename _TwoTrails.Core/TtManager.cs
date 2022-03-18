@@ -1899,6 +1899,12 @@ namespace TwoTrails.Core
 
 
         #region NMEA
+
+        public bool NmeaExists(string nmeaCN)
+        {
+            return _DAL.GetNmeaBurst(nmeaCN) != null;
+        }
+
         public List<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
             return (pointCN != null && _DeleteNmeaByPointCNs.Contains(pointCN)) ?
