@@ -465,7 +465,7 @@ namespace TwoTrails.ViewModels
 
         private void EditPolygonValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
         {
-            if (!origValue.Equals(newValue))
+            if (origValue == null ^ newValue == null || !origValue.Equals(newValue))
             {
                 origValue = newValue;
 
@@ -478,7 +478,7 @@ namespace TwoTrails.ViewModels
 
         private void EditPolygonValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
         {
-            if (!origValue.Equals(newValue))
+            if (origValue == null ^ newValue == null || !origValue.Equals(newValue))
             {
                 origValue = newValue;
 
@@ -843,7 +843,7 @@ namespace TwoTrails.ViewModels
 
         private void EditMetadataValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
         {
-            if (!origValue.Equals(newValue))
+            if (origValue == null ^ newValue == null || !origValue.Equals(newValue))
             {
                 origValue = newValue;
 
@@ -1029,7 +1029,7 @@ namespace TwoTrails.ViewModels
         
         private void EditGroupValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
         {
-            if (!origValue.Equals(newValue))
+            if (origValue == null ^ newValue == null || !origValue.Equals(newValue))
             {
                 origValue = newValue;
 
@@ -1042,7 +1042,7 @@ namespace TwoTrails.ViewModels
 
         private void EditGroupEnum<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : Enum
         {
-            if (!origValue.Equals(newValue))
+            if (origValue == null ^ newValue == null || !origValue.Equals(newValue))
             {
                 origValue = newValue;
 
