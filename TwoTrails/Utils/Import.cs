@@ -189,7 +189,7 @@ namespace TwoTrails.Utils
 
                 point.Group = groups.ContainsKey(point.GroupCN) ? groups[point.GroupCN] : aGroups[point.GroupCN];
                 
-                point.ClearLinks();
+                point.ClearLinkedPoints();
 
                 if (point.OpType == OpType.Quondam && point is QuondamPoint qp)
                 {

@@ -2647,6 +2647,10 @@ namespace TwoTrails.DAL
                     .Select(cn => GetPoint(cn) as QuondamPoint)
                     .ToList();
 
+                List<Tuple<TtPoint, List<string>>> pointsWithMissingChildren = GetPointsWithMissingChildren()
+                    .Select(kvpl => Tuple.Create(GetPoint(kvpl.Item1), kvpl.Item2))
+                    .ToList();
+
                 if (missingPointsByPolygons.Any())
                 {
                     int index = 1;
@@ -2693,6 +2697,18 @@ namespace TwoTrails.DAL
 
                             UpdatePoint(gpsPoint, qpoint);
                         }
+                    }
+                }
+
+                if (pointsWithMissingChildren.Any())
+                {
+                    foreach (Tuple<TtPoint, List<string>> pointAndGoodList in pointsWithMissingChildren)
+                    {
+                        TtPoint updatedPoint = pointAndGoodList.Item1.DeepCopy();
+
+                        pointAndGoodList.Item2.ForEach(lpCN => updatedPoint.AddLinkedPoint(lpCN));
+
+                        UpdatePoint(updatedPoint, pointAndGoodList.Item1);
                     }
                 }
 
@@ -2811,6 +2827,11 @@ namespace TwoTrails.DAL
                 errors |= DalError.OrphanedQuondams;
             }
 
+            if (GetPointsWithMissingChildren().Any())
+            {
+                errors |= DalError.MissingChildren;
+            }
+
             return errors;
         }
 
@@ -2870,6 +2891,37 @@ namespace TwoTrails.DAL
         {
             return GetItemList(TTS.QuondamPointSchema.TableName, TTS.SharedSchema.CN,
                 $"{TTS.QuondamPointSchema.ParentPointCN} not in (select distinct {TTS.SharedSchema.CN} from {TTS.PointSchema.TableName})");
+        }
+
+        public IEnumerable<Tuple<string, List<string>, List<string>>> GetPointsWithMissingChildren()
+        {
+            Dictionary<string, string> pointsAndLinks = new Dictionary<string, string>();
+
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = _Database.ExecuteReader(
+                    $"SELECT {TTS.SharedSchema.CN}, {TTS.PointSchema.QuondamLinks} from {TTS.PointSchema.TableName}", conn))
+                {
+
+                    while (dr.Read())
+                    {
+                        pointsAndLinks.Add(dr.GetString(0), dr.GetStringN(1));
+                    }
+                }
+            }
+
+            return pointsAndLinks
+                .Where(kvp => !String.IsNullOrEmpty(kvp.Value))
+                .Select(kvp =>
+                {
+                    string[] allLinks = kvp.Value.Split('_');
+                    List<string> goodLinks = allLinks.Where(lcn => pointsAndLinks.ContainsKey(lcn)).ToList();
+                    List<string> badLinks = allLinks.Where(link => !goodLinks.Contains(link)).ToList();
+
+                    return Tuple.Create(kvp.Key, goodLinks, badLinks);
+                })
+                .Where(pgb => pgb.Item3.Any())
+                .ToList();
         }
 
         protected bool ReindexPolygons()

@@ -44,15 +44,18 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding HasMiszonnedPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Miszonned Points" />
                 <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding HasOrphanedQuondams, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Orphaned Quondams" />
-                <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding HasDuplicateMetadata, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Duplicate Metadata" />
-
+                <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding HasMissingChildren, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Missing Children" />
+                
                 <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding HasEmptyPolygons, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Empty Polygons" />
-                <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding HasUnusedGroups, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Unused Groups" />
+                <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding HasDuplicateMetadata, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Duplicate Metadata" />
                 <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding HasUnusedMetadata, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Unused Metadata" />
+                <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding HasUnusedGroups, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Unused Groups" />
+                
             </Grid>
         </Grid>
 

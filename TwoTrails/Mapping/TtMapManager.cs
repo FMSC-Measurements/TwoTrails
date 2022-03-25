@@ -55,17 +55,6 @@ namespace TwoTrails.Mapping
                 point.PolygonChanged += Point_PolygonChanged;
             }
 
-
-            //EventManager.RegisterClassHandler(typeof(Control), Control.KeyDownEvent, new KeyEventHandler((s, e) => {
-            //    if (e.Key == Key.LeftCtrl)
-            //        SetCtrlKeyPress(true);
-            //}), true);
-
-            //EventManager.RegisterClassHandler(typeof(Control), Control.KeyUpEvent, new KeyEventHandler((s, e) => {
-            //    if (e.Key == Key.LeftCtrl)
-            //        SetCtrlKeyPress(false);
-            //}), true);
-
             ZoomToPolygonCommand = new RelayCommand(x =>
             {
                 if (x is TtPolygon poly)
@@ -99,7 +88,6 @@ namespace TwoTrails.Mapping
             _PolygonManagersMap.Add(polygon.CN, mpm);
             PolygonManagers.Add(mpm);
 
-            //mpm.PointSelected += PointSelected;
             mpm.PropertyChanged += TtMapPolygonManager_PropertyChanged;
         }
 

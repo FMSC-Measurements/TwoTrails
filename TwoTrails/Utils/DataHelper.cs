@@ -25,6 +25,9 @@ namespace TwoTrails.Utils
             if (AnalyzeOrphanedQuondams(manager))
                 errors |= DataErrors.OrphanedQuondams;
 
+            if (AnalyzeChildlessPoints(manager))
+                errors |= DataErrors.MissingChildren;
+
             if (AnalyzeEmptyPolygons(manager))
                 errors |= DataErrors.EmptyPolygons;
 
@@ -63,12 +66,15 @@ namespace TwoTrails.Utils
         {
             Dictionary<string, TtPoint> points = manager.GetPoints().ToDictionary(p => p.CN, p => p);
 
-            return points.Values.Where(p => p.OpType == OpType.Quondam).Any(point =>
-            {
-                if (point is QuondamPoint qp && (qp.ParentPoint == null || !points.ContainsKey(qp.ParentPointCN)))
-                    return true;
-                return false;
-            });
+            return points.Values.Where(p => p.OpType == OpType.Quondam)
+                .Any(point => point is QuondamPoint qp && (qp.ParentPoint == null || !points.ContainsKey(qp.ParentPointCN)));
+        }
+
+        public static bool AnalyzeChildlessPoints(ITtManager manager)
+        {
+            Dictionary<string, TtPoint> points = manager.GetPoints().ToDictionary(p => p.CN, p => p);
+
+            return points.Values.Any(p => p.HasQuondamLinks && p.LinkedPoints.Any(lpk => !points.ContainsKey(lpk)));
         }
 
         public static bool AnalyzeEmptyPolygons(ITtManager manager)
@@ -121,6 +127,8 @@ namespace TwoTrails.Utils
 
                 if (errors.HasFlag(DalError.OrphanedQuondams))
                     errList.Add("Orphaned Quondams");
+                if (errors.HasFlag(DalError.MissingChildren))
+                    errList.Add("Points with Missing Children");
                 if (errors.HasFlag(DalError.PointIndexes))
                     errList.Add("Skipped Point Indexes");
                 if (errors.HasFlag(DalError.NullAdjLocs))
@@ -132,14 +140,16 @@ namespace TwoTrails.Utils
                 if (errors.HasFlag(DalError.MissingGroup))
                     errList.Add("Missing Groups");
 
-                bool hardErrors = errors.HasFlag(DalError.OrphanedQuondams) || errors.HasFlag(DalError.MissingGroup) ||
-                    errors.HasFlag(DalError.MissingMetadata) || errors.HasFlag(DalError.MissingPolygon);
+                bool hardErrors =
+                    errors.HasFlag(DalError.OrphanedQuondams) || errors.HasFlag(DalError.MissingChildren) ||
+                    errors.HasFlag(DalError.MissingGroup) || errors.HasFlag(DalError.MissingMetadata) ||
+                    errors.HasFlag(DalError.MissingPolygon);
 
                 MessageBoxResult mbr = MessageBox.Show(
                     $"It appears part of the TwoTrails data {(hardErrors ? "is corrupt" : "needs adjusting")}. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(" | ", errList)}. " +
                     (hardErrors ? $"Would you like to try and fix the data by recreating, moving and modifing (Yes) or removing invalid (No)?" :
                     "Would you like to fix the data?"),
-                    (hardErrors ? "Data is corrupted" : "Data needs adjusting"),
+                    hardErrors ? "Data is corrupted" : "Data needs adjusting",
                     hardErrors ? MessageBoxButton.YesNoCancel : MessageBoxButton.OKCancel, MessageBoxImage.Error, MessageBoxResult.Cancel);
 
                 if (mbr == MessageBoxResult.Cancel)
@@ -169,7 +179,7 @@ namespace TwoTrails.Utils
                                 action.UpdateAction(DataActionType.ModifiedPoints);
                         }
 
-                        if (errors.HasFlag(DalError.NullAdjLocs))
+                        if (errors.HasFlag(DalError.NullAdjLocs) || errors.HasFlag(DalError.MissingChildren))
                             action.UpdateAction(DataActionType.ModifiedPoints);
 
                         if (errors.HasFlag(DalError.PointIndexes))
@@ -196,9 +206,10 @@ namespace TwoTrails.Utils
         None = 0,
         MiszonedPoints = 1 << 0,
         OrphanedQuondams = 1 << 1,
-        EmptyPolygons = 1 << 2,
-        UnusedMetadata = 1 << 3,
-        UnusedGroups = 1 << 4,
-        DuplicateMetadata = 1 << 5
+        MissingChildren = 1 << 2,
+        EmptyPolygons = 1 << 3,
+        UnusedMetadata = 1 << 4,
+        UnusedGroups = 1 << 5,
+        DuplicateMetadata = 1 << 6
     }
 }

@@ -17,6 +17,7 @@ namespace TwoTrails.ViewModels
 
         public bool HasMiszonnedPoints { get; private set; }
         public bool HasOrphanedQuondams { get; private set; }
+        public bool HasMissingChildren { get; private set; }
         public bool HasEmptyPolygons { get; private set; }
         public bool HasUnusedMetadata { get; private set; }
         public bool HasUnusedGroups { get; private set; }
@@ -36,8 +37,13 @@ namespace TwoTrails.ViewModels
                 Thread.Sleep(100);
 
                 HasOrphanedQuondams = DataHelper.AnalyzeOrphanedQuondams(project.HistoryManager);
-                ProgressComplete = 52;
+                ProgressComplete = 40;
                 OnPropertyChanged(nameof(HasOrphanedQuondams), nameof(ProgressComplete));
+                Thread.Sleep(100);
+
+                HasMissingChildren = DataHelper.AnalyzeChildlessPoints(project.HistoryManager);
+                ProgressComplete = 52;
+                OnPropertyChanged(nameof(HasMissingChildren), nameof(ProgressComplete));
                 Thread.Sleep(100);
 
                 HasEmptyPolygons = DataHelper.AnalyzeEmptyPolygons(project.HistoryManager);

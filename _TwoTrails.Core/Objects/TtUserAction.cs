@@ -9,7 +9,7 @@ namespace TwoTrails.Core
         public String DeviceName { get; }
         public DateTime Date { get; private set; }
         public DataActionType Action { get; private set; }
-        public String Notes { get; private set; }
+        public String Notes { get; private set; } = String.Empty;
 
         public String AppVersion { get; private set; }
         

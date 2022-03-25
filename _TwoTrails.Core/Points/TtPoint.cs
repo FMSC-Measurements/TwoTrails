@@ -194,11 +194,6 @@ namespace TwoTrails.Core.Points
         private ObservableCollection<String> _LinkedPoints = new ObservableCollection<string>();
         public ReadOnlyCollection<String> LinkedPoints => new ReadOnlyCollection<string>(_LinkedPoints);
 
-        internal void ClearLinkedPoints()
-        {
-            _LinkedPoints.Clear();
-        }
-
         public abstract OpType OpType { get; }
 
 
@@ -369,17 +364,28 @@ namespace TwoTrails.Core.Points
             if (!_LinkedPoints.Contains(point.CN))
             {
                 _LinkedPoints.Add(point.CN);
+                OnPropertyChanged(nameof(LinkedPoints));
+            }
+        }
+
+        internal void AddLinkedPoint(string pointCN)
+        {
+            if (!_LinkedPoints.Contains(pointCN))
+            {
+                _LinkedPoints.Add(pointCN);
             }
         }
 
         public void RemoveLinkedPoint(QuondamPoint point)
         {
             _LinkedPoints.Remove(point.CN);
+            OnPropertyChanged(nameof(LinkedPoints));
         }
 
-        public void ClearLinks()
+        public void ClearLinkedPoints()
         {
             _LinkedPoints.Clear();
+            OnPropertyChanged(nameof(LinkedPoints));
         }
 
 
