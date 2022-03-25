@@ -11,6 +11,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         private List<Tuple<QuondamPoint, TtPoint>> _ConvertedPoints = null;
         private List<TtNmeaBurst> _AddNmea = new List<TtNmeaBurst>();
+        private TtPoint _QpParentPoint = null;
 
         public DeleteTtPointCommand(TtPoint point, TtManager pointsManager) : base(point)
         {
@@ -36,6 +37,11 @@ namespace TwoTrails.Core.ComponentModel.History
                     }
                 }
             }
+
+            if (point.OpType == OpType.Quondam && point is QuondamPoint qp)
+            {
+                _QpParentPoint = qp.ParentPoint;
+            }
         }
 
         public override void Redo()
@@ -51,6 +57,11 @@ namespace TwoTrails.Core.ComponentModel.History
                 pointsManager.AddNmeaBursts(_AddNmea);
             }
 
+            if (_QpParentPoint != null)
+            {
+                _QpParentPoint.RemoveLinkedPoint(Point as QuondamPoint);
+            }
+
             pointsManager.DeletePoint(Point);
 
             if (Point.IsGpsType())
@@ -61,6 +72,18 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public override void Undo()
         {
+            if (Point.IsGpsType())
+            {
+                pointsManager.RestoreNmeaBurts(Point.CN);
+            }
+
+            pointsManager.AddPoint(Point);
+
+            if (_QpParentPoint != null)
+            {
+                _QpParentPoint.AddLinkedPoint(Point as QuondamPoint);
+            }
+
             if (_ConvertedPoints != null)
             {
                 foreach (Tuple<QuondamPoint, TtPoint> tuple in _ConvertedPoints)
@@ -69,13 +92,6 @@ namespace TwoTrails.Core.ComponentModel.History
                     Point.AddLinkedPoint(tuple.Item1);
                     pointsManager.DeleteNmeaBursts(tuple.Item2.CN);
                 }
-            }
-
-            pointsManager.AddPoint(Point);
-
-            if (Point.IsGpsType())
-            {
-                pointsManager.RestoreNmeaBurts(Point.CN);
             }
         }
     }

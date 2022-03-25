@@ -11,6 +11,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         private List<Tuple<TtPoint, QuondamPoint, TtPoint>> _ConvertedPoints = null;
         private List<TtNmeaBurst> _AddNmea = new List<TtNmeaBurst>();
+        private List<Tuple<QuondamPoint, TtPoint>> _QpParentPoints = null;
 
 
         public DeleteTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager) : base(points)
@@ -41,6 +42,16 @@ namespace TwoTrails.Core.ComponentModel.History
                     }
                 } 
             }
+
+            if (points.Any(p => p.OpType == OpType.Quondam))
+            {
+                _QpParentPoints = new List<Tuple<QuondamPoint, TtPoint>>();
+
+                foreach (QuondamPoint qp in points.Where(p => p.OpType == OpType.Quondam))
+                {
+                    _QpParentPoints.Add(Tuple.Create(qp, qp.ParentPoint));
+                }
+            }
         }
 
         public override void Redo()
@@ -56,6 +67,14 @@ namespace TwoTrails.Core.ComponentModel.History
                 pointsManager.AddNmeaBursts(_AddNmea);
             }
 
+            if (_QpParentPoints != null)
+            {
+                foreach (Tuple<QuondamPoint, TtPoint> qvp in _QpParentPoints)
+                {
+                    qvp.Item2.RemoveLinkedPoint(qvp.Item1);
+                }
+            }
+
             pointsManager.DeletePoints(Points);
 
             foreach (TtPoint point in Points.Where(p => p.IsGpsType()))
@@ -66,6 +85,21 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public override void Undo()
         {
+            foreach (TtPoint point in Points.Where(p => p.IsGpsType()))
+            {
+                pointsManager.RestoreNmeaBurts(point.CN);
+            }
+
+            pointsManager.AddPoints(Points);
+
+            if (_QpParentPoints != null)
+            {
+                foreach (Tuple<QuondamPoint, TtPoint> qvp in _QpParentPoints)
+                {
+                    qvp.Item2.AddLinkedPoint(qvp.Item1);
+                }
+            }
+
             if (_ConvertedPoints != null)
             {
                 foreach (Tuple<TtPoint, QuondamPoint, TtPoint> tuple in _ConvertedPoints)
@@ -75,13 +109,6 @@ namespace TwoTrails.Core.ComponentModel.History
 
                     pointsManager.DeleteNmeaBursts(tuple.Item3.CN);
                 }
-            }
-
-            pointsManager.AddPoints(Points);
-
-            foreach (TtPoint point in Points.Where(p => p.IsGpsType()))
-            {
-                pointsManager.RestoreNmeaBurts(point.CN);
             }
         }
     }
