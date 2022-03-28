@@ -11,7 +11,6 @@ namespace TwoTrails.Mapping
 
         private MapPolygon _MapPolygon { get; } = new MapPolygon();
 
-        private PolygonGraphicOptions _PGO { get; }
 
         private bool _Visible;
         public override bool Visible
@@ -26,7 +25,6 @@ namespace TwoTrails.Mapping
         {
             _Polygon = polygon;
             _Visible = visible;
-            _PGO = pgo;
 
             _MapPolygon.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
             _MapPolygon.Visibility = _Visible ? Visibility.Visible : Visibility.Collapsed;
@@ -36,7 +34,7 @@ namespace TwoTrails.Mapping
 
             _MapPolygon.Locations = locations;
 
-            _PGO.ColorChanged += OnColorChanged;
+            PGO.ColorChanged += OnColorChanged;
 
             map.Children.Add(_MapPolygon);
         }
@@ -63,10 +61,13 @@ namespace TwoTrails.Mapping
             });
         }
 
-        public override void Detach()
+        protected override void Dispose(bool dispoing)
         {
-            _PGO.ColorChanged -= OnColorChanged;
-            Map.Children.Remove(_MapPolygon);
+            if (dispoing)
+            {
+                PGO.ColorChanged -= OnColorChanged;
+                Map.Children.Remove(_MapPolygon);
+            }
         }
     }
 }

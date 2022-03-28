@@ -47,7 +47,7 @@ namespace TwoTrails.ViewModels
         public ICommand AboutCommand { get; private set; }
         #endregion
 
-        private readonly Dictionary<String, TtProject> _Projects = new Dictionary<String, TtProject>();
+        private readonly Dictionary<String, ProjectTab> _Projects = new Dictionary<String, ProjectTab>();
 
         private Binding sbiInfoBinding;
         private TtTabModel _CurrentTab;
@@ -121,7 +121,7 @@ namespace TwoTrails.ViewModels
         public bool HasPolygons => PointEditor != null && PointEditor.Manager.Polygons.Count > 0;
         public bool HasUnsavedProjects
         {
-            get { return _Projects.Values.Any(p => p.RequiresSave); }
+            get { return _Projects.Values.Any(p => p.Project.RequiresSave); }
         }
 
         public bool RecentItemsAvail
@@ -133,7 +133,7 @@ namespace TwoTrails.ViewModels
         private bool exiting = false;
         public bool ShouldExit()
         {
-            return exiting || Exit(false);
+            return exiting || Exit(false, true);
         }
 
         private TabControl _Tabs;
@@ -154,7 +154,7 @@ namespace TwoTrails.ViewModels
             SaveCommand = new RelayCommand(x => SaveCurrentProject());
             SaveAsCommand = new RelayCommand(x => SaveCurrentProject(true));
             CloseProjectCommand = new RelayCommand(x => (x as TtTabModel)?.CloseTab());
-            ExitCommand = new RelayCommand(x => Exit());
+            ExitCommand = new RelayCommand(x => Exit(true, true));
 
             ImportCommand = new RelayCommand(x => ImportDialog.ShowDialog(CurrentProject, this));
             ExportCommand = new RelayCommand(x => ExportDialog.ShowDialog(CurrentProject, this));
@@ -546,8 +546,10 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
 
                             Trace.WriteLine($"Project Copied: {nFile} from {oFile}");
 
+                            ProjectTab projectTab = _Projects[oFile];
+
                             _Projects.Remove(oFile);
-                            _Projects.Add(nFile, project);
+                            _Projects.Add(nFile, projectTab);
 
                             project.Save();
                         }
@@ -570,12 +572,13 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
         
         private void AddProject(TtProject project)
         {
-            CurrentTab = new ProjectTab(project, this);
+            ProjectTab currentProjecttab = new ProjectTab(project, this);
+            CurrentTab = currentProjecttab;
 
             _Tabs.Items.Add(CurrentTab.Tab);
             _Tabs.SelectedIndex = _Tabs.Items.Count - 1;
 
-            _Projects.Add(project.FilePath, project);
+            _Projects.Add(project.FilePath, currentProjecttab);
             App.Settings.AddRecentProject(project.FilePath);
             UpdateRecentProjectMenu();
 
@@ -631,26 +634,28 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
         }
 
 
-        public void RemoveTab(TtTabModel tab)
+        public void RemoveTab(TtTabModel tab, bool checkForChanges)
         {
             if (tab != null)
             {
                 if (tab is ProjectTab projTab)
                 {
-                    RemoveProject(projTab.Project, false);
+                    RemoveProject(projTab.Project, checkForChanges);
                 }
                 _Tabs.Items.Remove(tab.Tab);
+
+                tab.Dispose();
             }
         }
         
 
-        private bool Exit(bool closeWindow = true)
+        private bool Exit(bool closeWindow = true, bool checkForChanges = true)
         {
             try
             {
-                foreach (TtProject proj in _Projects.Values.ToList())
+                foreach (TtTabModel tab in _Projects.Values.ToList())
                 {
-                    RemoveProject(proj);
+                    RemoveTab(tab, checkForChanges);
                 }
             }
             catch (Exception ex)
@@ -747,7 +752,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             Directory.CreateDirectory(tempDirectory);
 
             File.Copy(App.LOG_FILE_PATH, Path.Combine(tempDirectory, App.LOG_FILE_NAME));
-            foreach (TtProject proj in _Projects.Values)
+            foreach (TtProject proj in _Projects.Values.Select(pt => pt.Project))
             {
                 File.Copy(proj.DAL.FilePath, Path.Combine(tempDirectory, Path.GetFileName(proj.DAL.FilePath)));
                 if (proj.MAL != null)
@@ -795,7 +800,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
     
         internal IEnumerable<string> GetListOfOpenedProjects()
         {
-            return _Projects.Values.Select(proj => proj.FilePath);
+            return _Projects.Values.Select(pt => pt.Project.FilePath);
         }
 
         private void CheckForUpdates()

@@ -38,10 +38,12 @@ namespace TwoTrails
 
         public void CloseTab()
         {
-            OnTabClose();
-            MainModel.RemoveTab(this);
+            if (OnTabClose())
+            {
+                MainModel.RemoveTab(this, false);
+            }
         }
 
-        protected abstract void OnTabClose();
+        protected abstract bool OnTabClose();
     }
 }

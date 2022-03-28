@@ -178,7 +178,7 @@ namespace TwoTrails
         }
 
 
-        protected override void OnTabClose()
+        protected override bool OnTabClose()
         {
             if (Project.RequiresSave)
             {
@@ -195,14 +195,16 @@ namespace TwoTrails
                     catch (Exception ex)
                     {
                         MessageBox.Show(ex.Message);
-                        return;
+                        return false;
                     }
                 }
                 else if (result == MessageBoxResult.Cancel)
                 {
-                    return;
+                    return false;
                 }
             }
+
+            return true;
         }
 
         protected override void Dispose(bool dispoing)

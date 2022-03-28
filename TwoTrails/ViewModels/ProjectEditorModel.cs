@@ -645,7 +645,7 @@ namespace TwoTrails.ViewModels
                     {
                         if (oldIndex >= Polygons.Count)
                         {
-                            listBox.SelectedItem = Polygons.Last();
+                            listBox.SelectedIndex = Polygons.Count - 1;
                         }
                         else
                         {

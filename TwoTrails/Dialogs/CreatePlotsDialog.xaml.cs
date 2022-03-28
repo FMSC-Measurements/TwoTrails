@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.ViewModels;
 
@@ -16,6 +17,11 @@ namespace TwoTrails.Dialogs
         {
             this.DataContext = new CreatePlotsModel(project, this);
             InitializeComponent();
+        }
+
+        private async void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            await Application.Current.Dispatcher.InvokeAsync((sender as TextBox).SelectAll);
         }
 
         private void TextIsUnsignedInteger(object sender, TextCompositionEventArgs e)

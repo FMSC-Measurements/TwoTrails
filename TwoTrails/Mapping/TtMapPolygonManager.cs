@@ -383,6 +383,10 @@ namespace TwoTrails.Mapping
                         }
                         break;
                     case NotifyCollectionChangedAction.Remove:
+                        foreach (TtMapPoint p in e.OldItems)
+                        {
+                            p.Dispose();
+                        }
                         break;
                     case NotifyCollectionChangedAction.Replace:
                         break;
@@ -456,6 +460,25 @@ namespace TwoTrails.Mapping
                             new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN)));
                 }
             }
+        }
+
+
+        protected override void Dispose(bool dispoing)
+        {
+            if (dispoing)
+            {
+                foreach (TtMapPoint p in Points)
+                {
+                    p.PointSelected -= MapPointSelected;
+                }
+
+                AdjBoundary.Dispose();
+                UnAdjBoundary.Dispose();
+                AdjNavigation.Dispose();
+                UnAdjNavigation.Dispose();
+            }
+
+            base.Dispose(dispoing);
         }
     }
 }

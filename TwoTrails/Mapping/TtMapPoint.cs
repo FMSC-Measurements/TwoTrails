@@ -17,7 +17,7 @@ namespace TwoTrails.Mapping
     public delegate void MapPointEvent(TtMapPoint point);
     public delegate void MapPointSelectedEvent(TtMapPoint point, bool adjusted);
 
-    public class TtMapPoint : BaseModel
+    public class TtMapPoint : TtMapBaseModel
     {
         public event MapPointEvent LocationChanged;
         public event MapPointSelectedEvent PointSelected;
@@ -34,12 +34,9 @@ namespace TwoTrails.Mapping
         public bool IsNavPoint { get; }
         public bool IsMiscPoint { get { return Point.IsMiscPoint(); } }
         public int Index { get { return Point.Index; } }
-
-        private PolygonGraphicOptions _PGO { get; }
-
-        private Map _Map;
         
         private object locker = new object();
+        private bool _detached = false;
 
         private bool _Editing;
         public bool Editing
@@ -111,7 +108,8 @@ namespace TwoTrails.Mapping
 
         #region Visibility
         private bool _Visible = true;
-        public bool Visible
+
+        public override bool Visible
         {
             get { return _Visible; }
             set { SetField(ref _Visible, value, UpdateVisibility); }
@@ -200,10 +198,9 @@ namespace TwoTrails.Mapping
         #endregion
 
 
-        public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo)
+        public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo) : base(map, pgo)
         {
             Point = point;
-            _PGO = pgo;
 
             AdjPushpin.Visibility = Visibility.Collapsed;
             UnAdjPushpin.Visibility = Visibility.Collapsed;
@@ -221,13 +218,13 @@ namespace TwoTrails.Mapping
             ToolTipService.SetShowDuration(UnAdjPushpin, 60000);
 
 
-            AdjColor = MediaTools.GetColor(_PGO.AdjPtsColor);
-            UnAdjColor = MediaTools.GetColor(_PGO.UnAdjPtsColor);
-            WayPointColor = MediaTools.GetColor(_PGO.WayPtsColor);
+            AdjColor = MediaTools.GetColor(PGO.AdjPtsColor);
+            UnAdjColor = MediaTools.GetColor(PGO.UnAdjPtsColor);
+            WayPointColor = MediaTools.GetColor(PGO.WayPtsColor);
 
             IsNavPoint = Point.IsNavPoint();
 
-            _PGO.ColorChanged += PGO_ColorChanged;
+            PGO.ColorChanged += PGO_ColorChanged;
 
             Point.PropertyChanged += Point_PropertyChanged;
             if (Point is QuondamPoint qp)
@@ -235,11 +232,9 @@ namespace TwoTrails.Mapping
 
             Point.LocationChanged += UpdateLocation;
             UpdateLocation(point);
-
-            _Map = map;
-
-            _Map.Children.Add(UnAdjPushpin);
-            _Map.Children.Add(AdjPushpin);
+            
+            Map.Children.Add(UnAdjPushpin);
+            Map.Children.Add(AdjPushpin);
         }
 
         public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo, bool visible,
@@ -362,6 +357,31 @@ namespace TwoTrails.Mapping
         public override string ToString()
         {
             return $"Point {Point.PID}";
+        }
+
+        protected override void Dispose(bool dispoing)
+        {
+            if (!_detached)
+            {
+                AdjPushpin.MouseLeftButtonDown -= AdjPushpin_MouseLeftButtonDown;
+                UnAdjPushpin.MouseLeftButtonDown -= UnAdjPushpin_MouseLeftButtonDown;
+
+                AdjPushpin.ToolTipOpening += LoadAdjToolTip;
+                UnAdjPushpin.ToolTipOpening += LoadUnAdjToolTip;
+
+                PGO.ColorChanged -= PGO_ColorChanged;
+
+                Point.PropertyChanged -= Point_PropertyChanged;
+                if (Point is QuondamPoint qp)
+                    qp.ParentPoint.PropertyChanged -= Point_PropertyChanged;
+
+                Point.LocationChanged -= UpdateLocation;
+
+                Map.Children.Remove(UnAdjPushpin);
+                Map.Children.Remove(AdjPushpin);
+
+                _detached = true;
+            }
         }
     }
 }
