@@ -37,6 +37,8 @@ namespace TwoTrails.Mapping
 
         private Map Map { get; }
 
+        private bool _detach;
+
         #region Visibility
         private bool _Visible;
         public bool Visible
@@ -385,7 +387,7 @@ namespace TwoTrails.Mapping
                     case NotifyCollectionChangedAction.Remove:
                         foreach (TtMapPoint p in e.OldItems)
                         {
-                            p.Dispose();
+                            p.Detach();
                         }
                         break;
                     case NotifyCollectionChangedAction.Replace:
@@ -463,22 +465,22 @@ namespace TwoTrails.Mapping
         }
 
 
-        protected override void Dispose(bool dispoing)
+        public void Detach()
         {
-            if (dispoing)
+            if (_detach)
             {
                 foreach (TtMapPoint p in Points)
                 {
                     p.PointSelected -= MapPointSelected;
                 }
 
-                AdjBoundary.Dispose();
-                UnAdjBoundary.Dispose();
-                AdjNavigation.Dispose();
-                UnAdjNavigation.Dispose();
-            }
+                AdjBoundary.Detach();
+                UnAdjBoundary.Detach();
+                AdjNavigation.Detach();
+                UnAdjNavigation.Detach();
 
-            base.Dispose(dispoing);
+                _detach = true;
+            }
         }
     }
 }

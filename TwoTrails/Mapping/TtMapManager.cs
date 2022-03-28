@@ -187,7 +187,7 @@ namespace TwoTrails.Mapping
             _PolygonManagersMap.Remove(polygon.CN);
             _PointsByPolys.Remove(polygon.CN);
 
-            mpm.Dispose();
+            mpm.Detach();
         }
 
 

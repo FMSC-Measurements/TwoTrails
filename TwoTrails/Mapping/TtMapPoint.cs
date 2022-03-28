@@ -359,7 +359,7 @@ namespace TwoTrails.Mapping
             return $"Point {Point.PID}";
         }
 
-        protected override void Dispose(bool dispoing)
+        public override void Detach()
         {
             if (!_detached)
             {
@@ -377,8 +377,11 @@ namespace TwoTrails.Mapping
 
                 Point.LocationChanged -= UpdateLocation;
 
-                Map.Children.Remove(UnAdjPushpin);
-                Map.Children.Remove(AdjPushpin);
+                //Map.Dispatcher.Invoke(() =>
+                //{
+                    Map.Children.Remove(UnAdjPushpin);
+                    Map.Children.Remove(AdjPushpin);
+                //});
 
                 _detached = true;
             }

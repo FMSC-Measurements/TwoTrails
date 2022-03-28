@@ -23,5 +23,7 @@ namespace TwoTrails.Mapping
             this.Map = map;
             this.PGO = pgo;
         }
+
+        public abstract void Detach();
     }
 }

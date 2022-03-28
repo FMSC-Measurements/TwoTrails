@@ -11,6 +11,8 @@ namespace TwoTrails.Mapping
 
         private MapPolyline _MapPolyline { get; } = new MapPolyline();
 
+        private bool _detached;
+
 
         private bool _Visible;
         public override bool Visible
@@ -61,12 +63,13 @@ namespace TwoTrails.Mapping
             });
         }
 
-        protected override void Dispose(bool dispoing)
+        public override void Detach()
         {
-            if (dispoing)
+            if (_detached)
             {
                 PGO.ColorChanged -= OnColorChanged;
                 Map.Children.Remove(_MapPolyline);
+                _detached = true;
             }
         }
     }
