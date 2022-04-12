@@ -1,12 +1,15 @@
 ﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
 using TwoTrails.Utils;
+
+using WF = System.Windows.Forms;
 
 namespace TwoTrails.ViewModels
 {
@@ -55,9 +58,6 @@ namespace TwoTrails.ViewModels
             ExportCommand = new BindedRelayCommand<ExportProjectModel>(
                 x => CreateFiles(), x => IsCheckAll != false,
                 this, m => m.IsCheckAll);
-            //ExportCommand = new BindedRelayCommand<ExportProjectModel>(
-            //    (x, m) => m.CreateFiles(), (x, m) => m.IsCheckAll != false,
-            //    this, m => m.IsCheckAll);
             CancelCommand = new RelayCommand(x => Cancel());
             CheckAllCommand = new RelayCommand(x => CheckAll((bool?)x));
 
@@ -69,9 +69,9 @@ namespace TwoTrails.ViewModels
 
         private void BrowseFolder()
         {
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            WF.FolderBrowserDialog dialog = new WF.FolderBrowserDialog();
 
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog() == WF.DialogResult.OK)
             {
                 FolderLocation = dialog.SelectedPath;
             }
@@ -85,9 +85,22 @@ namespace TwoTrails.ViewModels
                 {
                     string path = Path.Combine(FolderLocation, Path.GetFileNameWithoutExtension(_Project.DAL.FilePath)).Trim();
 
+                    int pathLen = path.Length;
+                    List<String> tlPolyNames = _Project.HistoryManager.Polygons
+                        .Where(p => (pathLen + p.Name.Length * 2 + 10) >= byte.MaxValue) //max possible length for generated path
+                        .Select(p => p.Name).ToList();
+
+                    if (tlPolyNames.Count > 0)
+                    {
+                        MessageBox.Show(
+                            $"The following Polygon names are too long to export:\n\n{String.Join(", ", tlPolyNames)}\n\nPlease rename the polygons or choose a shallower path to place the export.",
+                            "Polygon Names Too Long", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
                     if (Directory.Exists(path))
                     {
-                        if(System.Windows.MessageBox.Show("An export already exists, would you like to overwrite the existing file(s)?",
+                        if(MessageBox.Show("An export already exists, would you like to overwrite the existing file(s)?",
                             "Overwrite Export", MessageBoxButton.YesNo, MessageBoxImage.Hand)
                             == MessageBoxResult.No)
                         {

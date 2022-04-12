@@ -156,8 +156,8 @@ namespace TwoTrails.ViewModels
             CloseProjectCommand = new RelayCommand(x => (x as TtTabModel)?.CloseTab());
             ExitCommand = new RelayCommand(x => Exit(true, true));
 
-            ImportCommand = new RelayCommand(x => ImportDialog.ShowDialog(CurrentProject, this));
-            ExportCommand = new RelayCommand(x => ExportDialog.ShowDialog(CurrentProject, this));
+            ImportCommand = new RelayCommand(x => ImportDialog.ShowDialog(CurrentProject, this, MainWindow));
+            ExportCommand = new RelayCommand(x => ExportDialog.ShowDialog(CurrentProject, this, MainWindow));
             ViewPointDetailsCommand = new RelayCommand(x => PointDetailsDialog.ShowDialog(CurrentProject.HistoryManager.GetPoints(), MainWindow));
             OpenInEarthCommand = new RelayCommand(x => OpenInGoogleEarth());
 

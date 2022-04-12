@@ -148,11 +148,16 @@ namespace TwoTrails.ViewModels
         {
             if (polys.HasAtLeast(2))
             {
-                return $"MultiPoly_{String.Join("_", polys.Select(p => p.Name))}_Plts{(rev > 1 ? $"_{rev.ToString()}" : String.Empty)}";
+                String polyNames = String.Join("_", polys.Select(p => p.Name));
+
+                if (polyNames.Length > 20)
+                    polyNames = $"({polys.Count()})";
+
+                return $"MultiPoly_{polyNames}_Plts{(rev > 1 ? $"_{rev}" : String.Empty)}";
             }
             else if (polys.Any())
             {
-                return $"{polys.First().Name}_Plts{(rev > 1 ? $"_{rev.ToString()}" : String.Empty)}";
+                return $"{polys.First().Name}_Plts{(rev > 1 ? $"_{rev}" : String.Empty)}";
             }
             else
                 return "Plts";
