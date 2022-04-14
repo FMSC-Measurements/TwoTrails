@@ -2006,6 +2006,11 @@ namespace TwoTrails.Core
             return _DAL.GetDataDictionaryTemplate();
         }
         #endregion
+
+        public List<TtUserAction> GetUserActions()
+        {
+            return _DAL.GetUserActivity().ToList();
+        }
     }
 
     public class MissingDataException : Exception

@@ -53,6 +53,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\RezonePointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consts-Secure.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consts.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectProperties\MediaProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectProperties\ProjectProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HaidLogic.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IFileParseControl.cs" />
@@ -114,8 +115,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)TtManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\GroupType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\OpType.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)ObjectProperties\" />
   </ItemGroup>
 </Project>

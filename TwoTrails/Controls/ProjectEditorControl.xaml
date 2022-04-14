@@ -137,7 +137,7 @@
                 </Style>
             </TabControl.Resources>
 
-            <TabItem Header="Project">
+            <TabItem Name="tiProject" Header="Project">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="16*"/>
@@ -254,13 +254,13 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Points">
+            <TabItem Name="tiPoints" Header="Points">
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <ContentControl Content="{Binding PointEditorControl}"/>
                 </Border>
             </TabItem>
 
-            <TabItem Header="Polygons" PreviewKeyDown="CommandInterceptor">
+            <TabItem Name="tiPolygons" Header="Polygons" PreviewKeyDown="CommandInterceptor">
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -561,7 +561,7 @@
                 </Border>
             </TabItem>
 
-            <TabItem Header="Metadata">
+            <TabItem Name="tiMetadata" Header="Metadata">
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -768,7 +768,7 @@
                 </Border>
             </TabItem>
 
-            <TabItem Header="Groups">
+            <TabItem Name="tiGroups" Header="Groups">
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -883,7 +883,7 @@
                 </Border>
             </TabItem>
 
-            <TabItem Header="Media">
+            <TabItem Name="tiMedia" Header="Media">
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -1011,7 +1011,7 @@
                 </Border>
             </TabItem>
 
-            <TabItem Header="Data Dictionary" Visibility="Collapsed">
+            <TabItem Name="tiDataDictionary" Header="Data Dictionary" Visibility="Collapsed">
                 <!-- View / Filter DD Info -->
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid Background="LightGray">
@@ -1038,7 +1038,7 @@
                 </Border>
             </TabItem>
 
-            <TabItem Visibility="{Binding IsMapWindowOpen, Converter={StaticResource InverseBoolToVis}}">
+            <TabItem Name="tiMap" Visibility="{Binding IsMapWindowOpen, Converter={StaticResource InverseBoolToVis}}">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" Margin="0,0,-8,0">
                         <TextBlock Text="Map" Foreground="White"/>
@@ -1063,10 +1063,10 @@
                 </Border>
             </TabItem>
 
-            <TabItem Header="Activity" Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource BoolToVis}}">
+            <TabItem Name="tiActivity" Header="Activity" Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource BoolToVis}}">
                 <Border BorderBrush="Green" BorderThickness="3,0,0,0">
                     <Grid Background="LightGray">
-                        <ContentControl Content="{Binding UserActivityControl}"/>
+                        <ContentControl x:Name="uac" Content="{Binding UserActivityControl}"/>
                     </Grid>
                 </Border>
             </TabItem>

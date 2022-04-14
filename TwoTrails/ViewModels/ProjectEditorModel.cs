@@ -108,27 +108,28 @@ namespace TwoTrails.ViewModels
             DataStyle = new DataStyleModel(project.HistoryManager.Polygons);
             PointEditor = new PointEditorModel(project, this);
             PointEditorControl = new PointEditorControl(PointEditor, DataStyle);
-            UserActivityControl = new UserActivityControl(Project.DAL);
+            UserActivityControl = new UserActivityControl(Project.HistoryManager);
 
             MapControl = new MapControl(project);
 
             #region Commands
-            Func<ProjectTabSection, Type, bool> doesTabAndDataMatch = (tab, type) =>
-            {
-                if (type == null)
-                    return true;
-                switch (tab)
-                {
-                    case ProjectTabSection.Project: return type == ProjectProperties.DataType;
-                    case ProjectTabSection.Points: return type.IsAssignableFrom(PointProperties.DataType);
-                    case ProjectTabSection.Polygons: return type == PolygonProperties.DataType;
-                    case ProjectTabSection.Metadata: return type == MetadataProperties.DataType;
-                    case ProjectTabSection.Groups: return type == GroupProperties.DataType;
-                    case ProjectTabSection.Media: return type == PointProperties.DataType;
-                    case ProjectTabSection.Map:
-                    default: return false;
-                }
-            };
+            //Func<ProjectTabSection, Type, bool> doesTabAndDataMatch = (tab, type) =>
+            //{
+            //    if (type == null)
+            //        return true;
+            //    switch (tab)
+            //    {
+            //        case ProjectTabSection.Project: return type == ProjectProperties.DataType;
+            //        case ProjectTabSection.Points: return type.IsAssignableFrom(PointProperties.DataType);
+            //        case ProjectTabSection.Polygons: return type == PolygonProperties.DataType;
+            //        case ProjectTabSection.Metadata: return type == MetadataProperties.DataType;
+            //        case ProjectTabSection.Groups: return type == GroupProperties.DataType;
+            //        case ProjectTabSection.Media: return type == MediaProperties.DataType;
+            //        case ProjectTabSection.Map:
+            //        case ProjectTabSection.Actions:
+            //        default: return false;
+            //    }
+            //};
 
             OpenMapWindowCommand = new RelayCommand(x =>
             {

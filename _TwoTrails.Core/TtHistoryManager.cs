@@ -542,6 +542,9 @@ namespace TwoTrails.Core
             return BaseManager.GetDataDictionaryTemplate();
         }
 
+
+        public List<TtUserAction> GetUserActions() => BaseManager.GetUserActions();
+
         public void AddAction(DataActionType action, string notes = null)
         {
             AddCommand(new AddDataActionCommand(action, this.BaseManager, notes));

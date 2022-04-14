@@ -120,8 +120,10 @@ namespace TwoTrails
                 case ProjectTabSection.Polygons: return type == PolygonProperties.DataType;
                 case ProjectTabSection.Metadata: return type == MetadataProperties.DataType;
                 case ProjectTabSection.Groups: return type == GroupProperties.DataType;
-                case ProjectTabSection.Media: return type == PointProperties.DataType;
+                case ProjectTabSection.Media: return type == MediaProperties.DataType;
+                case ProjectTabSection.DataDictionary: return type == typeof(DataDictionary);
                 case ProjectTabSection.Map:
+                case ProjectTabSection.Actions:
                 default: return false;
             }
         }
@@ -157,15 +159,24 @@ namespace TwoTrails
 
         private void ProjectEditor_TabSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            switch (_ProjectEditorControl.tabControl.SelectedIndex)
+            string tabName = (_ProjectEditorControl.tabControl.SelectedItem as TabItem)?.Name;
+
+            IsEditingPoints = tabName == "tiPoints";
+
+            if (tabName != null)
             {
-                case 0: CurrentTabSection = ProjectTabSection.Project; break;
-                case 1: IsEditingPoints = true; CurrentTabSection = ProjectTabSection.Points; break;
-                case 2: CurrentTabSection = ProjectTabSection.Polygons; break;
-                case 3: CurrentTabSection = ProjectTabSection.Metadata; break;
-                case 4: CurrentTabSection = ProjectTabSection.Groups; break;
-                case 5: CurrentTabSection = ProjectTabSection.Media; break;
-                case 6: CurrentTabSection = ProjectTabSection.Map; break;
+                switch (tabName)
+                {
+                    case "tiProject": CurrentTabSection = ProjectTabSection.Project; break;
+                    case "tiPoints": CurrentTabSection = ProjectTabSection.Points; break;
+                    case "tiPolygons": CurrentTabSection = ProjectTabSection.Polygons; break;
+                    case "tiMetadata": CurrentTabSection = ProjectTabSection.Metadata; break;
+                    case "tiGroups": CurrentTabSection = ProjectTabSection.Groups; break;
+                    case "tiMedia": CurrentTabSection = ProjectTabSection.Media; break;
+                    case "tiDataDictionary": CurrentTabSection = ProjectTabSection.DataDictionary; break;
+                    case "tiMap": CurrentTabSection = ProjectTabSection.Map; break;
+                    case "tiActivity": CurrentTabSection = ProjectTabSection.Actions; break;
+                } 
             }
 
             OnPropertyChanged(nameof(TabInfo));

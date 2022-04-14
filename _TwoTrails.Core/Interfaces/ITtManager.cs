@@ -59,6 +59,8 @@ namespace TwoTrails.Core
         void InsertMedia(TtMedia media);
         void DeleteMedia(TtMedia media);
 
+        List<TtUserAction> GetUserActions();
+
 
         DataDictionaryTemplate GetDataDictionaryTemplate();
 

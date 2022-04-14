@@ -1,6 +1,7 @@
 ﻿using FMSC.Core.Windows.ComponentModel.Commands;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -14,33 +15,33 @@ namespace TwoTrails.Controls
     /// </summary>
     public partial class UserActivityControl : UserControl
     {
-        private List<TtUserAction> _Activites;
-        public ListCollectionView Activites { get; }
+        private List<TtUserAction> _Actions;
+        public ListCollectionView Actions { get; }
 
         public ICommand RefreshCommand { get; }
 
-        private ITtDataLayer DAL;
+        private ITtManager Manager;
 
 
-        public UserActivityControl(ITtDataLayer dal)
+        public UserActivityControl(ITtManager manager)
         {
-            DAL = dal;
-            _Activites = DAL.GetUserActivity().ToList();
-            Activites = CollectionViewSource.GetDefaultView(_Activites) as ListCollectionView;
-            Activites.CustomSort = new TtUserActionSorter();
+            Manager = manager;
+            _Actions = Manager.GetUserActions();
+            Actions = CollectionViewSource.GetDefaultView(_Actions) as ListCollectionView;
+            Actions.CustomSort = new TtUserActionSorter();
 
             this.DataContext = this;
 
-            RefreshCommand = new RelayCommand(x => RefreshActivites());
+            RefreshCommand = new RelayCommand(x => RefreshActions());
 
             InitializeComponent();
         }
 
-        private void RefreshActivites()
+        private void RefreshActions()
         {
-            _Activites.Clear();
-            _Activites.AddRange(DAL.GetUserActivity());
-            Activites.Refresh();
+            _Actions.Clear();
+            _Actions.AddRange(Manager.GetUserActions());
+            Actions.Refresh();
         }
 
         private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)

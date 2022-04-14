@@ -22,7 +22,7 @@
         <DataGrid Grid.Row="2"
                 Grid.Column="0"
                 BorderThickness="0"
-                ItemsSource="{Binding Activites}"
+                ItemsSource="{Binding Actions}"
                 AutoGenerateColumns="True"
                 CanUserReorderColumns="True" CanUserResizeColumns="True" 
                 CanUserResizeRows="False" CanUserSortColumns="False"
