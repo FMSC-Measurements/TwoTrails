@@ -142,7 +142,8 @@ namespace TwoTrails.Utils
                 }
             }
 
-            foreach (TtPoint point in aPoints.Values.ToList())
+            foreach (TtPoint point in aPoints.Values.Where(p => p.OpType != OpType.Quondam)
+                                                .Concat(aPoints.Values.Where(p => p.OpType == OpType.Quondam)).ToList())
             {
                 string oldCN = null;
 
@@ -211,10 +212,10 @@ namespace TwoTrails.Utils
                 }
             }
 
-            foreach (QuondamPoint qp in aPoints.Values.Where(p => p.OpType == OpType.Quondam))
-            {
-                aPoints[qp.ParentPointCN].AddLinkedPoint(qp);
-            }
+            //foreach (QuondamPoint qp in aPoints.Values.Where(p => p.OpType == OpType.Quondam))
+            //{
+            //    aPoints[qp.ParentPointCN].AddLinkedPoint(qp);
+            //}
 
             //reindex points
             foreach (TtPolygon poly in aPolys.Values)
