@@ -17,7 +17,6 @@ namespace TwoTrails.Mapping
 
         public event MapPointSelectedEvent PointSelected;
 
-        //public ICommand ZoomToPolygonCommand { get; }
 
         public ObservableConvertedCollection<TtPoint, TtMapPoint> Points { get; private set; }
 
@@ -327,8 +326,6 @@ namespace TwoTrails.Mapping
             }
 
             BuildExtents();
-
-            //ZoomToPolygonCommand = new RelayCommand(x => ZoomToPolygon());
         }
 
         private TtMapPoint CreateMapPoint(TtPoint point)
@@ -469,9 +466,13 @@ namespace TwoTrails.Mapping
         {
             if (_detach)
             {
+                Points.PreviewCollectionChanged -= Points_PreviewCollectionChanged;
+                Points.CollectionChanged -= Points_CollectionChanged;
+
                 foreach (TtMapPoint p in Points)
                 {
                     p.PointSelected -= MapPointSelected;
+                    p.Detach();
                 }
 
                 AdjBoundary.Detach();

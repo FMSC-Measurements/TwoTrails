@@ -2914,7 +2914,7 @@ namespace TwoTrails.DAL
                 .Where(kvp => !String.IsNullOrEmpty(kvp.Value))
                 .Select(kvp =>
                 {
-                    string[] allLinks = kvp.Value.Split('_');
+                    string[] allLinks = kvp.Value.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
                     List<string> goodLinks = allLinks.Where(lcn => pointsAndLinks.ContainsKey(lcn)).ToList();
                     List<string> badLinks = allLinks.Where(link => !goodLinks.Contains(link)).ToList();
 
