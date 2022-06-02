@@ -184,19 +184,23 @@
                             </Grid.Resources>
 
                             <TextBlock Grid.Column="0" Grid.Row="0" Text="Project" />
-                            <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding ProjectInfo.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding ProjectInfo.Name, UpdateSourceTrigger=PropertyChanged}"
+                                     PreviewTextInput="TextHasRestrictedCharacters"/>
 
                             <TextBlock Grid.Column="0" Grid.Row="2" Text="Region" />
                             <TextBox Grid.Column="0" Grid.Row="3"
-                                 Text="{Binding ProjectInfo.Region, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Text="{Binding ProjectInfo.Region, UpdateSourceTrigger=PropertyChanged}"
+                                 PreviewTextInput="TextHasRestrictedCharacters"/>
 
                             <TextBlock Grid.Column="0" Grid.Row="4" Text="Forest" />
                             <TextBox Grid.Column="0" Grid.Row="5"
-                                 Text="{Binding ProjectInfo.Forest, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Text="{Binding ProjectInfo.Forest, UpdateSourceTrigger=PropertyChanged}"
+                                 PreviewTextInput="TextHasRestrictedCharacters"/>
 
                             <TextBlock Grid.Column="0" Grid.Row="6" Text="District" />
                             <TextBox Grid.Column="0" Grid.Row="7"
-                                 Text="{Binding ProjectInfo.District, UpdateSourceTrigger=PropertyChanged}"/>
+                                 Text="{Binding ProjectInfo.District, UpdateSourceTrigger=PropertyChanged}"
+                                 PreviewTextInput="TextHasRestrictedCharacters"/>
 
                             <TextBlock Grid.Column="0" Grid.Row="8" Text="Description" />
                             <TextBox Grid.Column="0" Grid.Row="9" Grid.ColumnSpan="3" MinLines="5" MaxLines="5"
