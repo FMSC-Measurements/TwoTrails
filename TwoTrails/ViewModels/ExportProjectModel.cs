@@ -118,6 +118,8 @@ namespace TwoTrails.ViewModels
                         {
                             Export.CheckCreateFolder(path);
 
+                            string projectName = _Project.ProjectName.ScrubFileName().Trim();
+
                             if (ExportPoints)
                                 Export.Points(_Project.HistoryManager, Path.Combine(path, "Points.csv"));
 
@@ -149,10 +151,10 @@ namespace TwoTrails.ViewModels
                                 Export.Summary(_Project.HistoryManager, _Project.ProjectInfo, _Project.FilePath, Path.Combine(path, "Summary.txt"));
 
                             if (ExportGPX)
-                                Export.GPX(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, $"{_Project.ProjectName.Trim()}.gpx"));
+                                Export.GPX(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, $"{projectName}.gpx"));
 
                             if (ExportKMZ)
-                                Export.KMZ(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, $"{_Project.ProjectName.Trim()}.kmz"));
+                                Export.KMZ(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, $"{projectName}.kmz"));
 
                             if (ExportShapes)
                                 Export.Shapes(_Project.HistoryManager, _Project.ProjectInfo, path);
@@ -170,11 +172,11 @@ namespace TwoTrails.ViewModels
                     catch (Exception ex)
                     {
                         Trace.WriteLine($"{ ex.Message }\n\t{ ex.StackTrace }", "ExportProjectModel");
-                        System.Windows.MessageBox.Show("An error has occured. Please see log for details.");
+                        MessageBox.Show("An error has occured. Please see log for details.");
                     }
                 }
                 else
-                    System.Windows.MessageBox.Show("Invalid Folder Location"); 
+                    MessageBox.Show("Invalid Folder Location"); 
             }
         }
 

@@ -113,24 +113,6 @@ namespace TwoTrails.ViewModels
             MapControl = new MapControl(project);
 
             #region Commands
-            //Func<ProjectTabSection, Type, bool> doesTabAndDataMatch = (tab, type) =>
-            //{
-            //    if (type == null)
-            //        return true;
-            //    switch (tab)
-            //    {
-            //        case ProjectTabSection.Project: return type == ProjectProperties.DataType;
-            //        case ProjectTabSection.Points: return type.IsAssignableFrom(PointProperties.DataType);
-            //        case ProjectTabSection.Polygons: return type == PolygonProperties.DataType;
-            //        case ProjectTabSection.Metadata: return type == MetadataProperties.DataType;
-            //        case ProjectTabSection.Groups: return type == GroupProperties.DataType;
-            //        case ProjectTabSection.Media: return type == MediaProperties.DataType;
-            //        case ProjectTabSection.Map:
-            //        case ProjectTabSection.Actions:
-            //        default: return false;
-            //    }
-            //};
-
             OpenMapWindowCommand = new RelayCommand(x =>
             {
                 if (ProjectEditorControl != null)
@@ -674,6 +656,7 @@ namespace TwoTrails.ViewModels
                     using (StreamWriter sw = new StreamWriter(sfd.FileName))
                     {
                         sw.Write(HaidLogic.GenerateSummaryHeader(ProjectInfo, Project.FilePath));
+                        sw.WriteLine($"\n-- {CurrentPolygon.Name} --");
                         sw.WriteLine(PolygonSummary.SummaryText);
                     }
                 }

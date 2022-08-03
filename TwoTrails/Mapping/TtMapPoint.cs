@@ -330,13 +330,13 @@ namespace TwoTrails.Mapping
             }
         }
 
-        private void LoadUnAdjToolTip(Object sender, ToolTipEventArgs e)
+        private void LoadUnAdjToolTip(object sender, ToolTipEventArgs e)
         {
             if (!(UnAdjPushpin.ToolTip is PointInfoBox))
                 UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
         }
 
-        private void LoadAdjToolTip(Object sender, ToolTipEventArgs e)
+        private void LoadAdjToolTip(object sender, ToolTipEventArgs e)
         {
             if (!(AdjPushpin.ToolTip is PointInfoBox))
                 AdjPushpin.ToolTip = new PointInfoBox(this, true);

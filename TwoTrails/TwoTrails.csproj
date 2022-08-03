@@ -35,6 +35,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="27.2.1" />
     <PackageReference Include="GeoAPI" Version="1.7.5" />
     <PackageReference Include="GeoAPI.CoordinateSystems" Version="1.7.5" />
     <PackageReference Include="GeoAPI.Core" Version="1.7.5" />
@@ -43,7 +44,7 @@
     <PackageReference Include="NetTopologySuite.CoordinateSystems" Version="1.15.3" />
     <PackageReference Include="NetTopologySuite.Core" Version="1.15.3" />
     <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
-    <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.0.0" />
+    <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.1.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.115.5" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />

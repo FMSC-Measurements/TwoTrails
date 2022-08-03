@@ -619,20 +619,19 @@ namespace TwoTrails.Utils
 
 
 
-        private static string ScrubFileName(this string text)
+        public static string ScrubFileName(this string text)
         {
-            new Regex("[^a-zA-Z0-9 _-]").Replace(text, "_");
-            return text;
+            return new Regex("[^a-zA-Z0-9 _-]").Replace(text, "_");
         }
 
-        private static string Scrub(this string text)
+        public static string Scrub(this string text)
         {
             if (text != null)
                 return text.Replace("\n", "\\n").Replace("\r", "\\r").Replace("\"", "\"\"");
             return String.Empty;
         }
 
-        private static string Scrub(this object obj)
+        public static string Scrub(this object obj)
         {
             if (obj != null)
                 return obj.ToString().Scrub();
