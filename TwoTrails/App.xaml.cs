@@ -68,7 +68,7 @@ namespace TwoTrails
                         if (status.CheckStatus == true &&
                             MessageBox.Show($@"A new version of TwoTrails is ready for download.{
                                 (status.UpdateType.HasFlag(UpdateType.CriticalBugFixes) ? " There are CRITICAL updates implemented that should be installed. " : String.Empty)
-                            }Would you like to download it now?", "TwoTrails Update",
+                            } Would you like to download it now?", "TwoTrails Update",
                                 MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
                         {
                             Process.Start(Consts.URL_TWOTRAILS);
