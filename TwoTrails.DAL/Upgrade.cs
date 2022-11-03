@@ -77,45 +77,54 @@ namespace TwoTrails.DAL
         {
             TtUserAction activity = new TtUserAction("Upgrader", settings.DeviceName, $"PC: {settings.AppVersion}", DateTime.Now, DataActionType.ProjectUpgraded, $"TwoTrailsV2 {odal.GetDataVersion()} -> {TwoTrailsSchema.SchemaVersion}");
 
-            IEnumerable<TtMetadata> meta = odal.GetMetadata();
+            Dictionary<String, TtMetadata> meta = odal.GetMetadata().ToDictionary(m => m.CN, m => m);
             if (meta.Any())
             {
-                ndal.InsertMetadata(meta);
+                ndal.InsertMetadata(meta.Values);
                 activity.UpdateAction(DataActionType.InsertedMetadata);
             }
 
-            IEnumerable<TtGroup> groups = odal.GetGroups();
+            Dictionary<String, TtGroup> groups = odal.GetGroups().ToDictionary(g => g.CN, g => g);
             if (groups.Any())
             {
-                ndal.InsertGroups(groups);
+                ndal.InsertGroups(groups.Values);
                 activity.UpdateAction(DataActionType.InsertedGroups);
             }
 
             DateTime time = ndal.GetProjectInfo().CreationDate;
-            IEnumerable<TtPolygon> polys = odal.GetPolygons().Select(
+            Dictionary<String, TtPolygon> polys = odal.GetPolygons().Select(
                     poly => {
                         poly.TimeCreated = (time = time.AddSeconds(1));
                         return poly;
-                    });
+                    }).ToDictionary(p => p.CN, p => p);
 
             if (polys.Any())
             {
-                ndal.InsertPolygons(polys);
+                ndal.InsertPolygons(polys.Values);
                 activity.UpdateAction(DataActionType.InsertedPolygons);
 
-                List<TtPoint> points = new List<TtPoint>();
+                Dictionary<String, TtPoint> points = new Dictionary<string, TtPoint>();
 
-                foreach (TtPolygon poly in polys)
+                foreach (TtPolygon poly in polys.Values)
                 {
                     int i = 0;
-                    points.AddRange(odal.GetPoints(poly.CN, true).Select(p => { p.Index = i++; return p; }));
+                    foreach (TtPoint point in odal.GetPoints(poly.CN, false).Select(p => { 
+                        p.Index = i++;
+                        p.Polygon = polys[p.PolygonCN];
+                        p.Metadata = meta[p.MetadataCN];
+                        p.Group = groups[p.GroupCN];
+                        return p; 
+                    }))
+                    {
+                        points.Add(point.CN, point);
+                    }
                 }
 
-                foreach (QuondamPoint qpoint in points.Where(p => p.OpType == OpType.Quondam).ToList())
+                foreach (QuondamPoint qpoint in points.Values.ToList().Where(p => p.OpType == OpType.Quondam).ToList())
                 {
-                    if (!points.Any(p => p.CN == qpoint.ParentPointCN))
+                    if (!points.ContainsKey(qpoint.ParentPointCN))
                     {
-                        TtPoint cPoint = ndal.GetPoint(qpoint.ParentPointCN) ?? qpoint;
+                        TtPoint cPoint =  ndal.GetPoint(qpoint.ParentPointCN) ?? qpoint;
 
                         GpsPoint gpsPoint = new GpsPoint(cPoint)
                         {
@@ -124,18 +133,21 @@ namespace TwoTrails.DAL
                             Metadata = qpoint.Metadata,
                             Group = qpoint.Group,
                             Comment = string.IsNullOrWhiteSpace(qpoint.Comment) ?
-                                (cPoint.OpType == OpType.Quondam ? qpoint.ParentPoint.Comment : cPoint.Comment) : qpoint.Comment,
+                                (string.IsNullOrWhiteSpace(cPoint.Comment) ? String.Empty : cPoint.Comment) : qpoint.Comment,
                             TimeCreated = DateTime.Now
                         };
 
-                        points.Remove(qpoint);
-                        points.Add(gpsPoint);
+                        points[qpoint.CN] = gpsPoint;
+                    }
+                    else
+                    {
+                        qpoint.ParentPoint = points[qpoint.ParentPointCN];
                     }
                 }
 
                 if (points.Any())
                 {
-                    ndal.InsertPoints(points);
+                    ndal.InsertPoints(points.Values);
                     activity.UpdateAction(DataActionType.InsertedPoints);
                 }
             }

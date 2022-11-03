@@ -1,6 +1,6 @@
 ﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
-using FMSC.GeoSpatial.MTDC;
+using FMSC.GeoSpatial.NTDP;
 using System;
 using System.Windows;
 using System.Windows.Input;

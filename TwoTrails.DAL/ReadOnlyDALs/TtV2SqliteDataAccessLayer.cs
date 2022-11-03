@@ -239,6 +239,8 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                 {
                     if (dr != null)
                     {
+                        Dictionary<String, TtPoint> cachedPoints = new Dictionary<string, TtPoint>();
+
                         TtPoint point = null;
                         OpType op;
 
@@ -255,6 +257,13 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                                 throw new Exception("Point has no OpType");
 
                             cn = dr.GetString(0);
+
+                            if (cachedPoints.ContainsKey(cn))
+                            {
+                                yield return cachedPoints[cn];
+                                continue;
+                            }
+
                             index = dr.GetInt32(1);
                             pid = dr.GetInt32(2);
                             polycn = dr.GetString(3);
@@ -345,10 +354,25 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                                 if (linkPoints)
                                 {
                                     QuondamPoint qp = point as QuondamPoint;
-                                    qp.ParentPoint = GetTtPoints($"{TTV2S.PointSchema.TableName}.{TTV2S.SharedSchema.CN} = '{qp.ParentPointCN}'", false).FirstOrDefault();
+
+                                    if (!cachedPoints.ContainsKey(qp.ParentPointCN))
+                                    {
+                                        TtPoint pp = GetTtPoints($"{TTV2S.PointSchema.TableName}.{TTV2S.SharedSchema.CN} = '{qp.ParentPointCN}'", false).FirstOrDefault();
+                                        if (pp != null)
+                                        {
+                                            cachedPoints.Add(pp.CN, pp);
+                                        }
+                                        else
+                                        {
+                                            throw new Exception("Error Getting Parent Point");
+                                        }
+                                    }
+
+                                    qp.ParentPoint = cachedPoints[qp.ParentPointCN];
                                 }
                             }
-                            
+
+                            cachedPoints.Add(cn, point);
                             yield return point;
                         }
 

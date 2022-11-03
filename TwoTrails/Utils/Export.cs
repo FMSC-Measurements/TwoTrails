@@ -44,7 +44,7 @@ namespace TwoTrails.Utils
             CheckCreateFolder(folderPath);
 
             Project(projectInfo, Path.Combine(folderPath, "ProjectInfo.txt"));
-            Summary(manager, projectInfo, projectFilePath, Path.Combine(folderPath, "Summary.txt"));
+            Summary(manager, projectInfo, projectFilePath, Path.Combine(folderPath, $"{projectInfo.Name.ScrubFileName()}_Summary.txt"));
             Points(manager, Path.Combine(folderPath, "Points.csv"));
             DataDictionary(manager, Path.Combine(folderPath, "DataDictionary.csv"));
             Polygons(manager, Path.Combine(folderPath, "Polygons.csv"));
