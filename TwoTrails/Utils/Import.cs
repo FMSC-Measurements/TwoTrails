@@ -51,7 +51,7 @@ namespace TwoTrails.Utils
                 aPolys.Add(poly.CN, poly);
             }
 
-            aPoints = iPolys.Values.SelectMany(p => dal.GetPoints(p.CN, convertForeignQuondams)).ToDictionary(p => p.CN, p => p);
+            aPoints = iPolys.Values.SelectMany(poly => dal.GetPoints(poly.CN, convertForeignQuondams)).ToDictionary(p => p.CN, p => p);
 
 
             foreach (string metaCN in aPoints.Values.Select(p => p.MetadataCN).Distinct())
@@ -114,17 +114,18 @@ namespace TwoTrails.Utils
 
             Func<QuondamPoint, GpsPoint> convertQuondam = (qpoint) =>
             {
-                TtPoint cPoint = dal.GetPoint(qpoint.ParentPointCN) ?? qpoint;
-
+                TtPoint cPoint = qpoint.ParentPoint ?? (aPoints.ContainsKey(qpoint.ParentPointCN) ? aPoints[qpoint.ParentPointCN] : qpoint);
+                
                 GpsPoint gpsPoint = new GpsPoint(cPoint)
                 {
                     CN = qpoint.CN,
-                    Polygon = qpoint.Polygon,
-                    Metadata = qpoint.Metadata,
-                    Group = qpoint.Group,
+                    Index = qpoint.Index,
+                    PolygonCN = qpoint.PolygonCN,
+                    MetadataCN = qpoint.MetadataCN,
+                    GroupCN = qpoint.GroupCN,
                     ManualAccuracy = qpoint.ManualAccuracy ?? (cPoint.IsManualAccType() ? (cPoint as IManualAccuracy).ManualAccuracy : null),
                     Comment = string.IsNullOrWhiteSpace(qpoint.Comment) ?
-                        (cPoint.OpType == OpType.Quondam ? qpoint.ParentPoint.Comment : cPoint.Comment) : qpoint.Comment,
+                        (cPoint.OpType == OpType.Quondam ? qpoint.ParentPoint?.Comment ?? cPoint.Comment : cPoint.Comment) : qpoint.Comment,
                     TimeCreated = DateTime.Now
                 };
 
@@ -133,17 +134,50 @@ namespace TwoTrails.Utils
                 return gpsPoint;
             };
 
-            if (convertForeignQuondams)
+            //if (convertForeignQuondams)
+            //{
+            //    foreach (QuondamPoint qpoint in aPoints.Values
+            //        .Where(p => p.OpType == OpType.Quondam && p is QuondamPoint qp && !aPoints.ContainsKey(qp.ParentPointCN)).ToList())
+            //    {
+            //        aPoints[qpoint.CN] = convertQuondam(qpoint);
+            //    }
+            //}
+
+            foreach (QuondamPoint qpoint in aPoints.Values
+                    .Where(p => p.OpType == OpType.Quondam && p is QuondamPoint qp).ToList())
             {
-                foreach (QuondamPoint qpoint in aPoints.Values
-                    .Where(p => p.OpType == OpType.Quondam && p is QuondamPoint qp && !aPoints.ContainsKey(qp.ParentPointCN)).ToList())
+                if (aPoints.ContainsKey(qpoint.ParentPointCN))
+                {
+                    TtPoint pp = aPoints[qpoint.ParentPointCN];
+
+                    if (pp is QuondamPoint qp)
+                    {
+                        aPoints[qpoint.CN] = convertQuondam(qpoint);
+                    }
+                    else if (qpoint.ParentPoint == null)
+                    {
+                        if (convertForeignQuondams)
+                        {
+                            aPoints[qpoint.CN] = convertQuondam(qpoint);
+                        }
+                        else
+                        {
+                            throw new ForiegnQuondamException();
+                        }
+                    }
+                    else
+                    {
+                        qpoint.ParentPoint = pp;
+                    }
+                }
+                else
                 {
                     aPoints[qpoint.CN] = convertQuondam(qpoint);
                 }
             }
 
             foreach (TtPoint point in aPoints.Values.Where(p => p.OpType != OpType.Quondam)
-                                                .Concat(aPoints.Values.Where(p => p.OpType == OpType.Quondam)).ToList())
+                .Concat(aPoints.Values.Where(p => p.OpType == OpType.Quondam)).ToList())
             {
                 string oldCN = null;
 
@@ -194,11 +228,7 @@ namespace TwoTrails.Utils
 
                 if (point.OpType == OpType.Quondam && point is QuondamPoint qp)
                 {
-                    if (aPoints.ContainsKey(qp.ParentPointCN))
-                    {
-                        qp.ParentPoint = aPoints[qp.ParentPointCN];
-                    }
-                    else
+                    if (!aPoints.ContainsKey(qp.ParentPointCN))
                     {
                         throw new Exception("Foreign Quondam");
                     }
@@ -212,10 +242,6 @@ namespace TwoTrails.Utils
                 }
             }
 
-            //foreach (QuondamPoint qp in aPoints.Values.Where(p => p.OpType == OpType.Quondam))
-            //{
-            //    aPoints[qp.ParentPointCN].AddLinkedPoint(qp);
-            //}
 
             //reindex points
             foreach (TtPolygon poly in aPolys.Values)
@@ -280,6 +306,12 @@ namespace TwoTrails.Utils
                     hm.ResetMultiCommand();
                 throw e;
             }
+        }
+
+
+        public class ForiegnQuondamException : Exception
+        {
+            public ForiegnQuondamException() : base("Foriegn Quondam") { }
         }
     }
 }

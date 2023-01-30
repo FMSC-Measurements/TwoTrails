@@ -31,6 +31,9 @@ namespace TwoTrails.Core.Points
             set
             {
                 TtPoint oldParent = _ParentPoint;
+
+                if (value.OpType == OpType.Quondam) throw new Exception("Invalid Parent Point Type");
+
                 if (SetField(ref _ParentPoint, value))
                 {
                     if (_ParentPoint != null)
@@ -50,7 +53,7 @@ namespace TwoTrails.Core.Points
                         oldParent.OnAccuracyChanged -= ParentPoint_OnAccuracyChanged;
                         oldParent.RemoveLinkedPoint(this);
 
-                        if (_ParentPoint != null && !oldParent.HasSameAdjLocation(_ParentPoint))
+                        if (_ParentPoint != null && (oldParent.OpType == OpType.Quondam || !oldParent.HasSameAdjLocation(_ParentPoint)))
                         {
                             OnLocationChanged();
                         }
@@ -71,8 +74,6 @@ namespace TwoTrails.Core.Points
         }
 
         public override OpType OpType { get { return OpType.Quondam; } }
-
-        //public override bool OnBoundary { get => false; set => base.OnBoundary = value; }
         #endregion
 
 
@@ -125,7 +126,7 @@ namespace TwoTrails.Core.Points
 
         public override string ToString()
         {
-            return $"{base.ToString()}{(ParentPoint != null ? $" \u2794 {ParentPoint.ToString()} : {ParentPoint.Polygon.Name}" : String.Empty)}";
+            return $"{base.ToString()}{(ParentPoint != null ? $" \u2794 {ParentPoint} : {ParentPoint?.Polygon.Name}" : String.Empty)}";
         }
 
 

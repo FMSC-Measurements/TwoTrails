@@ -1287,7 +1287,10 @@ namespace TwoTrails.Core
         public void AddPoint(TtPoint point)
         {
             if (point.PolygonCN == null)
-                throw new Exception("No Valid Polygon");
+                throw new Exception("No Valid PolygonCN");
+
+            if (point.Polygon == null)
+                throw new Exception("Polygon Not Attached");
 
             lock (locker)
             {

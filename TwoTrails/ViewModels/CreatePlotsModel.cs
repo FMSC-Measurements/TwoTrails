@@ -258,31 +258,8 @@ namespace TwoTrails.ViewModels
                     {
                         if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                         {
-                            //poly = null;
-
-                            //for (int i = 2; i < Int32.MaxValue; i++)
-                            //{
-                            //    gPolyName = GeneratedPolyName(IncludedPolygons, i);
-
-                            //    try
-                            //    {
-                            //        poly = polygons.First(p => p.Name == gPolyName);
-                            //    }
-                            //    catch
-                            //    {
-                            //        poly = new TtPolygon()
-                            //        {
-                            //            Name = gPolyName,
-                            //            PointStartIndex = (polygons.Count + 1) * 1000 + 10,
-                            //            Increment = 1
-                            //        };
-
-                            //        _Manager.AddPolygon(poly);
-                            //        break;
-                            //    }
-                            //}
-
-                            _Manager.AddPolygon(GetOrCreateNewPoly(polygons, IncludedPolygons));
+                            poly = GetOrCreateNewPoly(polygons, IncludedPolygons);
+                            _Manager.AddPolygon(poly);
                         }
                         else return;
                     }

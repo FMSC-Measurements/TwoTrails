@@ -372,7 +372,7 @@ namespace TwoTrails.Mapping
                 PGO.ColorChanged -= PGO_ColorChanged;
 
                 Point.PropertyChanged -= Point_PropertyChanged;
-                if (Point is QuondamPoint qp)
+                if (Point is QuondamPoint qp && qp.ParentPoint != null)
                     qp.ParentPoint.PropertyChanged -= Point_PropertyChanged;
 
                 Point.LocationChanged -= UpdateLocation;

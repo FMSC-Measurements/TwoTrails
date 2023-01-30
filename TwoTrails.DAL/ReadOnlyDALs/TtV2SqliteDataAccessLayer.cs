@@ -358,13 +358,19 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                                     if (!cachedPoints.ContainsKey(qp.ParentPointCN))
                                     {
                                         TtPoint pp = GetTtPoints($"{TTV2S.PointSchema.TableName}.{TTV2S.SharedSchema.CN} = '{qp.ParentPointCN}'", false).FirstOrDefault();
+                                        
+                                        while (pp != null && pp.OpType == OpType.Quondam)
+                                        {
+                                            pp = GetTtPoints($"{TTV2S.PointSchema.TableName}.{TTV2S.SharedSchema.CN} = '{((QuondamPoint)pp).ParentPoint}'", false).FirstOrDefault();
+                                        }
+
                                         if (pp != null)
                                         {
                                             cachedPoints.Add(pp.CN, pp);
                                         }
                                         else
                                         {
-                                            throw new Exception("Error Getting Parent Point");
+                                            cachedPoints.Add(qp.ParentPointCN, new GpsPoint(point));
                                         }
                                     }
 
@@ -372,7 +378,8 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                                 }
                             }
 
-                            cachedPoints.Add(cn, point);
+                            if (point.OpType != OpType.Quondam)
+                                cachedPoints.Add(cn, point);
                             yield return point;
                         }
 

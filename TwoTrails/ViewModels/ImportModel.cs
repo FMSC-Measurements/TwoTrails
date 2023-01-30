@@ -18,6 +18,7 @@ using TwoTrails.Core.Interfaces;
 using TwoTrails.Core.Points;
 using TwoTrails.DAL;
 using TwoTrails.Utils;
+using static TwoTrails.Utils.Import;
 
 namespace TwoTrails.ViewModels
 {
@@ -417,14 +418,14 @@ This means a polygon being imported may already exist. Would you like to import 
                 }
                 else if (neededPolys.Count > 0)
                 {
-                    MessageBoxResult res = MessageBox.Show("Some quondams are linked to points that are not within the list of improted polygons. Would you like to import these polygons (YES) or convert the points to GPS (NO)?", "Foreign Quondams",
+                    MessageBoxResult res = MessageBox.Show("Some quondams are linked to points that are not within the list of improted polygons. Would you like to convert the points to GPS (YES) or import these polygons (NO)?", "Foreign Quondams",
                         MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
-                    if (res == MessageBoxResult.Yes)
+                    if (res == MessageBoxResult.No)
                     {
                         selectedPolys = selectedPolys.Concat(neededPolys);
                     }
-                    else if (res == MessageBoxResult.No)
+                    else if (res == MessageBoxResult.Yes)
                     {
                         convertForeignQuondams = true;
                     }
@@ -443,6 +444,12 @@ This means a polygon being imported may already exist. Would you like to import 
 
                 MessageBox.Show($"{selectedPolys.Count()} Polygons Imported",
                     String.Empty, MessageBoxButton.OK, MessageBoxImage.None);
+            }
+            catch (ForiegnQuondamException fq)
+            {
+                Trace.WriteLine(fq.Message, "ImportModel:ImportData:FQE");
+                MessageBox.Show("Import Failed. Foriegn Quondams found.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Error);
+
             }
             catch (Exception ex) //when (!_AutoCloseOnImport)
             {

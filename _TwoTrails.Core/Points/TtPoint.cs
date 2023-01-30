@@ -258,10 +258,16 @@ namespace TwoTrails.Core.Points
             _TimeCreated = point._TimeCreated;
 
             _PolyCN = point._PolyCN;
+            if (point._Polygon != null)
+                _Polygon = point._Polygon;
 
             _GroupCN = point._GroupCN;
+            if (point._Group != null)
+                _Group = point._Group;
 
             _MetadataCN = point._MetadataCN;
+            if (point._Metadata != null)
+                _Metadata = point._Metadata;
 
             _Comment = point._Comment;
             _OnBoundary = point._OnBoundary;
