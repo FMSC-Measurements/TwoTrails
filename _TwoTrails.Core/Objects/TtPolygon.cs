@@ -169,10 +169,7 @@ namespace TwoTrails.Core
             return @this.TimeCreated.CompareTo(other.TimeCreated);
         }
 
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
 
 
         public override bool Equals(object obj)

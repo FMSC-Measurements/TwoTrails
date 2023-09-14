@@ -19,17 +19,27 @@
             <Button Content="Refresh" Padding="4, 2, 4, 2" Width="Auto" HorizontalAlignment="Right" Command="{Binding RefreshCommand}" />
         </Grid>
 
-        <DataGrid Grid.Row="2"
-                Grid.Column="0"
-                BorderThickness="0"
-                ItemsSource="{Binding Actions}"
-                AutoGenerateColumns="True"
-                CanUserReorderColumns="True" CanUserResizeColumns="True" 
-                CanUserResizeRows="False" CanUserSortColumns="False"
-                CanUserDeleteRows="False" CanUserAddRows="False"
-                SelectionMode="Extended"
-                SelectionUnit="FullRow"
-                IsReadOnly="True"
-                AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"/>
+        <DataGrid
+            x:Name="dgActivity"
+            Grid.Row="2"
+            Grid.Column="0"
+            BorderThickness="0"
+            ItemsSource="{Binding Actions}"
+            AutoGenerateColumns="True"
+            CanUserReorderColumns="True" CanUserResizeColumns="True" 
+            CanUserResizeRows="False" CanUserSortColumns="False"
+            CanUserDeleteRows="False" CanUserAddRows="False"
+            SelectionMode="Extended"
+            SelectionUnit="FullRow"
+            IsReadOnly="True"
+            AutoGeneratingColumn="DataGrid_AutoGeneratingColumn">
+            
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
+							CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
     </Grid>
 </UserControl>
