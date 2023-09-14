@@ -10,7 +10,7 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         private TtManager pointsManager;
         private List<TtNmeaBurst> _AddNmea = new List<TtNmeaBurst>();
-        private List<TtPoint> _ConvertedPoints;
+        private List<GpsPoint> _ConvertedPoints;
 
         public ConvertQuondamsCommand(IEnumerable<QuondamPoint> points, TtManager pointsManager) : base(points)
         {

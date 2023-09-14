@@ -32,7 +32,7 @@ namespace TwoTrails.Core.Points
             {
                 TtPoint oldParent = _ParentPoint;
 
-                if (value.OpType == OpType.Quondam) throw new Exception("Invalid Parent Point Type");
+                if (value != null && value.OpType == OpType.Quondam) throw new Exception("Invalid Parent Point Type");
 
                 if (SetField(ref _ParentPoint, value))
                 {

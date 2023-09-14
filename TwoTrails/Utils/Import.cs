@@ -114,47 +114,55 @@ namespace TwoTrails.Utils
 
             Func<QuondamPoint, GpsPoint> convertQuondam = (qpoint) =>
             {
-                TtPoint cPoint = qpoint.ParentPoint ?? (aPoints.ContainsKey(qpoint.ParentPointCN) ? aPoints[qpoint.ParentPointCN] : qpoint);
+                GpsPoint convertedPoint;
                 
-                GpsPoint gpsPoint = new GpsPoint(cPoint)
+                if (qpoint.ParentPoint != null)
                 {
-                    CN = qpoint.CN,
-                    Index = qpoint.Index,
-                    PolygonCN = qpoint.PolygonCN,
-                    MetadataCN = qpoint.MetadataCN,
-                    GroupCN = qpoint.GroupCN,
-                    ManualAccuracy = qpoint.ManualAccuracy ?? (cPoint.IsManualAccType() ? (cPoint as IManualAccuracy).ManualAccuracy : null),
-                    Comment = string.IsNullOrWhiteSpace(qpoint.Comment) ?
-                        (cPoint.OpType == OpType.Quondam ? qpoint.ParentPoint?.Comment ?? cPoint.Comment : cPoint.Comment) : qpoint.Comment,
-                    TimeCreated = DateTime.Now
-                };
+                    convertedPoint = qpoint.ConvertQuondam();
+                }
+                else
+                {
+                    if (aPoints.ContainsKey(qpoint.ParentPointCN))
+                    {
+                        TtPoint apoint = aPoints[qpoint.ParentPointCN];
+                        convertedPoint = apoint != null ? (apoint.IsGpsType() ? (GpsPoint)apoint.DeepCopy() : new GpsPoint(apoint)) : new GpsPoint(qpoint);
+                    }
+                    else
+                    {
+                        convertedPoint = new GpsPoint(qpoint);
+                    }
 
-                gpsPoint.SetAccuracy(aPolys[qpoint.PolygonCN].Accuracy);
+                    convertedPoint.CN = qpoint.CN;
+                    convertedPoint.Index = qpoint.Index;
+                    convertedPoint.PolygonCN = qpoint.PolygonCN;
+                    convertedPoint.MetadataCN = qpoint.MetadataCN;
+                    convertedPoint.GroupCN = qpoint.GroupCN;
 
-                return gpsPoint;
+                    if (qpoint.ManualAccuracy != null)
+                        convertedPoint.ManualAccuracy = qpoint.ManualAccuracy;
+                    
+                    if (!string.IsNullOrWhiteSpace(qpoint.Comment))
+                    {
+                        convertedPoint.Comment = (!string.IsNullOrEmpty(convertedPoint.Comment)) ?
+                            $"{qpoint.Comment} | {convertedPoint.Comment}" :
+                            qpoint.Comment;
+                    }
+
+                    convertedPoint.ClearLinkedPoints();
+                }
+
+                convertedPoint.SetAccuracy(aPolys[qpoint.PolygonCN].Accuracy);
+
+                return convertedPoint;
             };
 
-            //if (convertForeignQuondams)
-            //{
-            //    foreach (QuondamPoint qpoint in aPoints.Values
-            //        .Where(p => p.OpType == OpType.Quondam && p is QuondamPoint qp && !aPoints.ContainsKey(qp.ParentPointCN)).ToList())
-            //    {
-            //        aPoints[qpoint.CN] = convertQuondam(qpoint);
-            //    }
-            //}
-
-            foreach (QuondamPoint qpoint in aPoints.Values
-                    .Where(p => p.OpType == OpType.Quondam && p is QuondamPoint qp).ToList())
+            foreach (QuondamPoint qpoint in aPoints.Values.Where(p => p.OpType == OpType.Quondam && p is QuondamPoint).ToList())
             {
                 if (aPoints.ContainsKey(qpoint.ParentPointCN))
                 {
                     TtPoint pp = aPoints[qpoint.ParentPointCN];
 
-                    if (pp is QuondamPoint qp)
-                    {
-                        aPoints[qpoint.CN] = convertQuondam(qpoint);
-                    }
-                    else if (qpoint.ParentPoint == null)
+                    if (pp == null)
                     {
                         if (convertForeignQuondams)
                         {
@@ -164,6 +172,10 @@ namespace TwoTrails.Utils
                         {
                             throw new ForiegnQuondamException();
                         }
+                    }
+                    else if (pp is QuondamPoint qp)
+                    {
+                        aPoints[qpoint.CN] = convertQuondam(qpoint);
                     }
                     else
                     {
@@ -231,6 +243,10 @@ namespace TwoTrails.Utils
                     if (!aPoints.ContainsKey(qp.ParentPointCN))
                     {
                         throw new Exception("Foreign Quondam");
+                    }
+                    else
+                    {
+                        qp.ParentPoint.AddLinkedPoint(qp);
                     }
                 }
 

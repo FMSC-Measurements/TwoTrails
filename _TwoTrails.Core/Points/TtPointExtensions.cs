@@ -102,18 +102,28 @@ namespace TwoTrails.Core.Points
         }
 
 
-        public static TtPoint ConvertQuondam(this QuondamPoint point)
+        public static GpsPoint ConvertQuondam(this QuondamPoint point)
         {
-            TtPoint conversion = point.IsGpsAtBase() ? point.ParentPoint.DeepCopy() : new GpsPoint(point.ParentPoint);
+            GpsPoint conversion = point.IsGpsAtBase() ? (GpsPoint)point.ParentPoint.DeepCopy() : new GpsPoint(point.ParentPoint);
 
             conversion.CN = point.CN;
-            conversion.PID = point.PID;
             conversion.Index = point.Index;
             conversion.Polygon = point.Polygon;
+            conversion.PolygonCN = point.PolygonCN;
             conversion.Group = point.Group;
+            conversion.GroupCN = point.GroupCN;
             conversion.OnBoundary = point.OnBoundary;
-            conversion.Comment = String.IsNullOrEmpty(point.Comment) ? conversion.Comment : point.Comment;
-            conversion.TimeCreated = point.TimeCreated;
+
+            if (point.ManualAccuracy != null)
+                conversion.ManualAccuracy = point.ManualAccuracy;
+
+            if (!string.IsNullOrWhiteSpace(point.Comment))
+            {
+                conversion.Comment = (!string.IsNullOrEmpty(conversion.Comment)) ?
+                    $"{point.Comment} | {conversion.Comment}" :
+                    point.Comment;
+            }
+
             conversion.ClearLinkedPoints();
 
             return conversion;

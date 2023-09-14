@@ -370,7 +370,7 @@ namespace TwoTrails.Core.Points
             if (!_LinkedPoints.Contains(point.CN))
             {
                 _LinkedPoints.Add(point.CN);
-                OnPropertyChanged(nameof(LinkedPoints));
+                OnPropertyChanged(nameof(LinkedPoints), nameof(HasQuondamLinks));
             }
         }
 
@@ -385,13 +385,13 @@ namespace TwoTrails.Core.Points
         public void RemoveLinkedPoint(QuondamPoint point)
         {
             _LinkedPoints.Remove(point.CN);
-            OnPropertyChanged(nameof(LinkedPoints));
+            OnPropertyChanged(nameof(LinkedPoints), nameof(HasQuondamLinks));
         }
 
         public void ClearLinkedPoints()
         {
             _LinkedPoints.Clear();
-            OnPropertyChanged(nameof(LinkedPoints));
+            OnPropertyChanged(nameof(LinkedPoints), nameof(HasQuondamLinks));
         }
 
 

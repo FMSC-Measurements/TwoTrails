@@ -9,7 +9,7 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         private TtManager pointsManager;
 
-        private List<Tuple<QuondamPoint, TtPoint>> _ConvertedPoints = null;
+        private List<Tuple<QuondamPoint, GpsPoint>> _ConvertedPoints = null;
         private List<TtNmeaBurst> _AddNmea = new List<TtNmeaBurst>();
         private TtPoint _QpParentPoint = null;
 
@@ -19,7 +19,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
             if (point.HasQuondamLinks)
             {
-                _ConvertedPoints = new List<Tuple<QuondamPoint, TtPoint>>();
+                _ConvertedPoints = new List<Tuple<QuondamPoint, GpsPoint>>();
 
                 QuondamPoint child;
                 foreach (string ccn in point.LinkedPoints)
@@ -48,7 +48,7 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             if (_ConvertedPoints != null)
             {
-                foreach (Tuple<QuondamPoint, TtPoint> tuple in _ConvertedPoints)
+                foreach (Tuple<QuondamPoint, GpsPoint> tuple in _ConvertedPoints)
                 {
                     pointsManager.ReplacePoint(tuple.Item2);
                     Point.RemoveLinkedPoint(tuple.Item1);
@@ -86,7 +86,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
             if (_ConvertedPoints != null)
             {
-                foreach (Tuple<QuondamPoint, TtPoint> tuple in _ConvertedPoints)
+                foreach (Tuple<QuondamPoint, GpsPoint> tuple in _ConvertedPoints)
                 {
                     pointsManager.ReplacePoint(tuple.Item1);
                     Point.AddLinkedPoint(tuple.Item1);
