@@ -130,9 +130,9 @@ namespace TwoTrails.ViewModels
                             }
                             else
                             {
-                                if (sindex > eindex)
+                                if (sindex < eindex)
                                 {
-                                    for (int i = sindex; i >= eindex; i--)
+                                    for (int i = eindex; i >= sindex; i--)
                                         retracePoints.Add(points[i]);
                                 }
                                 else
