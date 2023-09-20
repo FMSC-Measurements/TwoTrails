@@ -224,14 +224,17 @@ namespace TwoTrails
 
             try
             {
-                UndoCommand.Dispose();
-                RedoCommand.Dispose();
+                if (UndoCommand != null) UndoCommand.Dispose();
+                if (RedoCommand != null) RedoCommand.Dispose();
 
-                ProjectEditor.PointEditor.PropertyChanged -= PointEditor_PropertyChanged;
-                _ProjectEditorControl.Loaded -= ProjectEditorControl_Loaded;
-                _ProjectEditorControl.tabControl.SelectionChanged -= ProjectEditor_TabSelectionChanged;
+                if (ProjectEditor != null)
+                {
+                    ProjectEditor.PointEditor.PropertyChanged -= PointEditor_PropertyChanged;
+                    _ProjectEditorControl.Loaded -= ProjectEditorControl_Loaded;
+                    _ProjectEditorControl.tabControl.SelectionChanged -= ProjectEditor_TabSelectionChanged;
 
-                ProjectEditor.Dispose();
+                    ProjectEditor.Dispose();
+                }
             }
             catch (Exception)
             {

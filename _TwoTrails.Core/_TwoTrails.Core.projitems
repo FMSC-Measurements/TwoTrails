@@ -9,6 +9,7 @@
     <Import_RootNamespace>TwoTrails.Core</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AnglePointLogic.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddDataActionCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtGroupCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtMetadataCommand.cs" />

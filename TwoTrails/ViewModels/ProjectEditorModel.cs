@@ -84,7 +84,7 @@ namespace TwoTrails.ViewModels
         public TtProjectInfo ProjectInfo => Project.ProjectInfo;
         public TtHistoryManager Manager => Project.HistoryManager;
         public TtSettings Settings => Project.Settings;
-        
+
         public MapControl MapControl { get; private set; }
         public MapWindow MapWindow { get; private set; }
         public bool IsMapWindowOpen => MapWindow != null;
@@ -259,7 +259,7 @@ namespace TwoTrails.ViewModels
             if (MediaInfo != null && MediaInfo.Count > 0)
                 CurrentMediaInfo = MediaInfo[0];
 
-            
+
             KeyDownHandler = new KeyEventHandler(OnKeyDown);
             KeyUpHandler = new KeyEventHandler(OnKeyUp);
 
@@ -292,7 +292,7 @@ namespace TwoTrails.ViewModels
             Manager.HistoryChanged -= Manager_HistoryChanged;
 
             if (_CurrentPolygon != null)
-                _CurrentPolygon.PolygonChanged -= GeneratePolygonSummary;
+                _CurrentPolygon.PolygonChanged -= GeneratePolygonSummaryAndStats;
 
             PointEditorControl.RemoveHandler(PointEditorControl.KeyDownEvent, KeyDownHandler);
             PointEditorControl.RemoveHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
@@ -379,7 +379,7 @@ namespace TwoTrails.ViewModels
         private TtPolygon _CurrentPolygon;
         public TtPolygon CurrentPolygon
         {
-            get { return _CurrentPolygon; }
+            get => _CurrentPolygon;
             private set
             {
                 TtPolygon old = _CurrentPolygon;
@@ -387,18 +387,18 @@ namespace TwoTrails.ViewModels
                 SetField(ref _CurrentPolygon, value, () => {
                     if (old != null)
                     {
-                        old.PolygonChanged -= GeneratePolygonSummary;
+                        old.PolygonChanged -= GeneratePolygonSummaryAndStats;
                     }
 
                     BindPolygonValues(value);
 
                     if (_CurrentPolygon != null)
                     {
-                        _CurrentPolygon.PolygonChanged += GeneratePolygonSummary;
+                        _CurrentPolygon.PolygonChanged += GeneratePolygonSummaryAndStats;
 
                         ValidatePolygon(value);
 
-                        GeneratePolygonSummary(_CurrentPolygon);
+                        GeneratePolygonSummaryAndStats(_CurrentPolygon);
                     }
                 });
             }
@@ -444,6 +444,32 @@ namespace TwoTrails.ViewModels
 
         public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
         public double TotalPolygonPerimeter { get { return Get<double>(); } set { Set(value); } }
+
+
+        private AnglePointResult _PolygonAnglePointResult;
+        public AnglePointResult PolygonAnglePointResult
+        {
+            get => _PolygonAnglePointResult;
+            private set {
+                SetField(ref _PolygonAnglePointResult, value,
+                    () => OnPropertyChanged(
+                        nameof(IsAnglePoint), nameof(AnglePointText),
+                        nameof(AnglePointToolTip), nameof(AnglePointTextDec)
+                    ));
+            }
+        }
+
+        public bool IsAnglePoint => PolygonAnglePointResult == AnglePointResult.Qualifies;
+
+        public String AnglePointText => IsAnglePoint ? "Qualifies" : "Invalid";
+
+        public String AnglePointToolTip => IsAnglePoint ? "This unit meets the angle point method requirements." : 
+            String.Join("\n", _PolygonAnglePointResult.GetErrorMessages());
+
+        public String AnglePointTextDec => IsAnglePoint ? "None" : "Underline";
+
+        public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
+
 
 
         private void EditPolygonValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
@@ -502,12 +528,11 @@ namespace TwoTrails.ViewModels
         }
 
 
-        private void GeneratePolygonSummary(TtPolygon polygon)
+        private void GeneratePolygonSummaryAndStats(TtPolygon polygon)
         {
             PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true);
+            PolygonAnglePointResult = AnglePointLogic.VerifyGeometry(Manager, polygon.CN);
         }
-
-        public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
 
 
         private void PolygonCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -530,15 +555,15 @@ namespace TwoTrails.ViewModels
 
         private void PolygonShapeChanged(TtPolygon polygon)
         {
-            double area = 0, perim = 0;
-            foreach (TtPolygon poly in Manager.Polygons)
-            {
-                area += poly.Area;
-                perim += poly.Perimeter;
-            }
+            //double area = 0, perim = 0;
+            //foreach (TtPolygon poly in Manager.Polygons)
+            //{
+            //    area += poly.Area;
+            //    perim += poly.Perimeter;
+            //}
 
-            TotalPolygonArea = area;
-            TotalPolygonPerimeter = perim;
+            //TotalPolygonArea = area;
+            //TotalPolygonPerimeter = perim;
 
             ValidatePolygon(polygon);
         }

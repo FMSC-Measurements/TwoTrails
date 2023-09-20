@@ -40,8 +40,10 @@ namespace TwoTrails.ViewModels
             AfterPoints = new List<TtPoint>();
             Polygons = manager.GetPolygons();
 
-            Retraces = new ObservableCollection<Retrace>();
-            Retraces.Add(new Retrace(this, _Manager));
+            Retraces = new ObservableCollection<Retrace>
+            {
+                new Retrace(this, _Manager)
+            };
 
             CommitCommand = new RelayCommand(x => RetracePoints());
         }

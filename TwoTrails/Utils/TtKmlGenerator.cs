@@ -196,7 +196,7 @@ namespace TwoTrails.Utils
                     foreach (TtPoint point in points)
                     {
                         #region Create Placemarks
-                        Point pos = TtUtils.GetLatLon(point);
+                        Point pos = point.GetLatLon();
                         Coordinates adjCoords = new Coordinates(pos.Y, pos.X);
 
                         Coordinates unadjCoords;
@@ -205,7 +205,7 @@ namespace TwoTrails.Utils
                             unadjCoords = adjCoords;
                         else
                         {
-                            pos = TtUtils.GetLatLon(point, false);
+                            pos = point.GetLatLon(false);
                             unadjCoords = new Coordinates(pos.Y, pos.X);
                         }
 

@@ -303,7 +303,7 @@ namespace TwoTrails.ViewModels
 
             TtMetadata defMeta = _Manager.DefaultMetadata;
 
-            List<IEnumerable<Point>> polyIncudePoints = polyIncludeTtPoints.Select(pp => pp.Select(p => TtUtils.GetCoords(p, defMeta.Zone).ToPoint())).ToList();
+            List<IEnumerable<Point>> polyIncudePoints = polyIncludeTtPoints.Select(pp => pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint())).ToList();
             List<Point> allPoints = polyIncudePoints.SelectMany(pts => pts).ToList(); ;
             
             UtmExtent.Builder builder = new UtmExtent.Builder(defMeta.Zone);
@@ -312,7 +312,7 @@ namespace TwoTrails.ViewModels
 
             Random rand = new Random();
             UTMCoords startCoords = SelectedPoint != null ?
-                TtUtils.GetCoords(SelectedPoint, defMeta.Zone) :
+                SelectedPoint.GetCoords(defMeta.Zone) :
                 new UTMCoords(
                     (rand.NextDouble() * (totalExtents.East - totalExtents.West) + totalExtents.West),
                     (rand.NextDouble() * (totalExtents.North - totalExtents.South) + totalExtents.South),
@@ -323,7 +323,7 @@ namespace TwoTrails.ViewModels
 
             List<PolygonCalculator> polyIncludeCalcs = polyIncudePoints.Select(pp => new PolygonCalculator(pp)).ToList();
             List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint()))
-                                                    .Select(pp => pp.Select(p => TtUtils.GetCoords(p, defMeta.Zone).ToPoint()))
+                                                    .Select(pp => pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint()))
                                                     .Select(pp => new PolygonCalculator(pp)).ToList();
 
             Point farCorner = TtUtils.GetFarthestCorner(
@@ -461,7 +461,7 @@ namespace TwoTrails.ViewModels
             List<Tuple<TtPolygon, IEnumerable<Point>, string>> polyIncudePoints =
                 polys.Select(p => Tuple.Create(
                     p.Item1,
-                    _Manager.GetPoints(p.Item2).Where(pt => pt.IsBndPoint()).Select(po => TtUtils.GetCoords(po, defMeta.Zone).ToPoint()),
+                    _Manager.GetPoints(p.Item2).Where(pt => pt.IsBndPoint()).Select(po => po.GetCoords(defMeta.Zone).ToPoint()),
                     p.Item2))
                 .ToList();
 
@@ -473,7 +473,7 @@ namespace TwoTrails.ViewModels
 
             Random rand = new Random();
             UTMCoords startCoords = SelectedPoint != null ?
-                TtUtils.GetCoords(SelectedPoint, defMeta.Zone) :
+                SelectedPoint.GetCoords(defMeta.Zone) :
                 new UTMCoords(
                     (rand.NextDouble() * (totalExtents.East - totalExtents.West) + totalExtents.West),
                     (rand.NextDouble() * (totalExtents.North - totalExtents.South) + totalExtents.South),
@@ -484,7 +484,7 @@ namespace TwoTrails.ViewModels
 
             List<Tuple<TtPolygon, PolygonCalculator, string>> polyIncludeCalcs = polyIncudePoints.Select(pp => Tuple.Create(pp.Item1, new PolygonCalculator(pp.Item2), pp.Item3)).ToList();
             List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint()))
-                                                    .Select(pp => new PolygonCalculator(pp.Select(p => TtUtils.GetCoords(p, defMeta.Zone).ToPoint()))).ToList();
+                                                    .Select(pp => new PolygonCalculator(pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint()))).ToList();
 
             Point farCorner = TtUtils.GetFarthestCorner(
                 startCoords.X, startCoords.Y,

@@ -46,7 +46,7 @@ namespace TwoTrails.Utils
                     {
                         foreach (TtPoint point in points)
                         {
-                            PointF adj = TtUtils.GetLatLon(point, true);
+                            PointF adj = point.GetLatLon(true);
                             Point adjpoint = new Point(adj.Y, adj.X, point.AdjZ)
                             {
                                 Name = point.PID.ToString(),
@@ -55,7 +55,7 @@ namespace TwoTrails.Utils
                                 Description = $"Point Operation: {point.OpType}<br>UtmX: {point.AdjX}<br>UtmY: {point.AdjY}"
                             };
 
-                            PointF unadj = TtUtils.GetLatLon(point, true);
+                            PointF unadj = point.GetLatLon(true);
                             Point unAdjpoint = new Point(unadj.Y, unadj.X, point.UnAdjZ)
                             {
                                 Name = point.PID.ToString(),

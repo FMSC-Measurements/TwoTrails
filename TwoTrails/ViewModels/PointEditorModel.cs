@@ -107,6 +107,7 @@ namespace TwoTrails.ViewModels
 
         public BindedRelayCommand<PointEditorModel> RezonePointsCommand { get; }
         public BindedRelayCommand<PointEditorModel> DewebPointsCommand { get; }
+        public RelayCommand AnglifyCommand { get; }
 
         public RelayCommand SelectAlternateCommand { get; }
         public RelayCommand SelectGpsCommand { get; }
@@ -1069,11 +1070,11 @@ namespace TwoTrails.ViewModels
             DewebPointsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => DewebPoints(),
                 x => MultipleSelections && SamePolygon,
-                this, m => m.MultipleSelections);
+                this, m => new { m.MultipleSelections, m.SamePolygon });
 
-            //RezonePointsCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.RezonePoints(), (x, m) => m.HasSelection,
-            //    this, m => m.HasSelection);
+            AnglifyCommand = new RelayCommand(
+                x => AnglePointLogic.Qualifies(Manager, SelectedPoint.PolygonCN),
+                x => true);
 
             #endregion
 
@@ -1299,6 +1300,7 @@ namespace TwoTrails.ViewModels
 
             CopyCellValueCommand.Dispose();
             RezonePointsCommand.Dispose();
+            DewebPointsCommand.Dispose();
 
             ExtendedDataFields.Clear();
         }

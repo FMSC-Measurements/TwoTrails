@@ -1,4 +1,7 @@
-﻿using System;
+﻿using FMSC.Core;
+using FMSC.GeoSpatial;
+using FMSC.GeoSpatial.UTM;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -128,5 +131,53 @@ namespace TwoTrails.Core.Points
 
             return conversion;
         }
+
+
+        public static UTMCoords GetCoords(this TtPoint point, int targetZone, bool adjusted = true)
+        {
+            if (point.Metadata.Zone != targetZone)
+            {
+                if (point is GpsPoint gps && gps.HasLatLon)
+                {
+                    return UTMTools.ConvertLatLonSignedDecToUTM((double)gps.Latitude, (double)gps.Longitude, targetZone);
+                }
+                else //Use reverse location calculation
+                {
+                    Position pos;
+
+                    if (adjusted)
+                        pos = UTMTools.ConvertUTMtoLatLonSignedDec(point.AdjX, point.AdjY, point.Metadata.Zone);
+                    else
+                        pos = UTMTools.ConvertUTMtoLatLonSignedDec(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
+
+                    return UTMTools.ConvertLatLonToUTM(pos, targetZone);
+                }
+            }
+            else
+            {
+                if (adjusted)
+                    return new UTMCoords(point.AdjX, point.AdjY, targetZone);
+                else
+                    return new UTMCoords(point.UnAdjX, point.UnAdjY, targetZone);
+            }
+        }
+
+        public static Point GetLatLon(this TtPoint point, bool adjusted = true)
+        {
+            if (point is GpsPoint gps && gps.HasLatLon)
+            {
+                return new Point((double)gps.Longitude, (double)gps.Latitude);
+            }
+            else
+            {
+                if (point.Metadata == null)
+                    throw new Exception("Missing Metadata");
+
+                return adjusted ?
+                    UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone) :
+                    UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
+            }
+        }
+
     }
 }

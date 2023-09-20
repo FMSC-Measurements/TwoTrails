@@ -41,8 +41,8 @@ namespace TwoTrails.Utils
 
                 foreach (TtPoint p in points)
                 {
-                    UTMCoords adj = TtUtils.GetCoords(p, zone, true);
-                    UTMCoords unadj = TtUtils.GetCoords(p, zone, false);
+                    UTMCoords adj = p.GetCoords(zone, true);
+                    UTMCoords unadj = p.GetCoords(zone, false);
 
                     if (p.IsBndPoint())
                     {
@@ -374,7 +374,7 @@ namespace TwoTrails.Utils
 
 
                 feat = new Feature();
-                UTMCoords c = TtUtils.GetCoords(p, zone, adjusted);
+                UTMCoords c = p.GetCoords(zone, adjusted);
                 feat.Geometry = new Point(c.X, c.Y);
 
                 feat.Attributes = attPointTable;
