@@ -73,7 +73,7 @@ namespace TwoTrails.Core
 
                 Func<TtPoint, TtPoint, UTMCoords, UTMCoords, bool> meetsDistReq = (TtPoint cp, TtPoint np, UTMCoords cc, UTMCoords nc) =>
                 {
-                    double minDist = (cp.Accuracy + np.Accuracy) / 2;
+                    double minDist = (cp.Accuracy + np.Accuracy) / 2 * 10;
                     return MathEx.Distance(cc.X, cc.Y, nc.X, nc.Y) < minDist;
                 };
 
