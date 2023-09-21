@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
@@ -10,10 +11,10 @@ namespace TwoTrails.Core.ComponentModel.History
         private CreateQuondamsCommand _CreateQuondamsCommand;
         private readonly Guid _ID = Guid.NewGuid();
 
-        public RetraceCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
+        public RetraceCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtUnit targetUnit, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
         {
             _Manager = pointsManager;
-            _CreateQuondamsCommand = new CreateQuondamsCommand(points, pointsManager, targetPoly, insertIndex, bndMode);
+            _CreateQuondamsCommand = new CreateQuondamsCommand(points, pointsManager, targetUnit, insertIndex, bndMode);
         }
 
         public override void Redo()

@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Mapping
 {
@@ -30,7 +31,7 @@ namespace TwoTrails.Mapping
 
         private object locker = new object();
 
-        public TtPolygon Polygon { get; }
+        public PolygonUnit Polygon { get; }
 
         public Extent Extents { get; private set; }
 
@@ -272,22 +273,22 @@ namespace TwoTrails.Mapping
 
 
         #region Color
-        public PolygonGraphicBrushOptions Graphics { get; }
+        public UnitGraphicBrushOptions Graphics { get; }
         #endregion
 
 
-        public TtMapPolygonManager(Map map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo) :
+        public TtMapPolygonManager(Map map, PolygonUnit polygon, ObservableCollection<TtPoint> points, UnitGraphicOptions pgo) :
             this(map, polygon, points, pgo, true, true, true, false, false, false, false, false, false, false, false, false)
         { }
 
-        public TtMapPolygonManager(Map map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo,
+        public TtMapPolygonManager(Map map, PolygonUnit polygon, ObservableCollection<TtPoint> points, UnitGraphicOptions pgo,
             bool vis, bool adjBndVis, bool adjBndPtsVis, bool unadjBndVis, bool unadjBndPtsVis,
             bool adjNavVis, bool adjNavPtsVis, bool unadjNavVis, bool unadjNavPtsVis,
             bool adjMiscPtsVis, bool unadjMiscPtsVis, bool wayPtsVis)
         {
             Map = map;
             Polygon = polygon;
-            Graphics = new PolygonGraphicBrushOptions(pgo.CN, pgo);
+            Graphics = new UnitGraphicBrushOptions(pgo.CN, pgo);
 
             _Visible = vis;
             _AdjBndVisible = adjBndVis;
@@ -306,7 +307,7 @@ namespace TwoTrails.Mapping
             _WayPointsVisible = wayPtsVis;
 
 
-            Polygon.PolygonChanged += UpdatePolygonShape;
+            Polygon.UnitChanged += UpdateUnitShape;
 
             AdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, true, _AdjBndVisible);
             UnAdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, false, _UnAdjBndVisible);
@@ -315,7 +316,7 @@ namespace TwoTrails.Mapping
 
             Points = new ObservableConvertedCollection<TtPoint, TtMapPoint>(points, p => CreateMapPoint(p));
 
-            UpdatePolygonShape(polygon);
+            UpdateUnitShape(polygon);
 
             Points.PreviewCollectionChanged += Points_PreviewCollectionChanged;
             Points.CollectionChanged += Points_CollectionChanged;
@@ -406,7 +407,7 @@ namespace TwoTrails.Mapping
             PointSelected?.Invoke(point, adjusted);
         }
 
-        private void UpdatePolygonShape(TtPolygon polygon)
+        private void UpdateUnitShape(TtUnit polygon)
         {
             lock (locker)
             {
@@ -445,7 +446,7 @@ namespace TwoTrails.Mapping
         }
 
 
-        public void ZoomToPolygon()
+        public void ZoomToUnit()
         {
             if (Points.Any())
             {

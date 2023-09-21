@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core
 {
@@ -12,30 +13,30 @@ namespace TwoTrails.Core
 
         bool HasDataDictionary { get; }
 
-        int PolygonCount { get; }
+        int UnitCount { get; }
         int PointCount { get; }
 
-        void RebuildPolygon(TtPolygon polygon, bool reindex = false);
-        void RecalculatePolygons();
+        void RebuildUnit(TtUnit unit, bool reindex = false);
+        void RecalculateUnits();
 
         bool PointExists(String pointCN);
         TtPoint GetPoint(String pointCN);
         TtPoint GetNextPoint(TtPoint point);
-        List<TtPoint> GetPoints(String polyCN = null);
+        List<TtPoint> GetPoints(String unitCN = null);
         void AddPoint(TtPoint point);
         void AddPoints(IEnumerable<TtPoint> points);
         void ReplacePoint(TtPoint point);
         void ReplacePoints(IEnumerable<TtPoint> replacePoints);
-        void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex);
+        void MovePointsToUnit(IEnumerable<TtPoint> points, TtUnit targetUnit, int insertIndex);
         void DeletePoint(TtPoint point);
         void DeletePoints(IEnumerable<TtPoint> points);
-        void DeletePointsInPolygon(string polyCN);
+        void DeletePointsInUnit(string unitCN);
 
-        bool PolygonExists(string polyCN);
-        TtPolygon GetPolygon(string polyCN);
-        List<TtPolygon> GetPolygons();
-        void AddPolygon(TtPolygon polygon);
-        void DeletePolygon(TtPolygon polygon);
+        bool UnitExists(string unitCN);
+        TtUnit GetUnit(string unitCN);
+        List<TtUnit> GetUnits();
+        void AddUnit(TtUnit unit);
+        void DeleteUnit(TtUnit unit);
 
         bool MetadataExists(string metaCN);
         List<TtMetadata> GetMetadata();
@@ -65,9 +66,9 @@ namespace TwoTrails.Core
         DataDictionaryTemplate GetDataDictionaryTemplate();
 
 
-        PolygonGraphicOptions GetPolygonGraphicOption(string polyCN);
-        List<PolygonGraphicOptions> GetPolygonGraphicOptions();
+        UnitGraphicOptions GetUnitGraphicOption(string unitCN);
+        List<UnitGraphicOptions> GetUnitGraphicOptions();
 
-        PolygonGraphicOptions GetDefaultPolygonGraphicOption();
+        UnitGraphicOptions GetDefaultUnitGraphicOption();
     }
 }

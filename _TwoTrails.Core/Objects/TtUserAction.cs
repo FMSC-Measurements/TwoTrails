@@ -19,9 +19,9 @@ namespace TwoTrails.Core
         public bool PointsModified => Action.HasFlag(DataActionType.ModifiedPoints);
         public bool PointsDeleted => Action.HasFlag(DataActionType.DeletedPoints);
 
-        public bool PolygonsInserted => Action.HasFlag(DataActionType.InsertedPolygons);
-        public bool PolygonsModified => Action.HasFlag(DataActionType.ModifiedPolygons);
-        public bool PolygonsDeleted => Action.HasFlag(DataActionType.DeletedPolygons);
+        public bool PolygonsInserted => Action.HasFlag(DataActionType.InsertedUnits);
+        public bool PolygonsModified => Action.HasFlag(DataActionType.ModifiedUnits);
+        public bool PolygonsDeleted => Action.HasFlag(DataActionType.DeletedUnits);
 
         public bool MetadataInserted => Action.HasFlag(DataActionType.InsertedMetadata);
         public bool MetadataModified => Action.HasFlag(DataActionType.ModifiedMetadata);

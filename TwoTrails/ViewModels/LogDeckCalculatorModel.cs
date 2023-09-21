@@ -63,25 +63,25 @@ namespace TwoTrails.ViewModels
             });
         }
 
-        public ReadOnlyCollection<TtPolygon> Polygons { get; }
+        public ReadOnlyCollection<TtUnit> Polygons { get; }
 
-        public TtPolygon Polygon { get => Get<TtPolygon>(); set => Set(value, () => CalculateDeck(value)); }
-        private TtPolygon DeckPolygon = null;
+        public TtUnit Polygon { get => Get<TtUnit>(); set => Set(value, () => CalculateDeck(value)); }
+        private TtUnit DeckPolygon = null;
 
 
         public LogDeckCalculatorModel(TtProject project)
         {
             _Project = project;
 
-            Polygons = new ReadOnlyCollection<TtPolygon>(
-                _Project.HistoryManager.GetPolygons().Where(p => _Project.HistoryManager.IsPolygonValid(p.CN)).ToList());
+            Polygons = new ReadOnlyCollection<TtUnit>(
+                _Project.HistoryManager.GetUnits().Where(p => _Project.HistoryManager.IsPolygonValid(p.CN)).ToList());
 
             if (Polygons.Count > 0)
                 Polygon = Polygons[0];
         }
 
 
-        private void CalculateDeck(TtPolygon polygon)
+        private void CalculateDeck(TtUnit polygon)
         {
             DeckPolygon = polygon;
             List<TtPoint> points = _Project.HistoryManager.GetPoints(DeckPolygon.CN).Where(pt => pt.IsBndPoint()).ToList();

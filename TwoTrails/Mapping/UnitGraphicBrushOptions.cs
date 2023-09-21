@@ -3,13 +3,13 @@ using TwoTrails.Core;
 
 namespace TwoTrails.Mapping
 {
-    public class PolygonGraphicBrushOptions : PolygonGraphicOptions
+    public class UnitGraphicBrushOptions : UnitGraphicOptions
     {
-        public PolygonGraphicBrushOptions(string cn, PolygonGraphicOptions options) : base(cn, options)
+        public UnitGraphicBrushOptions(string cn, UnitGraphicOptions options) : base(cn, options)
         {
         }
 
-        public PolygonGraphicBrushOptions(string cn, int adjBndColor, int unAdjBndColor, int adjNavColor, int unAdjNavColor, int adjPtsColor, int unAdjPtsColor, int wayPtsColor, float adjWidth, float unAdjWidth) : base(cn, adjBndColor, unAdjBndColor, adjNavColor, unAdjNavColor, adjPtsColor, unAdjPtsColor, wayPtsColor, adjWidth, unAdjWidth)
+        public UnitGraphicBrushOptions(string cn, int adjBndColor, int unAdjBndColor, int adjNavColor, int unAdjNavColor, int adjPtsColor, int unAdjPtsColor, int wayPtsColor, float adjWidth, float unAdjWidth) : base(cn, adjBndColor, unAdjBndColor, adjNavColor, unAdjNavColor, adjPtsColor, unAdjPtsColor, wayPtsColor, adjWidth, unAdjWidth)
         {
         }
 

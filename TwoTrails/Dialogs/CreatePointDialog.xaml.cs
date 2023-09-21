@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Dialogs
 {
@@ -48,7 +49,7 @@ namespace TwoTrails.Dialogs
         public bool IsGpsType { get { return _OpType.IsGpsType(); } }
 
 
-        public CreateGpsPointDialog(TtHistoryManager manager, TtPolygon target = null, OpType opType = OpType.GPS)
+        public CreateGpsPointDialog(TtHistoryManager manager, TtUnit target = null, OpType opType = OpType.GPS)
         {
             if (opType == OpType.Quondam)
                 throw new Exception("Invalid Operation: Cannot create quondam");
@@ -63,7 +64,7 @@ namespace TwoTrails.Dialogs
 
             this.Title = $"Create {opType}";
 
-            cboPoly.ItemsSource = _Manager.GetPolygons();
+            cboPoly.ItemsSource = _Manager.GetUnits();
             cboPoly.SelectedItem = target??cboPoly.Items[0];
 
             cboMeta.ItemsSource = _Manager.GetMetadata();
@@ -84,7 +85,7 @@ namespace TwoTrails.Dialogs
                 }
                 else
                 {
-                    Txt3Watermark = $"Slope Distance ({metadata.Distance.ToStringAbv()})";
+                    Txt3Watermark = $"Distance ({metadata.Distance.ToStringAbv()})";
                     Txt4Watermark = $"Slope Angle ({metadata.Slope})";
 
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Txt4Watermark)));
@@ -97,7 +98,7 @@ namespace TwoTrails.Dialogs
 
         private void cboPoly_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (cboPoly.SelectedItem is TtPolygon polygon)
+            if (cboPoly.SelectedItem is TtUnit polygon)
             {
                 cboPolyPoints.ItemsSource = _Manager.GetPoints(polygon.CN);
                 cboPoly.ToolTip = polygon.Name;
@@ -140,7 +141,7 @@ namespace TwoTrails.Dialogs
                     {
                         if (double.TryParse(txt3.Text, out double c) || (cie && IsGpsType))
                         {
-                            TtPolygon poly = cboPoly.SelectedItem as TtPolygon;
+                            TtUnit poly = cboPoly.SelectedItem as TtUnit;
                             TtMetadata meta = cboMeta.SelectedItem as TtMetadata;
                             TtGroup group = cboGroup.SelectedItem as TtGroup;
 
@@ -213,7 +214,7 @@ namespace TwoTrails.Dialogs
                                 GpsPoint point = new GpsPoint()
                                 {
                                     Index = index,
-                                    Polygon = poly,
+                                    Unit = poly,
                                     Metadata = meta,
                                     Group = group,
                                     PID = pid,
@@ -246,7 +247,7 @@ namespace TwoTrails.Dialogs
                                 TravPoint point = new TravPoint()
                                 {
                                     Index = index,
-                                    Polygon = poly,
+                                    Unit = poly,
                                     Metadata = meta,
                                     Group = group,
                                     PID = pid,
@@ -286,7 +287,7 @@ namespace TwoTrails.Dialogs
             }
         }
 
-        public static bool? ShowDialog(TtHistoryManager manager, TtPolygon target = null, OpType opType = OpType.GPS, Window owner = null)
+        public static bool? ShowDialog(TtHistoryManager manager, TtUnit target = null, OpType opType = OpType.GPS, Window owner = null)
         {
             CreateGpsPointDialog cpd = new CreateGpsPointDialog(manager, target, opType);
             if (owner != null)

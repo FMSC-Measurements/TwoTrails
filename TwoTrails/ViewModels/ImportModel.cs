@@ -72,7 +72,7 @@ namespace TwoTrails.ViewModels
 
         public string CurrentFile { get { return Get<string>(); } set { Set(value); } }
 
-        public bool CanImport { get { return ImportControl != null && ImportControl.Context.HasSelectedPolygons && !IsImporting; } }
+        public bool CanImport { get { return ImportControl != null && ImportControl.Context.HasSelectedUnits && !IsImporting; } }
 
         private bool _AutoCloseOnImport;
 
@@ -267,7 +267,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                             {
                                 ImportControl = new ImportControl(
                                     new TtKmlDataAccessLayer(
-                                        new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true, startPolyNumber: _Manager.PolygonCount)
+                                        new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true, startUnitNumber: _Manager.UnitCount)
                                 ), _Project.Settings.SortPolysByName, false, false, false);
 
                                 IsSettingUp = true;
@@ -289,7 +289,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                                 {
                                     ImportControl = new ImportControl(
                                         new TtShapeFileDataAccessLayer(
-                                            new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
+                                            new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, _Manager.UnitCount)
                                         ), _Project.Settings.SortPolysByName, false, false, false
                                     );
                                     IsSettingUp = true;
@@ -338,7 +338,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                 {
                     ImportControl = new ImportControl(
                                 new TtShapeFileDataAccessLayer(
-                                    new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
+                                    new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.UnitCount)
                                 ),
                                 _Project.Settings.SortPolysByName
                             );
@@ -353,7 +353,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
         public void ImportData()
         {
-            IEnumerable<string> selectedPolys = ImportControl.Context.SelectedPolygons;
+            IEnumerable<string> selectedPolys = ImportControl.Context.SelectedUnits;
             bool convertForeignQuondams = false;
             
             if (ImportControl.Context.DAL.HandlesAllPointTypes)
@@ -367,20 +367,20 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                     {
                         if (_Project.HistoryManager.PointExists(point.CN))
                         {
-                            if (dupPoints.ContainsKey(point.PolygonCN))
+                            if (dupPoints.ContainsKey(point.UnitCN))
                             {
-                                dupPoints[point.PolygonCN].Add(point);
+                                dupPoints[point.UnitCN].Add(point);
                             }
                             else
                             {
-                                dupPoints.Add(point.PolygonCN, new List<TtPoint>() { point });
+                                dupPoints.Add(point.UnitCN, new List<TtPoint>() { point });
                             }
                         }
 
                         if (point.OpType == OpType.Quondam && point is QuondamPoint qp)
                         {
-                            if (qp.ParentPoint.PolygonCN != polyCN && !selectedPolys.Contains(qp.ParentPoint.PolygonCN) && !neededPolys.Contains(qp.ParentPoint.PolygonCN))
-                                neededPolys.Add(qp.ParentPoint.PolygonCN);
+                            if (qp.ParentPoint.UnitCN != polyCN && !selectedPolys.Contains(qp.ParentPoint.UnitCN) && !neededPolys.Contains(qp.ParentPoint.UnitCN))
+                                neededPolys.Add(qp.ParentPoint.UnitCN);
                         }
                     }
                 }
@@ -398,7 +398,7 @@ This means a polygon being imported may already exist. Would you like to import 
 
                             sb.AppendLine("** Current Existing Points **\n");
 
-                            foreach (TtPolygon poly in ImportControl.Context.DAL.GetPolygons())
+                            foreach (TtUnit poly in ImportControl.Context.DAL.GetUnits())
                             {
                                 if (dupPoints.ContainsKey(poly.CN))
                                 {

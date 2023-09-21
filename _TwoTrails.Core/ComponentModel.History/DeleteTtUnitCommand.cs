@@ -1,12 +1,14 @@
 ﻿
+using TwoTrails.Core.Units;
+
 namespace TwoTrails.Core.ComponentModel.History
 {
-    public class DeleteTtPolygonCommand : ITtPolygonCommand
+    public class DeleteTtUnitCommand : ITtUnitCommand
     {
         private TtManager pointsManager;
         private DeleteTtPointsCommand dpc;
 
-        public DeleteTtPolygonCommand(TtPolygon polygon, TtManager pointsManager) : base(polygon)
+        public DeleteTtUnitCommand(TtUnit polygon, TtManager pointsManager) : base(polygon)
         {
             this.pointsManager = pointsManager;
 
@@ -16,12 +18,12 @@ namespace TwoTrails.Core.ComponentModel.History
         public override void Redo()
         {
             dpc.Redo();
-            pointsManager.DeletePolygon(Polygon);
+            pointsManager.DeleteUnit(Unit);
         }
 
         public override void Undo()
         {
-            pointsManager.AddPolygon(Polygon);
+            pointsManager.AddUnit(Unit);
             dpc.Undo();
         }
     }

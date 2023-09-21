@@ -203,7 +203,7 @@ namespace TwoTrails.DAL
         #endregion
 
         #region Polygon Table
-        public static class PolygonSchema
+        public static class UnitSchema
         {
             public const String TableName = "Polygons";
 
@@ -476,7 +476,7 @@ namespace TwoTrails.DAL
         #endregion
 
         #region Polygon Attr Table
-        public static class PolygonAttrSchema
+        public static class UnitAttrSchema
         {
             public const String TableName = "PolygonAttr";
 
@@ -603,8 +603,8 @@ ALTER TABLE {TtNmeaSchema.TableName} ADD {TtNmeaSchema.SatellitesInView} TEXT; U
 UPDATE {ProjectInfoSchema.TableName} SET {ProjectInfoSchema.TtDbSchemaVersion} = '{OSV_2_0_3}';";
 
 
-        public static readonly string UPGRADE_OSV_2_1_0 = $@"ALTER TABLE {PolygonSchema.TableName} ADD {PolygonSchema.ParentUnitCN} TEXT;
-ALTER TABLE {PolygonSchema.TableName} ADD {PolygonSchema.UnitType} INTEGER; ALTER TABLE {ActivitySchema.TableName} ADD {ActivitySchema.AppVersion} TEXT;
+        public static readonly string UPGRADE_OSV_2_1_0 = $@"ALTER TABLE {UnitSchema.TableName} ADD {UnitSchema.ParentUnitCN} TEXT;
+ALTER TABLE {UnitSchema.TableName} ADD {UnitSchema.UnitType} INTEGER; ALTER TABLE {ActivitySchema.TableName} ADD {ActivitySchema.AppVersion} TEXT;
 UPDATE {ProjectInfoSchema.TableName} SET {ProjectInfoSchema.TtDbSchemaVersion} = '{OSV_2_1_0}'; PRAGMA user_version = {OSV_2_1_0_INT};";
         #endregion
     }

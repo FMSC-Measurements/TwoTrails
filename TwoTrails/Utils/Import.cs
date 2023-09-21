@@ -5,6 +5,7 @@ using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 using TwoTrails.DAL;
 
 namespace TwoTrails.Utils
@@ -16,16 +17,16 @@ namespace TwoTrails.Utils
         {
             int existingPointsImported = 0; // points that had a CN already in the project imported
 
-            Dictionary<string, TtPolygon> polygons = manager.GetPolygons().ToDictionary(p => p.CN, p => p);
+            Dictionary<string, TtUnit> polygons = manager.GetUnits().ToDictionary(p => p.CN, p => p);
             Dictionary<string, TtMetadata> metadata = manager.GetMetadata().ToDictionary(m => m.CN, m => m);
             Dictionary<string, TtGroup> groups = manager.GetGroups().ToDictionary(g => g.CN, g => g);
 
             Dictionary<string, TtPoint> aPoints;
-            Dictionary<string, TtPolygon> aPolys = new Dictionary<string, TtPolygon>();
+            Dictionary<string, TtUnit> aPolys = new Dictionary<string, TtUnit>();
             Dictionary<string, TtMetadata> aMeta = new Dictionary<string, TtMetadata>();
             Dictionary<string, TtGroup> aGroups = new Dictionary<string, TtGroup>();
 
-            Dictionary<string, TtPolygon> iPolys = dal.GetPolygons().Where(p => polyCNs == null || polyCNs.Contains(p.CN)).ToDictionary(p => p.CN, p => p);
+            Dictionary<string, TtUnit> iPolys = dal.GetUnits().Where(p => polyCNs == null || polyCNs.Contains(p.CN)).ToDictionary(p => p.CN, p => p);
             Dictionary<string, string> polyMap = new Dictionary<string, string>();
             Dictionary<string, TtMetadata> iMeta = dal.GetMetadata().ToDictionary(m => m.CN, m => m);
             Dictionary<string, string> metaMap = new Dictionary<string, string>();
@@ -37,7 +38,7 @@ namespace TwoTrails.Utils
             includeMetadata &= iMeta.Count > 0;
             includeGroups &= iGroups.Count > 0;
 
-            foreach (TtPolygon poly in iPolys.Values.DeepCopy())
+            foreach (TtUnit poly in iPolys.Values.DeepCopy())
             {
                 poly.Name = $"{poly.Name}_Import";
 
@@ -134,7 +135,7 @@ namespace TwoTrails.Utils
 
                     convertedPoint.CN = qpoint.CN;
                     convertedPoint.Index = qpoint.Index;
-                    convertedPoint.PolygonCN = qpoint.PolygonCN;
+                    convertedPoint.UnitCN = qpoint.UnitCN;
                     convertedPoint.MetadataCN = qpoint.MetadataCN;
                     convertedPoint.GroupCN = qpoint.GroupCN;
 
@@ -151,7 +152,7 @@ namespace TwoTrails.Utils
                     convertedPoint.ClearLinkedPoints();
                 }
 
-                convertedPoint.SetAccuracy(aPolys[qpoint.PolygonCN].Accuracy);
+                convertedPoint.SetAccuracy(aPolys[qpoint.UnitCN].Accuracy);
 
                 return convertedPoint;
             };
@@ -212,10 +213,10 @@ namespace TwoTrails.Utils
                     existingPointsImported++;
                 }
 
-                if (polyMap.ContainsKey(point.PolygonCN))
-                    point.PolygonCN = polyMap[point.PolygonCN];
+                if (polyMap.ContainsKey(point.UnitCN))
+                    point.UnitCN = polyMap[point.UnitCN];
 
-                point.Polygon = aPolys[point.PolygonCN];
+                point.Unit = aPolys[point.UnitCN];
 
                 if (!includeMetadata && point is GpsPoint gps)
                 {
@@ -260,10 +261,10 @@ namespace TwoTrails.Utils
 
 
             //reindex points
-            foreach (TtPolygon poly in aPolys.Values)
+            foreach (TtUnit poly in aPolys.Values)
             {
                 int index = 0;
-                foreach (TtPoint point in aPoints.Values.Where(p => p.PolygonCN == poly.CN).OrderBy(p => p.Index))
+                foreach (TtPoint point in aPoints.Values.Where(p => p.UnitCN == poly.CN).OrderBy(p => p.Index))
                 {
                     point.Index = index++;
                 }
@@ -275,9 +276,9 @@ namespace TwoTrails.Utils
 
             try
             {
-                foreach (TtPolygon p in aPolys.Values)
+                foreach (TtUnit p in aPolys.Values)
                 {
-                    manager.AddPolygon(p);
+                    manager.AddUnit(p);
                 }
 
                 if (includeMetadata)

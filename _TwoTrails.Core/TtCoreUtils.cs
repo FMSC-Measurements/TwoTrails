@@ -60,7 +60,7 @@ namespace TwoTrails.Core
 
         public static bool IsPolygonValid(this ITtManager manager, string polyCN)
         {
-            if (manager.PolygonExists(polyCN))
+            if (manager.UnitExists(polyCN))
                 return manager.GetPoints(polyCN).HasAtLeast(3, pt => pt.OnBoundary);
             throw new Exception("Polygon Not Found");
         }

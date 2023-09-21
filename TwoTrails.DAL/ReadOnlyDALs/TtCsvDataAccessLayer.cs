@@ -10,6 +10,7 @@ using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.DAL
 {
@@ -22,7 +23,7 @@ namespace TwoTrails.DAL
         public bool HandlesAllPointTypes => _Options.Mode == ParseMode.Advanced;
 
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
-        private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
+        private Dictionary<string, TtUnit> _Units = new Dictionary<string, TtUnit>();
         private Dictionary<string, TtMetadata> _Metadata = new Dictionary<string, TtMetadata>();
         private Dictionary<string, TtGroup> _Groups = new Dictionary<string, TtGroup>();
         private Dictionary<string, TtNmeaBurst> _Nmea = new Dictionary<string, TtNmeaBurst>();
@@ -32,7 +33,7 @@ namespace TwoTrails.DAL
         private readonly ParseOptions _Options;
         private bool parsed;
         private int milliSecondsInc = 0;
-        private int polyInc = 0;
+        private int unitInc = 0;
 
         private static object locker = new object();
 
@@ -40,7 +41,7 @@ namespace TwoTrails.DAL
         public TtCsvDataAccessLayer(ParseOptions options)
         {
             _Options = options;
-            polyInc = options.StartPolygonNumber;
+            unitInc = options.StartUnitNumber;
         }
 
         public void Parse(bool reparse = false)
@@ -52,7 +53,7 @@ namespace TwoTrails.DAL
                     if (reparse)
                     {
                         _Points.Clear();
-                        _Polygons.Clear();
+                        _Units.Clear();
                         _Metadata.Clear();
                         _Groups.Clear();
                         _Nmea.Clear();
@@ -60,7 +61,7 @@ namespace TwoTrails.DAL
                     }
 
                     ParseProject(_Options.ProjectFile);
-                    ParsePolygons(_Options.PolygonsFile);
+                    ParseUnits(_Options.UnitsFile);
                     ParseMetadata(_Options.MetadataFile);
                     ParseGroups(_Options.GroupsFile);
                     ParseNmea(_Options.NmeaFile);
@@ -78,14 +79,14 @@ namespace TwoTrails.DAL
 
             IDictionary<PointTextFieldType, int> mapping = _Options.PointMapping.Where(x => x.Value > -1).ToDictionary(x => x.Key, x => x.Value);
             
-            Dictionary<string, string> polyNameToCN = new Dictionary<string, string>();
+            Dictionary<string, string> unitNameToCN = new Dictionary<string, string>();
             Dictionary<string, string> groupNameToCN = new Dictionary<string, string>();
 
             #region Check and get Fields
-            bool hasPolyNames = mapping.ContainsKey(PointTextFieldType.POLY_NAME);
+            bool hasUnitNames = mapping.ContainsKey(PointTextFieldType.UNIT_NAME);
             bool hasPIDs = mapping.ContainsKey(PointTextFieldType.PID);
             bool hasCN = mapping.ContainsKey(PointTextFieldType.CN);
-            bool hasPolyCN = mapping.ContainsKey(PointTextFieldType.POLY_CN);
+            bool hasUnitCN = mapping.ContainsKey(PointTextFieldType.UNIT_CN);
             bool hasMetaCN = mapping.ContainsKey(PointTextFieldType.META_CN);
 
             bool hasGroupNames = mapping.ContainsKey(PointTextFieldType.GROUP_NAME);
@@ -107,8 +108,8 @@ namespace TwoTrails.DAL
             bool hasBnd = mapping.ContainsKey(PointTextFieldType.ONBND);
             bool hasComment = mapping.ContainsKey(PointTextFieldType.COMMENT);
 
-            int fPolyName = GetFieldColumn(mapping, PointTextFieldType.POLY_NAME, hasPolyNames);
-            int fPolyCN = GetFieldColumn(mapping, PointTextFieldType.POLY_CN, hasPolyCN);
+            int fUnitName = GetFieldColumn(mapping, PointTextFieldType.UNIT_NAME, hasUnitNames);
+            int fUnitCN = GetFieldColumn(mapping, PointTextFieldType.UNIT_CN, hasUnitCN);
             int fPID = GetFieldColumn(mapping, PointTextFieldType.PID, hasPIDs);
             int fCN = GetFieldColumn(mapping, PointTextFieldType.CN, useAdvParsing);
             int fOp = GetFieldColumn(mapping, PointTextFieldType.OPTYPE, useAdvParsing);
@@ -243,63 +244,64 @@ namespace TwoTrails.DAL
                         point.TimeCreated = DateTime.Now;
 
 
-                    #region Polygons
-                    if (hasPolyCN)
+                    #region Units
+                    if (hasUnitCN)
                     {
-                        string cn = reader.GetField<string>(fPolyCN);
-                        if (!_Polygons.ContainsKey(cn))
+                        string cn = reader.GetField<string>(fUnitCN);
+                        if (!_Units.ContainsKey(cn))
                         {
-                            TtPolygon poly = new TtPolygon()
+                            //TODO parse types
+                            TtUnit unit = new PolygonUnit()
                             {
                                 CN = cn,
-                                Name = hasPolyNames ?
-                                    reader.GetField<string>(fPolyName) : $"Poly {++polyInc}",
-                                PointStartIndex = _Polygons.Count * polyInc + Consts.DEFAULT_POINT_INCREMENT,
+                                Name = hasUnitNames ?
+                                    reader.GetField<string>(fUnitName) : $"Unit {++unitInc}",
+                                PointStartIndex = _Units.Count * unitInc + Consts.DEFAULT_POINT_INCREMENT,
                                 TimeCreated = _ProjectInfo.CreationDate.AddMilliseconds(milliSecondsInc++)
                             };
 
-                            _Polygons.Add(cn, poly);
+                            _Units.Add(cn, unit);
                         }
 
-                        point.PolygonCN = cn;
+                        point.UnitCN = cn;
                     }
-                    else if (hasPolyNames)
+                    else if (hasUnitNames)
                     {
-                        string name = reader.GetField<string>(fPolyName);
+                        string name = reader.GetField<string>(fUnitName);
 
-                        if (polyNameToCN.ContainsKey(name))
-                            point.PolygonCN = polyNameToCN[name];
+                        if (unitNameToCN.ContainsKey(name))
+                            point.UnitCN = unitNameToCN[name];
                         else
                         {
-                            TtPolygon poly = new TtPolygon()
+                            TtUnit unit = new PolygonUnit()
                             {
-                                Name = reader.GetField<string>(fPolyName),
-                                PointStartIndex = (_Polygons.Count + 1) * 1000 + Consts.DEFAULT_POINT_INCREMENT,
+                                Name = reader.GetField<string>(fUnitName),
+                                PointStartIndex = (_Units.Count + 1) * 1000 + Consts.DEFAULT_POINT_INCREMENT,
                                 TimeCreated = _ProjectInfo.CreationDate.AddMilliseconds(milliSecondsInc++)
                             };
 
-                            _Polygons.Add(poly.CN, poly);
-                            point.PolygonCN = poly.CN;
+                            _Units.Add(unit.CN, unit);
+                            point.UnitCN = unit.CN;
                         }
                     }
                     else
                     {
-                        TtPolygon poly;
-                        if (_Polygons.Count < 1)
+                        TtUnit unit;
+                        if (_Units.Count < 1)
                         {
-                            poly = new TtPolygon()
+                            unit = new PolygonUnit()
                             {
-                                Name = "Poly 1"
+                                Name = "Unit 1"
                             };
 
-                            _Polygons.Add(poly.CN, poly);
+                            _Units.Add(unit.CN, unit);
                         }
                         else
                         {
-                            poly = _Polygons.Values.First();
+                            unit = _Units.Values.First();
                         }
 
-                        point.PolygonCN = poly.CN;
+                        point.UnitCN = unit.CN;
                     }
                     #endregion
 
@@ -373,14 +375,14 @@ namespace TwoTrails.DAL
                     {
                         if (prevPoint != null)
                         {
-                            TtPolygon poly = _Polygons[point.PolygonCN];
+                            TtUnit unit = _Units[point.UnitCN];
 
-                            point.PID = (prevPoint.PolygonCN == poly.CN) ?
-                                PointNamer.NamePoint(poly, prevPoint) :
-                                PointNamer.NamePoint(poly);
+                            point.PID = (prevPoint.UnitCN == unit.CN) ?
+                                PointNamer.NamePoint(unit, prevPoint) :
+                                PointNamer.NamePoint(unit);
                         }
                         else
-                            PointNamer.NamePoint(_Polygons[point.PolygonCN]);
+                            PointNamer.NamePoint(_Units[point.UnitCN]);
                     }
 
                     if (hasIndex)
@@ -391,7 +393,7 @@ namespace TwoTrails.DAL
                     {
                         if (prevPoint != null)
                         {
-                            point.Index = (prevPoint.PolygonCN == point.PolygonCN) ?
+                            point.Index = (prevPoint.UnitCN == point.UnitCN) ?
                                 prevPoint.Index + 1 : 0;
                         }
                         else
@@ -459,9 +461,9 @@ namespace TwoTrails.DAL
         }
 
 
-        private void ParsePolygons(string filePath)
+        private void ParseUnits(string filePath)
         {
-            //TODO Parse Polygons
+            //TODO Parse Units
         }
 
         private void ParseMetadata(string filePath)
@@ -503,39 +505,39 @@ namespace TwoTrails.DAL
             return _Points.ContainsKey(cn) ? (linked ? GetLinkedPoints(new TtPoint[] { _Points[cn] }).First() : _Points[cn]) : null;
         }
 
-        public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
+        public IEnumerable<TtPoint> GetPoints(String unitCN = null, bool linked = false)
         {
             Parse();
 
-            IEnumerable<TtPoint> points = (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index);
+            IEnumerable<TtPoint> points = (unitCN == null ? _Points.Values : _Points.Values.Where(p => p.UnitCN == unitCN)).OrderBy(p => p.Index);
 
             return linked ? GetLinkedPoints(points) : points.DeepCopy();
         }
 
-        public int GetPointCount(params string[] polyCNs)
+        public int GetPointCount(params string[] unitCNs)
         {
-            if (polyCNs == null || !polyCNs.Any())
+            if (unitCNs == null || !unitCNs.Any())
             {
                 return _Points.Count;
             }
             else
             {
-                return _Points.Values.Count(p => polyCNs.Contains(p.PolygonCN));
+                return _Points.Values.Count(p => unitCNs.Contains(p.UnitCN));
             }
         }
 
-        public bool HasPolygons()
+        public bool HasUnits()
         {
             Parse();
 
-            return _Polygons.Count > 0;
+            return _Units.Count > 0;
         }
 
-        public IEnumerable<TtPolygon> GetPolygons()
+        public IEnumerable<TtUnit> GetUnits()
         {
             Parse();
 
-            return _Polygons.Values.DeepCopy();
+            return _Units.Values.DeepCopy();
         }
 
         public IEnumerable<TtMetadata> GetMetadata()
@@ -589,9 +591,9 @@ namespace TwoTrails.DAL
             return new TtProjectInfo(_ProjectInfo);
         }
 
-        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public IEnumerable<UnitGraphicOptions> GetUnitGraphicOptions()
         {
-            return new List<PolygonGraphicOptions>();
+            return new List<UnitGraphicOptions>();
         }
 
         public IEnumerable<TtImage> GetPictures(String pointCN)
@@ -624,7 +626,7 @@ namespace TwoTrails.DAL
         {
             public String PointsFile { get; }
             public string ProjectFile { get; }
-            public string PolygonsFile { get; }
+            public string UnitsFile { get; }
             public string MetadataFile { get; }
             public string GroupsFile { get; }
             public string NmeaFile { get; }
@@ -633,7 +635,7 @@ namespace TwoTrails.DAL
 
             public int TargetZone { get; }
 
-            public int StartPolygonNumber { get; }
+            public int StartUnitNumber { get; }
 
 
             private Dictionary<PointTextFieldType, int> _PointMapping { get; } = new Dictionary<PointTextFieldType, int>();
@@ -647,8 +649,8 @@ namespace TwoTrails.DAL
             {
                 get
                 {
-                    return PointMapping.ContainsKey(PointTextFieldType.POLY_NAME) ||
-                        PointMapping.ContainsKey(PointTextFieldType.POLY_CN);
+                    return PointMapping.ContainsKey(PointTextFieldType.UNIT_NAME) ||
+                        PointMapping.ContainsKey(PointTextFieldType.UNIT_CN);
                 }
             }
 
@@ -668,14 +670,14 @@ namespace TwoTrails.DAL
                 PointsFile = pointsFile;
                 TargetZone = targetZone;
                 ProjectFile = projectFile;
-                PolygonsFile = polysFile;
+                UnitsFile = polysFile;
                 MetadataFile = metaFile;
                 GroupsFile = groupsFile;
                 NmeaFile = nmeaFile;
                 MediaFile = mediaFile;
                 activityFile = UserActivityFile;
 
-                StartPolygonNumber = startPolyNumber;
+                StartUnitNumber = startPolyNumber;
 
                 ResetPointMap();
                 PointMapping = new ReadOnlyDictionary<PointTextFieldType, int>(_PointMapping);
@@ -706,10 +708,12 @@ namespace TwoTrails.DAL
                         case "indx":
                             EditPointMap(PointTextFieldType.INDEX, index, false);
                             break;
+                        case "unit":
+                        case "unit name":
                         case "polygon":
                         case "polygon name":
                         case "poly name":
-                            EditPointMap(PointTextFieldType.POLY_NAME, index, false);
+                            EditPointMap(PointTextFieldType.UNIT_NAME, index, false);
                             break;
                         case "group":
                         case "group name":
@@ -824,9 +828,10 @@ namespace TwoTrails.DAL
                         case "point cn":
                             EditPointMap(PointTextFieldType.CN, index, false);
                             break;
+                        case "unit cn":
                         case "poly cn":
                         case "polygon cn":
-                            EditPointMap(PointTextFieldType.POLY_CN, index, false);
+                            EditPointMap(PointTextFieldType.UNIT_CN, index, false);
                             break;
                         case "group cn":
                             EditPointMap(PointTextFieldType.GROUP_CN, index, false);

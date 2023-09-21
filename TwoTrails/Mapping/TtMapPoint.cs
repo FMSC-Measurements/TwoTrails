@@ -198,7 +198,7 @@ namespace TwoTrails.Mapping
         #endregion
 
 
-        public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo) : base(map, pgo)
+        public TtMapPoint(Map map, TtPoint point, UnitGraphicOptions pgo) : base(map, pgo)
         {
             Point = point;
 
@@ -237,7 +237,7 @@ namespace TwoTrails.Mapping
             Map.Children.Add(AdjPushpin);
         }
 
-        public TtMapPoint(Map map, TtPoint point, PolygonGraphicOptions pgo, bool visible,
+        public TtMapPoint(Map map, TtPoint point, UnitGraphicOptions pgo, bool visible,
             bool adjBndVis, bool unadjBndVis, bool adjNavVis,
             bool unadjNavVis, bool adjMiscVis, bool unadjMiscVis,
             bool wayVis) : this(map, point, pgo)
@@ -268,7 +268,7 @@ namespace TwoTrails.Mapping
             }
         }
 
-        private void PGO_ColorChanged(PolygonGraphicOptions _pgo, GraphicCode code, int color)
+        private void PGO_ColorChanged(UnitGraphicOptions _pgo, GraphicCode code, int color)
         {
             switch (code)
             {

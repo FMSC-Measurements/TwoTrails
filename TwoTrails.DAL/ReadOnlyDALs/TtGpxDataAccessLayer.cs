@@ -10,6 +10,7 @@ using System.Xml;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.DAL
 {
@@ -22,14 +23,14 @@ namespace TwoTrails.DAL
         public bool HandlesAllPointTypes => false;
 
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
-        private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
+        private Dictionary<string, TtUnit> _Units = new Dictionary<string, TtUnit>();
 
         private TtProjectInfo _ProjectInfo;
 
         private readonly ParseOptions _Options;
         private bool parsed;
         private int milliSecondsInc = 0;
-        private int polyInc = 0;
+        private int unitInc = 0;
 
         private static object locker = new object();
 
@@ -38,7 +39,7 @@ namespace TwoTrails.DAL
         {
             _Options = options;
 
-            polyInc = options.StartPolygonNumber;
+            unitInc = options.StartUnitNumber;
 
             _ProjectInfo = new TtProjectInfo(Path.GetFileName(options.FilePath),
                 String.Empty,
@@ -61,17 +62,17 @@ namespace TwoTrails.DAL
                     if (reparse)
                     {
                         _Points.Clear();
-                        _Polygons.Clear();
+                        _Units.Clear();
                     }
 
                     using (XmlTextReader r = new XmlTextReader(new StreamReader(_Options.FilePath)))
                     {
-                        bool inPoly = false, inPoint = false, inElev = false;
+                        bool inUnit = false, inPoint = false, inElev = false;
 
                         double lat = 0, lon = 0, elev = 0;
 
                         GpsPoint point = new GpsPoint(), lastPoint = null;
-                        TtPolygon poly = null;
+                        TtUnit unit = null;
 
                         int index = 0;
                         string tmp;
@@ -88,20 +89,20 @@ namespace TwoTrails.DAL
                                     {
                                         case XmlNodeType.Element:
                                             {
-                                                if (!inPoly && (r.Name == "rtept" || r.Name == "trkseg"))
+                                                if (!inUnit && (r.Name == "rtept" || r.Name == "trkseg"))
                                                 {
-                                                    inPoly = true;
-                                                    poly = new TtPolygon()
+                                                    inUnit = true;
+                                                    unit = new PolygonUnit()
                                                     {
-                                                        Name = $"Poly {++polyInc}",
-                                                        PointStartIndex = 1000 * polyInc + Consts.DEFAULT_POINT_INCREMENT,
+                                                        Name = $"Unit {++unitInc}",
+                                                        PointStartIndex = 1000 * unitInc + Consts.DEFAULT_POINT_INCREMENT,
                                                         TimeCreated = DateTime.Now.AddMilliseconds(milliSecondsInc++)
                                                     };
 
                                                     lastPoint = null;
                                                     index = 0;
                                                 }
-                                                else if (inPoly && (r.Name == "rtept" || r.Name == "trkpt"))
+                                                else if (inUnit && (r.Name == "rtept" || r.Name == "trkpt"))
                                                 {
                                                     inPoint = true;
                                                     point = new GpsPoint();
@@ -122,16 +123,16 @@ namespace TwoTrails.DAL
                                             {
                                                 if (!inPoint && (r.Name == "rtept" || r.Name == "trkseg"))
                                                 {
-                                                    inPoly = false;
-                                                    _Polygons.Add(poly.CN, poly);
+                                                    inUnit = false;
+                                                    _Units.Add(unit.CN, unit);
                                                 }
                                                 else if (inPoint && (r.Name == "rtept" && inPoint || r.Name == "trkpt"))
                                                 {
                                                     inPoint = false;
                                                     
-                                                    point.PID = PointNamer.NamePoint(poly, lastPoint);
+                                                    point.PID = PointNamer.NamePoint(unit, lastPoint);
 
-                                                    point.Polygon = poly;
+                                                    point.Unit = unit;
                                                     point.MetadataCN = Consts.EmptyGuid;
                                                     point.GroupCN = Consts.EmptyGuid;
                                                     point.Index = index++;
@@ -213,39 +214,39 @@ namespace TwoTrails.DAL
             return _Points.ContainsKey(cn) ? (linked ? GetLinkedPoints(new TtPoint[] { _Points[cn] }).First() : _Points[cn]) : null;
         }
 
-        public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
+        public IEnumerable<TtPoint> GetPoints(String unitCN = null, bool linked = false)
         {
             Parse();
             
-            IEnumerable<TtPoint> points = (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index);
+            IEnumerable<TtPoint> points = (unitCN == null ? _Points.Values : _Points.Values.Where(p => p.UnitCN == unitCN)).OrderBy(p => p.Index);
 
             return linked ? GetLinkedPoints(points) : points.DeepCopy(); ;
         }
 
-        public int GetPointCount(params string[] polyCNs)
+        public int GetPointCount(params string[] unitCNs)
         {
-            if (polyCNs == null || !polyCNs.Any())
+            if (unitCNs == null || !unitCNs.Any())
             {
                 return _Points.Count;
             }
             else
             {
-                return _Points.Values.Count(p => polyCNs.Contains(p.PolygonCN));
+                return _Points.Values.Count(p => unitCNs.Contains(p.UnitCN));
             }
         }
 
-        public bool HasPolygons()
+        public bool HasUnits()
         {
             Parse();
 
-            return _Polygons.Count > 0;
+            return _Units.Count > 0;
         }
 
-        public IEnumerable<TtPolygon> GetPolygons()
+        public IEnumerable<TtUnit> GetUnits()
         {
             Parse();
 
-            return _Polygons.Values.DeepCopy();
+            return _Units.Values.DeepCopy();
         }
 
         public IEnumerable<TtMetadata> GetMetadata()
@@ -280,9 +281,9 @@ namespace TwoTrails.DAL
             return new TtProjectInfo(_ProjectInfo);
         }
 
-        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public IEnumerable<UnitGraphicOptions> GetUnitGraphicOptions()
         {
-            return new List<PolygonGraphicOptions>();
+            return new List<UnitGraphicOptions>();
         }
 
         public IEnumerable<TtImage> GetPictures(String pointCN)
@@ -320,16 +321,16 @@ namespace TwoTrails.DAL
 
             public int TargetZone { get; }
 
-            public int StartPolygonNumber { get; }
+            public int StartUnitNumber { get; }
 
             public ParseOptions(string filePath, int targetZone, bool useElevation = false,
-                UomElevation uomElevation = UomElevation.Feet, int startPolyNumber = 0)
+                UomElevation uomElevation = UomElevation.Feet, int startUnitNumber = 0)
             {
                 FilePath = filePath;
                 TargetZone = targetZone;
                 UseElevation = useElevation;
                 UomElevation = uomElevation;
-                StartPolygonNumber = startPolyNumber;
+                StartUnitNumber = startUnitNumber;
             }
         }
     }

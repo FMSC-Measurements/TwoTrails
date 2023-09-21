@@ -130,7 +130,7 @@ namespace TwoTrails.ViewModels
                                 Export.TtNmea(_Project.HistoryManager, Path.Combine(path, "TTNmea.csv"));
 
                             if (ExportPolygons)
-                                Export.Polygons(_Project.HistoryManager, Path.Combine(path, "Polygons.csv"));
+                                Export.Units(_Project.HistoryManager, Path.Combine(path, "Polygons.csv"));
 
                             if (ExportMetadata)
                                 Export.Metadata(_Project.HistoryManager, Path.Combine(path, "Metadata.csv"));

@@ -20,8 +20,8 @@ namespace TwoTrails.ViewModels
 
         public ICommand CommitCommand { get; }
 
-        public List<TtPolygon> Polygons { get; }
-        public TtPolygon TargetPolygon { get { return Get<TtPolygon>(); } set { Set(value, () => PolygonChanged(value)); } }
+        public List<TtUnit> Polygons { get; }
+        public TtUnit TargetPolygon { get { return Get<TtUnit>(); } set { Set(value, () => PolygonChanged(value)); } }
         public int InsertIndex { get { return Get<int>(); } set { Set(value); } }
         public List<TtPoint> AfterPoints { get { return Get<List<TtPoint>>(); } set { Set(value); } }
 
@@ -38,7 +38,7 @@ namespace TwoTrails.ViewModels
             _Manager = manager;
 
             AfterPoints = new List<TtPoint>();
-            Polygons = manager.GetPolygons();
+            Polygons = manager.GetUnits();
 
             Retraces = new ObservableCollection<Retrace>
             {
@@ -49,7 +49,7 @@ namespace TwoTrails.ViewModels
         }
 
 
-        private void PolygonChanged(TtPolygon polygon)
+        private void PolygonChanged(TtUnit polygon)
         {
             if (polygon != null)
                 AfterPoints = _Manager.GetPoints(polygon.CN);
@@ -86,7 +86,7 @@ namespace TwoTrails.ViewModels
                 else
                 {
                     bool overrideAccs = false;
-                    if (MovePoints && Retraces.Any(r => r.Points.Any(p => p.Polygon.Accuracy != TargetPolygon.Accuracy)))
+                    if (MovePoints && Retraces.Any(r => r.Points.Any(p => p.Unit.Accuracy != TargetPolygon.Accuracy)))
                     {
                         var mbr = MessageBox.Show($"The Target Polygon '{TargetPolygon.Name}' has an accuracy that is different than some" +
                             "of the polygons that the points are in. Would you like to apply a manual accuracy to the points to keep their " +
@@ -161,7 +161,7 @@ namespace TwoTrails.ViewModels
                                 _Manager.StartMultiCommand();
                                 mcStarted = true;
 
-                                _Manager.EditPointsMultiValues(gpsPoints, PointProperties.MAN_ACC_GPS, gpsPoints.Select(p => (double?)p.Polygon.Accuracy));
+                                _Manager.EditPointsMultiValues(gpsPoints, PointProperties.MAN_ACC_GPS, gpsPoints.Select(p => (double?)p.Unit.Accuracy));
                             }
                         }
 
@@ -193,7 +193,7 @@ namespace TwoTrails.ViewModels
 
         private ITtManager _Manager;
 
-        public List<TtPolygon> Polygons { get; }
+        public List<TtUnit> Polygons { get; }
         
         public List<TtPoint> Points { get { return Get<List<TtPoint>>(); } set { Set(value); } }
 
@@ -206,18 +206,18 @@ namespace TwoTrails.ViewModels
         public bool IsValid { get { return PointFrom != null && PointTo != null || SinglePoint ; } }
 
         
-        public TtPolygon SelectedPolygon { get { return Get<TtPolygon>(); } set { Set(value, () => PolygonChanged(value)); } }
+        public TtUnit SelectedPolygon { get { return Get<TtUnit>(); } set { Set(value, () => PolygonChanged(value)); } }
         
 
         public Retrace(RetraceModel model, ITtManager manager)
         {
             _Manager = manager;
             PointFrom = PointTo = null;
-            Polygons = manager.GetPolygons();
+            Polygons = manager.GetUnits();
             DirInc = true;
         }
 
-        private void PolygonChanged(TtPolygon polygon)
+        private void PolygonChanged(TtUnit polygon)
         {
             Points = polygon == null ? new List<TtPoint>() : _Manager.GetPoints(polygon.CN);
         }

@@ -8,42 +8,43 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.ViewModels
 {
     public class DataStyleModel
     {
-        private readonly ReadOnlyObservableCollection<TtPolygon> _Polygons;
+        private readonly ReadOnlyObservableCollection<TtUnit> _Polygons;
         private Dictionary<String, Style> _PolygonStyles, _PolygonStylesAlt;
         public bool Disposed { get; private set; }
 
-        public DataStyleModel(ReadOnlyObservableCollection<TtPolygon> polygons)
+        public DataStyleModel(ReadOnlyObservableCollection<TtUnit> units)
         {
-            _Polygons = polygons;
+            _Polygons = units;
             _PolygonStyles = new Dictionary<string, Style>();
             _PolygonStylesAlt = new Dictionary<string, Style>();
 
-            foreach (TtPolygon poly in polygons)
+            foreach (TtUnit poly in units)
                 CreatePolygonStyle(poly);
 
             if (!_PolygonStyles.ContainsKey(Consts.EmptyGuid))
-                CreatePolygonStyle(new TtPolygon() { CN = Consts.EmptyGuid });
+                CreatePolygonStyle(new PolygonUnit() { CN = Consts.EmptyGuid });
 
-            ((INotifyCollectionChanged)polygons).CollectionChanged += DataStyleModel_CollectionChanged;
+            ((INotifyCollectionChanged)units).CollectionChanged += DataStyleModel_CollectionChanged;
         }
 
         private void DataStyleModel_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (TtPolygon poly in e.NewItems)
+                foreach (TtUnit poly in e.NewItems)
                 {
                     CreatePolygonStyle(poly);
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (TtPolygon poly in e.OldItems)
+                foreach (TtUnit poly in e.OldItems)
                 {
                     _PolygonStyles.Remove(poly.CN);
                     _PolygonStylesAlt.Remove(poly.CN);
@@ -51,7 +52,7 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void CreatePolygonStyle(TtPolygon polygon)
+        private void CreatePolygonStyle(TtUnit polygon)
         {
             Style style = new Style(typeof(DataGridRow));
             
@@ -92,7 +93,7 @@ namespace TwoTrails.ViewModels
 
         public Style GetRowStyle(TtPoint point)
         {
-            string id = point == null || !_PolygonStyles.ContainsKey(point.CN) ? Consts.EmptyGuid : point.PolygonCN;
+            string id = point == null || !_PolygonStyles.ContainsKey(point.CN) ? Consts.EmptyGuid : point.UnitCN;
 
             return (point == null ? 0 : point.Index) % 2 == 0 ? _PolygonStyles[id] : _PolygonStylesAlt[id];
         }

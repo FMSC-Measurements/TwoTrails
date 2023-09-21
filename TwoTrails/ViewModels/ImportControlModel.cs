@@ -4,38 +4,39 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using TwoTrails.Core;
+using TwoTrails.Core.Units;
 using TwoTrails.DAL;
 
 namespace TwoTrails.ViewModels
 {
     public class ImportControlModel : BaseModel
     {
-        public event EventHandler PolygonSelectionChanged;
+        public event EventHandler UnitSelectionChanged;
 
         private bool ignoreSelectionChange;
-        private bool _AllPolysChecked = true;
-        public bool AllPolysChecked
+        private bool _AllUnitsChecked = true;
+        public bool AllUnitsChecked
         {
-            get => _AllPolysChecked;
+            get => _AllUnitsChecked;
             set
             {
                 ignoreSelectionChange = true;
-                Polygons.ForEach(sp =>
+                Units.ForEach(sp =>
                 {
                     sp.IsSelected = value;
                 });
                 ignoreSelectionChange = false;
-                PolygonSelectionChanged?.Invoke(this, new EventArgs());
+                UnitSelectionChanged?.Invoke(this, new EventArgs());
 
-                _AllPolysChecked = value;
+                _AllUnitsChecked = value;
             }
         }
 
-        public int TotalPoints => Polygons.Sum(p => p.IsSelected ? p.PointCount : 0);
+        public int TotalPoints => Units.Sum(p => p.IsSelected ? p.PointCount : 0);
 
-        public List<SelectablePolygon> Polygons { get; }
+        public List<SelectableUnit> Units { get; }
 
-        public IEnumerable<string> SelectedPolygons { get { return Polygons.Where(p => p.IsSelected).Select(p => p.Polygon.CN); } }
+        public IEnumerable<string> SelectedUnits { get { return Units.Where(p => p.IsSelected).Select(p => p.Unit.CN); } }
 
         public IReadOnlyTtDataLayer DAL { get; }
 
@@ -49,27 +50,27 @@ namespace TwoTrails.ViewModels
         public bool IncludeNmea { get; set; } = true;
 
 
-        public bool HasSelectedPolygons { get { return Polygons.Where(p => p.IsSelected).Any(); } }
+        public bool HasSelectedUnits { get { return Units.Where(p => p.IsSelected).Any(); } }
 
         public ImportControlModel(IReadOnlyTtDataLayer dal, bool sortByName, bool hasMetadata = false, bool hasGroups = false, bool hasNmea = false)
         {
             DAL = dal;
-            Polygons = dal.GetPolygons()
+            Units = dal.GetUnits()
                 .OrderBy(p => sortByName ? (object)p.Name : p.TimeCreated)
-                .Select(p => new SelectablePolygon(p, dal.GetPointCount(p.CN)))
+                .Select(p => new SelectableUnit(p, dal.GetPointCount(p.CN)))
                 .ToList();
 
-            foreach (SelectablePolygon sp in Polygons)
+            foreach (SelectableUnit sp in Units)
             {
                 sp.PropertyChanged += (Object sender, PropertyChangedEventArgs e) =>
                 {
-                    if (e.PropertyName == nameof(SelectablePolygon.IsSelected))
+                    if (e.PropertyName == nameof(SelectableUnit.IsSelected))
                     {
                         if (!ignoreSelectionChange)
                         {
-                            _AllPolysChecked = Polygons.All(p => p.IsSelected);
-                            OnPropertyChanged(nameof(AllPolysChecked), nameof(HasSelectedPolygons));
-                            PolygonSelectionChanged?.Invoke(this, new EventArgs());
+                            _AllUnitsChecked = Units.All(p => p.IsSelected);
+                            OnPropertyChanged(nameof(AllUnitsChecked), nameof(HasSelectedUnits));
+                            UnitSelectionChanged?.Invoke(this, new EventArgs());
                         }
 
                         OnPropertyChanged(nameof(TotalPoints));
@@ -82,15 +83,15 @@ namespace TwoTrails.ViewModels
             HasNmea = hasNmea;
         }
 
-        public class SelectablePolygon : BaseModel
+        public class SelectableUnit : BaseModel
         {
-            public TtPolygon Polygon { get; }
+            public TtUnit Unit { get; }
             public bool IsSelected { get { return Get<bool>(); } set { Set(value); } }
             public int PointCount { get; private set; }
 
-            public SelectablePolygon(TtPolygon polygon, int pointCount)
+            public SelectableUnit(TtUnit unit, int pointCount)
             {
-                Polygon = polygon;
+                Unit = unit;
                 IsSelected = true;
                 PointCount = pointCount;
             }

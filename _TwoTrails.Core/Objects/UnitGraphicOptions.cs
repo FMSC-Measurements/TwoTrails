@@ -2,7 +2,7 @@
 
 namespace TwoTrails.Core
 {
-    public delegate void OnColorChangeEvent(PolygonGraphicOptions pgo, GraphicCode code, int color);
+    public delegate void OnColorChangeEvent(UnitGraphicOptions pgo, GraphicCode code, int color);
 
     public enum GraphicCode
     {
@@ -15,7 +15,7 @@ namespace TwoTrails.Core
         WAYPTS_COLOR
     }
 
-    public class PolygonGraphicOptions : TtObject
+    public class UnitGraphicOptions : TtObject
     {
         public event OnColorChangeEvent ColorChanged;
 
@@ -117,7 +117,7 @@ namespace TwoTrails.Core
         }
 
 
-        public PolygonGraphicOptions(String cn, PolygonGraphicOptions options) : base(cn)
+        public UnitGraphicOptions(String cn, UnitGraphicOptions options) : base(cn)
         {
             this._AdjBndColor = options.AdjBndColor;
             this._UnAdjBndColor = options.UnAdjBndColor;
@@ -130,7 +130,7 @@ namespace TwoTrails.Core
             this._UnAdjWidth = options.UnAdjWidth;
         }
 
-        public PolygonGraphicOptions(String cn, int adjBndColor, int unAdjBndColor, int adjNavColor, int unAdjNavColor,
+        public UnitGraphicOptions(String cn, int adjBndColor, int unAdjBndColor, int adjNavColor, int unAdjNavColor,
                                      int adjPtsColor, int unAdjPtsColor, int wayPtsColor,
                                      float adjWidth, float unAdjWidth) : base(cn)
         {
@@ -210,7 +210,7 @@ namespace TwoTrails.Core
 
         public override bool Equals(object obj)
         {
-            return (obj is PolygonGraphicOptions opts) &&
+            return (obj is UnitGraphicOptions opts) &&
                 AdjBndColor == opts.AdjBndColor &&
                 UnAdjBndColor == opts.UnAdjBndColor &&
                 AdjNavColor == opts.AdjNavColor &&
@@ -222,7 +222,7 @@ namespace TwoTrails.Core
                 UnAdjWidth == opts.UnAdjWidth;
         }
 
-        public static bool operator ==(PolygonGraphicOptions a, PolygonGraphicOptions b)
+        public static bool operator ==(UnitGraphicOptions a, UnitGraphicOptions b)
         {
             if (a is null ^ b is null)
                 return false;
@@ -241,7 +241,7 @@ namespace TwoTrails.Core
                 a.UnAdjWidth == b.UnAdjWidth;
         }
 
-        public static bool operator !=(PolygonGraphicOptions a, PolygonGraphicOptions b)
+        public static bool operator !=(UnitGraphicOptions a, UnitGraphicOptions b)
         {
             if (a is null ^ b is null || a is null)
                 return true;

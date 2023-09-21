@@ -5,17 +5,6 @@ namespace TwoTrails.Core
 {
     public static class TtObjectExtensions
     {
-        public static TtPolygon DeepCopy(this TtPolygon polygon)
-        {
-            return new TtPolygon(polygon);
-        }
-
-        public static IEnumerable<TtPolygon> DeepCopy(this IEnumerable<TtPolygon> polygons)
-        {
-            return polygons.Select(p => p.DeepCopy());
-        }
-
-
         public static TtGroup DeepCopy(this TtGroup group)
         {
             return new TtGroup(group);

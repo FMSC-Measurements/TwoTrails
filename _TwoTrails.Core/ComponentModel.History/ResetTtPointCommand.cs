@@ -17,7 +17,7 @@ namespace TwoTrails.Core.ComponentModel.History
             {
                 _ResetPoint.LocationChangedEventEnabled = false;
                 _ResetPoint.Index = point.Index;
-                _ResetPoint.Polygon = point.Polygon;
+                _ResetPoint.Unit = point.Unit;
                 _ResetPoint.LocationChangedEventEnabled = true;
             }
         }

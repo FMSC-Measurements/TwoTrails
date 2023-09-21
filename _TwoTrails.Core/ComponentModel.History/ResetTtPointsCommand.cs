@@ -24,7 +24,7 @@ namespace TwoTrails.Core.ComponentModel.History
                     TtPoint resetPoint = _ResetPoints.First(p => p.CN == point.CN);
                     resetPoint.LocationChangedEventEnabled = false;
                     resetPoint.Index = point.Index;
-                    resetPoint.Polygon = point.Polygon;
+                    resetPoint.Unit = point.Unit;
                     resetPoint.LocationChangedEventEnabled = true;
                 }
             }

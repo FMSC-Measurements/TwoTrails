@@ -345,7 +345,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                                 //check for v2 errors and ask for fix
                                 DalError errors = dalv2.GetErrors();
                                 if (errors > 0 && (errors.HasFlag(DalError.OrphanedQuondams) || errors.HasFlag(DalError.MissingGroup) ||
-                                    errors.HasFlag(DalError.MissingPolygon) || errors.HasFlag(DalError.MissingMetadata)))
+                                    errors.HasFlag(DalError.MissingUnit) || errors.HasFlag(DalError.MissingMetadata)))
                                 {
 
                                 }
@@ -469,14 +469,14 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                             case Consts.FILE_EXTENSION_V2: idal = new TtV2SqliteDataAccessLayer(file); break;
                             case Consts.GPX_EXT:
                                 idal = new TtGpxDataAccessLayer(
-                                    new TtGpxDataAccessLayer.ParseOptions(file, proj.HistoryManager.DefaultMetadata.Zone, startPolyNumber: proj.HistoryManager.PolygonCount + 1)); break;
+                                    new TtGpxDataAccessLayer.ParseOptions(file, proj.HistoryManager.DefaultMetadata.Zone, startUnitNumber: proj.HistoryManager.UnitCount + 1)); break;
                             case Consts.KML_EXT:
                             case Consts.KMZ_EXT:
                                 idal = new TtKmlDataAccessLayer(
-                                    new TtKmlDataAccessLayer.ParseOptions(file, proj.HistoryManager.DefaultMetadata.Zone, startPolyNumber: proj.HistoryManager.PolygonCount + 1)); break;
+                                    new TtKmlDataAccessLayer.ParseOptions(file, proj.HistoryManager.DefaultMetadata.Zone, startUnitNumber: proj.HistoryManager.UnitCount + 1)); break;
                             case Consts.SHAPE_EXT:
                                 idal = new TtShapeFileDataAccessLayer(
-                                    new TtShapeFileDataAccessLayer.ParseOptions(file, proj.HistoryManager.DefaultMetadata.Zone, proj.HistoryManager.PolygonCount + 1)); break;
+                                    new TtShapeFileDataAccessLayer.ParseOptions(file, proj.HistoryManager.DefaultMetadata.Zone, proj.HistoryManager.UnitCount + 1)); break;
                             case Consts.TEXT_EXT:
                             case Consts.CSV_EXT: ImportDialog.ShowDialog(proj, this, this.MainWindow, file, true); break;
                             default: idal = null; break;

@@ -192,7 +192,7 @@ namespace TwoTrails.ViewModels
 
         private bool ignoreSelectionChange = false, settingFields = false;
 
-        private TtPolygon _TargetPolygon { get; set; }
+        private TtUnit _TargetPolygon { get; set; }
 
         public String ConvertTypeHeader
         {
@@ -461,8 +461,8 @@ namespace TwoTrails.ViewModels
         private bool _SamePolygon = true;
         public bool SamePolygon => _SamePolygon;
 
-        private TtPolygon _Polygon;
-        public TtPolygon Polygon
+        private TtUnit _Polygon;
+        public TtUnit Polygon
         {
             get { return _Polygon; }
             set
@@ -479,7 +479,7 @@ namespace TwoTrails.ViewModels
         public int? Index
         {
             get { return _Index; }
-            set { EditValue(ref _Index, value, PointProperties.INDEX); Manager.BaseManager.RebuildPolygon(SelectedPoint.Polygon); }
+            set { EditValue(ref _Index, value, PointProperties.INDEX); Manager.BaseManager.RebuildUnit(SelectedPoint.Unit); }
         }
 
 
@@ -795,8 +795,8 @@ namespace TwoTrails.ViewModels
         Dictionary<OpType, bool> _CheckedOpTypes = new Dictionary<OpType, bool>();
 
 
-        private ObservableCollection<CheckedListItem<TtPolygon>> _Polygons = new ObservableCollection<CheckedListItem<TtPolygon>>();
-        public ReadOnlyObservableCollection<CheckedListItem<TtPolygon>> Polygons { get; private set; }
+        private ObservableCollection<CheckedListItem<TtUnit>> _Polygons = new ObservableCollection<CheckedListItem<TtUnit>>();
+        public ReadOnlyObservableCollection<CheckedListItem<TtUnit>> Polygons { get; private set; }
 
         private ObservableCollection<CheckedListItem<TtMetadata>> _Metadatas = new ObservableCollection<CheckedListItem<TtMetadata>>();
         public ReadOnlyObservableCollection<CheckedListItem<TtMetadata>> Metadatas { get; private set; }
@@ -822,14 +822,14 @@ namespace TwoTrails.ViewModels
             Manager.HistoryChanged += Manager_HistoryChanged;
 
             #region Setup Filters
-            CheckedListItem<TtPolygon> tmpPoly;
-            tmpPoly = new CheckedListItem<TtPolygon>(new TtPolygon() { Name = "All", CN = Consts.FullGuid, TimeCreated = new DateTime(0) }, true);
+            CheckedListItem<TtUnit> tmpPoly;
+            tmpPoly = new CheckedListItem<TtUnit>(new TtUnit() { Name = "All", CN = Consts.FullGuid, TimeCreated = new DateTime(0) }, true);
             _Polygons.Add(tmpPoly);
             tmpPoly.ItemCheckedChanged += Polygon_ItemCheckedChanged;
 
-            foreach (TtPolygon polygon in Manager.Polygons)
+            foreach (TtUnit polygon in Manager.Polygons)
             {
-                tmpPoly = new CheckedListItem<TtPolygon>(polygon, true);
+                tmpPoly = new CheckedListItem<TtUnit>(polygon, true);
                 _Polygons.Add(tmpPoly);
                 tmpPoly.ItemCheckedChanged += Polygon_ItemCheckedChanged;
                 _CheckedPolygons.Add(polygon.CN, true);
@@ -884,7 +884,7 @@ namespace TwoTrails.ViewModels
             }
             #endregion
 
-            Polygons = new ReadOnlyObservableCollection<CheckedListItem<TtPolygon>>(_Polygons);
+            Polygons = new ReadOnlyObservableCollection<CheckedListItem<TtUnit>>(_Polygons);
             Groups = new ReadOnlyObservableCollection<CheckedListItem<TtGroup>>(_Groups);
             Metadatas = new ReadOnlyObservableCollection<CheckedListItem<TtMetadata>>(_Metadatas);
             OpTypes = new ReadOnlyCollection<CheckedListItem<string>>(_OpTypes);
@@ -1248,7 +1248,7 @@ namespace TwoTrails.ViewModels
             Manager.HistoryChanged -= Manager_HistoryChanged;
 
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged -= Polygons_CollectionChanged;
-            foreach (CheckedListItem<TtPolygon> poly in _Polygons)
+            foreach (CheckedListItem<TtUnit> poly in _Polygons)
             {
                 poly.ItemCheckedChanged -= Polygon_ItemCheckedChanged;
             }
@@ -1340,11 +1340,11 @@ namespace TwoTrails.ViewModels
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                CheckedListItem<TtPolygon> tmp;
+                CheckedListItem<TtUnit> tmp;
 
-                foreach (TtPolygon polygon in e.NewItems)
+                foreach (TtUnit polygon in e.NewItems)
                 {
-                    tmp = new CheckedListItem<TtPolygon>(polygon, true);
+                    tmp = new CheckedListItem<TtUnit>(polygon, true);
                     _Polygons.Add(tmp);
                     _CheckedPolygons.Add(polygon.CN, true);
                     tmp.ItemCheckedChanged += Polygon_ItemCheckedChanged;
@@ -1352,7 +1352,7 @@ namespace TwoTrails.ViewModels
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (TtPolygon polygon in e.OldItems)
+                foreach (TtUnit polygon in e.OldItems)
                 {
                     for (int i = 0; i < _Polygons.Count; i++)
                     {
@@ -1617,7 +1617,7 @@ namespace TwoTrails.ViewModels
                 {
                     TtPoint fpt = SelectedPoints[0] as TtPoint;
 
-                    TtPolygon poly = fpt.Polygon;
+                    TtUnit poly = fpt.Unit;
                     TtMetadata meta = fpt.Metadata;
                     TtGroup group = fpt.Group;
 
@@ -1652,7 +1652,7 @@ namespace TwoTrails.ViewModels
 
                     foreach (TtPoint point in SelectedPoints)
                     {
-                        if (poly != null && poly.CN != point.PolygonCN)
+                        if (poly != null && poly.CN != point.UnitCN)
                             poly = null;
 
                         if (meta != null && meta.CN != point.MetadataCN)
@@ -1925,7 +1925,7 @@ namespace TwoTrails.ViewModels
                     _Comment = SelectedPoint.Comment;
                     _SameComment = true;
 
-                    _Polygon = SelectedPoint.Polygon;
+                    _Polygon = SelectedPoint.Unit;
                     _SamePolygon = true;
 
                     _Metadata = SelectedPoint.Metadata;
@@ -2136,7 +2136,7 @@ namespace TwoTrails.ViewModels
         {
             TtPoint point = obj as TtPoint;
             
-            if (!_CheckedPolygons[point.PolygonCN])
+            if (!_CheckedPolygons[point.UnitCN])
                 return false;
 
             if (!_CheckedMetadata[point.MetadataCN])
@@ -2243,7 +2243,7 @@ namespace TwoTrails.ViewModels
             Func<TtPoint, bool> hasConflict = (currPoint) =>
             {
                 TtPoint origPoint = Manager.BaseManager.GetOriginalPoint(currPoint.CN);
-                return currPoint.Index != origPoint.Index || currPoint.PolygonCN != origPoint.PolygonCN;
+                return currPoint.Index != origPoint.Index || currPoint.UnitCN != origPoint.UnitCN;
             };
 
             if (HasSelection)
@@ -2346,7 +2346,7 @@ namespace TwoTrails.ViewModels
                                 isManAcc = true;
                                 break;
                             case nameof(TtPoint.Index):
-                            case nameof(TtPoint.Polygon):
+                            case nameof(TtPoint.Unit):
                             case nameof(TtPoint.OpType):
                             case nameof(TtPoint.TimeCreated):
                             case nameof(TtPoint.AdjX):
@@ -2697,7 +2697,7 @@ namespace TwoTrails.ViewModels
             if (MultipleSelections && SamePolygon)
             {
                 List<TtPoint> points = GetSortedSelectedPoints();
-                Manager.MovePointsToPolygon(points.OrderBy(p => p.TimeCreated), points[0].Polygon, points[0].Index);
+                Manager.MovePointsToPolygon(points.OrderBy(p => p.TimeCreated), points[0].Unit, points[0].Index);
             }
         }
         #endregion
@@ -2980,7 +2980,7 @@ namespace TwoTrails.ViewModels
                 CreateDataGridTextColumn(nameof(TtPoint.Index)),
                 CreateDataGridTextColumn(nameof(TtPoint.PID)),
                 CreateDataGridTextColumn(nameof(TtPoint.OpType)),
-                CreateDataGridTextColumn(nameof(TtPoint.Polygon), "Polygon.Name", 100),
+                CreateDataGridTextColumn(nameof(TtPoint.Unit), "Polygon.Name", 100),
                 CreateDataGridTextColumn("OnBound", nameof(TtPoint.OnBoundary)),
                 CreateDataGridTextColumn(nameof(TtPoint.AdjX), stringFormat: defaultNumberFormat),
                 CreateDataGridTextColumn(nameof(TtPoint.AdjY), stringFormat: defaultNumberFormat),
@@ -3052,7 +3052,7 @@ namespace TwoTrails.ViewModels
                 case nameof(TtPoint.Index):
                 case nameof(TtPoint.PID):
                 case nameof(TtPoint.OpType):
-                case nameof(TtPoint.Polygon):
+                case nameof(TtPoint.Unit):
                 case "OnBound":
                 case nameof(TtPoint.AdjX):
                 case nameof(TtPoint.AdjY):

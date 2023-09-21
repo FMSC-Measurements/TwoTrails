@@ -13,6 +13,7 @@ using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Mapping
 {
@@ -42,22 +43,22 @@ namespace TwoTrails.Mapping
             _Map = map;
             _Manager = manager;
 
-            foreach (TtPolygon poly in _Manager.Polygons)
+            foreach (TtUnit poly in _Manager.Units)
             {
                 CreateMapPolygon(poly);
             }
             
             ((INotifyCollectionChanged)_Manager.Points).CollectionChanged += Points_CollectionChanged;
-            ((INotifyCollectionChanged)_Manager.Polygons).CollectionChanged += Polygons_CollectionChanged;
+            ((INotifyCollectionChanged)_Manager.Units).CollectionChanged += Polygons_CollectionChanged;
 
             foreach (TtPoint point in _Manager.Points)
             {
-                point.PolygonChanged += Point_PolygonChanged;
+                point.UnitChanged += Point_PolygonChanged;
             }
 
             ZoomToPolygonCommand = new RelayCommand(x =>
             {
-                if (x is TtPolygon poly)
+                if (x is TtUnit poly)
                 {
                     ZoomToPolygon(poly);
                 }
@@ -65,13 +66,13 @@ namespace TwoTrails.Mapping
         }
 
 
-        private void CreateMapPolygon(TtPolygon polygon)
+        private void CreateMapPolygon(TtUnit unit)
         {
-            ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Manager.Points.Where(p => p.PolygonCN == polygon.CN));
-            _PointsByPolys.Add(polygon.CN, ocPoints);
+            ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Manager.Points.Where(p => p.UnitCN == unit.CN));
+            _PointsByPolys.Add(unit.CN, ocPoints);
 
-            TtMapPolygonManager mpm = new TtMapPolygonManager(_Map, polygon, ocPoints, _Manager.GetPolygonGraphicOption(polygon.CN));
-            if (polygon.Name.IndexOf("_plt", StringComparison.InvariantCultureIgnoreCase) > 0 || 
+            TtMapPolygonManager mpm = new TtMapPolygonManager(_Map, unit, ocPoints, _Manager.GetUnitGraphicOption(unit.CN));
+            if (unit.Name.IndexOf("_plt", StringComparison.InvariantCultureIgnoreCase) > 0 || 
                 (ocPoints.Count > 0 && ocPoints.All(p => p.OpType == OpType.WayPoint)))
             {
                 mpm.AdjBndVisible = false;
@@ -85,7 +86,7 @@ namespace TwoTrails.Mapping
                 mpm.AdjMiscPointsVisible = true;
             }
 
-            _PolygonManagersMap.Add(polygon.CN, mpm);
+            _PolygonManagersMap.Add(unit.CN, mpm);
             PolygonManagers.Add(mpm);
 
             mpm.PropertyChanged += TtMapPolygonManager_PropertyChanged;
@@ -177,7 +178,7 @@ namespace TwoTrails.Mapping
         //    _LastPoint = point;
         //}
 
-        private void RemoveMapPolygon(TtPolygon polygon)
+        private void RemoveMapPolygon(TtUnit polygon)
         {
             TtMapPolygonManager mpm = _PolygonManagersMap[polygon.CN];
 
@@ -196,13 +197,13 @@ namespace TwoTrails.Mapping
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (TtPolygon poly in e.NewItems)
+                    foreach (TtUnit poly in e.NewItems)
                     {
                         CreateMapPolygon(poly);
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (TtPolygon poly in e.OldItems)
+                    foreach (TtUnit poly in e.OldItems)
                     {
                         RemoveMapPolygon(poly);
                     }
@@ -225,15 +226,15 @@ namespace TwoTrails.Mapping
                 case NotifyCollectionChangedAction.Add:
                     foreach (TtPoint p in e.NewItems)
                     {
-                        p.PolygonChanged += Point_PolygonChanged;
-                        _PointsByPolys[p.PolygonCN].Insert(p.Index, p);
+                        p.UnitChanged += Point_PolygonChanged;
+                        _PointsByPolys[p.UnitCN].Insert(p.Index, p);
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (TtPoint p in e.OldItems)
                     {
-                        p.PolygonChanged -= Point_PolygonChanged;
-                        _PointsByPolys[p.PolygonCN].Remove(p);
+                        p.UnitChanged -= Point_PolygonChanged;
+                        _PointsByPolys[p.UnitCN].Remove(p);
                     }
                     break;
                 case NotifyCollectionChangedAction.Replace:
@@ -247,7 +248,7 @@ namespace TwoTrails.Mapping
             }
         }
 
-        private void Point_PolygonChanged(TtPoint point, TtPolygon newPolygon, TtPolygon oldPolygon)
+        private void Point_PolygonChanged(TtPoint point, TtUnit newPolygon, TtUnit oldPolygon)
         {
             _PointsByPolys[oldPolygon.CN].Remove(point);
 
@@ -258,11 +259,11 @@ namespace TwoTrails.Mapping
                 points.Add(point);
         }
 
-        public void ZoomToPolygon(TtPolygon polygon)
+        public void ZoomToPolygon(TtUnit polygon)
         {
             if (_PolygonManagersMap.ContainsKey(polygon.CN))
             {
-                _PolygonManagersMap[polygon.CN].ZoomToPolygon();
+                _PolygonManagersMap[polygon.CN].ZoomToUnit();
             }
         }
     }

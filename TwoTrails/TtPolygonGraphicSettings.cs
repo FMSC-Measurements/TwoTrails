@@ -2,7 +2,7 @@
 
 namespace TwoTrails
 {
-    public class TtPolygonGraphicSettings : IPolygonGraphicSettings
+    public class TtPolygonGraphicSettings : IUnitGraphicSettings
     {
         //All Colors are in the ARGB format
 
@@ -28,9 +28,9 @@ namespace TwoTrails
         public float UnAdjWidth { get; } = 5;
 
 
-        public PolygonGraphicOptions CreatePolygonGraphicOptions(string polyCN)
+        public UnitGraphicOptions CreateUnitGraphicOptions(string unitCN)
         {
-            return new PolygonGraphicOptions(polyCN, AdjBndColor, UnAdjBndColor,
+            return new UnitGraphicOptions(unitCN, AdjBndColor, UnAdjBndColor,
                 AdjNavColor, UnAdjNavColor, AdjPtsColor, UnAdjPtsColor, WayPtsColor, AdjWidth, UnAdjWidth);
         }
     }

@@ -1,41 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
     public class MovePointsCommand : ITtPointsCommand
     {
         private TtManager pointsManager;
-        private TtPolygon TargetPolygon;
+        private TtUnit TargetUnit;
         private int InsertIndex;
 
         private Dictionary<String, int> NewIndexes = new Dictionary<String, int>();
         private Dictionary<String, int> OldIndexes = new Dictionary<String, int>();
-        private Dictionary<String, TtPolygon> OldPolygons = new Dictionary<String, TtPolygon>();
+        private Dictionary<String, TtUnit> OldUnits = new Dictionary<String, TtUnit>();
         private Dictionary<String, TtPoint> EditedPoints = new Dictionary<String, TtPoint>();
-        private Dictionary<String, TtPolygon> PolygonsToBuild = new Dictionary<String, TtPolygon>();
+        private Dictionary<String, TtUnit> UnitsToBuild = new Dictionary<String, TtUnit>();
 
-        public MovePointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex) : base(points)
+        public MovePointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtUnit targetUnit, int insertIndex) : base(points)
         {
             this.pointsManager = pointsManager;
 
-            TargetPolygon = targetPoly;
+            TargetUnit = targetUnit;
             InsertIndex = insertIndex;
 
-            PolygonsToBuild.Add(TargetPolygon.CN, TargetPolygon);
+            UnitsToBuild.Add(TargetUnit.CN, TargetUnit);
 
             foreach (TtPoint point in Points)
             {
                 EditedPoints.Add(point.CN, point);
                 OldIndexes.Add(point.CN, point.Index);
-                OldPolygons.Add(point.CN, point.Polygon);
+                OldUnits.Add(point.CN, point.Unit);
 
-                if (!PolygonsToBuild.ContainsKey(point.PolygonCN))
-                    PolygonsToBuild.Add(point.PolygonCN, point.Polygon);
+                if (!UnitsToBuild.ContainsKey(point.UnitCN))
+                    UnitsToBuild.Add(point.UnitCN, point.Unit);
             }
 
-            foreach (TtPolygon poly in PolygonsToBuild.Values)
+            foreach (TtUnit poly in UnitsToBuild.Values)
             {
                 foreach (TtPoint point in pointsManager.GetPoints(poly.CN))
                 {
@@ -50,7 +51,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public override void Redo()
         {
-            pointsManager.MovePointsToPolygon(Points, TargetPolygon, InsertIndex);
+            pointsManager.MovePointsToUnit(Points, TargetUnit, InsertIndex);
 
             NewIndexes.Clear();
             foreach (TtPoint point in EditedPoints.Values)
@@ -68,11 +69,11 @@ namespace TwoTrails.Core.ComponentModel.History
 
             foreach (TtPoint point in Points)
             {
-                point.Polygon = OldPolygons[point.CN];
+                point.Unit = OldUnits[point.CN];
             }
 
-            foreach (TtPolygon poly in PolygonsToBuild.Values)
-                pointsManager.RebuildPolygon(poly);
+            foreach (TtUnit poly in UnitsToBuild.Values)
+                pointsManager.RebuildUnit(poly);
         }
     }
 }

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core.Points
 {
     public delegate void PointChangedEvent(TtPoint point);
-    public delegate void PointPolygonChangedEvent(TtPoint point, TtPolygon newPolygon, TtPolygon oldPolygon);
+    public delegate void PointUnitChangedEvent(TtPoint point, TtUnit newUnit, TtUnit oldUnit);
     public delegate void PointMetadataChangedEvent(TtPoint point, TtMetadata newMetadata, TtMetadata oldMetadata);
 
     public abstract class TtPoint : TtObject, IAccuracy, IEquatable<TtPoint>, IComparable<TtPoint>, IComparer<TtPoint>
@@ -15,7 +16,7 @@ namespace TwoTrails.Core.Points
         public event PointChangedEvent LocationChanged;
         public event PointChangedEvent OnBoundaryChanged;
         public event PointChangedEvent OnAccuracyChanged;
-        public event PointPolygonChangedEvent PolygonChanged;
+        public event PointUnitChangedEvent UnitChanged;
         public event PointMetadataChangedEvent MetadataChanged;
 
 
@@ -41,39 +42,39 @@ namespace TwoTrails.Core.Points
             set { SetField(ref _TimeCreated, value); }
         }
         
-        private String _PolyCN;
-        public String PolygonCN
+        private String _UnitCN;
+        public String UnitCN
         {
-            get { return _PolyCN; }
-            set { SetField(ref _PolyCN, value); }
+            get { return _UnitCN; }
+            set { SetField(ref _UnitCN, value); }
         }
 
-        protected TtPolygon _Polygon;
-        public TtPolygon Polygon
+        protected TtUnit _Unit;
+        public TtUnit Unit
         {
-            get { return _Polygon; }
+            get { return _Unit; }
             set
             {
-                TtPolygon oldPoly = _Polygon;
-                if (SetField(ref _Polygon, value))
+                TtUnit oldUnit = _Unit;
+                if (SetField(ref _Unit, value))
                 {
-                    if (oldPoly != null)
+                    if (oldUnit != null)
                     {
-                        oldPoly.PreviewPolygonAccuracyChanged -= Polygon_PreviewPolygonAccuracyChanged;
+                        oldUnit.PreviewUnitAccuracyChanged -= Unit_PreviewUnitAccuracyChanged;
                     }
 
                     if (value != null)
                     {
-                        PolygonCN = value.CN;
+                        UnitCN = value.CN;
 
-                        _Polygon.PreviewPolygonAccuracyChanged += Polygon_PreviewPolygonAccuracyChanged;
+                        _Unit.PreviewUnitAccuracyChanged += Unit_PreviewUnitAccuracyChanged;
 
-                        SetAccuracy(_Polygon.Accuracy);
+                        SetAccuracy(_Unit.Accuracy);
                     }
 
-                    if (oldPoly != null && value != null)
+                    if (oldUnit != null && value != null)
                     {
-                        PolygonChanged?.Invoke(this, value, oldPoly);
+                        UnitChanged?.Invoke(this, value, oldUnit);
                     }
                 }
             }
@@ -257,9 +258,9 @@ namespace TwoTrails.Core.Points
             _PID = point._PID;
             _TimeCreated = point._TimeCreated;
 
-            _PolyCN = point._PolyCN;
-            if (point._Polygon != null)
-                _Polygon = point._Polygon;
+            _UnitCN = point._UnitCN;
+            if (point._Unit != null)
+                _Unit = point._Unit;
 
             _GroupCN = point._GroupCN;
             if (point._Group != null)
@@ -285,7 +286,7 @@ namespace TwoTrails.Core.Points
             _ExtendedData = new DataDictionary(point._ExtendedData);
         }
 
-        public TtPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,
+        public TtPoint(string cn, int index, int pid, DateTime time, string unitcn, string metacn, string groupcn,
             string comment, bool onbnd, double adjx, double adjy, double adjz, double unadjx, double unadjy, double unadjz,
             double acc, string qlinks, DataDictionary extended = null) : base(cn)
         {
@@ -295,7 +296,7 @@ namespace TwoTrails.Core.Points
             _PID = pid;
             _TimeCreated = time;
 
-            _PolyCN = polycn;
+            _UnitCN = unitcn;
             _GroupCN = groupcn;
             _MetadataCN = metacn;
 
@@ -332,9 +333,9 @@ namespace TwoTrails.Core.Points
                 OnPropertyChanged(nameof(HasQuondamLinks));
         }
         
-        protected virtual void Polygon_PreviewPolygonAccuracyChanged(TtPolygon polygon)
+        protected virtual void Unit_PreviewUnitAccuracyChanged(TtUnit unit)
         {
-            SetAccuracy(polygon.Accuracy);
+            SetAccuracy(unit.Accuracy);
         }
 
 
@@ -440,13 +441,13 @@ namespace TwoTrails.Core.Points
             if (other == null)
                 return 1;
 
-            int val = @this.Polygon.TimeCreated.CompareTo(other.Polygon.TimeCreated);
+            int val = @this.Unit.TimeCreated.CompareTo(other.Unit.TimeCreated);
 
             if (val != 0)
                 return val;
             else
             {
-                val = @this.PolygonCN.CompareTo(other.PolygonCN);
+                val = @this.UnitCN.CompareTo(other.UnitCN);
 
                 if (val != 0)
                     return val;
@@ -490,7 +491,7 @@ namespace TwoTrails.Core.Points
                 _Accuracy == point._Accuracy &&
                 _PID == point._PID &&
                 _Comment == point._Comment &&
-                _PolyCN == point._PolyCN &&
+                _UnitCN == point._UnitCN &&
                 _GroupCN == point._GroupCN &&
                 _MetadataCN == point._MetadataCN &&
                 _ExtendedData.Equals(point._ExtendedData);

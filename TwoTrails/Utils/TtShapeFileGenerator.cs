@@ -11,23 +11,24 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Utils
 {
     public static class TtShapeFileGenerator
     {
-        public static void WritePolygon(ITtManager manager, TtPolygon polygon, string folderPath)
+        public static void WritePolygon(ITtManager manager, TtUnit unit, string folderPath)
         {
-            string polyDir = Path.Combine(folderPath, polygon.Name.Sanitize());
+            string polyDir = Path.Combine(folderPath, unit.Name.Sanitize());
 
             if (!Directory.Exists(polyDir))
             {
                 Directory.CreateDirectory(polyDir);
             }
 
-            string baseFileName = Path.Combine(polyDir, polygon.Name.Sanitize());
+            string baseFileName = Path.Combine(polyDir, unit.Name.Sanitize());
 
-            IEnumerable<TtPoint> points = manager.GetPoints(polygon.CN).Where(p => p.OpType != OpType.WayPoint);
+            IEnumerable<TtPoint> points = manager.GetPoints(unit.CN).Where(p => p.OpType != OpType.WayPoint);
 
             if (points.Any())
             {
@@ -68,12 +69,12 @@ namespace TwoTrails.Utils
                 List<IFeature> features = new List<IFeature>();
                 AttributesTable attTable = new AttributesTable();
 
-                attTable.Add("Poly_Name", polygon.Name);
-                attTable.Add("Desc", polygon.Description);
+                attTable.Add("Poly_Name", unit.Name);
+                attTable.Add("Desc", unit.Description);
                 attTable.Add("Poly", "Navigation Adjusted");
-                attTable.Add("CN", polygon.CN);
-                attTable.Add("Perim_M", polygon.Perimeter);
-                attTable.Add("PerimL_M", polygon.PerimeterLine);
+                attTable.Add("CN", unit.CN);
+                attTable.Add("Perim_M", unit.Perimeter);
+                attTable.Add("PerimL_M", unit.PerimeterLine);
 
                 Feature feat = new Feature();
                 DbaseFileHeader dbh;
@@ -204,7 +205,7 @@ namespace TwoTrails.Utils
                     geoFac = new GeometryFactory();
                     sdw = new ShapefileDataWriter(fileName, geoFac);
                     features = new List<IFeature>();
-                    attTable.Add("Area_MtSq", polygon.Area);
+                    attTable.Add("Area_MtSq", unit.Area);
                     attTable["Poly"] = "Boundary Adjusted";
                     feat = new Feature();
 
@@ -284,10 +285,10 @@ namespace TwoTrails.Utils
                 #endregion
             }
 
-            WayPoint[] wayPoints = manager.GetPoints(polygon.CN).Where(p => p.IsWayPointAtBase()).Cast<WayPoint>().ToArray();
+            WayPoint[] wayPoints = manager.GetPoints(unit.CN).Where(p => p.IsWayPointAtBase()).Cast<WayPoint>().ToArray();
 
             if (wayPoints.Any())
-                WriteWayPointsFile(baseFileName, polygon, wayPoints);
+                WriteWayPointsFile(baseFileName, unit, wayPoints);
         }
 
 
@@ -318,7 +319,7 @@ namespace TwoTrails.Utils
                 attPointTable.Add("PID", p.PID);
                 attPointTable.Add("Op", p.OpType.ToString());
                 attPointTable.Add("Index", p.Index);
-                attPointTable.Add("PolyName", p.Polygon.Name);
+                attPointTable.Add("PolyName", p.Unit.Name);
                 attPointTable.Add("DateTime", p.TimeCreated.ToString("MM/dd/yyyy hh:mm:ss tt"));
                 
                 attPointTable.Add("OnBnd", p.OnBoundary);
@@ -385,7 +386,7 @@ namespace TwoTrails.Utils
             return features;
         }
 
-        private static void WriteWayPointsFile(string filePath, TtPolygon polygon, IEnumerable<WayPoint> points)
+        private static void WriteWayPointsFile(string filePath, TtUnit polygon, IEnumerable<WayPoint> points)
         {
             string fileName = filePath + "_WayPoints";
             int zone = points.First().Metadata.Zone;

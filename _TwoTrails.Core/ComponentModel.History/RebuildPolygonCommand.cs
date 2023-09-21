@@ -2,28 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    class RebuildPolygonCommand : ITtCommand
+    class RebuildUnitCommand : ITtCommand
     {
         private TtManager pointsManager;
 
         private List<TtPoint> _Points;
 
-        private TtPolygon Polygon;
+        private TtUnit Unit;
         private bool Reindex;
 
 
-        public RebuildPolygonCommand(TtPolygon polygon, bool reindex, TtManager pointsManager)
+        public RebuildUnitCommand(TtUnit unit, bool reindex, TtManager pointsManager)
         {
             this.pointsManager = pointsManager;
-            this.Polygon = polygon;
+            this.Unit = unit;
             this.Reindex = reindex;
 
-            _Points = pointsManager.GetPoints(polygon.CN).Select(pt => pt.DeepCopy()).ToList();
+            _Points = pointsManager.GetPoints(unit.CN).Select(pt => pt.DeepCopy()).ToList();
 
-            List<string> polyCNs = new List<string>() { polygon.CN };
+            List<string> polyCNs = new List<string>() { unit.CN };
             List<TtPoint> addPoints = new List<TtPoint>();
 
             void addFromLinks(TtPoint point)
@@ -34,11 +35,11 @@ namespace TwoTrails.Core.ComponentModel.History
                     {
                         QuondamPoint qp = pointsManager.GetPoint(cn) as QuondamPoint;
 
-                        if (qp.PolygonCN != point.PolygonCN && !polyCNs.Contains(qp.PolygonCN))
+                        if (qp.UnitCN != point.UnitCN && !polyCNs.Contains(qp.UnitCN))
                         {
-                            List<TtPoint> spoints = pointsManager.GetPoints(qp.PolygonCN).DeepCopy().ToList();
+                            List<TtPoint> spoints = pointsManager.GetPoints(qp.UnitCN).DeepCopy().ToList();
                             addPoints.AddRange(spoints);
-                            polyCNs.Add(qp.PolygonCN);
+                            polyCNs.Add(qp.UnitCN);
 
                             foreach(TtPoint spoint in spoints)
                             {
@@ -63,7 +64,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public void Redo()
         {
-            pointsManager.RebuildPolygon(Polygon, Reindex);
+            pointsManager.RebuildPolygon(Unit, Reindex);
         }
 
         public void Undo()

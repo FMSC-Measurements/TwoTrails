@@ -1,15 +1,16 @@
 ﻿using System.IO;
 using System.Text;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core
 {
     public static class HaidLogic
     {
-        public static PolygonSummary GenerateSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false)
+        public static UnitSummary GenerateSummary(ITtManager manager, TtUnit unit, bool showPoints = false)
         {
             lock (manager)
             {
-                return new PolygonSummary(manager, polygon, showPoints);
+                return new UnitSummary(manager, unit, showPoints);
             }
         }
 

@@ -25,7 +25,7 @@ namespace TwoTrails.ViewModels
         public int INDEX_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.INDEX, value)); } }
         public int PID_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.PID, value)); } }
         public int TIME_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.TIME, value)); } }
-        public int POLY_NAME_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.POLY_NAME, value)); } }
+        public int POLY_NAME_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.UNIT_NAME, value)); } }
         public int GROUP_NAME_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.GROUP_NAME, value)); } }
         public int COMMENT_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.COMMENT, value)); } }
         public int META_CN_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.META_CN, value)); } }
@@ -46,7 +46,7 @@ namespace TwoTrails.ViewModels
         public int SLOPE_ANG_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.SLOPE_ANG, value)); } }
         public int SLOPE_ANG_TYPE_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.SLOPE_ANG_TYPE, value)); } }
         public int PARENT_CN_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.PARENT_CN, value)); } }
-        public int POLY_CN_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.POLY_CN, value)); } }
+        public int POLY_CN_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.UNIT_CN, value)); } }
         public int GROUP_CN_FIELD { get { return Get<int>(); } set { Set(value, () => EditPointMap(PointTextFieldType.GROUP_CN, value)); } }
         #endregion
 
@@ -225,7 +225,7 @@ namespace TwoTrails.ViewModels
                     case PointTextFieldType.TIME:
                         TIME_FIELD = findex;
                         break;
-                    case PointTextFieldType.POLY_NAME:
+                    case PointTextFieldType.UNIT_NAME:
                         POLY_NAME_FIELD = findex;
                         break;
                     case PointTextFieldType.GROUP_NAME:
@@ -288,7 +288,7 @@ namespace TwoTrails.ViewModels
                     case PointTextFieldType.PARENT_CN:
                         PARENT_CN_FIELD = findex;
                         break;
-                    case PointTextFieldType.POLY_CN:
+                    case PointTextFieldType.UNIT_CN:
                         POLY_CN_FIELD = findex;
                         break;
                     case PointTextFieldType.GROUP_CN:

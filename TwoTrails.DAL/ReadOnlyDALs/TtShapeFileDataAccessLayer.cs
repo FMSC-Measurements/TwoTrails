@@ -13,6 +13,7 @@ using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.DAL
 {
@@ -25,14 +26,14 @@ namespace TwoTrails.DAL
         public bool HandlesAllPointTypes => false;
 
         private readonly Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
-        private readonly Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
+        private readonly Dictionary<string, TtUnit> _Units = new Dictionary<string, TtUnit>();
 
         private readonly TtProjectInfo _ProjectInfo;
 
         private readonly ParseOptions _Options;
         private bool parsed;
         private int milliSecondsInc = 0;
-        private int polyInc = 0;
+        private int unitInc = 0;
 
         private static readonly object locker = new object();
 
@@ -40,7 +41,7 @@ namespace TwoTrails.DAL
         public TtShapeFileDataAccessLayer(ParseOptions options)
         {
             _Options = options;
-            polyInc = options.StartPolygonNumber;
+            unitInc = options.StartUnitNumber;
 
             string filePath = options.ShapeFiles.First().ShapeFilePath;
             _ProjectInfo = new TtProjectInfo(Path.GetFileName(filePath),
@@ -65,7 +66,7 @@ namespace TwoTrails.DAL
                     if (reparse)
                     {
                         _Points.Clear();
-                        _Polygons.Clear();
+                        _Units.Clear();
                         milliSecondsInc = 0;
                     }
 
@@ -77,7 +78,7 @@ namespace TwoTrails.DAL
                     string[] keys;
                     Geometry geometry;
                     DbaseFieldDescriptor fldDescriptor;
-                    TtPolygon poly;
+                    TtUnit unit;
 
                     GpsPoint gps;
                     int index = 0;
@@ -124,9 +125,9 @@ namespace TwoTrails.DAL
                         //if all features are points
                         if (areAllPoints)
                         {
-                            poly = new TtPolygon()
+                            unit = new PolygonUnit()
                             {
-                                PointStartIndex = 1000 * ++polyInc + Consts.DEFAULT_POINT_INCREMENT,
+                                PointStartIndex = 1000 * ++unitInc + Consts.DEFAULT_POINT_INCREMENT,
                                 Name = file.Name,
                                 TimeCreated = DateTime.Now.AddMilliseconds(milliSecondsInc++)
                             };
@@ -144,8 +145,8 @@ namespace TwoTrails.DAL
                                         Index = index++,
                                         MetadataCN = Consts.EmptyGuid,
                                         GroupCN = Consts.EmptyGuid,
-                                        PID = PointNamer.NamePoint(poly, lastPoint),
-                                        Polygon = poly
+                                        PID = PointNamer.NamePoint(unit, lastPoint),
+                                        Unit = unit
                                     };
 
                                     if (file.Zone != _Options.TargetZone && _Options.ConvertInvalidZones)
@@ -180,7 +181,7 @@ namespace TwoTrails.DAL
                                 }
                             }
 
-                            _Polygons.Add(poly.CN, poly);
+                            _Units.Add(unit.CN, unit);
                         }
                         else //else get points out of each features
                         {
@@ -190,9 +191,9 @@ namespace TwoTrails.DAL
                             {
                                 lastPoint = null;
 
-                                poly = new TtPolygon()
+                                unit = new PolygonUnit()
                                 {
-                                    PointStartIndex = 1000 * ++polyInc + Consts.DEFAULT_POINT_INCREMENT,
+                                    PointStartIndex = 1000 * ++unitInc + Consts.DEFAULT_POINT_INCREMENT,
                                     Name = features.Count < 2 ? file.Name :
                                         $"{fidInc++}-{file.Name}",
                                     TimeCreated = DateTime.Now.AddMilliseconds(milliSecondsInc++)
@@ -217,14 +218,14 @@ namespace TwoTrails.DAL
                                             case "description":
                                             case "comment":
                                             case "poly":
-                                                if (String.IsNullOrEmpty(poly.Description))
-                                                    poly.Description = objv;
+                                            case "unit":
+                                                if (String.IsNullOrEmpty(unit.Description))
+                                                    unit.Description = objv;
                                                 else
-                                                    poly.Description = $"{poly.Description} | {objv}";
+                                                    unit.Description = $"{unit.Description} | {objv}";
                                                 break;
                                             case "name":
-                                            case "unit":
-                                                poly.Name = objv;
+                                                unit.Name = objv;
                                                 break;
                                         }
                                     }
@@ -239,11 +240,11 @@ namespace TwoTrails.DAL
                                     gps = new GpsPoint()
                                     {
                                         OnBoundary = true,
-                                        PID = PointNamer.NamePoint(poly, lastPoint),
+                                        PID = PointNamer.NamePoint(unit, lastPoint),
                                         Index = index++,
                                         MetadataCN = Consts.EmptyGuid,
                                         GroupCN = Consts.EmptyGuid,
-                                        Polygon = poly
+                                        Unit = unit
                                     };
 
                                     if (file.Zone != _Options.TargetZone && _Options.ConvertInvalidZones)
@@ -277,7 +278,7 @@ namespace TwoTrails.DAL
                                     lastPoint = gps;
                                 }
 
-                                _Polygons.Add(poly.CN, poly);
+                                _Units.Add(unit.CN, unit);
                             }
                         }
 
@@ -322,7 +323,7 @@ namespace TwoTrails.DAL
         {
             Parse();
 
-            IEnumerable<TtPoint> points = (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN)).OrderBy(p => p.Index);
+            IEnumerable<TtPoint> points = (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.UnitCN == polyCN)).OrderBy(p => p.Index);
 
             return linked ? GetLinkedPoints(points).DeepCopy() : points.DeepCopy();
         }
@@ -335,23 +336,23 @@ namespace TwoTrails.DAL
             }
             else
             {
-                return _Points.Values.Count(p => polyCNs.Contains(p.PolygonCN));
+                return _Points.Values.Count(p => polyCNs.Contains(p.UnitCN));
             }
         }
 
 
-        public bool HasPolygons()
+        public bool HasUnits()
         {
             Parse();
 
-            return _Polygons.Count > 0;
+            return _Units.Count > 0;
         }
 
-        public IEnumerable<TtPolygon> GetPolygons()
+        public IEnumerable<TtUnit> GetUnits()
         {
             Parse();
 
-            return _Polygons.Values.DeepCopy();
+            return _Units.Values.DeepCopy();
         }
 
         public IEnumerable<TtMetadata> GetMetadata()
@@ -386,9 +387,9 @@ namespace TwoTrails.DAL
             return new TtProjectInfo(_ProjectInfo);
         }
 
-        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public IEnumerable<UnitGraphicOptions> GetUnitGraphicOptions()
         {
-            return new List<PolygonGraphicOptions>();
+            return new List<UnitGraphicOptions>();
         }
 
         public IEnumerable<TtImage> GetPictures(String pointCN)
@@ -518,16 +519,16 @@ namespace TwoTrails.DAL
 
             public int TargetZone { get; }
 
-            public int StartPolygonNumber { get; }
+            public int StartUnitNumber { get; }
 
 
-            public ParseOptions(string shapeFile, int targetZone, int startPolyNumber = 0) : this(new string[] { shapeFile }, targetZone, startPolyNumber) { }
+            public ParseOptions(string shapeFile, int targetZone, int startUnitNumber = 0) : this(new string[] { shapeFile }, targetZone, startUnitNumber) { }
 
-            public ParseOptions(IEnumerable<string> shapeFiles, int targetZone, int startPolyNumber = 0)
+            public ParseOptions(IEnumerable<string> shapeFiles, int targetZone, int startUnitNumber = 0)
             {
                 TargetZone = targetZone;
                 ShapeFiles = shapeFiles.Select(f => new ShapeFilePackage(f, targetZone));
-                StartPolygonNumber = startPolyNumber;
+                StartUnitNumber = startUnitNumber;
             }
         }
 

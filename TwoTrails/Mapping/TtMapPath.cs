@@ -2,12 +2,13 @@
 using System.Windows;
 using System.Windows.Media;
 using TwoTrails.Core;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Mapping
 {
     public class TtMapPath : TtMapShape
     {
-        private TtPolygon _Polygon { get; }
+        private TtUnit _Unit { get; }
 
         private MapPolyline _MapPolyline { get; } = new MapPolyline();
 
@@ -23,9 +24,9 @@ namespace TwoTrails.Mapping
 
         public bool IsEditing { get; set; }
 
-        public TtMapPath(Map map, TtPolygon polygon, LocationCollection locations, PolygonGraphicOptions pgo, bool adjusted, bool visible) : base(map, polygon, locations, pgo)
+        public TtMapPath(Map map, TtUnit unit, LocationCollection locations, UnitGraphicOptions pgo, bool adjusted, bool visible) : base(map, unit, locations, pgo)
         {
-            _Polygon = polygon;
+            _Unit = unit;
             _Visible = visible;
 
             _MapPolyline.Stroke = new SolidColorBrush(MediaTools.GetColor(pgo.AdjBndColor));
@@ -41,7 +42,7 @@ namespace TwoTrails.Mapping
             map.Children.Add(_MapPolyline);
         }
 
-        private void OnColorChanged(PolygonGraphicOptions pgo, GraphicCode code, int color)
+        private void OnColorChanged(UnitGraphicOptions pgo, GraphicCode code, int color)
         {
             switch (code)
             {

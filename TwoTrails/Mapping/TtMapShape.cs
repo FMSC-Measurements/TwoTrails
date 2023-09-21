@@ -1,12 +1,13 @@
 ﻿using FMSC.Core.ComponentModel;
 using Microsoft.Maps.MapControl.WPF;
 using TwoTrails.Core;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Mapping
 {
     public abstract class TtMapShape : TtMapBaseModel
     {
-        public TtMapShape(Map map, TtPolygon polygon, LocationCollection locations, PolygonGraphicOptions pgo) : base(map, pgo)
+        public TtMapShape(Map map, TtUnit unit, LocationCollection locations, UnitGraphicOptions pgo) : base(map, pgo)
         {
         }
 

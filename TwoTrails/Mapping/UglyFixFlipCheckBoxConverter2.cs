@@ -28,7 +28,7 @@ namespace TwoTrails.Mapping
 
             if (fcb != null)
             {
-                if (fcb.DataContext is PolygonVisibilityControl pvc)
+                if (fcb.DataContext is UnitVisibilityControl pvc)
                 {
                     string key = $"{propertyName}";
 

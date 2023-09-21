@@ -8,6 +8,7 @@ using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.DAL
 {
@@ -16,7 +17,7 @@ namespace TwoTrails.DAL
         private KmlDocument _KDoc;
 
         private Dictionary<string, TtPoint> _Points = new Dictionary<string, TtPoint>();
-        private Dictionary<string, TtPolygon> _Polygons = new Dictionary<string, TtPolygon>();
+        private Dictionary<string, TtUnit> _Units = new Dictionary<string, TtUnit>();
 
         private TtProjectInfo _ProjectInfo;
         private ParseOptions _Options;
@@ -30,14 +31,14 @@ namespace TwoTrails.DAL
         private bool parsed = false;
         private object locker = new object();
 
-        private int polyCount = 0;
+        private int unitCount = 0;
 
         
         public TtKmlDataAccessLayer(ParseOptions options)
         {
             _Options = options;
             _KDoc = KmlDocument.Load(_Options.FilePath);
-            polyCount = options.StartPolygonNumber;
+            unitCount = options.StartUnitNumber;
         }
 
 
@@ -50,10 +51,10 @@ namespace TwoTrails.DAL
                     if (reparse)
                     {
                         _Points.Clear();
-                        _Polygons.Clear();
+                        _Units.Clear();
                     }
 
-                    polyCount = 0;
+                    unitCount = 0;
 
                     ParseFolder(_KDoc, null);
 
@@ -82,7 +83,7 @@ namespace TwoTrails.DAL
             if (_Options.ParseOnlyPointFolders && folder.SubFolders.Count == 0 &&
                 folder.Placemarks.Count(x => x.Polygons.Count == 0 && x.Points.Count > 0) > 2)
             {
-                ParseSinglePolyFromPoints(folder, parentFolderName);
+                ParseSingleUnitFromPoints(folder, parentFolderName);
             }
             else
             {
@@ -94,15 +95,19 @@ namespace TwoTrails.DAL
             }
         }
 
-        private void ParseSinglePolyFromPoints(KmlFolder folder, string parentFolderName)
+        private void ParseSingleUnitFromPoints(KmlFolder folder, string parentFolderName)
         {
-            polyCount++;
+            unitCount++;
 
-            TtPolygon poly = new TtPolygon();
-            poly.Name = String.IsNullOrWhiteSpace(folder.Name) ? $"Poly {polyCount} ({parentFolderName})" : folder.Name;
-            poly.PointStartIndex = polyCount * 1000 + Consts.DEFAULT_POINT_INCREMENT;
-            poly.Description = folder.Desctription;
-            poly.TimeCreated = DateTime.Now.AddMilliseconds(polyCount);
+            TtUnit unit = new PolygonUnit()
+            {
+
+                Name = String.IsNullOrWhiteSpace(folder.Name) ? $"Unit {unitCount} ({parentFolderName})" : folder.Name,
+                PointStartIndex = unitCount * 1000 + Consts.DEFAULT_POINT_INCREMENT,
+                Description = folder.Desctription,
+                TimeCreated = DateTime.Now.AddMilliseconds(unitCount)
+            };
+            
 
             GpsPoint point, prev = null;
 
@@ -110,7 +115,7 @@ namespace TwoTrails.DAL
             {
                 if (pm.Points.Any())
                 {
-                    point = CreatePoint(pm.Points[0].Coordinates, poly, prev, pm.Desctription);
+                    point = CreatePoint(pm.Points[0].Coordinates, unit, prev, pm.Desctription);
 
                     _Points.Add(point.CN, point);
 
@@ -118,7 +123,7 @@ namespace TwoTrails.DAL
                 }
             }
 
-            _Polygons.Add(poly.CN, poly);
+            _Units.Add(unit.CN, unit);
         }
 
         private void ParsePolygonsInPlacemarks(Placemark placemark, string parentFolderName)
@@ -127,31 +132,33 @@ namespace TwoTrails.DAL
             {
                 if (kpoly.HasOuterBoundary || kpoly.HasInnerBoundary)
                 {
-                    polyCount++;
+                    unitCount++;
 
-                    TtPolygon poly = new TtPolygon();
-                    poly.Name = String.IsNullOrWhiteSpace(kpoly.Name) ? $"Poly {polyCount} ({parentFolderName})" : kpoly.Name;
-                    poly.PointStartIndex = polyCount * 1000 + Consts.DEFAULT_POINT_INCREMENT;
-                    poly.Description = placemark.Desctription;
-                    poly.TimeCreated = DateTime.Now.AddMilliseconds(polyCount);
+                    TtUnit unit = new PolygonUnit()
+                    {
+                        Name = String.IsNullOrWhiteSpace(kpoly.Name) ? $"Unit {unitCount} ({parentFolderName})" : kpoly.Name,
+                        PointStartIndex = unitCount * 1000 + Consts.DEFAULT_POINT_INCREMENT,
+                        Description = placemark.Desctription,
+                        TimeCreated = DateTime.Now.AddMilliseconds(unitCount)
+                    };
 
                     GpsPoint point, prev = null;
 
                     foreach (Coordinates coord in kpoly.HasOuterBoundary ? kpoly.OuterBoundary : kpoly.InnerBoundary)
                     {
-                        point = CreatePoint(coord, poly, prev);
+                        point = CreatePoint(coord, unit, prev);
 
                         _Points.Add(point.CN, point);
 
                         prev = point;
                     }
 
-                    _Polygons.Add(poly.CN, poly);
+                    _Units.Add(unit.CN, unit);
                 } 
             }
         }
 
-        private GpsPoint CreatePoint(Coordinates coords, TtPolygon poly, TtPoint prevPoint = null, string desc = null)
+        private GpsPoint CreatePoint(Coordinates coords, TtUnit unit, TtPoint prevPoint = null, string desc = null)
         {
             GpsPoint point = new GpsPoint();
 
@@ -159,12 +166,12 @@ namespace TwoTrails.DAL
 
             point.SetUnAdjLocation(utmCoords.X, utmCoords.Y, coords.Altitude != null ? (double)coords.Altitude : 0);
 
-            point.PID = PointNamer.NamePoint(poly, prevPoint);
+            point.PID = PointNamer.NamePoint(unit, prevPoint);
             point.OnBoundary = true;
             point.Comment = desc;
             point.GroupCN = Consts.EmptyGuid;
             point.MetadataCN = Consts.EmptyGuid;
-            point.Polygon = poly;
+            point.Unit = unit;
 
             return point;
         }
@@ -197,39 +204,39 @@ namespace TwoTrails.DAL
             return _Points.ContainsKey(cn) ? (linked ? GetLinkedPoints(new TtPoint[] { _Points[cn] }).First() : _Points[cn]) : null;
         }
 
-        public IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false)
+        public IEnumerable<TtPoint> GetPoints(String unitCN = null, bool linked = false)
         {
             Parse();
 
-            return (polyCN == null ? _Points.Values : _Points.Values.Where(p => p.PolygonCN == polyCN))
+            return (unitCN == null ? _Points.Values : _Points.Values.Where(p => p.UnitCN == unitCN))
                 .OrderBy(p => p.Index).DeepCopy();
         }
 
-        public int GetPointCount(params string[] polyCNs)
+        public int GetPointCount(params string[] unitCNs)
         {
-            if (polyCNs == null || !polyCNs.Any())
+            if (unitCNs == null || !unitCNs.Any())
             {
                 return _Points.Count;
             }
             else
             {
-                return _Points.Values.Count(p => polyCNs.Contains(p.PolygonCN));
+                return _Points.Values.Count(p => unitCNs.Contains(p.UnitCN));
             }
         }
 
 
-        public bool HasPolygons()
+        public bool HasUnits()
         {
             Parse();
 
-            return _Polygons.Count > 0;
+            return _Units.Count > 0;
         }
 
-        public IEnumerable<TtPolygon> GetPolygons()
+        public IEnumerable<TtUnit> GetUnits()
         {
             Parse();
 
-            return _Polygons.Values.DeepCopy();
+            return _Units.Values.DeepCopy();
         }
 
         public IEnumerable<TtMetadata> GetMetadata()
@@ -264,9 +271,9 @@ namespace TwoTrails.DAL
             return new TtProjectInfo(_ProjectInfo);
         }
 
-        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public IEnumerable<UnitGraphicOptions> GetUnitGraphicOptions()
         {
-            return new List<PolygonGraphicOptions>();
+            return new List<UnitGraphicOptions>();
         }
 
         public IEnumerable<TtImage> GetPictures(String pointCN)
@@ -306,18 +313,18 @@ namespace TwoTrails.DAL
 
             public bool ParseOnlyPointFolders { get; }
 
-            public int StartPolygonNumber { get; }
+            public int StartUnitNumber { get; }
 
 
             public ParseOptions(string filePath, int targetZone, bool useElevation = false,
-                UomElevation uomElevation = UomElevation.Feet, bool parseOnlyPointFolders = false, int startPolyNumber = 0)
+                UomElevation uomElevation = UomElevation.Feet, bool parseOnlyPointFolders = false, int startUnitNumber = 0)
             {
                 FilePath = filePath;
                 TargetZone = targetZone;
                 UseElevation = useElevation;
                 UomElevation = uomElevation;
                 ParseOnlyPointFolders = parseOnlyPointFolders;
-                StartPolygonNumber = startPolyNumber;
+                StartUnitNumber = startUnitNumber;
             }
         }
     }

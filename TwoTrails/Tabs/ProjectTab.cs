@@ -38,9 +38,9 @@ namespace TwoTrails
                         return $"{ProjectEditor.PointEditor.SelectedPoints.Count}/{ProjectEditor.PointEditor.Points.Count}";
                     case 2:
                         {
-                            if (_ProjectEditorControl.lbPolys.SelectedItem is TtPolygon poly)
+                            if (_ProjectEditorControl.lbPolys.SelectedItem is TtUnit poly)
                             {
-                                return $"{Project.HistoryManager.Points.Where(p => p.PolygonCN == poly.CN).Count()} Points in {poly.Name}";
+                                return $"{Project.HistoryManager.Points.Where(p => p.UnitCN == poly.CN).Count()} Points in {poly.Name}";
                             }
 
                             return String.Empty;
@@ -117,7 +117,7 @@ namespace TwoTrails
             {
                 case ProjectTabSection.Project: return type == ProjectProperties.DataType;
                 case ProjectTabSection.Points: return PointProperties.DataType.IsAssignableFrom(type);
-                case ProjectTabSection.Polygons: return type == PolygonProperties.DataType;
+                case ProjectTabSection.Polygons: return type == UnitProperties.DataType;
                 case ProjectTabSection.Metadata: return type == MetadataProperties.DataType;
                 case ProjectTabSection.Groups: return type == GroupProperties.DataType;
                 case ProjectTabSection.Media: return type == MediaProperties.DataType;

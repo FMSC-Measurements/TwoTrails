@@ -19,7 +19,7 @@ namespace TwoTrails
 
         public IMetadataSettings MetadataSettings { get; set; }
         public IDeviceSettings DeviceSettings { get; set; }
-        public IPolygonGraphicSettings PolygonGraphicSettings { get; set; }
+        public IUnitGraphicSettings UnitGraphicSettings { get; set; }
 
         public String UserName => Environment.UserName;
 
@@ -132,11 +132,11 @@ namespace TwoTrails
         }
 
 
-        public TtSettings(IDeviceSettings deviceSettings, IMetadataSettings metadataSettings, IPolygonGraphicSettings polyGraphicSettings)
+        public TtSettings(IDeviceSettings deviceSettings, IMetadataSettings metadataSettings, IUnitGraphicSettings polyGraphicSettings)
         {
             DeviceSettings = deviceSettings;
             MetadataSettings = metadataSettings;
-            PolygonGraphicSettings = polyGraphicSettings;
+            UnitGraphicSettings = polyGraphicSettings;
 
             _UpgradeRequired = (bool)Properties.Settings.Default[UPGRADE_REQUIRED];
 

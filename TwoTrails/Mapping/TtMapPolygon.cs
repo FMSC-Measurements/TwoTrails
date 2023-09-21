@@ -2,12 +2,13 @@
 using System.Windows;
 using System.Windows.Media;
 using TwoTrails.Core;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Mapping
 {
     public class TtMapPolygon : TtMapShape
     {
-        private TtPolygon _Polygon { get; }
+        private PolygonUnit _Polygon { get; }
 
         private MapPolygon _MapPolygon { get; } = new MapPolygon();
 
@@ -23,7 +24,7 @@ namespace TwoTrails.Mapping
 
         public bool IsEditing { get; set; }
 
-        public TtMapPolygon(Map map, TtPolygon polygon, LocationCollection locations, PolygonGraphicOptions pgo, bool adjusted, bool visible) : base(map, polygon, locations, pgo)
+        public TtMapPolygon(Map map, PolygonUnit polygon, LocationCollection locations, UnitGraphicOptions pgo, bool adjusted, bool visible) : base(map, polygon, locations, pgo)
         {
             _Polygon = polygon;
             _Visible = visible;
@@ -41,7 +42,7 @@ namespace TwoTrails.Mapping
             map.Children.Add(_MapPolygon);
         }
 
-        private void OnColorChanged(PolygonGraphicOptions pgo, GraphicCode code, int color)
+        private void OnColorChanged(UnitGraphicOptions pgo, GraphicCode code, int color)
         {
             switch (code)
             {

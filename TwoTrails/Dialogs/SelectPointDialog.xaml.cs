@@ -25,18 +25,18 @@ namespace TwoTrails.Dialogs
             _HidePoints = hidePoints.Select(p => p.CN);
 
             InitializeComponent();
-            lbPolys.ItemsSource = manager.GetPolygons();
+            lbPolys.ItemsSource = manager.GetUnits();
 
             if (defaultSelection != null && !_HidePoints.Contains(defaultSelection.CN))
             {
-                lbPolys.SelectedItem = defaultSelection.Polygon;
+                lbPolys.SelectedItem = defaultSelection.Unit;
                 SelectedPoint = defaultSelection;
             }
         }
 
         private void Polygon_Selected(object sender, RoutedEventArgs e)
         {
-            TtPolygon poly = lbPolys.SelectedItem as TtPolygon;
+            TtUnit poly = lbPolys.SelectedItem as TtUnit;
 
             if (poly != null)
             {

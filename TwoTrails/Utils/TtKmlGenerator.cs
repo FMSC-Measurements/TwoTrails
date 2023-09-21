@@ -28,16 +28,16 @@ namespace TwoTrails.Utils
             Dictionary<Color, Tuple<Style, Style>> styles = new Dictionary<Color, Tuple<Style, Style>>();
             Dictionary<Color, StyleMap> styleMaps = new Dictionary<Color, StyleMap>();
             
-            List<PolygonGraphicOptions> pgos = new List<PolygonGraphicOptions>();
+            List<UnitGraphicOptions> pgos = new List<UnitGraphicOptions>();
 
             foreach (ITtManager manager in managers)
             {
                 Dictionary<string, TtMetadata> metadata = manager.GetMetadata().ToDictionary(m => m.CN, m => m);
-                pgos.AddRange(manager.GetPolygonGraphicOptions().Where(p => !pgos.Any(ip => ip.CN == p.CN)));
+                pgos.AddRange(manager.GetUnitGraphicOptions().Where(p => !pgos.Any(ip => ip.CN == p.CN)));
 
-                foreach (TtPolygon poly in manager.GetPolygons())
+                foreach (TtUnit poly in manager.GetUnits())
                 {
-                    PolygonGraphicOptions pgo = pgos.FirstOrDefault(p => p.CN == poly.CN);
+                    UnitGraphicOptions pgo = pgos.FirstOrDefault(p => p.CN == poly.CN);
 
                     PolygonStyle style = (pgo != null && polyStyles.Count > 0) ? polyStyles.FirstOrDefault(ps => ps.Key == pgo) : null;
 
@@ -46,7 +46,7 @@ namespace TwoTrails.Utils
                     {
                         if (pgo == null)
                         {
-                            pgo = new PolygonGraphicOptions(Consts.EmptyGuid,
+                            pgo = new UnitGraphicOptions(Consts.EmptyGuid,
                                 -769226,
                                 -15064194,
                                 -12627531,
@@ -477,7 +477,7 @@ namespace TwoTrails.Utils
 
         private class PolygonStyle
         {
-            public PolygonGraphicOptions Key { get; }
+            public UnitGraphicOptions Key { get; }
 
             public StyleMap AdjBndStyle { get; }
             public StyleMap UnAdjBndStyle { get; }
@@ -486,7 +486,7 @@ namespace TwoTrails.Utils
             public StyleMap UnAdjMiscStyle { get; }
             public StyleMap WayPtsStyle { get; }
 
-            public PolygonStyle(PolygonGraphicOptions baseStyle,
+            public PolygonStyle(UnitGraphicOptions baseStyle,
                 StyleMap adjBnd, StyleMap unadjBnd,
                 StyleMap adjNav, StyleMap unadjNav,
                 StyleMap unadjMisc, StyleMap waypts)

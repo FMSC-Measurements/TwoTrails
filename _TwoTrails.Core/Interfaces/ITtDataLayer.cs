@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.DAL
 {
@@ -21,15 +22,15 @@ namespace TwoTrails.DAL
         #endregion
 
 
-        #region Polygons
-        bool InsertPolygon(TtPolygon polygon);
-        int InsertPolygons(IEnumerable<TtPolygon> polygons);
+        #region Units
+        bool InsertUnit(TtUnit unit);
+        int InsertUnits(IEnumerable<TtUnit> unit);
 
-        bool UpdatePolygon(TtPolygon polygon);
-        int UpdatePolygons(IEnumerable<TtPolygon> polygons);
+        bool UpdateUnit(TtUnit unit);
+        int UpdateUnits(IEnumerable<TtUnit> units);
 
-        bool DeletePolygon(TtPolygon polygon);
-        int DeletePolygons(IEnumerable<TtPolygon> polygons);
+        bool DeleteUnit(TtUnit unit);
+        int DeleteUnits(IEnumerable<TtUnit> unit);
         #endregion
 
 
@@ -74,10 +75,10 @@ namespace TwoTrails.DAL
         #endregion
 
 
-        #region Polygon Attributes
-        bool InsertPolygonGraphicOption(PolygonGraphicOptions option);
+        #region Unit Attributes
+        bool InsertUnitGraphicOption(UnitGraphicOptions option);
 
-        bool DeletePolygonGraphicOption(PolygonGraphicOptions option);
+        bool DeleteUnitGraphicOption(UnitGraphicOptions option);
         #endregion
 
 
@@ -106,7 +107,7 @@ namespace TwoTrails.DAL
         CorruptDatabase = 1 << 0,
         PointIndexes    = 1 << 1,
         NullAdjLocs     = 1 << 2,
-        MissingPolygon  = 1 << 3,
+        MissingUnit     = 1 << 3,
         MissingMetadata = 1 << 4,
         MissingGroup    = 1 << 5,
         OrphanedQuondams= 1 << 6,

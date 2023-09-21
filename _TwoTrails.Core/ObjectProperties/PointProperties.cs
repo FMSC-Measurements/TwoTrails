@@ -49,7 +49,7 @@ namespace TwoTrails.Core
             INDEX = DataType.GetProperty(nameof(TtPoint.Index), bf);
             PID = DataType.GetProperty(nameof(TtPoint.PID), bf);
             TIME_CREATED = DataType.GetProperty(nameof(TtPoint.TimeCreated), bf);
-            POLY = DataType.GetProperty(nameof(TtPoint.Polygon), bf);
+            POLY = DataType.GetProperty(nameof(TtPoint.Unit), bf);
             GROUP = DataType.GetProperty(nameof(TtPoint.Group), bf);
             META = DataType.GetProperty(nameof(TtPoint.Metadata), bf);
             COMMENT = DataType.GetProperty(nameof(TtPoint.Comment), bf);
@@ -85,7 +85,7 @@ namespace TwoTrails.Core
                 case nameof(TtPoint.Index): return INDEX;
                 case nameof(TtPoint.PID): return PID;
                 case nameof(TtPoint.TimeCreated): return TIME_CREATED;
-                case nameof(TtPoint.Polygon): return POLY;
+                case nameof(TtPoint.Unit): return POLY;
                 case nameof(TtPoint.Group): return GROUP;
                 case nameof(TtPoint.Metadata): return META;
                 case nameof(TtPoint.Comment): return COMMENT;
@@ -123,7 +123,7 @@ namespace TwoTrails.Core
                 case nameof(TtPoint.Index):
                 case nameof(TtPoint.PID):
                 case nameof(TtPoint.TimeCreated):
-                case nameof(TtPoint.Polygon):
+                case nameof(TtPoint.Unit):
                 case nameof(TtPoint.Group):
                 case nameof(TtPoint.Metadata):
                 case nameof(TtPoint.Comment):

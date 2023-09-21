@@ -1,13 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core
 {
     public interface IObservableTtManager : ITtManager
     {
         ReadOnlyObservableCollection<TtPoint> Points { get; }
-        ReadOnlyObservableCollection<TtPolygon> Polygons { get; }
+        ReadOnlyObservableCollection<TtUnit> Units { get; }
         ReadOnlyObservableCollection<TtMetadata> Metadata { get; }
         ReadOnlyObservableCollection<TtGroup> Groups { get; }
         ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get; }

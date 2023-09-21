@@ -29,7 +29,7 @@ namespace TwoTrails.Utils
             foreach (ITtManager manager in managers)
             {
 
-                foreach (TtPolygon poly in manager.GetPolygons())
+                foreach (TtUnit poly in manager.GetUnits())
                 {
                     Route AdjRoute = new Route(poly.Name + " - Adj Boundary", poly.Description);
                     Track AdjTrack = new Track(poly.Name + " - Adj Navigation", poly.Description);

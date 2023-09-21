@@ -8,9 +8,9 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public Type DataType => PolygonProperties.DataType;
 
-        protected TtPolygon Polygon;
+        protected TtUnit Polygon;
 
-        public ITtPolygonCommand(TtPolygon polygon)
+        public ITtPolygonCommand(TtUnit polygon)
         {
             this.Polygon = polygon ?? throw new ArgumentNullException(nameof(polygon));
         }

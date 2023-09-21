@@ -23,8 +23,8 @@ namespace TwoTrails.Controls
         public IObservableTtManager Manager => Project.HistoryManager;
         public bool SortPolysByName => Project.Settings.SortPolysByName;
 
-        public PolygonVisibilityControl PolygonVisibilityControl { get; private set; }
-        public PolygonGraphicBrushOptions DefaultPolygonGraphicBrushOptions { get; private set; }
+        public UnitVisibilityControl PolygonVisibilityControl { get; private set; }
+        public UnitGraphicBrushOptions DefaultPolygonGraphicBrushOptions { get; private set; }
 
 
         private readonly KeyEventHandler KeyDownHandler, KeyUpHandler;
@@ -65,8 +65,8 @@ namespace TwoTrails.Controls
             if (Manager != null && MapManager == null)
             {
                 MapManager = new TtMapManager(this, map, Manager);
-                DefaultPolygonGraphicBrushOptions = new PolygonGraphicBrushOptions(null, Manager.GetDefaultPolygonGraphicOption());
-                PolygonVisibilityControl = new PolygonVisibilityControl(MapManager.PolygonManagers, DefaultPolygonGraphicBrushOptions);
+                DefaultPolygonGraphicBrushOptions = new UnitGraphicBrushOptions(null, Manager.GetDefaultUnitGraphicOption());
+                PolygonVisibilityControl = new UnitVisibilityControl(MapManager.PolygonManagers, DefaultPolygonGraphicBrushOptions);
                 DataContext = this;
 
                 AddHandler(MapControl.KeyDownEvent, KeyDownHandler);

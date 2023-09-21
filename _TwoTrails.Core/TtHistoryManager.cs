@@ -7,6 +7,7 @@ using System.Reflection;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 using TwoTrails.Core.Media;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core
 {
@@ -17,7 +18,7 @@ namespace TwoTrails.Core
         public event EventHandler<HistoryEventArgs> HistoryChanged;
         
         public ReadOnlyObservableCollection<TtPoint> Points { get { return BaseManager.Points; } }
-        public ReadOnlyObservableCollection<TtPolygon> Polygons { get { return BaseManager.Polygons; } }
+        public ReadOnlyObservableCollection<TtUnit> Units { get { return BaseManager.Units; } }
         public ReadOnlyObservableCollection<TtMetadata> Metadata { get { return BaseManager.Metadata; } }
         public ReadOnlyObservableCollection<TtGroup> Groups { get { return BaseManager.Groups; } }
         public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo { get { return BaseManager.MediaInfo; } }
@@ -39,7 +40,7 @@ namespace TwoTrails.Core
 
         public TtMetadata DefaultMetadata { get { return BaseManager.DefaultMetadata; } }
 
-        public int PolygonCount => Polygons.Count;
+        public int UnitCount => Units.Count;
 
         public int PointCount => Points.Count;
         
@@ -220,9 +221,9 @@ namespace TwoTrails.Core
             return BaseManager.GetPoint(pointCN);
         }
 
-        public List<TtPoint> GetPoints(string polyCN = null)
+        public List<TtPoint> GetPoints(string unitCN = null)
         {
-            return BaseManager.GetPoints(polyCN);
+            return BaseManager.GetPoints(unitCN);
         }
 
         public TtPoint GetNextPoint(TtPoint point)
@@ -230,19 +231,19 @@ namespace TwoTrails.Core
             return BaseManager.GetNextPoint(point);
         }
 
-        public bool PolygonExists(string polyCN)
+        public bool UnitExists(string unitCN)
         {
-            return BaseManager.PolygonExists(polyCN);
+            return BaseManager.UnitExists(unitCN);
         }
 
-        public TtPolygon GetPolygon(string polyCN)
+        public TtUnit GetUnit(string unitCN)
         {
-            return BaseManager.GetPolygon(polyCN);
+            return BaseManager.GetUnit(unitCN);
         }
 
-        public List<TtPolygon> GetPolygons()
+        public List<TtUnit> GetUnits()
         {
-            return BaseManager.GetPolygons();
+            return BaseManager.GetUnits();
         }
         
 
@@ -294,20 +295,20 @@ namespace TwoTrails.Core
             AddCommand(new DeleteTtPointsCommand(points, BaseManager));
         }
 
-        public void DeletePointsInPolygon(string polyCN)
+        public void DeletePointsInUnit(string unitCN)
         {
-            AddCommand(new DeleteTtPointsCommand(BaseManager.GetPoints(polyCN), BaseManager));
+            AddCommand(new DeleteTtPointsCommand(BaseManager.GetPoints(unitCN), BaseManager));
         }
 
 
-        public void AddPolygon(TtPolygon polygon)
+        public void AddUnit(TtUnit unit)
         {
-            AddCommand(new AddTtPolygonCommand(polygon, BaseManager));
+            AddCommand(new AddTtUnitCommand(unit, BaseManager));
         }
 
-        public void DeletePolygon(TtPolygon polygon)
+        public void DeleteUnit(TtUnit unit)
         {
-            AddCommand(new DeleteTtPolygonCommand(polygon, BaseManager));
+            AddCommand(new DeleteTtUnitCommand(unit, BaseManager));
         }
 
 
@@ -334,35 +335,35 @@ namespace TwoTrails.Core
         #endregion
 
 
-        public void CreateQuondamLinks(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit, bool reverse = false)
+        public void CreateQuondamLinks(IEnumerable<TtPoint> points, TtUnit targetUnit, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit, bool reverse = false)
         {
-            AddCommand(new CreateQuondamsCommand(reverse ? points.Reverse() : points, BaseManager, targetPolygon, insertIndex, bndMode));
+            AddCommand(new CreateQuondamsCommand(reverse ? points.Reverse() : points, BaseManager, targetUnit, insertIndex, bndMode));
         }
 
-        public void CreateRetrace(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit, bool reverse = false)
+        public void CreateRetrace(IEnumerable<TtPoint> points, TtUnit targetUnit, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit, bool reverse = false)
         {
-            AddCommand(new RetraceCommand(reverse ? points.Reverse() : points, this.BaseManager, targetPolygon, insertIndex, bndMode));
-        }
-
-
-        public void CreateCorridor(IEnumerable<TtPoint> points, TtPolygon targetPolygon)
-        {
-            AddCommand(new CreateCorridorCommand(points, targetPolygon, BaseManager));
-        }
-        public void CreateDoubleSidedCorridor(IEnumerable<TtPoint> points, TtPolygon targetPolygon)
-        {
-            AddCommand(new CreateCorridorDoubleSidedCommand(points, targetPolygon, BaseManager));
+            AddCommand(new RetraceCommand(reverse ? points.Reverse() : points, this.BaseManager, targetUnit, insertIndex, bndMode));
         }
 
 
-        public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex)
+        public void CreateCorridor(IEnumerable<TtPoint> points, TtUnit targetUnit)
         {
-            AddCommand(new MovePointsCommand(points, BaseManager, targetPolygon, insertIndex));
+            AddCommand(new CreateCorridorCommand(points, targetUnit, BaseManager));
+        }
+        public void CreateDoubleSidedCorridor(IEnumerable<TtPoint> points, TtUnit targetUnit)
+        {
+            AddCommand(new CreateCorridorDoubleSidedCommand(points, targetUnit, BaseManager));
         }
 
-        public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, bool reverse)
+
+        public void MovePointsToUnit(IEnumerable<TtPoint> points, TtUnit targetUnit, int insertIndex)
         {
-            AddCommand(new MovePointsCommand(reverse ? points.Reverse() : points, BaseManager, targetPolygon, insertIndex));
+            AddCommand(new MovePointsCommand(points, BaseManager, targetUnit, insertIndex));
+        }
+
+        public void MovePointsToUnit(IEnumerable<TtPoint> points, TtUnit targetUnit, int insertIndex, bool reverse)
+        {
+            AddCommand(new MovePointsCommand(reverse ? points.Reverse() : points, BaseManager, targetUnit, insertIndex));
         }
 
 
@@ -417,10 +418,10 @@ namespace TwoTrails.Core
         }
         #endregion
 
-        #region Polygons
-        public void EditPolygon<T>(TtPolygon polygon, PropertyInfo property, T newValue)
+        #region Units
+        public void EditUnit<T>(TtUnit unit, PropertyInfo property, T newValue)
         {
-            AddCommand(new EditTtPolygonCommand<T>(polygon, property, newValue));
+            AddCommand(new EditTtUnitCommand<T>(unit, property, newValue));
         }
         #endregion
 
@@ -463,31 +464,31 @@ namespace TwoTrails.Core
         }
 
 
-        public void RebuildPolygon(TtPolygon polygon, bool reindex = false)
+        public void RebuildUnit(TtUnit unit, bool reindex = false)
         {
-            AddCommand(new RebuildPolygonCommand(polygon, reindex, BaseManager));
+            AddCommand(new RebuildUnitCommand(unit, reindex, BaseManager));
         }
 
-        public void RecalculatePolygons()
+        public void RecalculateUnits()
         {
-            AddCommand(new RecalculatePolygonsCommand(BaseManager));
+            AddCommand(new RecalculateUnitsCommand(BaseManager));
         }
 
 
 
-        public PolygonGraphicOptions GetPolygonGraphicOption(string polyCN)
+        public UnitGraphicOptions GetUnitGraphicOption(string unitCN)
         {
-            return BaseManager.GetPolygonGraphicOption(polyCN);
+            return BaseManager.GetUnitGraphicOption(unitCN);
         }
 
-        public List<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public List<UnitGraphicOptions> GetUnitGraphicOptions()
         {
-            return BaseManager.GetPolygonGraphicOptions();
+            return BaseManager.GetUnitGraphicOptions();
         }
 
-        public PolygonGraphicOptions GetDefaultPolygonGraphicOption()
+        public UnitGraphicOptions GetDefaultUnitGraphicOption()
         {
-            return BaseManager.GetDefaultPolygonGraphicOption();
+            return BaseManager.GetDefaultUnitGraphicOption();
         }
 
         bool ITtManager.NmeaExists(string nmeaCN)

@@ -10,7 +10,7 @@ using TwoTrails.Core;
 
 namespace TwoTrails.Mapping
 {
-    public class PolygonVisibilityControl : BaseModel, IDisposable
+    public class UnitVisibilityControl : BaseModel, IDisposable
     {
         private ObservableCollection<TtMapPolygonManager> PolygonManagers { get; set; }
 
@@ -29,10 +29,10 @@ namespace TwoTrails.Mapping
 
         private bool ignoreChanges;
 
-        public PolygonGraphicOptions Graphics { get; }
+        public UnitGraphicOptions Graphics { get; }
 
 
-        public PolygonVisibilityControl(ObservableCollection<TtMapPolygonManager> polyManagers, PolygonGraphicBrushOptions polygonGraphicBrushOptions)
+        public UnitVisibilityControl(ObservableCollection<TtMapPolygonManager> polyManagers, UnitGraphicBrushOptions polygonGraphicBrushOptions)
         {
             Graphics = polygonGraphicBrushOptions;
 

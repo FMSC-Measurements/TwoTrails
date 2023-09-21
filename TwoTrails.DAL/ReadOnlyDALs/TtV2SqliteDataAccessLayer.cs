@@ -10,6 +10,7 @@ using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 using TTV2S = TwoTrails.DAL.TwoTrailsV2Schema;
 
 namespace TwoTrails.DAL
@@ -137,7 +138,7 @@ namespace TwoTrails.DAL
             }
         }
 
-        public IEnumerable<TtPolygon> GetPolygons()
+        public IEnumerable<TtUnit> GetUnits()
         {
             CheckVersion();
             
@@ -159,12 +160,12 @@ namespace TwoTrails.DAL
                 {
                     if (reader != null)
                     {
-                        TtPolygon poly;
+                        TtUnit poly;
                         int milliSeconds = 0;
 
                         while (reader.Read())
                         {
-                            poly = new TtPolygon();
+                            poly = new PolygonUnit();
                             poly.CN = reader.GetString(0);
                             poly.Name = reader.GetString(1);
                             if (!reader.IsDBNull(2))
@@ -222,13 +223,13 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                 limit > 0 ? $" limit {limit}" : String.Empty
             );
 
-            Dictionary<string, TtPolygon> polygons = null;
+            Dictionary<string, TtUnit> polygons = null;
             Dictionary<string, TtMetadata> metadata = null;
             Dictionary<string, TtGroup> groups = null;
 
             if (linkPoints)
             {
-                polygons = GetPolygons().ToDictionary(p => p.CN, p => p);
+                polygons = GetUnits().ToDictionary(p => p.CN, p => p);
                 metadata = GetMetadata().ToDictionary(m => m.CN, m => m);
                 groups = GetGroups().ToDictionary(g => g.CN, g => g); 
             }
@@ -316,7 +317,7 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
 
                                 if (linkPoints)
                                 {
-                                    point.Polygon = polygons[point.PolygonCN];
+                                    point.Unit = polygons[point.UnitCN];
                                     point.Metadata = metadata[point.MetadataCN];
                                     point.Group = groups[point.GroupCN];
                                 }
@@ -609,9 +610,9 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
         }
 
 
-        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        public IEnumerable<UnitGraphicOptions> GetUnitGraphicOptions()
         {
-            return new List<PolygonGraphicOptions>();
+            return new List<UnitGraphicOptions>();
         }
 
 
@@ -692,7 +693,7 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
         }
 
 
-        public bool HasPolygons()
+        public bool HasUnits()
         {
             CheckVersion();
 
@@ -716,7 +717,7 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
 
             if (GetPointsWithMissingPolygons().Any())
             {
-                errors |= DalError.MissingPolygon;
+                errors |= DalError.MissingUnit;
             }
 
             if (GetPointsWithMissingMetadata().Any())

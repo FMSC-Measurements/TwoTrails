@@ -61,11 +61,11 @@ namespace TwoTrails.Mapping
             {
                 TtPoint parent = qp.ParentPoint;
 
-                return $"{point.PID} ({point.OpType}) : {point.Polygon.Name} \u2794 {parent.PID} ({parent.OpType}) : {parent.Polygon.Name}   ";
+                return $"{point.PID} ({point.OpType}) : {point.Unit.Name} \u2794 {parent.PID} ({parent.OpType}) : {parent.Unit.Name}   ";
             }
             else
             {
-                return $"{point.PID} ({point.OpType}) : {point.Polygon.Name}";
+                return $"{point.PID} ({point.OpType}) : {point.Unit.Name}";
             }
         }
     }

@@ -29,7 +29,7 @@ namespace TwoTrails.Core.Media
 
         private void Point_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(TtPoint.PID) || e.PropertyName == nameof(TtPoint.Polygon))
+            if (e.PropertyName == nameof(TtPoint.PID) || e.PropertyName == nameof(TtPoint.Unit))
                 OnPropertyChanged(nameof(Title));
         }
 
@@ -53,7 +53,7 @@ namespace TwoTrails.Core.Media
 
         public override string ToString()
         {
-            return $"{_Point.PID} ({_Point.Polygon})";
+            return $"{_Point.PID} ({_Point.Unit})";
         }
     }
 }

@@ -5,14 +5,14 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    class RecalculatePolygonsCommand : ITtCommand
+    class RecalculateUnitsCommand : ITtCommand
     {
         private TtManager pointsManager;
 
         private List<TtPoint> Points;
 
 
-        public RecalculatePolygonsCommand(TtManager pointsManager)
+        public RecalculateUnitsCommand(TtManager pointsManager)
         {
             this.pointsManager = pointsManager;
 
@@ -25,7 +25,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public void Redo()
         {
-            pointsManager.RecalculatePolygons();
+            pointsManager.RecalculateUnits();
         }
 
         public void Undo()

@@ -13,7 +13,7 @@ namespace TwoTrails.Core.Points
             set
             {
                 SetField(ref _ManualAccuracy, value,
-                    () => SetAccuracy(Polygon != null ? Polygon.Accuracy : Consts.DEFAULT_POINT_ACCURACY));
+                    () => SetAccuracy(Unit != null ? Unit.Accuracy : Consts.DEFAULT_POINT_ACCURACY));
             }
         }
 
@@ -168,7 +168,7 @@ namespace TwoTrails.Core.Points
             else
                 SetUnAdjLocation(this);
 
-            SetAccuracy(Polygon.Accuracy);
+            SetAccuracy(Unit.Accuracy);
         }
 
         public override bool Equals(object obj)

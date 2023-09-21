@@ -13,6 +13,7 @@ using System.Xml;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 using TwoTrails.DAL;
 using TwoTrails.ViewModels;
 
@@ -47,7 +48,7 @@ namespace TwoTrails.Utils
             Summary(manager, projectInfo, projectFilePath, Path.Combine(folderPath, $"{projectInfo.Name.ScrubFileName()}_Summary.txt"));
             Points(manager, Path.Combine(folderPath, "Points.csv"));
             DataDictionary(manager, Path.Combine(folderPath, "DataDictionary.csv"));
-            Polygons(manager, Path.Combine(folderPath, "Polygons.csv"));
+            Units(manager, Path.Combine(folderPath, "Polygons.csv"));
             Metadata(manager, Path.Combine(folderPath, "Metadata.csv"));
             Groups(manager, Path.Combine(folderPath, "Groups.csv"));
             TtNmea(manager, Path.Combine(folderPath, "TTNmea.csv"));
@@ -75,7 +76,7 @@ namespace TwoTrails.Utils
 
         public static void Points(List<TtPoint> points, String fileName)
         {
-            if (points.Any(p => p.Polygon == null || p.Metadata == null || p.Group == null))
+            if (points.Any(p => p.Unit == null || p.Metadata == null || p.Group == null))
                 throw new Exception("Points missing Polygons, Metadata or Groups");
 
             points.Sort();
@@ -138,7 +139,7 @@ namespace TwoTrails.Utils
                     sb.Append($"{point.PID},{point.CN},");
                     sb.Append($"{point.OpType},{point.Index},");
 
-                    sb.Append($"{point.Polygon.Scrub()},{point.TimeCreated.ToString(Consts.DATE_FORMAT)},");
+                    sb.Append($"{point.Unit.Scrub()},{point.TimeCreated.ToString(Consts.DATE_FORMAT)},");
                     sb.Append($"{point.Metadata.Scrub()},{point.Group.Scrub()},");
 
                     sb.Append($"{point.OnBoundary},");
@@ -180,7 +181,7 @@ namespace TwoTrails.Utils
                     else
                         sb.Append(",");
 
-                    sb.Append($"{point.PolygonCN},{point.MetadataCN},{point.GroupCN},");
+                    sb.Append($"{point.UnitCN},{point.MetadataCN},{point.GroupCN},");
                     sb.Append(point.LinkedPoints.ToStringContents("_"));
 
                     sw.WriteLine(sb.ToString());
@@ -258,12 +259,12 @@ namespace TwoTrails.Utils
         }
 
 
-        public static void Polygons(ITtManager manager, String fileName)
+        public static void Units(ITtManager manager, String fileName)
         {
-            Polygons(manager.GetPolygons(), fileName);
+            Units(manager.GetUnits(), fileName);
         }
 
-        public static void Polygons(IEnumerable<TtPolygon> polygons, String fileName)
+        public static void Units(IEnumerable<TtUnit> units, String fileName)
         {
             using (StreamWriter sw = new StreamWriter(fileName))
             {
@@ -280,12 +281,12 @@ namespace TwoTrails.Utils
                 sw.WriteLine(sb.ToString());
                 #endregion
 
-                foreach (TtPolygon poly in polygons)
+                foreach (TtUnit unit in units)
                 {
                     sb = new StringBuilder();
-                    sb.AppendFormat("{0},{1},", poly.Name.Scrub(), poly.Accuracy);
-                    sb.AppendFormat("{0},{1},{2},", poly.Area, poly.Perimeter, poly.PerimeterLine);
-                    sb.AppendFormat("\"{0}\",{1}", poly.Description.Scrub(), poly.CN);
+                    sb.AppendFormat("{0},{1},", unit.Name.Scrub(), unit.Accuracy);
+                    sb.AppendFormat("{0},{1},{2},", unit.Area, unit.Perimeter, unit.PerimeterLine);
+                    sb.AppendFormat("\"{0}\",{1}", unit.Description.Scrub(), unit.CN);
 
                     sw.WriteLine(sb.ToString());
                 }
@@ -405,7 +406,7 @@ namespace TwoTrails.Utils
             {
                 sw.Write(HaidLogic.GenerateSummaryHeader(projectInfo, projectFilePath));
                 
-                foreach (TtPolygon poly in manager.GetPolygons())
+                foreach (TtUnit poly in manager.GetUnits())
                 {
                     sw.WriteLine($"{poly.Name}{Environment.NewLine}{new String('-', poly.Name.Length)}");
                     sw.WriteLine(HaidLogic.GenerateSummary(manager, poly).SummaryText);
@@ -611,7 +612,7 @@ namespace TwoTrails.Utils
         {
             string shapeFolderPath = Path.Combine(folderPath, $"GIS_{projectInfo.Name.Trim()}");
 
-            foreach (TtPolygon poly in manager.GetPolygons())
+            foreach (TtUnit poly in manager.GetUnits())
             {
                 TtShapeFileGenerator.WritePolygon(manager, poly, shapeFolderPath);
             }

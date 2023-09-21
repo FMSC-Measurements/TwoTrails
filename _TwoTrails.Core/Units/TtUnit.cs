@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TwoTrails.Core
+namespace TwoTrails.Core.Units
 {
-    public delegate void PolygonChangedEvent(TtPolygon polygon);
+    public delegate void UnitChangedEvent(TtUnit unit);
 
-    public class TtPolygon : TtObject, IComparable<TtPolygon>, IComparer<TtPolygon>
+    public abstract class TtUnit : TtObject, IComparable<TtUnit>, IComparer<TtUnit>
     {
-        public event PolygonChangedEvent PolygonAccuracyChanged;
-        public event PolygonChangedEvent PreviewPolygonAccuracyChanged;
+        public event UnitChangedEvent UnitAccuracyChanged;
+        public event UnitChangedEvent PreviewUnitAccuracyChanged;
 
-        public event PolygonChangedEvent PolygonChanged;
-        public event PolygonChangedEvent PreviewPolygonChanged;
+        public event UnitChangedEvent UnitChanged;
+        public event UnitChangedEvent PreviewUnitChanged;
 
         #region Properties
         protected String _Name;
@@ -20,6 +20,8 @@ namespace TwoTrails.Core
             get { return _Name; }
             set { SetField(ref _Name, value); }
         }
+
+        public abstract UnitType UnitType { get; }
         
         private String _Description = String.Empty;
         public String Description
@@ -53,7 +55,7 @@ namespace TwoTrails.Core
         public Double Accuracy
         {
             get { return _Accuracy; }
-            set { SetField(ref _Accuracy, value, OnPolygonAccuracyChanged); }
+            set { SetField(ref _Accuracy, value, OnUnitAccuracyChanged); }
         }
 
         protected Double _Area = 0;
@@ -69,8 +71,8 @@ namespace TwoTrails.Core
             }
         }
 
-        public Double AreaAcres { get { return _Area * 0.00024711; } }
-        public Double AreaHectaAcres { get { return _Area / 10000; } }
+        public Double AreaAcres => _Area * FMSC.Core.Convert.SquareMeterToAcre_Coeff;
+        public Double AreaHectaAcres => _Area * FMSC.Core.Convert.SquareMeterToHectare_Coeff;
 
         protected Double _Perimeter = 0;
         public Double Perimeter
@@ -85,7 +87,7 @@ namespace TwoTrails.Core
             }
         }
 
-        public Double PerimeterFt { get { return Perimeter * 3937d / 1200d; } }
+        public Double PerimeterFt => Perimeter * FMSC.Core.Convert.MetersToFeet_Coeff;
 
 
         protected Double _PerimeterLine = 0;
@@ -101,25 +103,28 @@ namespace TwoTrails.Core
             }
         }
 
-        public Double PerimeterLineFt { get { return PerimeterLine * 3937d / 1200d; } }
+        public Double PerimeterLineFt => PerimeterLine * FMSC.Core.Convert.MetersToFeet_Coeff;
         #endregion
 
 
-        public TtPolygon() { }
-
-        public TtPolygon(TtPolygon polygon) : base(polygon.CN)
+        public TtUnit()
         {
-            _Name = polygon._Name;
-            _Description = polygon._Description;
-            _PointStartIndex = polygon._PointStartIndex;
-            _Increment = polygon._Increment;
-            _TimeCreated = polygon._TimeCreated;
-            _Accuracy = polygon._Accuracy;
-            _Area = polygon._Area;
-            _Perimeter = polygon._Perimeter;
+
         }
 
-        public TtPolygon(string cn, string name, string desc, int psi, int inc, DateTime time,
+        public TtUnit(TtUnit unit) : base(unit.CN)
+        {
+            _Name = unit._Name;
+            _Description = unit._Description;
+            _PointStartIndex = unit._PointStartIndex;
+            _Increment = unit._Increment;
+            _TimeCreated = unit._TimeCreated;
+            _Accuracy = unit._Accuracy;
+            _Area = unit._Area;
+            _Perimeter = unit._Perimeter;
+        }
+
+        public TtUnit(string cn, string name, string desc, int psi, int inc, DateTime time,
             double acc, double area, double perim, double perimLine) : base(cn)
         {
             _Name = name;
@@ -133,10 +138,10 @@ namespace TwoTrails.Core
             _PerimeterLine = perimLine;
         }
 
-        protected void OnPolygonAccuracyChanged()
+        protected void OnUnitAccuracyChanged()
         {
-            PreviewPolygonAccuracyChanged?.Invoke(this);
-            PolygonAccuracyChanged?.Invoke(this);
+            PreviewUnitAccuracyChanged?.Invoke(this);
+            UnitAccuracyChanged?.Invoke(this);
         }
 
         public void Update(double area, double perimeter, double linePerimeter)
@@ -145,17 +150,17 @@ namespace TwoTrails.Core
             Perimeter = perimeter;
             PerimeterLine = linePerimeter;
 
-            PreviewPolygonChanged?.Invoke(this);
-            PolygonChanged?.Invoke(this);
+            PreviewUnitChanged?.Invoke(this);
+            UnitChanged?.Invoke(this);
         }
 
 
-        public int CompareTo(TtPolygon other)
+        public int CompareTo(TtUnit other)
         {
             return Compare(this, other);
         }
 
-        public int Compare(TtPolygon @this, TtPolygon other)
+        public int Compare(TtUnit @this, TtUnit other)
         {
             if (@this == null && other == null)
                 return 0;
@@ -169,21 +174,25 @@ namespace TwoTrails.Core
             return @this.TimeCreated.CompareTo(other.TimeCreated);
         }
 
-        public override string ToString() => Name;
+        public override string ToString()
+        {
+            return $"{Name} ({UnitType})";
+        }
 
 
         public override bool Equals(object obj)
         {
-            TtPolygon polygon = obj as TtPolygon;
+            TtUnit unit = obj as TtUnit;
 
-            return base.Equals(polygon) &&
-                _Area == polygon._Area &&
-                _Perimeter == polygon._Perimeter &&
-                _Name == polygon._Name &&
-                _Accuracy == polygon._Accuracy &&
-                _Description == polygon._Description &&
-                _PointStartIndex == polygon._PointStartIndex &&
-                _Increment == polygon._Increment;
+            return base.Equals(unit) &&
+                UnitType == unit.UnitType &&
+                _Area == unit._Area &&
+                _Perimeter == unit._Perimeter &&
+                _Name == unit._Name &&
+                _Accuracy == unit._Accuracy &&
+                _Description == unit._Description &&
+                _PointStartIndex == unit._PointStartIndex &&
+                _Increment == unit._Increment;
         }
 
         public override int GetHashCode()

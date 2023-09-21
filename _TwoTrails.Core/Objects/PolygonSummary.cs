@@ -19,7 +19,7 @@ namespace TwoTrails.Core
 
         private bool traversing = false;
 
-        public TtPolygon Polygon { get; }
+        public TtUnit Polygon { get; }
         public HaidResult Result { get; }
 
         public double TotalGpsError { get; private set; } = 0;
@@ -37,7 +37,7 @@ namespace TwoTrails.Core
         public String SummaryText { get; }
 
 
-        public PolygonSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false)
+        public PolygonSummary(ITtManager manager, TtUnit polygon, bool showPoints = false)
         {
             Polygon = polygon;
             Legs = new ReadOnlyCollection<TtLeg>(_Legs);
@@ -254,8 +254,8 @@ namespace TwoTrails.Core
                         {
                             sbPoints.AppendFormat("Point {0}: {1} Quondam to Point {2} ({3}){4}.{5}", point.PID,
                                 point.OnBoundary ? " " : "*", qp.ParentPoint.PID, qp.ParentPoint.OpType,
-                                qp.Polygon.Name != qp.ParentPoint.Polygon.Name ?
-                                    $" in {qp.ParentPoint.Polygon.Name}" : String.Empty,
+                                qp.Unit.Name != qp.ParentPoint.Unit.Name ?
+                                    $" in {qp.ParentPoint.Unit.Name}" : String.Empty,
                                 Environment.NewLine);
                         }
 

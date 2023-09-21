@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Dialogs
 {
@@ -16,9 +17,9 @@ namespace TwoTrails.Dialogs
     {
         private TtHistoryManager _Manager;
         private List<TtPoint> _Points;
-        public TtPolygon TargetPoly { get; private set; }
+        public TtUnit TargetUnit { get; private set; }
 
-        public PointLocManipDialog(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null)
+        public PointLocManipDialog(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtUnit target = null)
         {
             if (points == null || points.Count < 1)
                 throw new Exception("No Points");
@@ -28,10 +29,10 @@ namespace TwoTrails.Dialogs
 
             InitializeComponent();
 
-            cboPoly.ItemsSource = manager.GetPolygons();
+            cboPoly.ItemsSource = manager.GetUnits();
 
             if (target != null)
-                target = points.First().Polygon;
+                target = points.First().Unit;
 
             cboPoly.SelectedItem = target;
             cboPolyPoints.ItemsSource = manager.GetPoints(target?.CN);
@@ -66,16 +67,16 @@ namespace TwoTrails.Dialogs
                                     : rbInsEnd.IsChecked == true ? int.MaxValue
                                         : cboPolyPoints.SelectedIndex + 1;
 
-                    TargetPoly = cboPoly.SelectedItem as TtPolygon;
+                    TargetUnit = cboPoly.SelectedItem as TtUnit;
                     bool reverse = rbDirReverse.IsChecked == true;
 
                     if (rbActQuondam.IsChecked == true)
                     {
-                        _Manager.CreateQuondamLinks(_Points, TargetPoly, index, QuondamBoundaryMode.Inherit, reverse);
+                        _Manager.CreateQuondamLinks(_Points, TargetUnit, index, QuondamBoundaryMode.Inherit, reverse);
                     }
                     else
                     {
-                        _Manager.MovePointsToPolygon(_Points, TargetPoly, index, reverse);
+                        _Manager.MovePointsToUnit(_Points, TargetUnit, index, reverse);
                     } 
 
                     Close(); 
@@ -89,7 +90,7 @@ namespace TwoTrails.Dialogs
 
         private void cboPoly_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (cboPoly.SelectedItem is TtPolygon polygon)
+            if (cboPoly.SelectedItem is TtUnit polygon)
             {
                 cboPolyPoints.ItemsSource = _Manager.GetPoints(polygon.CN);
                 cboPoly.ToolTip = polygon.Name; 
@@ -109,7 +110,7 @@ namespace TwoTrails.Dialogs
         }
 
 
-        public static bool? ShowDialog(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null, Window owner = null)
+        public static bool? ShowDialog(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtUnit target = null, Window owner = null)
         {
             PointLocManipDialog plmd = new PointLocManipDialog(manager, points, quondam, reverse, target);
             if (owner != null)
@@ -117,7 +118,7 @@ namespace TwoTrails.Dialogs
             return plmd.ShowDialog();
         }
 
-        public static void Show(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtPolygon target = null, Window owner = null, Action<TtPolygon> onClose = null)
+        public static void Show(TtHistoryManager manager, List<TtPoint> points, bool quondam = false, bool reverse = false, TtUnit target = null, Window owner = null, Action<TtUnit> onClose = null)
         {
             PointLocManipDialog plmd = new PointLocManipDialog(manager, points, quondam, reverse, target);
             if (owner != null)
@@ -125,7 +126,7 @@ namespace TwoTrails.Dialogs
 
             if (onClose != null)
             {
-                plmd.Closed += (s, e) => onClose(plmd.TargetPoly);
+                plmd.Closed += (s, e) => onClose(plmd.TargetUnit);
             }
 
             plmd.Show();

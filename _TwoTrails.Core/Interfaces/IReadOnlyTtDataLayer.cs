@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.DAL
 {
@@ -13,14 +14,14 @@ namespace TwoTrails.DAL
 
         #region Points
         TtPoint GetPoint(String cn = null, bool linked = false);
-        IEnumerable<TtPoint> GetPoints(String polyCN = null, bool linked = false);
+        IEnumerable<TtPoint> GetPoints(String unitCN = null, bool linked = false);
         #endregion
 
 
-        #region Polygons
-        bool HasPolygons();
+        #region Units
+        bool HasUnits();
 
-        IEnumerable<TtPolygon> GetPolygons();
+        IEnumerable<TtUnit> GetUnits();
         #endregion
 
 
@@ -46,8 +47,8 @@ namespace TwoTrails.DAL
         #endregion
 
 
-        #region Polygon Attributes
-        IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions();
+        #region Unit Attributes
+        IEnumerable<UnitGraphicOptions> GetUnitGraphicOptions();
         #endregion
 
 
@@ -68,7 +69,7 @@ namespace TwoTrails.DAL
         #region Util
         bool RequiresUpgrade { get; }
 
-        int GetPointCount(params string[] polyCNs);
+        int GetPointCount(params string[] unitCNs);
         #endregion
     }
 }

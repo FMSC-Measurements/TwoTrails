@@ -12,8 +12,8 @@ namespace TwoTrails.Controls
     {
         public event EventHandler PolygonSelectionChanged
         {
-            add => Context.PolygonSelectionChanged += value;
-            remove => Context.PolygonSelectionChanged -= value;
+            add => Context.UnitSelectionChanged += value;
+            remove => Context.UnitSelectionChanged -= value;
         }
 
         public ImportControlModel Context { get; }

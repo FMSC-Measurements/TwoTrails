@@ -14,6 +14,7 @@ using FMSC.GeoSpatial.NMEA.Sentences;
 using FMSC.GeoSpatial.Types;
 
 using TTS = TwoTrails.DAL.TwoTrailsSchema;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.DAL
 {
@@ -50,7 +51,7 @@ namespace TwoTrails.DAL
             using (SQLiteConnection conn = database.CreateAndOpenConnection())
             {
                 database.ExecuteNonQuery(TTS.PointSchema.CreateTable, conn);
-                database.ExecuteNonQuery(TTS.PolygonSchema.CreateTable, conn);
+                database.ExecuteNonQuery(TTS.UnitSchema.CreateTable, conn);
                 database.ExecuteNonQuery(TTS.GroupSchema.CreateTable, conn);
                 database.ExecuteNonQuery(TTS.MetadataSchema.CreateTable, conn);
                 database.ExecuteNonQuery(TTS.GpsPointSchema.CreateTable, conn);
@@ -58,7 +59,7 @@ namespace TwoTrails.DAL
                 database.ExecuteNonQuery(TTS.QuondamPointSchema.CreateTable, conn);
                 database.ExecuteNonQuery(TTS.ProjectInfoSchema.CreateTable, conn);
                 database.ExecuteNonQuery(TTS.TtNmeaSchema.CreateTable, conn);
-                database.ExecuteNonQuery(TTS.PolygonAttrSchema.CreateTable, conn);
+                database.ExecuteNonQuery(TTS.UnitAttrSchema.CreateTable, conn);
                 database.ExecuteNonQuery(TTS.ActivitySchema.CreateTable, conn);
                 database.ExecuteNonQuery(TTS.DataDictionarySchema.CreateTable, conn);
             }
@@ -548,7 +549,7 @@ namespace TwoTrails.DAL
                 [TTS.SharedSchema.CN] = point.CN,
                 [TTS.PointSchema.Index] = point.Index,
                 [TTS.PointSchema.ID] = point.PID,
-                [TTS.PointSchema.PolyCN] = point.PolygonCN,
+                [TTS.PointSchema.PolyCN] = point.UnitCN,
                 [TTS.PointSchema.GroupCN] = point.GroupCN,
                 [TTS.PointSchema.OnBoundary] = point.OnBoundary,
                 [TTS.PointSchema.Comment] = point.Comment,
@@ -578,8 +579,8 @@ namespace TwoTrails.DAL
                 dic.Add(TTS.PointSchema.UnAdjZ, 0);
             }
 
-            if (point.Polygon != null)
-                dic.Add(TTS.PointSchema.PolyName, point.Polygon.Name);
+            if (point.Unit != null)
+                dic.Add(TTS.PointSchema.PolyName, point.Unit.Name);
 
             if (point.Group != null)
                 dic.Add(TTS.PointSchema.GroupName, point.Group.Name);
@@ -784,13 +785,13 @@ namespace TwoTrails.DAL
         #endregion
 
 
-        #region Polygons
-        #region Get Polygons
-        public bool HasPolygons()
+        #region Units
+        #region Get Units
+        public bool HasUnits()
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
-                using (SQLiteDataReader dr = _Database.ExecuteReader($"select count(*) from {TTS.PolygonSchema.TableName}", conn))
+                using (SQLiteDataReader dr = _Database.ExecuteReader($"select count(*) from {TTS.UnitSchema.TableName}", conn))
                 {
                     if (dr != null)
                     {
@@ -806,15 +807,15 @@ namespace TwoTrails.DAL
                 conn.Close();
             }
 
-            throw new Exception("Unable to get polygon count.");
+            throw new Exception("Unable to get unit count.");
         }
 
 
-        public IEnumerable<TtPolygon> GetPolygons() => GetPolygons(null);
+        public IEnumerable<TtUnit> GetUnits() => GetUnits(null);
 
-        public IEnumerable<TtPolygon> GetPolygons(string where)
+        public IEnumerable<TtUnit> GetUnits(string where)
         {
-            String query = $"select {TTS.PolygonSchema.SelectItems} from {TTS.PolygonSchema.TableName}{(where != null ? $" where {where}" : String.Empty)}";
+            String query = $"select {TTS.UnitSchema.SelectItems} from {TTS.UnitSchema.TableName}{(where != null ? $" where {where}" : String.Empty)}";
 
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -824,7 +825,7 @@ namespace TwoTrails.DAL
                     {
                         while (dr.Read())
                         {
-                            yield return new TtPolygon(
+                            yield return new TtUnit(
                                 dr.GetString(0),
                                 dr.GetString(1),
                                 dr.GetString(2),
@@ -847,8 +848,8 @@ namespace TwoTrails.DAL
         #endregion
 
 
-        #region Insert/Update Polygons
-        public bool InsertPolygon(TtPolygon polygon)
+        #region Insert/Update Units
+        public bool InsertUnit(TtUnit unit)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -856,12 +857,12 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        _Database.Insert(TTS.PolygonSchema.TableName, GetPolygonValues(polygon), conn, trans);
+                        _Database.Insert(TTS.UnitSchema.TableName, GetUnitValues(unit), conn, trans);
                         trans.Commit();
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message, "DAL:InsertPolygon");
+                        Debug.WriteLine(ex.Message, "DAL:InsertUnit");
                         trans.Rollback();
                         return false;
                     }
@@ -875,7 +876,7 @@ namespace TwoTrails.DAL
             return true;
         }
 
-        public int InsertPolygons(IEnumerable<TtPolygon> polygons)
+        public int InsertUnits(IEnumerable<TtUnit> units)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -883,16 +884,16 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        foreach (TtPolygon poly in polygons)
+                        foreach (TtUnit poly in units)
                         {
-                            _Database.Insert(TTS.PolygonSchema.TableName, GetPolygonValues(poly), conn, trans);
+                            _Database.Insert(TTS.UnitSchema.TableName, GetUnitValues(poly), conn, trans);
                         }
 
                         trans.Commit();
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message, "DAL:InsertPolygons");
+                        Debug.WriteLine(ex.Message, "DAL:InsertUnits");
                         trans.Rollback();
                         return -1;
                     }
@@ -903,11 +904,11 @@ namespace TwoTrails.DAL
                 }
             }
 
-            return polygons.Count();
+            return units.Count();
         }
 
 
-        public bool UpdatePolygon(TtPolygon polygon)
+        public bool UpdateUnit(TtUnit unit)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -915,9 +916,9 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        _Database.Update(TTS.PolygonSchema.TableName,
-                            GetPolygonValues(polygon),
-                            $"{TTS.SharedSchema.CN} = '{polygon.CN}'",
+                        _Database.Update(TTS.UnitSchema.TableName,
+                            GetUnitValues(unit),
+                            $"{TTS.SharedSchema.CN} = '{unit.CN}'",
                             conn,
                             trans);
 
@@ -925,7 +926,7 @@ namespace TwoTrails.DAL
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message, "DAL:UpdatePolygon");
+                        Debug.WriteLine(ex.Message, "DAL:UpdateUnit");
                         trans.Rollback();
                         return false;
                     }
@@ -939,7 +940,7 @@ namespace TwoTrails.DAL
             return true;
         }
 
-        public int UpdatePolygons(IEnumerable<TtPolygon> polygons)
+        public int UpdateUnits(IEnumerable<TtUnit> units)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -947,11 +948,11 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        foreach (TtPolygon poly in polygons)
+                        foreach (TtUnit unit in units)
                         {
-                            _Database.Update(TTS.PolygonSchema.TableName,
-                                GetPolygonValues(poly),
-                                $"{TTS.SharedSchema.CN} = '{poly.CN}'",
+                            _Database.Update(TTS.UnitSchema.TableName,
+                                GetUnitValues(unit),
+                                $"{TTS.SharedSchema.CN} = '{unit.CN}'",
                                 conn,
                                 trans);
                         }
@@ -960,38 +961,38 @@ namespace TwoTrails.DAL
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message, "DAL:UpdatePolygons");
+                        Debug.WriteLine(ex.Message, "DAL:UpdateUnits");
                         trans.Rollback();
                         return -1;
                     }
                 }
             }
 
-            return polygons.Count();
+            return units.Count();
         }
 
 
-        private Dictionary<string, object> GetPolygonValues(TtPolygon poly)
+        private Dictionary<string, object> GetUnitValues(TtUnit unit)
         {
             return new Dictionary<string, object>()
             {
-                [TTS.SharedSchema.CN] = poly.CN,
-                [TTS.PolygonSchema.Name] = poly.Name,
-                [TTS.PolygonSchema.Description] = poly.Description,
-                [TTS.PolygonSchema.Accuracy] = poly.Accuracy,
-                [TTS.PolygonSchema.IncrementBy] = poly.Increment,
-                [TTS.PolygonSchema.PointStartIndex] = poly.PointStartIndex,
-                [TTS.PolygonSchema.TimeCreated] = poly.TimeCreated.ToString(Consts.DATE_FORMAT),
-                [TTS.PolygonSchema.Area] = poly.Area,
-                [TTS.PolygonSchema.Perimeter] = poly.Perimeter,
-                [TTS.PolygonSchema.PerimeterLine] = poly.PerimeterLine
+                [TTS.SharedSchema.CN] = unit.CN,
+                [TTS.UnitSchema.Name] = unit.Name,
+                [TTS.UnitSchema.Description] = unit.Description,
+                [TTS.UnitSchema.Accuracy] = unit.Accuracy,
+                [TTS.UnitSchema.IncrementBy] = unit.Increment,
+                [TTS.UnitSchema.PointStartIndex] = unit.PointStartIndex,
+                [TTS.UnitSchema.TimeCreated] = unit.TimeCreated.ToString(Consts.DATE_FORMAT),
+                [TTS.UnitSchema.Area] = unit.Area,
+                [TTS.UnitSchema.Perimeter] = unit.Perimeter,
+                [TTS.UnitSchema.PerimeterLine] = unit.PerimeterLine
             };
         }
         #endregion
 
 
-        #region Delete Polygons
-        public bool DeletePolygon(TtPolygon polygon)
+        #region Delete Units
+        public bool DeleteUnit(TtUnit unit)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -999,8 +1000,8 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        _Database.Delete(TTS.PolygonSchema.TableName,
-                            $"{TTS.SharedSchema.CN} = '{polygon.CN}'",
+                        _Database.Delete(TTS.UnitSchema.TableName,
+                            $"{TTS.SharedSchema.CN} = '{unit.CN}'",
                             conn,
                             trans);
 
@@ -1008,7 +1009,7 @@ namespace TwoTrails.DAL
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message, "DAL:DeletePolygon");
+                        Debug.WriteLine(ex.Message, "DAL:DeleteUnit");
                         trans.Rollback();
                         return false;
                     }
@@ -1022,10 +1023,10 @@ namespace TwoTrails.DAL
             return true;
         }
 
-        public int DeletePolygons(IEnumerable<TtPolygon> polygons)
+        public int DeleteUnits(IEnumerable<TtUnit> units)
         {
             StringBuilder sb = new StringBuilder();
-            int total = polygons.Count();
+            int total = units.Count();
             int count = 0;
 
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
@@ -1034,16 +1035,16 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        foreach (TtPolygon poly in polygons)
+                        foreach (TtUnit unit in units)
                         {
                             count++;
-                            sb.Append($"{TTS.SharedSchema.CN} = '{poly.CN}'{(count < total ? " or " : String.Empty)}");
+                            sb.Append($"{TTS.SharedSchema.CN} = '{unit.CN}'{(count < total ? " or " : String.Empty)}");
                         }
 
                         string where = sb.ToString();
 
                         if (!String.IsNullOrEmpty(where) &&
-                            _Database.Delete(TTS.PolygonSchema.TableName,
+                            _Database.Delete(TTS.UnitSchema.TableName,
                             where, conn, transaction) < 0)
                         {
                             transaction.Rollback();
@@ -1054,7 +1055,7 @@ namespace TwoTrails.DAL
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message, "DAL:DeletePolygons");
+                        Debug.WriteLine(ex.Message, "DAL:DeleteUnits");
                         transaction.Rollback();
                         return -1;
                     }
@@ -1775,7 +1776,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        _Database.Update(TTS.PolygonSchema.TableName,
+                        _Database.Update(TTS.UnitSchema.TableName,
                             new Dictionary<string, object>()
                             {
                                 [TTS.TtNmeaSchema.Used] = burst.IsUsed
@@ -1812,7 +1813,7 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtNmeaBurst burst in bursts)
                         {
-                            _Database.Update(TTS.PolygonSchema.TableName,
+                            _Database.Update(TTS.UnitSchema.TableName,
                                 new Dictionary<string, object>()
                                 {
                                     [TTS.TtNmeaSchema.Used] = burst.IsUsed
@@ -2064,10 +2065,10 @@ namespace TwoTrails.DAL
         #endregion
 
 
-        #region Polygon Attrs
-        public IEnumerable<PolygonGraphicOptions> GetPolygonGraphicOptions()
+        #region Unit Attrs
+        public IEnumerable<UnitGraphicOptions> GetUnitGraphicOptions()
         {
-            String query = $"select {TTS.PolygonAttrSchema.SelectItems} from {TTS.PolygonAttrSchema.TableName}";
+            String query = $"select {TTS.UnitAttrSchema.SelectItems} from {TTS.UnitAttrSchema.TableName}";
 
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -2090,7 +2091,7 @@ namespace TwoTrails.DAL
                             unadjpts = dr.GetInt32(6);
                             waypts = dr.GetInt32(7);
 
-                            yield return new PolygonGraphicOptions(cn, adjbnd, unadjbnd, adjnav, unadjnav,
+                            yield return new UnitGraphicOptions(cn, adjbnd, unadjbnd, adjnav, unadjnav,
                                 adjpts, unadjpts, waypts, 0, 0);
                         }
 
@@ -2102,7 +2103,7 @@ namespace TwoTrails.DAL
             }
         }
 
-        public bool InsertPolygonGraphicOption(PolygonGraphicOptions option)
+        public bool InsertUnitGraphicOption(UnitGraphicOptions option)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -2110,12 +2111,12 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        _Database.Insert(TTS.PolygonAttrSchema.TableName, GetGraphicOptionValues(option), conn, trans);
+                        _Database.Insert(TTS.UnitAttrSchema.TableName, GetUnitGraphicOptionValues(option), conn, trans);
                         trans.Commit();
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message, "DAL:InsertPolygonGraphicOption");
+                        Debug.WriteLine(ex.Message, "DAL:InsertUnitGraphicOption");
                         trans.Rollback();
                         return false;
                     }
@@ -2129,22 +2130,22 @@ namespace TwoTrails.DAL
             return true;
         }
 
-        private Dictionary<string, object> GetGraphicOptionValues(PolygonGraphicOptions option)
+        private Dictionary<string, object> GetUnitGraphicOptionValues(UnitGraphicOptions option)
         {
             return new Dictionary<string, object>()
             {
                 [TTS.SharedSchema.CN] = option.CN,
-                [TTS.PolygonAttrSchema.AdjBndColor] = option.AdjBndColor,
-                [TTS.PolygonAttrSchema.UnAdjBndColor] = option.UnAdjBndColor,
-                [TTS.PolygonAttrSchema.AdjNavColor] = option.AdjNavColor,
-                [TTS.PolygonAttrSchema.UnAdjNavColor] = option.UnAdjNavColor,
-                [TTS.PolygonAttrSchema.AdjPtsColor] = option.AdjPtsColor,
-                [TTS.PolygonAttrSchema.UnAdjPtsColor] = option.UnAdjPtsColor,
-                [TTS.PolygonAttrSchema.WayPtsColor] = option.WayPtsColor
+                [TTS.UnitAttrSchema.AdjBndColor] = option.AdjBndColor,
+                [TTS.UnitAttrSchema.UnAdjBndColor] = option.UnAdjBndColor,
+                [TTS.UnitAttrSchema.AdjNavColor] = option.AdjNavColor,
+                [TTS.UnitAttrSchema.UnAdjNavColor] = option.UnAdjNavColor,
+                [TTS.UnitAttrSchema.AdjPtsColor] = option.AdjPtsColor,
+                [TTS.UnitAttrSchema.UnAdjPtsColor] = option.UnAdjPtsColor,
+                [TTS.UnitAttrSchema.WayPtsColor] = option.WayPtsColor
             };
         }
 
-        public bool DeletePolygonGraphicOption(PolygonGraphicOptions option)
+        public bool DeleteUnitGraphicOption(UnitGraphicOptions option)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -2152,7 +2153,7 @@ namespace TwoTrails.DAL
                 {
                     try
                     {
-                        _Database.Delete(TTS.PolygonAttrSchema.TableName,
+                        _Database.Delete(TTS.UnitAttrSchema.TableName,
                             $"{TTS.SharedSchema.CN} = '{option.CN}'",
                             conn,
                             trans);
@@ -2160,7 +2161,7 @@ namespace TwoTrails.DAL
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message, "DAL:DeletePolygonGraphicOption");
+                        Debug.WriteLine(ex.Message, "DAL:DeleteUnitGraphicOption");
                         trans.Rollback();
                         return false;
                     }
@@ -2640,7 +2641,7 @@ namespace TwoTrails.DAL
             {
                 List<Tuple<string, TtPoint>> missingPointsByPolygons = GetPointsWithMissingPolygons()
                     .Select(pointCN => GetPoint(pointCN, true))
-                    .GroupBy(p => p.PolygonCN)
+                    .GroupBy(p => p.UnitCN)
                     .Select(g => Tuple.Create(g.Key, g.First())).ToList();
 
                 List<QuondamPoint> orphanedQuondams = GetOrphanedQuondams()
@@ -2661,7 +2662,7 @@ namespace TwoTrails.DAL
 
                         string polyName = GetItemList(TTS.PointSchema.TableName, TTS.PointSchema.PolyName, $"{TTS.SharedSchema.CN} = '{firstPoint.CN}'").FirstOrDefault();
 
-                        TtPolygon mPoly = new TtPolygon(pointGroup.Item1, String.IsNullOrEmpty(polyName) ? $"Fix Point Poly {index++}" : polyName,
+                        TtUnit mPoly = new TtUnit(pointGroup.Item1, String.IsNullOrEmpty(polyName) ? $"Fix Point Poly {index++}" : polyName,
                             "Polygon that was rebuild from points which had a missing or corrupt polygon.",
                             firstPoint.PID, 10, firstPoint.TimeCreated,
                             (firstPoint is IManualAccuracy imanpt) ?
@@ -2672,7 +2673,7 @@ namespace TwoTrails.DAL
                                 Consts.DEFAULT_POINT_ACCURACY,
                             0, 0, 0);
 
-                        InsertPolygon(mPoly);
+                        InsertUnit(mPoly);
                     }
                 }
 
@@ -2814,7 +2815,7 @@ namespace TwoTrails.DAL
 
             if (GetPointsWithMissingPolygons().Any())
             {
-                errors |= DalError.MissingPolygon;
+                errors |= DalError.MissingUnit;
             }
 
             if (GetPointsWithMissingMetadata().Any())
@@ -2878,7 +2879,7 @@ namespace TwoTrails.DAL
         public IEnumerable<string> GetPointsWithMissingPolygons()
         {
             return GetItemList(TTS.PointSchema.TableName, TTS.SharedSchema.CN,
-                $"{TTS.PointSchema.PolyCN} not in (select distinct {TTS.SharedSchema.CN} from {TTS.PolygonSchema.TableName})");
+                $"{TTS.PointSchema.PolyCN} not in (select distinct {TTS.SharedSchema.CN} from {TTS.UnitSchema.TableName})");
         }
 
         public IEnumerable<string> GetPointsWithMissingGroups()

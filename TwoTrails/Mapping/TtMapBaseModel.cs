@@ -1,10 +1,5 @@
 ﻿using FMSC.Core.ComponentModel;
 using Microsoft.Maps.MapControl.WPF;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TwoTrails.Core;
 
 namespace TwoTrails.Mapping
@@ -15,10 +10,10 @@ namespace TwoTrails.Mapping
 
         protected Map Map { get; }
 
-        protected PolygonGraphicOptions PGO { get; }
+        protected UnitGraphicOptions PGO { get; }
 
 
-        public TtMapBaseModel(Map map, PolygonGraphicOptions pgo)
+        public TtMapBaseModel(Map map, UnitGraphicOptions pgo)
         {
             this.Map = map;
             this.PGO = pgo;

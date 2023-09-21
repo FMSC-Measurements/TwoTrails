@@ -2,29 +2,30 @@
 using System.ComponentModel;
 using System.Linq;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
     public class CreateQuondamsCommand : ITtPointsCommand
     {
-        private TtPolygon TargetPolygon;
+        private TtUnit TargetUnit;
         private int StartIndex;
 
         private EditTtPointsMultiValueCommand<int> editPointsCmd = null;
         private AddTtPointsCommand addPointsCmd;
 
-        public CreateQuondamsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
+        public CreateQuondamsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtUnit targetUnit, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
         {
-            TargetPolygon = targetPoly;
+            TargetUnit = targetUnit;
 
-            List<TtPoint> polyPoints = pointsManager.GetPoints(TargetPolygon.CN);
+            List<TtPoint> unitPoints = pointsManager.GetPoints(TargetUnit.CN);
 
             List<TtPoint> addPoints = new List<TtPoint>();
             List<TtPoint> editedPoints = new List<TtPoint>();
             List<int> editedIndexes = new List<int>();
 
-            int index = insertIndex > polyPoints.Count ?
-                polyPoints.Count : 
+            int index = insertIndex > unitPoints.Count ?
+                unitPoints.Count : 
                 insertIndex < 0 ? 0 : insertIndex;
             StartIndex = index;
 
@@ -32,7 +33,7 @@ namespace TwoTrails.Core.ComponentModel.History
             QuondamPoint qp;
 
             if (StartIndex > 0)
-                prevPoint = polyPoints[StartIndex - 1];
+                prevPoint = unitPoints[StartIndex - 1];
 
             foreach (TtPoint point in Points)
             {
@@ -40,16 +41,16 @@ namespace TwoTrails.Core.ComponentModel.History
                 {
                     qp = new QuondamPoint()
                     {
-                        PID = PointNamer.NamePoint(TargetPolygon, prevPoint),
+                        PID = PointNamer.NamePoint(TargetUnit, prevPoint),
                         Index = index++,
                         ParentPoint = point.OpType == OpType.Quondam ? ((QuondamPoint)point).ParentPoint : point,
-                        Polygon = TargetPolygon,
+                        Unit = TargetUnit,
                         Metadata = point.Metadata,
                         Group = pointsManager.MainGroup,
                         OnBoundary = (bndMode == QuondamBoundaryMode.Inherit) ? point.OnBoundary : (bndMode != QuondamBoundaryMode.Off)
                     };
 
-                    qp.SetAccuracy(TargetPolygon.Accuracy);
+                    qp.SetAccuracy(TargetUnit.Accuracy);
 
                     addPoints.Add(qp);
 
@@ -57,9 +58,9 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
 
-            if (StartIndex < polyPoints.Count)
+            if (StartIndex < unitPoints.Count)
             {
-                foreach (TtPoint point in polyPoints.Skip(StartIndex))
+                foreach (TtPoint point in unitPoints.Skip(StartIndex))
                 {
                     editedPoints.Add(point);
                     editedIndexes.Add(index++);

@@ -79,7 +79,7 @@ namespace TwoTrails.Utils
 
         public static bool AnalyzeEmptyPolygons(ITtManager manager)
         {
-            return manager.GetPolygons().Any(poly => !manager.GetPoints().Any(p => p.PolygonCN == poly.CN));
+            return manager.GetUnits().Any(poly => !manager.GetPoints().Any(p => p.UnitCN == poly.CN));
         }
 
         public static bool AnalyzeUnusedMetadata(ITtManager manager)
@@ -133,7 +133,7 @@ namespace TwoTrails.Utils
                     errList.Add("Skipped Point Indexes");
                 if (errors.HasFlag(DalError.NullAdjLocs))
                     errList.Add("Invalid Point Locations");
-                if (errors.HasFlag(DalError.MissingPolygon))
+                if (errors.HasFlag(DalError.MissingUnit))
                     errList.Add("Missing Polygons");
                 if (errors.HasFlag(DalError.MissingMetadata))
                     errList.Add("Missing Metadata");
@@ -143,7 +143,7 @@ namespace TwoTrails.Utils
                 bool hardErrors =
                     errors.HasFlag(DalError.OrphanedQuondams) || errors.HasFlag(DalError.MissingChildren) ||
                     errors.HasFlag(DalError.MissingGroup) || errors.HasFlag(DalError.MissingMetadata) ||
-                    errors.HasFlag(DalError.MissingPolygon);
+                    errors.HasFlag(DalError.MissingUnit);
 
                 MessageBoxResult mbr = MessageBox.Show(
                     $"It appears part of the TwoTrails data {(hardErrors ? "is corrupt" : "needs adjusting")}. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(" | ", errList)}. " +
@@ -173,8 +173,8 @@ namespace TwoTrails.Utils
                         {
                             dal.FixErrors(false);
 
-                            if (errors.HasFlag(DalError.MissingPolygon))
-                                action.UpdateAction(DataActionType.InsertedPolygons);
+                            if (errors.HasFlag(DalError.MissingUnit))
+                                action.UpdateAction(DataActionType.InsertedUnits);
                             if (errors.HasFlag(DalError.OrphanedQuondams) || errors.HasFlag(DalError.MissingMetadata) || errors.HasFlag(DalError.MissingGroup))
                                 action.UpdateAction(DataActionType.ModifiedPoints);
                         }

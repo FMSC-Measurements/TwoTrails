@@ -20,7 +20,7 @@ namespace TwoTrails.Dialogs
             InitializeComponent();
             this.DataContext = this;
 
-            cbPolys.ItemsSource = manager.GetPolygons();
+            cbPolys.ItemsSource = manager.GetUnits();
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -44,7 +44,7 @@ namespace TwoTrails.Dialogs
 
         private void cbPolys_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (cbPolys.SelectedItem is TtPolygon poly)
+            if (cbPolys.SelectedItem is TtUnit poly)
             {
                 txtStartIndex.Text = poly.PointStartIndex.ToString();
                 StartIndex = poly.PointStartIndex;

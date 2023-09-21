@@ -12,7 +12,7 @@ namespace TwoTrails.Core.Points
             set
             {
                 SetField(ref _ManualAccuracy, value,
-                    () => SetAccuracy(Polygon != null ? Polygon.Accuracy : Consts.DEFAULT_POINT_ACCURACY));
+                    () => SetAccuracy(Unit != null ? Unit.Accuracy : Consts.DEFAULT_POINT_ACCURACY));
             }
         }
 
@@ -126,7 +126,7 @@ namespace TwoTrails.Core.Points
 
         public override string ToString()
         {
-            return $"{base.ToString()}{(ParentPoint != null ? $" \u2794 {ParentPoint} : {ParentPoint?.Polygon.Name}" : String.Empty)}";
+            return $"{base.ToString()}{(ParentPoint != null ? $" \u2794 {ParentPoint.ToString()} : {ParentPoint.Unit.Name}" : String.Empty)}";
         }
 
 

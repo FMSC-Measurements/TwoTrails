@@ -92,7 +92,7 @@ namespace TwoTrails.DAL
             }
 
             DateTime time = ndal.GetProjectInfo().CreationDate;
-            Dictionary<String, TtPolygon> polys = odal.GetPolygons().Select(
+            IEnumerable<TtUnit> polys = odal.GetUnits().Select(
                     poly => {
                         poly.TimeCreated = (time = time.AddSeconds(1));
                         return poly;
@@ -100,12 +100,12 @@ namespace TwoTrails.DAL
 
             if (polys.Any())
             {
-                ndal.InsertPolygons(polys.Values);
-                activity.UpdateAction(DataActionType.InsertedPolygons);
+                ndal.InsertPolygons(polys);
+                activity.UpdateAction(DataActionType.InsertedUnits);
 
                 Dictionary<String, TtPoint> points = new Dictionary<string, TtPoint>();
 
-                foreach (TtPolygon poly in polys.Values)
+                foreach (TtUnit poly in polys)
                 {
                     int i = 0;
                     foreach (TtPoint point in odal.GetPoints(poly.CN, false).Select(p => { 
@@ -129,7 +129,7 @@ namespace TwoTrails.DAL
                         GpsPoint gpsPoint = new GpsPoint(cPoint)
                         {
                             CN = qpoint.CN,
-                            Polygon = qpoint.Polygon,
+                            Unit = qpoint.Unit,
                             Metadata = qpoint.Metadata,
                             Group = qpoint.Group,
                             Comment = string.IsNullOrWhiteSpace(qpoint.Comment) ?
@@ -164,7 +164,7 @@ namespace TwoTrails.DAL
 
             TtManager manger = new TtManager(ndal, null, settings);
 
-            manger.RecalculatePolygons(false);
+            manger.RecalculateUnits(false);
             manger.Save();
         }
     }

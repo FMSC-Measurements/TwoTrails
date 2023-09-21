@@ -15,8 +15,8 @@ namespace TwoTrails.ViewModels
     public class ReindexModel : BaseModel
     {
         private TtHistoryManager _Manager;
-        public ReadOnlyObservableCollection<TtPolygon> Polygons => _Manager.Polygons;
-        public TtPolygon SelectedPolygon { get { return Get<TtPolygon>(); } set { Set(value); } }
+        public ReadOnlyObservableCollection<TtUnit> Polygons => _Manager.Polygons;
+        public TtUnit SelectedPolygon { get { return Get<TtUnit>(); } set { Set(value); } }
         public ReindexMode ReindexMode { get { return Get<ReindexMode>(); } set { Set(value); } }
 
         public ICommand ReindexCommand { get; }

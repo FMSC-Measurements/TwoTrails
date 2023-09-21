@@ -94,7 +94,7 @@ namespace TwoTrails.ViewModels
         public bool CtrlKeyPressed { get; private set; }
 
 
-        public ReadOnlyObservableCollection<TtPolygon> Polygons => Manager.Polygons;
+        public ReadOnlyObservableCollection<TtUnit> Polygons => Manager.Polygons;
         public ReadOnlyObservableCollection<TtMetadata> Metadata => Manager.Metadata;
         public ReadOnlyObservableCollection<TtGroup> Groups => Manager.Groups;
         public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo => Manager.MediaInfo;
@@ -149,11 +149,11 @@ namespace TwoTrails.ViewModels
                 x => Manager.CanUndo,
                 this, m => m.Manager.CanUndo);
 
-            RecalculateAllPolygonsCommand = new RelayCommand(x => Manager.RecalculatePolygons());
+            RecalculateAllPolygonsCommand = new RelayCommand(x => Manager.RecalculateUnits());
             CalculateLogDeckCommand = new RelayCommand(x => CalculateLogDeck());
 
             #region Polygons
-            PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtPolygon));
+            PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtUnit));
             CreatePolygonCommand = new RelayCommand(x => CreatePolygon(x as ListBox));
             DeletePolygonCommand = new RelayCommand(x => DeletePolygon(x as ListBox));
 
@@ -243,7 +243,7 @@ namespace TwoTrails.ViewModels
 
             PolygonShapeChanged(null);
 
-            foreach (TtPolygon poly in Manager.Polygons)
+            foreach (TtUnit poly in Manager.Polygons)
                 poly.PolygonChanged += PolygonShapeChanged;
 
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += PolygonCollectionChanged;
@@ -286,7 +286,7 @@ namespace TwoTrails.ViewModels
 
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged -= PolygonCollectionChanged;
 
-            foreach (TtPolygon poly in Manager.Polygons)
+            foreach (TtUnit poly in Manager.Polygons)
                 poly.PolygonChanged -= PolygonShapeChanged;
 
             Manager.HistoryChanged -= Manager_HistoryChanged;
@@ -313,7 +313,7 @@ namespace TwoTrails.ViewModels
         {
             if (e.DataType != null && e.HistoryEventType == HistoryEventType.Undone || e.HistoryEventType == HistoryEventType.Redone)
             {
-                if (e.DataType == PolygonProperties.DataType)
+                if (e.DataType == UnitProperties.DataType)
                 {
                     BindPolygonValues(CurrentPolygon);
                 }
@@ -360,7 +360,7 @@ namespace TwoTrails.ViewModels
 
         private void CalculateLogDeck()
         {
-            if (Manager.BaseManager.PolygonCount > 0)
+            if (Manager.BaseManager.UnitCount > 0)
             {
                 MainModel.MainWindow.IsEnabled = false;
                 LogDeckCalculatorDialog.Show(Project, this.MainModel.MainWindow, () =>
@@ -376,13 +376,13 @@ namespace TwoTrails.ViewModels
         #region Polygons
 
         #region Properties
-        private TtPolygon _CurrentPolygon;
-        public TtPolygon CurrentPolygon
+        private TtUnit _CurrentPolygon;
+        public TtUnit CurrentPolygon
         {
             get => _CurrentPolygon;
             private set
             {
-                TtPolygon old = _CurrentPolygon;
+                TtUnit old = _CurrentPolygon;
 
                 SetField(ref _CurrentPolygon, value, () => {
                     if (old != null)
@@ -408,7 +408,7 @@ namespace TwoTrails.ViewModels
         public string PolygonName
         {
             get => _PolygonName;
-            set => EditPolygonValue(ref _PolygonName, value, PolygonProperties.NAME);
+            set => EditPolygonValue(ref _PolygonName, value, UnitProperties.NAME);
         }
 
         private double _PolygonAccuracy;
@@ -425,21 +425,21 @@ namespace TwoTrails.ViewModels
         public string PolygonDescription
         {
             get => _PolygonDescription;
-            set => EditPolygonValue(ref _PolygonDescription, value, PolygonProperties.DESCRIPTION);
+            set => EditPolygonValue(ref _PolygonDescription, value, UnitProperties.DESCRIPTION);
         }
 
         private int? _PolygonPointStartIndex;
         public int? PolygonPointStartIndex
         {
             get => _PolygonPointStartIndex;
-            set => EditPolygonValue(ref _PolygonPointStartIndex, value, PolygonProperties.POINT_START_INDEX);
+            set => EditPolygonValue(ref _PolygonPointStartIndex, value, UnitProperties.POINT_START_INDEX);
         }
 
         private int? _PolygonIncrement;
         public int? PolygonIncrement
         {
             get => _PolygonIncrement;
-            set => EditPolygonValue(ref _PolygonIncrement, value, PolygonProperties.INCREMENT);
+            set => EditPolygonValue(ref _PolygonIncrement, value, UnitProperties.INCREMENT);
         }
 
         public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
@@ -500,7 +500,7 @@ namespace TwoTrails.ViewModels
         #endregion
 
 
-        private void BindPolygonValues(TtPolygon polygon)
+        private void BindPolygonValues(TtUnit polygon)
         {
             if (polygon != null)
             {
@@ -534,17 +534,18 @@ namespace TwoTrails.ViewModels
             PolygonAnglePointResult = AnglePointLogic.VerifyGeometry(Manager, polygon.CN);
         }
 
+        public UnitSummary PolygonSummary { get { return Get<UnitSummary>(); } set { Set(value); } }
 
         private void PolygonCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (TtPolygon poly in e.NewItems)
+                    foreach (TtUnit poly in e.NewItems)
                         poly.PolygonChanged += PolygonShapeChanged;
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (TtPolygon poly in e.OldItems)
+                    foreach (TtUnit poly in e.OldItems)
                         poly.PolygonChanged -= PolygonShapeChanged;
                     break;
                 case NotifyCollectionChangedAction.Replace:
@@ -553,7 +554,7 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void PolygonShapeChanged(TtPolygon polygon)
+        private void PolygonShapeChanged(TtUnit polygon)
         {
             //double area = 0, perim = 0;
             //foreach (TtPolygon poly in Manager.Polygons)
@@ -568,7 +569,7 @@ namespace TwoTrails.ViewModels
             ValidatePolygon(polygon);
         }
 
-        private void PolygonChanged(TtPolygon poly)
+        private void PolygonChanged(TtUnit poly)
         {
             CurrentPolygon = poly;
         }
@@ -578,7 +579,7 @@ namespace TwoTrails.ViewModels
         {
             if (!_PolygonAccuracy.Equals(CurrentPolygon.Accuracy))
             {
-                Manager.EditPolygon(CurrentPolygon, PolygonProperties.ACCURACY, _PolygonAccuracy);
+                Manager.EditPolygon(CurrentPolygon, UnitProperties.ACCURACY, _PolygonAccuracy);
             }
 
             OnPropertyChanged(nameof(PolygonAccuracy));
@@ -615,10 +616,10 @@ namespace TwoTrails.ViewModels
         /// <param name="name">Name of Polygon</param>
         /// <param name="pointStartIndex">Point starting index for points in the polygon</param>
         /// <returns>New Polygon</returns>
-        public TtPolygon CreatePolygon(String name = null, int pointStartIndex = 0)
+        public TtUnit CreatePolygon(String name = null, int pointStartIndex = 0)
         {
-            int num = Manager.PolygonCount + 1;
-            return new TtPolygon()
+            int num = Manager.UnitCount + 1;
+            return new TtUnit()
             {
                 Name = name ?? $"Poly {num}",
                 PointStartIndex = pointStartIndex > 0 ? pointStartIndex : num * 1000 + Consts.DEFAULT_POINT_INCREMENT
@@ -688,7 +689,7 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void ValidatePolygon(TtPolygon polygon)
+        private void ValidatePolygon(TtUnit polygon)
         {
             if (polygon != null)
             {
@@ -1213,7 +1214,7 @@ namespace TwoTrails.ViewModels
 
         private void RemoveUnusedPolygons()
         {
-            List<TtPolygon> delPolys = Manager.Polygons.Where(poly => poly.CN != Consts.EmptyGuid && !Manager.GetPoints(poly.CN).Any()).ToList();
+            List<TtUnit> delPolys = Manager.Polygons.Where(poly => poly.CN != Consts.EmptyGuid && !Manager.GetPoints(poly.CN).Any()).ToList();
 
             if (delPolys.Count > 0)
             {

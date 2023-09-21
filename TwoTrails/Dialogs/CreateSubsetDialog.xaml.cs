@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.Dialogs
@@ -18,7 +19,7 @@ namespace TwoTrails.Dialogs
     {
         private TtProject _Project;
 
-        public TtPolygon SelectedPlotPolygon { get; set; }
+        public TtUnit SelectedPlot { get; set; }
         public int SubsetValue { get; set; }
         public bool IsPercentMode { get; set; } = true;
         public bool DeleteExistingPlots
@@ -27,13 +28,13 @@ namespace TwoTrails.Dialogs
             set { if (_Project.Settings.DeviceSettings is DeviceSettings ds) { ds.DeleteExistingPlots = value; } }
         }
 
-        public ObservableFilteredCollection<TtPolygon> PlotPolygons { get; }
+        public ObservableFilteredCollection<TtUnit> PlotPolygons { get; }
 
         public CreateSubsetDialog(TtProject project)
         {
             _Project = project;
 
-            PlotPolygons = new ObservableFilteredCollection<TtPolygon>(_Project.HistoryManager.Polygons,
+            PlotPolygons = new ObservableFilteredCollection<TtUnit>(_Project.HistoryManager.Units,
                 poly => _Project.HistoryManager.GetPoints(poly.CN).All(p => p.IsWayPointAtBase()));
 
             this.Unloaded += CreateSubsetDialog_Unloaded;
@@ -50,7 +51,7 @@ namespace TwoTrails.Dialogs
 
         private void CreateSubset()
         {
-            if (SelectedPlotPolygon == null)
+            if (SelectedPlot == null)
             {
                 MessageBox.Show("A polygon filled with plots must be selected.");
                 return;
@@ -69,14 +70,14 @@ namespace TwoTrails.Dialogs
             }
             
             
-            List<TtPolygon> polygons = _Project.HistoryManager.GetPolygons();
-            string gPolyName = GeneratePolyName(SelectedPlotPolygon);
+            List<TtUnit> polygons = _Project.HistoryManager.GetUnits();
+            string gUnitName = GeneratePolyName(SelectedPlot);
 
-            TtPolygon poly = null;
+            TtUnit unit = null;
 
             try
             {
-                poly = polygons.First(p => p.Name == gPolyName);
+                unit = polygons.First(p => p.Name == gUnitName);
             }
             catch
             {
@@ -84,32 +85,32 @@ namespace TwoTrails.Dialogs
             }
             
 
-            if (poly != null)
+            if (unit != null)
             {
                 if (!DeleteExistingPlots)
                 {
-                    if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                    if (MessageBox.Show($"Plots '{gUnitName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                     {
-                        poly = null;
+                        unit = null;
 
                         for (int i = 2; i < Int32.MaxValue; i++)
                         {
-                            gPolyName = GeneratePolyName(SelectedPlotPolygon, i);
+                            gUnitName = GeneratePolyName(SelectedPlot, i);
 
                             try
                             {
-                                poly = polygons.First(p => p.Name == gPolyName);
+                                unit = polygons.First(p => p.Name == gUnitName);
                             }
                             catch
                             {
-                                poly = new TtPolygon()
+                                unit = new PlotsUnit()
                                 {
-                                    Name = gPolyName,
+                                    Name = gUnitName,
                                     PointStartIndex = (polygons.Count + 1) * 1000 + Consts.DEFAULT_POINT_INCREMENT,
                                     Increment = 1
                                 };
 
-                                _Project.HistoryManager.AddPolygon(poly);
+                                _Project.HistoryManager.AddUnit(unit);
                                 break;
                             }
                         }
@@ -120,30 +121,30 @@ namespace TwoTrails.Dialogs
                 else
                 {
                     _Project.HistoryManager.StartMultiCommand();
-                    _Project.HistoryManager.DeletePointsInPolygon(poly.CN);
+                    _Project.HistoryManager.DeletePointsInUnit(unit.CN);
                 }
             }
             else
             {
                 _Project.HistoryManager.StartMultiCommand();
 
-                poly = new TtPolygon()
+                unit = new PlotsUnit()
                 {
-                    Name = gPolyName,
+                    Name = gUnitName,
                     PointStartIndex = (polygons.Count + 1) * 1000 + Consts.DEFAULT_POINT_INCREMENT,
                     Increment = 1
                 };
 
-                _Project.HistoryManager.AddPolygon(poly);
+                _Project.HistoryManager.AddUnit(unit);
             }
 
-            List<TtPoint> points = _Project.HistoryManager.GetPoints(SelectedPlotPolygon.CN);
+            List<TtPoint> points = _Project.HistoryManager.GetPoints(SelectedPlot.CN);
 
             int maxPoints = IsPercentMode ? (int)((SubsetValue / 100.0) * points.Count) : SubsetValue > points.Count ? points.Count : SubsetValue;
             Random rand = new Random(DateTime.Now.Millisecond);
 
 
-            poly.Description = $"Subsample of {SelectedPlotPolygon.Name}. {maxPoints} of {points.Count} points.";
+            unit.Description = $"Subsample of {SelectedPlot.Name}. {maxPoints} of {points.Count} points.";
 
             while (maxPoints < points.Count)
             {
@@ -160,12 +161,12 @@ namespace TwoTrails.Dialogs
                 {
                     UnAdjX = p.UnAdjX,
                     UnAdjY = p.UnAdjY,
-                    Polygon = poly,
+                    Unit = unit,
                     Group = _Project.HistoryManager.MainGroup,
                     Metadata = p.Metadata,
                     Index = index++,
-                    Comment = $"Generated from {p.PID} : {p.Polygon.Name}",
-                    PID = PointNamer.NamePoint(poly, prev)
+                    Comment = $"Generated from {p.PID} : {p.Unit.Name}",
+                    PID = PointNamer.NamePoint(unit, prev)
                 };
 
                 wayPoints.Add(curr);
@@ -180,9 +181,9 @@ namespace TwoTrails.Dialogs
         }
 
 
-        public String GeneratePolyName(TtPolygon poly, int rev = 1)
+        public String GeneratePolyName(TtUnit unit, int rev = 1)
         {
-            return $"{poly.Name}_Sample{(rev > 1 ? $"_{rev}" : String.Empty)}";
+            return $"{unit.Name}_Sample{(rev > 1 ? $"_{rev}" : String.Empty)}";
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)

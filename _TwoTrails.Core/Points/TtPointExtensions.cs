@@ -111,8 +111,8 @@ namespace TwoTrails.Core.Points
 
             conversion.CN = point.CN;
             conversion.Index = point.Index;
-            conversion.Polygon = point.Polygon;
-            conversion.PolygonCN = point.PolygonCN;
+            conversion.Unit = point.Unit;
+            conversion.UnitCN = point.UnitCN;
             conversion.Group = point.Group;
             conversion.GroupCN = point.GroupCN;
             conversion.OnBoundary = point.OnBoundary;

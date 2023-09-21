@@ -1,6 +1,6 @@
 ﻿namespace TwoTrails.Core
 {
-    public interface IPolygonGraphicSettings
+    public interface IUnitGraphicSettings
     {
         int AdjBndColor { get; }
         int UnAdjBndColor { get; }
@@ -16,6 +16,6 @@
         float AdjWidth { get; }
         float UnAdjWidth { get; }
 
-        PolygonGraphicOptions CreatePolygonGraphicOptions(string polyCN);
+        UnitGraphicOptions CreateUnitGraphicOptions(string unitCN);
     }
 }

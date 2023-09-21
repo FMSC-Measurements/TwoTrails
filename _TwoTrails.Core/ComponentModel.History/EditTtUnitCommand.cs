@@ -1,29 +1,29 @@
 ﻿using System.Reflection;
-using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    public class EditTtPolygonCommand<T> : ITtPolygonCommand
+    public class EditTtUnitCommand<T> : ITtUnitCommand
     {
         private T NewValue;
         private T OldValue;
         private PropertyInfo Property;
 
-        public EditTtPolygonCommand(TtPolygon polygon, PropertyInfo property, T newValue) : base(polygon)
+        public EditTtUnitCommand(TtUnit unit, PropertyInfo property, T newValue) : base(unit)
         {
             this.Property = property;
             this.NewValue = newValue;
-            this.OldValue = (T)property.GetValue(polygon);
+            this.OldValue = (T)property.GetValue(unit);
         }
 
         public override void Redo()
         {
-            Property.SetValue(Polygon, NewValue);
+            Property.SetValue(Unit, NewValue);
         }
 
         public override void Undo()
         {
-            Property.SetValue(Polygon, OldValue);
+            Property.SetValue(Unit, OldValue);
         }
     }
 }

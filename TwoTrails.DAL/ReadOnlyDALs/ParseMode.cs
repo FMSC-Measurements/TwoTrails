@@ -16,7 +16,7 @@
         INDEX = 3,
         PID = 4,
         TIME = 5,
-        POLY_NAME = 6,
+        UNIT_NAME = 6,
         GROUP_NAME = 7,
         COMMENT = 8,
         META_CN = 9,
@@ -37,7 +37,7 @@
         SLOPE_ANG = 24,
         SLOPE_ANG_TYPE = 25,
         PARENT_CN = 26,
-        POLY_CN = 27,
+        UNIT_CN = 27,
         GROUP_CN = 28
     }
 }
