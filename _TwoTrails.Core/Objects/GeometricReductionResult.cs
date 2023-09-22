@@ -106,6 +106,8 @@ namespace TwoTrails.Core
                         nextCoords.X, nextCoords.Y);
 
                     angle = angle % 180;
+                    if (angle > MAXIMUM_ANGLE)
+                        angle = MAXIMUM_ANGLE - (angle % MAXIMUM_ANGLE);
 
                     distSegB = MathEx.Distance(currCoords.X, currCoords.Y, nextCoords.X, nextCoords.Y);
 
@@ -116,7 +118,7 @@ namespace TwoTrails.Core
 
                     accDistSegB = accSegB * distSegB;
 
-                    double segmentLength = (distSegA + distSegB) / 2;
+                    double segmentLength = (distSegA + distSegB) / 2d;
 
                     bool shortLegB = distSegB < minDistSegB;
                     bool shallowEdge = angle < MINIMUM_ANGLE;
@@ -124,19 +126,19 @@ namespace TwoTrails.Core
                     if (distSegB >= maxDistSegB)
                         LongLegs++;
 
-                    if (angle >= MAXIMUM_ANGLE)
+                    if (angle >= MINIMUM_ANGLE)
                         SharpEdges++;
 
-                    aeDistDivB = shortLegB ? 1 :
-                            (distSegB >= maxDistSegB) ? 2 :
+                    aeDistDivB = shortLegB ? 1d :
+                            (distSegB >= maxDistSegB) ? 2d :
                                 distSegB / minDistSegB;
 
-                    double aeAngDiv = shallowEdge ? 1 :
-                            (angle >= MAXIMUM_ANGLE) ? 2 :
+                    double aeAngDiv = shallowEdge ? 1d :
+                            (angle >= MAXIMUM_ANGLE) ? 2d :
                                 angle / MINIMUM_ANGLE;
 
-                    double aeA = accDistSegA / 2 / ((aeDistDivA + aeAngDiv) / 2);
-                    double aeB = accDistSegB / 2 / ((aeDistDivB + aeAngDiv) / 2);
+                    double aeA = accDistSegA / 2 / (aeAngDiv > 1d ? ((aeDistDivA + aeAngDiv) / 2) : 1d);
+                    double aeB = accDistSegB / 2 / (aeAngDiv > 1d ? ((aeDistDivB + aeAngDiv) / 2) : 1d);
 
                     double segAreaError = aeA + aeB;
 
@@ -172,7 +174,7 @@ namespace TwoTrails.Core
             public TtPoint Point2 { get; }
             public TtPoint Point3 { get; }
 
-            public bool SharpEdge => Edge >= MAXIMUM_ANGLE;
+            public bool SharpEdge => Edge >= MINIMUM_ANGLE;
             public bool ShallowEdge => Edge < MINIMUM_ANGLE;
 
             public double AreaError { get; }

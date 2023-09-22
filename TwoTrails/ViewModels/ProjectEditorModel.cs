@@ -491,6 +491,8 @@ namespace TwoTrails.ViewModels
 
         public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
 
+        public double TotalReduction => (_GERResult != null && PolygonSummary != null && PolygonSummary.TotalGpsError > 0) ?
+                                            (1 - (GERResult.TotalError / PolygonSummary.TotalGpsError)) * 100: 0;
 
 
         private void EditPolygonValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
@@ -552,8 +554,10 @@ namespace TwoTrails.ViewModels
         private void GeneratePolygonSummaryAndStats(TtPolygon polygon)
         {
             PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true);
-            //PolygonAnglePointResult = AnglePointLogic.VerifyGeometry(Manager, polygon.CN);
             GERResult = AnglePointLogic.GetGeometricErrorReduction(Manager, polygon);
+            OnPropertyChanged(nameof(TotalReduction));
+
+            //PolygonAnglePointResult = AnglePointLogic.VerifyGeometry(Manager, polygon.CN);
         }
 
 
