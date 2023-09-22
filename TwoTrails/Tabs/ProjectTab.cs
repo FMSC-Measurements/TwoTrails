@@ -104,6 +104,8 @@ namespace TwoTrails
             Project.PropertyChanged += Project_PropertyChanged;
             ProjectEditor.PointEditor.PropertyChanged += PointEditor_PropertyChanged;
             _ProjectEditorControl.tabControl.SelectionChanged += ProjectEditor_TabSelectionChanged;
+
+            ProjectEditor_TabSelectionChanged(null, null);
         }
 
         static bool doesTabAndDataMatch(ProjectTabSection selectedTab, Type type)

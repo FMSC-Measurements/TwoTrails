@@ -204,7 +204,7 @@
                 </i:Interaction.Triggers>
             </ListBox>
 
-            <TextBlock Grid.Column="2" Grid.Row="0" Text="Exlude" TextAlignment="Center" />
+            <TextBlock Grid.Column="2" Grid.Row="0" Text="Exclude" TextAlignment="Center" />
             <ListBox Name="lstExcPoly" Grid.Column="2" Grid.Row="1" ItemsSource="{Binding ExclusionPolygons}" SelectionMode="Multiple" ItemTemplate="{StaticResource listToolTip}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
