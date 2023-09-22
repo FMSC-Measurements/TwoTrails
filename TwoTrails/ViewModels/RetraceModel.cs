@@ -193,7 +193,8 @@ namespace TwoTrails.ViewModels
     {
         public string GCN { get; } = Guid.NewGuid().ToString();
 
-        private TtHistoryManager _Manager;
+        private TtProject _Project;
+        private TtHistoryManager _Manager => _Project.HistoryManager;
 
         public List<TtPolygon> Polygons { get; }
         
@@ -213,8 +214,9 @@ namespace TwoTrails.ViewModels
 
         public Retrace(RetraceModel model, TtProject project)
         {
+            _Project = project;
             PointFrom = PointTo = null;
-            Polygons = project.GetSortedPolygons();
+            Polygons = _Project.GetSortedPolygons();
             DirInc = true;
         }
 

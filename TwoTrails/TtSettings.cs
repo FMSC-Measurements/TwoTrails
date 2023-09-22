@@ -168,7 +168,7 @@ namespace TwoTrails
 
         public TtProjectInfo CreateProjectInfo(Version programVersion)
         {
-            String version = $"PC: {programVersion}";
+            String version = $"PC: {programVersion.GetVersionWithBuildType()}";
             return new TtProjectInfo("Unamed Project", String.Empty, Region, String.Empty, District,
                 version, version, TwoTrailsSchema.SchemaVersion, DeviceName, DateTime.Now);
         }

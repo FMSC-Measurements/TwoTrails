@@ -22,11 +22,11 @@ namespace TwoTrails.Core
         public double TotalError { get; private set; }
         public double AreaError => Polygon.Area > 0 ? TotalError / Polygon.Area * 100d : 0;
 
-        public int ShortLegs { get; private set; }
-        public int ShallowEdges { get; private set; }
+        public int LongLegs { get; private set; }
+        public int SharpEdges { get; private set; }
 
-        public double LegsPercent => Segments.Count > 0 ? (Segments.Count - ShortLegs) * 100d / Segments.Count : 0;
-        public double EdgesPercent => Segments.Count > 0 ? (Segments.Count - ShallowEdges) * 100d / Segments.Count : 0;
+        public double LongLegsPercent => Segments.Count > 0 ? LongLegs * 100d / Segments.Count : 0;
+        public double SharpEdgesPercent => Segments.Count > 0 ? SharpEdges * 100d / Segments.Count : 0;
 
 
         public List<GERSegment> Segments { get; private set; } = new List<GERSegment>();
@@ -118,16 +118,16 @@ namespace TwoTrails.Core
 
                     double segmentLength = (distSegA + distSegB) / 2;
 
-                    bool shortLeg = distSegB < minDistSegB;
+                    bool shortLegB = distSegB < minDistSegB;
                     bool shallowEdge = angle < MINIMUM_ANGLE;
 
-                    if (shortLeg)
-                        ShortLegs++;
+                    if (distSegB >= maxDistSegB)
+                        LongLegs++;
 
-                    if (shallowEdge)
-                        ShallowEdges++;
+                    if (angle >= MAXIMUM_ANGLE)
+                        SharpEdges++;
 
-                    aeDistDivB = shortLeg ? 1 :
+                    aeDistDivB = shortLegB ? 1 :
                             (distSegB >= maxDistSegB) ? 2 :
                                 distSegB / minDistSegB;
 
@@ -140,7 +140,8 @@ namespace TwoTrails.Core
 
                     double segAreaError = aeA + aeB;
 
-                    Segments.Add(new GERSegment(lastPoint, currPoint, nextPoint, segAreaError, segmentLength, shortLeg, shallowEdge));
+                    Segments.Add(new GERSegment(lastPoint, currPoint, nextPoint, segAreaError, angle, segmentLength,
+                        aeDistDivA <= 1 || aeDistDivB <= 1, aeDistDivA >= 2 && aeDistDivB >= 2));
 
                     TotalError += segAreaError;
 
@@ -167,73 +168,35 @@ namespace TwoTrails.Core
 
         public class GERSegment
         {
-            //public const double MINIMUM_ANGLE = 45d;
-            //public const double MAXIMUM_ANGLE = 90d;
-            //public const double MIN_DIST_MULTIPLIER = 5d;
-            //public const double MAX_DIST_MULTIPLIER = 10d;
-
             public TtPoint Point1 { get; }
             public TtPoint Point2 { get; }
             public TtPoint Point3 { get; }
 
-            public bool ShortLegs { get; }
-            public bool ShallowEdge { get; }
+            public bool SharpEdge => Edge >= MAXIMUM_ANGLE;
+            public bool ShallowEdge => Edge < MINIMUM_ANGLE;
 
-            public double SegmentLength { get; }
             public double AreaError { get; }
+            public double Edge { get; }
+            public double SegmentLength { get; }
+
+            public bool HasLongLegs { get; }
+            public bool HasShortLegs { get; }
 
 
-            public GERSegment(TtPoint p1, TtPoint p2, TtPoint p3, double areaError, double segLength, bool shortLegs, bool shallowEdge)
+            public GERSegment(TtPoint p1, TtPoint p2, TtPoint p3, double areaError, double edge, double segLength,
+                bool hasShortLegs, bool hasLongLegs)
             {
                 Point1 = p1;
                 Point2 = p2;
                 Point3 = p3;
 
                 AreaError = areaError;
+                Edge = edge;
                 SegmentLength = segLength;
-                ShortLegs = shortLegs;
-                ShallowEdge = shallowEdge;
 
-                //double distSegA = MathEx.Distance(c1.X, c1.Y, c2.X, c2.Y);
-                //double distSegB = MathEx.Distance(c2.X, c2.Y, c3.X, c3.Y);
+                HasShortLegs = hasShortLegs;
+                HasLongLegs = hasLongLegs;
 
-                //double accSegA = (p1.Accuracy + p2.Accuracy) / 2d;
-                //double accSegB = (p2.Accuracy + p3.Accuracy) / 2d;
-
-                //double minDistSegA = accSegA * MIN_DIST_MULTIPLIER;
-                //double minDistSegB = accSegB * MIN_DIST_MULTIPLIER;
-                //double maxDistSegA = accSegA * MAX_DIST_MULTIPLIER;
-                //double maxDistSegB = accSegB * MAX_DIST_MULTIPLIER;
-
-                //double accDistSegA = accSegA * distSegA;
-                //double accDistSegB = accSegB * distSegB;
-
-                //SegmentLength = (distSegA + distSegB) / 2;
-                //ShortLegs = distSegA < minDistSegA || distSegB < minDistSegB;
-
-                //double angle = MathEx.CalculateAngleBetweenPoints(
-                //        c1.X, c1.Y,
-                //        c2.X, c2.Y,
-                //        c3.X, c3.Y);
-
-                //ShallowEdge = angle < MINIMUM_ANGLE;
-
-                //double aeDistDivA = distSegA < minDistSegA ? 1 : 
-                //        (distSegA >= maxDistSegA) ? 2 :
-                //            distSegA / minDistSegA;
-
-                //double aeDistDivB = distSegB < minDistSegB ? 1 :
-                //        (distSegB >= maxDistSegB) ? 2 :
-                //            distSegB / minDistSegB;
-
-                //double aeAngDiv = angle < MINIMUM_ANGLE ? 1 :
-                //        (angle >= MAXIMUM_ANGLE) ? 2 :
-                //            angle / MINIMUM_ANGLE;
-
-                //double aeA = accDistSegA / 2 / ((aeDistDivA + aeAngDiv) / 2);
-                //double aeB = accDistSegB / 2 / ((aeDistDivB + aeAngDiv) / 2);
-
-                //AreaError = aeA + aeB;
             }
         }
     }
