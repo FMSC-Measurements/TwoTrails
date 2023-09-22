@@ -891,7 +891,7 @@ namespace TwoTrails.ViewModels
             #endregion
 
             Polygons = CollectionViewSource.GetDefaultView(new ReadOnlyObservableCollection<PriorityCheckedListItem<TtPolygon>>(_Polygons)) as ListCollectionView;
-            Polygons.CustomSort = new PolygonSorterEx<PriorityCheckedListItem<TtPolygon>>(x => x.Item, project.Settings.SortPolysByName);
+            Polygons.CustomSort = new PolygonPrioritySorterEx<PriorityCheckedListItem<TtPolygon>>(x => x.Item, x => x.IsPriority, project.Settings.SortPolysByName);
 
 
             Groups = new ReadOnlyObservableCollection<PriorityCheckedListItem<TtGroup>>(_Groups);
@@ -1078,7 +1078,7 @@ namespace TwoTrails.ViewModels
                 if (pce.PropertyName == nameof(TtSettings.SortPolysByName))
                 {
                     Points.CustomSort = new PointSorter(project.Settings.SortPolysByName);
-                    Polygons.CustomSort = new PolygonSorterEx<PriorityCheckedListItem<TtPolygon>>(x => x.Item, project.Settings.SortPolysByName);
+                    Polygons.CustomSort = new PolygonPrioritySorterEx<PriorityCheckedListItem<TtPolygon>>(x => x.Item, x => x.IsPriority, project.Settings.SortPolysByName);
                 }
             };
         }

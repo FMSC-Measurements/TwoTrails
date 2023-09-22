@@ -547,14 +547,19 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                     <ColumnDefinition Width="10"/>
                                                     <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="10"/>
+                                                    <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
 
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="5"/>
-                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="5"/>
-                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="5"/>
+                                                    <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ha:"/>
@@ -565,6 +570,16 @@
 
                                                 <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Err Ratio**"/>
                                                 <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding GERResult.AreaError, StringFormat={}{0:F3}%}"/>
+
+                                                <TextBlock Grid.Column="3" Grid.Row="0" VerticalAlignment="Center" Text="Long Legs"/>
+                                                <TextBlock Grid.Column="5" Grid.Row="0" VerticalAlignment="Center" Text="{Binding GERResult.LegsPercent, StringFormat={}{0:F2}%}"/>
+
+                                                <TextBlock Grid.Column="3" Grid.Row="2" VerticalAlignment="Center" Text="Sharp Edges"/>
+                                                <TextBlock Grid.Column="5" Grid.Row="2" VerticalAlignment="Center" Text="{Binding GERResult.EdgesPercent, StringFormat={}{0:F2}%}"/>
+
+                                                <!--<TextBlock Grid.Column="3" Grid.Row="4" VerticalAlignment="Center" Text=""/>
+                                                <TextBlock Grid.Column="5" Grid.Row="4" VerticalAlignment="Center" Text="{Binding GERResult., StringFormat={}{0:F2}%}"/>-->
+
                                             </Grid>
                                         </GroupBox>
                                         

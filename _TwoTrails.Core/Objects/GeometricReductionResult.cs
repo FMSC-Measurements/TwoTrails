@@ -25,6 +25,9 @@ namespace TwoTrails.Core
         public int ShortLegs { get; private set; }
         public int ShallowEdges { get; private set; }
 
+        public double LegsPercent => Segments.Count > 0 ? (Segments.Count - ShortLegs) * 100d / Segments.Count : 0;
+        public double EdgesPercent => Segments.Count > 0 ? (Segments.Count - ShallowEdges) * 100d / Segments.Count : 0;
+
 
         public List<GERSegment> Segments { get; private set; } = new List<GERSegment>();
 
