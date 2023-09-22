@@ -95,6 +95,7 @@ namespace TwoTrails.ViewModels
 
         public BindedRelayCommand<PointEditorModel> MovePointsCommand { get; }
         public BindedRelayCommand<PointEditorModel> ReverseSelectedCommand { get; }
+        public BindedRelayCommand<PointEditorModel> InvertBoundaryCommand { get; }
         public BindedRelayCommand<PointEditorModel> SortSelectedByPIDCommand { get; }
         public BindedRelayCommand<PointEditorModel> SortSelectedByTimeCreatedCommand { get; }
         public BindedRelayCommand<PointEditorModel> ReindexCommand { get; }
@@ -954,6 +955,11 @@ namespace TwoTrails.ViewModels
                 x => MultipleSelections && SamePolygon,
                 this, m => m.MultipleSelections);
 
+            InvertBoundaryCommand = new BindedRelayCommand<PointEditorModel>(
+                x => InvertBoundary(),
+                x => HasSelection,
+                this, m => m.HasSelection);
+
             SortSelectedByPIDCommand = new BindedRelayCommand<PointEditorModel>(
                 x => SortByPID(),
                 x => MultipleSelections && SamePolygon,
@@ -1228,6 +1234,7 @@ namespace TwoTrails.ViewModels
 
             MovePointsCommand.Dispose();
             ReverseSelectedCommand.Dispose();
+            InvertBoundaryCommand.Dispose();
             ReindexCommand.Dispose();
             RetraceCommand.Dispose();
 
@@ -2174,6 +2181,12 @@ namespace TwoTrails.ViewModels
 
                 UpdatePointIndexes(updatedPoints, indexes);
             }
+        }
+
+        public void InvertBoundary()
+        {
+            List<TtPoint> points = GetSortedSelectedPoints();
+            Manager.EditPointsMultiValues(points, PointProperties.BOUNDARY, points.Select(p => !p.OnBoundary));
         }
 
         public void ResetPoint()

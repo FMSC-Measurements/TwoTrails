@@ -157,6 +157,7 @@
         <KeyBinding Command="{Binding SelectInverseCommand}" Key="I" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding DeselectCommand}" Key="D" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding ReverseSelectedCommand}" Key="R" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding InvertBoundaryCommand}" Key="B" Modifiers="Ctrl"/>
     </UserControl.InputBindings>
 
 
