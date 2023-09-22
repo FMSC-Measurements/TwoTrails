@@ -9,12 +9,14 @@ using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
+using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
 {
     public class RetraceModel : BaseModel
     {
-        private TtHistoryManager _Manager;
+        private TtProject _Project;
+        private TtHistoryManager _Manager => _Project.HistoryManager;
 
         public ObservableCollection<Retrace> Retraces { get { return Get<ObservableCollection<Retrace>>(); } set { Set(value); } }
 
@@ -33,16 +35,16 @@ namespace TwoTrails.ViewModels
         public string TargetPolygonToolTip => MovePoints ? "The polygon in which to move the points to." : "The polygon in which to place the Quondams.";
 
 
-        public RetraceModel(TtHistoryManager manager)
+        public RetraceModel(TtProject project)
         {
-            _Manager = manager;
-
+            _Project = project;
+                
             AfterPoints = new List<TtPoint>();
-            Polygons = manager.GetPolygons();
+            Polygons = _Project.GetSortedPolygons();
 
             Retraces = new ObservableCollection<Retrace>
             {
-                new Retrace(this, _Manager)
+                new Retrace(this, project)
             };
 
             CommitCommand = new RelayCommand(x => RetracePoints());
@@ -57,7 +59,7 @@ namespace TwoTrails.ViewModels
 
         public void AddRetrace(Retrace sender)
         {
-            Retrace retrace = new Retrace(this, _Manager);
+            Retrace retrace = new Retrace(this, _Project);
             int index = -1;
 
             if (sender != null)
@@ -191,7 +193,7 @@ namespace TwoTrails.ViewModels
     {
         public string GCN { get; } = Guid.NewGuid().ToString();
 
-        private ITtManager _Manager;
+        private TtHistoryManager _Manager;
 
         public List<TtPolygon> Polygons { get; }
         
@@ -209,11 +211,10 @@ namespace TwoTrails.ViewModels
         public TtPolygon SelectedPolygon { get { return Get<TtPolygon>(); } set { Set(value, () => PolygonChanged(value)); } }
         
 
-        public Retrace(RetraceModel model, ITtManager manager)
+        public Retrace(RetraceModel model, TtProject project)
         {
-            _Manager = manager;
             PointFrom = PointTo = null;
-            Polygons = manager.GetPolygons();
+            Polygons = project.GetSortedPolygons();
             DirInc = true;
         }
 

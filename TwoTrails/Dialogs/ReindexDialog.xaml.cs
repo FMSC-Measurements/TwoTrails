@@ -10,9 +10,9 @@ namespace TwoTrails.Dialogs
     /// </summary>
     public partial class ReindexDialog : Window
     {
-        public ReindexDialog(TtHistoryManager manager)
+        public ReindexDialog(TtProject project)
         {
-            this.DataContext = new ReindexModel(manager);
+            this.DataContext = new ReindexModel(project);
             InitializeComponent();
         }
 
@@ -21,9 +21,9 @@ namespace TwoTrails.Dialogs
             Close();
         }
 
-        public static void Show(TtHistoryManager manager, Window owner = null, Action<bool?> onClose = null)
+        public static void Show(TtProject project, Window owner = null, Action<bool?> onClose = null)
         {
-            ReindexDialog dialog = new ReindexDialog(manager);
+            ReindexDialog dialog = new ReindexDialog(project);
             if (owner != null)
                 dialog.Owner = owner;
 

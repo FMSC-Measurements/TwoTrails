@@ -32,19 +32,6 @@ namespace TwoTrails.Controls
             dgPoints.PreviewMouseUp += DgPoints_PreviewMouseUp;
             dgPoints.LoadingRow += DgPoints_LoadingRow;
             dgPoints.BindableColumns = PointEditor.DataColumns;
-
-            SortPolys();
-
-            pointEditor.Project.Settings.PropertyChanged += (s, pce) =>
-            {
-                if (pce.PropertyName == nameof(TtSettings.SortPolysByName)) SortPolys();
-            };
-        }
-
-        private void SortPolys()
-        {
-            lbPolys.Items.SortDescriptions.Clear();
-            lbPolys.Items.SortDescriptions.Add(new SortDescription($"Item.{(PointEditor.Project.Settings.SortPolysByName ? "Name" : "TimeCreated")}", ListSortDirection.Ascending));
         }
 
         private void DgPoints_PreviewMouseUp(object sender, MouseButtonEventArgs e)

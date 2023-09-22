@@ -1,5 +1,4 @@
 ﻿using FMSC.Core;
-using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
@@ -192,6 +191,7 @@ namespace TwoTrails.Utils
 
             return String.Empty;
         }
+
     }
 
     public struct UpdateStatus

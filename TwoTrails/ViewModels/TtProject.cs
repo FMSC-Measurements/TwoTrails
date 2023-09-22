@@ -1,7 +1,9 @@
 ﻿using FMSC.Core.ComponentModel;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.DAL;
@@ -120,6 +122,13 @@ namespace TwoTrails.ViewModels
             MAL = mal;
             Manager.ReplaceMAL(MAL);
             OnPropertyChanged(nameof(MAL));
+        }
+
+        public List<TtPolygon> GetSortedPolygons()
+        {
+            List<TtPolygon> polygons = HistoryManager.Polygons.ToList();
+            polygons.Sort(new PolygonSorterDirect(Settings.SortPolysByName));
+            return polygons;
         }
     }
 }

@@ -74,7 +74,7 @@ namespace TwoTrails.ViewModels
             _Project = project;
 
             Polygons = new ReadOnlyCollection<TtPolygon>(
-                _Project.HistoryManager.GetPolygons().Where(p => _Project.HistoryManager.IsPolygonValid(p.CN)).ToList());
+                _Project.GetSortedPolygons().Where(p => _Project.HistoryManager.IsPolygonValid(p.CN)).ToList());
 
             if (Polygons.Count > 0)
                 Polygon = Polygons[0];

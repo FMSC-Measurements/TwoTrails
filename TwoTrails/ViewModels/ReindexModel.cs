@@ -15,16 +15,16 @@ namespace TwoTrails.ViewModels
     public class ReindexModel : BaseModel
     {
         private TtHistoryManager _Manager;
-        public ReadOnlyObservableCollection<TtPolygon> Polygons => _Manager.Polygons;
+        public List<TtPolygon> Polygons { get; }
         public TtPolygon SelectedPolygon { get { return Get<TtPolygon>(); } set { Set(value); } }
         public ReindexMode ReindexMode { get { return Get<ReindexMode>(); } set { Set(value); } }
 
         public ICommand ReindexCommand { get; }
 
 
-        public ReindexModel(TtHistoryManager manager)
+        public ReindexModel(TtProject project)
         {
-            _Manager = manager;
+            Polygons = project.GetSortedPolygons();
             ReindexCommand = new BindedRelayCommand<ReindexModel>(
                 x=> Reindex(), x=> SelectedPolygon != null,
                 this, m => new { m.SelectedPolygon, m.ReindexMode });

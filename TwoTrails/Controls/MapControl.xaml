@@ -405,7 +405,7 @@
             <ListBox x:Name="lvPolygons" Grid.Row="1" Background="LightGray"
                       ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Visible"
                       ScrollViewer.CanContentScroll="False"
-                      ItemsSource="{Binding MapManager.PolygonManagers, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}">
+                      ItemsSource="{Binding MapManager.PolygonManagersLVC, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Background" Value="White" />

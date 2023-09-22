@@ -278,7 +278,7 @@
                         </Grid.RowDefinitions>
 
                         <ListBox Name="lbPolys" Grid.Column="0" Grid.Row="0" BorderThickness="0"
-                                    ItemsSource="{Binding Polygons, Mode=OneWay}"
+                                    ItemsSource="{Binding PolygonsLVC, Mode=OneWay}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">

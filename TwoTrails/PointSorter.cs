@@ -26,37 +26,30 @@ namespace TwoTrails
             if (yp == null)
                 return 1;
 
-            int val = SortPolysByName ? xp.Polygon.Name.CompareTo(yp.Polygon.Name) : xp.Polygon.TimeCreated.CompareTo(yp.Polygon.TimeCreated);
+            int val = SortPolysByName ? xp.Polygon.Name.ToLower().CompareTo(yp.Polygon.Name.ToLower()) : xp.Polygon.TimeCreated.CompareTo(yp.Polygon.TimeCreated);
 
             if (val != 0)
                 return val;
             else
             {
-                val = SortPolysByName ? xp.Polygon.TimeCreated.CompareTo(yp.Polygon.TimeCreated) : xp.Polygon.Name.CompareTo(yp.Polygon.Name);
+                val = xp.PolygonCN.CompareTo(yp.PolygonCN);
 
                 if (val != 0)
                     return val;
                 else
                 {
-                    val = xp.PolygonCN.CompareTo(yp.PolygonCN);
+                    val = xp.Index.CompareTo(yp.Index);
 
                     if (val != 0)
                         return val;
                     else
                     {
-                        val = xp.Index.CompareTo(yp.Index);
+                        val = xp.PID.CompareTo(yp.PID);
 
                         if (val != 0)
                             return val;
                         else
-                        {
-                            val = xp.PID.CompareTo(yp.PID);
-
-                            if (val != 0)
-                                return val;
-                            else
-                                return xp.CN.CompareTo(yp.CN);
-                        }
+                            return xp.CN.CompareTo(yp.CN);
                     }
                 }
             }

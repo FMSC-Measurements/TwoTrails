@@ -64,7 +64,7 @@ namespace TwoTrails.Controls
         {
             if (Manager != null && MapManager == null)
             {
-                MapManager = new TtMapManager(this, map, Manager);
+                MapManager = new TtMapManager(this, map, Project);
                 DefaultPolygonGraphicBrushOptions = new PolygonGraphicBrushOptions(null, Manager.GetDefaultPolygonGraphicOption());
                 PolygonVisibilityControl = new PolygonVisibilityControl(MapManager.PolygonManagers, DefaultPolygonGraphicBrushOptions);
                 DataContext = this;
@@ -74,13 +74,6 @@ namespace TwoTrails.Controls
             }
 
             this.Loaded -= OnLoaded;
-
-            SortPolys();
-
-            Project.Settings.PropertyChanged += (s, pce) =>
-            {
-                if (pce.PropertyName == nameof(TtSettings.SortPolysByName)) SortPolys();
-            };
         }
 
         private void OnUnloaded(object sender, EventArgs e)
@@ -143,12 +136,6 @@ namespace TwoTrails.Controls
             IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
             if (locs.Any())
                 map.SetView(locs, new Thickness(30), 0);
-        }
-
-        private void SortPolys()
-        {
-            lvPolygons.Items.SortDescriptions.Clear();
-            lvPolygons.Items.SortDescriptions.Add(new SortDescription($"Polygon.{(Project.Settings.SortPolysByName ? "Name" : "TimeCreated")}", ListSortDirection.Ascending));
         }
     }
 }

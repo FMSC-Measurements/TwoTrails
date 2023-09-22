@@ -6,6 +6,8 @@ using System.Windows;
 using System.Windows.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Utils;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails.Dialogs
 {
@@ -16,7 +18,9 @@ namespace TwoTrails.Dialogs
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private TtHistoryManager _Manager;
+        private TtProject _Project;
+        private TtHistoryManager _Manager => _Project.HistoryManager;
+
         private OpType _OpType;
         
         public String Txt1Watermark
@@ -48,13 +52,12 @@ namespace TwoTrails.Dialogs
         public bool IsGpsType { get { return _OpType.IsGpsType(); } }
 
 
-        public CreateGpsPointDialog(TtHistoryManager manager, TtPolygon target = null, OpType opType = OpType.GPS)
+        public CreateGpsPointDialog(TtProject project, TtPolygon target = null, OpType opType = OpType.GPS)
         {
             if (opType == OpType.Quondam)
                 throw new Exception("Invalid Operation: Cannot create quondam");
 
-
-            _Manager = manager;
+            _Project = project;
 
             _OpType = opType;
 
@@ -63,7 +66,7 @@ namespace TwoTrails.Dialogs
 
             this.Title = $"Create {opType}";
 
-            cboPoly.ItemsSource = _Manager.GetPolygons();
+            cboPoly.ItemsSource = _Project.GetSortedPolygons();
             cboPoly.SelectedItem = target??cboPoly.Items[0];
 
             cboMeta.ItemsSource = _Manager.GetMetadata();
@@ -290,9 +293,9 @@ namespace TwoTrails.Dialogs
             }
         }
 
-        public static bool? ShowDialog(TtHistoryManager manager, TtPolygon target = null, OpType opType = OpType.GPS, Window owner = null)
+        public static bool? ShowDialog(TtProject project, TtPolygon target = null, OpType opType = OpType.GPS, Window owner = null)
         {
-            CreateGpsPointDialog cpd = new CreateGpsPointDialog(manager, target, opType);
+            CreateGpsPointDialog cpd = new CreateGpsPointDialog(project, target, opType);
             if (owner != null)
                 cpd.Owner = owner;
             return cpd.ShowDialog();

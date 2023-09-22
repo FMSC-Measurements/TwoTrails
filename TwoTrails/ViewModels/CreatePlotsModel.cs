@@ -93,7 +93,7 @@ namespace TwoTrails.ViewModels
             InclusionPolygons = new ObservableFilteredSortableCollection<TtPolygon, string>(
                 project.HistoryManager.Polygons,
                 p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint()),
-                p => p.Name);
+                p => p.Name.ToLower());
 
             ExclusionPolygons = new ObservableCollection<TtPolygon>();
             

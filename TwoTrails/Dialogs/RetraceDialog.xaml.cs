@@ -13,9 +13,9 @@ namespace TwoTrails.Dialogs
     {
         RetraceModel model;
 
-        public RetraceDialog(TtHistoryManager manager)
+        public RetraceDialog(TtProject project)
         {
-            model = new RetraceModel(manager);
+            model = new RetraceModel(project);
             this.DataContext = model;
             InitializeComponent();
         }
@@ -42,17 +42,17 @@ namespace TwoTrails.Dialogs
         }
 
 
-        public static bool? ShowDialog(TtHistoryManager manager, Window owner = null)
+        public static bool? ShowDialog(TtProject project, Window owner = null)
         {
-            RetraceDialog diag = new RetraceDialog(manager);
+            RetraceDialog diag = new RetraceDialog(project);
             if (owner != null)
                 diag.Owner = owner;
             return diag.ShowDialog();
         }
 
-        public static void Show(TtHistoryManager manager, Window owner = null, Action<bool?> onClose = null)
+        public static void Show(TtProject project, Window owner = null, Action<bool?> onClose = null)
         {
-            RetraceDialog dialog = new RetraceDialog(manager);
+            RetraceDialog dialog = new RetraceDialog(project);
             if (owner != null)
                 dialog.Owner = owner;
 

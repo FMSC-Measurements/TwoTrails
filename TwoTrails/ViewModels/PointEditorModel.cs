@@ -796,18 +796,23 @@ namespace TwoTrails.ViewModels
         Dictionary<OpType, bool> _CheckedOpTypes = new Dictionary<OpType, bool>();
 
 
-        private ObservableCollection<CheckedListItem<TtPolygon>> _Polygons = new ObservableCollection<CheckedListItem<TtPolygon>>();
-        public ReadOnlyObservableCollection<CheckedListItem<TtPolygon>> Polygons { get; private set; }
+        private ObservableCollection<PriorityCheckedListItem<TtPolygon>> _Polygons = new ObservableCollection<PriorityCheckedListItem<TtPolygon>>();
+        private ListCollectionView _PolygonsLCV;
+        public ListCollectionView Polygons
+        {
+            get { return _PolygonsLCV; }
+            set { SetField(ref _PolygonsLCV, value); }
+        }
 
-        private ObservableCollection<CheckedListItem<TtMetadata>> _Metadatas = new ObservableCollection<CheckedListItem<TtMetadata>>();
-        public ReadOnlyObservableCollection<CheckedListItem<TtMetadata>> Metadatas { get; private set; }
+        private ObservableCollection<PriorityCheckedListItem<TtMetadata>> _Metadatas = new ObservableCollection<PriorityCheckedListItem<TtMetadata>>();
+        public ReadOnlyObservableCollection<PriorityCheckedListItem<TtMetadata>> Metadatas { get; private set; }
 
-        private ObservableCollection<CheckedListItem<TtGroup>> _Groups = new ObservableCollection<CheckedListItem<TtGroup>>();
-        public ReadOnlyObservableCollection<CheckedListItem<TtGroup>> Groups { get; private set; }
+        private ObservableCollection<PriorityCheckedListItem<TtGroup>> _Groups = new ObservableCollection<PriorityCheckedListItem<TtGroup>>();
+        public ReadOnlyObservableCollection<PriorityCheckedListItem<TtGroup>> Groups { get; private set; }
 
-        private List<CheckedListItem<string>> _OpTypes = new List<CheckedListItem<string>>();
+        private List<PriorityCheckedListItem<string>> _OpTypes = new List<PriorityCheckedListItem<string>>();
 
-        public ReadOnlyCollection<CheckedListItem<String>> OpTypes { get; private set; }
+        public ReadOnlyCollection<PriorityCheckedListItem<String>> OpTypes { get; private set; }
 
         public bool? IsOnBnd { get { return Get<bool?>(); } set { Set(value); } }
         public bool? HasLinks { get { return Get<bool?>(); } set { Set(value); } }
@@ -823,14 +828,14 @@ namespace TwoTrails.ViewModels
             Manager.HistoryChanged += Manager_HistoryChanged;
 
             #region Setup Filters
-            CheckedListItem<TtPolygon> tmpPoly;
-            tmpPoly = new CheckedListItem<TtPolygon>(new TtPolygon() { Name = "All", CN = Consts.FullGuid, TimeCreated = new DateTime(0) }, true);
+            PriorityCheckedListItem<TtPolygon> tmpPoly;
+            tmpPoly = new PriorityCheckedListItem<TtPolygon>(new TtPolygon() { Name = "All", CN = Consts.FullGuid, TimeCreated = new DateTime(0) }, true, true);
             _Polygons.Add(tmpPoly);
             tmpPoly.ItemCheckedChanged += Polygon_ItemCheckedChanged;
 
             foreach (TtPolygon polygon in Manager.Polygons)
             {
-                tmpPoly = new CheckedListItem<TtPolygon>(polygon, true);
+                tmpPoly = new PriorityCheckedListItem<TtPolygon>(polygon, true);
                 _Polygons.Add(tmpPoly);
                 tmpPoly.ItemCheckedChanged += Polygon_ItemCheckedChanged;
                 _CheckedPolygons.Add(polygon.CN, true);
@@ -839,14 +844,14 @@ namespace TwoTrails.ViewModels
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += Polygons_CollectionChanged;
 
 
-            CheckedListItem<TtMetadata> tmpMeta;
-            tmpMeta = new CheckedListItem<TtMetadata>(new TtMetadata() { Name = "All", CN = Consts.FullGuid }, true);
+            PriorityCheckedListItem<TtMetadata> tmpMeta;
+            tmpMeta = new PriorityCheckedListItem<TtMetadata>(new TtMetadata() { Name = "All", CN = Consts.FullGuid }, true);
             _Metadatas.Add(tmpMeta);
             tmpMeta.ItemCheckedChanged += Metadata_ItemCheckedChanged;
 
             foreach (TtMetadata metadata in Manager.Metadata.OrderBy(m => m.Name))
             {
-                tmpMeta = new CheckedListItem<TtMetadata>(metadata, true);
+                tmpMeta = new PriorityCheckedListItem<TtMetadata>(metadata, true);
                 _Metadatas.Add(tmpMeta);
                 tmpMeta.ItemCheckedChanged += Metadata_ItemCheckedChanged;
                 _CheckedMetadata.Add(metadata.CN, true);
@@ -855,14 +860,14 @@ namespace TwoTrails.ViewModels
             ((INotifyCollectionChanged)Manager.Metadata).CollectionChanged += Metadata_CollectionChanged;
 
 
-            CheckedListItem<TtGroup> tmpGroup;
-            tmpGroup = new CheckedListItem<TtGroup>(new TtGroup() { Name = "All", CN = Consts.FullGuid }, true);
+            PriorityCheckedListItem<TtGroup> tmpGroup;
+            tmpGroup = new PriorityCheckedListItem<TtGroup>(new TtGroup() { Name = "All", CN = Consts.FullGuid }, true);
             _Groups.Add(tmpGroup);
             tmpGroup.ItemCheckedChanged += Groups_ItemCheckedChanged;
 
             foreach (TtGroup group in Manager.Groups.OrderBy(g => g.Name))
             {
-                tmpGroup = new CheckedListItem<TtGroup>(group, true);
+                tmpGroup = new PriorityCheckedListItem<TtGroup>(group, true);
                 _Groups.Add(tmpGroup);
                 tmpGroup.ItemCheckedChanged += Groups_ItemCheckedChanged;
                 _CheckedGroups.Add(group.CN, true);
@@ -871,34 +876,35 @@ namespace TwoTrails.ViewModels
             ((INotifyCollectionChanged)Manager.Groups).CollectionChanged += Groups_CollectionChanged;
 
 
-            CheckedListItem<string> tmpOpType;
-            tmpOpType = new CheckedListItem<string>("All", true);
+            PriorityCheckedListItem<string> tmpOpType;
+            tmpOpType = new PriorityCheckedListItem<string>("All", true);
             tmpOpType.ItemCheckedChanged += OpType_ItemCheckedChanged;
             _OpTypes.Add(tmpOpType);
 
             foreach (OpType op in Enum.GetValues(typeof(OpType)))
             {
-                tmpOpType = new CheckedListItem<string>(op.ToString(), true);
+                tmpOpType = new PriorityCheckedListItem<string>(op.ToString(), true);
                 _OpTypes.Add(tmpOpType);
                 tmpOpType.ItemCheckedChanged += OpType_ItemCheckedChanged;
                 _CheckedOpTypes.Add(op, true);
             }
             #endregion
 
-            Polygons = new ReadOnlyObservableCollection<CheckedListItem<TtPolygon>>(_Polygons);
-            Groups = new ReadOnlyObservableCollection<CheckedListItem<TtGroup>>(_Groups);
-            Metadatas = new ReadOnlyObservableCollection<CheckedListItem<TtMetadata>>(_Metadatas);
-            OpTypes = new ReadOnlyCollection<CheckedListItem<string>>(_OpTypes);
+            Polygons = CollectionViewSource.GetDefaultView(new ReadOnlyObservableCollection<PriorityCheckedListItem<TtPolygon>>(_Polygons)) as ListCollectionView;
+            Polygons.CustomSort = new PolygonSorterEx<PriorityCheckedListItem<TtPolygon>>(x => x.Item, project.Settings.SortPolysByName);
+
+
+            Groups = new ReadOnlyObservableCollection<PriorityCheckedListItem<TtGroup>>(_Groups);
+            Metadatas = new ReadOnlyObservableCollection<PriorityCheckedListItem<TtMetadata>>(_Metadatas);
+            OpTypes = new ReadOnlyCollection<PriorityCheckedListItem<string>>(_OpTypes);
 
             IsOnBnd = null;
             HasLinks = null;
 
             Points = CollectionViewSource.GetDefaultView(Manager.Points) as ListCollectionView;
-            
             Points.CustomSort = new PointSorter(project.Settings.SortPolysByName);
-
             Points.Filter = Filter;
-            
+
             #region Init Commands
             RefreshPoints = new RelayCommand(x => Points.Refresh());
 
@@ -1072,6 +1078,7 @@ namespace TwoTrails.ViewModels
                 if (pce.PropertyName == nameof(TtSettings.SortPolysByName))
                 {
                     Points.CustomSort = new PointSorter(project.Settings.SortPolysByName);
+                    Polygons.CustomSort = new PolygonSorterEx<PriorityCheckedListItem<TtPolygon>>(x => x.Item, project.Settings.SortPolysByName);
                 }
             };
         }
@@ -1271,11 +1278,11 @@ namespace TwoTrails.ViewModels
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                CheckedListItem<TtPolygon> tmp;
+                PriorityCheckedListItem<TtPolygon> tmp;
 
                 foreach (TtPolygon polygon in e.NewItems)
                 {
-                    tmp = new CheckedListItem<TtPolygon>(polygon, true);
+                    tmp = new PriorityCheckedListItem<TtPolygon>(polygon, true);
                     _Polygons.Add(tmp);
                     _CheckedPolygons.Add(polygon.CN, true);
                     tmp.ItemCheckedChanged += Polygon_ItemCheckedChanged;
@@ -1312,10 +1319,10 @@ namespace TwoTrails.ViewModels
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                CheckedListItem<TtMetadata> tmp;
+                PriorityCheckedListItem<TtMetadata> tmp;
                 foreach (TtMetadata Metadata in e.NewItems)
                 {
-                    tmp = new CheckedListItem<TtMetadata>(Metadata, true);
+                    tmp = new PriorityCheckedListItem<TtMetadata>(Metadata, true);
                     _Metadatas.Add(tmp);
                     _CheckedMetadata.Add(Metadata.CN, true);
                     tmp.ItemCheckedChanged += Metadata_ItemCheckedChanged;
@@ -1352,10 +1359,10 @@ namespace TwoTrails.ViewModels
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                CheckedListItem<TtGroup> tmp;
+                PriorityCheckedListItem<TtGroup> tmp;
                 foreach (TtGroup Group in e.NewItems)
                 {
-                    tmp = new CheckedListItem<TtGroup>(Group, true);
+                    tmp = new PriorityCheckedListItem<TtGroup>(Group, true);
                     _Groups.Add(tmp);
                     _CheckedGroups.Add(Group.CN, true);
                     tmp.ItemCheckedChanged += Groups_ItemCheckedChanged;
@@ -1389,7 +1396,7 @@ namespace TwoTrails.ViewModels
 
 
         private void UpdateCheckedItems<T>(object sender, ref Dictionary<string, bool> checkedItems,
-            ref ObservableCollection<CheckedListItem<T>> items) where T : TtObject
+            ref ObservableCollection<PriorityCheckedListItem<T>> items) where T : TtObject
         {
             if (sender is CheckedListItem<T> cp)
             {
@@ -1428,7 +1435,7 @@ namespace TwoTrails.ViewModels
         }
 
         private void OnlyCheckThisItem<T>(object sender, ref Dictionary<string, bool> checkedItems,
-            ref ObservableCollection<CheckedListItem<T>> items) where T : TtObject
+            ref ObservableCollection<PriorityCheckedListItem<T>> items) where T : TtObject
         {
             if (sender is CheckedListItem<T> cp)
             {
@@ -2406,7 +2413,7 @@ namespace TwoTrails.ViewModels
                     case OpType.SideShot:
                     case OpType.WayPoint:
                         {
-                            CreateGpsPointDialog.ShowDialog(Manager, null, optype, MainModel.MainWindow);
+                            CreateGpsPointDialog.ShowDialog(Project, null, optype, MainModel.MainWindow);
                             break;
                         }
                     case OpType.Quondam: Retrace(); break;
@@ -2489,7 +2496,7 @@ namespace TwoTrails.ViewModels
         public void Retrace()
         {
             MainModel.MainWindow.IsEnabled = false;
-            RetraceDialog.Show(Manager, MainModel.MainWindow, (result) =>
+            RetraceDialog.Show(Project, MainModel.MainWindow, (result) =>
             {
                 MainModel.MainWindow.IsEnabled = true;
             });
@@ -2498,7 +2505,7 @@ namespace TwoTrails.ViewModels
         public void Reindex()
         {
             MainModel.MainWindow.IsEnabled = false;
-            ReindexDialog.Show(Manager, MainModel.MainWindow, (result) =>
+            ReindexDialog.Show(Project, MainModel.MainWindow, (result) =>
             {
                 MainModel.MainWindow.IsEnabled = true;
             });

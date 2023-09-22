@@ -9,10 +9,12 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails.Mapping
 {
@@ -23,12 +25,10 @@ namespace TwoTrails.Mapping
         private Map _Map;
         private MapControl _MapControl;
 
-        //private TtPoint _LastPoint;
-        //private List<TtPoint> _SelectedPoints { get; } =  new List<TtPoint>();
-
         public ObservableCollection<TtMapPolygonManager> PolygonManagers { get; } = new ObservableCollection<TtMapPolygonManager>();
-        
-        
+        public ListCollectionView PolygonManagersLVC { get; }
+
+
         private IObservableTtManager _Manager;
 
         private bool SettingVisibilities;
@@ -36,11 +36,11 @@ namespace TwoTrails.Mapping
         public ICommand ZoomToPolygonCommand { get; }
 
 
-        public TtMapManager(MapControl mapControl, Map map, IObservableTtManager manager)
+        public TtMapManager(MapControl mapControl, Map map, TtProject project)
         {
             _MapControl = mapControl;
             _Map = map;
-            _Manager = manager;
+            _Manager = project.HistoryManager;
 
             foreach (TtPolygon poly in _Manager.Polygons)
             {
@@ -62,6 +62,18 @@ namespace TwoTrails.Mapping
                     ZoomToPolygon(poly);
                 }
             });
+
+
+            PolygonManagersLVC = CollectionViewSource.GetDefaultView(PolygonManagers) as ListCollectionView;
+            PolygonManagersLVC.CustomSort = new PolygonSorterEx<TtMapPolygonManager>(x => x.Polygon, project.Settings.SortPolysByName);
+
+            project.Settings.PropertyChanged += (s, pce) =>
+            {
+                if (pce.PropertyName == nameof(TtSettings.SortPolysByName))
+                {
+                    PolygonManagersLVC.CustomSort = new PolygonSorterEx<TtMapPolygonManager>(x => x.Polygon, project.Settings.SortPolysByName);
+                }
+            };
         }
 
 

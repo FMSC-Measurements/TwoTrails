@@ -1,5 +1,6 @@
 ﻿using FMSC.Core;
 using FMSC.Core.ComponentModel;
+using FMSC.Core.Windows.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
@@ -95,6 +97,8 @@ namespace TwoTrails.ViewModels
 
 
         public ReadOnlyObservableCollection<TtPolygon> Polygons => Manager.Polygons;
+        public ListCollectionView PolygonsLVC { get; }
+
         public ReadOnlyObservableCollection<TtMetadata> Metadata => Manager.Metadata;
         public ReadOnlyObservableCollection<TtGroup> Groups => Manager.Groups;
         public ReadOnlyObservableCollection<TtMediaInfo> MediaInfo => Manager.MediaInfo;
@@ -258,6 +262,9 @@ namespace TwoTrails.ViewModels
 
             if (MediaInfo != null && MediaInfo.Count > 0)
                 CurrentMediaInfo = MediaInfo[0];
+
+            PolygonsLVC = CollectionViewSource.GetDefaultView(Polygons) as ListCollectionView;
+            PolygonsLVC.CustomSort = new PolygonSorter(project.Settings.SortPolysByName);
 
 
             KeyDownHandler = new KeyEventHandler(OnKeyDown);
@@ -620,8 +627,10 @@ namespace TwoTrails.ViewModels
 
         private void CreatePolygon(ListBox listBox)
         {
-            Manager.AddPolygon(CreatePolygon());
-            listBox.SelectedIndex = listBox.Items.Count - 1;
+            TtPolygon polygon = CreatePolygon();
+            Manager.AddPolygon(polygon);
+            listBox.SelectedItem = polygon;
+            CurrentPolygon = polygon;
         }
 
         /// <summary>
@@ -970,8 +979,10 @@ namespace TwoTrails.ViewModels
 
         private void NewMetadata(ListBox listBox)
         {
-            Manager.AddMetadata(CreateMetadata());
-            listBox.SelectedIndex = listBox.Items.Count - 1;
+            TtMetadata metadata = CreateMetadata();
+            Manager.AddMetadata(metadata);
+            listBox.SelectedItem = metadata;
+            CurrentMetadata = metadata;
         }
 
         /// <summary>
@@ -1107,8 +1118,10 @@ namespace TwoTrails.ViewModels
 
         private void NewGroup(ListBox listBox)
         {
-            Manager.AddGroup(CreateGroup());
-            listBox.SelectedIndex = listBox.Items.Count - 1;
+            TtGroup group = CreateGroup();
+            Manager.AddGroup(group);
+            listBox.SelectedItem = group;
+            CurrentGroup = group;
         }
 
         /// <summary>
