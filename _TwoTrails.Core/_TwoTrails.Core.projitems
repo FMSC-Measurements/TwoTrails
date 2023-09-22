@@ -66,6 +66,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtMediaInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionaryTemplate.cs" />
+    <Compile Include="..\_TwoTrails.Core\Objects\GeometricReductionResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectProperties\MetadataProperties.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectProperties\GroupProperties.cs" />

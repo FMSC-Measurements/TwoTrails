@@ -10,8 +10,9 @@ namespace TwoTrails.Core
 {
     public static class AnglePointLogic
     {
-        public const double MINIMUM_ANGLE = 35d;
+        public const double MINIMUM_ANGLE = 45d;
         public const double MAXIMUM_ANGLE = 180 - MINIMUM_ANGLE;
+        public const double MIN_DIST_MULTIPLIER = 10d;
 
         public const AnglePointResult MAX_ERROR =
             AnglePointResult.AngleSpecsNotMet | AnglePointResult.SegmentsTooShort |
@@ -19,9 +20,9 @@ namespace TwoTrails.Core
 
 
 
-        public static bool Qualifies(ITtManager manager, String polyCN)
+        public static bool Qualifies(ITtManager manager, TtPolygon poly)
         {
-            return Qualifies(manager.GetPoints(polyCN));
+            return Qualifies(manager.GetPoints(poly.CN));
         }
 
         public static bool Qualifies(IEnumerable<TtPoint> points)
@@ -71,12 +72,6 @@ namespace TwoTrails.Core
                     bpoints.Add(currPoint);
                 }
 
-                Func<TtPoint, TtPoint, UTMCoords, UTMCoords, bool> meetsDistReq = (TtPoint cp, TtPoint np, UTMCoords cc, UTMCoords nc) =>
-                {
-                    double minDist = (cp.Accuracy + np.Accuracy) / 2 * 10;
-                    return MathEx.Distance(cc.X, cc.Y, nc.X, nc.Y) < minDist;
-                };
-
                 UTMCoords lastCoords = lastPoint.GetCoords(targetZone);
                 UTMCoords currCoords = currPoint.GetCoords(targetZone);
                 UTMCoords nextCoords;
@@ -87,9 +82,9 @@ namespace TwoTrails.Core
                     nextCoords = nextPoint.GetCoords(targetZone);
 
                     double angle = MathEx.CalculateAngleBetweenPoints(
-                        lastPoint.AdjX, lastPoint.AdjY,
-                        currPoint.AdjX, currPoint.AdjY,
-                        nextPoint.AdjX, nextPoint.AdjY);
+                        lastCoords.X, lastCoords.Y,
+                        currCoords.X, currCoords.Y,
+                        nextCoords.X, nextCoords.Y);
 
                     angle = angle % 180;
 
@@ -98,7 +93,7 @@ namespace TwoTrails.Core
                         result |= AnglePointResult.AngleSpecsNotMet;
                     }
 
-                    if (meetsDistReq(lastPoint, currPoint, lastCoords, currCoords))
+                    if (CheckSegmentMeetsMinimumDistance(lastPoint, currPoint, lastCoords, currCoords))
                     {
                         result |= AnglePointResult.SegmentsTooShort;
                     }
@@ -113,7 +108,7 @@ namespace TwoTrails.Core
                 }
 
                 //check last and first point
-                if (meetsDistReq(lastPoint, currPoint, lastCoords, currCoords))
+                if (CheckSegmentMeetsMinimumDistance(lastPoint, currPoint, lastCoords, currCoords))
                 {
                     result |= AnglePointResult.SegmentsTooShort;
                 }
@@ -125,6 +120,19 @@ namespace TwoTrails.Core
 
             return result;
         }
+
+        public static bool CheckSegmentMeetsMinimumDistance(TtPoint cp, TtPoint np, UTMCoords cc, UTMCoords nc) =>
+            MathEx.Distance(cc.X, cc.Y, nc.X, nc.Y) < ((cp.Accuracy + np.Accuracy) / 2 * MIN_DIST_MULTIPLIER);
+
+
+
+        public static GeometricErrorReductionResult GetGeometricErrorReduction(ITtManager manager, TtPolygon polygon)
+        {
+            return new GeometricErrorReductionResult(manager, polygon);
+        }
+
+
+
 
         public static IEnumerable<String> GetErrorMessages(this AnglePointResult result)
         {
@@ -138,9 +146,10 @@ namespace TwoTrails.Core
                 yield return "Not all edges meet the required angle specifications.";
 
             if (result.HasFlag(AnglePointResult.SegmentsTooShort))
-                yield return "Not all segments meet the required distancce specifications";
+                yield return "Not all segments meet the required distancce specifications.";
         }
     }
+
 
     [Flags]
     public enum AnglePointResult
@@ -148,7 +157,7 @@ namespace TwoTrails.Core
         Qualifies               = 0,
         NotEnoughBoundaryPoints = 1 << 0,
         NotEnoughCorners        = 1 << 1,
-        AngleSpecsNotMet          = 1 << 2,
+        AngleSpecsNotMet        = 1 << 2,
         SegmentsTooShort        = 1 << 3
     }
 }

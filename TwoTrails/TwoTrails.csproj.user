@@ -21,5 +21,8 @@
     <Page Update="Dialogs\HistoryDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Dialogs\PointMinimizationDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 </Project>

@@ -10,7 +10,7 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.ViewModels
 {
-    public class AnglePointModel : BaseModel
+    public class PointMinimizationModel : BaseModel
     {
         private TtHistoryManager _Manager;
 
@@ -22,6 +22,13 @@ namespace TwoTrails.ViewModels
 
 
         public TtPolygon TargetPolygon { get { return Get<TtPolygon>(); } set { Set(value, () => Reset()); } }
+
+        public string TargetPolygonToolTip => TargetPolygon?.ToString();
+
+
+        public double MinimumAngle { get { return Get<double>(); } set { Set(value); } }
+
+
 
         public bool AnalyzeAllPointsInPoly { get; set; }
 
@@ -51,7 +58,7 @@ namespace TwoTrails.ViewModels
 
 
 
-        public AnglePointModel(TtHistoryManager manager)
+        public PointMinimizationModel(TtHistoryManager manager)
         {
             _Manager = manager;
 
@@ -86,7 +93,7 @@ namespace TwoTrails.ViewModels
             _APStats = null;
         }
 
-        public void ApplyAnglePoint()
+        public bool Apply()
         {
             if (_APStats != null)
             {
@@ -96,6 +103,9 @@ namespace TwoTrails.ViewModels
             {
                 //nothing to apply
             }
+
+
+            return true;
         }
 
 

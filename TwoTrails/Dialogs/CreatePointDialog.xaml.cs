@@ -130,7 +130,11 @@ namespace TwoTrails.Dialogs
 
             if (aie && bie && !IsGpsType)
             {
-                MessageBox.Show("You must enter at least the Forward or Backward Azimuth", String.Empty);
+                MessageBox.Show("You must enter at least the Forward or Backward Azimuth.", String.Empty);
+            }
+            else if (rbInsAft.IsChecked == true && cboPolyPoints.SelectedIndex < 0)
+            {
+                MessageBox.Show("You must select a point to insert after.", String.Empty);
             }
             else
             {

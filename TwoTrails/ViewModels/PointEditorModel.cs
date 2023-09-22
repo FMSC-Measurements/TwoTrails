@@ -24,6 +24,7 @@ using TwoTrails.Converters;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
+using TwoTrails.Properties;
 using TwoTrails.Utils;
 using Point = FMSC.Core.Point;
 
@@ -107,7 +108,7 @@ namespace TwoTrails.ViewModels
 
         public BindedRelayCommand<PointEditorModel> RezonePointsCommand { get; }
         public BindedRelayCommand<PointEditorModel> DewebPointsCommand { get; }
-        public RelayCommand AnglifyCommand { get; }
+        public BindedRelayCommand<PointEditorModel> GeometricERCommand { get; }
 
         public RelayCommand SelectAlternateCommand { get; }
         public RelayCommand SelectGpsCommand { get; }
@@ -934,46 +935,12 @@ namespace TwoTrails.ViewModels
             ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ChangeQuondamParent(), x => OnlyQuondams && !MultipleSelections,
                 this, m => new { OnlyQuondams, MultipleSelections });
-
-
-
-            //CreatePointCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.CreateNewPoint(x != null ? (OpType)x : OpType.GPS),
-            //    (x, m) => m.Manager.Polygons.Count > 0,
-            //    this, m => m.Manager.Polygons.Count);
-
-            //CreateQuondamsCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => CreateQuondams(), (x, m) => m.HasSelection,
-            //    this, m => m.HasSelection);
-
-            //DeleteCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => DeletePoint(), (x, m) => m.HasSelection,
-            //    this, x => x.HasSelection);
-
-            //RenamePointsCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.RenamePoints(), (x, m) => m.MultipleSelections && m.SamePolygon,
-            //    this, m => m.MultipleSelections);
-
-            //ConvertPointsCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.ConvertPoints(), (x, m) => m.OnlyQuondams || m.OnlyTravTypes,
-            //    this, m => new { m.OnlyQuondams, m.OnlyTravTypes });
-
-            //ResetPointCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.ResetPoint(), (x, m) => m.HasSelection,
-            //    this, m => m.HasSelection);
-
-            //ResetPointFieldCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.ResetPointField(x as DataGrid), (x, m) => m.HasSelection,
-            //    this, m => m.HasSelection);
-
-            //ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.ChangeQuondamParent(), (x, m) => m.OnlyQuondams && !m.MultipleSelections,
-            //    this, m => new { m.OnlyQuondams, m.MultipleSelections });
             #endregion
 
             #region Move Reverse Reindex Retrace
             MovePointsCommand = new BindedRelayCommand<PointEditorModel>(
-                x => MovePoints(), x => HasSelection,
+                x => MovePoints(),
+                x => HasSelection,
                 this, m => m.HasSelection);
 
             ReverseSelectedCommand = new BindedRelayCommand<PointEditorModel>(
@@ -992,30 +959,14 @@ namespace TwoTrails.ViewModels
                 this, m => m.MultipleSelections);
 
             ReindexCommand = new BindedRelayCommand<PointEditorModel>(
-                x => Reindex(), x => Manager.Points.Count > 0,
+                x => Reindex(),
+                x => Manager.Points.Count > 0,
                 this, m => m.Manager.Points.Count);
 
             RetraceCommand = new BindedRelayCommand<PointEditorModel>(
-                x => Retrace(), x => Manager.Points.Count > 0,
+                x => Retrace(),
+                x => Manager.Points.Count > 0,
                 this, m => m.Manager.Points.Count);
-
-
-            //MovePointsCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.MovePoints(), (x, m) => m.HasSelection,
-            //    this, m => m.HasSelection);
-
-            //ReverseSelectedCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => { if (m.SelectedPoints.Count > 2) m.ReverseSelection(); else m.SwapPoints(); },
-            //    (x, m) => m.MultipleSelections && m.SamePolygon,
-            //    this, m => m.MultipleSelections);
-
-            //ReindexCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.Reindex(), (x, m) => m.Manager.Points.Count > 0,
-            //    this, m => m.Manager.Points.Count);
-
-            //RetraceCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.Retrace(), (x, m) => m.Manager.Points.Count > 0,
-            //    this, m => m.Manager.Points.Count);
             #endregion
 
             #region Plot Corridors DataDictionary
@@ -1038,27 +989,6 @@ namespace TwoTrails.ViewModels
                 this, m => m.HasPossibleDoubleSidedCorridor);
 
 
-
-            //CreatePlotsCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.CreatePlots(),
-            //    (x, m) => m.Manager.Polygons.Count > 0 && !m.PlotToolInUse,
-            //    this, m => m.Manager.Polygons.Count);
-
-            //CreateSubsampleCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.CreateSubsample(),
-            //    (x, m) => m.Manager.Polygons.Count > 0 && !m.PlotToolInUse,
-            //    this, m => m.Manager.Polygons.Count);
-
-            //CreateCorridorCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.CreateCorridor(), (x, m) => m.HasPossibleCorridor,
-            //    this, m => m.HasPossibleCorridor);
-
-            //CreateDoubleSidedCorridorCommand = new BindedRelayCommand<PointEditorModel>(
-            //    (x, m) => m.CreateDoubleSidedCorridor(), (x, m) => m.HasPossibleDoubleSidedCorridor,
-            //    this, m => m.HasPossibleDoubleSidedCorridor);
-
-
-
             ModifyDataDictionaryCommand = new RelayCommand(x => ModifyDataDictionary());
             #endregion
 
@@ -1072,9 +1002,10 @@ namespace TwoTrails.ViewModels
                 x => MultipleSelections && SamePolygon,
                 this, m => new { m.MultipleSelections, m.SamePolygon });
 
-            AnglifyCommand = new RelayCommand(
-                x => AnglePointLogic.Qualifies(Manager, SelectedPoint.PolygonCN),
-                x => true);
+            GeometricERCommand = new BindedRelayCommand<PointEditorModel>(
+                x => GeometricER(),
+                x => Polygons.Count > 0,
+                this, m => new { m.Polygons.Count });
 
             #endregion
 
@@ -2691,15 +2622,6 @@ namespace TwoTrails.ViewModels
                 UpdatePointIndexes(updatedPoints, indexes);
             }
         }
-
-        public void DewebPoints()
-        {
-            if (MultipleSelections && SamePolygon)
-            {
-                List<TtPoint> points = GetSortedSelectedPoints();
-                Manager.MovePointsToPolygon(points.OrderBy(p => p.TimeCreated), points[0].Polygon, points[0].Index);
-            }
-        }
         #endregion
 
         #region Info Tools
@@ -2818,6 +2740,24 @@ namespace TwoTrails.ViewModels
             {
                 MessageBox.Show("Only GPS type points can be rezoned.");
             }
+        }
+
+        public void DewebPoints()
+        {
+            if (MultipleSelections && SamePolygon)
+            {
+                List<TtPoint> points = GetSortedSelectedPoints();
+                Manager.MovePointsToPolygon(points.OrderBy(p => p.TimeCreated), points[0].Polygon, points[0].Index);
+            }
+        }
+
+        public void GeometricER()
+        {
+            MainModel.MainWindow.IsEnabled = false;
+            PointMinimizationDialog.Show(Manager, MainModel.MainWindow, (result) =>
+            {
+                MainModel.MainWindow.IsEnabled = true;
+            });
         }
         #endregion
 

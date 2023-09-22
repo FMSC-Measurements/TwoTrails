@@ -83,6 +83,7 @@
     <Compile Remove="Tabs\UserActivityTab.cs" />
     <None Remove="AnalyzeProjectWindow.xaml" />
     <None Remove="Dialogs\HistoryDialog.xaml" />
+    <None Remove="Dialogs\PointMinimizationDialog.xaml" />
     <None Remove="Dialogs\ReindexDialog.xaml" />
     <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />
 
@@ -96,6 +97,9 @@
     </Compile>
     <Compile Update="Dialogs\ReindexDialog.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="Dialogs\PointMinimizationDialog.xaml.cs">
+      <DependentUpon>PointMinimizationDialog.xaml</DependentUpon>
     </Compile>
     <Compile Update="Properties\Resources.Designer.cs" AutoGen="True" DependentUpon="Resources.resx" DesignTime="True" />
 

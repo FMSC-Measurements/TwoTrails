@@ -143,14 +143,11 @@ namespace TwoTrails.Core.Points
                 }
                 else //Use reverse location calculation
                 {
-                    Position pos;
-
-                    if (adjusted)
-                        pos = UTMTools.ConvertUTMtoLatLonSignedDec(point.AdjX, point.AdjY, point.Metadata.Zone);
-                    else
-                        pos = UTMTools.ConvertUTMtoLatLonSignedDec(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
-
-                    return UTMTools.ConvertLatLonToUTM(pos, targetZone);
+                    return UTMTools.ConvertLatLonToUTM(
+                        adjusted ?
+                            UTMTools.ConvertUTMtoLatLonSignedDec(point.AdjX, point.AdjY, point.Metadata.Zone) :
+                            UTMTools.ConvertUTMtoLatLonSignedDec(point.UnAdjX, point.UnAdjY, point.Metadata.Zone),
+                        targetZone);
                 }
             }
             else

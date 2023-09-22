@@ -68,7 +68,7 @@ namespace TwoTrails.Core
                         _Legs.Add(new TtLeg(_LastTtBndPt, sp));
 
                     double perim = 0;
-                    foreach (TtLeg leg in _Legs.Where(l => l is TtLeg))
+                    foreach (TtLeg leg in _Legs)
                     {
                         TotalGpsError += leg.Error;
                         perim += leg.LegLength;

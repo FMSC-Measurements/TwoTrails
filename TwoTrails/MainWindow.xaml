@@ -231,7 +231,7 @@
                     <MenuItem Header="Advanced" IsEnabled="{Binding HasOpenedProject}">
                         <MenuItem Header="Rezone Points" Command="{Binding PointEditor.RezonePointsCommand}"/>
                         <MenuItem Header="Deweb Points" Command="{Binding PointEditor.DewebPointsCommand}"/>
-                        <!--<MenuItem Header="Anglify Polygon" Command="{Binding PointEditor.AnglifyCommand}"/>-->
+                        <!--<MenuItem Header="Geometric ER" Command="{Binding PointEditor.GeometricERCommand}"/>-->
                     </MenuItem>
 
                     <Separator/>
