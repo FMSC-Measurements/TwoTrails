@@ -1,10 +1,12 @@
-﻿using FMSC.Core.ComponentModel;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using FMSC.Core.Utilities;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.Core.Windows.Utilities;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -56,6 +58,16 @@ namespace TwoTrails.ViewModels
             get => _CurrentTab;
             set {
                 SetField(ref _CurrentTab, value, () => {
+                    if (_CurrentTab != null)
+                    {
+                        _CurrentTab.PropertyChanged -= CurrentTab_PropertyChanged;
+                    }
+
+                    if (value != null)
+                    {
+                        value.PropertyChanged += CurrentTab_PropertyChanged;
+                    }
+
                     if (value is ProjectTab projectTab)
                     {
                         CurrentProject = projectTab.Project;
@@ -83,12 +95,15 @@ namespace TwoTrails.ViewModels
                         BindingOperations.SetBinding(MainWindow.sbiInfo, TextBlock.TextProperty, sbiInfoBinding);
                     }
 
-                    OnPropertyChanged(nameof(CurrentProject), nameof(HasOpenedProject), nameof(ProjectEditor), nameof(PointEditor));
+                    OnPropertyChanged(nameof(CurrentProject), nameof(HasOpenedProject), nameof(ProjectEditor), nameof(PointEditor), nameof(InPointEdior));
 
                     MainWindow.Title = $"TwoTrails{(CurrentProject != null ? $" - {CurrentProject.ProjectName}" : String.Empty)}";
                 });
             }
         }
+
+        public bool InPointEdior => CurrentTab != null &&
+            (CurrentTab is ProjectTab projectTab && projectTab.CurrentTabSection == Controls.ProjectTabSection.Points);
 
         public TtProject CurrentProject { get; private set; }
         public ProjectEditorModel ProjectEditor { get; private set; }
@@ -215,6 +230,14 @@ namespace TwoTrails.ViewModels
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             CurrentTab = (_Tabs.SelectedIndex > -1) ?  (_Tabs.Items[_Tabs.SelectedIndex] as TabItem).DataContext as TtTabModel : null;
+        }
+
+        private void CurrentTab_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is ProjectTab projectTab && e.PropertyName == nameof(projectTab.CurrentTabSection))
+            {
+                OnPropertyChanged(nameof(InPointEdior));
+            }
         }
 
 

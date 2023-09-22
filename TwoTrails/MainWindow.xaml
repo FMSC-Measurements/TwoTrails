@@ -114,28 +114,36 @@
                     <Separator/>
 
                     <MenuItem Header="Rename Points" Command="{Binding PointEditor.RenamePointsCommand}"
-                          Style="{StaticResource styleMiHiddenNullCommand}"/>
+                          Style="{StaticResource styleMiHiddenNullCommand}" IsEnabled="{Binding InPointEdior}"/>
                     <MenuItem Header="{Binding PointEditor.ReverseTypeHeader}" Command="{Binding PointEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
-                          Style="{StaticResource styleMiHiddenNullCommand}"/>
+                          Style="{StaticResource styleMiHiddenNullCommand}" IsEnabled="{Binding InPointEdior}"/>
 
-                    <MenuItem Header="Sort Points" IsEnabled="{Binding PointEditor.MultipleSelections}">
+                    <MenuItem Header="Sort Points">
+                        <MenuItem.IsEnabled>
+                            <MultiBinding Converter="{StaticResource MultiBoolConverter}">
+                                <Binding Path="PointEditor.MultipleSelections"/>
+                                <Binding Path="InPointEdior"/>
+                            </MultiBinding>
+                        </MenuItem.IsEnabled>
+                        
                         <MenuItem Header="PID" Command="{Binding PointEditor.SortSelectedByPIDCommand}"/>
-                        <MenuItem Header="Time Created" Command="{Binding PointEditor.SortSelectedByTimeCreatedCommand}"/>
+                        <MenuItem Header="Time Created" Command="{Binding PointEditor.SortSelectedByTimeCreatedCommand}" />
                     </MenuItem>
 
-                    <MenuItem Header="{Binding PointEditor.ConvertTypeHeader}" Command="{Binding PointEditor.ConvertPointsCommand}" Visibility="{Binding CurrentEditor, Converter={StaticResource NotNullVisibilityConverter}}" />
+                    <MenuItem Header="{Binding PointEditor.ConvertTypeHeader}" Command="{Binding PointEditor.ConvertPointsCommand}"
+                               IsEnabled="{Binding InPointEdior}" />
 
                     <Separator/>
 
                     <MenuItem Header="Reset Point" Command="{Binding PointEditor.ResetPointCommand}" InputGestureText="Ctrl+R"
-                          Style="{StaticResource ResourceKey=styleMiPointEdit}"/>
+                          Style="{StaticResource ResourceKey=styleMiPointEdit}" IsEnabled="{Binding InPointEdior}"/>
                     <MenuItem Header="Discard All Changes" Command="{Binding ProjectEditor.DiscardChangesCommand}"
-                          Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                          Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" IsEnabled="{Binding InPointEdior}"/>
 
                     <Separator/>
 
                     <MenuItem Header="Delete" Command="{Binding PointEditor.DeleteCommand}" InputGestureText="Del"
-                          Style="{StaticResource styleMiPointEdit}"/>
+                          Style="{StaticResource styleMiPointEdit}" IsEnabled="{Binding InPointEdior}"/>
                 </MenuItem>
 
                 <MenuItem Header="_Data">

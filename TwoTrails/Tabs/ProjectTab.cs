@@ -180,6 +180,9 @@ namespace TwoTrails
             }
 
             OnPropertyChanged(nameof(TabInfo));
+
+            UndoCommand.OnCanExecuteChanged();
+            RedoCommand.OnCanExecuteChanged();
         }
 
 
