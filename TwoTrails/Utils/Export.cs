@@ -52,8 +52,8 @@ namespace TwoTrails.Utils
             Groups(manager, Path.Combine(folderPath, "Groups.csv"));
             TtNmea(manager, Path.Combine(folderPath, "TTNmea.csv"));
             ImageInfo(manager, Path.Combine(folderPath, "ImageInfo.csv"));
-            GPX(manager, projectInfo, Path.Combine(folderPath, $"{projectInfo.Name.Trim()}.gpx"));
-            KMZ(manager, projectInfo, Path.Combine(folderPath, $"{projectInfo.Name.Trim()}.kmz"));
+            GPX(manager, projectInfo, Path.Combine(folderPath, $"{projectInfo.Name.ScrubFileName()}.gpx"));
+            KMZ(manager, projectInfo, Path.Combine(folderPath, $"{projectInfo.Name.ScrubFileName()}.kmz"));
 
             Shapes(manager, projectInfo, folderPath);
 
@@ -568,14 +568,14 @@ namespace TwoTrails.Utils
 
         public static void GPX(ITtManager manager, TtProjectInfo projectInfo, String fileName)
         {
-            GpxWriter.WriteGpxFile(fileName, TtGpxGenerator.Generate(manager, projectInfo.Name.Trim(), projectInfo.Description));
+            GpxWriter.WriteGpxFile(fileName, TtGpxGenerator.Generate(manager, projectInfo.Name.ScrubFileName(), projectInfo.Description));
         }
 
         public static void KMZ(ITtManager manager, TtProjectInfo projectInfo, String fileName)
         {
-            KmlDocument doc = TtKmlGenerator.Generate(manager, projectInfo.Name.Trim(), projectInfo.Description);
+            KmlDocument doc = TtKmlGenerator.Generate(manager, projectInfo.Name.ScrubFileName(), projectInfo.Description);
             
-            string kmlName = $"{projectInfo.Name.Trim()}.kml";
+            string kmlName = $"{projectInfo.Name.ScrubFileName()}.kml";
             string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);
 
             KmlWriter.WriteKmlFile(kmlFile, doc);
@@ -609,7 +609,7 @@ namespace TwoTrails.Utils
 
         public static void Shapes(ITtManager manager, TtProjectInfo projectInfo, String folderPath)
         {
-            string shapeFolderPath = Path.Combine(folderPath, $"GIS_{projectInfo.Name.Trim()}");
+            string shapeFolderPath = Path.Combine(folderPath, $"GIS_{projectInfo.Name.ScrubFileName()}");
 
             foreach (TtPolygon poly in manager.GetPolygons())
             {
@@ -621,7 +621,7 @@ namespace TwoTrails.Utils
 
         public static string ScrubFileName(this string text)
         {
-            return new Regex("[^a-zA-Z0-9 _-]").Replace(text, "_");
+            return new Regex("[^a-zA-Z0-9 _-]").Replace(text, "_").Trim();
         }
 
         public static string Scrub(this string text)
