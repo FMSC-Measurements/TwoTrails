@@ -61,15 +61,8 @@ namespace TwoTrails.Controls
             if (_ProjectEditor.MapControl != null)
                 MapContainer.Children.Add(_ProjectEditor.MapControl);
 
-            SortPolys();
-
             lbMetadata.Items.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
             lbGroups.Items.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
-
-            _ProjectEditor.Project.Settings.PropertyChanged += (s, pce) =>
-            {
-                if (pce.PropertyName == nameof(TtSettings.SortPolysByName)) SortPolys();
-            };
         }
 
 
@@ -129,13 +122,6 @@ namespace TwoTrails.Controls
                     }
                 }
             }
-        }
-
-
-        private void SortPolys()
-        {
-            lbPolys.Items.SortDescriptions.Clear();
-            lbPolys.Items.SortDescriptions.Add(new SortDescription(_ProjectEditor.Project.Settings.SortPolysByName ? "Name" : "TimeCreated", ListSortDirection.Ascending));
         }
     }
 

@@ -272,6 +272,14 @@ namespace TwoTrails.ViewModels
 
             PointEditorControl.AddHandler(PointEditorControl.KeyDownEvent, KeyDownHandler);
             PointEditorControl.AddHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
+
+            Project.Settings.PropertyChanged += (s, pce) =>
+            {
+                if (pce.PropertyName == nameof(TtSettings.SortPolysByName))
+                {
+                    PolygonsLVC.CustomSort = new PolygonSorter(Project.Settings.SortPolysByName);
+                }
+            };
         }
 
         protected override void Dispose(bool disposing)
