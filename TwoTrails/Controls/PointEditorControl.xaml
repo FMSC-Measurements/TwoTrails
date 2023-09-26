@@ -394,7 +394,7 @@
                         <MenuItem Header="Export Point Values" Command="{Binding ExportValuesCommand}" 
 								  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>
 
-                        <MenuItem x:Name="miDDA" Header="Dist/Dir/Loc" ItemsSource="{Binding AdvInfoItems}" Visibility="{Binding MultipleSelections, Converter={StaticResource BoolToVis}}">
+                        <MenuItem x:Name="miDDA" Header="Dist/Dir/Loc/Ang" ItemsSource="{Binding AdvInfoItems}" Visibility="{Binding MultipleSelections, Converter={StaticResource BoolToVis}}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SubmenuOpened">
                                     <i:InvokeCommandAction Command="{Binding UpdateAdvInfo}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type MenuItem}}}"/>

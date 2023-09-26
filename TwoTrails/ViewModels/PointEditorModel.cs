@@ -268,6 +268,8 @@ namespace TwoTrails.ViewModels
 
         public string AI_AverageLL { get { return Get<string>(); } set { Set(value); } }
         public string AI_AverageUTM { get { return Get<string>(); } set { Set(value); } }
+
+        public double? AI_Angle { get { return Get<double?>(); } set { Set(value); } }
         #endregion
 
 
@@ -293,18 +295,24 @@ namespace TwoTrails.ViewModels
                 TtPoint currPoint = points[0];
                 UTMCoords coords = GetCoords(currPoint, zone);
 
-                n = s = ay = cy = coords.Y;
-                e = w = ax = cx = coords.X;
+                n = s = ay = coords.Y;
+                e = w = ax = coords.X;
                 mine = maxe = currPoint.AdjZ;
                 
-                TtPoint lastPoint = currPoint;
                 UTMCoords lastCoords = coords;
+                UTMCoords[] angCoords = new UTMCoords[3];
+                angCoords[0] = coords;
 
                 bool isPoly = points.Count > 2;
                 for (int i = 1; i < points.Count; i++)
                 {
                     currPoint = points[i];
                     coords = GetCoords(currPoint, zone);
+
+                    if (i < 3)
+                    {
+                        angCoords[i] = coords;
+                    }
 
                     if (coords.Y > n)
                         n = coords.Y;
@@ -357,10 +365,16 @@ namespace TwoTrails.ViewModels
                     AI_AverageLL = $"Lat: {point.Y.ToString("F3")}, Lon: {point.X.ToString("F3")}";
 
                     AI_Az = AI_AzTrue = null;
+
+                    AI_Angle = MathEx.CalculateAngleBetweenPoints(
+                        angCoords[0].X, angCoords[0].Y,
+                        angCoords[1].X, angCoords[1].Y,
+                        angCoords[2].X, angCoords[2].Y);
                 }
                 else
                 {
                     AI_AverageUTM = AI_AverageLL = null;
+                    AI_Angle = null;
 
                     AI_Az = az;
                     AI_AzTrue = az + Manager.DefaultMetadata.MagDec;
@@ -369,7 +383,7 @@ namespace TwoTrails.ViewModels
             else
             {
                 AI_DistFt = AI_DistMt = null;
-                AI_Az = AI_AzTrue = null;
+                AI_Az = AI_AzTrue = AI_Angle = null;
                 AI_AverageUTM = AI_AverageLL = AI_CenterUTM = AI_CenterLL = null;
             }
         }
@@ -411,7 +425,8 @@ namespace TwoTrails.ViewModels
                 GenerateAdvInfoMenuItem("Center (L/L):   {0}", nameof(AI_CenterLL), x => Clipboard.SetText(AI_CenterLL)),
                 GenerateAdvInfoMenuItem("Center (UTM):   {0}", nameof(AI_CenterUTM), x => Clipboard.SetText(AI_CenterUTM)),
                 GenerateAdvInfoMenuItem("Average (L/L):  {0}", nameof(AI_AverageLL), x => Clipboard.SetText(AI_AverageLL)),
-                GenerateAdvInfoMenuItem("Average (UTM):  {0}", nameof(AI_AverageUTM), x => Clipboard.SetText(AI_AverageUTM))
+                GenerateAdvInfoMenuItem("Average (UTM):  {0}", nameof(AI_AverageUTM), x => Clipboard.SetText(AI_AverageUTM)),
+                GenerateAdvInfoMenuItem("Angle (deg):    {0}", nameof(AI_Angle), x => Clipboard.SetText(AI_Angle.ToString()))
             };
         }
         
