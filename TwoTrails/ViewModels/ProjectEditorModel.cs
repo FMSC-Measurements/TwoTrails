@@ -499,8 +499,8 @@ namespace TwoTrails.ViewModels
 
         public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
 
-        public double TotalReduction => (_GERResult != null && PolygonSummary != null && PolygonSummary.TotalGpsError > 0) ?
-                                            (1 - (GERResult.TotalError / PolygonSummary.TotalGpsError)) * 100: 0;
+        public double TotalReduction => (_GERResult != null && PolygonSummary != null && PolygonSummary.GpsAreaError > 0) ?
+                                            (PolygonSummary.GpsAreaError - GERResult.AreaError): 0;
 
 
         private void EditPolygonValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
