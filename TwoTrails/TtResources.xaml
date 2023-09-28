@@ -52,15 +52,42 @@
         </Style.Triggers>
     </Style>
 
-    <SolidColorBrush x:Key="colorPriamry" Color="MediumSeaGreen" />
-    <SolidColorBrush x:Key="colorPriamryLighter" Color="PaleGreen" />
-    <SolidColorBrush x:Key="colorPriamryLight" Color="DarkSeaGreen" />
-    <SolidColorBrush x:Key="colorPriamryDark" Color="SeaGreen" />
-    <SolidColorBrush x:Key="colorBackground" Color="DimGray" />
 
-    <SolidColorBrush x:Key="colorSystemBackground" Color="LightGray" />
+    <Color x:Key="colorPrimary">#FF3CB371</Color> <!--MediumSeaGreen-->
+    <Color x:Key="colorPrimaryLighter">#FFBDDBBD</Color>
+    <Color x:Key="colorPrimaryLight">#FF8FBC8F</Color> <!--DarkSeaGreen-->
+    <Color x:Key="colorPrimaryDark">#FF2E8B57</Color> <!--SeaGreen-->
+    <Color x:Key="colorBackground">#FF696969</Color> <!--DimGray-->
+    <Color x:Key="colorSystemBackground">#FFD3D3D3</Color>
 
+    <SolidColorBrush x:Key="scbPrimary" Color="{StaticResource colorPrimary}" />
+    <SolidColorBrush x:Key="scbPrimaryLighter" Color="{StaticResource colorPrimaryLighter}" />
+    <SolidColorBrush x:Key="scbPrimaryLight" Color="{StaticResource colorPrimaryLight}" />
+    <SolidColorBrush x:Key="scbPrimaryDark" Color="{StaticResource colorPrimaryDark}" />
+    <SolidColorBrush x:Key="scbBackground" Color="{StaticResource colorBackground}" />
+    <SolidColorBrush x:Key="scbSystemBackground" Color="{StaticResource colorSystemBackground}" />
     
+
+    <Style x:Key="styleListBoxContainer" TargetType="{x:Type ListBoxItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border Name="_Border" SnapsToDevicePixels="true">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="true">
+                            <Setter TargetName="_Border" Property="Background" Value="{StaticResource scbPrimaryLighter}"/>
+                            <Setter TargetName="_Border" Property="BorderBrush" Value="{StaticResource scbPrimaryLight}"/>
+                            <Setter TargetName="_Border" Property="BorderThickness" Value="1.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
     <!--Custom Material Theme--><!--
     <SolidColorBrush x:Key="PrimaryHueLightBrush" Color="MediumSeaGreen"/>
     <SolidColorBrush x:Key="PrimaryHueLightForegroundBrush" Color="Black"/>

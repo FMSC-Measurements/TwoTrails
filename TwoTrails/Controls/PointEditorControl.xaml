@@ -3,8 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-    xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:tt="clr-namespace:TwoTrails"
     xmlns:cvt="clr-namespace:TwoTrails.Converters"
     xmlns:cp="clr-namespace:TwoTrails.CustomProperties"
@@ -52,7 +51,7 @@
                     </MultiTrigger.Conditions>
 
                     <MultiTrigger.Setters>
-                        <Setter Property="Background" Value="PaleGreen"/>
+                        <Setter Property="Background" Value="#bddbbd"/>
                     </MultiTrigger.Setters>
                 </MultiTrigger>
 
@@ -299,13 +298,13 @@
                 <!--BindableColumns="{Binding DataColumns}">-->
 
                 <DataGrid.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="SeaGreen"/>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="DarkSeaGreen"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{StaticResource colorPrimaryDark}"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{StaticResource colorPrimaryLight}"/>
 
                     <Style TargetType="DataGridCell">
                         <Style.Triggers>
                             <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                <Setter Property="BorderBrush" Value="SeaGreen" />
+                                <Setter Property="BorderBrush" Value="{StaticResource scbPrimaryDark}" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -737,7 +736,7 @@
 											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="PreviewTextInput">
-                                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="TextValidation"  />
+                                                    <i:CallMethodAction TargetObject="{Binding}" MethodName="TextValidation"  />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </TextBox>
@@ -761,7 +760,7 @@
 											cp:CustomProperties.BackgroundEnabled="{Binding IsValueSame, Converter={StaticResource IBC}}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="PreviewTextInput">
-                                                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="TextValidation"  />
+                                                    <i:CallMethodAction TargetObject="{Binding}" MethodName="TextValidation"  />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </ComboBox>

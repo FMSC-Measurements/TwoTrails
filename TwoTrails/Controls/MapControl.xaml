@@ -79,7 +79,7 @@
                                 </TextBlock>
 
                                 <Grid Grid.Column="1">
-                                    <Ellipse Width="35" Height="35" Fill="{StaticResource ResourceKey=colorBackground}" />
+                                    <Ellipse Width="35" Height="35" Fill="{StaticResource ResourceKey=scbBackground}" />
                                     <Image Grid.Column="1" MouseDown="ZoomToAllPolys" Margin="2" Height="25" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{StaticResource ResourceKey=ic_ttpoint_gps_white}">
                                         <Image.ToolTip>
                                             <Grid Background="WhiteSmoke">
@@ -445,7 +445,7 @@
                                             </TextBlock.ToolTip>
                                         </TextBlock>
                                         <Grid Grid.Column="1">
-                                            <Ellipse Width="35" Height="35" Fill="{StaticResource ResourceKey=colorBackground}" />
+                                            <Ellipse Width="35" Height="35" Fill="{StaticResource ResourceKey=scbBackground}" />
                                             <Image Grid.Column="1" Margin="2" Height="25" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{StaticResource ResourceKey=ic_ttpoint_gps_white}">
                                                 <Image.ToolTip>
                                                     <Grid Background="WhiteSmoke">

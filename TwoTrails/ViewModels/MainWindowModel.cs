@@ -207,7 +207,7 @@ namespace TwoTrails.ViewModels
                 {
                     if (File.Exists(filePath))
                     {
-                        //OpenProject(filePath);
+                        OpenProject(filePath);
                         break;
                     }
                 }

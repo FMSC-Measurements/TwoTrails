@@ -96,7 +96,7 @@ namespace TwoTrails
 
             _Listener = new TtTextWriterTraceListener(LOG_FILE_PATH);
 
-            _Listener.WriteLine($"TwoTrails Started ({Assembly.GetExecutingAssembly().GetName().Version}|{TwoTrailsSchema.SchemaVersion}D)");
+            _Listener.WriteLine($"TwoTrails Started ({Assembly.GetExecutingAssembly().GetName().Version.GetVersionWithBuildType()}|{TwoTrailsSchema.SchemaVersion}D)");
 
 #if DEBUG
             Debug.Listeners.Add(_Listener);

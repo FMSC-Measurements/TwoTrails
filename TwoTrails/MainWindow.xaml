@@ -43,7 +43,7 @@
         <Style x:Key="styleTabButtonBorderStyle" TargetType="Border">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource colorPriamry}" />
+                    <Setter Property="Background" Value="{StaticResource scbPrimary}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -246,7 +246,7 @@
                     <MenuItem Header="Advanced" IsEnabled="{Binding HasOpenedProject}">
                         <MenuItem Header="Rezone Points" Command="{Binding PointEditor.RezonePointsCommand}"/>
                         <MenuItem Header="Deweb Points" Command="{Binding PointEditor.DewebPointsCommand}"/>
-                        <!--<MenuItem Header="Geometric ER" Command="{Binding PointEditor.GeometricERCommand}"/>-->
+                        <MenuItem Header="Point Minimization" Command="{Binding PointEditor.PointMinimizationCommand}"/>
                     </MenuItem>
 
                     <Separator/>
@@ -266,7 +266,7 @@
                 </MenuItem>
             </Menu>
 
-            <StatusBar Height="25" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="{StaticResource colorPriamryDark}">
+            <StatusBar Height="25" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="{StaticResource scbPrimaryDark}">
                 <StatusBar.Resources>
                     <Style TargetType="TextBlock">
                         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -299,7 +299,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type TabItem}">
-                                        <Grid Name="Grid" VerticalAlignment="Bottom" Background="{StaticResource colorBackground}" Margin="-3, 0, 2, 0" HorizontalAlignment="Stretch">
+                                        <Grid Name="Grid" VerticalAlignment="Bottom" Background="{StaticResource scbBackground}" Margin="-3, 0, 2, 0" HorizontalAlignment="Stretch">
                                             <Border>
                                                 <DockPanel Margin="2">
                                                     <TextBlock x:Name="ContentSite" Text="{Binding TabTitle}" DockPanel.Dock="Left" HorizontalAlignment="Center"

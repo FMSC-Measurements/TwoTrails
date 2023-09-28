@@ -12,7 +12,7 @@ namespace TwoTrails.Core
 
         static MediaProperties()
         {
-            BindingFlags bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+            //BindingFlags bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
         }
     }
 }

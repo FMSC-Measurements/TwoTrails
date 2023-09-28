@@ -6,7 +6,7 @@
         xmlns:ttc="clr-namespace:TwoTrails.Controls"
         xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
         xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
         Title="Create Grid Sample Points"

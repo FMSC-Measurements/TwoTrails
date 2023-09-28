@@ -1,9 +1,12 @@
 ﻿using FMSC.Core.Windows.Controls;
+using Microsoft.Maps.MapControl.WPF;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Core;
+using TwoTrails.Mapping;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.Dialogs
@@ -15,16 +18,33 @@ namespace TwoTrails.Dialogs
     {
         PointMinimizationModel model;
 
-        public PointMinimizationDialog(TtHistoryManager manager)
+        public PointMinimizationDialog(TtProject project)
         {
-            model = new PointMinimizationModel(manager);
+            model = new PointMinimizationModel(project);
             this.DataContext = model;
             InitializeComponent();
+
+            map.Loaded += OnMapLoaded;
+
+            map.CredentialsProvider = new ApplicationIdCredentialsProvider(APIKeys.BING_MAPS_API_KEY);
+            map.Mode = new AerialMode();
+        }
+
+        private void OnMapLoaded(object sender, EventArgs e)
+        {
+            if (map.ActualHeight > 0)
+            {
+                //IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
+                //if (locs.Any())
+                //    map.SetView(locs, new Thickness(30), 0);
+
+                map.Loaded -= OnMapLoaded;
+            }
         }
 
         private void Analyze_Click(object sender, RoutedEventArgs e)
         {
-            model.AnalyzePolygon();
+            model.AnalyzeTargetPolygon();
         }
 
         private void Apply_Click(object sender, RoutedEventArgs e)
@@ -55,17 +75,17 @@ namespace TwoTrails.Dialogs
         }
 
 
-        public static bool? ShowDialog(TtHistoryManager manager, Window owner = null)
+        public static bool? ShowDialog(TtProject project, Window owner = null)
         {
-            PointMinimizationDialog diag = new PointMinimizationDialog(manager);
+            PointMinimizationDialog diag = new PointMinimizationDialog(project);
             if (owner != null)
                 diag.Owner = owner;
             return diag.ShowDialog();
         }
 
-        public static void Show(TtHistoryManager manager, Window owner = null, Action<bool?> onClose = null)
+        public static void Show(TtProject project, Window owner = null, Action<bool?> onClose = null)
         {
-            PointMinimizationDialog dialog = new PointMinimizationDialog(manager);
+            PointMinimizationDialog dialog = new PointMinimizationDialog(project);
             if (owner != null)
                 dialog.Owner = owner;
 

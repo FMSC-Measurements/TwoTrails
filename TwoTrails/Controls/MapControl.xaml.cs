@@ -89,9 +89,7 @@ namespace TwoTrails.Controls
         {
             if (map.ActualHeight > 0 && MapManager != null)
             {
-                IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
-                if (locs.Any())
-                    map.SetView(locs, new Thickness(30), 0);
+                ZoomToAllPolys(sender, null);
 
                 map.Loaded -= OnMapLoaded;
             }

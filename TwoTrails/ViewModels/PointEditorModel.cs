@@ -109,7 +109,7 @@ namespace TwoTrails.ViewModels
 
         public BindedRelayCommand<PointEditorModel> RezonePointsCommand { get; }
         public BindedRelayCommand<PointEditorModel> DewebPointsCommand { get; }
-        public BindedRelayCommand<PointEditorModel> GeometricERCommand { get; }
+        public BindedRelayCommand<PointEditorModel> PointMinimizationCommand { get; }
 
         public RelayCommand SelectAlternateCommand { get; }
         public RelayCommand SelectGpsCommand { get; }
@@ -418,15 +418,15 @@ namespace TwoTrails.ViewModels
 
             return new MenuItem[]
             {
-                GenerateAdvInfoMenuItem("Dist (Ft):      {0:#,0.0000}", nameof(AI_DistFt), x => Clipboard.SetText(AI_DistFt.ToString())),
-                GenerateAdvInfoMenuItem("Dist (Mt):      {0:#,0.0000}", nameof(AI_DistMt), x => Clipboard.SetText(AI_DistMt.ToString())),
-                GenerateAdvInfoMenuItem("Azimuth (Mag):  {0:#,0.00}", nameof(AI_Az), x => Clipboard.SetText(AI_Az.ToString())),
+                GenerateAdvInfoMenuItem("Dist (Ft): {0:#,0.0000}", nameof(AI_DistFt), x => Clipboard.SetText(AI_DistFt.ToString())),
+                GenerateAdvInfoMenuItem("Dist (Mt): {0:#,0.0000}", nameof(AI_DistMt), x => Clipboard.SetText(AI_DistMt.ToString())),
+                GenerateAdvInfoMenuItem("Azimuth (Mag): {0:#,0.00}", nameof(AI_Az), x => Clipboard.SetText(AI_Az.ToString())),
                 GenerateAdvInfoMenuItem("Azimuth (True): {0:#,0.00}", nameof(AI_AzTrue), x => Clipboard.SetText(AI_AzTrue.ToString())),
-                GenerateAdvInfoMenuItem("Center (L/L):   {0}", nameof(AI_CenterLL), x => Clipboard.SetText(AI_CenterLL)),
-                GenerateAdvInfoMenuItem("Center (UTM):   {0}", nameof(AI_CenterUTM), x => Clipboard.SetText(AI_CenterUTM)),
-                GenerateAdvInfoMenuItem("Average (L/L):  {0}", nameof(AI_AverageLL), x => Clipboard.SetText(AI_AverageLL)),
-                GenerateAdvInfoMenuItem("Average (UTM):  {0}", nameof(AI_AverageUTM), x => Clipboard.SetText(AI_AverageUTM)),
-                GenerateAdvInfoMenuItem("Angle (deg):    {0}", nameof(AI_Angle), x => Clipboard.SetText(AI_Angle.ToString()))
+                GenerateAdvInfoMenuItem("Center (L/L): {0:F3}", nameof(AI_CenterLL), x => Clipboard.SetText(AI_CenterLL)),
+                GenerateAdvInfoMenuItem("Center (UTM): {0:F3}", nameof(AI_CenterUTM), x => Clipboard.SetText(AI_CenterUTM)),
+                GenerateAdvInfoMenuItem("Average (L/L): {0:F3}", nameof(AI_AverageLL), x => Clipboard.SetText(AI_AverageLL)),
+                GenerateAdvInfoMenuItem("Average (UTM): {0:F3}", nameof(AI_AverageUTM), x => Clipboard.SetText(AI_AverageUTM)),
+                GenerateAdvInfoMenuItem("Angle (deg): {0:F2}", nameof(AI_Angle), x => Clipboard.SetText(AI_Angle.ToString()))
             };
         }
         
@@ -1029,12 +1029,16 @@ namespace TwoTrails.ViewModels
                 x => MultipleSelections && SamePolygon,
                 this, m => new { m.MultipleSelections, m.SamePolygon });
 
-            GeometricERCommand = new BindedRelayCommand<PointEditorModel>(
-                x => GeometricER(),
+            PointMinimizationCommand = new BindedRelayCommand<PointEditorModel>(
+                x => PointMinimization(),
+#if DEBUG
                 x => Polygons.Count > 0,
+#else
+                x => false,
+#endif
                 this, m => new { m.Polygons.Count });
 
-            #endregion
+#endregion
 
             #region Selections
             SelectAlternateCommand = new RelayCommand(x => SelectAlternate());
@@ -1086,7 +1090,7 @@ namespace TwoTrails.ViewModels
             UpdateAdvInfo = new RelayCommand(x => UpdateAdvInfoItems());
             #endregion
 
-            #endregion
+#endregion
 
             //BindingOperations.EnableCollectionSynchronization(_SelectedPoints, _lock);
 
@@ -2786,10 +2790,10 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        public void GeometricER()
+        public void PointMinimization()
         {
             MainModel.MainWindow.IsEnabled = false;
-            PointMinimizationDialog.Show(Manager, MainModel.MainWindow, (result) =>
+            PointMinimizationDialog.Show(Project, MainModel.MainWindow, (result) =>
             {
                 MainModel.MainWindow.IsEnabled = true;
             });

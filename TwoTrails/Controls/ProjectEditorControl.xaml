@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TwoTrails.Controls"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
              xmlns:tt="clr-namespace:TwoTrails"
              xmlns:ttc="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
@@ -12,7 +12,7 @@
              xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800"
-             Background="{StaticResource colorBackground}"
+             Background="{StaticResource scbBackground}"
              PreviewKeyDown="CommandInterceptor">
 
     <UserControl.InputBindings>
@@ -73,13 +73,13 @@
         <Style x:Key="styleTabButtonBorderStyle" TargetType="Border">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource colorPriamry}" />
+                    <Setter Property="Background" Value="{StaticResource scbPrimary}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
-    <Grid Background="{StaticResource colorBackground}">
+    <Grid Background="{StaticResource scbBackground}">
 
         <TabControl x:Name="tabControl"
                     Grid.Row="1"
@@ -103,7 +103,7 @@
 
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="ControlContainer" Property="Background" Value="SeaGreen"/>
+                                        <Setter TargetName="ControlContainer" Property="Background" Value="{StaticResource scbPrimaryDark}"/>
                                     </Trigger>
 
                                     <MultiTrigger>
@@ -113,7 +113,7 @@
                                         </MultiTrigger.Conditions>
 
                                         <MultiTrigger.Setters>
-                                            <Setter TargetName="ControlContainer" Property="Background" Value="MediumSeaGreen"/>
+                                            <Setter TargetName="ControlContainer" Property="Background" Value="{StaticResource scbPrimary}"/>
                                         </MultiTrigger.Setters>
                                     </MultiTrigger>
                                 </ControlTemplate.Triggers>
@@ -144,7 +144,7 @@
                         <RowDefinition Height="47*"/>
                         <RowDefinition Height="87*"/>
                     </Grid.RowDefinitions>
-                    <Border BorderBrush="{StaticResource colorPriamryDark}" BorderThickness="4,0,0,0" Grid.RowSpan="3" Margin="0,0,-0.2,0">
+                    <Border BorderBrush="{StaticResource scbPrimaryDark}" BorderThickness="4,0,0,0" Grid.RowSpan="3" Margin="0,0,-0.2,0">
                         <Grid Grid.Column="1" Grid.Row="0" Margin="5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -279,7 +279,8 @@
 
                         <ListBox Name="lbPolys" Grid.Column="0" Grid.Row="0" BorderThickness="0"
                                     ItemsSource="{Binding PolygonsLVC, Mode=OneWay}"
-                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemContainerStyle="{StaticResource styleListBoxContainer}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">
                                     <i:InvokeCommandAction Command="{Binding PolygonChangedCommand}"
@@ -643,8 +644,9 @@
                         </Grid.RowDefinitions>
 
                         <ListBox Name="lbMetadata" Grid.Column="0" Grid.Row="0" BorderThickness="0"
-                                     ItemsSource="{Binding Metadata, Mode=OneWay}"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                ItemsSource="{Binding Metadata, Mode=OneWay}"
+                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                ItemContainerStyle="{StaticResource styleListBoxContainer}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">
                                     <i:InvokeCommandAction Command="{Binding MetadataChangedCommand}"
@@ -850,8 +852,9 @@
                         </Grid.RowDefinitions>
 
                         <ListBox Name="lbGroups" Grid.Column="0" Grid.Row="0" BorderThickness="0"
-                                     ItemsSource="{Binding Groups, Mode=OneWay}"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                ItemsSource="{Binding Groups, Mode=OneWay}"
+                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                ItemContainerStyle="{StaticResource styleListBoxContainer}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">
                                     <i:InvokeCommandAction Command="{Binding GroupChangedCommand}"
@@ -1142,6 +1145,6 @@
 
         </TabControl>
 
-        <Grid Grid.Row="0" Height="3" Background="{StaticResource colorPriamryDark}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+        <Grid Grid.Row="0" Height="3" Background="{StaticResource scbPrimaryDark}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
     </Grid>
 </UserControl>

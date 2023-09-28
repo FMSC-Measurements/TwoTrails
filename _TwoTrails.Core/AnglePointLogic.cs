@@ -93,7 +93,7 @@ namespace TwoTrails.Core
                         result |= AnglePointResult.AngleSpecsNotMet;
                     }
 
-                    if (CheckSegmentMeetsMinimumDistance(lastPoint, currPoint, lastCoords, currCoords))
+                    if (CheckSegmentMeetsMinimumDistance(lastCoords, currCoords, (currPoint.Accuracy + lastPoint.Accuracy) / 2d))
                     {
                         result |= AnglePointResult.SegmentsTooShort;
                     }
@@ -108,7 +108,7 @@ namespace TwoTrails.Core
                 }
 
                 //check last and first point
-                if (CheckSegmentMeetsMinimumDistance(lastPoint, currPoint, lastCoords, currCoords))
+                if (CheckSegmentMeetsMinimumDistance(lastCoords, currCoords, (currPoint.Accuracy + lastPoint.Accuracy) / 2d))
                 {
                     result |= AnglePointResult.SegmentsTooShort;
                 }
@@ -121,17 +121,14 @@ namespace TwoTrails.Core
             return result;
         }
 
-        public static bool CheckSegmentMeetsMinimumDistance(TtPoint cp, TtPoint np, UTMCoords cc, UTMCoords nc) =>
-            MathEx.Distance(cc.X, cc.Y, nc.X, nc.Y) < ((cp.Accuracy + np.Accuracy) / 2 * MIN_DIST_MULTIPLIER);
-
+        public static bool CheckSegmentMeetsMinimumDistance(UTMCoords cc, UTMCoords nc, double accuracy) =>
+            MathEx.Distance(cc.X, cc.Y, nc.X, nc.Y) < (accuracy * MIN_DIST_MULTIPLIER);
 
 
         public static GeometricErrorReductionResult GetGeometricErrorReduction(ITtManager manager, TtPolygon polygon)
         {
             return new GeometricErrorReductionResult(manager, polygon);
         }
-
-
 
 
         public static IEnumerable<String> GetErrorMessages(this AnglePointResult result)
