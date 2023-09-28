@@ -88,7 +88,7 @@
                         <ColumnDefinition Width="*"/>-->
                     </Grid.ColumnDefinitions>
 
-                    <ComboBox SelectedIndex="1" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcmh:QuondamBoundaryMode}}"
+                    <ComboBox SelectedItem="{Binding BoundaryMode}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type ttcmh:QuondamBoundaryMode}}"
                               IsEnabled="{Binding ElementName=rbRetrace, Path=IsChecked}"
                               ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}, Converter={StaticResource edc}}">
                         <ComboBox.ItemTemplate>
