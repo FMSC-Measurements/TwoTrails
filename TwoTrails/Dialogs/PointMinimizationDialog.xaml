@@ -10,8 +10,8 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Geometric Error Reduction"
-        Height="400" MinHeight="300"
-        Width="800" MinWidth="600">
+        Height="600" MinHeight="300"
+        Width="950" MinWidth="600">
     
     <Window.Resources>
         <fmsccm:EnumDescriptionConverter x:Key="edc"/>
@@ -94,7 +94,7 @@
             </Grid>
 
             <ListBox x:Name="lbPoints" Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"
-                     MinWidth="120"
+                     MinWidth="100"
                      ItemsSource="{Binding Points, Mode=OneWay}" SelectionMode="Multiple">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
@@ -110,14 +110,26 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBoxItem">
                                     <Border Name="_Border" SnapsToDevicePixels="true">
+                                        <Border.Style>
+                                            <Style>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Path=OnBoundary}"
+                                                Value="True">
+                                                        <Setter Property="Border.Background" Value="{StaticResource scbPrimaryLighter}"/>
+                                                        <Setter Property="Border.BorderBrush" Value="{StaticResource scbPrimaryLight}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
                                         <ContentPresenter />
                                     </Border>
-                                    <ControlTemplate.Triggers>
+                                    
+                                    <!--<ControlTemplate.Triggers>
                                         <Trigger Property="IsSelected" Value="true">
                                             <Setter TargetName="_Border" Property="Background" Value="{StaticResource scbPrimaryLighter}"/>
                                             <Setter TargetName="_Border" Property="BorderBrush" Value="{StaticResource scbPrimaryLight}"/>
                                         </Trigger>
-                                    </ControlTemplate.Triggers>
+                                    </ControlTemplate.Triggers>-->
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
@@ -125,7 +137,7 @@
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
+                        <Grid Margin="4 0 0 2">
                             <!--<Grid.Style>
                                 <Style>
                                     <Setter Property="Grid.Background" Value="White"/>
@@ -151,7 +163,8 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <map:Map Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" x:Name="map" Mode="Aerial"/>
+            <ContentControl x:Name="map" Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" Content="{Binding Map}" />
+            <!--<map:Map Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" x:Name="map" Mode="Aerial"/>-->
 
         </Grid>
 

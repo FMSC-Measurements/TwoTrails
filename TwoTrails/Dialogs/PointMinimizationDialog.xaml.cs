@@ -16,30 +16,13 @@ namespace TwoTrails.Dialogs
     /// </summary>
     public partial class PointMinimizationDialog : Window
     {
-        PointMinimizationModel model;
+        private PointMinimizationModel model;
 
         public PointMinimizationDialog(TtProject project)
         {
             model = new PointMinimizationModel(project);
             this.DataContext = model;
             InitializeComponent();
-
-            map.Loaded += OnMapLoaded;
-
-            map.CredentialsProvider = new ApplicationIdCredentialsProvider(APIKeys.BING_MAPS_API_KEY);
-            map.Mode = new AerialMode();
-        }
-
-        private void OnMapLoaded(object sender, EventArgs e)
-        {
-            if (map.ActualHeight > 0)
-            {
-                //IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
-                //if (locs.Any())
-                //    map.SetView(locs, new Thickness(30), 0);
-
-                map.Loaded -= OnMapLoaded;
-            }
         }
 
         private void Analyze_Click(object sender, RoutedEventArgs e)
