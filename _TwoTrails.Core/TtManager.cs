@@ -911,34 +911,45 @@ namespace TwoTrails.Core
             List<IPointSegment> segments = new List<IPointSegment>();
             SideShotSegment ssSeg = new SideShotSegment();
 
+            Action<TtPoint> startNewSideShotSeg = (point) =>
+            {
+                if (ssSeg.Count > 0)
+                    segments.Add(ssSeg);
+
+                ssSeg = new SideShotSegment();
+                ssSeg.Add(point);
+            };
+
             IList<TtPoint> points = _PointsByPoly[poly.CN];
             if (points.Count > 1)
             {
-                TtPoint lastPoint = points[0];
+                TtPoint lastGps = null;
 
                 foreach (TtPoint point in points)
                 {
                     if (point.IsGpsAtBase())
                     {
-                        if (ssSeg.Count > 0)
-                            segments.Add(ssSeg);
+                        startNewSideShotSeg(point);
 
-                        ssSeg = new SideShotSegment();
-                        ssSeg.Add(point);
+                        lastGps = point;
                     }
                     else if (point.OpType == OpType.SideShot)
                     {
                         ssSeg.Add(point);
                     }
-                    else if (point.OpType == OpType.Traverse && lastPoint.IsGpsAtBase())
+                    else if (point.OpType == OpType.Traverse)
                     {
-                        segments.Add(GetTraverseSegment(lastPoint.Index, points));
-                    }
+                        startNewSideShotSeg(point);
 
-                    lastPoint = point;
+                        if (lastGps != null)
+                        {
+                            segments.Add(GetTraverseSegment(lastGps.Index, points));
+                            lastGps = null;
+                        }
+                    }
                 }
 
-                if (ssSeg.Count > 0)
+                if (ssSeg.Count > 0 && ssSeg.Count > 1)
                     segments.Add(ssSeg);
             }
 
