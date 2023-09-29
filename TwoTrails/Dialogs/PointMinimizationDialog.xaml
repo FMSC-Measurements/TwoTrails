@@ -163,7 +163,7 @@
                                         <Border.Style>
                                             <Style>
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Path=OnBoundary}" Value="True">
+                                                    <DataTrigger Binding="{Binding Path=OnBoundary, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
                                                         <Setter Property="Border.Background" Value="{StaticResource scbPrimaryLighter}"/>
                                                         <Setter Property="Border.BorderBrush" Value="{StaticResource scbPrimaryLight}"/>
                                                     </DataTrigger>

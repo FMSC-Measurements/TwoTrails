@@ -58,6 +58,11 @@ namespace TwoTrails.ViewModels
             get => Get<TtPolygon>();
             set => Set(value, () => {
                 OnPropertyChanged(nameof(TargetPolygonToolTip));
+
+                _OrigPoints = Manager.GetPoints(TargetPolygon.CN);
+                Points = new ReadOnlyObservableCollection<TtPoint>(
+                    new ObservableCollection<TtPoint>(_OrigPoints.DeepCopy()));
+
                 UpdateOrigPoly();
                 AnalyzeTargetPolygon();
             });
@@ -274,9 +279,6 @@ namespace TwoTrails.ViewModels
 
             if (TargetPolygon != null)
             {
-                _OrigPoints = Manager.GetPoints(TargetPolygon.CN);
-                Points = new ReadOnlyObservableCollection<TtPoint>(
-                    new ObservableCollection<TtPoint>(_OrigPoints.DeepCopy()));
                 UpdateOrigPoly();
 
                 List<PMSegment> segments = new List<PMSegment>();
