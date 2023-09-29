@@ -24,6 +24,8 @@ namespace TwoTrails.Mapping
 
         public Pushpin AdjPushpin { get; } = new Pushpin();
         public Pushpin UnAdjPushpin { get; } = new Pushpin();
+        public Label AdjLabel { get; }
+        public Label UnAdjLabel { get; }
 
         private Location _AdjLoc, _UnAdjLoc;
         public Location AdjLocation { get { return _AdjLoc; } private set { SetField(ref _AdjLoc, value); } }
@@ -211,6 +213,27 @@ namespace TwoTrails.Mapping
             AdjPushpin.ToolTipOpening += LoadAdjToolTip;
             UnAdjPushpin.ToolTipOpening += LoadUnAdjToolTip;
 
+            AdjLabel = new Label()
+            {
+                FontSize = 6,
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(-5, 0, -5, 0),
+                Foreground = new SolidColorBrush(Colors.White),
+                Content = point.PID
+            };
+
+            UnAdjLabel = new Label()
+            {
+                FontSize = 6,
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(-5, 0, -5, 0),
+                Foreground = new SolidColorBrush(Colors.White),
+                Content = point.PID
+            };
+
+            AdjPushpin.Content = AdjLabel;
+            UnAdjPushpin.Content = UnAdjLabel;
+
             AdjPushpin.ToolTip = String.Empty;
             UnAdjPushpin.ToolTip = String.Empty;
 
@@ -265,6 +288,9 @@ namespace TwoTrails.Mapping
             {
                 UnAdjPushpin.ToolTip = new PointInfoBox(this, false);
                 AdjPushpin.ToolTip = new PointInfoBox(this, true);
+
+                AdjLabel.Content = Point.PID;
+                UnAdjLabel.Content = Point.PID;
             }
         }
 

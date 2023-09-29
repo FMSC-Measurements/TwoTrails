@@ -2,10 +2,12 @@
 using Microsoft.Maps.MapControl.WPF;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.Core;
+using TwoTrails.Core.Points;
 using TwoTrails.Mapping;
 using TwoTrails.ViewModels;
 
@@ -23,6 +25,13 @@ namespace TwoTrails.Dialogs
             model = new PointMinimizationModel(project);
             this.DataContext = model;
             InitializeComponent();
+
+            List<TtPoint> points = model.Points.Where(p => p.OnBoundary).ToList();
+
+            foreach (TtPoint p in points)
+            {
+                lbPoints.SelectedItems.Add(p);
+            }
         }
 
         private void Analyze_Click(object sender, RoutedEventArgs e)
@@ -56,6 +65,17 @@ namespace TwoTrails.Dialogs
         {
             e.Handled = ControlUtils.TextIsInteger(sender, e);
         }
+
+        private void TextIsDouble(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = ControlUtils.TextIsDouble(sender, e);
+        }
+
+        private void TextIsUnsignedDouble(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = ControlUtils.TextIsUnsignedDouble(sender, e);
+        }
+
 
 
         public static bool? ShowDialog(TtProject project, Window owner = null)

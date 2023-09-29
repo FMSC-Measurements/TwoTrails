@@ -9,14 +9,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.Mapping;
+using Convert = FMSC.Core.Convert;
+using Point = FMSC.Core.Point;
 
 namespace TwoTrails.ViewModels
 {
@@ -31,6 +32,7 @@ namespace TwoTrails.ViewModels
 
 
         public ICommand PointSelectionChangedCommand { get; }
+        public ICommand PointSelectedCommand { get; }
         public ICommand CommitCommand { get; }
 
 
@@ -44,9 +46,12 @@ namespace TwoTrails.ViewModels
         public List<TtPolygon> Polygons { get; }
         public ReadOnlyObservableCollection<TtPoint> Points { get; private set; }
         private List<TtPoint> _OrigPoints;
+        private readonly Dictionary<string, Pushpin> _PushPins = new Dictionary<string, Pushpin>();
         private readonly MapPolygon _OrigPoly = new MapPolygon();
         private readonly MapPolygon _MinPoly = new MapPolygon();
         private Extent Extents;
+
+        private readonly SolidColorBrush _OnBoundBrush, _OffBoundBrush;
 
 
         public TtPolygon TargetPolygon {
@@ -61,12 +66,24 @@ namespace TwoTrails.ViewModels
         public string TargetPolygonToolTip => TargetPolygon?.ToString();
 
 
-        public double MinimumAngle { get => Get<double>(); set => Set(value); }
-        public double MinimumLegLength { get => Get<double>(); set => Set(value); }
-        public double? AccuracyOverride { get => Get<double?>(); set => Set(value); }
+        public double MinimumAngle { get => Get<double>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+        public double? MinimumLegLength { get => Get<double?>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+        public double? AccuracyOverride { get => Get<double?>(); set => Set(value, () => AnalyzeTargetPolygon()); }
 
-        public bool RunPartial { get => Get<bool>(); set => Set(value); }
-        public bool AnalyzeAllPointsInPoly { get => Get<bool>(); set => Set(value); }
+        public bool AnalyzeAllPointsInPoly { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+        public bool RunPartial { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+
+
+        public bool HidePoints {
+            get => Get<bool>();
+            set => Set(value, () => {
+                if (_PushPins.Any())
+                {
+                    Visibility vis = value ? Visibility.Collapsed: Visibility.Visible;
+                    _PushPins.Values.ForEach(pin => { pin.Visibility = vis; });
+                }
+            });
+        }
 
 
 
@@ -74,16 +91,20 @@ namespace TwoTrails.ViewModels
             get => Get<Tuple<double, double, double>>();
             set => Set(value, () =>
                     OnPropertyChanged(
-                        nameof(NewArea),
-                        nameof(NewPerimeter),
+                        nameof(NewAreaHa),
+                        nameof(NewAreaAc),
+                        nameof(NewPerimeterM),
+                        nameof(NewPerimeterFt),
                         nameof(AreaDifference),
                         nameof(PerimeterDifference)
                     )
                 );
         }
-
-        public double? NewArea => APStats?.Item1;
-        public double? NewPerimeter => APStats?.Item2;
+        
+        public double? NewAreaHa => APStats != null ? Convert.ToHectare(APStats.Item1, Area.MeterSq) : (double?)null;
+        public double? NewAreaAc => APStats != null ? Convert.ToAcre(APStats.Item1, Area.MeterSq) : (double?)null;
+        public double? NewPerimeterM => APStats?.Item2;
+        public double? NewPerimeterFt => APStats != null ? Convert.ToFeetTenths(APStats.Item2, Distance.Meters) : (double?)null;
 
         public double? AreaDifference => APStats != null ? (double?)(APStats.Item1 / TargetPolygon.Area) : null;
         public double? PerimeterDifference => APStats != null ? (double?)(APStats.Item2 / TargetPolygon.Perimeter) : null;
@@ -96,38 +117,41 @@ namespace TwoTrails.ViewModels
             Polygons = Manager.Polygons.Where(p => Manager.GetPoints(p.CN).HasAtLeast(3)).ToList();
             Polygons.Sort(new PolygonSorterDirect(project.Settings.SortPolysByName));
 
-            PointSelectionChangedCommand = new RelayCommand(x => SelectedPointsChanged(x as CompositeCommandParameter));
+            PointSelectedCommand = new RelayCommand(x =>
+            {
+                if (x is CompositeCommandParameter param && param.Parameter is TtPoint point)
+                    PointSelected(point);
+            });
 
             MinimumAngle = MINIMUM_ANGLE;
             AnalyzeAllPointsInPoly = true;
 
+            _OnBoundBrush = (SolidColorBrush)Application.Current.Resources["scbPrimary"];
+            _OffBoundBrush = (SolidColorBrush)Application.Current.Resources["scbBackground"];
 
-            _OrigPoly.Stroke = new SolidColorBrush(Colors.Gray);
+            _OrigPoly.Stroke = new SolidColorBrush(Colors.LightGray);
             _OrigPoly.StrokeThickness = 5;
 
             _MinPoly.Stroke = new SolidColorBrush(Colors.Red);
-            _MinPoly.StrokeThickness = 2;
+            _MinPoly.StrokeThickness = 3;
 
-            TargetPolygon = Polygons.FirstOrDefault();
 
+            Map.MouseDoubleClick += (s, e) => e.Handled = true;
             Map.CredentialsProvider = new ApplicationIdCredentialsProvider(APIKeys.BING_MAPS_API_KEY);
             Map.Mode = new AerialMode();
+
+            Map.Children.Add(_OrigPoly);
+            Map.Children.Add(_MinPoly);
+
             Map.Loaded += OnMapLoaded;
+
+            TargetPolygon = Polygons.FirstOrDefault();
         }
 
-
-        private void OnMapLoaded(object sender, System.Windows.RoutedEventArgs e)
+        private void OnMapLoaded(object sender, RoutedEventArgs e)
         {
             if (Map.ActualHeight > 0)
             {
-                //IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
-                //if (locs.Any())
-                //    map.SetView(locs, new Thickness(30), 0);
-
-
-                Map.Children.Add(_OrigPoly);
-                Map.Children.Add(_MinPoly);
-
                 Map.Loaded -= OnMapLoaded;
 
                 if (Extents == null)
@@ -147,21 +171,11 @@ namespace TwoTrails.ViewModels
         }
 
 
-        private void SelectedPointsChanged(CompositeCommandParameter parameters)
+        private void PointSelected(TtPoint point)
         {
-            SelectionChangedEventArgs args = parameters.EventArgs as SelectionChangedEventArgs;
-
-            foreach (TtPoint point in args.AddedItems)
-            {
-                point.OnBoundary = true;
-            }
-
-            foreach (TtPoint point in args.RemovedItems)
-            {
-                point.OnBoundary = false;
-            }
-
-            UpdateMinimizedPoly();
+            point.OnBoundary = !point.OnBoundary;
+            _PushPins[point.CN].Background = point.OnBoundary ? _OnBoundBrush : _OffBoundBrush;
+            UpdateMinimizedPoly(false);
         }
 
 
@@ -170,31 +184,61 @@ namespace TwoTrails.ViewModels
             if (_OrigPoints != null && _OrigPoints.Count > 2)
             {
                 LocationCollection locations = new LocationCollection();
-                IEnumerable<TtPoint> points = AnalyzeAllPointsInPoly ? _OrigPoints : _OrigPoints.Where(p => p.IsBndPoint());
+                Extent.Builder eb = new Extent.Builder();   
 
-                Extent.Builder eb = new Extent.Builder();
+                if (_PushPins.Count > 0)
+                {
+                    foreach (Pushpin pushpin in _PushPins.Values)
+                    {
+                        Map.Children.Remove(pushpin);
+                    }
 
-                foreach (TtPoint point in points.OrderBy(p => p.Index))
+                    _PushPins.Clear();
+                }
+
+                foreach (TtPoint point in Points.OrderBy(p => p.Index))
                 {
                     Point ll = point.GetLatLon();
                     eb.Include(ll.Y, ll.X);
-                    locations.Add(new Location(ll.Y, ll.X));
+                    Location location = new Location(ll.Y, ll.X);
+
+                    Pushpin pushpin = new Pushpin();
+                    pushpin.Location = location;
+                    pushpin.Background = _OffBoundBrush;
+                    pushpin.Visibility = HidePoints ? Visibility.Collapsed : Visibility.Visible;
+                    pushpin.MouseDoubleClick += (s, e) => PointSelected(point);
+
+                    pushpin.Content = new Label()
+                    {
+                        FontSize = 6,
+                        FontWeight = FontWeights.Bold,
+                        Margin = new Thickness(-5, 0, -5, 0),
+                        Foreground = new SolidColorBrush(Colors.White),
+                        Content = point.PID
+                    };
+
+                    pushpin.ToolTip = point.ToString();
+
+                    Map.Children.Add(pushpin);
+
+                    _PushPins.Add(point.CN, pushpin);
+                    locations.Add(location);
                 }
 
                 _OrigPoly.Locations = locations;
-                _OrigPoly.Visibility = System.Windows.Visibility.Visible;
+                _OrigPoly.Visibility = Visibility.Visible;
 
                 Extents = eb.Build();
             }
             else
             {
-                _OrigPoly.Visibility = System.Windows.Visibility.Hidden;
+                _OrigPoly.Visibility = Visibility.Hidden;
             }
 
             Map.Refresh();
         }
 
-        public void UpdateMinimizedPoly()
+        public void UpdateMinimizedPoly(bool updatePushpins = true)
         {
             if (Points != null && Points.Count > 2)
             {
@@ -202,18 +246,21 @@ namespace TwoTrails.ViewModels
                 LocationCollection locations = new LocationCollection();
                 foreach (TtPoint point in points)
                 {
-                    Point ll = point.GetLatLon();
-                    locations.Add(new Location(ll.Y, ll.X));
+                    Pushpin pushpin = _PushPins[point.CN];
+                    locations.Add(pushpin.Location);
+
+                    if (updatePushpins)
+                        pushpin.Background = _OnBoundBrush;
                 }
 
                 _MinPoly.Locations = locations;
-                _MinPoly.Visibility = System.Windows.Visibility.Visible;
+                _MinPoly.Visibility = Visibility.Visible;
 
                 APStats = TtCoreUtils.CalculateAreaPerimeterAndOnBoundTrail(points);
             }
             else
             {
-                _MinPoly.Visibility = System.Windows.Visibility.Hidden;
+                _MinPoly.Visibility = Visibility.Hidden;
                 APStats = null;
             }
 
@@ -228,12 +275,9 @@ namespace TwoTrails.ViewModels
             if (TargetPolygon != null)
             {
                 _OrigPoints = Manager.GetPoints(TargetPolygon.CN);
-                UpdateOrigPoly();
-
-                List<TtPoint> points = new List<TtPoint>(_OrigPoints.DeepCopy());
-
                 Points = new ReadOnlyObservableCollection<TtPoint>(
-                    new ObservableCollection<TtPoint>(points));
+                    new ObservableCollection<TtPoint>(_OrigPoints.DeepCopy()));
+                UpdateOrigPoly();
 
                 List<PMSegment> segments = new List<PMSegment>();
 
@@ -247,12 +291,12 @@ namespace TwoTrails.ViewModels
                 UTMCoords currCoords = currPoint.GetCoords(targetZone);
                 UTMCoords nextCoords;
 
-                for (int i = 0; i < points.Count; i++)
+                for (int i = 0; i < Points.Count; i++)
                 {
-                    nextPoint = (i == points.Count - 1) ? points[0] : points[i + 1];
+                    nextPoint = (i == Points.Count - 1) ? Points[0] : Points[i + 1];
                     nextCoords = nextPoint.GetCoords(targetZone);
 
-                    if (currPoint.HasSameAdjLocation(nextPoint) || (AnalyzeAllPointsInPoly && !currPoint.OnBoundary))
+                    if (currPoint.HasSameAdjLocation(nextPoint) || (!AnalyzeAllPointsInPoly && !currPoint.OnBoundary))
                     {
                         currPoint.OnBoundary = false;
                         currPoint = nextPoint;
@@ -261,9 +305,9 @@ namespace TwoTrails.ViewModels
                     else
                     {
                         currPoint.OnBoundary = true;
+                        segments.Add(new PMSegment(lastPoint, currPoint, nextPoint, lastCoords, currCoords, nextCoords, AccuracyOverride));
                     }
 
-                    segments.Add(new PMSegment(lastPoint, currPoint, nextPoint, lastCoords, currCoords, nextCoords, AccuracyOverride));
 
                     lastPoint = currPoint;
                     lastCoords = currCoords;
@@ -292,6 +336,7 @@ namespace TwoTrails.ViewModels
                         foreach (PMSegment seg in nonComplientSegs)
                         {
                             seg.OnBoundary = false;
+                            seg.CurrPoint.OnBoundary = false;
                         }
 
                         nonComplientSegs.Clear();
@@ -312,9 +357,14 @@ namespace TwoTrails.ViewModels
                         currSeg.Leg2Accuracy :
                         (avgSegsAcc * (nonComplientSegs.Count - 1) / nonComplientSegs.Count + currSeg.Leg2Accuracy / nonComplientSegs.Count);
 
+
                     if (Math.Abs(totalSegsAngle) > MinimumAngle && totalSegsLength >= avgSegsAcc * MIN_DIST_MULTIPLIER)
                     {
                         commitSegment();
+                    }
+                    else
+                    {
+                        nonComplientSegs.Add(currSeg);
                     }
                 };
 
@@ -322,7 +372,7 @@ namespace TwoTrails.ViewModels
                 {
                     currSeg = segments[i];
 
-                    if (currSeg.Angle >= MinimumAngle && currSeg.Leg1MeetsMinDist && currSeg.Leg2MeetsMinDist)
+                    if (currSeg.Angle >= MinimumAngle && currSeg.Leg1MeetsMinDist)
                     {
                         commitSegment();
                     }
@@ -352,7 +402,6 @@ namespace TwoTrails.ViewModels
 
             return true;
         }
-
 
         public class PMSegment
         {
