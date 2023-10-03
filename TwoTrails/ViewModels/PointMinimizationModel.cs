@@ -83,7 +83,17 @@ namespace TwoTrails.ViewModels
         public double? MaximumLegAdjustDist { get => Get<double?>(); set => Set(value, () => AnalyzeTargetPolygon()); }
         public double? AccuracyOverride { get => Get<double?>(); set => Set(value, () => AnalyzeTargetPolygon()); }
 
-        public bool AnalyzeAllPointsInPoly { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+        public bool AnalyzeAllPointsInPoly { get => Get<bool>(); set => Set(value, () =>
+        {
+            if (_OrigPoints != null)
+            {
+                Points = new ReadOnlyObservableCollection<TtPoint>(
+                    new ObservableCollection<TtPoint>(_OrigPoints.Values.OrderBy(p => p.Index).DeepCopy()));
+            }
+            else Points = null;
+            
+            AnalyzeTargetPolygon();
+        }); }
         public bool LimitAreaChange { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
         public bool RespectCurves { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
 
@@ -104,30 +114,60 @@ namespace TwoTrails.ViewModels
         private Tuple<double, double, double> APStats {
             get => Get<Tuple<double, double, double>>();
             set => Set(value, () =>
-                    OnPropertyChanged(
-                        nameof(NewAreaHa),
-                        nameof(NewAreaAc),
-                        nameof(NewPerimeterM),
-                        nameof(NewPerimeterFt),
-                        nameof(AreaDifference),
-                        nameof(PerimeterDifference)
-                    )
-                );
+                OnPropertyChanged(
+                    nameof(NewAreaHa),
+                    nameof(NewAreaAc),
+                    nameof(NewPerimeterM),
+                    nameof(NewPerimeterFt),
+                    nameof(AreaDifference),
+                    nameof(AreaDifferenceAc),
+                    nameof(PerimeterDifference),
+                    nameof(PerimeterDifferenceFt)
+                ));
         }
 
-        public double? NewAreaHa => APStats != null ? Convert.ToHectare(APStats.Item1, Area.MeterSq) : (double?)null;
         public double? NewAreaAc => APStats != null ? Convert.ToAcre(APStats.Item1, Area.MeterSq) : (double?)null;
+        public double? NewAreaHa => APStats != null ? Convert.ToHectare(APStats.Item1, Area.MeterSq) : (double?)null;
 
-        public double? NewPerimeterM => APStats?.Item2;
         public double? NewPerimeterFt => APStats != null ? Convert.ToFeetTenths(APStats.Item2, Distance.Meters) : (double?)null;
+        public double? NewPerimeterM => APStats?.Item2;
 
         public double? AreaDifference => APStats != null ? (double?)GetDiff(APStats.Item1, TargetPolygon.Area) : null;
+        public double? AreaDifferenceAc => (APStats != null) ? NewAreaAc - TargetPolygon.AreaAcres : null;
+
         public double? PerimeterDifference => APStats != null ? (double?)GetDiff(APStats.Item2, TargetPolygon.Perimeter) : null;
+        public double? PerimeterDifferenceFt => APStats != null ? NewPerimeterFt - TargetPolygon.PerimeterFt : null;
+
+
+        private GeometricErrorReductionResult GERResult
+        {
+            get => Get<GeometricErrorReductionResult>();
+            set => Set(value, () => OnPropertyChanged(
+                nameof(GpsAreaError),
+                nameof(VariableAreaError)
+            ));
+        }
+
+        private GeometricErrorReductionResult NewGERResult
+        {
+            get => Get<GeometricErrorReductionResult>();
+            set => Set(value, () => OnPropertyChanged(
+                nameof(NewGpsAreaError),
+                nameof(NewVariableAreaError)
+            ));
+        }
+
+        public double? GpsAreaError => GERResult != null ? GERResult.TotalGpsError / TargetPolygon.Area * 100d : (double?)null;
+        public double? NewGpsAreaError => NewGERResult != null ? NewGERResult.TotalGpsError / TargetPolygon.Area * 100d : (double?)null;
+
+        public double? VariableAreaError => GERResult != null ? GERResult.TotalError / TargetPolygon.Area * 100d : (double?)null;
+        public double? NewVariableAreaError => NewGERResult != null ? NewGERResult.TotalError / TargetPolygon.Area * 100d : (double?)null;
+
 
         private double GetDiff(double i1, double i2)
         {
             double diff = (i1 / i2);
-            return ((diff > 1) ? (diff - 1) : (1 - diff)) * 100d;
+            return (((diff > 1) ? (diff - 1) : (1 - diff)) * 100d) * (i1 < i2 ? -1 : 1);
         }
 
 
@@ -203,7 +243,7 @@ namespace TwoTrails.ViewModels
                 Map.Loaded -= OnMapLoaded;
 
                 if (Extents == null)
-                    UpdateMinimizedPoly();
+                    UpdateOrigPoly();
 
 
                 if (Extents != null)
@@ -278,6 +318,8 @@ namespace TwoTrails.ViewModels
                 _OrigPoly.Visibility = Visibility.Visible;
 
                 Extents = eb.Build();
+
+                GERResult = new GeometricErrorReductionResult(Manager, TargetPolygon);
             }
             else
             {
@@ -306,11 +348,13 @@ namespace TwoTrails.ViewModels
                 _MinPoly.Visibility = Visibility.Visible;
 
                 APStats = TtCoreUtils.CalculateAreaPerimeterAndOnBoundTrail(points);
+                NewGERResult = new GeometricErrorReductionResult(points, TargetPolygon.Area);
             }
             else
             {
                 _MinPoly.Visibility = Visibility.Hidden;
                 APStats = null;
+                NewGERResult = null;
             }
 
             Map.Refresh();
@@ -323,8 +367,6 @@ namespace TwoTrails.ViewModels
 
             if (TargetPolygon != null)
             {
-                UpdateOrigPoly();
-
                 List<PMSegment> segments = new List<PMSegment>();
 
                 int targetZone = Points[0].Metadata.Zone;

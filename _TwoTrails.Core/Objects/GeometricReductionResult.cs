@@ -17,10 +17,11 @@ namespace TwoTrails.Core
 
         public AnglePointResult Flags { get; private set; }
 
-        public TtPolygon Polygon { get; private set; }
+        private double PolygonArea { get; set; }
 
+        public double TotalGpsError { get; private set; }
         public double TotalError { get; private set; }
-        public double AreaError => Polygon.Area > 0 ? TotalError / Polygon.Area * 100d : 0;
+        public double AreaError => PolygonArea > 0 ? TotalError / PolygonArea * 100d : 0;
 
         public int LongLegs { get; private set; }
         public int SharpEdges { get; private set; }
@@ -32,28 +33,31 @@ namespace TwoTrails.Core
         public List<GERSegment> Segments { get; private set; } = new List<GERSegment>();
 
 
-        public GeometricErrorReductionResult(ITtManager manager, TtPolygon polygon)
+
+        public GeometricErrorReductionResult(ITtManager manager, TtPolygon polygon) :
+            this(manager.GetPoints(polygon.CN).Where(p => p.IsBndPoint()).ToList(), polygon.Area)
+        { }
+
+        public GeometricErrorReductionResult(List<TtPoint> points, double polygonArea)
         {
-            Polygon = polygon;
+            PolygonArea = polygonArea;
 
-            List<TtPoint> bpoints = manager.GetPoints(polygon.CN).Where(p => p.IsBndPoint()).ToList();
-
-            if (bpoints.Count > 2)
+            if (points.Count > 2)
             {
-                int targetZone = bpoints[0].Metadata.Zone;
+                int targetZone = points[0].Metadata.Zone;
 
-                TtPoint lastPoint = bpoints[bpoints.Count - 1];
-                TtPoint currPoint = bpoints[0];
+                TtPoint lastPoint = points[points.Count - 1];
+                TtPoint currPoint = points[0];
                 TtPoint nextPoint;
 
                 if (currPoint.HasSameAdjLocation(lastPoint))
                 {
-                    for (int i = bpoints.Count - 2; i > 1; i--)
+                    for (int i = points.Count - 2; i > 1; i--)
                     {
-                        lastPoint = bpoints[i];
+                        lastPoint = points[i];
                         if (currPoint.HasSameAdjLocation(lastPoint))
                         {
-                            bpoints.RemoveAt(i + 1);
+                            points.RemoveAt(i + 1);
                         }
                         else
                         {
@@ -61,7 +65,7 @@ namespace TwoTrails.Core
                         }
                     }
 
-                    if (bpoints.Count < 3)
+                    if (points.Count < 3)
                     {
                         Flags |= AnglePointResult.NotEnoughCorners;
                         return;
@@ -69,7 +73,7 @@ namespace TwoTrails.Core
                 }
                 else
                 {
-                    bpoints.Add(currPoint);
+                    points.Add(currPoint);
                 }
 
                 UTMCoords lastCoords = lastPoint.GetCoords(targetZone);
@@ -95,9 +99,9 @@ namespace TwoTrails.Core
                             distSegA / minDistSegA;
                 double aeDistDivB;
 
-                for (int i = 0; i < bpoints.Count - 1; i++)
+                for (int i = 0; i < points.Count - 1; i++)
                 {
-                    nextPoint = bpoints[i + 1];
+                    nextPoint = points[i + 1];
                     nextCoords = nextPoint.GetCoords(targetZone);
 
                     double angle = MathEx.CalculateAngleBetweenPoints(
@@ -146,6 +150,7 @@ namespace TwoTrails.Core
                         aeDistDivA <= 1 || aeDistDivB <= 1, aeDistDivA >= 2 && aeDistDivB >= 2));
 
                     TotalError += segAreaError;
+                    TotalGpsError += accDistSegB;
 
 
                     lastPoint = currPoint;

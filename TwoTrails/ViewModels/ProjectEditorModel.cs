@@ -257,14 +257,15 @@ namespace TwoTrails.ViewModels
             CurrentMetadata = Metadata[0];
             CurrentGroup = Groups[0];
 
+            PolygonsLVC = CollectionViewSource.GetDefaultView(Polygons) as ListCollectionView;
+            PolygonsLVC.CustomSort = new PolygonSorter(project.Settings.SortPolysByName);
+
             if (Polygons != null && Polygons.Count > 0)
-                CurrentPolygon = Polygons[0];
+                CurrentPolygon = PolygonsLVC.GetItemAt(0) as TtPolygon;
 
             if (MediaInfo != null && MediaInfo.Count > 0)
                 CurrentMediaInfo = MediaInfo[0];
 
-            PolygonsLVC = CollectionViewSource.GetDefaultView(Polygons) as ListCollectionView;
-            PolygonsLVC.CustomSort = new PolygonSorter(project.Settings.SortPolysByName);
 
 
             KeyDownHandler = new KeyEventHandler(OnKeyDown);
@@ -562,10 +563,8 @@ namespace TwoTrails.ViewModels
         private void GeneratePolygonSummaryAndStats(TtPolygon polygon)
         {
             PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true);
-            GERResult = AnglePointLogic.GetGeometricErrorReduction(Manager, polygon);
+            GERResult = new GeometricErrorReductionResult(Manager, polygon);
             OnPropertyChanged(nameof(TotalReduction));
-
-            //PolygonAnglePointResult = AnglePointLogic.VerifyGeometry(Manager, polygon.CN);
         }
 
 

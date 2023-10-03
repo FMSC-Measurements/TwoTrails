@@ -125,11 +125,6 @@ namespace TwoTrails.Core
             MathEx.Distance(cc.X, cc.Y, nc.X, nc.Y) < (accuracy * MIN_DIST_MULTIPLIER);
 
 
-        public static GeometricErrorReductionResult GetGeometricErrorReduction(ITtManager manager, TtPolygon polygon)
-        {
-            return new GeometricErrorReductionResult(manager, polygon);
-        }
-
 
         public static IEnumerable<String> GetErrorMessages(this AnglePointResult result)
         {
