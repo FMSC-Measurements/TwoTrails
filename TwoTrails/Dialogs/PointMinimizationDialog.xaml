@@ -56,7 +56,7 @@
             
             <Grid Margin="5" Grid.Column="0" Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" MinWidth="120"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
@@ -99,7 +99,7 @@
                 </TextBox>
 
                 <TextBlock Text="Respect Curves" Grid.Column="0" Grid.Row="4"/>
-                <CheckBox Grid.Column="1" Grid.Row="4" IsChecked="{Binding RespectCurves}"
+                <CheckBox Grid.Column="1" Grid.Row="4" IsChecked="{Binding RespectCurves}" IsEnabled="False"
                           ToolTip="Do not try and minimize points on continuous curves of the boundary"/>
 
                 <TextBlock Text="Minimum Angle" Grid.Column="0" Grid.Row="5"/>
