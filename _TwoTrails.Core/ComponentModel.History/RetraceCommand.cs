@@ -14,6 +14,7 @@ namespace TwoTrails.Core.ComponentModel.History
         public RetraceCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
         {
             _Manager = pointsManager;
+            _Polygon = targetPoly;
             _CreateQuondamsCommand = new CreateQuondamsCommand(points, pointsManager, targetPoly, insertIndex, bndMode);
         }
 

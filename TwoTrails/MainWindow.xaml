@@ -103,12 +103,12 @@
 
                 <MenuItem Header="_Edit">
                     <MenuItem Header="Undo" Command="{Binding CurrentTab.UndoCommand}" InputGestureText="Ctrl+Z"
-                          ToolTip="{Binding CurrentProject.UndoCommandInfo}"
+                          ToolTip="{Binding CurrentTab.UndoCommandInfo}"
                           Style="{StaticResource styleMiPointEdit}">
                         <!-- Menu for action history -->
                     </MenuItem>
                     <MenuItem Header="Redo" Command="{Binding CurrentTab.RedoCommand}" InputGestureText="Ctrl+Shift+Z"
-                          ToolTip="{Binding CurrentProject.RedoCommandInfo}"
+                          ToolTip="{Binding CurrentTab.RedoCommandInfo}"
                           Style="{StaticResource styleMiPointEdit}"/>
 
                     <MenuItem Header="History" Command="{Binding ProjectEditor.HistoryCommand}" InputGestureText="Ctrl+H"

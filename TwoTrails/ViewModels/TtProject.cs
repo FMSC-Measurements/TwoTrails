@@ -14,12 +14,6 @@ namespace TwoTrails.ViewModels
     {
         public event EventHandler<string> MessagePosted;
 
-
-
-        public String UndoCommandInfo => HistoryManager.CanUndo ? HistoryManager.UndoCommandInfo.Description : "No Actions";
-        public String RedoCommandInfo => HistoryManager.CanRedo ? HistoryManager.RedoCommandInfo.Description : "No Actions";
-
-
         #region Properties
         public String FilePath { get { return DAL.FilePath; } }
         
@@ -81,11 +75,21 @@ namespace TwoTrails.ViewModels
             ProjectChanged = !_ProjectInfo.Equals(ProjectInfo);
         }
 
-        private void Manager_HistoryChanged(object sender, EventArgs e)
+        private void Manager_HistoryChanged(object sender, HistoryEventArgs e)
         {
             RequiresSave = HistoryManager.CanUndo;
 
-            OnPropertyChanged(nameof(UndoCommandInfo), nameof(RedoCommandInfo));
+            String eTypeStr;
+
+            switch (e.HistoryEventType)
+            {
+                case HistoryEventType.Undone: eTypeStr = "Undone: "; break;
+                case HistoryEventType.Redone: eTypeStr = "Redone: "; break;
+                case HistoryEventType.Commit:
+                default: eTypeStr = String.Empty; break;
+            }
+
+            MessagePosted?.Invoke(this, $"{eTypeStr}{e.CommandInfo.Description}");
         }
 
         public bool Save()

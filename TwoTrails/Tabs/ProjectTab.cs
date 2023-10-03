@@ -16,6 +16,10 @@ namespace TwoTrails
         public BindedRelayCommand<TtHistoryManager> RedoCommand { get; }
 
 
+        public String UndoCommandInfo => Project.HistoryManager.CanUndo ? Project.HistoryManager.UndoCommandInfo.Description : "No Actions";
+        public String RedoCommandInfo => Project.HistoryManager.CanRedo ? Project.HistoryManager.RedoCommandInfo.Description : "No Actions";
+
+
         public TtProject Project { get; private set; }
 
         public ProjectEditorModel ProjectEditor { get; }
@@ -101,6 +105,9 @@ namespace TwoTrails
                 x => Project.HistoryManager.CanRedo && doesTabAndDataMatch(CurrentTabSection, Project.HistoryManager.RedoCommandType),
                 Project.HistoryManager,
                 x => x.CanRedo);
+
+            Project.HistoryManager.HistoryChanged += HistoryManager_HistoryChanged;
+
 
             Project.PropertyChanged += Project_PropertyChanged;
             ProjectEditor.PointEditor.PropertyChanged += PointEditor_PropertyChanged;
@@ -188,6 +195,11 @@ namespace TwoTrails
             RedoCommand.OnCanExecuteChanged();
         }
 
+        private void HistoryManager_HistoryChanged(object sender, HistoryEventArgs e)
+        {
+
+            OnPropertyChanged(nameof(UndoCommandInfo), nameof(RedoCommandInfo));
+        }
 
         public void SwitchToTabSection(ProjectTabSection tab)
         {
@@ -240,6 +252,11 @@ namespace TwoTrails
                     _ProjectEditorControl.tabControl.SelectionChanged -= ProjectEditor_TabSelectionChanged;
 
                     ProjectEditor.Dispose();
+                }
+
+                if (ProjectEditor != null && Project.HistoryManager != null)
+                {
+                    Project.HistoryManager.HistoryChanged -= HistoryManager_HistoryChanged;
                 }
             }
             catch (Exception)
