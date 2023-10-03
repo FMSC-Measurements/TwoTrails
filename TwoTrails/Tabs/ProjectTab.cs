@@ -15,6 +15,7 @@ namespace TwoTrails
         public BindedRelayCommand<TtHistoryManager> UndoCommand { get; }
         public BindedRelayCommand<TtHistoryManager> RedoCommand { get; }
 
+
         public TtProject Project { get; private set; }
 
         public ProjectEditorModel ProjectEditor { get; }

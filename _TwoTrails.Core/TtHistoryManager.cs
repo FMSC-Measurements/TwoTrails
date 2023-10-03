@@ -29,8 +29,11 @@ namespace TwoTrails.Core
         public bool CanUndo => _UndoStack.Any();
         public bool CanRedo => _RedoStack.Any();
 
-        public Type UndoCommandType => CanUndo ? _UndoStack.Peek().DataType : null;
-        public Type RedoCommandType => CanRedo ? _RedoStack.Peek().DataType : null;
+        public Type UndoCommandType => CanUndo ? _UndoStack.Peek().CommandInfo.AffectedType : null;
+        public Type RedoCommandType => CanRedo ? _RedoStack.Peek().CommandInfo.AffectedType : null;
+
+        public CommandInfo UndoCommandInfo => CanUndo ? _UndoStack.Peek().CommandInfo : null;
+        public CommandInfo RedoCommandInfo => CanRedo ? _RedoStack.Peek().CommandInfo : null;
 
 
         public bool HasDataDictionary { get { return BaseManager.HasDataDictionary; } }
@@ -60,7 +63,7 @@ namespace TwoTrails.Core
                     case nameof(TtMetadata.Slope):
                     case nameof(TtMetadata.Distance):
                     case nameof(TtMetadata.Elevation):
-                        OnHistoryChanged(HistoryEventType.Reset, typeof(TtMetadata), true);
+                        OnHistoryChanged(HistoryEventType.Reset, new CommandInfo(typeof(TtMetadata), $"{e.PropertyName} change in Default Metadata"), true);
                         break;
                 }
             };
@@ -98,7 +101,7 @@ namespace TwoTrails.Core
                 }
                 _UndoStack.Push(command);
                 _RedoStack.Clear();
-                OnHistoryChanged(HistoryEventType.Commit, command.DataType, command.RequireRefresh);
+                OnHistoryChanged(HistoryEventType.Commit, command.CommandInfo, command.RequireRefresh);
             }
         }
 
@@ -140,7 +143,7 @@ namespace TwoTrails.Core
                 _RedoStack.Push(command);
                 command.Undo();
 
-                OnHistoryChanged(HistoryEventType.Undone, command.DataType, command.RequireRefresh);
+                OnHistoryChanged(HistoryEventType.Undone, command.CommandInfo, command.RequireRefresh);
             }
         }
 
@@ -159,7 +162,7 @@ namespace TwoTrails.Core
                     command.Undo();
                 }
 
-                OnHistoryChanged(HistoryEventType.Undone, command?.DataType, requireRefresh);
+                OnHistoryChanged(HistoryEventType.Undone, command?.CommandInfo, requireRefresh);
             }
         }
 
@@ -171,7 +174,7 @@ namespace TwoTrails.Core
                 _UndoStack.Push(command);
                 command.Redo();
 
-                OnHistoryChanged(HistoryEventType.Redone, command.DataType, command.RequireRefresh);
+                OnHistoryChanged(HistoryEventType.Redone, command.CommandInfo, command.RequireRefresh);
             }
         }
 
@@ -190,7 +193,7 @@ namespace TwoTrails.Core
                     command.Redo();
                 }
 
-                OnHistoryChanged(HistoryEventType.Redone, command?.DataType, requireRefresh);
+                OnHistoryChanged(HistoryEventType.Redone, command?.CommandInfo, requireRefresh);
             }
         }
 
@@ -201,9 +204,9 @@ namespace TwoTrails.Core
             OnPropertyChanged(nameof(CanUndo), nameof(CanRedo));
         }
 
-        private void OnHistoryChanged(HistoryEventType historyEventType, Type dataType, bool requireRefresh)
+        private void OnHistoryChanged(HistoryEventType historyEventType, CommandInfo cmdInfo, bool requireRefresh)
         {
-            HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, dataType, requireRefresh));
+            HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, cmdInfo, requireRefresh));
             OnPropertyChanged(nameof(CanUndo), nameof(CanRedo));
         }
         #endregion
@@ -568,13 +571,13 @@ namespace TwoTrails.Core
     public class HistoryEventArgs : EventArgs
     {
         public HistoryEventType HistoryEventType { get; }
-        public Type DataType { get; }
+        public CommandInfo CommandInfo { get; }
         public bool RequireRefresh { get; }
 
-        public HistoryEventArgs(HistoryEventType historyEventType, Type dataType, bool requireRefresh)
+        public HistoryEventArgs(HistoryEventType historyEventType, CommandInfo cmdInfo, bool requireRefresh)
         {
             HistoryEventType = historyEventType;
-            DataType = dataType;
+            CommandInfo = cmdInfo;
             RequireRefresh = requireRefresh;
         }
     }

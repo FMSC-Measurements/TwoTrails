@@ -18,5 +18,7 @@
         {
             pointsManager.DeleteGroup(Group);
         }
+
+        protected override string GetCommandInfoDescription() => $"Add Group {Group.Name}";
     }
 }

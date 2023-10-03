@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    public class AddDataActionCommand : ITtCommand
+    public class AddDataActionCommand : ITtBaseCommand
     {
         private TtManager _Manager;
-        public Type DataType => null;
-        public bool RequireRefresh => false;
 
         private readonly DataActionType _DataActionType;
         private readonly string _Notes;
@@ -22,14 +18,18 @@ namespace TwoTrails.Core.ComponentModel.History
             _Notes = notes;
         }
 
-        public void Redo()
+        public override void Redo()
         {
             _Manager.AddAction(_DataActionType, _Notes, _ID);
         }
 
-        public void Undo()
+        public override void Undo()
         {
             _Manager.RemoveAction(_ID);
         }
+
+        protected override Type GetAffectedType() => null;
+
+        protected override string GetCommandInfoDescription() => $"Add data action";
     }
 }

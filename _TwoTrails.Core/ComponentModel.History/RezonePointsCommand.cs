@@ -54,5 +54,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
             _Manager.RemoveAction(_ID);
         }
+
+        protected override string GetCommandInfoDescription() => $"Rezone {Points.Count} points";
     }
 }

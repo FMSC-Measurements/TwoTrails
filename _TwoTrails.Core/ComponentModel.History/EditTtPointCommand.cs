@@ -27,5 +27,7 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             Property.SetValue(Point, OldValue);
         }
+
+        protected override string GetCommandInfoDescription() => $"Edit {Property.Name} of point {Point}";
     }
 }

@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddDataActionCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtGroupCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtMetadataCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CommandInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPointCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\AddTtPointsCommand.cs" />
@@ -21,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ConvertQuondamCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateCorridorDoubleSidedCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateCorridorCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtBaseCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MinimizePointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\RetraceCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateQuondamsCommand.cs" />

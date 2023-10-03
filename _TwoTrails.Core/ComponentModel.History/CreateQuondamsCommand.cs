@@ -7,17 +7,17 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class CreateQuondamsCommand : ITtPointsCommand
     {
-        private TtPolygon TargetPolygon;
-        private int StartIndex;
+        private TtPolygon _TargetPolygon;
+        private int _StartIndex;
 
-        private EditTtPointsMultiValueCommand<int> editPointsCmd = null;
-        private AddTtPointsCommand addPointsCmd;
+        private EditTtPointsMultiValueCommand<int> _EditPointsCommand = null;
+        private AddTtPointsCommand _AddPointsCommand;
 
         public CreateQuondamsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
         {
-            TargetPolygon = targetPoly;
+            _TargetPolygon = targetPoly;
 
-            List<TtPoint> polyPoints = pointsManager.GetPoints(TargetPolygon.CN);
+            List<TtPoint> polyPoints = pointsManager.GetPoints(_TargetPolygon.CN);
 
             List<TtPoint> addPoints = new List<TtPoint>();
             List<TtPoint> editedPoints = new List<TtPoint>();
@@ -26,13 +26,13 @@ namespace TwoTrails.Core.ComponentModel.History
             int index = insertIndex > polyPoints.Count ?
                 polyPoints.Count : 
                 insertIndex < 0 ? 0 : insertIndex;
-            StartIndex = index;
+            _StartIndex = index;
 
             TtPoint prevPoint = null;
             QuondamPoint qp;
 
-            if (StartIndex > 0)
-                prevPoint = polyPoints[StartIndex - 1];
+            if (_StartIndex > 0)
+                prevPoint = polyPoints[_StartIndex - 1];
 
             foreach (TtPoint point in Points)
             {
@@ -40,16 +40,16 @@ namespace TwoTrails.Core.ComponentModel.History
                 {
                     qp = new QuondamPoint()
                     {
-                        PID = PointNamer.NamePoint(TargetPolygon, prevPoint),
+                        PID = PointNamer.NamePoint(_TargetPolygon, prevPoint),
                         Index = index++,
                         ParentPoint = point.OpType == OpType.Quondam ? ((QuondamPoint)point).ParentPoint : point,
-                        Polygon = TargetPolygon,
+                        Polygon = _TargetPolygon,
                         Metadata = point.Metadata,
                         Group = pointsManager.MainGroup,
                         OnBoundary = (bndMode == QuondamBoundaryMode.Inherit) ? point.OnBoundary : (bndMode != QuondamBoundaryMode.Off)
                     };
 
-                    qp.SetAccuracy(TargetPolygon.Accuracy);
+                    qp.SetAccuracy(_TargetPolygon.Accuracy);
 
                     addPoints.Add(qp);
 
@@ -57,36 +57,39 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
 
-            if (StartIndex < polyPoints.Count)
+            if (_StartIndex < polyPoints.Count)
             {
-                foreach (TtPoint point in polyPoints.Skip(StartIndex))
+                foreach (TtPoint point in polyPoints.Skip(_StartIndex))
                 {
                     editedPoints.Add(point);
                     editedIndexes.Add(index++);
                 }
             }
 
-            addPointsCmd = new AddTtPointsCommand(addPoints, pointsManager);
+            _AddPointsCommand = new AddTtPointsCommand(addPoints, pointsManager);
 
             if (editedPoints.Count > 0)
-                editPointsCmd = new EditTtPointsMultiValueCommand<int>(editedPoints, PointProperties.INDEX, editedIndexes);
+                _EditPointsCommand = new EditTtPointsMultiValueCommand<int>(editedPoints, PointProperties.INDEX, editedIndexes);
         }
 
         public override void Redo()
         {
-            if (editPointsCmd != null)
-                editPointsCmd.Redo();
+            if (_EditPointsCommand != null)
+                _EditPointsCommand.Redo();
 
-            addPointsCmd.Redo();
+            _AddPointsCommand.Redo();
         }
 
         public override void Undo()
         {
-            if (editPointsCmd != null)
-                editPointsCmd.Undo();
+            if (_EditPointsCommand != null)
+                _EditPointsCommand.Undo();
 
-            addPointsCmd.Undo();
+            _AddPointsCommand.Undo();
         }
+
+
+        protected override string GetCommandInfoDescription() => $"Create {_AddPointsCommand.CommandInfo.AffectedItems} Quondams in unit {_TargetPolygon.Name}";
     }
 
     public enum QuondamBoundaryMode

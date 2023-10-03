@@ -18,5 +18,7 @@
         {
             Manager.DeletePolygon(Polygon);
         }
+
+        protected override string GetCommandInfoDescription() => $"Add Polygon {Polygon.Name}";
     }
 }

@@ -39,5 +39,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 Properties[i].SetValue(Point, OldValues[i]);
             }
         }
+
+        protected override string GetCommandInfoDescription() => $"Edit {Properties.Count} properties of {Point}";
     }
 }

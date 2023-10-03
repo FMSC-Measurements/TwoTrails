@@ -2,12 +2,8 @@
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    public abstract class ITtGroupCommand : ITtCommand
+    public abstract class ITtGroupCommand : ITtBaseCommand
     {
-        public bool RequireRefresh { get; } = false;
-
-        public Type DataType => GroupProperties.DataType;
-
         protected TtGroup Group;
 
         public ITtGroupCommand(TtGroup group)
@@ -15,8 +11,8 @@ namespace TwoTrails.Core.ComponentModel.History
             this.Group = group ?? throw new ArgumentNullException(nameof(group));
         }
 
-        public abstract void Redo();
-
-        public abstract void Undo();
+        protected override Type GetAffectedType() => GroupProperties.DataType;
+        protected override int GetAffectedItemCount() => 1;
+        protected override String GetCommandInfoDescription() => "Group";
     }
 }

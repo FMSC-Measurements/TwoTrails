@@ -4,12 +4,8 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    public abstract class ITtPointsCommand : ITtCommand
+    public abstract class ITtPointsCommand : ITtBaseCommand
     {
-        public bool RequireRefresh { get; protected set; } = true;
-
-        public Type DataType => PointProperties.DataType;
-
         protected List<TtPoint> Points;
 
         public ITtPointsCommand(IEnumerable<TtPoint> points)
@@ -17,8 +13,8 @@ namespace TwoTrails.Core.ComponentModel.History
             this.Points = new List<TtPoint>(points) ?? throw new ArgumentNullException(nameof(points));
         }
 
-        public abstract void Redo();
-
-        public abstract void Undo();
+        protected override Type GetAffectedType() => PointProperties.DataType;
+        protected override int GetAffectedItemCount() => Points.Count;
+        protected override String GetCommandInfoDescription() => $"Edit of {Points.Count} points";
     }
 }

@@ -5,21 +5,17 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    class RebuildPolygonCommand : ITtCommand
+    public class RebuildPolygonCommand : ITtPolygonCommand
     {
         private TtManager pointsManager;
-
         private List<TtPoint> _Points;
-
-        private TtPolygon Polygon;
-        private bool Reindex;
+        private bool _Reindex;
 
 
-        public RebuildPolygonCommand(TtPolygon polygon, bool reindex, TtManager pointsManager)
+        public RebuildPolygonCommand(TtPolygon polygon, bool reindex, TtManager pointsManager) : base(polygon)
         {
             this.pointsManager = pointsManager;
-            this.Polygon = polygon;
-            this.Reindex = reindex;
+            this._Reindex = reindex;
 
             _Points = pointsManager.GetPoints(polygon.CN).Select(pt => pt.DeepCopy()).ToList();
 
@@ -57,21 +53,20 @@ namespace TwoTrails.Core.ComponentModel.History
             _Points.AddRange(addPoints);
         }
 
-        public Type DataType => PointProperties.DataType;
-
-        public bool RequireRefresh => true;
-
-        public void Redo()
+        public override void Redo()
         {
-            pointsManager.RebuildPolygon(Polygon, Reindex);
+            pointsManager.RebuildPolygon(Polygon, _Reindex);
         }
 
-        public void Undo()
+        public override void Undo()
         {
             foreach (TtPoint point in _Points)
             {
                 pointsManager.ReplacePoint(point);
             }
         }
+
+
+        protected override string GetCommandInfoDescription() => $"Reindex unit {Polygon.Name}";
     }
 }

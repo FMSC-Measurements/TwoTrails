@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
@@ -46,5 +45,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
         }
+
+        protected override string GetCommandInfoDescription() => $"Convert {Points.Count} Quondams";
     }
 }

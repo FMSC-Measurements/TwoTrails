@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using TwoTrails.Core.Points;
 
@@ -38,5 +39,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 Property.SetValue(Points[i], OldValues[i]);
             }
         }
+
+        protected override String GetCommandInfoDescription() => $"Edit {Property.Name} properties of {Points.Count} points";
     }
 }

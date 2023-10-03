@@ -33,5 +33,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 pointsManager.ReplacePoints(_ReplacedPoints);
             }
         }
+
+        protected override string GetCommandInfoDescription() => $"Repalce {Points.Count} points";
     }
 }

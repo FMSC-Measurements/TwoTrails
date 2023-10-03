@@ -24,5 +24,7 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             Property.SetValue(Group, OldValue);
         }
+
+        protected override string GetCommandInfoDescription() => $"Edit {Property.Name} of group {Group.Name}";
     }
 }

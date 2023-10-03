@@ -21,5 +21,7 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             pointsManager.DeletePoints(Points);
         }
+
+        protected override string GetCommandInfoDescription() => $"Add {Points.Count} points";
     }
 }

@@ -4,31 +4,36 @@ using System.Linq;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    public class MultiTtCommand : ITtCommand
+    public class MultiTtCommand : ITtBaseCommand
     {
-        public bool RequireRefresh { get { return _Commands.Any(c => c.RequireRefresh); } }
-
         private List<ITtCommand> _Commands = new List<ITtCommand>();
 
         public int NumberOfCommands => _Commands.Count;
 
-        public Type DataType => null;
+        public string Description { get; }
 
-        public MultiTtCommand(IEnumerable<ITtCommand> commands)
+        public MultiTtCommand(IEnumerable<ITtCommand> commands, string descripton = null)
         {
             _Commands = new List<ITtCommand>(commands);
+            Description = descripton;
         }
 
-        public void Redo()
+        public override void Redo()
         {
             foreach (ITtCommand command in _Commands)
                 command.Redo();
         }
 
-        public void Undo()
+        public override void Undo()
         {
             foreach (ITtCommand command in _Commands)
                 command.Undo();
         }
+
+        protected override int GetAffectedItemCount() => _Commands.Select(c => c.CommandInfo.AffectedItems).Count();
+
+        protected override Type GetAffectedType() => null;
+
+        protected override string GetCommandInfoDescription() => Description ?? $"Multi Command made of {_Commands} commands.";
     }
 }

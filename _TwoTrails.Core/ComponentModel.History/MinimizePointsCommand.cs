@@ -8,16 +8,16 @@ namespace TwoTrails.Core.ComponentModel.History
     public class MinimizePointsCommand : ITtPointsCommand
     {
         private TtManager _Manager;
-        private List<bool> NewValues;
-        private List<bool> OldValues;
+        private List<bool> _NewValues;
+        private List<bool> _OldValues;
         private readonly Guid _ID = Guid.NewGuid();
 
         public MinimizePointsCommand(IEnumerable<TtPoint> points, IEnumerable<bool> newValues, TtManager manager) : base(points)
         {
             _Manager = manager;
 
-            this.NewValues = new List<bool>(newValues);
-            this.OldValues = points.Select(p => p.OnBoundary).ToList();
+            this._NewValues = new List<bool>(newValues);
+            this._OldValues = points.Select(p => p.OnBoundary).ToList();
         }
 
         public override void Redo()
@@ -25,8 +25,9 @@ namespace TwoTrails.Core.ComponentModel.History
 
             for (int i = 0; i < Points.Count; i++)
             {
-                Points[i].OnBoundary = NewValues[i];
+                Points[i].OnBoundary = _NewValues[i];
             }
+
 
             _Manager.AddAction(DataActionType.PointMinimization, $"{Points[0].Polygon} minimized to {Points.Count(p => p.OnBoundary)} points.", _ID);
         }
@@ -35,10 +36,14 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             for (int i = 0; i < Points.Count; i++)
             {
-                Points[i].OnBoundary = OldValues[i];
+                Points[i].OnBoundary = _OldValues[i];
             }
 
             _Manager.RemoveAction(_ID);
         }
+
+
+        protected override string GetCommandInfoDescription() =>
+            $"Minimize polygon {(Points.Count > 0 ? Points[0].Polygon.Name : String.Empty)} to {_NewValues.Count(b => b)} points";
     }
 }

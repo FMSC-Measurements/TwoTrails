@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
@@ -25,5 +24,7 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             Property.SetValue(Polygon, OldValue);
         }
+
+        protected override string GetCommandInfoDescription() => $"Edit {Property.Name} of polygon {Polygon.Name}";
     }
 }

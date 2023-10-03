@@ -1,4 +1,5 @@
-﻿using TwoTrails.Core.Points;
+﻿using System.Text.RegularExpressions;
+using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
@@ -20,5 +21,7 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             pointsManager.DeletePoint(Point);
         }
+
+        protected override string GetCommandInfoDescription() => $"Add Point {Point.PID}";
     }
 }

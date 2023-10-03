@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
@@ -43,5 +41,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 pointsManager.RestoreNmeaBurts(Point.CN);
             }
         }
+
+        protected override string GetCommandInfoDescription() => $"Convert Quondam {Point}";
     }
 }

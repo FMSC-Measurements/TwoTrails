@@ -4,7 +4,7 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public interface ITtCommand
     {
-        Type DataType { get; }
+        CommandInfo CommandInfo { get; }
         bool RequireRefresh { get; }
         void Undo();
         void Redo();

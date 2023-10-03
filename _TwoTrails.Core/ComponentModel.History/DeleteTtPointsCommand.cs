@@ -111,5 +111,8 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
         }
+
+
+        protected override string GetCommandInfoDescription() => $"Delete {Points.Count} points";
     }
 }

@@ -24,5 +24,7 @@ namespace TwoTrails.Core.ComponentModel.History
             _AddDataActionCommand.Undo();
             _AddTtPointCommand.Undo();
         }
+
+        protected override string GetCommandInfoDescription() => $"Create Point {Point.PID}";
     }
 }

@@ -14,6 +14,12 @@ namespace TwoTrails.ViewModels
     {
         public event EventHandler<string> MessagePosted;
 
+
+
+        public String UndoCommandInfo => HistoryManager.CanUndo ? HistoryManager.UndoCommandInfo.Description : "No Actions";
+        public String RedoCommandInfo => HistoryManager.CanRedo ? HistoryManager.RedoCommandInfo.Description : "No Actions";
+
+
         #region Properties
         public String FilePath { get { return DAL.FilePath; } }
         
@@ -78,6 +84,8 @@ namespace TwoTrails.ViewModels
         private void Manager_HistoryChanged(object sender, EventArgs e)
         {
             RequiresSave = HistoryManager.CanUndo;
+
+            OnPropertyChanged(nameof(UndoCommandInfo), nameof(RedoCommandInfo));
         }
 
         public bool Save()

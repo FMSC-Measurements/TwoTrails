@@ -6,8 +6,9 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class RetraceCommand : ITtPointsCommand
     {
-        private TtManager _Manager;
-        private CreateQuondamsCommand _CreateQuondamsCommand;
+        private readonly TtManager _Manager;
+        private readonly TtPolygon _Polygon;
+        private readonly CreateQuondamsCommand _CreateQuondamsCommand;
         private readonly Guid _ID = Guid.NewGuid();
 
         public RetraceCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
@@ -29,5 +30,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
             _Manager.RemoveAction(_ID);
         }
+
+        protected override string GetCommandInfoDescription() => $"Retrace {Points.Count} points to unit {_Polygon.Name}";
     }
 }

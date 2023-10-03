@@ -24,5 +24,7 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             Property.SetValue(Metadata, OldValue);
         }
+
+        protected override string GetCommandInfoDescription() => $"Edit {Property.Name} of metadata {Metadata.Name}";
     }
 }

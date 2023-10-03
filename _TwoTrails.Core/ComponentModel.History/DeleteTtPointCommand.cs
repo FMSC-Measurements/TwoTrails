@@ -94,5 +94,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
         }
+
+        protected override string GetCommandInfoDescription() => $"Delete Point {Point.PID}";
     }
 }

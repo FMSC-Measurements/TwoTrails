@@ -327,17 +327,17 @@ namespace TwoTrails.ViewModels
 
         private void Manager_HistoryChanged(object sender, HistoryEventArgs e)
         {
-            if (e.DataType != null && e.HistoryEventType == HistoryEventType.Undone || e.HistoryEventType == HistoryEventType.Redone)
+            if (e.CommandInfo != null && e.HistoryEventType == HistoryEventType.Undone || e.HistoryEventType == HistoryEventType.Redone)
             {
-                if (e.DataType == PolygonProperties.DataType)
+                if (e.CommandInfo.AffectedType == PolygonProperties.DataType)
                 {
                     BindPolygonValues(CurrentPolygon);
                 }
-                else if (e.DataType == GroupProperties.DataType)
+                else if (e.CommandInfo.AffectedType == GroupProperties.DataType)
                 {
                     BindGroupValues(CurrentGroup);
                 }
-                else if (e.DataType == MetadataProperties.DataType)
+                else if (e.CommandInfo.AffectedType == MetadataProperties.DataType)
                 {
                     BindMetadataValues(CurrentMetadata);
                 }
