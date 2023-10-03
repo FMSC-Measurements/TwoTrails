@@ -1031,11 +1031,7 @@ namespace TwoTrails.ViewModels
 
             PointMinimizationCommand = new BindedRelayCommand<PointEditorModel>(
                 x => PointMinimization(),
-#if DEBUG
                 x => Polygons.Count > 0,
-#else
-                x => false,
-#endif
                 this, m => new { m.Polygons.Count });
 
 #endregion
