@@ -22,7 +22,7 @@ namespace TwoTrails.Dialogs
 
         public PointMinimizationDialog(TtProject project)
         {
-            model = new PointMinimizationModel(project);
+            model = new PointMinimizationModel(project, this);
             this.DataContext = model;
             InitializeComponent();
 
@@ -34,42 +34,11 @@ namespace TwoTrails.Dialogs
             }
         }
 
-        private void Analyze_Click(object sender, RoutedEventArgs e)
-        {
-            model.AnalyzeTargetPolygon();
-        }
-
-        private void Apply_Click(object sender, RoutedEventArgs e)
-        {
-            if (model.Apply())
-                this.Close();
-        }
-
-        private void Cancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-
         private async void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             await Application.Current.Dispatcher.InvokeAsync((sender as TextBox).SelectAll);
         }
 
-        private void TextIsUnsignedInteger(object sender, TextCompositionEventArgs e)
-        {
-            e.Handled = ControlUtils.TextIsUnsignedInteger(sender, e);
-        }
-
-        private void TextIsInteger(object sender, TextCompositionEventArgs e)
-        {
-            e.Handled = ControlUtils.TextIsInteger(sender, e);
-        }
-
-        private void TextIsDouble(object sender, TextCompositionEventArgs e)
-        {
-            e.Handled = ControlUtils.TextIsDouble(sender, e);
-        }
 
         private void TextIsUnsignedDouble(object sender, TextCompositionEventArgs e)
         {

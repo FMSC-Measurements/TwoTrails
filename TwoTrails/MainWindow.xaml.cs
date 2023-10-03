@@ -28,6 +28,12 @@ namespace TwoTrails
                 this.Height = 500;
             }
 
+            if (App.Settings.HasValidateWindowsStartupLocation)
+            {
+                this.Left = App.Settings.WindowStartupLocation.X;
+                this.Top = App.Settings.WindowStartupLocation.Y;
+            }
+
             MainModel = new MainWindowModel(this);
             this.DataContext = MainModel;
 
@@ -41,10 +47,20 @@ namespace TwoTrails
                             MainModel.OpenProject(proj); 
                     }
                 };
+
+            this.Loaded += MainWindow_Loaded;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+#if DEBUG
+            MainModel.PointEditor.PointMinimization();
+#endif
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            App.Settings.WindowStartupLocation = new System.Drawing.Point((int)Left, (int)Top);
             e.Cancel = MainModel != null ? !MainModel.ShouldExit() : false;
         }
 

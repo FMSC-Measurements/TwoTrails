@@ -377,7 +377,7 @@ namespace TwoTrails.ViewModels
                     {
                         for (int m = 0; m < points.Count - 1; m++)
                         {
-                            if (MathEx.LineToPointDistance2D(points[m], points[m + 1], p) < ba)
+                            if (MathEx.DistanceToLine(points[m], points[m + 1], p) < ba)
                             {
                                 addPoints.RemoveAt(i);
                                 break;
@@ -539,7 +539,7 @@ namespace TwoTrails.ViewModels
                         {
                             for (int m = 0; m < ipoints.Count - 1; m++)
                             {
-                                if (MathEx.LineToPointDistance2D(ipoints[m], ipoints[m + 1], p) < ba)
+                                if (MathEx.DistanceToLine(ipoints[m], ipoints[m + 1], p) < ba)
                                 {
                                     points.RemoveAt(i);
                                     break;

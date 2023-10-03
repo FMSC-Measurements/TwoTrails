@@ -33,6 +33,7 @@ namespace TwoTrails.Core
         InsertedNmea        = 1 << 24,
         DeletedNmea         = 1 << 25,
         RezonedPoints       = 1 << 26,
-        ModifiedNmea        = 1 << 27
+        ModifiedNmea        = 1 << 27,
+        PointMinimization    = 1 << 28
     }
 }

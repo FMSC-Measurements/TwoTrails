@@ -1,8 +1,10 @@
 ﻿using FMSC.Core.ComponentModel;
 using System;
 using System.Collections.Specialized;
+using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.DAL;
+using Point = System.Drawing.Point;
 
 namespace TwoTrails
 {
@@ -16,6 +18,7 @@ namespace TwoTrails
         private const String LAST_UPDATE_CHECK = "LastUpdateCheck";
         private const String UPGRADE_REQUIRED = "UpgradeRequired";
         private const String SORT_POLYS_BY_NAME = "SortPolysByName";
+        private const String WINDOW_STARTUP_LOCATION = "WindowStartupLocation";
 
         public IMetadataSettings MetadataSettings { get; set; }
         public IDeviceSettings DeviceSettings { get; set; }
@@ -131,6 +134,21 @@ namespace TwoTrails
             }
         }
 
+        private Point _WindowStartupLocation;
+        public Point WindowStartupLocation
+        {
+            get { return _WindowStartupLocation; }
+
+            set
+            {
+                SetField(ref _WindowStartupLocation, value);
+                Properties.Settings.Default[WINDOW_STARTUP_LOCATION] = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+        public bool HasValidateWindowsStartupLocation => _WindowStartupLocation.X != 0 || _WindowStartupLocation.Y != 0;
+
+
 
         public TtSettings(IDeviceSettings deviceSettings, IMetadataSettings metadataSettings, IPolygonGraphicSettings polyGraphicSettings)
         {
@@ -153,6 +171,7 @@ namespace TwoTrails
 #endif
 
             _SortPolysByName = (bool)Properties.Settings.Default[SORT_POLYS_BY_NAME];
+            _WindowStartupLocation = (Point)Properties.Settings.Default[WINDOW_STARTUP_LOCATION];
         }
 
 

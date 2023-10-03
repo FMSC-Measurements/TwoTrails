@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Dialogs;
 using TwoTrails.Mapping;
 using Convert = FMSC.Core.Convert;
 using Point = FMSC.Core.Point;
@@ -33,23 +34,27 @@ namespace TwoTrails.ViewModels
 
         public ICommand PointSelectionChangedCommand { get; }
         public ICommand PointSelectedCommand { get; }
-        public ICommand CommitCommand { get; }
+        public ICommand ApplyCommand { get; }
+        public ICommand AnalyzeCommand { get; }
+        public ICommand CancelCommand { get; }
+        public ICommand ZoomCommand { get; }
 
 
 
-        private TtProject Project;
+        private readonly TtProject Project;
         private TtHistoryManager Manager => Project.HistoryManager;
+        private readonly PointMinimizationDialog _Dialog;
 
 
         public Map Map { get; } = new Map();
 
         public List<TtPolygon> Polygons { get; }
         public ReadOnlyObservableCollection<TtPoint> Points { get; private set; }
-        private List<TtPoint> _OrigPoints;
+        private Dictionary<String, TtPoint> _OrigPoints;
         private readonly Dictionary<string, Pushpin> _PushPins = new Dictionary<string, Pushpin>();
         private readonly MapPolygon _OrigPoly = new MapPolygon();
         private readonly MapPolygon _MinPoly = new MapPolygon();
-        private Extent Extents;
+        public Extent Extents { get; set; }
 
         private readonly SolidColorBrush _OnBoundBrush, _OffBoundBrush;
 
@@ -59,9 +64,11 @@ namespace TwoTrails.ViewModels
             set => Set(value, () => {
                 OnPropertyChanged(nameof(TargetPolygonToolTip));
 
-                _OrigPoints = Manager.GetPoints(TargetPolygon.CN);
+                List<TtPoint> points = Manager.GetPoints(TargetPolygon.CN);
+                _OrigPoints = points.ToDictionary(p => p.CN, p => p);
+
                 Points = new ReadOnlyObservableCollection<TtPoint>(
-                    new ObservableCollection<TtPoint>(_OrigPoints.DeepCopy()));
+                    new ObservableCollection<TtPoint>(points.DeepCopy()));
 
                 UpdateOrigPoly();
                 AnalyzeTargetPolygon();
@@ -73,10 +80,12 @@ namespace TwoTrails.ViewModels
 
         public double MinimumAngle { get => Get<double>(); set => Set(value, () => AnalyzeTargetPolygon()); }
         public double? MinimumLegLength { get => Get<double?>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+        public double? MaximumLegAdjustDist { get => Get<double?>(); set => Set(value, () => AnalyzeTargetPolygon()); }
         public double? AccuracyOverride { get => Get<double?>(); set => Set(value, () => AnalyzeTargetPolygon()); }
 
         public bool AnalyzeAllPointsInPoly { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
-        public bool RunPartial { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+        public bool LimitAreaChange { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+        public bool RespectCurves { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
 
 
         public bool HidePoints {
@@ -84,7 +93,7 @@ namespace TwoTrails.ViewModels
             set => Set(value, () => {
                 if (_PushPins.Any())
                 {
-                    Visibility vis = value ? Visibility.Collapsed: Visibility.Visible;
+                    Visibility vis = value ? Visibility.Collapsed : Visibility.Visible;
                     _PushPins.Values.ForEach(pin => { pin.Visibility = vis; });
                 }
             });
@@ -105,22 +114,30 @@ namespace TwoTrails.ViewModels
                     )
                 );
         }
-        
+
         public double? NewAreaHa => APStats != null ? Convert.ToHectare(APStats.Item1, Area.MeterSq) : (double?)null;
         public double? NewAreaAc => APStats != null ? Convert.ToAcre(APStats.Item1, Area.MeterSq) : (double?)null;
+
         public double? NewPerimeterM => APStats?.Item2;
         public double? NewPerimeterFt => APStats != null ? Convert.ToFeetTenths(APStats.Item2, Distance.Meters) : (double?)null;
 
-        public double? AreaDifference => APStats != null ? (double?)(APStats.Item1 / TargetPolygon.Area) : null;
-        public double? PerimeterDifference => APStats != null ? (double?)(APStats.Item2 / TargetPolygon.Perimeter) : null;
+        public double? AreaDifference => APStats != null ? (double?)GetDiff(APStats.Item1, TargetPolygon.Area) : null;
+        public double? PerimeterDifference => APStats != null ? (double?)GetDiff(APStats.Item2, TargetPolygon.Perimeter) : null;
+
+        private double GetDiff(double i1, double i2)
+        {
+            double diff = (i1 / i2);
+            return ((diff > 1) ? (diff - 1) : (1 - diff)) * 100d;
+        }
 
 
 
-        public PointMinimizationModel(TtProject project)
+        public PointMinimizationModel(TtProject project, PointMinimizationDialog dialog)
         {
             Project = project;
             Polygons = Manager.Polygons.Where(p => Manager.GetPoints(p.CN).HasAtLeast(3)).ToList();
             Polygons.Sort(new PolygonSorterDirect(project.Settings.SortPolysByName));
+            _Dialog = dialog;
 
             PointSelectedCommand = new RelayCommand(x =>
             {
@@ -128,8 +145,34 @@ namespace TwoTrails.ViewModels
                     PointSelected(point);
             });
 
+            CancelCommand = new RelayCommand(x => _Dialog.Close());
+            AnalyzeCommand = new BindedRelayCommand<PointMinimizationModel>(
+                x => AnalyzeTargetPolygon(),
+                x=> TargetPolygon != null,
+                this,
+                x => this.TargetPolygon);
+
+            ZoomCommand = new BindedRelayCommand<PointMinimizationModel>(
+                x =>
+                {
+                    Map.SetView(
+                        new LocationRect(
+                            new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BOUNDARY_ZOOM_MARGIN),
+                            new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN)));
+                    Map.Refresh();
+                },
+                x => Extents != null,
+                this,
+                x => this.Extents);
+            ApplyCommand = new BindedRelayCommand<PointMinimizationModel>(
+                x => Apply(),
+                x => APStats != null,
+                this,
+                x => this.APStats);
+
             MinimumAngle = MINIMUM_ANGLE;
             AnalyzeAllPointsInPoly = true;
+            LimitAreaChange = true;
 
             _OnBoundBrush = (SolidColorBrush)Application.Current.Resources["scbPrimary"];
             _OffBoundBrush = (SolidColorBrush)Application.Current.Resources["scbBackground"];
@@ -175,18 +218,19 @@ namespace TwoTrails.ViewModels
             }
         }
 
-
         private void PointSelected(TtPoint point)
         {
             point.OnBoundary = !point.OnBoundary;
             _PushPins[point.CN].Background = point.OnBoundary ? _OnBoundBrush : _OffBoundBrush;
             UpdateMinimizedPoly(false);
+
+            _Dialog.lbPoints.ScrollIntoView(point);
         }
 
 
         public void UpdateOrigPoly()
         {
-            if (_OrigPoints != null && _OrigPoints.Count > 2)
+            if (Points != null && Points.Count > 2)
             {
                 LocationCollection locations = new LocationCollection();
                 Extent.Builder eb = new Extent.Builder();   
@@ -222,7 +266,7 @@ namespace TwoTrails.ViewModels
                         Content = point.PID
                     };
 
-                    pushpin.ToolTip = point.ToString();
+                    pushpin.ToolTip = $"({point.PID})\nX: {point.AdjX:F3}\nY: {point.AdjY:F3}";
 
                     Map.Children.Add(pushpin);
 
@@ -328,30 +372,31 @@ namespace TwoTrails.ViewModels
 
                 double totalSegsAngle = 0, totalSegsLength = 0, avgSegsAcc = 0;
 
-
                 Action commitSegment = () =>
                 {
-                    lastKeptSeg = currSeg;
-
                     if (nonComplientSegs.Count > 0)
                     {
                         foreach (PMSegment seg in nonComplientSegs)
                         {
-                            seg.OnBoundary = false;
                             seg.CurrPoint.OnBoundary = false;
                         }
+
+                        if (LimitAreaChange)
+                            LimitArea(lastKeptSeg, currSeg, nonComplientSegs);
 
                         nonComplientSegs.Clear();
                         totalSegsAngle = totalSegsLength = 0;
                     }
+
+                    lastKeptSeg = currSeg;
                 };
 
                 Action addNonCompSeg = () =>
                 {
                     if (currSeg.AngleDir < 0)
-                        totalSegsAngle -= currSeg.Angle;
+                        totalSegsAngle -= currSeg.AngleRel;
                     else
-                        totalSegsAngle += currSeg.Angle;
+                        totalSegsAngle += currSeg.AngleRel;
 
                     totalSegsLength += currSeg.Leg2Length;
 
@@ -360,7 +405,7 @@ namespace TwoTrails.ViewModels
                         (avgSegsAcc * (nonComplientSegs.Count - 1) / nonComplientSegs.Count + currSeg.Leg2Accuracy / nonComplientSegs.Count);
 
 
-                    if (Math.Abs(totalSegsAngle) > MinimumAngle && totalSegsLength >= avgSegsAcc * MIN_DIST_MULTIPLIER)
+                    if (Math.Abs(totalSegsAngle) > MinimumAngle && totalSegsLength >= (MinimumLegLength ?? avgSegsAcc * MIN_DIST_MULTIPLIER))
                     {
                         commitSegment();
                     }
@@ -370,11 +415,11 @@ namespace TwoTrails.ViewModels
                     }
                 };
 
-                for (int i = 1; i < segments.Count; i++)
+                foreach (PMSegment seg in segments.Concat(new []{ segments[0] }))
                 {
-                    currSeg = segments[i];
+                    currSeg = seg;
 
-                    if (currSeg.Angle >= MinimumAngle && currSeg.Leg1MeetsMinDist)
+                    if (currSeg.Angle >= MinimumAngle)
                     {
                         commitSegment();
                     }
@@ -385,24 +430,74 @@ namespace TwoTrails.ViewModels
                 }
 
                 commitSegment();
+            }
 
-                UpdateMinimizedPoly();
+            UpdateMinimizedPoly();
+        }
+
+
+        private void LimitArea(PMSegment startSeg, PMSegment endSeg, IEnumerable<PMSegment> segs, bool reverseDir = false)
+        {
+            double maxSegDist = 0;
+            int segIdx = 0, maxSegIdx = 0, segsCount = segs.Count();
+            PMSegment maxSeg = null;
+
+            foreach (PMSegment currSeg in segs)
+            {
+                double distFromSESeg = MathEx.DistanceToLine(
+                    currSeg.CurrCoords.X, currSeg.CurrCoords.Y,
+                    startSeg.CurrCoords.X, startSeg.CurrCoords.Y,
+                    endSeg.CurrCoords.X, endSeg.CurrCoords.Y);
+
+                double maxAllowedDistFromSeg = MaximumLegAdjustDist ?? ((AccuracyOverride ?? currSeg.CurrPoint.Accuracy) * 2);
+
+                if (distFromSESeg > maxAllowedDistFromSeg)
+                {
+                    if (segsCount == 1)
+                    {
+                        currSeg.CurrPoint.OnBoundary = true;
+                        return;
+                    }
+
+                    if (distFromSESeg > maxSegDist)
+                    {
+                        maxSegDist = distFromSESeg;
+                        maxSeg = currSeg;
+                        maxSegIdx = segIdx;
+                    }
+                }
+
+                segIdx++;
+            }
+
+            if (maxSegDist > 0)
+            {
+                maxSeg.CurrPoint.OnBoundary = true;
+
+                if (maxSegIdx > 0)
+                {
+                    LimitArea(startSeg, maxSeg, segs.Take(maxSegIdx));
+                }
+
+                if (maxSegIdx < segsCount - 1)
+                {
+                    LimitArea(maxSeg, endSeg, segs.Skip(maxSegIdx + 1));
+                }
             }
         }
 
-        public bool Apply()
+
+        public void Apply()
         {
             if (APStats != null)
             {
-
+                Project.HistoryManager.MinimizePoints(Points.Select(p => _OrigPoints[p.CN]), Points.Select(p => p.OnBoundary));
+                _Dialog.Close();
             }
             else
             {
-                //nothing to apply
+                MessageBox.Show("No Adjustments Made");
             }
-
-
-            return true;
         }
 
         public class PMSegment
@@ -417,10 +512,10 @@ namespace TwoTrails.ViewModels
 
 
             public double Angle { get; }
+            public double AngleRel { get; }
             public double AngleDir { get; }
 
-            public bool OnBoundary { get; set; }
-            public bool Ignore { get; set; }
+            public bool OnBoundary => CurrPoint.OnBoundary;
 
 
             public double Leg1Length { get; }
@@ -450,6 +545,7 @@ namespace TwoTrails.ViewModels
                 NextCoords = nextCoords;
 
                 Angle = MathEx.CalculateAngleBetweenPoints(lastCoords.X, lastCoords.Y, currCoords.X, currCoords.Y, nextCoords.X, nextCoords.Y);
+                AngleRel = Angle > MAXIMUM_ANGLE ? (MAXIMUM_ANGLE - (Angle % MAXIMUM_ANGLE)) : Angle;
                 AngleDir = MathEx.CalculateNextPointDir(lastCoords.X, lastCoords.Y, currCoords.X, currCoords.Y, nextCoords.X, nextCoords.Y);
 
                 Leg1Length = MathEx.Distance(lastCoords.X, lastCoords.Y, currCoords.X, currCoords.Y);
@@ -461,6 +557,11 @@ namespace TwoTrails.ViewModels
 
                 Leg1AccDist = Leg1Accuracy * Leg1Length;
                 Leg2AccDist = Leg2Accuracy * Leg2Length;
+            }
+
+            public override string ToString()
+            {
+                return $"{LastPoint.PID} -> ({CurrPoint.PID}) -> {NextPoint.PID} | Ang: {Angle:F1} | Dist: ({Leg1Length:F1} - {Leg2Length:F1})";
             }
         }
 

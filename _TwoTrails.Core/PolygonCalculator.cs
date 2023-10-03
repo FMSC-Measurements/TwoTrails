@@ -105,7 +105,7 @@ namespace TwoTrails.Core
 
             for (int i = 0; i < polyX.Length; i++)
             {
-                temp = MathEx.LineToPointDistance2D(polyX[i], polyY[i], polyX[i + 1], polyY[i + 1], x, y);
+                temp = MathEx.DistanceToLine(x, y, polyX[i], polyY[i], polyX[i + 1], polyY[i + 1]);
                 if (temp < shortestDist)
                 {
                     shortestDist = temp;

@@ -371,6 +371,12 @@ namespace TwoTrails.Core
             AddCommand(new RezonePointsCommand(points, this.BaseManager));
         }
 
+
+        public void MinimizePoints(IEnumerable<TtPoint> points, IEnumerable<bool> onBoundary)
+        {
+            AddCommand(new MinimizePointsCommand(points, onBoundary, this.BaseManager));
+        }
+
         #region Editing
 
         #region Points

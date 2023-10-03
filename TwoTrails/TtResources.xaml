@@ -36,6 +36,22 @@
     <BitmapImage x:Key="ic_ttpoint_gps_white" UriSource="Resources/ttpoint_gps_white.png" />
 
 
+    <Color x:Key="colorPrimary">#FF3CB371</Color> <!--MediumSeaGreen-->
+    <Color x:Key="colorPrimaryLighter">#FFBDDBBD</Color>
+    <Color x:Key="colorPrimaryLight">#FF8FBC8F</Color> <!--DarkSeaGreen-->
+    <Color x:Key="colorPrimaryDark">#FF2E8B57</Color> <!--SeaGreen-->
+    <Color x:Key="colorBackground">#FF696969</Color> <!--DimGray-->
+    <Color x:Key="colorSystemBackground">#FFD3D3D3</Color>
+
+    <SolidColorBrush x:Key="scbPrimary" Color="{StaticResource colorPrimary}" />
+    <SolidColorBrush x:Key="scbPrimaryLighter" Color="{StaticResource colorPrimaryLighter}" />
+    <SolidColorBrush x:Key="scbPrimaryLight" Color="{StaticResource colorPrimaryLight}" />
+    <SolidColorBrush x:Key="scbPrimaryDark" Color="{StaticResource colorPrimaryDark}" />
+    <SolidColorBrush x:Key="scbBackground" Color="{StaticResource colorBackground}" />
+    <SolidColorBrush x:Key="scbSystemBackground" Color="{StaticResource colorSystemBackground}" />
+
+
+
     <Style x:Key="styleMiDisableNullCommand" TargetType="{x:Type MenuItem}">
         <Style.Triggers>
             <Trigger Property="Command" Value="{x:Null}">
@@ -51,21 +67,6 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-
-
-    <Color x:Key="colorPrimary">#FF3CB371</Color> <!--MediumSeaGreen-->
-    <Color x:Key="colorPrimaryLighter">#FFBDDBBD</Color>
-    <Color x:Key="colorPrimaryLight">#FF8FBC8F</Color> <!--DarkSeaGreen-->
-    <Color x:Key="colorPrimaryDark">#FF2E8B57</Color> <!--SeaGreen-->
-    <Color x:Key="colorBackground">#FF696969</Color> <!--DimGray-->
-    <Color x:Key="colorSystemBackground">#FFD3D3D3</Color>
-
-    <SolidColorBrush x:Key="scbPrimary" Color="{StaticResource colorPrimary}" />
-    <SolidColorBrush x:Key="scbPrimaryLighter" Color="{StaticResource colorPrimaryLighter}" />
-    <SolidColorBrush x:Key="scbPrimaryLight" Color="{StaticResource colorPrimaryLight}" />
-    <SolidColorBrush x:Key="scbPrimaryDark" Color="{StaticResource colorPrimaryDark}" />
-    <SolidColorBrush x:Key="scbBackground" Color="{StaticResource colorBackground}" />
-    <SolidColorBrush x:Key="scbSystemBackground" Color="{StaticResource colorSystemBackground}" />
     
 
     <Style x:Key="styleListBoxContainer" TargetType="{x:Type ListBoxItem}">

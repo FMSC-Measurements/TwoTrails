@@ -8,7 +8,7 @@
         Title="TwoTrails"
         Width="1000" MinWidth="700"
         Height="800" MinHeight="500"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="Manual">
 
     <Window.InputBindings>
         <KeyBinding Command="{Binding CurrentTab.UndoCommand}" Key="Z" Modifiers="Ctrl"/>
@@ -246,7 +246,8 @@
                     <MenuItem Header="Advanced" IsEnabled="{Binding HasOpenedProject}">
                         <MenuItem Header="Rezone Points" Command="{Binding PointEditor.RezonePointsCommand}"/>
                         <MenuItem Header="Deweb Points" Command="{Binding PointEditor.DewebPointsCommand}"/>
-                        <MenuItem Header="Point Minimization" Command="{Binding PointEditor.PointMinimizationCommand}"/>
+                        <MenuItem Header="Point Minimization" Command="{Binding PointEditor.PointMinimizationCommand}"
+                                  Visibility="{Binding CurrentProject.Settings.IsAdvancedMode, Converter={StaticResource BoolToVis}}"/>
                     </MenuItem>
 
                     <Separator/>

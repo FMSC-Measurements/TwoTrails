@@ -21,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ConvertQuondamCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateCorridorDoubleSidedCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateCorridorCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MinimizePointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\RetraceCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateQuondamsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\DeleteTtGroupCommand.cs" />

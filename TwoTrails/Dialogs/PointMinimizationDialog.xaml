@@ -67,6 +67,8 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="Polygon" Grid.Column="0" Grid.Row="0"/>
@@ -79,22 +81,46 @@
                 <CheckBox Grid.Column="1" Grid.Row="1" IsChecked="{Binding AnalyzeAllPointsInPoly}"
                           ToolTip="Run minimization on all points instead of the current on boundary points"/>
                 
-                <TextBlock Text="Respect Curves" Grid.Column="0" Grid.Row="2"/>
-                <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding RunPartial}"
+                <TextBlock Text="Limit Area Change" Grid.Column="0" Grid.Row="2"/>
+                <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding LimitAreaChange}"
+                          ToolTip="Limit the amount of area lost or gained"/>
+
+                <TextBlock Text="Max Adjust Distance" Grid.Column="0" Grid.Row="3" Visibility="{Binding LimitAreaChange, Converter={StaticResource BoolToVis}}"/>
+                <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding MaximumLegAdjustDist, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
+                         Visibility="{Binding LimitAreaChange, Converter={StaticResource BoolToVis}}"
+                         GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble">
+                    <TextBox.ToolTip>
+                        <TextBlock>
+                              Maximum Distance a point can be from its minimized poly segment
+                              <LineBreak /> 
+                              Default is twice the point accuracy
+                        </TextBlock>
+                    </TextBox.ToolTip>
+                </TextBox>
+
+                <TextBlock Text="Respect Curves" Grid.Column="0" Grid.Row="4"/>
+                <CheckBox Grid.Column="1" Grid.Row="4" IsChecked="{Binding RespectCurves}"
                           ToolTip="Do not try and minimize points on continuous curves of the boundary"/>
 
-                <TextBlock Text="Minimum Angle" Grid.Column="0" Grid.Row="3"/>
-                <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding MinimumAngle, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged}"
+                <TextBlock Text="Minimum Angle" Grid.Column="0" Grid.Row="5"/>
+                <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding MinimumAngle, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble"
                           ToolTip="Minimum angle to adjust for (45&#176; is recommended)"/>
 
-                <TextBlock Text="Minimum Distance" Grid.Column="0" Grid.Row="4"/>
-                <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding MinimumLegLength, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
-                         GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble"
-                         ToolTip="Override the minimum distance between points (in meters)" />
+                <TextBlock Text="Minimum Distance" Grid.Column="0" Grid.Row="6"/>
+                <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding MinimumLegLength, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
+                         GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble">
+                    <TextBox.ToolTip>
+                        <TextBlock>
+                              Override the minimum distance between points (in meters)
+                              <LineBreak /> 
+                              Default is 5 times the point accuracy
+                        </TextBlock>
+                    </TextBox.ToolTip>
+                </TextBox>
 
-                <TextBlock Text="Accuracy Override" Grid.Column="0" Grid.Row="5"/>
-                <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding AccuracyOverride, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
+                <TextBlock Text="Accuracy Override" Grid.Column="0" Grid.Row="7"/>
+                <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding AccuracyOverride, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble"
                           ToolTip="Override the accuracy of the points" />
 
@@ -123,6 +149,9 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Column="2" Grid.Row="0" Text="Current" Padding="0 0 20 0"/>
@@ -130,12 +159,16 @@
 
                 <TextBlock Grid.Column="0" Grid.Row="1" Text="Area (Ac)"/>
                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Area (Ha)"/>
+                
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Area Difference"/>
 
-                <TextBlock Grid.Column="0" Grid.Row="3" Text="Perimeter (M)"/>
-                <TextBlock Grid.Column="0" Grid.Row="4" Text="Perimeter (Ft)"/>
+                <TextBlock Grid.Column="0" Grid.Row="4" Text="Perimeter (M)"/>
+                <TextBlock Grid.Column="0" Grid.Row="5" Text="Perimeter (Ft)"/>
 
-                <TextBlock Grid.Column="0" Grid.Row="5" Text="GPS Area-Err"/>
-                <TextBlock Grid.Column="0" Grid.Row="6" Text="Geometric ER"/>
+                <TextBlock Grid.Column="0" Grid.Row="6" Text="Perimeter Difference"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="7" Text="GPS Area-Err"/>
+                <TextBlock Grid.Column="0" Grid.Row="8" Text="Geometric ER"/>
 
 
                 <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding TargetPolygon.AreaAcres, StringFormat=F3, TargetNullValue=''}"/>
@@ -144,11 +177,20 @@
                 <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding TargetPolygon.AreaHectaAcres, StringFormat=F3, TargetNullValue=''}"/>
                 <TextBlock Grid.Column="3" Grid.Row="2" Text="{Binding NewAreaHa, StringFormat=F3, TargetNullValue=''}"/>
 
-                <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding TargetPolygon.Perimeter, StringFormat=F2, TargetNullValue=''}"/>
-                <TextBlock Grid.Column="3" Grid.Row="3" Text="{Binding NewPerimeterM, StringFormat=F2, TargetNullValue=''}"/>
+                <TextBlock Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Margin="35 0 0 0"
+                           Text="{Binding AreaDifference, StringFormat='{}{0:F3}%', TargetNullValue=''}"/>
 
-                <TextBlock Grid.Column="2" Grid.Row="4" Text="{Binding TargetPolygon.PerimeterFt, StringFormat=F2, TargetNullValue=''}"/>
-                <TextBlock Grid.Column="3" Grid.Row="4" Text="{Binding NewPerimeterFt, StringFormat=F2, TargetNullValue=''}"/>
+                <TextBlock Grid.Column="2" Grid.Row="4" Text="{Binding TargetPolygon.Perimeter, StringFormat=F2, TargetNullValue=''}"/>
+                <TextBlock Grid.Column="3" Grid.Row="4" Text="{Binding NewPerimeterM, StringFormat=F2, TargetNullValue=''}"/>
+
+                <TextBlock Grid.Column="2" Grid.Row="5" Text="{Binding TargetPolygon.PerimeterFt, StringFormat=F2, TargetNullValue=''}"/>
+                <TextBlock Grid.Column="3" Grid.Row="5" Text="{Binding NewPerimeterFt, StringFormat=F2, TargetNullValue=''}"/>
+
+                <TextBlock Grid.Column="2" Grid.Row="6" Grid.ColumnSpan="2" Margin="35 0 0 0"
+                           Text="{Binding PerimeterDifference, StringFormat='{}{0:F3}%', TargetNullValue=''}"/>
+                
+                
+                
             </Grid>
 
             <ListBox x:Name="lbPoints" Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"
@@ -218,11 +260,14 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0" Width="75" Content="Cancel" Click="Cancel_Click" Margin="3 0 0 0"/>
-                    <Button Grid.Column="2" Width="75" Content="Analyze" Click="Analyze_Click"/>
-                    <Button Grid.Column="4" Width="75" Content="Apply" Click="Apply_Click" Margin="0 0 3 0"/>
+                    <Button Grid.Column="0" Width="75" Content="Cancel" Command="{Binding CancelCommand}" Margin="3 0 0 0"/>
+                    <Button Grid.Column="2" Width="75" Content="Analyze" Command="{Binding AnalyzeCommand}"/>
+                    <Button Grid.Column="4" Width="100" Content="Zoom To Poly" Command="{Binding ZoomCommand}"/>
+                    <Button Grid.Column="6" Width="75" Content="Apply" Command="{Binding ApplyCommand}" Margin="0 0 3 0"/>
                 </Grid>
             </Border>
         </Grid>
