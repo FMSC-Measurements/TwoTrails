@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using TwoTrails.Core.Points;
 
-namespace TwoTrails
+namespace TwoTrails.Utils
 {
     public class PointSorter : IComparer
     {
-        public bool SortPolysByName {get; private set;}
+        public bool SortPolysByName { get; private set; }
 
         public PointSorter(bool sortPolysByName = true)
         {

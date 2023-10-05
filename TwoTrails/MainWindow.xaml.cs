@@ -41,6 +41,7 @@ namespace TwoTrails
                 app.ExternalInstanceArgs += (object sender, IEnumerable<string> args) =>
                 {
                     this.Activate();
+                    this.Focus();
                     if (args != null)
                     {
                         foreach (string proj in args)
@@ -54,7 +55,7 @@ namespace TwoTrails
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
 #if DEBUG
-            MainModel.PointEditor.PointMinimization();
+            //run on load
 #endif
         }
 

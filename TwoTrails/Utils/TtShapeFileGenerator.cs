@@ -27,7 +27,7 @@ namespace TwoTrails.Utils
 
             string baseFileName = Path.Combine(polyDir, polygon.Name.Sanitize());
 
-            IEnumerable<TtPoint> points = manager.GetPoints(polygon.CN).Where(p => p.OpType != OpType.WayPoint);
+            IEnumerable<TtPoint> points = manager.GetPoints(polygon.CN).Where(p => p.CanBeBndPoint());
 
             if (points.Any())
             {

@@ -87,7 +87,7 @@ namespace TwoTrails.ViewModels
 
                     int pathLen = path.Length;
                     List<String> tlPolyNames = _Project.HistoryManager.Polygons
-                        .Where(p => (pathLen + p.Name.Length * 2 + 10) >= byte.MaxValue) //max possible length for generated path
+                        .Where(p => (pathLen + p.Name.Length * 2 + 20) >= byte.MaxValue) //max possible length for generated path
                         .Select(p => p.Name).ToList();
 
                     if (tlPolyNames.Count > 0)

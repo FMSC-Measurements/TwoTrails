@@ -1,5 +1,4 @@
 ﻿using FMSC.Core;
-using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
@@ -27,8 +26,14 @@ namespace TwoTrails.Core.Points
 
         public static bool IsBndPoint(this TtPoint point)
         {
-            return point.OnBoundary;
+            return point.OpType != OpType.WayPoint && point.OnBoundary;
         }
+
+        public static bool CanBeBndPoint(this TtPoint point)
+        {
+            return point.OpType != OpType.WayPoint;
+        }
+
 
         public static bool IsNavPoint(this TtPoint point)
         {

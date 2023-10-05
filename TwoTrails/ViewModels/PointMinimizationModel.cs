@@ -17,6 +17,7 @@ using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
 using TwoTrails.Mapping;
+using TwoTrails.Utils;
 using Convert = FMSC.Core.Convert;
 using Point = FMSC.Core.Point;
 
@@ -64,7 +65,7 @@ namespace TwoTrails.ViewModels
             set => Set(value, () => {
                 OnPropertyChanged(nameof(TargetPolygonToolTip));
 
-                List<TtPoint> points = Manager.GetPoints(TargetPolygon.CN);
+                List<TtPoint> points = Manager.GetPoints(TargetPolygon.CN).Where(p => p.CanBeBndPoint()).ToList();
                 _OrigPoints = points.ToDictionary(p => p.CN, p => p);
 
                 Points = new ReadOnlyObservableCollection<TtPoint>(
@@ -175,7 +176,7 @@ namespace TwoTrails.ViewModels
         public PointMinimizationModel(TtProject project, PointMinimizationDialog dialog)
         {
             Project = project;
-            Polygons = Manager.Polygons.Where(p => Manager.GetPoints(p.CN).HasAtLeast(3)).ToList();
+            Polygons = Manager.Polygons.Where(p => Manager.GetPoints(p.CN).Select(pt => pt.CanBeBndPoint()).HasAtLeast(3)).ToList();
             Polygons.Sort(new PolygonSorterDirect(project.Settings.SortPolysByName));
             _Dialog = dialog;
 
@@ -384,21 +385,18 @@ namespace TwoTrails.ViewModels
                     nextPoint = (i == Points.Count - 1) ? Points[0] : Points[i + 1];
                     nextCoords = nextPoint.GetCoords(targetZone);
 
-                    if (currPoint.HasSameAdjLocation(nextPoint) || (!AnalyzeAllPointsInPoly && !currPoint.OnBoundary))
+                    if (currPoint.HasSameAdjLocation(nextPoint) || (!AnalyzeAllPointsInPoly && !_OrigPoints[currPoint.CN].OnBoundary))
                     {
                         currPoint.OnBoundary = false;
-                        currPoint = nextPoint;
-                        continue;
                     }
                     else
                     {
                         currPoint.OnBoundary = true;
                         segments.Add(new PMSegment(lastPoint, currPoint, nextPoint, lastCoords, currCoords, nextCoords, AccuracyOverride));
+
+                        lastPoint = currPoint;
+                        lastCoords = currCoords;
                     }
-
-
-                    lastPoint = currPoint;
-                    lastCoords = currCoords;
 
                     currPoint = nextPoint;
                     currCoords = nextCoords;

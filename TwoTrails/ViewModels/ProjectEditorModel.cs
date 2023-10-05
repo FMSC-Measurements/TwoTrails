@@ -1,6 +1,5 @@
 ﻿using FMSC.Core;
 using FMSC.Core.ComponentModel;
-using FMSC.Core.Windows.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
@@ -20,6 +19,7 @@ using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
+using TwoTrails.Utils;
 using static TwoTrails.Core.MediaTools;
 
 namespace TwoTrails.ViewModels

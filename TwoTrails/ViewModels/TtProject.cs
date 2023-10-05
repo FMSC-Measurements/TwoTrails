@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.DAL;
+using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
 {

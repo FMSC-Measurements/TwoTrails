@@ -5,11 +5,11 @@ using System.Web.UI.WebControls;
 using TwoTrails.Core;
 using TwoTrails.ViewModels;
 
-namespace TwoTrails
+namespace TwoTrails.Utils
 {
     public class PolygonSorter : IComparer
     {
-        public bool SortPolysByName {get; private set;}
+        public bool SortPolysByName { get; private set; }
 
         public PolygonSorter(bool sortPolysByName = true)
         {

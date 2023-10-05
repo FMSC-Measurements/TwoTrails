@@ -1,5 +1,4 @@
 ﻿using FMSC.Core.Windows.ComponentModel.Commands;
-using FMSC.GeoSpatial.UTM;
 using Microsoft.Maps.MapControl.WPF;
 using System;
 using System.Collections.Generic;
@@ -7,13 +6,12 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Utils;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.Mapping

@@ -1,7 +1,7 @@
 ﻿using System;
 using TwoTrails.Core;
 
-namespace TwoTrails
+namespace TwoTrails.Utils
 {
     public class PolygonSorterEx<TModel> : PolygonSorter where TModel : class
     {
@@ -9,7 +9,7 @@ namespace TwoTrails
 
         public PolygonSorterEx(Func<TModel, TtPolygon> func, bool sortPolysByName = true) : base(sortPolysByName)
         {
-            this._Func = func;
+            _Func = func;
         }
 
         public override int Compare(object x, object y)
@@ -30,8 +30,8 @@ namespace TwoTrails
 
         public PolygonPrioritySorterEx(Func<TModel, TtPolygon> func, Func<TModel, bool> pfunc, bool sortPolysByName = true) : base(sortPolysByName)
         {
-            this._PolyFunc = func;
-            this._PriorityFunc = pfunc;
+            _PolyFunc = func;
+            _PriorityFunc = pfunc;
         }
 
         public override int Compare(object x, object y)

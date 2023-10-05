@@ -56,9 +56,8 @@ namespace TwoTrails.Mapping
 
         protected override void UpdateShape(LocationCollection locations)
         {
-            Application.Current.Dispatcher.Invoke(() => {
+            Map.Dispatcher.Invoke(() => {
                 _MapPolyline.Locations = locations;
-
                 Map.Refresh();
             });
         }
