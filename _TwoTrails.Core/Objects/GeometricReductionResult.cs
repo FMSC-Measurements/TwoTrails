@@ -14,6 +14,8 @@ namespace TwoTrails.Core
         public const double MAXIMUM_ANGLE = 90d;
         public const double MIN_DIST_MULTIPLIER = 5d;
         public const double MAX_DIST_MULTIPLIER = 10d;
+        public const double MIN_DIVISOR = 1d;
+        public const double MAX_DIVISOR = 2d;
 
         public AnglePointResult Flags { get; private set; }
 
@@ -94,8 +96,8 @@ namespace TwoTrails.Core
                 double accDistSegA = accSegA * distSegA;
                 double accDistSegB;
 
-                double aeDistDivA = distSegA < minDistSegA ? 1 :
-                        (distSegA >= maxDistSegA) ? 2 :
+                double aeDistDivA = distSegA < minDistSegA ? MIN_DIVISOR :
+                        (distSegA >= maxDistSegA) ? MAX_DIVISOR :
                             distSegA / minDistSegA;
                 double aeDistDivB;
 
@@ -109,7 +111,7 @@ namespace TwoTrails.Core
                         currCoords.X, currCoords.Y,
                         nextCoords.X, nextCoords.Y);
 
-                    angle = angle % 180;
+                    angle = Math.Round(angle % 180, 8);
                     if (angle > MAXIMUM_ANGLE)
                         angle = MAXIMUM_ANGLE - (angle % MAXIMUM_ANGLE);
 
@@ -125,29 +127,27 @@ namespace TwoTrails.Core
                     double segmentLength = (distSegA + distSegB) / 2d;
 
                     bool shortLegB = distSegB < minDistSegB;
-                    bool shallowEdge = angle < MINIMUM_ANGLE;
+                    bool sharpEdge = angle >= MINIMUM_ANGLE;
 
-                    if (distSegB >= maxDistSegB)
+                    if (distSegB >= minDistSegB)
                         LongLegs++;
 
-                    if (angle >= MINIMUM_ANGLE)
+                    if (sharpEdge)
                         SharpEdges++;
 
-                    aeDistDivB = shortLegB ? 1d :
-                            (distSegB >= maxDistSegB) ? 2d :
+                    aeDistDivB = shortLegB ? MIN_DIVISOR :
+                            (distSegB >= maxDistSegB) ? MAX_DIVISOR :
                                 distSegB / minDistSegB;
 
-                    double aeAngDiv = shallowEdge ? 1d :
-                            (angle >= MAXIMUM_ANGLE) ? 2d :
-                                angle / MINIMUM_ANGLE;
+                    double aeAngDiv = sharpEdge ? ((angle >= MAXIMUM_ANGLE) ? MAX_DIVISOR : angle / MINIMUM_ANGLE) : MIN_DIVISOR;
 
-                    double aeA = accDistSegA / 2 / (aeAngDiv > 1d ? ((aeDistDivA + aeAngDiv) / 2) : 1d);
-                    double aeB = accDistSegB / 2 / (aeAngDiv > 1d ? ((aeDistDivB + aeAngDiv) / 2) : 1d);
+                    double aeA = accDistSegA / 2 / (sharpEdge ? ((aeDistDivA + aeAngDiv) / 2) : MIN_DIVISOR);
+                    double aeB = accDistSegB / 2 / (sharpEdge ? ((aeDistDivB + aeAngDiv) / 2) : MIN_DIVISOR);
 
                     double segAreaError = aeA + aeB;
 
                     Segments.Add(new GERSegment(lastPoint, currPoint, nextPoint, segAreaError, angle, segmentLength,
-                        aeDistDivA <= 1 || aeDistDivB <= 1, aeDistDivA >= 2 && aeDistDivB >= 2));
+                        aeDistDivA < MIN_DIVISOR || aeDistDivB < MIN_DIVISOR, aeDistDivA >= MIN_DIVISOR && aeDistDivB >= MIN_DIVISOR));
 
                     TotalError += segAreaError;
                     TotalGpsError += accDistSegB;
@@ -203,7 +203,6 @@ namespace TwoTrails.Core
 
                 HasShortLegs = hasShortLegs;
                 HasLongLegs = hasLongLegs;
-
             }
         }
     }
