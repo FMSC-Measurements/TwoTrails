@@ -130,13 +130,13 @@ namespace TwoTrails.Core.Points
         }
 
 
-        public override bool Equals(object obj)
+        public override bool Equals(TtPoint point)
         {
-            QuondamPoint point = obj as QuondamPoint;
+            QuondamPoint qPoint = point as QuondamPoint;
 
             return base.Equals(point) &&
-                _ParentPointCN == point._ParentPointCN &&
-                _ManualAccuracy == point._ManualAccuracy;
+                _ParentPointCN == qPoint._ParentPointCN &&
+                _ManualAccuracy == qPoint._ManualAccuracy;
         }
 
         public override int GetHashCode()

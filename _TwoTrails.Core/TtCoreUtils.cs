@@ -106,7 +106,7 @@ namespace TwoTrails.Core
 
         public static Tuple<double, double, double> CalculateAreaPerimeterAndOnBoundTrail(this ITtManager manager, string polyCN)
         {
-            return TtCoreUtils.CalculateAreaPerimeterAndOnBoundTrail(manager.GetPoints(polyCN).Where(p => p.IsBndPoint()).ToList());
+            return CalculateAreaPerimeterAndOnBoundTrail(manager.GetPoints(polyCN).Where(p => p.IsBndPoint()).ToList());
         }
 
         public static Tuple<double, double, double> CalculateAreaPerimeterAndOnBoundTrail(List<TtPoint> points)

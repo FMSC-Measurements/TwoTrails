@@ -475,7 +475,7 @@ namespace TwoTrails.Core.Points
             return obj is TtPoint point && Equals(point);
         }
         
-        public bool Equals(TtPoint point)
+        public virtual bool Equals(TtPoint point)
         {
             return base.Equals(point) &&
                 OpType == point.OpType &&

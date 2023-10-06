@@ -171,15 +171,16 @@ namespace TwoTrails.Core.Points
             SetAccuracy(Polygon.Accuracy);
         }
 
-        public override bool Equals(object obj)
-        {
-            GpsPoint point = obj as GpsPoint;
 
-            return base.Equals(point) &&
-                _Latitude == point._Latitude &&
-                _Longitude == point._Longitude &&
-                _Elevation == point._Elevation &&
-                _ManualAccuracy == point._ManualAccuracy;
+        public override bool Equals(TtPoint point)
+        {
+            GpsPoint gpsPoint = point as GpsPoint;
+
+            return base.Equals(gpsPoint) &&
+                _Latitude == gpsPoint._Latitude &&
+                _Longitude == gpsPoint._Longitude &&
+                _Elevation == gpsPoint._Elevation &&
+                _ManualAccuracy == gpsPoint._ManualAccuracy;
         }
 
         public override int GetHashCode()
