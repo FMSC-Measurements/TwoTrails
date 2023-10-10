@@ -1,4 +1,6 @@
-﻿using FMSC.Core;
+﻿//#define USE_VARIABLE_DIST_MULTIPLIER
+
+using FMSC.Core;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
@@ -12,8 +14,14 @@ namespace TwoTrails.Core
     {
         public const double MINIMUM_ANGLE = 45d;
         public const double MAXIMUM_ANGLE = 90d;
+
+#if USE_VARIABLE_DIST_MULTIPLIER
         public const double MIN_DIST_MULTIPLIER = 5d;
         public const double MAX_DIST_MULTIPLIER = 10d;
+#else
+        public const double MIN_DIST_MULTIPLIER = 10d;
+#endif
+
         public const double MIN_DIVISOR = 1d;
         public const double MAX_DIVISOR = 2d;
 
@@ -88,18 +96,22 @@ namespace TwoTrails.Core
                 double accSegA = (lastPoint.Accuracy + currPoint.Accuracy) / 2d;
                 double accSegB;
 
-                double minDistSegA = accSegA * MIN_DIST_MULTIPLIER;
                 double minDistSegB;
-                double maxDistSegA = accSegA * MAX_DIST_MULTIPLIER;
-                double maxDistSegB;
 
                 double accDistSegA = accSegA * distSegA;
                 double accDistSegB;
 
+#if USE_VARIABLE_DIST_MULTIPLIER
+                double minDistSegA = accSegA * MIN_DIST_MULTIPLIER;
+                double maxDistSegA = accSegA * MIN_DIST_MULTIPLIER;
+
+                double maxDistSegB;
+
                 double aeDistDivA = distSegA < minDistSegA ? MIN_DIVISOR :
-                        (distSegA >= maxDistSegA) ? MAX_DIVISOR :
-                            distSegA / minDistSegA;
+                            (distSegA >= maxDistSegA) ? MAX_DIVISOR :
+                                distSegA / minDistSegA;
                 double aeDistDivB;
+#endif
 
                 for (int i = 0; i < points.Count - 1; i++)
                 {
@@ -120,13 +132,11 @@ namespace TwoTrails.Core
                     accSegB = (currPoint.Accuracy + nextPoint.Accuracy) / 2d;
 
                     minDistSegB = accSegB * MIN_DIST_MULTIPLIER;
-                    maxDistSegB = accSegB * MAX_DIST_MULTIPLIER;
 
                     accDistSegB = accSegB * distSegB;
 
                     double segmentLength = (distSegA + distSegB) / 2d;
 
-                    bool shortLegB = distSegB < minDistSegB;
                     bool sharpEdge = angle >= MINIMUM_ANGLE;
 
                     if (distSegB >= minDistSegB)
@@ -135,19 +145,26 @@ namespace TwoTrails.Core
                     if (sharpEdge)
                         SharpEdges++;
 
-                    aeDistDivB = shortLegB ? MIN_DIVISOR :
-                            (distSegB >= maxDistSegB) ? MAX_DIVISOR :
-                                distSegB / minDistSegB;
-
                     double aeAngDiv = sharpEdge ? ((angle >= MAXIMUM_ANGLE) ? MAX_DIVISOR : angle / MINIMUM_ANGLE) : MIN_DIVISOR;
+
+#if USE_VARIABLE_DIST_MULTIPLIER
+                    maxDistSegB = accSegB * MAX_DIST_MULTIPLIER;
+                    bool shortLegB = distSegB < minDistSegB;
+
+                    aeDistDivB = shortLegB ? MIN_DIVISOR :
+                                (distSegB >= maxDistSegB) ? MAX_DIVISOR :
+                                    distSegB / minDistSegB;
 
                     double aeA = accDistSegA / 2 / (sharpEdge ? ((aeDistDivA + aeAngDiv) / 2) : MIN_DIVISOR);
                     double aeB = accDistSegB / 2 / (sharpEdge ? ((aeDistDivB + aeAngDiv) / 2) : MIN_DIVISOR);
+#else
+                    double aeA = accDistSegA / 2 / aeAngDiv;
+                    double aeB = accDistSegB / 2 / aeAngDiv;
+#endif
 
                     double segAreaError = aeA + aeB;
 
-                    Segments.Add(new GERSegment(lastPoint, currPoint, nextPoint, segAreaError, angle, segmentLength,
-                        aeDistDivA < MIN_DIVISOR || aeDistDivB < MIN_DIVISOR, aeDistDivA >= MIN_DIVISOR && aeDistDivB >= MIN_DIVISOR));
+                    Segments.Add(new GERSegment(lastPoint, currPoint, nextPoint, segAreaError, angle, segmentLength));
 
                     TotalError += segAreaError;
                     TotalGpsError += accDistSegB;
@@ -160,11 +177,14 @@ namespace TwoTrails.Core
                     currCoords = nextCoords;
 
                     distSegA = distSegB;
-                    accSegA = accSegB;
-                    minDistSegA = minDistSegB;
-                    maxDistSegA = maxDistSegB;
+                    //accSegA = accSegB;
+                    //minDistSegA = minDistSegB;
+                    //maxDistSegA = maxDistSegB;
                     accDistSegA = accDistSegB;
+
+#if USE_VARIABLE_DIST_MULTIPLIER
                     aeDistDivA = aeDistDivB;
+#endif
                 }
             }
             else
@@ -186,12 +206,7 @@ namespace TwoTrails.Core
             public double Edge { get; }
             public double SegmentLength { get; }
 
-            public bool HasLongLegs { get; }
-            public bool HasShortLegs { get; }
-
-
-            public GERSegment(TtPoint p1, TtPoint p2, TtPoint p3, double areaError, double edge, double segLength,
-                bool hasShortLegs, bool hasLongLegs)
+            public GERSegment(TtPoint p1, TtPoint p2, TtPoint p3, double areaError, double edge, double segLength)
             {
                 Point1 = p1;
                 Point2 = p2;
@@ -200,9 +215,6 @@ namespace TwoTrails.Core
                 AreaError = areaError;
                 Edge = edge;
                 SegmentLength = segLength;
-
-                HasShortLegs = hasShortLegs;
-                HasLongLegs = hasLongLegs;
             }
         }
     }

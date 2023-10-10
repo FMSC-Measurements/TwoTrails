@@ -77,17 +77,17 @@
                         <CheckBox Grid.Column="1" Grid.Row="1" IsChecked="{Binding AnalyzeAllPointsInPoly}"
                           ToolTip="Run minimization on all points instead of the current on boundary points"/>
 
-                        <TextBlock Text="Limit Area Change" Grid.Column="0" Grid.Row="2"/>
-                        <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding LimitAreaChange}"
-                          ToolTip="Limit the amount of area lost or gained"/>
+                        <TextBlock Text="Limit Boundary Change" Grid.Column="0" Grid.Row="2"/>
+                        <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding LimitBoundaryChange}"
+                          ToolTip="Limit the change in boundary location"/>
 
                         <TextBlock Text="Max Adjust Distance" Grid.Column="0" Grid.Row="3"/>
                         <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding MaximumLegAdjustDist, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
-                         IsEnabled="{Binding LimitAreaChange}"
+                         IsEnabled="{Binding LimitBoundaryChange}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble">
                             <TextBox.ToolTip>
                                 <TextBlock>
-                              Maximum Distance a point can be from its minimized poly segment
+                              Maximum Distance a point can be from its original boundary (in meters)
                               <LineBreak /> 
                               Default is twice the point accuracy
                                 </TextBlock>

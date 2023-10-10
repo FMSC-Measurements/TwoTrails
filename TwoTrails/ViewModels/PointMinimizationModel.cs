@@ -70,9 +70,11 @@ namespace TwoTrails.ViewModels
 
                 Points = new ReadOnlyObservableCollection<TtPoint>(
                     new ObservableCollection<TtPoint>(points.DeepCopy()));
+                OnPropertyChanged(nameof(Points));
 
                 UpdateOrigPoly();
                 AnalyzeTargetPolygon();
+                ZoomeToPoly();
             });
         }
 
@@ -95,7 +97,7 @@ namespace TwoTrails.ViewModels
             
             AnalyzeTargetPolygon();
         }); }
-        public bool LimitAreaChange { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+        public bool LimitBoundaryChange { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
         public bool RespectCurves { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
 
 
@@ -194,14 +196,7 @@ namespace TwoTrails.ViewModels
                 x => this.TargetPolygon);
 
             ZoomCommand = new BindedRelayCommand<PointMinimizationModel>(
-                x =>
-                {
-                    Map.SetView(
-                        new LocationRect(
-                            new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BOUNDARY_ZOOM_MARGIN),
-                            new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN)));
-                    Map.Refresh();
-                },
+                x => ZoomeToPoly(),
                 x => Extents != null,
                 this,
                 x => this.Extents);
@@ -213,7 +208,7 @@ namespace TwoTrails.ViewModels
 
             MinimumAngle = MINIMUM_ANGLE;
             AnalyzeAllPointsInPoly = true;
-            LimitAreaChange = true;
+            LimitBoundaryChange = true;
 
             _OnBoundBrush = (SolidColorBrush)Application.Current.Resources["scbPrimary"];
             _OffBoundBrush = (SolidColorBrush)Application.Current.Resources["scbBackground"];
@@ -246,16 +241,7 @@ namespace TwoTrails.ViewModels
                 if (Extents == null)
                     UpdateOrigPoly();
 
-
-                if (Extents != null)
-                {
-                    Map.SetView(
-                        new LocationRect(
-                            new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BOUNDARY_ZOOM_MARGIN),
-                            new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN)));
-
-                    Map.Refresh();
-                }
+                ZoomeToPoly();
             }
         }
 
@@ -372,17 +358,17 @@ namespace TwoTrails.ViewModels
 
                 int targetZone = Points[0].Metadata.Zone;
 
-                TtPoint lastPoint = Points[Points.Count - 1];
-                TtPoint currPoint = Points[0];
+                TtPoint lastPoint = Points[0];
+                TtPoint currPoint = Points[1];
                 TtPoint nextPoint;
 
                 UTMCoords lastCoords = lastPoint.GetCoords(targetZone);
                 UTMCoords currCoords = currPoint.GetCoords(targetZone);
                 UTMCoords nextCoords;
 
-                for (int i = 0; i < Points.Count; i++)
+                for (int i = 1; i <= Points.Count; i++)
                 {
-                    nextPoint = (i == Points.Count - 1) ? Points[0] : Points[i + 1];
+                    nextPoint = (i < Points.Count - 1) ? Points[i + 1] : ((i == Points.Count - 1) ? Points[0] : Points[1]);
                     nextCoords = nextPoint.GetCoords(targetZone);
 
                     if (currPoint.HasSameAdjLocation(nextPoint) || (!AnalyzeAllPointsInPoly && !_OrigPoints[currPoint.CN].OnBoundary))
@@ -421,7 +407,7 @@ namespace TwoTrails.ViewModels
                             seg.CurrPoint.OnBoundary = false;
                         }
 
-                        if (LimitAreaChange)
+                        if (LimitBoundaryChange)
                             LimitArea(lastKeptSeg, currSeg, nonComplientSegs);
 
                         nonComplientSegs.Clear();
@@ -523,6 +509,20 @@ namespace TwoTrails.ViewModels
                 {
                     LimitArea(maxSeg, endSeg, segs.Skip(maxSegIdx + 1));
                 }
+            }
+        }
+
+
+        private void ZoomeToPoly()
+        {
+            if (Extents != null && Map.IsLoaded)
+            {
+                Map.SetView(
+                    new LocationRect(
+                        new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BOUNDARY_ZOOM_MARGIN),
+                        new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN)));
+
+                Map.Refresh();
             }
         }
 

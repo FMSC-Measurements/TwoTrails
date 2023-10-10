@@ -93,16 +93,15 @@ namespace TwoTrails
 
             Tab.Content = _ProjectEditorControl;
 
-
             UndoCommand = new BindedRelayCommand<TtHistoryManager>(
-                x => Project.HistoryManager.Undo(),
-                x => Project.HistoryManager.CanUndo && doesTabAndDataMatch(CurrentTabSection, Project.HistoryManager.UndoCommandType),
+                x => Undo(),
+                x => Project.HistoryManager.CanUndo,
                 Project.HistoryManager,
                 x => x.CanUndo);
 
             RedoCommand = new BindedRelayCommand<TtHistoryManager>(
-                x => Project.HistoryManager.Redo(),
-                x => Project.HistoryManager.CanRedo && doesTabAndDataMatch(CurrentTabSection, Project.HistoryManager.RedoCommandType),
+                x => Redo(),
+                x => Project.HistoryManager.CanRedo,
                 Project.HistoryManager,
                 x => x.CanRedo);
 
@@ -116,7 +115,31 @@ namespace TwoTrails
             ProjectEditor_TabSelectionChanged(null, null);
         }
 
-        static bool doesTabAndDataMatch(ProjectTabSection selectedTab, Type type)
+        private void Undo()
+        {
+            String dt = GetActionTypeFromDataType(Project.HistoryManager.UndoCommandType);
+
+            if (DoesTabAndDataMatch(CurrentTabSection, Project.HistoryManager.UndoCommandType) ||
+                MessageBox.Show($"You are about to undo a{(dt != null ? $" {dt}": "n")} action but are not on the {(dt != null ? dt : "correct")} tab. Would you like to continue?", "About to Undo",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
+            {
+                Project.HistoryManager.Undo();
+            }
+        }
+
+        private void Redo()
+        {
+            String dt = GetActionTypeFromDataType(Project.HistoryManager.RedoCommandType);
+
+            if (DoesTabAndDataMatch(CurrentTabSection, Project.HistoryManager.RedoCommandType) ||
+                MessageBox.Show($"You are about to redo a{(dt != null ? $" {dt}" : "n")} action but are not on the {(dt != null ? dt : "correct")} tab. Would you like to continue?", "About to Redo",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
+            {
+                Project.HistoryManager.Redo();
+            }
+        }
+
+        public static bool DoesTabAndDataMatch(ProjectTabSection selectedTab, Type type)
         {
             if (type == null)
             {
@@ -136,6 +159,26 @@ namespace TwoTrails
                 case ProjectTabSection.Actions:
                 default: return false;
             }
+        }
+
+        private static String GetActionTypeFromDataType(Type type)
+        {
+            if (PointProperties.DataType.IsAssignableFrom(type))
+                return "Point";
+            else if (type == ProjectProperties.DataType)
+                return "Polygon";
+            else if (type == MetadataProperties.DataType)
+                return "Metadata";
+            else if (type == GroupProperties.DataType)
+                return "Project";
+            else if (type == PolygonProperties.DataType)
+                return "Group";
+            else if (type == MediaProperties.DataType)
+                return "Media";
+            else if (type == typeof(DataDictionary))
+                return "Data Dictionary";
+
+            return null;
         }
 
         private void Project_PropertyChanged(object sender, PropertyChangedEventArgs e)
