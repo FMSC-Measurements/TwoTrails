@@ -117,6 +117,7 @@ namespace TwoTrails.ViewModels
         public RelayCommand SelectInverseCommand { get; }
         public RelayCommand DeselectCommand { get; }
         public RelayCommand SelectNon3DPointsCommand { get; }
+        public RelayCommand SelectNonDiffPointsCommand { get; }
         public RelayCommand SelectGpsPointsWithoutNmeaCommand { get; }
 
         public BindedRelayCommand<PointEditorModel> CopyCellValueCommand { get; }
@@ -1048,6 +1049,8 @@ namespace TwoTrails.ViewModels
             DeselectCommand = new RelayCommand(x => DeselectAll());
 
             SelectNon3DPointsCommand = new RelayCommand(x => SelectNon3DPoints());
+
+            SelectNonDiffPointsCommand = new RelayCommand(x => SelectNonDiffPoints());
 
             SelectGpsPointsWithoutNmeaCommand = new RelayCommand(x => SelectGpsPointsWithoutNmea());
             #endregion
@@ -2910,6 +2913,28 @@ namespace TwoTrails.ViewModels
             foreach (GpsPoint point in points)
             {
                 if (Manager.BaseManager.GetNmeaBursts(point.CN).Any(b => b.IsUsed && b.Fix != Fix._3D))
+                {
+                    SelectedPoints.Add(point);
+                }
+            }
+
+            ignoreSelectionChange = false;
+
+            OnSelectionChanged();
+        }
+        
+        private void SelectNonDiffPoints()
+        {
+            List<TtPoint> points = (MultipleSelections ? SelectedPoints : VisiblePoints)
+                .Cast<TtPoint>().Where(p => p.IsGpsType()).ToList();
+
+            ignoreSelectionChange = true;
+
+            SelectedPoints.Clear();
+
+            foreach (GpsPoint point in points)
+            {
+                if (Manager.BaseManager.GetNmeaBursts(point.CN).Any(b => b.IsUsed && b.FixQuality != GpsFixType.DGPS))
                 {
                     SelectedPoints.Add(point);
                 }

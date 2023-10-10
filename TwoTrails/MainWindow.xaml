@@ -185,6 +185,7 @@
                         <Separator/>
                         
                         <MenuItem Header="Non-3D Points" Command="{Binding PointEditor.SelectNon3DPointsCommand}"/>
+                        <MenuItem Header="Non-Differential Points" Command="{Binding PointEditor.SelectNonDiffPointsCommand}"/>
                         <MenuItem Header="Gps Points w/o NMEA" Command="{Binding PointEditor.SelectGpsPointsWithoutNmeaCommand}" />
                     </MenuItem>
 
