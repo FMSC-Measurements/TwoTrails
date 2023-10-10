@@ -246,7 +246,7 @@ namespace TwoTrails.ViewModels
             OpenFileDialog dialog = new OpenFileDialog();
 
             dialog.DefaultExt = Consts.FILE_EXTENSION;
-            dialog.Filter = $"{Consts.FILE_EXTENSION_FILTER}|{Consts.FILE_EXTENSION_FILTER_V2}|All Files|*.*";
+            dialog.Filter = $"{Consts.FILE_EXTENSION_FILTER_ALL_TT}|{Consts.FILE_EXTENSION_FILTER}|{Consts.FILE_EXTENSION_FILTER_V2}|All Files|*.*";
             
             if (dialog.ShowDialog() == true)
             {
@@ -272,6 +272,15 @@ namespace TwoTrails.ViewModels
                         {
                             try
                             {
+                                if (DataHelper.IsEmptyFile(filePath))
+                                {
+                                    MessageBox.Show(
+                                    $@"""File '{filePath}' has a size of 0. This sometimes is happens when copying over from a mobile device. 
+                                    Try to copy the file over again and see if it fixes this issue.""",
+                                    "Empty File", MessageBoxButton.OK);
+                                    return;
+                                }
+
                                 TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
                                 TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
 
@@ -327,6 +336,7 @@ namespace TwoTrails.ViewModels
                             {
                                 if (tab.DataContext is ProjectTab projTab && projTab.Project.FilePath == filePath)
                                     SwitchToTab(tab);
+                                MainWindow.Focus();
                             }
                         }
                     }
@@ -410,7 +420,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                     }
                     else
                     {
-                        MessageBox.Show(MainWindow, $"File '{filePath}' is not a compatible project type.");
+                        MessageBox.Show(MainWindow, $"File '{filePath}' is not a compatible file type.");
                     }
                 }
             }

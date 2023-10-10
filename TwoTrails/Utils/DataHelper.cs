@@ -198,6 +198,11 @@ namespace TwoTrails.Utils
 
             return true;
         }
+
+        public static bool IsEmptyFile(string path)
+        {
+            return new FileInfo(path).Length == 0;
+        }
     }
 
     [Flags]

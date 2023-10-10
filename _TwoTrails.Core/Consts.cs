@@ -17,6 +17,8 @@ namespace TwoTrails.Core
         public const String DefaultGroupName = "Main Group";
         public const String DefaultGroupDesc = "Default Group";
 
+        public const String FILE_EXTENSION_FILTER_ALL_TT = "All TwoTrails Files |*.ttx;*.tt2";
+
         public const String FILE_EXTENSION = ".ttx";
         public const String FILE_EXTENSION_FILTER = "TwoTrails Files (*.ttx)|*.ttx";
 

@@ -170,47 +170,94 @@
                             <TextBlock Grid.Column="0" Grid.Row="8" Text="Geometric ER"/>
 
 
-                            <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding TargetPolygon.AreaAcres, StringFormat=F3, TargetNullValue=''}"
-                                ToolTip="{Binding TargetPolygon.AreaAcres, TargetNullValue=''}"/>
-                            <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding NewAreaAc, StringFormat=F3, TargetNullValue=''}"
-                                ToolTip="{Binding NewAreaAc, TargetNullValue=''}"/>
+                            <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding TargetPolygon.AreaAcres, StringFormat=F3, TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding TargetPolygon.AreaAcres, StringFormat=F8, TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding NewAreaAc, StringFormat=F3, TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding NewAreaAc, StringFormat=F8, TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
 
-                            <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding TargetPolygon.AreaHectaAcres, StringFormat=F3, TargetNullValue=''}"
-                                ToolTip="{Binding TargetPolygon.AreaHectaAcres, TargetNullValue=''}"/>
-                            <TextBlock Grid.Column="3" Grid.Row="2" Text="{Binding NewAreaHa, StringFormat=F3, TargetNullValue=''}"
-                                ToolTip="{Binding NewAreaHa, TargetNullValue=''}"/>
+                            <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding TargetPolygon.AreaHectaAcres, StringFormat=F3, TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding TargetPolygon.AreaHectaAcres, StringFormat=F8, TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBlock Grid.Column="3" Grid.Row="2" Text="{Binding NewAreaHa, StringFormat=F3, TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding NewAreaHa, StringFormat=F8, TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
 
 
-                            <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding AreaDifferenceAc, StringFormat='{}{0:F3}', TargetNullValue=''}"
-                                ToolTip="{Binding AreaDifferenceAc, TargetNullValue=''}"/>
-                            <TextBlock Grid.Column="3" Grid.Row="3" Text="{Binding AreaDifference, StringFormat='{}{0:F2}%', TargetNullValue=''}"
-                                ToolTip="{Binding AreaDifference, StringFormat='{}{0}%', TargetNullValue=''}"/>
+                            <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding AreaDifferenceAc, StringFormat='{}{0:F3}', TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding AreaDifferenceAc, StringFormat='{}{0:F8}', TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBlock Grid.Column="3" Grid.Row="3" Text="{Binding AreaDifference, StringFormat='{}{0:F2}%', TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding AreaDifference, StringFormat='{}{0:F8}%', TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
 
-                            <TextBlock Grid.Column="2" Grid.Row="4" Text="{Binding TargetPolygon.PerimeterFt, StringFormat=F2, TargetNullValue=''}"
-                                ToolTip="{Binding TargetPolygon.PerimeterFt, TargetNullValue=''}"/>
-                            <TextBlock Grid.Column="3" Grid.Row="4" Text="{Binding NewPerimeterFt, StringFormat=F2, TargetNullValue=''}"
-                                ToolTip="{Binding NewPerimeterFt, TargetNullValue=''}"/>
+                            <TextBlock Grid.Column="2" Grid.Row="4" Text="{Binding TargetPolygon.PerimeterFt, StringFormat=F2, TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding TargetPolygon.PerimeterFt, StringFormat=F8, TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBlock Grid.Column="3" Grid.Row="4" Text="{Binding NewPerimeterFt, StringFormat=F2, TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding NewPerimeterFt, StringFormat=F8, TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
 
-                            <TextBlock Grid.Column="2" Grid.Row="5" Text="{Binding TargetPolygon.Perimeter, StringFormat=F2, TargetNullValue=''}"
-                                ToolTip="{Binding TargetPolygon.Perimeter, TargetNullValue=''}"/>
-                            <TextBlock Grid.Column="3" Grid.Row="5" Text="{Binding NewPerimeterM, StringFormat=F2, TargetNullValue=''}"
-                                ToolTip="{Binding NewPerimeterM, TargetNullValue=''}"/>
+                            <TextBlock Grid.Column="2" Grid.Row="5" Text="{Binding TargetPolygon.Perimeter, StringFormat=F2, TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding TargetPolygon.Perimeter, StringFormat=F8, TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBlock Grid.Column="3" Grid.Row="5" Text="{Binding NewPerimeterM, StringFormat=F2, TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding NewPerimeterM, StringFormat=F8, TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
 
-                            <TextBlock Grid.Column="2" Grid.Row="6" Text="{Binding PerimeterDifferenceFt, StringFormat='{}{0:F3}', TargetNullValue=''}"
-                                ToolTip="{Binding PerimeterDifferenceFt, TargetNullValue=''}"/>
-                            <TextBlock Grid.Column="3" Grid.Row="6" Text="{Binding PerimeterDifference, StringFormat='{}{0:F2}%', TargetNullValue=''}"
-                                ToolTip="{Binding PerimeterDifference, StringFormat='{}{0}%', TargetNullValue=''}"/>
+                            <TextBlock Grid.Column="2" Grid.Row="6" Text="{Binding PerimeterDifferenceFt, StringFormat='{}{0:F3}', TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding PerimeterDifferenceFt, StringFormat='{}{0:F8}', TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBlock Grid.Column="3" Grid.Row="6" Text="{Binding PerimeterDifference, StringFormat='{}{0:F2}%', TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding PerimeterDifference, StringFormat='{}{0:F8}%', TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
 
-                            <TextBlock Grid.Column="2" Grid.Row="7" Text="{Binding GpsAreaError, StringFormat='{}{0:F2}%', TargetNullValue=''}"
-                                ToolTip="{Binding GpsAreaError, StringFormat='{}{0}%', TargetNullValue=''}"/>
-                            <TextBlock Grid.Column="3" Grid.Row="7" Text="{Binding NewGpsAreaError, StringFormat='{}{0:F2}%', TargetNullValue=''}"
-                                ToolTip="{Binding NewGpsAreaError, StringFormat='{}{0}%', TargetNullValue=''}"/>
+                            <TextBlock Grid.Column="2" Grid.Row="7" Text="{Binding GpsAreaError, StringFormat='{}{0:F2}%', TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding GpsAreaError, StringFormat='{}{0:F8}%', TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBlock Grid.Column="3" Grid.Row="7" Text="{Binding NewGpsAreaError, StringFormat='{}{0:F2}%', TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding NewGpsAreaError, StringFormat='{}{0:F8}%', TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
 
-                            <TextBlock Grid.Column="2" Grid.Row="8" Text="{Binding VariableAreaError, StringFormat='{}{0:F2}%', TargetNullValue=''}"
-                                ToolTip="{Binding VariableAreaError, StringFormat='{}{0}%', TargetNullValue=''}"/>
-                            <TextBlock Grid.Column="3" Grid.Row="8" Text="{Binding NewVariableAreaError, StringFormat='{}{0:F2}%', TargetNullValue=''}"
-                                ToolTip="{Binding NewVariableAreaError, StringFormat='{}{0}%', TargetNullValue=''}"/>
-
+                            <TextBlock Grid.Column="2" Grid.Row="8" Text="{Binding VariableAreaError, StringFormat='{}{0:F2}%', TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding VariableAreaError, StringFormat='{}{0:F8}%', TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                            <TextBlock Grid.Column="3" Grid.Row="8" Text="{Binding NewVariableAreaError, StringFormat='{}{0:F2}%', TargetNullValue=''}">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding NewVariableAreaError, StringFormat='{}{0:F8}%', TargetNullValue=''}"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                         </Grid>
                     </Border>
 

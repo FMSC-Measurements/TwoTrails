@@ -417,15 +417,21 @@ namespace TwoTrails.Utils
 
         public static void TtNmea(ITtManager manager, String fileName)
         {
-            TtNmea(manager.GetNmeaBursts(), fileName);
+            TtNmea(manager.GetNmeaBursts(), fileName, manager.GetPoints().ToDictionary(p => p.CN, p => p));
         }
 
-        public static void TtNmea(IEnumerable<TtNmeaBurst> bursts, String fileName)
+        public static void TtNmea(IEnumerable<TtNmeaBurst> bursts, String fileName, Dictionary<string, TtPoint> points = null)
         {
             using (StreamWriter sw = new StreamWriter(fileName))
             {
                 #region Columns
                 StringBuilder sb = new StringBuilder();
+
+                if (points != null)
+                {
+                    sb.Append("Point (At Exported)");
+                }
+
                 sb.Append("PointCN,");
                 sb.Append("IsUsed,");
 
@@ -450,7 +456,6 @@ namespace TwoTrails.Utils
                 sb.Append("HDOP,");
                 sb.Append("VDOP,");
 
-                //sb.Append("Horiz Dilution,");
                 sb.Append("Geoid Height (Mt),");
 
                 sb.Append("Tracked Satellites Count,");
@@ -466,6 +471,14 @@ namespace TwoTrails.Utils
                 foreach (TtNmeaBurst burst in bursts)
                 {
                     sb = new StringBuilder();
+
+                    if (points != null)
+                    {
+                        TtPoint point = points.ContainsKey(burst.PointCN) ? points[burst.PointCN] : null;
+                        String pinfo = point != null ? $"{point.PID} ({point.Polygon?.Name})" : String.Empty;
+                        sb.AppendFormat("{0},", pinfo);
+                    }
+
                     sb.AppendFormat("{0},{1},", burst.PointCN, burst.IsUsed);
                     sb.AppendFormat("{0},{1},", burst.TimeCreated.ToString(Consts.DATE_FORMAT), burst.FixTime.ToString(Consts.DATE_FORMAT));
 
@@ -480,7 +493,6 @@ namespace TwoTrails.Utils
                     sb.AppendFormat("{0},{1},{2},", burst.HDOP, burst.PDOP, burst.VDOP);
 
                     sb.AppendFormat("{0},", burst.GeoidHeight);
-                    //sb.AppendFormat("{0},{1},", burst.HorizDilution, burst.GeoidHeight);
 
                     sb.AppendFormat("{0},{1},", burst.TrackedSatellitesCount, burst.SatellitesInViewCount);
                     sb.AppendFormat("{0},{1},{2},", burst.UsedSatelliteIDsCount, burst.UsedSatelliteIDsString, burst.SatellitesInViewString);
@@ -611,12 +623,8 @@ namespace TwoTrails.Utils
         {
             string shapeFolderPath = Path.Combine(folderPath, $"GIS_{projectInfo.Name.ScrubFileName()}");
 
-            foreach (TtPolygon poly in manager.GetPolygons())
-            {
-                TtShapeFileGenerator.WritePolygon(manager, poly, shapeFolderPath);
-            }
+            TtShapeFileGenerator.WriteAllPolygons(manager, manager.GetPolygons(), shapeFolderPath);
         }
-
 
 
         public static string ScrubFileName(this string text)
