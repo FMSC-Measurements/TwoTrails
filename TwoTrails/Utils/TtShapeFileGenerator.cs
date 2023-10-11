@@ -34,7 +34,7 @@ namespace TwoTrails.Utils
 
             if (polyPoints.Count > 0)
             {
-                string fileName = Path.Combine(folder, "AllBndUnits");
+                string fileName = Path.Combine(folder, "AllAdjBndUnits");
                 GeometryFactory geoFac = new GeometryFactory();
                 ShapefileDataWriter sdw;
                 Polygonizer polyizer = new Polygonizer();
@@ -62,7 +62,7 @@ namespace TwoTrails.Utils
                 WriteProjection(fileName, manager.DefaultMetadata.Zone);
 
                 //points
-                fileName = Path.Combine(folder, "AllBndPoints");
+                fileName = Path.Combine(folder, "AllAdjBndPoints");
                 geoFac = new GeometryFactory();
                 sdw = new ShapefileDataWriter(fileName, geoFac);
 

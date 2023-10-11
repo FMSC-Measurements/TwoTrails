@@ -500,9 +500,6 @@ namespace TwoTrails.ViewModels
 
         public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
 
-        public double TotalReduction => (_GERResult != null && PolygonSummary != null && PolygonSummary.GpsAreaError > 0) ?
-                                            (PolygonSummary.GpsAreaError - GERResult.AreaError): 0;
-
 
         private void EditPolygonValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
         {
@@ -564,7 +561,6 @@ namespace TwoTrails.ViewModels
         {
             PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true);
             GERResult = new GeometricErrorReductionResult(Manager, polygon);
-            OnPropertyChanged(nameof(TotalReduction));
         }
 
 

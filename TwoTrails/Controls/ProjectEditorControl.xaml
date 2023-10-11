@@ -589,7 +589,7 @@
 
                                                 <TextBlock Grid.Column="3" Grid.Row="4" VerticalAlignment="Center" Text="Reduction"
                                                            ToolTip="Reduction from Total GPS Contribution"/>
-                                                <TextBlock Grid.Column="5" Grid.Row="4" VerticalAlignment="Center" Text="{Binding TotalReduction, StringFormat={}{0:F3}%}"/>
+                                                <TextBlock Grid.Column="5" Grid.Row="4" VerticalAlignment="Center" Text="{Binding GERResult.TotalReduction, StringFormat={}{0:F3}%}"/>
 
                                             </Grid>
                                         </GroupBox>

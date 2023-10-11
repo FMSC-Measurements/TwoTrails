@@ -52,7 +52,7 @@ namespace TwoTrails.Core
                     StringBuilder sbPoints = new StringBuilder();
 
                     foreach (TtPoint point in points)
-                        ProcessPoint(sbPoints, point, false, showPoints);
+                        ProcessPoint(sbPoints, point, null, showPoints);
 
                     TtPoint sp = null;
                     foreach (TtPoint p in points)
@@ -139,8 +139,10 @@ namespace TwoTrails.Core
         }
         
 
-        private void ProcessPoint(StringBuilder sbPoints, TtPoint point, bool fromQndm = false, bool showPoints = false)
+        private void ProcessPoint(StringBuilder sbPoints, TtPoint point, QuondamPoint parent = null, bool showPoints = false)
         {
+            bool isOnBound = (parent != null && parent.OnBoundary) || (parent == null && point.IsBndPoint());
+
             switch (point.OpType)
             {
                 case OpType.GPS:
@@ -151,7 +153,7 @@ namespace TwoTrails.Core
                         if (traversing)
                             CloseTraverse(sbPoints, point);
 
-                        if (point.OnBoundary)
+                        if (isOnBound)
                         {
                             if (_LastTtBndPt != null)
                                 _Legs.Add(new TtLeg(_LastTtBndPt, point));
@@ -159,7 +161,7 @@ namespace TwoTrails.Core
                             _LastTtBndPt = point;
                         }
 
-                        if (!fromQndm && showPoints)
+                        if (parent == null && showPoints)
                         {
                             sbPoints.Append($"Point {point.PID}: {(point.OnBoundary ? " " : "*")} {point.OpType}- ");
                             sbPoints.Append($"Accuracy is {point.Accuracy:0.00#} meters.{Environment.NewLine}");
@@ -172,7 +174,7 @@ namespace TwoTrails.Core
                     {
                         if (_LastTtPoint != null)
                         {
-                            if (point.OnBoundary)
+                            if (isOnBound)
                             {
                                 if (traversing)
                                 {
@@ -189,7 +191,7 @@ namespace TwoTrails.Core
                                     travLength = MathEx.Distance(_LastTtPoint.UnAdjX, _LastTtPoint.UnAdjY, point.UnAdjX, point.UnAdjY);
                                     traversing = true;
 
-                                    if (showPoints && !fromQndm)
+                                    if (showPoints && parent == null)
                                     {
                                         sbPoints.Append($"Traverse Start:{Environment.NewLine}");
                                     }
@@ -211,17 +213,17 @@ namespace TwoTrails.Core
                     break;
                 case OpType.SideShot:
                     {
-                        if (showPoints && !fromQndm)
+                        if (showPoints && parent == null)
                         {
                             sbPoints.Append($"Point {point.PID}: {(point.OnBoundary ? " " : "*")} SideShot off Point {_LastGpsPoint?.PID}.{Environment.NewLine}");
                         }
 
-                        if (_LastTtBndPt != null && point.OnBoundary || fromQndm)
+                        if (_LastTtBndPt != null && isOnBound)
                         {
                             _Legs.Add(new TtLeg(_LastTtBndPt, point));
                         }
                         
-                        if (point.OnBoundary)
+                        if (isOnBound)
                         {
                             _LastTtBndPt = point;
                         }
@@ -247,7 +249,7 @@ namespace TwoTrails.Core
                         }
                         else
                         {
-                            ProcessPoint(sbPoints, qp.ParentPoint, true, showPoints);
+                            ProcessPoint(sbPoints, qp.ParentPoint, qp, showPoints);
                         }
 
                         if (showPoints)

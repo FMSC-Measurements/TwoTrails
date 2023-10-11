@@ -31,7 +31,11 @@ namespace TwoTrails.Core
 
         public double TotalGpsError { get; private set; }
         public double TotalError { get; private set; }
+        public double GpsAreaError => PolygonArea > 0 ? TotalGpsError / PolygonArea * 100d : 0;
         public double AreaError => PolygonArea > 0 ? TotalError / PolygonArea * 100d : 0;
+
+        public double TotalReduction => GpsAreaError > 0 ? (GpsAreaError - AreaError) : 0;
+
 
         public int LongLegs { get; private set; }
         public int SharpEdges { get; private set; }
@@ -96,13 +100,15 @@ namespace TwoTrails.Core
                 double accSegA = (lastPoint.Accuracy + currPoint.Accuracy) / 2d;
                 double accSegB;
 
+                double minDistSegA = accSegA * MIN_DIST_MULTIPLIER;
                 double minDistSegB;
+
+                bool shortLegA = distSegA < minDistSegA;
 
                 double accDistSegA = accSegA * distSegA;
                 double accDistSegB;
 
 #if USE_VARIABLE_DIST_MULTIPLIER
-                double minDistSegA = accSegA * MIN_DIST_MULTIPLIER;
                 double maxDistSegA = accSegA * MIN_DIST_MULTIPLIER;
 
                 double maxDistSegB;
@@ -139,17 +145,18 @@ namespace TwoTrails.Core
 
                     bool sharpEdge = angle >= MINIMUM_ANGLE;
 
+                    bool shortLegB = distSegB < minDistSegB;
+
                     if (distSegB >= minDistSegB)
                         LongLegs++;
 
                     if (sharpEdge)
                         SharpEdges++;
 
-                    double aeAngDiv = sharpEdge ? ((angle >= MAXIMUM_ANGLE) ? MAX_DIVISOR : angle / MINIMUM_ANGLE) : MIN_DIVISOR;
 
 #if USE_VARIABLE_DIST_MULTIPLIER
+                    double aeAngDiv = sharpEdge ? ((angle >= MAXIMUM_ANGLE) ? MAX_DIVISOR : angle / MINIMUM_ANGLE) : MIN_DIVISOR;
                     maxDistSegB = accSegB * MAX_DIST_MULTIPLIER;
-                    bool shortLegB = distSegB < minDistSegB;
 
                     aeDistDivB = shortLegB ? MIN_DIVISOR :
                                 (distSegB >= maxDistSegB) ? MAX_DIVISOR :
@@ -158,8 +165,10 @@ namespace TwoTrails.Core
                     double aeA = accDistSegA / 2 / (sharpEdge ? ((aeDistDivA + aeAngDiv) / 2) : MIN_DIVISOR);
                     double aeB = accDistSegB / 2 / (sharpEdge ? ((aeDistDivB + aeAngDiv) / 2) : MIN_DIVISOR);
 #else
-                    double aeA = accDistSegA / 2 / aeAngDiv;
-                    double aeB = accDistSegB / 2 / aeAngDiv;
+                    double aeDiv = (sharpEdge && !shortLegA && !shortLegB) ?
+                        ((angle >= MAXIMUM_ANGLE) ? MAX_DIVISOR : angle / MINIMUM_ANGLE) : MIN_DIVISOR;
+                    double aeA = accDistSegA / 2 / aeDiv;
+                    double aeB = accDistSegB / 2 / aeDiv;
 #endif
 
                     double segAreaError = aeA + aeB;
@@ -178,9 +187,10 @@ namespace TwoTrails.Core
 
                     distSegA = distSegB;
                     //accSegA = accSegB;
-                    //minDistSegA = minDistSegB;
+                    minDistSegA = minDistSegB;
                     //maxDistSegA = maxDistSegB;
                     accDistSegA = accDistSegB;
+                    shortLegA = shortLegB;
 
 #if USE_VARIABLE_DIST_MULTIPLIER
                     aeDistDivA = aeDistDivB;
