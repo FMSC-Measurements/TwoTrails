@@ -1085,7 +1085,7 @@ namespace TwoTrails.Core
             {
                 if (_PointsByPoly.ContainsKey(polygon.CN))
                 {
-                    Tuple<double, double, double> stats = TtCoreUtils.CalculateAreaPerimeterAndOnBoundTrail(_PointsByPoly[polygon.CN].Where(p => p.IsBndPoint()).ToList());
+                    Tuple<double, double, double> stats = TtCoreUtils.CalculateAreaPerimeterAndOnBoundTrail(_PointsByPoly[polygon.CN].Where(p => p.OnBoundary).ToList());
                     polygon.Update(stats.Item1, stats.Item2, stats.Item3);
                 }
             }

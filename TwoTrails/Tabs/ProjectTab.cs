@@ -165,13 +165,13 @@ namespace TwoTrails
         {
             if (PointProperties.DataType.IsAssignableFrom(type))
                 return "Point";
-            else if (type == ProjectProperties.DataType)
+            else if (type == PolygonProperties.DataType)
                 return "Polygon";
             else if (type == MetadataProperties.DataType)
                 return "Metadata";
-            else if (type == GroupProperties.DataType)
+            else if (type == ProjectProperties.DataType)
                 return "Project";
-            else if (type == PolygonProperties.DataType)
+            else if (type == GroupProperties.DataType)
                 return "Group";
             else if (type == MediaProperties.DataType)
                 return "Media";

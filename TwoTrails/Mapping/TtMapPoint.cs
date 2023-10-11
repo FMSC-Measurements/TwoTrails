@@ -32,7 +32,7 @@ namespace TwoTrails.Mapping
         public Location UnAdjLocation { get { return _UnAdjLoc; } private set { SetField(ref _UnAdjLoc, value); } }
 
         public TtPoint Point { get; }
-        public bool IsBndPoint { get { return Point.IsBndPoint(); } }
+        public bool IsBndPoint { get { return Point.OnBoundary; } }
         public bool IsNavPoint { get; }
         public bool IsMiscPoint { get { return Point.IsMiscPoint(); } }
         public int Index { get { return Point.Index; } }
@@ -178,13 +178,13 @@ namespace TwoTrails.Mapping
                 if (_Visible)
                 {
                     AdjPushpin.Visibility =
-                        ((AdjBndVisible && Point.IsBndPoint()) ||
+                        ((AdjBndVisible && Point.OnBoundary) ||
                         (AdjNavVisible && IsNavPoint) ||
                         (AdjMiscVisible && Point.IsMiscPoint())) ?
                         Visibility.Visible : Visibility.Collapsed;
 
                     UnAdjPushpin.Visibility =
-                        ((UnAdjBndVisible && Point.IsBndPoint()) ||
+                        ((UnAdjBndVisible && Point.OnBoundary) ||
                         (UnAdjNavVisible && IsNavPoint) ||
                         (UnAdjMiscVisible && Point.IsMiscPoint())) ||
                         (WayPointVisible && Point.IsWayPointAtBase()) ?

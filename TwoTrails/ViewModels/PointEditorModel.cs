@@ -2550,7 +2550,7 @@ namespace TwoTrails.ViewModels
 
         public void CreatePlots()
         {
-            if (Manager.Polygons.Any(poly => Manager.GetPoints(poly.CN).HasAtLeast(3, p => p.IsBndPoint())))
+            if (Manager.Polygons.Any(poly => Manager.GetPoints(poly.CN).HasAtLeast(3, p => p.OnBoundary)))
             {
                 PlotToolInUse = true;
                 CreatePlotsDialog.Show(Project, MainModel.MainWindow, () =>

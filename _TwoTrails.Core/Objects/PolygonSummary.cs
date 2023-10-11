@@ -141,7 +141,7 @@ namespace TwoTrails.Core
 
         private void ProcessPoint(StringBuilder sbPoints, TtPoint point, QuondamPoint parent = null, bool showPoints = false)
         {
-            bool isOnBound = (parent != null && parent.OnBoundary) || (parent == null && point.IsBndPoint());
+            bool isOnBound = (parent != null && parent.OnBoundary) || (parent == null && point.OnBoundary);
 
             switch (point.OpType)
             {

@@ -49,7 +49,7 @@ namespace TwoTrails.Core
 
 
         public GeometricErrorReductionResult(ITtManager manager, TtPolygon polygon) :
-            this(manager.GetPoints(polygon.CN).Where(p => p.IsBndPoint()).ToList(), polygon.Area)
+            this(manager.GetPoints(polygon.CN).Where(p => p.OnBoundary).ToList(), polygon.Area)
         { }
 
         public GeometricErrorReductionResult(List<TtPoint> points, double polygonArea)

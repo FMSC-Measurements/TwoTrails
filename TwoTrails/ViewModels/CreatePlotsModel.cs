@@ -92,7 +92,7 @@ namespace TwoTrails.ViewModels
             
             InclusionPolygons = new ObservableFilteredSortableCollection<TtPolygon, string>(
                 project.HistoryManager.Polygons,
-                p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.IsBndPoint()),
+                p => _Manager.GetPoints(p.CN).HasAtLeast(2, pt => pt.OnBoundary),
                 p => p.Name.ToLower());
 
             ExclusionPolygons = new ObservableCollection<TtPolygon>();
@@ -299,7 +299,7 @@ namespace TwoTrails.ViewModels
 
             poly.Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon{(IncludedPolygons.Count > 1 ? $"s {String.Join(", ", IncludedPolygons)}" : $" {IncludedPolygons.First().Name}")}";
 
-            List<IEnumerable<TtPoint>> polyIncludeTtPoints = IncludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint())).ToList();
+            List<IEnumerable<TtPoint>> polyIncludeTtPoints = IncludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.OnBoundary)).ToList();
 
             TtMetadata defMeta = _Manager.DefaultMetadata;
 
@@ -322,7 +322,7 @@ namespace TwoTrails.ViewModels
             PolygonCalculator.Boundaries totalPolyBnds = new PolygonCalculator(allPoints).PointBoundaries;
 
             List<PolygonCalculator> polyIncludeCalcs = polyIncudePoints.Select(pp => new PolygonCalculator(pp)).ToList();
-            List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint()))
+            List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.OnBoundary))
                                                     .Select(pp => pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint()))
                                                     .Select(pp => new PolygonCalculator(pp)).ToList();
 
@@ -461,7 +461,7 @@ namespace TwoTrails.ViewModels
             List<Tuple<TtPolygon, IEnumerable<Point>, string>> polyIncudePoints =
                 polys.Select(p => Tuple.Create(
                     p.Item1,
-                    _Manager.GetPoints(p.Item2).Where(pt => pt.IsBndPoint()).Select(po => po.GetCoords(defMeta.Zone).ToPoint()),
+                    _Manager.GetPoints(p.Item2).Where(pt => pt.OnBoundary).Select(po => po.GetCoords(defMeta.Zone).ToPoint()),
                     p.Item2))
                 .ToList();
 
@@ -483,7 +483,7 @@ namespace TwoTrails.ViewModels
             PolygonCalculator.Boundaries totalPolyBnds = new PolygonCalculator(allPoints).PointBoundaries;
 
             List<Tuple<TtPolygon, PolygonCalculator, string>> polyIncludeCalcs = polyIncudePoints.Select(pp => Tuple.Create(pp.Item1, new PolygonCalculator(pp.Item2), pp.Item3)).ToList();
-            List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.IsBndPoint()))
+            List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.OnBoundary))
                                                     .Select(pp => new PolygonCalculator(pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint()))).ToList();
 
             Point farCorner = TtUtils.GetFarthestCorner(

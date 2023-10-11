@@ -92,6 +92,7 @@ namespace TwoTrails.ViewModels
             {
                 Points = new ReadOnlyObservableCollection<TtPoint>(
                     new ObservableCollection<TtPoint>(_OrigPoints.Values.OrderBy(p => p.Index).DeepCopy()));
+                UpdateOrigPoly();
             }
             else Points = null;
             
@@ -320,15 +321,26 @@ namespace TwoTrails.ViewModels
         {
             if (Points != null && Points.Count > 2)
             {
-                List<TtPoint> points = Points.Where(p => p.IsBndPoint()).OrderBy(p => p.Index).ToList();
-                LocationCollection locations = new LocationCollection();
-                foreach (TtPoint point in points)
-                {
-                    Pushpin pushpin = _PushPins[point.CN];
-                    locations.Add(pushpin.Location);
+                List<TtPoint> points = new List<TtPoint>();
 
-                    if (updatePushpins)
-                        pushpin.Background = _OnBoundBrush;
+                LocationCollection locations = new LocationCollection();
+                foreach (TtPoint point in Points.OrderBy(p => p.Index))
+                {
+                    if (point.OnBoundary)
+                    {
+                        Pushpin pushpin = _PushPins[point.CN];
+                        locations.Add(pushpin.Location);
+
+                        if (updatePushpins)
+                            pushpin.Background = _OnBoundBrush;
+
+                        points.Add(point);
+                    }
+                    else if (updatePushpins)
+                    {
+                        Pushpin pushpin = _PushPins[point.CN];
+                        pushpin.Background = _OffBoundBrush;
+                    }
                 }
 
                 _MinPoly.Locations = locations;
@@ -377,11 +389,15 @@ namespace TwoTrails.ViewModels
                     }
                     else
                     {
-                        currPoint.OnBoundary = true;
-                        segments.Add(new PMSegment(lastPoint, currPoint, nextPoint, lastCoords, currCoords, nextCoords, AccuracyOverride));
+                        if (AnalyzeAllPointsInPoly || _OrigPoints[nextPoint.CN].OnBoundary)
+                        {
+                            currPoint.OnBoundary = true;
+                            segments.Add(new PMSegment(lastPoint, currPoint, nextPoint, lastCoords, currCoords, nextCoords, AccuracyOverride));
 
-                        lastPoint = currPoint;
-                        lastCoords = currCoords;
+                            lastPoint = currPoint;
+                            lastCoords = currCoords;
+                        }
+                        else continue;
                     }
 
                     currPoint = nextPoint;

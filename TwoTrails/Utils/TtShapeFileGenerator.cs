@@ -113,7 +113,7 @@ namespace TwoTrails.Utils
                     UTMCoords adj = p.GetCoords(zone, true);
                     UTMCoords unadj = p.GetCoords(zone, false);
 
-                    if (p.IsBndPoint())
+                    if (p.OnBoundary)
                     {
                         bndAdjCoords.Add(new NetTopologySuite.Geometries.Coordinate(adj.X, adj.Y));
                         bndUnAdjCoords.Add(new NetTopologySuite.Geometries.Coordinate(unadj.X, unadj.Y));
@@ -297,7 +297,7 @@ namespace TwoTrails.Utils
                     sdw = new ShapefileDataWriter(fileName, geoFac);
                     attTable["Poly"] = "Boundary Adjusted Points";
 
-                    features = GetPointFeatures(points.Where(p => p.IsBndPoint()), true, zone);
+                    features = GetPointFeatures(points.Where(p => p.OnBoundary), true, zone);
                     adjBndPoints = features.Select(f => f.Geometry as Point).ToList();
 
                     if (features.Count > 0)
@@ -339,7 +339,7 @@ namespace TwoTrails.Utils
                     sdw = new ShapefileDataWriter(fileName, geoFac);
                     attTable["Poly"] = "Boundary UnAdjusted Points";
 
-                    features = GetPointFeatures(points.Where(p => p.IsBndPoint()), false, zone);
+                    features = GetPointFeatures(points.Where(p => p.OnBoundary), false, zone);
 
                     if (features.Count > 0)
                     {

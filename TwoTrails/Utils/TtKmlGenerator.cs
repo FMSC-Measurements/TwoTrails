@@ -252,7 +252,7 @@ namespace TwoTrails.Utils
                         #endregion
 
                         #region Add Placemarks to Lists
-                        if (point.IsBndPoint())
+                        if (point.OnBoundary)
                         {
                             AdjBoundPointList.Add(adjCoords);
                             UnAdjBoundPointList.Add(unadjCoords);

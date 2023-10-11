@@ -65,7 +65,7 @@ namespace TwoTrails.Utils
                             };
 
                             #region Add points to lists
-                            if (point.IsBndPoint())
+                            if (point.OnBoundary)
                             {
                                 AdjRoute.Points.Add(adjpoint);
                                 UnAdjRoute.Points.Add(unAdjpoint);
