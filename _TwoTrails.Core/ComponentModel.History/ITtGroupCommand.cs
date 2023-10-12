@@ -11,7 +11,6 @@ namespace TwoTrails.Core.ComponentModel.History
             this.Group = group ?? throw new ArgumentNullException(nameof(group));
         }
 
-        protected override Type GetAffectedType() => GroupProperties.DataType;
         protected override int GetAffectedItemCount() => 1;
         protected override String GetCommandInfoDescription() => "Group";
     }

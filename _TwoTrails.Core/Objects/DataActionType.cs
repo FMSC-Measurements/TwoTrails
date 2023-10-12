@@ -36,4 +36,74 @@ namespace TwoTrails.Core
         ModifiedNmea        = 1 << 27,
         PointMinimization    = 1 << 28
     }
+
+    public static class DataActionTypeExtensions
+    {
+        public static bool AffectsPoints(this DataActionType action)
+        {
+            return
+                action.HasFlag(DataActionType.InsertedPoints) ||
+                action.HasFlag(DataActionType.ModifiedPoints) ||
+                action.HasFlag(DataActionType.DeletedPoints) ||
+                action.HasFlag(DataActionType.ManualPointCreation) ||
+                action.HasFlag(DataActionType.MovedPoints) ||
+                action.HasFlag(DataActionType.RetracePoints) ||
+                action.HasFlag(DataActionType.ReindexPoints) ||
+                action.HasFlag(DataActionType.ConvertedPoints) ||
+                action.HasFlag(DataActionType.RezonedPoints) ||
+                action.HasFlag(DataActionType.PointMinimization);
+        }
+
+        public static bool AffectsPolygons(this DataActionType action)
+        {
+            return
+                action.HasFlag(DataActionType.InsertedPolygons) ||
+                action.HasFlag(DataActionType.ModifiedPolygons) ||
+                action.HasFlag(DataActionType.DeletedPolygons);
+        }
+
+        public static bool AffectsMetadata(this DataActionType action)
+        {
+            return
+                action.HasFlag(DataActionType.InsertedMetadata) ||
+                action.HasFlag(DataActionType.ModifiedMetadata) ||
+                action.HasFlag(DataActionType.DeletedMetadata);
+        }
+
+        public static bool AffectsGroups(this DataActionType action)
+        {
+            return
+                action.HasFlag(DataActionType.InsertedGroups) ||
+                action.HasFlag(DataActionType.ModifiedGroups) ||
+                action.HasFlag(DataActionType.DeletedGroups);
+        }
+
+        public static bool AffectsProject(this DataActionType action)
+        {
+            return
+                action.HasFlag(DataActionType.ProjectUpgraded) ||
+                action.HasFlag(DataActionType.ModifiedProject);
+        }
+
+        public static bool AffectsNmea(this DataActionType action)
+        {
+            return
+                action.HasFlag(DataActionType.InsertedNmea) ||
+                action.HasFlag(DataActionType.ModifiedNmea) ||
+                action.HasFlag(DataActionType.DeletedNmea);
+        }
+
+        public static bool AffectsMedia(this DataActionType action)
+        {
+            return
+                action.HasFlag(DataActionType.InsertedMedia) ||
+                action.HasFlag(DataActionType.ModifiedMedia) ||
+                action.HasFlag(DataActionType.DeletedMedia);
+        }
+
+        public static bool AffectsDataDictionary(this DataActionType action)
+        {
+            return action.HasFlag(DataActionType.ModifiedDataDictionary);
+        }
+    }
 }

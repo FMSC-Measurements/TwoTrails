@@ -13,7 +13,7 @@ namespace TwoTrails.Core.ComponentModel.History
             this.Points = new List<TtPoint>(points) ?? throw new ArgumentNullException(nameof(points));
         }
 
-        protected override Type GetAffectedType() => PointProperties.DataType;
+
         protected override int GetAffectedItemCount() => Points.Count;
         protected override String GetCommandInfoDescription() => $"Edit of {Points.Count} points";
     }

@@ -40,6 +40,7 @@ namespace TwoTrails.Core.ComponentModel.History
             }
         }
 
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
         protected override string GetCommandInfoDescription() => $"Edit {Properties.Count} properties of {Point}";
     }
 }

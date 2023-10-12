@@ -9,6 +9,7 @@ using System.Security.Permissions;
 using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.DAL;
+using TwoTrails.Settings;
 using TwoTrails.Utils;
 
 namespace TwoTrails

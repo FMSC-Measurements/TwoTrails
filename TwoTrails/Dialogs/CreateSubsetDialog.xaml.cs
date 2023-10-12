@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Settings;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.Dialogs

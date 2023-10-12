@@ -28,7 +28,7 @@ namespace TwoTrails.Core.ComponentModel.History
             _Manager.RemoveAction(_ID);
         }
 
-        protected override Type GetAffectedType() => null;
+        protected override DataActionType GetActionType() => DataActionType.None;
 
         protected override string GetCommandInfoDescription() => $"Add data action";
     }

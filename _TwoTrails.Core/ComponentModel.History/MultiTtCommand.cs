@@ -30,10 +30,15 @@ namespace TwoTrails.Core.ComponentModel.History
                 command.Undo();
         }
 
+
         protected override int GetAffectedItemCount() => _Commands.Select(c => c.CommandInfo.AffectedItems).Count();
-
-        protected override Type GetAffectedType() => null;
-
+        protected override DataActionType GetActionType()
+        {
+            DataActionType action = DataActionType.None;
+            foreach (ITtCommand command in _Commands)
+                action |= command.CommandInfo.ActionType;
+            return action;
+        }
         protected override string GetCommandInfoDescription() => Description ?? $"Multi Command made of {_Commands} commands.";
     }
 }

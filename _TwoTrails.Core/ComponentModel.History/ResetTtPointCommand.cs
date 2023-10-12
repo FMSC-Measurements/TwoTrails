@@ -32,6 +32,7 @@ namespace TwoTrails.Core.ComponentModel.History
             _Manager.ReplacePoint(Point);
         }
 
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
         protected override string GetCommandInfoDescription() => $"Reset point {Point}";
     }
 }

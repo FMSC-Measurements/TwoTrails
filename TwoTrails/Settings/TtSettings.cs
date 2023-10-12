@@ -6,39 +6,39 @@ using TwoTrails.Core;
 using TwoTrails.DAL;
 using Point = System.Drawing.Point;
 
-namespace TwoTrails
+namespace TwoTrails.Settings
 {
     public class TtSettings : BaseModel, ITtSettings
     {
-        private const String DISTRICT = "District";
-        private const String REGION = "Region";
-        private const String RECENT_PROJECTS = "RecentProjects";
-        private const String ADVANCED_MODE = "AdvancedMode";
-        private const String OPEN_FOLDER_ON_EXPORT = "OpenFolderOnExport";
-        private const String LAST_UPDATE_CHECK = "LastUpdateCheck";
-        private const String UPGRADE_REQUIRED = "UpgradeRequired";
-        private const String SORT_POLYS_BY_NAME = "SortPolysByName";
-        private const String WINDOW_STARTUP_LOCATION = "WindowStartupLocation";
+        private const string DISTRICT = "District";
+        private const string REGION = "Region";
+        private const string RECENT_PROJECTS = "RecentProjects";
+        private const string ADVANCED_MODE = "AdvancedMode";
+        private const string OPEN_FOLDER_ON_EXPORT = "OpenFolderOnExport";
+        private const string LAST_UPDATE_CHECK = "LastUpdateCheck";
+        private const string UPGRADE_REQUIRED = "UpgradeRequired";
+        private const string SORT_POLYS_BY_NAME = "SortPolysByName";
+        private const string WINDOW_STARTUP_LOCATION = "WindowStartupLocation";
 
         public IMetadataSettings MetadataSettings { get; set; }
         public IDeviceSettings DeviceSettings { get; set; }
         public IPolygonGraphicSettings PolygonGraphicSettings { get; set; }
 
-        public String UserName => Environment.UserName;
+        public string UserName => Environment.UserName;
 
-        public String DeviceName =>
+        public string DeviceName =>
 #if DEBUG
             "-";
 #else
             Environment.MachineName;
 #endif
 
-        public String AppVersion => AppInfo.Version.ToString();
+        public string AppVersion => AppInfo.Version.ToString();
 
-        private String _Region;
-        public String Region
+        private string _Region;
+        public string Region
         {
-            get {  return _Region ?? (_Region = Properties.Settings.Default[REGION] as string); }
+            get { return _Region ?? (_Region = Properties.Settings.Default[REGION] as string); }
 
             set
             {
@@ -48,8 +48,8 @@ namespace TwoTrails
             }
         }
 
-        private String _District;
-        public String District
+        private string _District;
+        public string District
         {
             get { return _District ?? (_District = Properties.Settings.Default[DISTRICT] as string); }
 
@@ -187,8 +187,8 @@ namespace TwoTrails
 
         public TtProjectInfo CreateProjectInfo(Version programVersion)
         {
-            String version = $"PC: {programVersion.GetVersionWithBuildType()}";
-            return new TtProjectInfo("Unamed Project", String.Empty, Region, String.Empty, District,
+            string version = $"PC: {programVersion.GetVersionWithBuildType()}";
+            return new TtProjectInfo("Unamed Project", string.Empty, Region, string.Empty, District,
                 version, version, TwoTrailsSchema.SchemaVersion, DeviceName, DateTime.Now);
         }
 
@@ -208,7 +208,7 @@ namespace TwoTrails
         }
 
 
-        public void AddRecentProject(String filePath)
+        public void AddRecentProject(string filePath)
         {
             _RecentProjects.Remove(filePath);
             _RecentProjects.Insert(0, filePath);
@@ -222,7 +222,7 @@ namespace TwoTrails
             Properties.Settings.Default.Save();
         }
 
-        public void RemoveRecentProject(String filePath)
+        public void RemoveRecentProject(string filePath)
         {
             _RecentProjects.Remove(filePath);
             Properties.Settings.Default[RECENT_PROJECTS] = _RecentProjects;

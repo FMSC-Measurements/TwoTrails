@@ -7,9 +7,9 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class EditTtPointsMultiValueCommand<T> : ITtPointsCommand
     {
-        private List<T> NewValues;
-        private List<T> OldValues = new List<T>();
-        private PropertyInfo Property;
+        protected readonly List<T> NewValues;
+        protected readonly List<T> OldValues = new List<T>();
+        protected readonly PropertyInfo Property;
 
         public EditTtPointsMultiValueCommand(IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<T> newValues) : base(points)
         {
@@ -40,6 +40,7 @@ namespace TwoTrails.Core.ComponentModel.History
             }
         }
 
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
         protected override String GetCommandInfoDescription() => $"Edit {Property.Name} properties of {Points.Count} points";
     }
 }

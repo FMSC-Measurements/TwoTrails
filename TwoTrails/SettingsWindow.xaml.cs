@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using TwoTrails.Settings;
 
 namespace TwoTrails
 {

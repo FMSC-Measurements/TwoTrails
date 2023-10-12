@@ -12,7 +12,6 @@ namespace TwoTrails.Core.ComponentModel.History
         }
 
 
-        protected override Type GetAffectedType() => PolygonProperties.DataType;
         protected override int GetAffectedItemCount() => 1;
         protected override String GetCommandInfoDescription() => "Polygon";
     }

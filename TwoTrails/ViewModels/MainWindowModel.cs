@@ -18,6 +18,7 @@ using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.DAL;
 using TwoTrails.Dialogs;
+using TwoTrails.Settings;
 using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels

@@ -19,6 +19,7 @@ using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
+using TwoTrails.Settings;
 using TwoTrails.Utils;
 using static TwoTrails.Core.MediaTools;
 
@@ -329,15 +330,15 @@ namespace TwoTrails.ViewModels
         {
             if (e.CommandInfo != null && e.HistoryEventType == HistoryEventType.Undone || e.HistoryEventType == HistoryEventType.Redone)
             {
-                if (e.CommandInfo.AffectedType == PolygonProperties.DataType)
+                if (e.CommandInfo.ActionType.AffectsPolygons())
                 {
                     BindPolygonValues(CurrentPolygon);
                 }
-                else if (e.CommandInfo.AffectedType == GroupProperties.DataType)
+                else if (e.CommandInfo.ActionType.AffectsGroups())
                 {
                     BindGroupValues(CurrentGroup);
                 }
-                else if (e.CommandInfo.AffectedType == MetadataProperties.DataType)
+                else if (e.CommandInfo.ActionType.AffectsMetadata())
                 {
                     BindMetadataValues(CurrentMetadata);
                 }

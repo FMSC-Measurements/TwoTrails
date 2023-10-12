@@ -46,6 +46,7 @@ namespace TwoTrails.Core.ComponentModel.History
             }
         }
 
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints | (_AddNmea.Count > 0 ? DataActionType.InsertedNmea : DataActionType.None);
         protected override string GetCommandInfoDescription() => $"Convert {Points.Count} Quondams";
     }
 }

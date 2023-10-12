@@ -34,6 +34,7 @@ namespace TwoTrails.Core.ComponentModel.History
             }
         }
 
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
         protected override string GetCommandInfoDescription() => $"Repalce {Points.Count} points";
     }
 }

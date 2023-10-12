@@ -29,8 +29,8 @@ namespace TwoTrails.Core
         public bool CanUndo => _UndoStack.Any();
         public bool CanRedo => _RedoStack.Any();
 
-        public Type UndoCommandType => CanUndo ? _UndoStack.Peek().CommandInfo.AffectedType : null;
-        public Type RedoCommandType => CanRedo ? _RedoStack.Peek().CommandInfo.AffectedType : null;
+        public DataActionType UndoCommandType => CanUndo ? _UndoStack.Peek().CommandInfo.ActionType : DataActionType.None;
+        public DataActionType RedoCommandType => CanRedo ? _RedoStack.Peek().CommandInfo.ActionType : DataActionType.None;
 
         public CommandInfo UndoCommandInfo => CanUndo ? _UndoStack.Peek().CommandInfo : null;
         public CommandInfo RedoCommandInfo => CanRedo ? _RedoStack.Peek().CommandInfo : null;
@@ -63,7 +63,7 @@ namespace TwoTrails.Core
                     case nameof(TtMetadata.Slope):
                     case nameof(TtMetadata.Distance):
                     case nameof(TtMetadata.Elevation):
-                        OnHistoryChanged(HistoryEventType.Reset, new CommandInfo(typeof(TtMetadata), $"{e.PropertyName} change in Default Metadata"), true);
+                        OnHistoryChanged(HistoryEventType.Reset, new CommandInfo(DataActionType.ModifiedMetadata, $"{e.PropertyName} change in Default Metadata"), true);
                         break;
                 }
             };
@@ -203,7 +203,10 @@ namespace TwoTrails.Core
         private void OnHistoryChanged(HistoryEventType historyEventType, CommandInfo cmdInfo, bool requireRefresh)
         {
             HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, cmdInfo, requireRefresh));
-            OnPropertyChanged(nameof(CanUndo), nameof(CanRedo));
+            OnPropertyChanged(
+                nameof(CanUndo), nameof(CanRedo),
+                nameof(UndoCommandType), nameof(RedoCommandType),
+                nameof(UndoCommandInfo), nameof(RedoCommandInfo));
         }
         #endregion
 

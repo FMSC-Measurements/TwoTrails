@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.DAL;
+using TwoTrails.Settings;
 using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
@@ -47,6 +48,7 @@ namespace TwoTrails.ViewModels
         public ITtMediaLayer MAL { get; private set; }
 
         public TtSettings Settings { get; private set; }
+        public ProjectSettings ProjectSettings { get; private set; }
 
         private TtManager Manager { get; }
         public TtHistoryManager HistoryManager { get; }
@@ -69,6 +71,8 @@ namespace TwoTrails.ViewModels
             Manager = new TtManager(dal, mal, settings);
             HistoryManager = new TtHistoryManager(Manager);
             HistoryManager.HistoryChanged += Manager_HistoryChanged;
+
+            ProjectSettings = new ProjectSettings(this);
         }
 
         private void ProjectInfoChanged(object sender, PropertyChangedEventArgs e)

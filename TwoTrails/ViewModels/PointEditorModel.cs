@@ -25,6 +25,7 @@ using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;
 using TwoTrails.Properties;
+using TwoTrails.Settings;
 using TwoTrails.Utils;
 using Point = FMSC.Core.Point;
 

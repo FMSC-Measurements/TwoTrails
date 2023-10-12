@@ -19,6 +19,7 @@
             pointsManager.AddMetadata(Metadata);
         }
 
+        protected override DataActionType GetActionType() => DataActionType.DeletedMetadata;
         protected override string GetCommandInfoDescription() => $"Delete Metadata {Metadata.Name}";
     }
 }

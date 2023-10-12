@@ -24,6 +24,7 @@ namespace TwoTrails.Core.ComponentModel.History
             _Manager.ReplacePoint(_ReplacedPoint);
         }
 
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
         protected override string GetCommandInfoDescription() => $"Repalce point {Point.PID} with {_ReplacedPoint.PID}";
     }
 }

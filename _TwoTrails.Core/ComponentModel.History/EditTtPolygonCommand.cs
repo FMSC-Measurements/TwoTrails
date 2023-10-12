@@ -25,6 +25,7 @@ namespace TwoTrails.Core.ComponentModel.History
             Property.SetValue(Polygon, OldValue);
         }
 
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPolygons;
         protected override string GetCommandInfoDescription() => $"Edit {Property.Name} of polygon {Polygon.Name}";
     }
 }

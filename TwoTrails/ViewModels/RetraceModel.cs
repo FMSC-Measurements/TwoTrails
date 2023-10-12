@@ -9,7 +9,6 @@ using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
-using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
 {
@@ -42,10 +41,18 @@ namespace TwoTrails.ViewModels
             AfterPoints = new List<TtPoint>();
             Polygons = _Project.GetSortedPolygons();
 
-            Retraces = new ObservableCollection<Retrace>
+            if (_Project.ProjectSettings.LastRetrace != null)
             {
-                new Retrace(this, project)
-            };
+                Retraces = new ObservableCollection<Retrace>(_Project.ProjectSettings.LastRetrace);
+                TargetPolygon = _Project.ProjectSettings.LastRetraceTargetPolygon;
+            }
+            else
+            {
+                Retraces = new ObservableCollection<Retrace>
+                {
+                    new Retrace(project)
+                };
+            }
 
             CommitCommand = new RelayCommand(x => RetracePoints());
         }
@@ -59,7 +66,7 @@ namespace TwoTrails.ViewModels
 
         public void AddRetrace(Retrace sender)
         {
-            Retrace retrace = new Retrace(this, _Project);
+            Retrace retrace = new Retrace(_Project);
             int index = -1;
 
             if (sender != null)
@@ -79,7 +86,7 @@ namespace TwoTrails.ViewModels
 
         public bool RetracePoints()
         {
-            if (Retraces.Count > 0)
+            if (Retraces.Count > 0 && TargetPolygon != null)
             {
                 if (Retraces.Any(r => !r.IsValid))
                 {
@@ -181,6 +188,9 @@ namespace TwoTrails.ViewModels
                             InsertBeginning ? 0 : InsertAfter ? InsertIndex : int.MaxValue, BoundaryMode);
                     }
 
+
+                    _Project.ProjectSettings.LastRetraceTargetPolygon = TargetPolygon;
+                    _Project.ProjectSettings.LastRetrace = Retraces.ToList();
                     return true;
                 } 
             }
@@ -206,13 +216,13 @@ namespace TwoTrails.ViewModels
         public bool DirInc { get { return Get<bool>(); } set { Set(value); } }
         public bool SinglePoint { get { return Get<bool>(); } set { Set(value); } }
 
-        public bool IsValid { get { return PointFrom != null && PointTo != null || SinglePoint ; } }
+        public bool IsValid { get { return PointFrom != null && PointTo != null || SinglePoint; } }
 
         
         public TtPolygon SelectedPolygon { get { return Get<TtPolygon>(); } set { Set(value, () => PolygonChanged(value)); } }
         
 
-        public Retrace(RetraceModel model, TtProject project)
+        public Retrace(TtProject project)
         {
             _Project = project;
             PointFrom = PointTo = null;

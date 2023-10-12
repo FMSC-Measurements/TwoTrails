@@ -14,6 +14,7 @@ using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.Utils;
 using Point = FMSC.Core.Point;
+using TwoTrails.Settings;
 
 namespace TwoTrails.ViewModels
 {

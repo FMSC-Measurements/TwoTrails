@@ -139,44 +139,44 @@ namespace TwoTrails
             }
         }
 
-        public static bool DoesTabAndDataMatch(ProjectTabSection selectedTab, Type type)
+        public static bool DoesTabAndDataMatch(ProjectTabSection selectedTab, DataActionType type)
         {
-            if (type == null)
+            if (type == DataActionType.None)
             {
                 return true;
             }
 
             switch (selectedTab)
             {
-                case ProjectTabSection.Project: return type == ProjectProperties.DataType;
-                case ProjectTabSection.Points: return PointProperties.DataType.IsAssignableFrom(type);
-                case ProjectTabSection.Polygons: return type == PolygonProperties.DataType;
-                case ProjectTabSection.Metadata: return type == MetadataProperties.DataType;
-                case ProjectTabSection.Groups: return type == GroupProperties.DataType;
-                case ProjectTabSection.Media: return type == MediaProperties.DataType;
-                case ProjectTabSection.DataDictionary: return type == typeof(DataDictionary);
+                case ProjectTabSection.Project: return type.AffectsProject();
+                case ProjectTabSection.Points: return type.AffectsPoints();
+                case ProjectTabSection.Polygons: return type.AffectsPolygons();
+                case ProjectTabSection.Metadata: return type.AffectsMetadata();
+                case ProjectTabSection.Groups: return type.AffectsGroups();
+                case ProjectTabSection.Media: return type.AffectsMedia();
+                case ProjectTabSection.DataDictionary: return type.AffectsDataDictionary();
                 case ProjectTabSection.Map:
                 case ProjectTabSection.Actions:
                 default: return false;
             }
         }
 
-        private static String GetActionTypeFromDataType(Type type)
+        private static String GetActionTypeFromDataType(DataActionType type)
         {
-            if (PointProperties.DataType.IsAssignableFrom(type))
-                return "Point";
-            else if (type == PolygonProperties.DataType)
+            if (type.AffectsPolygons())
                 return "Polygon";
-            else if (type == MetadataProperties.DataType)
+            else if (type.AffectsMetadata())
                 return "Metadata";
-            else if (type == ProjectProperties.DataType)
+            else if (type.AffectsProject())
                 return "Project";
-            else if (type == GroupProperties.DataType)
+            else if (type.AffectsGroups())
                 return "Group";
-            else if (type == MediaProperties.DataType)
+            else if (type.AffectsMedia())
                 return "Media";
-            else if (type == typeof(DataDictionary))
+            else if (type.AffectsDataDictionary())
                 return "Data Dictionary";
+            else if (type.AffectsPoints())
+                return "Point";
 
             return null;
         }

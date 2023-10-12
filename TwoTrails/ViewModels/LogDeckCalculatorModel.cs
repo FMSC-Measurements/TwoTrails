@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Settings;
 using Convert = FMSC.Core.Convert;
 
 namespace TwoTrails.ViewModels

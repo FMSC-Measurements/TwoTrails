@@ -7,12 +7,12 @@ namespace TwoTrails.Core.ComponentModel.History
     public class CommandInfo
     {
         public String Description { get; }
-        public Type AffectedType { get; }
+        public DataActionType ActionType { get; }
         public int AffectedItems { get; }
 
-        public CommandInfo(Type affectedType,  string description, int adffectedItems = 1)
+        public CommandInfo(DataActionType actionType,  string description, int adffectedItems = 1)
         {
-            AffectedType = affectedType;
+            ActionType = actionType;
 
             Description = description ?? "Unknown Command";
             AffectedItems = adffectedItems;

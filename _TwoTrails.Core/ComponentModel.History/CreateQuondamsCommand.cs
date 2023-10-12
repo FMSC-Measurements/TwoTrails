@@ -89,6 +89,8 @@ namespace TwoTrails.Core.ComponentModel.History
         }
 
 
+        protected override DataActionType GetActionType() =>
+            (_EditPointsCommand != null ? _EditPointsCommand.CommandInfo.ActionType : DataActionType.None) | _AddPointsCommand.CommandInfo.ActionType;
         protected override string GetCommandInfoDescription() => $"Create {_AddPointsCommand.CommandInfo.AffectedItems} Quondams in unit {_TargetPolygon.Name}";
     }
 

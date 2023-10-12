@@ -47,7 +47,9 @@ namespace TwoTrails.Core.ComponentModel.History
             _EditPointsCommand.Undo();
         }
 
+
         protected override int GetAffectedItemCount() => _CreateQuondamsCommand.CommandInfo.AffectedItems + _EditPointsCommand.CommandInfo.AffectedItems;
+        protected override DataActionType GetActionType() => _CreateQuondamsCommand.CommandInfo.ActionType | _EditPointsCommand.CommandInfo.ActionType;
         protected override string GetCommandInfoDescription() => $"Create Corridor in unit {_TargetPolygon.Name}";
     }
 }

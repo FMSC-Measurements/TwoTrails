@@ -2,17 +2,17 @@
 using FMSC.Core;
 using TwoTrails.Core;
 
-namespace TwoTrails
+namespace TwoTrails.Settings
 {
     public class MetadataSettings : IMetadataSettings
     {
-        private const String DATUM = "Datum";
-        private const String DEC_TYPE = "DecType";
-        private const String DISTANCE = "Distance";
-        private const String ELEVATION = "Elevation";
-        private const String MAG_DEC = "MagDec";
-        private const String SLOPE = "Slope";
-        private const String ZONE = "Zone";
+        private const string DATUM = "Datum";
+        private const string DEC_TYPE = "DecType";
+        private const string DISTANCE = "Distance";
+        private const string ELEVATION = "Elevation";
+        private const string MAG_DEC = "MagDec";
+        private const string SLOPE = "Slope";
+        private const string ZONE = "Zone";
 
         public Datum Datum { get; set; } = Datum.NAD83;
 
@@ -43,9 +43,9 @@ namespace TwoTrails
 
         public TtMetadata CreateDefaultMetadata()
         {
-            return new TtMetadata(Consts.EmptyGuid, "Default Meta", String.Empty,
+            return new TtMetadata(Consts.EmptyGuid, "Default Meta", string.Empty,
                 Zone, DecType, MagDec, Datum, Distance, Elevation, Slope,
-                String.Empty, String.Empty, String.Empty, String.Empty);
+                string.Empty, string.Empty, string.Empty, string.Empty);
         }
 
         public void SetMetadataSettings(TtMetadata metadata)

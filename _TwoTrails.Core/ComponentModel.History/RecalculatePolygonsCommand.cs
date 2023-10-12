@@ -10,7 +10,6 @@ namespace TwoTrails.Core.ComponentModel.History
         private TtManager _Manager;
         private List<TtPoint> _Points;
 
-
         public RecalculatePolygonsCommand(TtManager pointsManager)
         {
             this._Manager = pointsManager;
@@ -32,10 +31,9 @@ namespace TwoTrails.Core.ComponentModel.History
             }
         }
 
+
         protected override int GetAffectedItemCount() => _Points.Count;
-
-        protected override Type GetAffectedType() => PointProperties.DataType;
-
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
         protected override string GetCommandInfoDescription() => "Recalculate all polygons";
     }
 }

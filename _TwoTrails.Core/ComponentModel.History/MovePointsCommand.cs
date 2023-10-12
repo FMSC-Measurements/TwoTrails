@@ -75,7 +75,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 _Manager.RebuildPolygon(poly);
         }
 
-
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
         protected override string GetCommandInfoDescription() => $"Move {Points.Count} points to unit {_TargetPolygon.Name}";
     }
 }

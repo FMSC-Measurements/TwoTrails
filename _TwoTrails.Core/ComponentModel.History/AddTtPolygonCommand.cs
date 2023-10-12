@@ -19,6 +19,7 @@
             Manager.DeletePolygon(Polygon);
         }
 
+        protected override DataActionType GetActionType() => DataActionType.InsertedPolygons;
         protected override string GetCommandInfoDescription() => $"Add Polygon {Polygon.Name}";
     }
 }

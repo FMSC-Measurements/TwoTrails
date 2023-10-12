@@ -39,7 +39,7 @@
             </Grid.ColumnDefinitions>
 
             <GroupBox Grid.Column="0" Header="Target Polygon">
-                <ComboBox MaxWidth="125" ItemsSource="{Binding Polygons, Mode=OneWay}" SelectedItem="{Binding TargetPolygon, Mode=OneWayToSource}"
+                <ComboBox MaxWidth="125" ItemsSource="{Binding Polygons, Mode=OneWay}" SelectedItem="{Binding TargetPolygon}"
                           ToolTip="{Binding TargetPolygonToolTip}"/>
             </GroupBox>
 
@@ -134,14 +134,14 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <ComboBox Grid.Column="0" ItemsSource="{Binding Polygons}" SelectedItem="{Binding SelectedPolygon, Mode=OneWayToSource}"
+                        <ComboBox Grid.Column="0" ItemsSource="{Binding Polygons}" SelectedItem="{Binding SelectedPolygon}"
                                   ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
-                        <ComboBox Grid.Column="1" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointFrom, Mode=OneWayToSource}" Margin="5 0 5 0"
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointFrom}" Margin="5 0 5 0"
                                   ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
                         <RadioButton Grid.Column="2" GroupName="{Binding GCN}" Content="Fwd" IsChecked="{Binding DirInc, Mode=TwoWay}" ToolTip="The Quondams will be added in order from how their parent's were collected." Padding="4 0 5 0"/>
-                        <RadioButton Name="rbSingle" Grid.Column="3" GroupName="{Binding GCN}" Content="Single" IsChecked="{Binding SinglePoint, Mode=OneWayToSource}" ToolTip="Only a single Quondam will be created." Padding="4 0 5 0"/>
+                        <RadioButton Name="rbSingle" Grid.Column="3" GroupName="{Binding GCN}" Content="Single" IsChecked="{Binding SinglePoint}" ToolTip="Only a single Quondam will be created." Padding="4 0 5 0"/>
                         <RadioButton Grid.Column="4" GroupName="{Binding GCN}" Content="Rev" ToolTip="The Quondams will be added in the reverse order from how their parent's were collected." Padding="4 0 5 0"/>
-                        <ComboBox Grid.Column="5" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointTo, Mode=OneWayToSource}" IsEnabled="{Binding ElementName=rbSingle, Path=IsChecked, Converter={StaticResource IBC}}"
+                        <ComboBox Grid.Column="5" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointTo}" IsEnabled="{Binding ElementName=rbSingle, Path=IsChecked, Converter={StaticResource IBC}}"
                                   ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
                         <!--<Image Grid.Column="6" Width="25" Height="25" Source="/Resources/ic_loop_black.png" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5 0 0 0"/>-->
 

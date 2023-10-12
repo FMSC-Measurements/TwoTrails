@@ -14,6 +14,7 @@ using TwoTrails.Core;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 using TwoTrails.DAL;
+using TwoTrails.Settings;
 using TwoTrails.ViewModels;
 using Convert = FMSC.Core.Convert;
 

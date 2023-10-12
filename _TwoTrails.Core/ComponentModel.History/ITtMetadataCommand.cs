@@ -14,7 +14,6 @@ namespace TwoTrails.Core.ComponentModel.History
             this.Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
         }
 
-        protected override Type GetAffectedType() => MetadataProperties.DataType;
         protected override int GetAffectedItemCount() => 1;
         protected override String GetCommandInfoDescription() => "Metadata";
     }
