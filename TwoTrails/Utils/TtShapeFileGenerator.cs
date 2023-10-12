@@ -1,5 +1,4 @@
 ﻿using FMSC.GeoSpatial.UTM;
-using GeoAPI.Geometries;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
@@ -8,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
@@ -50,7 +48,7 @@ namespace TwoTrails.Utils
 
                 feat.Attributes = new AttributesTable
                 {
-                    { "Units", polyPoints.Count },
+                    { "Units", polyPoints.Count }
                 };
 
                 features.Add(feat);
@@ -141,6 +139,9 @@ namespace TwoTrails.Utils
                     { "Desc", polygon.Description },
                     { "Poly", "Navigation Adjusted" },
                     { "CN", polygon.CN },
+                    { "Area_MtSq", polygon.Area },
+                    { "Area_Ac", polygon.AreaAcres },
+                    { "Area_Ha", polygon.AreaHectaAcres },
                     { "Perim_M", polygon.Perimeter },
                     { "PerimL_M", polygon.PerimeterLine }
                 };
