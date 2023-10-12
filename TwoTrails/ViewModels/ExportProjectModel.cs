@@ -121,40 +121,40 @@ namespace TwoTrails.ViewModels
                             string projectName = _Project.ProjectName.ScrubFileName().Trim();
 
                             if (ExportPoints)
-                                Export.Points(_Project.HistoryManager, Path.Combine(path, "Points.csv"));
+                                Export.Points(_Project.HistoryManager, Path.Combine(path, "Points"));
 
                             if (ExportDataDictionary)
-                                Export.DataDictionary(_Project.HistoryManager, Path.Combine(path, "DataDictionary.csv"));
+                                Export.DataDictionary(_Project.HistoryManager, Path.Combine(path, "DataDictionary"));
 
                             if (ExportNMEA)
-                                Export.TtNmea(_Project.HistoryManager, Path.Combine(path, "TTNmea.csv"));
+                                Export.TtNmea(_Project.HistoryManager, Path.Combine(path, "TTNmea"));
 
                             if (ExportPolygons)
-                                Export.Polygons(_Project.HistoryManager, Path.Combine(path, "Polygons.csv"));
+                                Export.Polygons(_Project.HistoryManager, Path.Combine(path, "Polygons"));
 
                             if (ExportMetadata)
-                                Export.Metadata(_Project.HistoryManager, Path.Combine(path, "Metadata.csv"));
+                                Export.Metadata(_Project.HistoryManager, Path.Combine(path, "Metadata"));
 
                             if (ExportGroups)
-                                Export.Groups(_Project.HistoryManager, Path.Combine(path, "Groups.csv"));
+                                Export.Groups(_Project.HistoryManager, Path.Combine(path, "Groups"));
 
                             if (ExportMediaInfo && _Project.MAL != null)
-                                Export.ImageInfo(_Project.HistoryManager, Path.Combine(path, "ImageInfo.csv"));
+                                Export.ImageInfo(_Project.HistoryManager, Path.Combine(path, "ImageInfo"));
 
                             if (ExportMediaFiles && _Project.MAL != null)
                                 Export.MediaFiles(_Project.MAL, path);
 
                             if (ExportProject)
-                                Export.Project(_Project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));
+                                Export.Project(_Project.ProjectInfo, Path.Combine(path, "ProjectInfo"));
 
                             if (ExportSummary)
-                                Export.Summary(_Project.HistoryManager, _Project.ProjectInfo, _Project.FilePath, Path.Combine(path, "Summary.txt"));
+                                Export.Summary(_Project.HistoryManager, _Project.ProjectInfo, _Project.FilePath, Path.Combine(path, "Summary"));
 
                             if (ExportGPX)
-                                Export.GPX(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, $"{projectName}.gpx"));
+                                Export.GPX(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, projectName));
 
                             if (ExportKMZ)
-                                Export.KMZ(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, $"{projectName}.kmz"));
+                                Export.KMZ(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, projectName));
 
                             if (ExportShapes)
                                 Export.Shapes(_Project.HistoryManager, _Project.ProjectInfo, path);

@@ -15,6 +15,7 @@ using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 using TwoTrails.DAL;
 using TwoTrails.ViewModels;
+using Convert = FMSC.Core.Convert;
 
 namespace TwoTrails.Utils
 {
@@ -43,17 +44,17 @@ namespace TwoTrails.Utils
             folderPath = folderPath.Trim();
             CheckCreateFolder(folderPath);
 
-            Project(projectInfo, Path.Combine(folderPath, "ProjectInfo.txt"));
-            Summary(manager, projectInfo, projectFilePath, Path.Combine(folderPath, $"{projectInfo.Name.ScrubFileName()}_Summary.txt"));
-            Points(manager, Path.Combine(folderPath, "Points.csv"));
-            DataDictionary(manager, Path.Combine(folderPath, "DataDictionary.csv"));
-            Polygons(manager, Path.Combine(folderPath, "Polygons.csv"));
-            Metadata(manager, Path.Combine(folderPath, "Metadata.csv"));
-            Groups(manager, Path.Combine(folderPath, "Groups.csv"));
-            TtNmea(manager, Path.Combine(folderPath, "TTNmea.csv"));
-            ImageInfo(manager, Path.Combine(folderPath, "ImageInfo.csv"));
-            GPX(manager, projectInfo, Path.Combine(folderPath, $"{projectInfo.Name.ScrubFileName()}.gpx"));
-            KMZ(manager, projectInfo, Path.Combine(folderPath, $"{projectInfo.Name.ScrubFileName()}.kmz"));
+            Project(projectInfo, Path.Combine(folderPath, "ProjectInfo"));
+            Summary(manager, projectInfo, projectFilePath, Path.Combine(folderPath, $"{projectInfo.Name.ScrubFileName()}_Summary"));
+            Points(manager, Path.Combine(folderPath, "Points"));
+            DataDictionary(manager, Path.Combine(folderPath, "DataDictionary"));
+            Polygons(manager, Path.Combine(folderPath, "Polygons"));
+            Metadata(manager, Path.Combine(folderPath, "Metadata"));
+            Groups(manager, Path.Combine(folderPath, "Groups"));
+            TtNmea(manager, Path.Combine(folderPath, "TTNmea"));
+            ImageInfo(manager, Path.Combine(folderPath, "ImageInfo"));
+            GPX(manager, projectInfo, Path.Combine(folderPath, projectInfo.Name.ScrubFileName()));
+            KMZ(manager, projectInfo, Path.Combine(folderPath, projectInfo.Name.ScrubFileName()));
 
             Shapes(manager, projectInfo, folderPath);
 
@@ -80,7 +81,7 @@ namespace TwoTrails.Utils
 
             points.Sort();
             
-            using (StreamWriter sw = new StreamWriter(fileName))
+            using (StreamWriter sw = new StreamWriter($"{fileName}.csv"))
             {
                 #region Columns
                 StringBuilder sb = new StringBuilder();
@@ -207,7 +208,7 @@ namespace TwoTrails.Utils
             if (points.Any(p => p.ExtendedData == null))
                 throw new Exception("Points missing DataDictionary");
 
-            using (StreamWriter sw = new StreamWriter(fileName))
+            using (StreamWriter sw = new StreamWriter($"{fileName}.csv"))
             {
                 List<string> fieldCNs = template.Select(ddf => ddf.CN).ToList();
 
@@ -265,7 +266,7 @@ namespace TwoTrails.Utils
 
         public static void Polygons(IEnumerable<TtPolygon> polygons, String fileName)
         {
-            using (StreamWriter sw = new StreamWriter(fileName))
+            using (StreamWriter sw = new StreamWriter($"{fileName}.csv"))
             {
                 #region Columns
                 StringBuilder sb = new StringBuilder();
@@ -302,7 +303,7 @@ namespace TwoTrails.Utils
 
         public static void Groups(IEnumerable<TtGroup> groups, String fileName)
         {
-            using (StreamWriter sw = new StreamWriter(fileName))
+            using (StreamWriter sw = new StreamWriter($"{fileName}.csv"))
             {
                 #region Columns
                 StringBuilder sb = new StringBuilder();
@@ -335,7 +336,7 @@ namespace TwoTrails.Utils
 
         public static void Metadata(IEnumerable<TtMetadata> metadata, String fileName)
         {
-            using (StreamWriter sw = new StreamWriter(fileName))
+            using (StreamWriter sw = new StreamWriter($"{fileName}.csv"))
             {
                 #region Columns
                 StringBuilder sb = new StringBuilder();
@@ -379,7 +380,7 @@ namespace TwoTrails.Utils
 
         public static void Project(TtProjectInfo project, String fileName)
         {
-            using (StreamWriter sw = new StreamWriter(fileName))
+            using (StreamWriter sw = new StreamWriter($"{fileName}.txt"))
             {
                 StringBuilder sb = new StringBuilder();
 
@@ -399,18 +400,26 @@ namespace TwoTrails.Utils
             }
         }
 
-        public static void Summary(ITtManager manager, TtProjectInfo projectInfo, String projectFilePath, String summaryFilePath)
+        public static void Summary(ITtManager manager, TtProjectInfo projectInfo, String projectFilePath, String fileName)
         {
-            using (StreamWriter sw = new StreamWriter(summaryFilePath))
+            using (StreamWriter sw = new StreamWriter($"{fileName}.txt"))
             {
-                sw.Write(HaidLogic.GenerateSummaryHeader(projectInfo, projectFilePath));
-                
-                foreach (TtPolygon poly in manager.GetPolygons())
+                using (StreamWriter swcsv = new StreamWriter($"{fileName}.csv"))
                 {
-                    sw.WriteLine($"{poly.Name}{Environment.NewLine}{new String('-', poly.Name.Length)}");
-                    sw.WriteLine(HaidLogic.GenerateSummary(manager, poly).SummaryText);
-                }
+                    sw.Write(HaidLogic.GenerateSummaryHeader(projectInfo, projectFilePath));
+                    swcsv.WriteLine("Unit,Area_Ac,Perim_Ft,GpsAE_Ac,GpsAE_Ratio,TravAE_ac,TravAE_Ratio");
 
+                    foreach (TtPolygon poly in manager.GetPolygons())
+                    {
+                        PolygonSummary ps = HaidLogic.GenerateSummary(manager, poly);
+                        sw.WriteLine($"{poly.Name}{Environment.NewLine}{new String('-', poly.Name.Length)}");
+                        sw.WriteLine(ps.SummaryText);
+
+                        swcsv.Write($"{poly.Name},{poly.AreaAcres},{poly.PerimeterFt},");
+                        swcsv.Write($"{Convert.ToAcre(ps.TotalGpsError, Area.MeterSq)},{ps.GpsAreaError},");
+                        swcsv.WriteLine($"{Convert.ToAcre(ps.TotalTraverseError, Area.MeterSq)},{ps.TraverseAreaError}");
+                    }
+                }
             }
         }
 
@@ -422,7 +431,7 @@ namespace TwoTrails.Utils
 
         public static void TtNmea(IEnumerable<TtNmeaBurst> bursts, String fileName, Dictionary<string, TtPoint> points = null)
         {
-            using (StreamWriter sw = new StreamWriter(fileName))
+            using (StreamWriter sw = new StreamWriter($"{fileName}.csv"))
             {
                 #region Columns
                 StringBuilder sb = new StringBuilder();
@@ -514,7 +523,7 @@ namespace TwoTrails.Utils
 
         public static void ImageInfo(IEnumerable<TtImage> images, String fileName)
         {
-            using (StreamWriter sw = new StreamWriter(fileName))
+            using (StreamWriter sw = new StreamWriter($"{fileName}.csv"))
             {
                 #region Columns
                 StringBuilder sb = new StringBuilder();
@@ -580,14 +589,16 @@ namespace TwoTrails.Utils
 
         public static void GPX(ITtManager manager, TtProjectInfo projectInfo, String fileName)
         {
-            GpxWriter.WriteGpxFile(fileName, TtGpxGenerator.Generate(manager, projectInfo.Name.ScrubFileName(), projectInfo.Description));
+            GpxWriter.WriteGpxFile($"{fileName}.gpx", TtGpxGenerator.Generate(manager, projectInfo.Name.ScrubFileName(), projectInfo.Description));
         }
 
         public static void KMZ(ITtManager manager, TtProjectInfo projectInfo, String fileName)
         {
+            string kmlName = $"{fileName}.kml";
+            fileName = $"{fileName}.kmz";
+
             KmlDocument doc = TtKmlGenerator.Generate(manager, projectInfo.Name.ScrubFileName(), projectInfo.Description);
             
-            string kmlName = $"{projectInfo.Name.ScrubFileName()}.kml";
             string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);
 
             KmlWriter.WriteKmlFile(kmlFile, doc);
@@ -603,9 +614,11 @@ namespace TwoTrails.Utils
 
         public static void KMZ(IEnumerable<TtProject> projects, String fileName)
         {
+            string kmlName = "multiproject.kml";
+            fileName = $"{fileName}.kmz";
+
             KmlDocument doc = TtKmlGenerator.Generate(projects.Select(p => p.HistoryManager), "MultiProject");
 
-            string kmlName = "multiproject.kml";
             string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);
 
             KmlWriter.WriteKmlFile(kmlFile, doc);
