@@ -87,7 +87,7 @@ namespace TwoTrails.Core
 
 
         #region History Management
-        private void AddCommand(ITtCommand command, bool runCommand = true)
+        private void AddCommand(ITtCommand command)
         {
             if (ComplexActionStarted)
             {
@@ -95,10 +95,7 @@ namespace TwoTrails.Core
             }
             else
             {
-                if (runCommand)
-                {
-                    command.Redo();
-                }
+                command.Redo();
                 _UndoStack.Push(command);
                 _RedoStack.Clear();
                 OnHistoryChanged(HistoryEventType.Commit, command.CommandInfo, command.RequireRefresh);
@@ -112,17 +109,16 @@ namespace TwoTrails.Core
             _ComplexActionCommands = new List<ITtCommand>();
         }
 
-        public void CommitMultiCommand(ITtCommand commitCommand = null)
+        public void CommitMultiCommand(DataActionType dataAction, string notes = null)
         {
             if (_ComplexActionCommands == null)
                 throw new Exception("Complex Action not started!");
 
             if (_ComplexActionCommands.Count > 0)
             {
-                if (commitCommand != null)
-                    _ComplexActionCommands.Add(commitCommand);
+                _ComplexActionCommands.Add(new AddDataActionCommand(dataAction, BaseManager, notes));
 
-                MultiTtCommand command = new MultiTtCommand(_ComplexActionCommands);
+                MultiTtCommand command = new MultiTtCommand(_ComplexActionCommands, notes);
                 _ComplexActionCommands = null;
                 AddCommand(command);
             }
@@ -553,11 +549,6 @@ namespace TwoTrails.Core
 
 
         public List<TtUserAction> GetUserActions() => BaseManager.GetUserActions();
-
-        public void AddAction(DataActionType action, string notes = null)
-        {
-            AddCommand(new AddDataActionCommand(action, this.BaseManager, notes));
-        }
     }
 
     public enum HistoryEventType

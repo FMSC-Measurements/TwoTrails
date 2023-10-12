@@ -1237,7 +1237,7 @@ namespace TwoTrails.ViewModels
                         foreach (var delMeta in ml.Item2.Where(m => m.CN != Consts.EmptyGuid))
                             Manager.DeleteMetadata(delMeta);
                     }
-                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {removedMetaCount} duplicate metadata"));
+                    Manager.CommitMultiCommand(DataActionType.DeletedMetadata, $"Removed {removedMetaCount} duplicate metadata");
                 }
             }
             else
@@ -1262,7 +1262,7 @@ namespace TwoTrails.ViewModels
                         Manager.DeletePolygon(poly);
                     }
 
-                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delPolys.Count} empty polygons"));
+                    Manager.CommitMultiCommand(DataActionType.DeletedPolygons, $"Removed {delPolys.Count} empty polygons");
                 }
             }
             else
@@ -1287,7 +1287,7 @@ namespace TwoTrails.ViewModels
                         Manager.DeleteMetadata(meta);
                     }
 
-                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delMeta.Count} unused metadata"));
+                    Manager.CommitMultiCommand(DataActionType.DeletedMetadata, $"Removed {delMeta.Count} unused metadata");
                 }
             }
             else
@@ -1312,7 +1312,7 @@ namespace TwoTrails.ViewModels
                         Manager.DeleteGroup(group);
                     }
 
-                    Manager.CommitMultiCommand(new AddDataActionCommand(DataActionType.None, Manager.BaseManager, $"Removed {delGroups.Count} unused groups"));
+                    Manager.CommitMultiCommand(DataActionType.DeletedGroups, $"Removed {delGroups.Count} unused groups");
                 }
             }
             else

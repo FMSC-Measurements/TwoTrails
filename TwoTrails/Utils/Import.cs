@@ -312,12 +312,12 @@ namespace TwoTrails.Utils
 #endif
 
                     hm.CommitMultiCommand(
-                        new AddDataActionCommand(DataActionType.DataImported, hm.BaseManager,
+                        DataActionType.DataImported,
                         $@"{filePath} [{
                             String.Join(", ", aPolys.Values)
                         }]{
                             (existingPointsImported > 0 ? $" ({existingPointsImported} Point CN Changes)" : String.Empty)
-                        }"));
+                        }");
                 }
             }
             catch (Exception e)

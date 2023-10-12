@@ -90,6 +90,8 @@ namespace TwoTrails.Dialogs
                 {
                     if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                     {
+                        _Project.HistoryManager.StartMultiCommand();
+
                         poly = null;
 
                         for (int i = 2; i < Int32.MaxValue; i++)
@@ -113,7 +115,6 @@ namespace TwoTrails.Dialogs
                                 break;
                             }
                         }
-                        _Project.HistoryManager.StartMultiCommand();
                     }
                     else return;
                 }
@@ -174,7 +175,7 @@ namespace TwoTrails.Dialogs
 
             _Project.HistoryManager.AddPoints(wayPoints);
             
-            _Project.HistoryManager.CommitMultiCommand();
+            _Project.HistoryManager.CommitMultiCommand(DataActionType.InsertedPoints, $"Created {points.Count} points as a subset of plot {SelectedPlotPolygon.Name}");
 
             MessageBox.Show($"{points.Count} WayPoints Created");
         }

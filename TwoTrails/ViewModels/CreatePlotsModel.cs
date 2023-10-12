@@ -399,33 +399,41 @@ namespace TwoTrails.ViewModels
                 }
             }
 
-
-            List<TtPoint> wayPoints = new List<TtPoint>();
-            i = 0;
-            WayPoint curr, prev = null;
-
-            foreach (Point p in addPoints)
+            if (addPoints.Count > 0)
             {
-                curr = new WayPoint()
-                {
-                    UnAdjX = p.X,
-                    UnAdjY = p.Y,
-                    Polygon = poly,
-                    Group = _Manager.MainGroup,
-                    Metadata = defMeta,
-                    Index = i,
-                    Comment = "Generated Point",
-                    PID = PointNamer.NamePoint(poly, prev)
-                };
 
-                wayPoints.Add(curr);
-                prev = curr;
-                j++;
+                List<TtPoint> wayPoints = new List<TtPoint>();
+                i = 0;
+                WayPoint curr, prev = null;
+
+                foreach (Point p in addPoints)
+                {
+                    curr = new WayPoint()
+                    {
+                        UnAdjX = p.X,
+                        UnAdjY = p.Y,
+                        Polygon = poly,
+                        Group = _Manager.MainGroup,
+                        Metadata = defMeta,
+                        Index = i,
+                        Comment = "Generated Point",
+                        PID = PointNamer.NamePoint(poly, prev)
+                    };
+
+                    wayPoints.Add(curr);
+                    prev = curr;
+                    j++;
+                }
+
+                _Manager.AddPoints(wayPoints);
+
+                MessageBox.Show($"{addPoints.Count} plots created");
+            }
+            else
+            {
+                MessageBox.Show($"No plots created");
             }
 
-            _Manager.AddPoints(wayPoints);
-
-            MessageBox.Show($"{addPoints.Count} WayPoints Created");
             IsGenerating = false;
         }
 
@@ -444,16 +452,6 @@ namespace TwoTrails.ViewModels
             List<Tuple<TtPolygon, string>> polys = IncludedPolygons.Select(p =>
             {
                 return Tuple.Create(GetOrCreateNewPoly(allPolys, new TtPolygon[] { p }), p.CN);
-
-                //return Tuple.Create(
-                //    new TtPolygon()
-                //    {
-                //        Name = GeneratedPolyName(new TtPolygon[] { p }),
-                //        PointStartIndex = (++polyCount) * 1000 + 10,
-                //        Increment = 1,
-                //        Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon {p.Name} as a group of {IncludedPolygons.Count} polygons"
-                //    }, 
-                //    p.CN);
             }).ToList();
 
             TtMetadata defMeta = _Manager.DefaultMetadata;
@@ -566,15 +564,18 @@ namespace TwoTrails.ViewModels
 
             _Manager.StartMultiCommand();
 
+            List<TtPoint> wayPoints = new List<TtPoint>();
+            int polysAdded = 0;
+
             foreach (Tuple<TtPolygon, List<Point>> polypts in addPoints.Values)
             {
-                List<TtPoint> wayPoints = new List<TtPoint>();
                 i = 0;
                 WayPoint curr, prev = null;
 
                 if (!allPolys.Contains(polypts.Item1))
                 {
                     _Manager.AddPolygon(polypts.Item1);
+                    polysAdded++;
                 }
 
                 foreach (Point p in polypts.Item2)
@@ -599,9 +600,17 @@ namespace TwoTrails.ViewModels
                 _Manager.AddPoints(wayPoints); 
             }
 
-            _Manager.CommitMultiCommand();
+            if (wayPoints.Count > 0)
+            {
+                _Manager.CommitMultiCommand(DataActionType.InsertedPoints,
+                    $"Created {wayPoints.Count} plot points in {(polysAdded > 1 ? $"{polysAdded} units" : $"unit {wayPoints[0].Polygon.Name}")}");
 
-            MessageBox.Show($"{addPoints.Sum(p => p.Value.Item2.Count)} WayPoints Created");
+                MessageBox.Show($"{wayPoints.Count} plots created");
+            }
+            else
+            {
+                MessageBox.Show($"No plots created");
+            }
             IsGenerating = false;
         }
     }

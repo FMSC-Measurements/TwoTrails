@@ -920,7 +920,7 @@ namespace TwoTrails.ViewModels
 
             Points = CollectionViewSource.GetDefaultView(Manager.Points) as ListCollectionView;
             Points.CustomSort = new PointSorter(project.Settings.SortPolysByName);
-            Points.Filter = Filter;
+            Points.Filter = FilterPoints;
 
             #region Init Commands
             RefreshPoints = new RelayCommand(x => Points.Refresh());
@@ -2095,27 +2095,28 @@ namespace TwoTrails.ViewModels
             settingFields = false;
         }
 
-        private bool Filter(object obj)
+        private bool FilterPoints(object obj)
         {
-            TtPoint point = obj as TtPoint;
-            
-            if (!_CheckedPolygons[point.PolygonCN])
-                return false;
+            if (obj is TtPoint point)
+            {
+                if (!_CheckedPolygons[point.PolygonCN])
+                    return false;
 
-            if (!_CheckedMetadata[point.MetadataCN])
-                return false;
+                if (!_CheckedMetadata[point.MetadataCN])
+                    return false;
 
-            if (!_CheckedGroups[point.GroupCN])
-                return false;
+                if (!_CheckedGroups[point.GroupCN])
+                    return false;
 
-            if (!_CheckedOpTypes[point.OpType])
-                return false;
+                if (!_CheckedOpTypes[point.OpType])
+                    return false;
 
-            if (IsOnBnd != null && IsOnBnd != point.OnBoundary)
-                return false;
+                if (IsOnBnd != null && IsOnBnd != point.OnBoundary)
+                    return false;
 
-            if (HasLinks != null && HasLinks != point.HasQuondamLinks)
-                return false;
+                if (HasLinks != null && HasLinks != point.HasQuondamLinks)
+                    return false;
+            }
 
             return true;
         }

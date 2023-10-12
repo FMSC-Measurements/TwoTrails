@@ -172,7 +172,7 @@ namespace TwoTrails.ViewModels
 
                         if (mcStarted)
                         {
-                            _Manager.CommitMultiCommand();
+                            _Manager.CommitMultiCommand(DataActionType.MovedPoints);
                         }
                     }
                     else
