@@ -6,20 +6,17 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class MovePointsCommand : ITtPointsCommand
     {
-        private TtManager _Manager;
-        private TtPolygon _TargetPolygon;
-        private int _InsertIndex;
+        private readonly TtPolygon _TargetPolygon;
+        private readonly int _InsertIndex;
 
-        private Dictionary<String, int> _NewIndexes = new Dictionary<String, int>();
-        private Dictionary<String, int> _OldIndexes = new Dictionary<String, int>();
-        private Dictionary<String, TtPolygon> _OldPolygons = new Dictionary<String, TtPolygon>();
-        private Dictionary<String, TtPoint> _EditedPoints = new Dictionary<String, TtPoint>();
-        private Dictionary<String, TtPolygon> _PolygonsToBuild = new Dictionary<String, TtPolygon>();
+        private readonly Dictionary<String, int> _NewIndexes = new Dictionary<String, int>();
+        private readonly Dictionary<String, int> _OldIndexes = new Dictionary<String, int>();
+        private readonly Dictionary<String, TtPolygon> _OldPolygons = new Dictionary<String, TtPolygon>();
+        private readonly Dictionary<String, TtPoint> _EditedPoints = new Dictionary<String, TtPoint>();
+        private readonly Dictionary<String, TtPolygon> _PolygonsToBuild = new Dictionary<String, TtPolygon>();
 
-        public MovePointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex) : base(points)
+        public MovePointsCommand(TtManager manager, IEnumerable<TtPoint> points, TtPolygon targetPoly, int insertIndex) : base(manager, points)
         {
-            this._Manager = pointsManager;
-
             _TargetPolygon = targetPoly;
             _InsertIndex = insertIndex;
 
@@ -37,7 +34,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
             foreach (TtPolygon poly in _PolygonsToBuild.Values)
             {
-                foreach (TtPoint point in pointsManager.GetPoints(poly.CN))
+                foreach (TtPoint point in manager.GetPoints(poly.CN))
                 {
                     if (!_EditedPoints.ContainsKey(point.CN))
                     {
@@ -50,7 +47,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public override void Redo()
         {
-            _Manager.MovePointsToPolygon(Points, _TargetPolygon, _InsertIndex);
+            Manager.MovePointsToPolygon(Points, _TargetPolygon, _InsertIndex);
 
             _NewIndexes.Clear();
             foreach (TtPoint point in _EditedPoints.Values)
@@ -72,7 +69,7 @@ namespace TwoTrails.Core.ComponentModel.History
             }
 
             foreach (TtPolygon poly in _PolygonsToBuild.Values)
-                _Manager.RebuildPolygon(poly);
+                Manager.RebuildPolygon(poly);
         }
 
         protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;

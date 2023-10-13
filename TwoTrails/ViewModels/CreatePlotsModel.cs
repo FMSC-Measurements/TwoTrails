@@ -15,16 +15,22 @@ using TwoTrails.Core.Points;
 using TwoTrails.Utils;
 using Point = FMSC.Core.Point;
 using TwoTrails.Settings;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace TwoTrails.ViewModels
 {
     public class CreatePlotsModel : BaseModel
     {
-        private TtHistoryManager _Manager;
+        private readonly TtProject _Project;
+        private TtHistoryManager _Manager => _Project.HistoryManager;
         public TtSettings Settings { get; }
+        private readonly Window _Window;
 
         public ICommand GenerateCommand { get; }
-        public ICommand CloseCommand { get; }
+        public ICommand CloseCancelCommand { get; }
 
         public ICommand InclusionPolygonsSelectedCommand { get; }
         public ICommand ExclusionPolygonsSelectedCommand { get; }
@@ -64,7 +70,8 @@ namespace TwoTrails.ViewModels
         public bool? BoundaryBuffer { get { return Get<bool?>(); } set { Set(value); } }
         public int BufferAmount { get { return Get<int>(); } set { Set(value); } }
 
-        public bool IsGenerating { get { return Get<bool>(); } set { Set(value); } }
+        public bool IsGenerating { get { return Get<bool>(); } set { Set(value, () => OnPropertyChanged(nameof(CloseCancelBtnText))); } }
+        public string CloseCancelBtnText => IsGenerating ? "Cancel" : "Close";
 
         public bool SplitToIndividualPolys {
             get => Settings.DeviceSettings.SplitToIndividualPolys;
@@ -82,11 +89,16 @@ namespace TwoTrails.ViewModels
 
         private int polyCount;
 
+        private readonly Dispatcher _CurrentDispatcher;
+        private Task _GenerateTask;
+        private CancellationTokenSource _CancellationTokenSource;
+
 
         public CreatePlotsModel(TtProject project, Window window)
         {
-            _Manager = project.HistoryManager;
+            _Project = project;
             Settings = project.Settings;
+            _Window = window;
 
             InclusionPolygonsSelectedCommand = new RelayCommand(x => InclusionPolygonsSelected(x as IList));
             ExclusionPolygonsSelectedCommand = new RelayCommand(x => ExclusionPolygonsSelected(x as IList));
@@ -115,7 +127,21 @@ namespace TwoTrails.ViewModels
             SelectedPoint = null;
 
             GenerateCommand = new RelayCommand(x => ValidateSettings());
-            CloseCommand = new RelayCommand(x => window.Close());
+            CloseCancelCommand = new RelayCommand(x => CloseOrCancel());
+
+            _CurrentDispatcher = Dispatcher.CurrentDispatcher;
+            _Window.Closing += (s, e) =>
+            {
+                CancelGeneration();
+            };
+        }
+
+        private void CloseOrCancel()
+        {
+            if (IsGenerating)
+                CancelGeneration();
+            else
+                _Window.Close();
         }
 
         private void InclusionPolygonsSelected(IList selectedItems)
@@ -237,57 +263,72 @@ namespace TwoTrails.ViewModels
 
             List<TtPolygon> polygons = _Manager.GetPolygons();
 
-            if (!SplitToIndividualPolys || IncludedPolygons.Count < 2)
+            _Manager.StartMultiCommand();
+            _CancellationTokenSource = new CancellationTokenSource();
+            IsGenerating = true;
+
+            try
             {
-                string gPolyName = GeneratedPolyName(IncludedPolygons);
-
-                TtPolygon poly = null;
-
-                try
+                if (!SplitToIndividualPolys || IncludedPolygons.Count < 2)
                 {
-                    poly = polygons.First(p => p.Name == gPolyName);
-                }
-                catch
-                {
-                    //
-                }
+                    string gPolyName = GeneratedPolyName(IncludedPolygons);
 
+                    TtPolygon poly = null;
 
-                if (poly != null)
-                {
-                    if (!Settings.DeviceSettings.DeleteExistingPlots)
+                    try
                     {
-                        if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                        poly = polygons.First(p => p.Name == gPolyName);
+                    }
+                    catch
+                    {
+                        //
+                    }
+
+                    if (poly != null)
+                    {
+                        if (!Settings.DeviceSettings.DeleteExistingPlots)
                         {
-                            poly = GetOrCreateNewPoly(polygons, IncludedPolygons);
-                            _Manager.AddPolygon(poly);
+                            if (MessageBox.Show($"Plots '{gPolyName}' already exist. Would you like to rename the plots?", "Plots Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                            {
+                                poly = GetOrCreateNewPoly(polygons, IncludedPolygons);
+                                _Manager.AddPolygon(poly);
+                            }
+                            else
+                            {
+                                _Manager.CancelMultiCommand();
+                                OnGenerationFinished();
+                                return;
+                            }
                         }
-                        else return;
+                        else
+                        {
+                            _Manager.DeletePointsInPolygon(poly.CN);
+                        }
                     }
                     else
                     {
-                        _Manager.DeletePointsInPolygon(poly.CN);
+                        poly = new TtPolygon()
+                        {
+                            Name = gPolyName,
+                            PointStartIndex = (polygons.Count + 1) * 1000 + Consts.DEFAULT_POINT_INCREMENT,
+                            Increment = 1
+                        };
+
+                        _Manager.AddPolygon(poly);
                     }
+
+                    _GenerateTask = Task.Run(() => GeneratePoints(poly), _CancellationTokenSource.Token);
                 }
                 else
                 {
-                    poly = new TtPolygon()
-                    {
-                        Name = gPolyName,
-                        PointStartIndex = (polygons.Count + 1) * 1000 + Consts.DEFAULT_POINT_INCREMENT,
-                        Increment = 1
-                    };
-
-                    _Manager.AddPolygon(poly);
+                    _GenerateTask = Task.Run(() => GeneratePointsInIndividualPolys(), _CancellationTokenSource.Token);
                 }
-
-                IsGenerating = true;
-                GeneratePoints(poly);
             }
-            else
+            catch (Exception ex)
             {
-                IsGenerating = true;
-                GeneratePointsInIndividualPolys();
+                Trace.WriteLine($"{ex.Message}\n\t{ex.StackTrace}", "CreatePlotsModel");
+                _Manager.CancelMultiCommand();
+                OnGenerationFinished("Error generating plots");
             }
         }
 
@@ -311,6 +352,8 @@ namespace TwoTrails.ViewModels
             builder.Include(allPoints);
             UtmExtent totalExtents = builder.Build();
 
+            if (ShouldCancel()) return;
+
             Random rand = new Random();
             UTMCoords startCoords = SelectedPoint != null ?
                 SelectedPoint.GetCoords(defMeta.Zone) :
@@ -322,10 +365,17 @@ namespace TwoTrails.ViewModels
             
             PolygonCalculator.Boundaries totalPolyBnds = new PolygonCalculator(allPoints).PointBoundaries;
 
+            if (ShouldCancel()) return;
+
             List<PolygonCalculator> polyIncludeCalcs = polyIncudePoints.Select(pp => new PolygonCalculator(pp)).ToList();
+
+            if (ShouldCancel()) return;
+
             List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.OnBoundary))
                                                     .Select(pp => pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint()))
                                                     .Select(pp => new PolygonCalculator(pp)).ToList();
+            if (ShouldCancel()) return;
+
 
             Point farCorner = TtUtils.GetFarthestCorner(
                 startCoords.X, startCoords.Y,
@@ -359,6 +409,8 @@ namespace TwoTrails.ViewModels
                     {
                         if (pc.IsPointInPolygon(tmp.X, tmp.Y) && !polyExcludeCalcs.Any(pec => pec.IsPointInPolygon(tmp.X, tmp.Y)))
                             addPoints.Add(tmp);
+
+                        if (ShouldCancel()) return;
                     }
 
                     k -= gridY;
@@ -383,9 +435,10 @@ namespace TwoTrails.ViewModels
                                 addPoints.RemoveAt(i);
                                 break;
                             }
-                        } 
+                        }
+
+                        if (ShouldCancel()) return;
                     }
-                    
                 }
             }
 
@@ -400,12 +453,22 @@ namespace TwoTrails.ViewModels
                 }
             }
 
+            if (ShouldCancel())
+                return;
+
+            if (addPoints.Count > 100 && MessageBox.Show($"{addPoints.Count} will be generated. Would you like to continue?",
+                "Massive point generation", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+            {
+                CancelGeneration();
+                ShouldCancel();
+                return;
+            }
+
             if (addPoints.Count > 0)
             {
-
                 List<TtPoint> wayPoints = new List<TtPoint>();
-                i = 0;
                 WayPoint curr, prev = null;
+                int index = 0;
 
                 foreach (Point p in addPoints)
                 {
@@ -416,10 +479,13 @@ namespace TwoTrails.ViewModels
                         Polygon = poly,
                         Group = _Manager.MainGroup,
                         Metadata = defMeta,
-                        Index = i,
+                        Index = index++,
                         Comment = "Generated Point",
                         PID = PointNamer.NamePoint(poly, prev)
                     };
+
+                    while (_Manager.PointExists(curr.CN))
+                        curr.CN = Guid.NewGuid().ToString();
 
                     wayPoints.Add(curr);
                     prev = curr;
@@ -428,14 +494,14 @@ namespace TwoTrails.ViewModels
 
                 _Manager.AddPoints(wayPoints);
 
-                MessageBox.Show($"{addPoints.Count} plots created");
+                CommitNewPlots($"Created {wayPoints.Count} plot points in {poly.Name}");
+                OnGenerationFinished($"{wayPoints.Count} plots created");
             }
             else
             {
-                MessageBox.Show($"No plots created");
+                _Manager.CancelMultiCommand();
+                OnGenerationFinished("No plots created");
             }
-
-            IsGenerating = false;
         }
 
         private void GeneratePointsInIndividualPolys()
@@ -455,6 +521,10 @@ namespace TwoTrails.ViewModels
                 return Tuple.Create(GetOrCreateNewPoly(allPolys, new TtPolygon[] { p }), p.CN);
             }).ToList();
 
+
+            if (ShouldCancel())
+                return;
+
             TtMetadata defMeta = _Manager.DefaultMetadata;
 
             List<Tuple<TtPolygon, IEnumerable<Point>, string>> polyIncudePoints =
@@ -464,11 +534,17 @@ namespace TwoTrails.ViewModels
                     p.Item2))
                 .ToList();
 
+            if (ShouldCancel())
+                return;
+
             List<Point> allPoints = polyIncudePoints.SelectMany(pts => pts.Item2).ToList(); ;
 
             UtmExtent.Builder builder = new UtmExtent.Builder(defMeta.Zone);
             builder.Include(allPoints);
             UtmExtent totalExtents = builder.Build();
+
+            if (ShouldCancel())
+                return;
 
             Random rand = new Random();
             UTMCoords startCoords = SelectedPoint != null ?
@@ -481,9 +557,19 @@ namespace TwoTrails.ViewModels
 
             PolygonCalculator.Boundaries totalPolyBnds = new PolygonCalculator(allPoints).PointBoundaries;
 
+            if (ShouldCancel())
+                return;
+
             List<Tuple<TtPolygon, PolygonCalculator, string>> polyIncludeCalcs = polyIncudePoints.Select(pp => Tuple.Create(pp.Item1, new PolygonCalculator(pp.Item2), pp.Item3)).ToList();
+
+            if (ShouldCancel())
+                return;
+
             List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.OnBoundary))
                                                     .Select(pp => new PolygonCalculator(pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint()))).ToList();
+
+            if (ShouldCancel())
+                return;
 
             Point farCorner = TtUtils.GetFarthestCorner(
                 startCoords.X, startCoords.Y,
@@ -517,6 +603,9 @@ namespace TwoTrails.ViewModels
                     {
                         if (tpc.Item2.IsPointInPolygon(tmp.X, tmp.Y) && !polyExcludeCalcs.Any(pec => pec.IsPointInPolygon(tmp.X, tmp.Y)))
                             addPoints[tpc.Item3].Item2.Add(tmp);
+
+                        if (ShouldCancel())
+                            return;
                     }
 
                     k -= gridY;
@@ -544,6 +633,9 @@ namespace TwoTrails.ViewModels
                                     break;
                                 }
                             }
+
+                            if (ShouldCancel())
+                                return;
                         }
                     }
                 }
@@ -563,14 +655,23 @@ namespace TwoTrails.ViewModels
                 }
             }
 
-            _Manager.StartMultiCommand();
+            if (ShouldCancel())
+                return;
 
             List<TtPoint> wayPoints = new List<TtPoint>();
             int polysAdded = 0;
 
+            int totalPlots = addPoints.Sum(pp => pp.Value.Item2.Count);
+            if (totalPlots > 500 && MessageBox.Show($"{totalPlots} will be generated. Would you like to continue?",
+                "Massive point generation", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+            {
+                CancelGeneration();
+                ShouldCancel();
+                return;
+            }
+
             foreach (Tuple<TtPolygon, List<Point>> polypts in addPoints.Values)
             {
-                i = 0;
                 WayPoint curr, prev = null;
 
                 if (!allPolys.Contains(polypts.Item1))
@@ -579,6 +680,7 @@ namespace TwoTrails.ViewModels
                     polysAdded++;
                 }
 
+                int index = 0;
                 foreach (Point p in polypts.Item2)
                 {
                     curr = new WayPoint()
@@ -588,10 +690,13 @@ namespace TwoTrails.ViewModels
                         Polygon = polypts.Item1,
                         Group = _Manager.MainGroup,
                         Metadata = defMeta,
-                        Index = i,
+                        Index = index,
                         Comment = "Generated Point",
                         PID = PointNamer.NamePoint(polypts.Item1, prev)
                     };
+
+                    while (_Manager.PointExists(curr.CN))
+                        curr.CN = Guid.NewGuid().ToString();
 
                     wayPoints.Add(curr);
                     prev = curr;
@@ -603,16 +708,48 @@ namespace TwoTrails.ViewModels
 
             if (wayPoints.Count > 0)
             {
-                _Manager.CommitMultiCommand(DataActionType.InsertedPoints,
-                    $"Created {wayPoints.Count} plot points in {(polysAdded > 1 ? $"{polysAdded} units" : $"unit {wayPoints[0].Polygon.Name}")}");
-
-                MessageBox.Show($"{wayPoints.Count} plots created");
+                CommitNewPlots($"Created {wayPoints.Count} plot points in {(polysAdded > 1 ? $"{polysAdded} units" : $"unit {wayPoints[0].Polygon.Name}")}");
+                OnGenerationFinished($"{wayPoints.Count} plots created");
             }
             else
             {
-                MessageBox.Show($"No plots created");
+                _Manager.CancelMultiCommand();
+                OnGenerationFinished("No plots created");
             }
+        }
+
+        private void OnGenerationFinished(String message = null)
+        {
             IsGenerating = false;
+            if (!String.IsNullOrEmpty(message))
+                MessageBox.Show(message);
+        }
+
+        private bool ShouldCancel()
+        {
+            if (_CancellationTokenSource != null && _CancellationTokenSource.IsCancellationRequested)
+            {
+                _Manager.CancelMultiCommand();
+                IsGenerating = false;
+                _CancellationTokenSource = null;
+                _GenerateTask = null;
+                return true;
+            }
+
+            return false;
+        }
+
+        private void CommitNewPlots(string message)
+        {
+            _CurrentDispatcher.Invoke(() => _Manager.CommitMultiCommand(DataActionType.InsertedPoints, message));
+        }
+
+        private void CancelGeneration()
+        {
+            if (_GenerateTask != null && _GenerateTask.Status == TaskStatus.Running && _CancellationTokenSource != null)
+            {
+                _CancellationTokenSource.Cancel();
+            }
         }
     }
 

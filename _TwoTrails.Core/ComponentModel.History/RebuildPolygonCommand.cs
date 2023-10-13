@@ -7,17 +7,15 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class RebuildPolygonCommand : ITtPolygonCommand
     {
-        private TtManager pointsManager;
-        private List<TtPoint> _Points;
-        private bool _Reindex;
+        private readonly List<TtPoint> _Points;
+        private readonly bool _Reindex;
 
 
-        public RebuildPolygonCommand(TtPolygon polygon, bool reindex, TtManager pointsManager) : base(polygon)
+        public RebuildPolygonCommand(TtManager manager, TtPolygon polygon, bool reindex) : base(manager, polygon)
         {
-            this.pointsManager = pointsManager;
             this._Reindex = reindex;
 
-            _Points = pointsManager.GetPoints(polygon.CN).Select(pt => pt.DeepCopy()).ToList();
+            _Points = manager.GetPoints(polygon.CN).Select(pt => pt.DeepCopy()).ToList();
 
             List<string> polyCNs = new List<string>() { polygon.CN };
             List<TtPoint> addPoints = new List<TtPoint>();
@@ -28,11 +26,11 @@ namespace TwoTrails.Core.ComponentModel.History
                 {
                     foreach (String cn in point.LinkedPoints)
                     {
-                        QuondamPoint qp = pointsManager.GetPoint(cn) as QuondamPoint;
+                        QuondamPoint qp = manager.GetPoint(cn) as QuondamPoint;
 
                         if (qp.PolygonCN != point.PolygonCN && !polyCNs.Contains(qp.PolygonCN))
                         {
-                            List<TtPoint> spoints = pointsManager.GetPoints(qp.PolygonCN).DeepCopy().ToList();
+                            List<TtPoint> spoints = manager.GetPoints(qp.PolygonCN).DeepCopy().ToList();
                             addPoints.AddRange(spoints);
                             polyCNs.Add(qp.PolygonCN);
 
@@ -55,14 +53,14 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public override void Redo()
         {
-            pointsManager.RebuildPolygon(Polygon, _Reindex);
+            Manager.RebuildPolygon(Polygon, _Reindex);
         }
 
         public override void Undo()
         {
             foreach (TtPoint point in _Points)
             {
-                pointsManager.ReplacePoint(point);
+                Manager.ReplacePoint(point);
             }
         }
 

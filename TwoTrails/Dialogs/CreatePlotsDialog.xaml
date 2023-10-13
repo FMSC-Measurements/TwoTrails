@@ -221,10 +221,10 @@
                 <ColumnDefinition Width="75"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Close" Command="{Binding CloseCommand}" />
-            <Button Grid.Column="2" Content="Generate" Command="{Binding GenerateCommand}" />
+            <Button Grid.Column="0" Content="{Binding CloseCancelBtnText}" Command="{Binding CloseCancelCommand}" />
+            <Button Grid.Column="2" Content="Generate" Command="{Binding GenerateCommand}" IsEnabled="{Binding IsGenerating, Converter={StaticResource IBC}}" />
         </Grid>
 
-        <!--<ttc:TtProgressControl Grid.ColumnSpan="2" Grid.Row="0" Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}" Background="White" Opacity="70" />-->
+        <ttc:TtProgressControl Grid.ColumnSpan="2" Grid.Row="0" Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}" Background="White" Opacity="70" />
         </Grid>
 </Window>

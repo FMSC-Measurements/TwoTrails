@@ -6,11 +6,11 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class EditTtPointsCommand : ITtPointsCommand
     {
-        private object NewValue;
-        private List<object> OldValues = new List<object>();
-        private PropertyInfo Property;
+        private readonly object NewValue;
+        private readonly List<object> OldValues = new List<object>();
+        private readonly PropertyInfo Property;
 
-        public EditTtPointsCommand(IEnumerable<TtPoint> points, PropertyInfo property, object newValue) : base(points)
+        public EditTtPointsCommand(TtManager manager, IEnumerable<TtPoint> points, PropertyInfo property, object newValue) : base(manager, points)
         {
             RequireRefresh = property == PointProperties.INDEX;
 

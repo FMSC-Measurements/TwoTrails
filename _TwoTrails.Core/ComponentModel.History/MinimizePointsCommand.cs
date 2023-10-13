@@ -7,11 +7,11 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class MinimizePointsCommand : EditTtPointsMultiValueCommand<bool>
     {
-        private AddDataActionCommand _AddDataActionCommand;
+        private readonly AddDataActionCommand _AddDataActionCommand;
 
-        public MinimizePointsCommand(IEnumerable<TtPoint> points, IEnumerable<bool> newValues, TtManager manager) : base(points, PointProperties.BOUNDARY, newValues)
+        public MinimizePointsCommand(TtManager manager, IEnumerable<TtPoint> points, IEnumerable<bool> newValues) : base(manager, points, PointProperties.BOUNDARY, newValues)
         {
-            _AddDataActionCommand = new AddDataActionCommand(DataActionType.PointMinimization, manager, $"{Points[0].Polygon} minimized to {Points.Count(p => p.OnBoundary)} points.");
+            _AddDataActionCommand = new AddDataActionCommand(manager, DataActionType.PointMinimization, $"{Points[0].Polygon} minimized to {Points.Count(p => p.OnBoundary)} points.");
         }
 
         public override void Redo()

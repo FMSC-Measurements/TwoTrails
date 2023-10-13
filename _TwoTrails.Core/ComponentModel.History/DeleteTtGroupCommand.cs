@@ -2,21 +2,16 @@
 {
     public class DeleteTtGroupCommand : ITtGroupCommand
     {
-        private TtManager pointsManager;
-
-        public DeleteTtGroupCommand(TtGroup group, TtManager pointsManager) : base(group)
-        {
-            this.pointsManager = pointsManager;
-        }
+        public DeleteTtGroupCommand(TtManager manager, TtGroup group) : base(manager, group) { }
 
         public override void Redo()
         {
-            pointsManager.DeleteGroup(Group);
+            Manager.DeleteGroup(Group);
         }
 
         public override void Undo()
         {
-            pointsManager.AddGroup(Group);
+            Manager.AddGroup(Group);
         }
 
         protected override DataActionType GetActionType() => DataActionType.DeletedGroups;

@@ -8,7 +8,7 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         protected List<TtPoint> Points;
 
-        public ITtPointsCommand(IEnumerable<TtPoint> points)
+        public ITtPointsCommand(TtManager manager, IEnumerable<TtPoint> points) : base(manager)
         {
             this.Points = new List<TtPoint>(points) ?? throw new ArgumentNullException(nameof(points));
         }

@@ -2,12 +2,7 @@
 {
     public class AddTtPolygonCommand : ITtPolygonCommand
     {
-        private TtManager Manager;
-
-        public AddTtPolygonCommand(TtPolygon polygon, TtManager manager) : base(polygon)
-        {
-            this.Manager = manager;
-        }
+        public AddTtPolygonCommand(TtManager manager, TtPolygon polygon) : base(manager, polygon) { }
 
         public override void Redo()
         {

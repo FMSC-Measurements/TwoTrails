@@ -8,7 +8,7 @@ namespace TwoTrails.Core.ComponentModel.History
         private T OldValue;
         private PropertyInfo Property;
 
-        public EditTtPolygonCommand(TtPolygon polygon, PropertyInfo property, T newValue) : base(polygon)
+        public EditTtPolygonCommand(TtManager manager, TtPolygon polygon, PropertyInfo property, T newValue) : base(manager, polygon)
         {
             this.Property = property;
             this.NewValue = newValue;

@@ -12,7 +12,7 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public string Description { get; }
 
-        public MultiTtCommand(IEnumerable<ITtCommand> commands, string descripton = null)
+        public MultiTtCommand(TtManager manager, IEnumerable<ITtCommand> commands, string descripton = null) : base(manager)
         {
             _Commands = new List<ITtCommand>(commands);
             Description = descripton;

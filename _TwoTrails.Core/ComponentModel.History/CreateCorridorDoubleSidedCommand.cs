@@ -6,12 +6,13 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class CreateCorridorDoubleSidedCommand : ITtPointsCommand
     {
-        private EditTtPointsCommand _EditPointsCommand;
-        private CreateQuondamsCommand _CreateQuondamsCommand;
-
         private readonly TtPolygon _TargetPolygon;
 
-        public CreateCorridorDoubleSidedCommand(IEnumerable<TtPoint> points, TtPolygon targetPolygon, TtManager pointsManager) : base(points)
+        private readonly EditTtPointsCommand _EditPointsCommand;
+        private readonly CreateQuondamsCommand _CreateQuondamsCommand;
+
+
+        public CreateCorridorDoubleSidedCommand(TtManager manager, IEnumerable<TtPoint> points, TtPolygon targetPolygon) : base(manager, points)
         {
             IEnumerable<TtPoint> ssPoints = points.Where(p => p.OpType == OpType.SideShot);
             List<TtPoint> s2ssPoints = new List<TtPoint>();
@@ -31,8 +32,8 @@ namespace TwoTrails.Core.ComponentModel.History
 
             s2ssPoints.Reverse();
             
-            _EditPointsCommand = new EditTtPointsCommand(s2ssPoints.Concat(points.Where(p => p.IsGpsType())), PointProperties.BOUNDARY, false);
-            _CreateQuondamsCommand = new CreateQuondamsCommand(s2ssPoints, pointsManager, targetPolygon, int.MaxValue, QuondamBoundaryMode.On);
+            _EditPointsCommand = new EditTtPointsCommand(manager, s2ssPoints.Concat(points.Where(p => p.IsGpsType())), PointProperties.BOUNDARY, false);
+            _CreateQuondamsCommand = new CreateQuondamsCommand(manager, s2ssPoints, targetPolygon, int.MaxValue, QuondamBoundaryMode.On);
         }
 
         public override void Redo()

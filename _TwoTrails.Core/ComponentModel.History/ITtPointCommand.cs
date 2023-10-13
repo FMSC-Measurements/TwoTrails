@@ -8,7 +8,7 @@ namespace TwoTrails.Core.ComponentModel.History
         protected TtPoint Point;
 
 
-        public ITtPointCommand(TtPoint point)
+        public ITtPointCommand(TtManager manager, TtPoint point) : base(manager)
         {
             this.Point = point ?? throw new ArgumentNullException(nameof(point));
         }

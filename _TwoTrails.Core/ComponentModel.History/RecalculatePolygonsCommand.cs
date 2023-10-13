@@ -5,29 +5,26 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    class RecalculatePolygonsCommand : ITtBaseCommand
+    public class RecalculatePolygonsCommand : ITtBaseCommand
     {
-        private TtManager _Manager;
-        private List<TtPoint> _Points;
+        private readonly List<TtPoint> _Points;
 
-        public RecalculatePolygonsCommand(TtManager pointsManager)
+        public RecalculatePolygonsCommand(TtManager manager) : base(manager)
         {
-            this._Manager = pointsManager;
-
-            _Points = pointsManager.Points.Select(pt => pt.DeepCopy()).ToList();
+            _Points = manager.Points.Select(pt => pt.DeepCopy()).ToList();
         }
 
 
         public override void Redo()
         {
-            _Manager.RecalculatePolygons();
+            Manager.RecalculatePolygons();
         }
 
         public override void Undo()
         {
             foreach (TtPoint point in _Points)
             {
-                _Manager.ReplacePoint(point);
+                Manager.ReplacePoint(point);
             }
         }
 

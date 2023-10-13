@@ -11,7 +11,7 @@ namespace TwoTrails.Core.ComponentModel.History
         protected readonly List<T> OldValues = new List<T>();
         protected readonly PropertyInfo Property;
 
-        public EditTtPointsMultiValueCommand(IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<T> newValues) : base(points)
+        public EditTtPointsMultiValueCommand(TtManager manager, IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<T> newValues) : base(manager, points)
         {
             RequireRefresh = property == PointProperties.INDEX;
 

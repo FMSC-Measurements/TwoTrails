@@ -6,7 +6,7 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         protected TtGroup Group;
 
-        public ITtGroupCommand(TtGroup group)
+        public ITtGroupCommand(TtManager manager, TtGroup group) : base(manager)
         {
             this.Group = group ?? throw new ArgumentNullException(nameof(group));
         }

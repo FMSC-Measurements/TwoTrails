@@ -2,21 +2,16 @@
 {
     public class AddTtGroupCommand : ITtGroupCommand
     {
-        private TtManager pointsManager;
-
-        public AddTtGroupCommand(TtGroup group, TtManager pointsManager) : base(group)
-        {
-            this.pointsManager = pointsManager;
-        }
+        public AddTtGroupCommand(TtManager manager, TtGroup group) : base(manager, group) { }
 
         public override void Redo()
         {
-            pointsManager.AddGroup(Group);
+            Manager.AddGroup(Group);
         }
 
         public override void Undo()
         {
-            pointsManager.DeleteGroup(Group);
+            Manager.DeleteGroup(Group);
         }
 
         protected override DataActionType GetActionType() => DataActionType.InsertedGroups;

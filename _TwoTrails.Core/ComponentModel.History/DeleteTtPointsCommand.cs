@@ -7,17 +7,13 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class DeleteTtPointsCommand : ITtPointsCommand
     {
-        private TtManager pointsManager;
-
-        private List<Tuple<TtPoint, QuondamPoint, GpsPoint>> _ConvertedPoints = null;
-        private List<TtNmeaBurst> _AddNmea = new List<TtNmeaBurst>();
-        private List<Tuple<QuondamPoint, TtPoint>> _QpParentPoints = null;
+        private readonly List<Tuple<TtPoint, QuondamPoint, GpsPoint>> _ConvertedPoints = null;
+        private readonly List<TtNmeaBurst> _AddNmea = new List<TtNmeaBurst>();
+        private readonly List<Tuple<QuondamPoint, TtPoint>> _QpParentPoints = null;
 
 
-        public DeleteTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager) : base(points)
+        public DeleteTtPointsCommand(TtManager manager, IEnumerable<TtPoint> points) : base(manager, points)
         {
-            this.pointsManager = pointsManager;
-
             if (points.Any(p => p.HasQuondamLinks))
             {
                 HashSet<string> deletedCNs = new HashSet<string>(points.Select(p => p.CN));
@@ -28,15 +24,15 @@ namespace TwoTrails.Core.ComponentModel.History
                     QuondamPoint child;
                     foreach (string ccn in point.LinkedPoints)
                     {
-                        if (!deletedCNs.Contains(ccn) && pointsManager.PointExists(ccn))
+                        if (!deletedCNs.Contains(ccn) && manager.PointExists(ccn))
                         {
-                            child = pointsManager.GetPoint(ccn) as QuondamPoint;
+                            child = manager.GetPoint(ccn) as QuondamPoint;
 
                             _ConvertedPoints.Add(Tuple.Create(point, child, child.ConvertQuondam()));
 
                             if (point.IsGpsType())
                             {
-                                _AddNmea.AddRange(pointsManager.GetNmeaBursts(point.CN).Select(n => new TtNmeaBurst(n, child.CN)));
+                                _AddNmea.AddRange(manager.GetNmeaBursts(point.CN).Select(n => new TtNmeaBurst(n, child.CN)));
                             }
                         }
                     }
@@ -60,11 +56,11 @@ namespace TwoTrails.Core.ComponentModel.History
             {
                 foreach (Tuple<TtPoint, QuondamPoint, GpsPoint> tuple in _ConvertedPoints)
                 {
-                    pointsManager.ReplacePoint(tuple.Item3);
+                    Manager.ReplacePoint(tuple.Item3);
                     tuple.Item1.RemoveLinkedPoint(tuple.Item2);
                 }
                 
-                pointsManager.AddNmeaBursts(_AddNmea);
+                Manager.AddNmeaBursts(_AddNmea);
             }
 
             if (_QpParentPoints != null)
@@ -75,11 +71,11 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
 
-            pointsManager.DeletePoints(Points);
+            Manager.DeletePoints(Points);
 
             foreach (TtPoint point in Points.Where(p => p.IsGpsType()))
             {
-                pointsManager.DeleteNmeaBursts(point.CN);
+                Manager.DeleteNmeaBursts(point.CN);
             }
         }
 
@@ -87,10 +83,10 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             foreach (TtPoint point in Points.Where(p => p.IsGpsType()))
             {
-                pointsManager.RestoreNmeaBurts(point.CN);
+                Manager.RestoreNmeaBurts(point.CN);
             }
 
-            pointsManager.AddPoints(Points);
+            Manager.AddPoints(Points);
 
             if (_QpParentPoints != null)
             {
@@ -104,16 +100,16 @@ namespace TwoTrails.Core.ComponentModel.History
             {
                 foreach (Tuple<TtPoint, QuondamPoint, GpsPoint> tuple in _ConvertedPoints)
                 {
-                    pointsManager.ReplacePoint(tuple.Item2);
+                    Manager.ReplacePoint(tuple.Item2);
                     tuple.Item1.AddLinkedPoint(tuple.Item2);
 
-                    pointsManager.DeleteNmeaBursts(tuple.Item3.CN);
+                    Manager.DeleteNmeaBursts(tuple.Item3.CN);
                 }
             }
         }
 
 
-        protected override int GetAffectedItemCount() => _ConvertedPoints.Count + Points.Count;
+        protected override int GetAffectedItemCount() => _ConvertedPoints != null ? _ConvertedPoints.Count : 0 + Points.Count;
         protected override DataActionType GetActionType() => DataActionType.DeletedPoints | (_AddNmea.Count > 0 ? DataActionType.InsertedNmea : DataActionType.None);
         protected override string GetCommandInfoDescription() => $"Delete {Points.Count} points";
     }

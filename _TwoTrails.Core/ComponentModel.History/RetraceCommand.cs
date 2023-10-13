@@ -10,11 +10,11 @@ namespace TwoTrails.Core.ComponentModel.History
         private readonly CreateQuondamsCommand _CreateQuondamsCommand;
         private readonly AddDataActionCommand _AddDataActionCommand;
 
-        public RetraceCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
+        public RetraceCommand(TtManager manager, IEnumerable<TtPoint> points, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(manager, points)
         {
             _Polygon = targetPoly;
-            _CreateQuondamsCommand = new CreateQuondamsCommand(points, pointsManager, targetPoly, insertIndex, bndMode);
-            _AddDataActionCommand = new AddDataActionCommand(DataActionType.RetracePoints, pointsManager);
+            _CreateQuondamsCommand = new CreateQuondamsCommand(manager, points, targetPoly, insertIndex, bndMode);
+            _AddDataActionCommand = new AddDataActionCommand(manager, DataActionType.RetracePoints);
         }
 
         public override void Redo()

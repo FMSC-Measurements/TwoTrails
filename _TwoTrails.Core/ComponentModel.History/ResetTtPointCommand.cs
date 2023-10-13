@@ -4,14 +4,11 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class ResetTtPointCommand : ITtPointCommand
     {
-        private TtManager _Manager;
-        private TtPoint _ResetPoint;
+        private readonly TtPoint _ResetPoint;
 
-        public ResetTtPointCommand(TtPoint point, TtManager pointsManager, bool keepIndexAndPoly = false) : base(point)
+        public ResetTtPointCommand(TtManager manager, TtPoint point, bool keepIndexAndPoly = false) : base(manager, point)
         {
-            this._Manager = pointsManager;
-
-            _ResetPoint = pointsManager.GetOriginalPoint(point.CN).DeepCopy();
+            _ResetPoint = manager.GetOriginalPoint(point.CN).DeepCopy();
 
             if (keepIndexAndPoly)
             {
@@ -24,12 +21,12 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public override void Redo()
         {
-            _Manager.ReplacePoint(_ResetPoint);
+            Manager.ReplacePoint(_ResetPoint);
         }
 
         public override void Undo()
         {
-            _Manager.ReplacePoint(Point);
+            Manager.ReplacePoint(Point);
         }
 
         protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;

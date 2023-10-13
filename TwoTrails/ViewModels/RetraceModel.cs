@@ -50,7 +50,7 @@ namespace TwoTrails.ViewModels
             {
                 Retraces = new ObservableCollection<Retrace>
                 {
-                    new Retrace(project)
+                    new Retrace(_Project)
                 };
             }
 

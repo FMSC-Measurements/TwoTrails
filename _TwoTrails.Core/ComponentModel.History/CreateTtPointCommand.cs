@@ -4,13 +4,13 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class CreateTtPointCommand : ITtPointCommand
     {
-        private AddTtPointCommand _AddTtPointCommand;
-        private AddDataActionCommand _AddDataActionCommand;
+        private readonly AddTtPointCommand _AddTtPointCommand;
+        private readonly AddDataActionCommand _AddDataActionCommand;
 
-        public CreateTtPointCommand(TtPoint point, TtManager pointsManager) : base(point)
+        public CreateTtPointCommand(TtManager manager, TtPoint point) : base(manager, point)
         {
-            _AddTtPointCommand = new AddTtPointCommand(point, pointsManager);
-            _AddDataActionCommand = new AddDataActionCommand(DataActionType.ManualPointCreation, pointsManager);
+            _AddTtPointCommand = new AddTtPointCommand(manager, point);
+            _AddDataActionCommand = new AddDataActionCommand(manager, DataActionType.ManualPointCreation);
         }
 
         public override void Redo()

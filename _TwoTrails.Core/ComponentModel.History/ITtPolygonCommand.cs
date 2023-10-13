@@ -6,7 +6,7 @@ namespace TwoTrails.Core.ComponentModel.History
     {
         protected TtPolygon Polygon;
 
-        public ITtPolygonCommand(TtPolygon polygon)
+        public ITtPolygonCommand(TtManager manager, TtPolygon polygon) : base(manager)
         {
             this.Polygon = polygon ?? throw new ArgumentNullException(nameof(polygon));
         }

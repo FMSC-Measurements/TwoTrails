@@ -15,7 +15,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.Controls;
 using TwoTrails.Core;
-using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Media;
 using TwoTrails.Core.Points;
 using TwoTrails.Dialogs;

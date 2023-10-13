@@ -76,43 +76,43 @@ namespace TwoTrails.Core
 
                     StringBuilder sb = new StringBuilder();
                     
-                    sb.AppendFormat("The polygon area is: {0:0.000} Ha ({1:0.00} ac).{2}",
-                        Math.Round(polygon.AreaHectaAcres, 2),
+                    sb.AppendFormat("The polygon area is: {0:F3} Ac ({1:F2} Ha).{2}",
                         Math.Round(polygon.AreaAcres, 2),
+                        Math.Round(polygon.AreaHectaAcres, 2),
                         Environment.NewLine);
 
-                    sb.AppendFormat("The polygon exterior perimeter is: {0:0.00} M ({1:0} ft).{2}",
-                        Math.Round(polygon.Perimeter, 2),
+                    sb.AppendFormat("The polygon exterior perimeter is: {0:F2} Ft ({1:F1} M).{2}",
                         Math.Round(polygon.PerimeterFt, 0),
+                        Math.Round(polygon.Perimeter, 2),
                         Environment.NewLine);
 
-                    sb.AppendFormat("The polyline perimeter is: {0:0.00} M ({1:0} ft).{2}{2}",
-                        Math.Round(polygon.PerimeterLine, 2),
+                    sb.AppendFormat("The polyline perimeter is: {0:F2} Ft ({1:F1} M).{2}{2}",
                         Math.Round(polygon.PerimeterLineFt, 0),
+                        Math.Round(polygon.PerimeterLine, 2),
                         Environment.NewLine);
 
                     if (TotalGpsError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
-                        sb.AppendFormat("GPS area-error Contribution: {0:0.000} Ha ({1:0.00} ac){2}",
-                            Math.Round(FMSC.Core.Convert.ToHectare(TotalGpsError, Area.MeterSq), 2),
+                        sb.AppendFormat("GPS area-error Contribution: {0:F3} Ac ({1:F2} Ha){2}",
                             Math.Round(FMSC.Core.Convert.ToAcre(TotalGpsError, Area.MeterSq), 2),
+                            Math.Round(FMSC.Core.Convert.ToHectare(TotalGpsError, Area.MeterSq), 2),
                             Environment.NewLine);
 
                         GpsAreaError = TotalGpsError / polygon.Area * 100.0;
-                        sb.AppendFormat("GPS Contribution Ratio of area-error-area to area is: {0:0.00}%.{1}{1}",
+                        sb.AppendFormat("GPS Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
                             Math.Round(GpsAreaError, 2),
                             Environment.NewLine);
                     }
 
                     if (TotalTraverseError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                     {
-                        sb.AppendFormat("Traverse Contribution: {0:0.000} Ha ({1:0.00} ac){2}",
-                            Math.Round(FMSC.Core.Convert.ToHectare(TotalTraverseError, Area.MeterSq), 2),
+                        sb.AppendFormat("Traverse Contribution: {0:F3} Ac ({1:F2} Ha){2}",
                             Math.Round(FMSC.Core.Convert.ToAcre(TotalTraverseError, Area.MeterSq), 2),
+                            Math.Round(FMSC.Core.Convert.ToHectare(TotalTraverseError, Area.MeterSq), 2),
                             Environment.NewLine);
 
                         TraverseAreaError = TotalTraverseError / polygon.Area * 100.0;
-                        sb.AppendFormat("Traverse Contribution Ratio of area-error-area to area is: {0:0.00}%.{1}{1}",
+                        sb.AppendFormat("Traverse Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
                             Math.Round(TraverseAreaError, 2),
                             Environment.NewLine);
                     }

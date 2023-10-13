@@ -7,17 +7,18 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class CreateQuondamsCommand : ITtPointsCommand
     {
-        private TtPolygon _TargetPolygon;
-        private int _StartIndex;
+        private readonly TtPolygon _TargetPolygon;
+        private readonly int _StartIndex;
 
-        private EditTtPointsMultiValueCommand<int> _EditPointsCommand = null;
-        private AddTtPointsCommand _AddPointsCommand;
+        private readonly EditTtPointsMultiValueCommand<int> _EditPointsCommand = null;
+        private readonly AddTtPointsCommand _AddPointsCommand;
 
-        public CreateQuondamsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, TtPolygon targetPoly, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(points)
+        public CreateQuondamsCommand(TtManager manager, IEnumerable<TtPoint> points, TtPolygon targetPoly,
+            int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit) : base(manager, points)
         {
             _TargetPolygon = targetPoly;
 
-            List<TtPoint> polyPoints = pointsManager.GetPoints(_TargetPolygon.CN);
+            List<TtPoint> polyPoints = manager.GetPoints(_TargetPolygon.CN);
 
             List<TtPoint> addPoints = new List<TtPoint>();
             List<TtPoint> editedPoints = new List<TtPoint>();
@@ -45,7 +46,7 @@ namespace TwoTrails.Core.ComponentModel.History
                         ParentPoint = point.OpType == OpType.Quondam ? ((QuondamPoint)point).ParentPoint : point,
                         Polygon = _TargetPolygon,
                         Metadata = point.Metadata,
-                        Group = pointsManager.MainGroup,
+                        Group = manager.MainGroup,
                         OnBoundary = (bndMode == QuondamBoundaryMode.Inherit) ? point.OnBoundary : (bndMode != QuondamBoundaryMode.Off)
                     };
 
@@ -66,10 +67,10 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
 
-            _AddPointsCommand = new AddTtPointsCommand(addPoints, pointsManager);
+            _AddPointsCommand = new AddTtPointsCommand(manager, addPoints);
 
             if (editedPoints.Count > 0)
-                _EditPointsCommand = new EditTtPointsMultiValueCommand<int>(editedPoints, PointProperties.INDEX, editedIndexes);
+                _EditPointsCommand = new EditTtPointsMultiValueCommand<int>(manager, editedPoints, PointProperties.INDEX, editedIndexes);
         }
 
         public override void Redo()

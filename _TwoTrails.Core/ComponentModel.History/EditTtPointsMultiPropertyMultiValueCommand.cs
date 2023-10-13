@@ -11,11 +11,11 @@ namespace TwoTrails.Core.ComponentModel.History
     /// </summary>
     public class EditTtPointsMultiPropertyMultiValueCommand : ITtPointsCommand
     {
-        private List<object> NewValues;
-        private List<object[]> OldValues = new List<object[]>();
-        private List<PropertyInfo> Properties;
+        private readonly List<object> NewValues;
+        private readonly List<object[]> OldValues = new List<object[]>();
+        private readonly List<PropertyInfo> Properties;
 
-        public EditTtPointsMultiPropertyMultiValueCommand(IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues) : base(points)
+        public EditTtPointsMultiPropertyMultiValueCommand(TtManager manager, IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues) : base(manager, points)
         {
             RequireRefresh = properties.Any(p => p == PointProperties.INDEX);
 

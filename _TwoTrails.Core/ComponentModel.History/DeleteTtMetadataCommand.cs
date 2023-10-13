@@ -2,21 +2,16 @@
 {
     public class DeleteTtMetadataCommand : ITtMetadataCommand
     {
-        private TtManager pointsManager;
-
-        public DeleteTtMetadataCommand(TtMetadata metadata, TtManager pointsManager) : base(metadata)
-        {
-            this.pointsManager = pointsManager;
-        }
+        public DeleteTtMetadataCommand(TtManager manager, TtMetadata metadata) : base(manager, metadata) { }
 
         public override void Redo()
         {
-            pointsManager.DeleteMetadata(Metadata);
+            Manager.DeleteMetadata(Metadata);
         }
 
         public override void Undo()
         {
-            pointsManager.AddMetadata(Metadata);
+            Manager.AddMetadata(Metadata);
         }
 
         protected override DataActionType GetActionType() => DataActionType.DeletedMetadata;

@@ -2,22 +2,18 @@
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
     public class RezonePointsCommand : ITtPointsCommand
     {
-        private TtManager _Manager;
         private List<Tuple<GpsPoint, double, double>> NewValues = new List<Tuple<GpsPoint, double, double>>();
         private List<Tuple<GpsPoint, double, double>> OldValues = new List<Tuple<GpsPoint, double, double>>();
         private readonly Guid _ID = Guid.NewGuid();
 
-        public RezonePointsCommand(IEnumerable<GpsPoint> points, TtManager manager) : base(points)
+        public RezonePointsCommand(TtManager manager, IEnumerable<GpsPoint> points) : base(manager, points)
         {
-            _Manager = manager;
-
             foreach (GpsPoint point in Points)
             {
                 //get real lat and lon
@@ -41,7 +37,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 PointProperties.UNADJY.SetValue(tup.Item1, tup.Item3);
             }
 
-            _Manager.AddAction(DataActionType.RezonedPoints, $"{NewValues.Count} points rezoned.", _ID);
+            Manager.AddAction(DataActionType.RezonedPoints, $"{NewValues.Count} points rezoned.", _ID);
         }
 
         public override void Undo()
@@ -52,7 +48,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 PointProperties.UNADJY.SetValue(tup.Item1, tup.Item3);
             }
 
-            _Manager.RemoveAction(_ID);
+            Manager.RemoveAction(_ID);
         }
 
         protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;

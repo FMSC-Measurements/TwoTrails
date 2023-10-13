@@ -2,25 +2,22 @@
 {
     public class DeleteTtPolygonCommand : ITtPolygonCommand
     {
-        private TtManager _Manager;
-        private DeleteTtPointsCommand _DeletePointsCommand;
+        private readonly DeleteTtPointsCommand _DeletePointsCommand;
 
-        public DeleteTtPolygonCommand(TtPolygon polygon, TtManager pointsManager) : base(polygon)
+        public DeleteTtPolygonCommand(TtManager manager, TtPolygon polygon) : base(manager, polygon)
         {
-            this._Manager = pointsManager;
-
-            _DeletePointsCommand = new DeleteTtPointsCommand(pointsManager.GetPoints(polygon.CN), pointsManager);
+            _DeletePointsCommand = new DeleteTtPointsCommand(manager, manager.GetPoints(polygon.CN));
         }
 
         public override void Redo()
         {
             _DeletePointsCommand.Redo();
-            _Manager.DeletePolygon(Polygon);
+            Manager.DeletePolygon(Polygon);
         }
 
         public override void Undo()
         {
-            _Manager.AddPolygon(Polygon);
+            Manager.AddPolygon(Polygon);
             _DeletePointsCommand.Undo();
         }
 

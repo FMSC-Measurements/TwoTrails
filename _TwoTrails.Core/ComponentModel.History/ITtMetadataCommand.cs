@@ -4,12 +4,10 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public abstract class ITtMetadataCommand : ITtBaseCommand
     {
-        public Type DataType => MetadataProperties.DataType;
-
         protected TtMetadata Metadata;
 
 
-        public ITtMetadataCommand(TtMetadata metadata)
+        public ITtMetadataCommand(TtManager manager, TtMetadata metadata) : base(manager)
         {
             this.Metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
         }

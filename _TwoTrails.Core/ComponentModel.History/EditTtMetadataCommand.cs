@@ -4,11 +4,11 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class EditTtMetadataCommand<T> : ITtMetadataCommand
     {
-        private T NewValue;
-        private T OldValue;
-        private PropertyInfo Property;
+        private readonly T NewValue;
+        private readonly T OldValue;
+        private readonly PropertyInfo Property;
 
-        public EditTtMetadataCommand(TtMetadata metadata, PropertyInfo property, T newValue) : base(metadata)
+        public EditTtMetadataCommand(TtManager manager, TtMetadata metadata, PropertyInfo property, T newValue) : base(manager, metadata)
         {
             this.Property = property;
             this.NewValue = newValue;
