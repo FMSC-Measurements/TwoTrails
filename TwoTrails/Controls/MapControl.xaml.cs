@@ -27,9 +27,6 @@ namespace TwoTrails.Controls
         public PolygonGraphicBrushOptions DefaultPolygonGraphicBrushOptions { get; private set; }
 
 
-        private readonly KeyEventHandler KeyDownHandler, KeyUpHandler;
-        public bool CtrlKeyPressed { get; private set; }
-
         public bool HasManager => Manager != null;
 
         public TtMapManager MapManager { get; private set; }
@@ -40,7 +37,6 @@ namespace TwoTrails.Controls
         public MapControl()
         {
             this.Loaded += OnLoaded;
-            this.Unloaded += OnUnloaded;
 
             InitializeComponent();
 
@@ -49,9 +45,6 @@ namespace TwoTrails.Controls
 
             map.CredentialsProvider = new ApplicationIdCredentialsProvider(APIKeys.BING_MAPS_API_KEY);
             map.Mode = new AerialMode();
-
-            KeyDownHandler = new KeyEventHandler(OnKeyDown);
-            KeyUpHandler = new KeyEventHandler(OnKeyUp);
         }
 
         public MapControl(TtProject project) : this()
@@ -68,20 +61,9 @@ namespace TwoTrails.Controls
                 DefaultPolygonGraphicBrushOptions = new PolygonGraphicBrushOptions(null, Manager.GetDefaultPolygonGraphicOption());
                 PolygonVisibilityControl = new PolygonVisibilityControl(MapManager.PolygonManagers, DefaultPolygonGraphicBrushOptions);
                 DataContext = this;
-
-                AddHandler(MapControl.KeyDownEvent, KeyDownHandler);
-                AddHandler(MapControl.KeyUpEvent, KeyUpHandler);
             }
 
             this.Loaded -= OnLoaded;
-        }
-
-        private void OnUnloaded(object sender, EventArgs e)
-        {
-            RemoveHandler(MapControl.KeyDownEvent, KeyDownHandler);
-            RemoveHandler(MapControl.KeyUpEvent, KeyUpHandler);
-
-            this.Unloaded -= OnUnloaded;
         }
 
 
@@ -108,19 +90,6 @@ namespace TwoTrails.Controls
 
                 tbLoc.Text = $"[{ coords.Zone }]  X: { coords.X:F2}  Y: { coords.Y:F2}";
             }
-        }
-
-
-        private void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftCtrl)
-                CtrlKeyPressed = true;
-        }
-
-        private void OnKeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftCtrl)
-                CtrlKeyPressed = false;
         }
 
 

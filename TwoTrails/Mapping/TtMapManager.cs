@@ -104,7 +104,7 @@ namespace TwoTrails.Mapping
 
         private void TtMapPolygonManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!SettingVisibilities && _MapControl.CtrlKeyPressed && e.PropertyName == nameof(TtMapPolygonManager.Visible) &&
+            if (!SettingVisibilities && e.PropertyName == nameof(TtMapPolygonManager.Visible) && Keyboard.IsKeyDown(Key.LeftCtrl) &&
                 sender is TtMapPolygonManager mapPolyManager)
             {
                 SettingVisibilities = true;

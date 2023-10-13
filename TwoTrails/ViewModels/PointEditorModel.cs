@@ -33,55 +33,6 @@ namespace TwoTrails.ViewModels
 {
     public class PointEditorModel : BaseModel
     {
-        #region Vars
-        private readonly string[] SelectionChangedProperties = new string[]
-        {
-            nameof(HasSelection),
-            nameof(SelectedPoint),
-            nameof(SelectedPoints),
-            nameof(MultipleSelections),
-            nameof(OnlyGpsTypes),
-            nameof(OnlyTravTypes),
-            nameof(OnlyManAccTypes),
-            nameof(OnlyQuondams),
-            nameof(HasPossibleCorridor),
-            nameof(HasPossibleDoubleSidedCorridor),
-            nameof(ConvertTypeHeader),
-            nameof(PID),
-            nameof(SamePID),
-            nameof(Index),
-            nameof(SameIndex),
-            nameof(Polygon),
-            nameof(SamePolygon),
-            nameof(Metadata),
-            nameof(SameMetadata),
-            nameof(Group),
-            nameof(SameGroup),
-            nameof(OnBoundary),
-            nameof(SameOnBound),
-            nameof(UnAdjX),
-            nameof(SameUnAdjX),
-            nameof(UnAdjY),
-            nameof(SameUnAdjY),
-            nameof(UnAdjZ),
-            nameof(SameUnAdjZ),
-            nameof(ManAcc),
-            nameof(SameManAcc),
-            nameof(FwdAz),
-            nameof(SameFwdAz),
-            nameof(BkAz),
-            nameof(SameBkAz),
-            nameof(SlpAng),
-            nameof(SameSlpAng),
-            nameof(SlpDist),
-            nameof(SameSlpDist),
-            nameof(ParentPoint),
-            nameof(SameParentPoint),
-            nameof(Comment),
-            nameof(SameComment)
-        };
-        #endregion
-
         #region Commands
         public ICommand RefreshPoints { get; }
 
@@ -109,9 +60,11 @@ namespace TwoTrails.ViewModels
         public RelayCommand ModifyDataDictionaryCommand { get; }
 
         public BindedRelayCommand<PointEditorModel> RezonePointsCommand { get; }
+        public BindedRelayCommand<PointEditorModel> RezoneAllPointsCommand { get; }
         public BindedRelayCommand<PointEditorModel> DewebPointsCommand { get; }
         public BindedRelayCommand<PointEditorModel> PointMinimizationCommand { get; }
 
+        public RelayCommand SelectByTypeCommand { get; }
         public RelayCommand SelectAlternateCommand { get; }
         public RelayCommand SelectGpsCommand { get; }
         public RelayCommand SelectTravCommand { get; }
@@ -1026,6 +979,10 @@ namespace TwoTrails.ViewModels
                 x => RezonePoints(), x => HasSelection,
                 this, m => m.HasSelection);
 
+            RezoneAllPointsCommand = new BindedRelayCommand<PointEditorModel>(
+                x => RezonePoints(true), x => Points.Count > 0,
+                this, m => m.Points);
+
             DewebPointsCommand = new BindedRelayCommand<PointEditorModel>(
                 x => DewebPoints(),
                 x => MultipleSelections && SamePolygon,
@@ -1036,9 +993,11 @@ namespace TwoTrails.ViewModels
                 x => Polygons.Count > 0,
                 this, m => new { m.Polygons.Count });
 
-#endregion
+            #endregion
 
             #region Selections
+            SelectByTypeCommand = new RelayCommand(x => SelectByType(x));
+
             SelectAlternateCommand = new RelayCommand(x => SelectAlternate());
 
             SelectGpsCommand = new RelayCommand(x => SelectGps());
@@ -1334,10 +1293,12 @@ namespace TwoTrails.ViewModels
 
         private void Polygon_ItemCheckedChanged(object sender, EventArgs e)
         {
-            if (_ProjectEditor.CtrlKeyPressed)
+            if (Keyboard.IsKeyDown(Key.LeftCtrl))
                 OnlyCheckThisItem(sender, ref _CheckedPolygons, ref _Polygons);
             else
                 UpdateCheckedItems(sender, ref _CheckedPolygons, ref _Polygons);
+
+            OnPropertyChanged(nameof(Polygons));
         }
 
 
@@ -1374,7 +1335,7 @@ namespace TwoTrails.ViewModels
 
         private void Metadata_ItemCheckedChanged(object sender, EventArgs e)
         {
-            if (_ProjectEditor.CtrlKeyPressed)
+            if (Keyboard.IsKeyDown(Key.LeftCtrl))
                 OnlyCheckThisItem(sender, ref _CheckedMetadata, ref _Metadatas);
             else
                 UpdateCheckedItems(sender, ref _CheckedMetadata, ref _Metadatas);
@@ -1414,7 +1375,7 @@ namespace TwoTrails.ViewModels
 
         private void Groups_ItemCheckedChanged(object sender, EventArgs e)
         {
-            if (_ProjectEditor.CtrlKeyPressed)
+            if (Keyboard.IsKeyDown(Key.LeftCtrl))
                 OnlyCheckThisItem(sender, ref _CheckedGroups, ref _Groups);
             else
                 UpdateCheckedItems(sender, ref _CheckedGroups, ref _Groups);
@@ -1501,7 +1462,7 @@ namespace TwoTrails.ViewModels
             {
                 if (cp.Item != "All")
                 {
-                    if (_ProjectEditor.CtrlKeyPressed)
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
                     {
                         foreach (CheckedListItem<string> item in _OpTypes)
                         {
@@ -2636,6 +2597,7 @@ namespace TwoTrails.ViewModels
         }
         #endregion
 
+
         #region Sort
         public void SortByPID()
         {
@@ -2663,6 +2625,7 @@ namespace TwoTrails.ViewModels
             }
         }
         #endregion
+
 
         #region Info Tools
 
@@ -2768,9 +2731,12 @@ namespace TwoTrails.ViewModels
 
 
         #region Advanced
-        private void RezonePoints()
+        private void RezonePoints(bool rezoneAllPoints = false)
         {
-            List<GpsPoint> points = GetSortedSelectedPoints(x => x.IsGpsType()).Cast<GpsPoint>().ToList();
+            List<GpsPoint> points = (rezoneAllPoints ?
+                    Manager.GetPoints().Where(p => p.IsGpsType()) :
+                    GetSortedSelectedPoints(x => x.IsGpsType()))
+                .Cast<GpsPoint>().ToList();
 
             if (points.Count > 0)
             {
@@ -2807,7 +2773,7 @@ namespace TwoTrails.ViewModels
         {
             List<TtPoint> points;
 
-            if (SelectedPoints.Count > 1)
+            if (SelectedPoints.Count > 1 && !Keyboard.IsKeyDown(Key.LeftCtrl))
             {
                 points = new List<TtPoint>(SelectedPoints.Cast<TtPoint>());
                 points.Sort();
@@ -2821,6 +2787,30 @@ namespace TwoTrails.ViewModels
         private void DeselectAll()
         {
             SelectedPoints.Clear();
+        }
+
+
+        private void SelectByType(object obj)
+        {
+            if (obj is OpType opType)
+            {
+
+                List<TtPoint> points = GetEditSelectionPoints();
+
+                ignoreSelectionChange = true;
+
+                SelectedPoints.Clear();
+
+                foreach (TtPoint point in points)
+                {
+                    if (point.OpType == opType)
+                        SelectedPoints.Add(point);
+                }
+
+                ignoreSelectionChange = false;
+
+                OnSelectionChanged();
+            }
         }
 
         private void SelectAlternate()
@@ -2982,7 +2972,7 @@ namespace TwoTrails.ViewModels
                 CreateDataGridTextColumn(nameof(TtPoint.Index)),
                 CreateDataGridTextColumn(nameof(TtPoint.PID)),
                 CreateDataGridTextColumn(nameof(TtPoint.OpType)),
-                CreateDataGridTextColumn(nameof(TtPoint.Polygon), "Polygon.Name", 100),
+                CreateDataGridTextColumn(nameof(TtPoint.Polygon), "Polygon.Name"),
                 CreateDataGridTextColumn("OnBound", nameof(TtPoint.OnBoundary)),
                 CreateDataGridTextColumn(nameof(TtPoint.AdjX), stringFormat: defaultNumberFormat),
                 CreateDataGridTextColumn(nameof(TtPoint.AdjY), stringFormat: defaultNumberFormat),
@@ -3033,15 +3023,6 @@ namespace TwoTrails.ViewModels
                 VisibleFields,
                 new RelayCommand(x => dataGridTextColumn.Visibility = Visibility.Collapsed),
                 new RelayCommand(x => CopyColumnValues(binding ?? name)));
-
-            //dataGridTextColumn.Header = new ColumnHeader()
-            //{
-            //    Column = dataGridTextColumn,
-            //    Name = name,
-            //    HideColumn = new RelayCommand(x => dataGridTextColumn.Visibility = Visibility.Collapsed),
-            //    CopyColumnValues = new RelayCommand(x => CopyColumnValues(binding ?? name)),
-            //    VisibleFields = VisibleFields
-            //};
 
             return Tuple.Create(dataGridTextColumn, name);
         }

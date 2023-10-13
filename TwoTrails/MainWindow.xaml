@@ -176,6 +176,19 @@
                     </MenuItem>
 
                     <MenuItem Header="Selections" IsEnabled="{Binding HasOpenedProject}">
+
+                        <MenuItem Header="Operation">
+                            <MenuItem Header="GPS" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.GPS}"/>
+                            <MenuItem Header="Take5" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.Take5}"/>
+                            <MenuItem Header="Walk" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.Walk}"/>
+                            <MenuItem Header="WayPoint" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.WayPoint}"/>
+                            <MenuItem Header="SideShot" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.SideShot}"/>
+                            <MenuItem Header="Traverse" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.Traverse}"/>
+                            <MenuItem Header="Quondam" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.Quondam}"/>
+                        </MenuItem>
+                        
+                        <Separator/>
+                        
                         <MenuItem Header="Alternate Points" Command="{Binding PointEditor.SelectAlternateCommand}"/>
                         <MenuItem Header="Gps Type Points" Command="{Binding PointEditor.SelectGpsCommand}"/>
                         <MenuItem Header="Traverse &amp; Sideshot Points" Command="{Binding PointEditor.SelectTravCommand}"/>
@@ -248,6 +261,7 @@
 
                     <MenuItem Header="Advanced" IsEnabled="{Binding HasOpenedProject}">
                         <MenuItem Header="Rezone Points" Command="{Binding PointEditor.RezonePointsCommand}"/>
+                        <MenuItem Header="Rezone All Points" Command="{Binding PointEditor.RezoneAllPointsCommand}"/>
                         <MenuItem Header="Deweb Points" Command="{Binding PointEditor.DewebPointsCommand}"/>
                         <MenuItem Header="Point Minimization" Command="{Binding PointEditor.PointMinimizationCommand}"
                                   Visibility="{Binding CurrentProject.Settings.IsAdvancedMode, Converter={StaticResource BoolToVis}}"/>

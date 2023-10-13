@@ -199,7 +199,8 @@ namespace TwoTrails
 
         private void PointEditor_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ProjectEditor.PointEditor.SelectedPoints))
+            if (e.PropertyName == nameof(ProjectEditor.PointEditor.SelectedPoints) ||
+                e.PropertyName == nameof(ProjectEditor.PointEditor.Polygons))
             {
                 OnPropertyChanged(nameof(TabInfo));
             }

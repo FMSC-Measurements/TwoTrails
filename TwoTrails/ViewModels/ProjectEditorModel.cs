@@ -92,10 +92,6 @@ namespace TwoTrails.ViewModels
         public bool IsMapWindowOpen => MapWindow != null;
 
 
-        private readonly KeyEventHandler KeyDownHandler, KeyUpHandler;
-        public bool CtrlKeyPressed { get; private set; }
-
-
         public ReadOnlyObservableCollection<TtPolygon> Polygons => Manager.Polygons;
         public ListCollectionView PolygonsLVC { get; }
 
@@ -266,14 +262,6 @@ namespace TwoTrails.ViewModels
             if (MediaInfo != null && MediaInfo.Count > 0)
                 CurrentMediaInfo = MediaInfo[0];
 
-
-
-            KeyDownHandler = new KeyEventHandler(OnKeyDown);
-            KeyUpHandler = new KeyEventHandler(OnKeyUp);
-
-            PointEditorControl.AddHandler(PointEditorControl.KeyDownEvent, KeyDownHandler);
-            PointEditorControl.AddHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
-
             Project.Settings.PropertyChanged += (s, pce) =>
             {
                 if (pce.PropertyName == nameof(TtSettings.SortPolysByName))
@@ -309,9 +297,6 @@ namespace TwoTrails.ViewModels
 
             if (_CurrentPolygon != null)
                 _CurrentPolygon.PolygonChanged -= GeneratePolygonSummaryAndStats;
-
-            PointEditorControl.RemoveHandler(PointEditorControl.KeyDownEvent, KeyDownHandler);
-            PointEditorControl.RemoveHandler(PointEditorControl.KeyUpEvent, KeyUpHandler);
         }
 
 
@@ -343,20 +328,6 @@ namespace TwoTrails.ViewModels
                 }
             }
         }
-
-
-        private void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftCtrl)
-                CtrlKeyPressed = true;
-        }
-
-        private void OnKeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftCtrl)
-                CtrlKeyPressed = false;
-        }
-
 
         private void CloseWindows()
         {
