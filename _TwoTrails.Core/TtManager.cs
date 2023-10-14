@@ -1320,7 +1320,7 @@ namespace TwoTrails.Core
                     throw new Exception("Some points already exist");
 
                 TtPoint lastPoint = null;
-                IList<TtPoint> points = null;
+                List<TtPoint> points = null;
 
                 List<String> polysToAdjustTravsIn = new List<string>();
                 List<string> polysToAdjust = new List<string>();
@@ -1439,7 +1439,7 @@ namespace TwoTrails.Core
                     throw new Exception("Some points don't exist");
 
                 TtPoint lastPoint = null;
-                IList<TtPoint> points = null;
+                List<TtPoint> points = null;
 
                 List<TtPolygon> polysToAdjustTravsIn = new List<TtPolygon>();
 

@@ -456,17 +456,12 @@ namespace TwoTrails.ViewModels
             if (ShouldCancel())
                 return;
 
-            if (addPoints.Count > 100 && MessageBox.Show($"{addPoints.Count} will be generated. Would you like to continue?",
-                "Massive point generation", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
-            {
-                CancelGeneration();
-                ShouldCancel();
+            if (addPoints.Count > 100 && PromptToCancel(addPoints.Count))
                 return;
-            }
 
             if (addPoints.Count > 0)
             {
-                List<TtPoint> wayPoints = new List<TtPoint>();
+                Dictionary<string, TtPoint> wayPoints = new Dictionary<string, TtPoint>();
                 WayPoint curr, prev = null;
                 int index = 0;
 
@@ -484,15 +479,15 @@ namespace TwoTrails.ViewModels
                         PID = PointNamer.NamePoint(poly, prev)
                     };
 
-                    while (_Manager.PointExists(curr.CN))
+                    while (_Manager.PointExists(curr.CN) || wayPoints.ContainsKey(curr.CN))
                         curr.CN = Guid.NewGuid().ToString();
 
-                    wayPoints.Add(curr);
+                    wayPoints.Add(curr.CN, curr);
                     prev = curr;
                     j++;
                 }
 
-                _Manager.AddPoints(wayPoints);
+                _Manager.AddPoints(wayPoints.Values);
 
                 CommitNewPlots($"Created {wayPoints.Count} plot points in {poly.Name}");
                 OnGenerationFinished($"{wayPoints.Count} plots created");
@@ -522,8 +517,7 @@ namespace TwoTrails.ViewModels
             }).ToList();
 
 
-            if (ShouldCancel())
-                return;
+            if (ShouldCancel()) return;
 
             TtMetadata defMeta = _Manager.DefaultMetadata;
 
@@ -534,8 +528,7 @@ namespace TwoTrails.ViewModels
                     p.Item2))
                 .ToList();
 
-            if (ShouldCancel())
-                return;
+            if (ShouldCancel()) return;
 
             List<Point> allPoints = polyIncudePoints.SelectMany(pts => pts.Item2).ToList(); ;
 
@@ -543,8 +536,7 @@ namespace TwoTrails.ViewModels
             builder.Include(allPoints);
             UtmExtent totalExtents = builder.Build();
 
-            if (ShouldCancel())
-                return;
+            if (ShouldCancel()) return;
 
             Random rand = new Random();
             UTMCoords startCoords = SelectedPoint != null ?
@@ -557,19 +549,16 @@ namespace TwoTrails.ViewModels
 
             PolygonCalculator.Boundaries totalPolyBnds = new PolygonCalculator(allPoints).PointBoundaries;
 
-            if (ShouldCancel())
-                return;
+            if (ShouldCancel()) return;
 
             List<Tuple<TtPolygon, PolygonCalculator, string>> polyIncludeCalcs = polyIncudePoints.Select(pp => Tuple.Create(pp.Item1, new PolygonCalculator(pp.Item2), pp.Item3)).ToList();
 
-            if (ShouldCancel())
-                return;
+            if (ShouldCancel()) return;
 
             List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.OnBoundary))
                                                     .Select(pp => new PolygonCalculator(pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint()))).ToList();
 
-            if (ShouldCancel())
-                return;
+            if (ShouldCancel()) return;
 
             Point farCorner = TtUtils.GetFarthestCorner(
                 startCoords.X, startCoords.Y,
@@ -634,8 +623,7 @@ namespace TwoTrails.ViewModels
                                 }
                             }
 
-                            if (ShouldCancel())
-                                return;
+                            if (ShouldCancel()) return;
                         }
                     }
                 }
@@ -655,20 +643,14 @@ namespace TwoTrails.ViewModels
                 }
             }
 
-            if (ShouldCancel())
-                return;
+            if (ShouldCancel()) return;
 
-            List<TtPoint> wayPoints = new List<TtPoint>();
+            Dictionary<string, TtPoint> wayPoints = new Dictionary<string, TtPoint>();
             int polysAdded = 0;
 
             int totalPlots = addPoints.Sum(pp => pp.Value.Item2.Count);
-            if (totalPlots > 500 && MessageBox.Show($"{totalPlots} will be generated. Would you like to continue?",
-                "Massive point generation", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
-            {
-                CancelGeneration();
-                ShouldCancel();
+            if (totalPlots > 500 && PromptToCancel(totalPlots))
                 return;
-            }
 
             foreach (Tuple<TtPolygon, List<Point>> polypts in addPoints.Values)
             {
@@ -695,20 +677,20 @@ namespace TwoTrails.ViewModels
                         PID = PointNamer.NamePoint(polypts.Item1, prev)
                     };
 
-                    while (_Manager.PointExists(curr.CN))
+                    while (_Manager.PointExists(curr.CN) || wayPoints.ContainsKey(curr.CN))
                         curr.CN = Guid.NewGuid().ToString();
 
-                    wayPoints.Add(curr);
+                    wayPoints.Add(curr.CN, curr);
                     prev = curr;
                     j++;
                 }
-
-                _Manager.AddPoints(wayPoints); 
             }
+
+            _Manager.AddPoints(wayPoints.Values);
 
             if (wayPoints.Count > 0)
             {
-                CommitNewPlots($"Created {wayPoints.Count} plot points in {(polysAdded > 1 ? $"{polysAdded} units" : $"unit {wayPoints[0].Polygon.Name}")}");
+                CommitNewPlots($"Created {wayPoints.Count} plot points in {(polysAdded > 1 ? $"{polysAdded} units" : $"unit {wayPoints.Values.First().Polygon.Name}")}");
                 OnGenerationFinished($"{wayPoints.Count} plots created");
             }
             else
@@ -750,6 +732,32 @@ namespace TwoTrails.ViewModels
             {
                 _CancellationTokenSource.Cancel();
             }
+        }
+
+        private bool PromptToCancel(int totalPlots)
+        {
+            SetWindowEnabled(false);
+
+            if (MessageBox.Show($"{totalPlots} will be generated. This may take a while and TwoTrails may look frozen. Would you like to continue?",
+                "Massive point generation", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+            {
+                CancelGeneration();
+                ShouldCancel();
+                SetWindowEnabled(true);
+                return true;
+            }
+
+            SetWindowEnabled(true);
+
+            return false;
+        }
+
+        private void SetWindowEnabled(bool enabled)
+        {
+            _CurrentDispatcher.Invoke(() =>
+            {
+                _Window.IsEnabled = enabled;
+            });
         }
     }
 

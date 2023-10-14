@@ -21,6 +21,7 @@
             _DeletePointsCommand.Undo();
         }
 
+        protected override int GetAffectedItemCount() => (_DeletePointsCommand != null ? _DeletePointsCommand.CommandInfo.AffectedItems : 0) + 1;
         protected override DataActionType GetActionType() => DataActionType.DeletedPolygons | _DeletePointsCommand.CommandInfo.ActionType;
         protected override string GetCommandInfoDescription() => $"Delete polygon {Polygon.Name} ({_DeletePointsCommand.CommandInfo.AffectedItems} points affected)";
     }

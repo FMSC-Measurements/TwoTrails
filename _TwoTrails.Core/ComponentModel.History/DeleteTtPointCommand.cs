@@ -92,7 +92,7 @@ namespace TwoTrails.Core.ComponentModel.History
         }
 
 
-        protected override int GetAffectedItemCount() => _ConvertedPoints.Count + 1;
+        protected override int GetAffectedItemCount() => (_ConvertedPoints != null ? _ConvertedPoints.Count : 0) + 1;
         protected override DataActionType GetActionType() => DataActionType.DeletedPoints;
         protected override string GetCommandInfoDescription() => $"Delete Point {Point.PID}";
     }
