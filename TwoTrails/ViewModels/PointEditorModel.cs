@@ -65,7 +65,7 @@ namespace TwoTrails.ViewModels
 
         public RelayCommand SelectByTypeCommand { get; }
         public RelayCommand SelectAlternateCommand { get; }
-        public RelayCommand SelectGpsCommand { get; }
+        public RelayCommand SelectGpsTypeCommand { get; }
         public RelayCommand SelectTravCommand { get; }
         public RelayCommand SelectInverseCommand { get; }
         public RelayCommand DeselectCommand { get; }
@@ -997,21 +997,21 @@ namespace TwoTrails.ViewModels
             #region Selections
             SelectByTypeCommand = new RelayCommand(x => SelectByType(x));
 
-            SelectAlternateCommand = new RelayCommand(x => SelectAlternate());
+            SelectAlternateCommand = new RelayCommand(x => SelectAlternate(x));
 
-            SelectGpsCommand = new RelayCommand(x => SelectGps());
+            SelectGpsTypeCommand = new RelayCommand(x => SelectGpsType(x));
 
-            SelectTravCommand = new RelayCommand(x => SelectTraverse());
+            SelectTravCommand = new RelayCommand(x => SelectTraverse(x));
 
             SelectInverseCommand = new RelayCommand(x => SelectInverse());
 
             DeselectCommand = new RelayCommand(x => DeselectAll());
 
-            SelectNon3DPointsCommand = new RelayCommand(x => SelectNon3DPoints());
+            SelectNon3DPointsCommand = new RelayCommand(x => SelectNon3DPoints(x));
 
-            SelectNonDiffPointsCommand = new RelayCommand(x => SelectNonDiffPoints());
+            SelectNonDiffPointsCommand = new RelayCommand(x => SelectNonDiffPoints(x));
 
-            SelectGpsPointsWithoutNmeaCommand = new RelayCommand(x => SelectGpsPointsWithoutNmea());
+            SelectGpsPointsWithoutNmeaCommand = new RelayCommand(x => SelectGpsPointsWithoutNmea(x));
             #endregion
 
             #region Copy Export Info
@@ -2768,11 +2768,11 @@ namespace TwoTrails.ViewModels
 
 
         #region Selections
-        private List<TtPoint> GetEditSelectionPoints()
+        private List<TtPoint> GetEditSelectionPoints(bool ignoreCtrl = false)
         {
             List<TtPoint> points;
 
-            if (SelectedPoints.Count > 1 && !Keyboard.IsKeyDown(Key.LeftCtrl))
+            if (SelectedPoints.Count > 1 && (ignoreCtrl || !Keyboard.IsKeyDown(Key.LeftCtrl)))
             {
                 points = new List<TtPoint>(SelectedPoints.Cast<TtPoint>());
                 points.Sort();
@@ -2793,7 +2793,6 @@ namespace TwoTrails.ViewModels
         {
             if (obj is OpType opType)
             {
-
                 List<TtPoint> points = GetEditSelectionPoints();
 
                 ignoreSelectionChange = true;
@@ -2812,9 +2811,9 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void SelectAlternate()
+        private void SelectAlternate(object obj)
         {
-            List<TtPoint> points = GetEditSelectionPoints();
+            List<TtPoint> points = GetEditSelectionPoints(obj is bool b && b);
 
             ignoreSelectionChange = true;
 
@@ -2834,9 +2833,9 @@ namespace TwoTrails.ViewModels
             OnSelectionChanged();
         }
 
-        private void SelectGps()
+        private void SelectGpsType(object obj)
         {
-            List<TtPoint> points = GetEditSelectionPoints();
+            List<TtPoint> points = GetEditSelectionPoints(obj is bool b && b);
 
             ignoreSelectionChange = true;
 
@@ -2853,9 +2852,9 @@ namespace TwoTrails.ViewModels
             OnSelectionChanged();
         }
 
-        private void SelectTraverse()
+        private void SelectTraverse(object obj)
         {
-            List<TtPoint> points = GetEditSelectionPoints();
+            List<TtPoint> points = GetEditSelectionPoints(obj is bool b && b);
 
             ignoreSelectionChange = true;
 
@@ -2892,10 +2891,9 @@ namespace TwoTrails.ViewModels
             OnSelectionChanged();
         }
 
-        private void SelectNon3DPoints()
+        private void SelectNon3DPoints(object obj)
         {
-            List<TtPoint> points = (MultipleSelections ? SelectedPoints : VisiblePoints)
-                .Cast<TtPoint>().Where(p => p.IsGpsType()).ToList();
+            List<TtPoint> points = GetEditSelectionPoints(obj is bool b && b);
 
             ignoreSelectionChange = true;
 
@@ -2903,7 +2901,7 @@ namespace TwoTrails.ViewModels
 
             foreach (GpsPoint point in points)
             {
-                if (Manager.BaseManager.GetNmeaBursts(point.CN).Any(b => b.IsUsed && b.Fix != Fix._3D))
+                if (Manager.BaseManager.GetNmeaBursts(point.CN).Any(nb => nb.IsUsed && nb.Fix != Fix._3D))
                 {
                     SelectedPoints.Add(point);
                 }
@@ -2914,10 +2912,9 @@ namespace TwoTrails.ViewModels
             OnSelectionChanged();
         }
         
-        private void SelectNonDiffPoints()
+        private void SelectNonDiffPoints(object obj)
         {
-            List<TtPoint> points = (MultipleSelections ? SelectedPoints : VisiblePoints)
-                .Cast<TtPoint>().Where(p => p.IsGpsType()).ToList();
+            List<TtPoint> points = GetEditSelectionPoints(obj is bool b && b);
 
             ignoreSelectionChange = true;
 
@@ -2925,7 +2922,7 @@ namespace TwoTrails.ViewModels
 
             foreach (GpsPoint point in points)
             {
-                if (Manager.BaseManager.GetNmeaBursts(point.CN).Any(b => b.IsUsed && b.FixQuality != GpsFixType.DGPS))
+                if (Manager.BaseManager.GetNmeaBursts(point.CN).Any(nb => nb.IsUsed && nb.FixQuality != GpsFixType.DGPS))
                 {
                     SelectedPoints.Add(point);
                 }
@@ -2936,10 +2933,9 @@ namespace TwoTrails.ViewModels
             OnSelectionChanged();
         }
 
-        private void SelectGpsPointsWithoutNmea()
+        private void SelectGpsPointsWithoutNmea(object obj)
         {
-            List<TtPoint> points = (MultipleSelections ? SelectedPoints : VisiblePoints)
-                .Cast<TtPoint>().Where(p => p.IsGpsType()).ToList();
+            List<TtPoint> points = GetEditSelectionPoints(obj is bool b && b);
 
             ignoreSelectionChange = true;
 

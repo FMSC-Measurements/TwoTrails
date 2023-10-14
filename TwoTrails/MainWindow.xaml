@@ -190,7 +190,7 @@
                         <Separator/>
 
                         <MenuItem Header="Alternate Points" Command="{Binding PointEditor.SelectAlternateCommand}"/>
-                        <MenuItem Header="Gps Type Points" Command="{Binding PointEditor.SelectGpsCommand}"/>
+                        <MenuItem Header="Gps Type Points" Command="{Binding PointEditor.SelectGpsTypeCommand}"/>
                         <MenuItem Header="Traverse &amp; Sideshot Points" Command="{Binding PointEditor.SelectTravCommand}"/>
                         <MenuItem Header="Inverse Selection" Command="{Binding PointEditor.SelectInverseCommand}"/>
                         <MenuItem Header="Deselect All" Command="{Binding PointEditor.DeselectCommand}"/>
