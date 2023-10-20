@@ -98,12 +98,12 @@
                         <CheckBox Grid.Column="1" Grid.Row="4" IsChecked="{Binding RespectCurves}" IsEnabled="False"
                           ToolTip="Do not try and minimize points on continuous curves of the boundary"/>
 
-                        <TextBlock Text="Minimum Angle" Grid.Column="0" Grid.Row="5"/>
+                        <TextBlock Text="Minimization Angle" Grid.Column="0" Grid.Row="5"/>
                         <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding MinimumAngle, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble"
                           ToolTip="Minimum angle to adjust for (45&#176; is recommended)"/>
 
-                        <TextBlock Text="Minimum Distance" Grid.Column="0" Grid.Row="6"/>
+                        <TextBlock Text="Minimization Distance" Grid.Column="0" Grid.Row="6"/>
                         <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding MinimumLegLength, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble">
                             <TextBox.ToolTip>

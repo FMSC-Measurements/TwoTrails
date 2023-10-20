@@ -439,7 +439,7 @@ namespace TwoTrails.Utils
 
                 if (points != null)
                 {
-                    sb.Append("Point (At Exported)");
+                    sb.Append("Point At Exported,");
                 }
 
                 sb.Append("PointCN,");

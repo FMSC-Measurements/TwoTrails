@@ -546,8 +546,7 @@
                                             </Grid>
                                         </GroupBox>
 
-                                        <GroupBox Header="Geometric Error Reduction" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
-                                            Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource BoolToVis}}">
+                                        <GroupBox Header="Geometric Error Reduction" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
                                             <Grid Margin="5,0,5,0">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
@@ -587,7 +586,7 @@
                                                 <TextBlock Grid.Column="5" Grid.Row="2" VerticalAlignment="Center"
                                                            Text="{Binding GERResult.SharpEdgesPercent, StringFormat={}{0:F2}%}"/>
 
-                                                <TextBlock Grid.Column="3" Grid.Row="4" Margin="40 0 0 0" VerticalAlignment="Center" Text="Reduction"
+                                                <TextBlock Grid.Column="3" Grid.Row="4" Margin="40 0 0 0" VerticalAlignment="Center" Text="Reduction Of"
                                                            ToolTip="Reduction from Total GPS Contribution"/>
                                                 <TextBlock Grid.Column="5" Grid.Row="4" VerticalAlignment="Center" Text="{Binding GERResult.TotalReduction, StringFormat={}{0:F3}%}"/>
 

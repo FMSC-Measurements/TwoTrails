@@ -42,94 +42,85 @@ namespace TwoTrails.Core
             Polygon = polygon;
             Legs = new ReadOnlyCollection<TtLeg>(_Legs);
 
-            List<TtPoint> allPoints = manager.GetPoints(polygon.CN);
+            List<TtPoint> points = manager.GetPoints(polygon.CN);
 
-            if (allPoints.Count > 2)
+            if (points.Count > 2)
             {
-                IEnumerable<TtPoint> points = allPoints;//.Where(p => p.OnBoundary);
-                if (points.Count() > 2)
+                StringBuilder sbPoints = new StringBuilder();
+
+                foreach (TtPoint point in points)
+                    ProcessPoint(sbPoints, point, null, showPoints);
+
+                TtPoint sp = null;
+                foreach (TtPoint p in points)
                 {
-                    StringBuilder sbPoints = new StringBuilder();
-
-                    foreach (TtPoint point in points)
-                        ProcessPoint(sbPoints, point, null, showPoints);
-
-                    TtPoint sp = null;
-                    foreach (TtPoint p in points)
+                    if (p.OnBoundary)
                     {
-                        if (p.OnBoundary)
-                        {
-                            sp = p;
-                            break;
-                        }
+                        sp = p;
+                        break;
                     }
+                }
 
-                    if (sp != null && !sp.HasSameAdjLocation(_LastTtBndPt))
-                        _Legs.Add(new TtLeg(_LastTtBndPt, sp));
+                if (sp != null && !sp.HasSameAdjLocation(_LastTtBndPt))
+                    _Legs.Add(new TtLeg(_LastTtBndPt, sp));
 
-                    double perim = 0;
-                    foreach (TtLeg leg in _Legs)
-                    {
-                        TotalGpsError += leg.Error;
-                        perim += leg.LegLength;
-                    }
+                double perim = 0;
+                foreach (TtLeg leg in _Legs)
+                {
+                    TotalGpsError += leg.Error;
+                    perim += leg.LegLength;
+                }
 
-                    StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
                     
-                    sb.AppendFormat("The polygon area is: {0:F3} Ac ({1:F2} Ha).{2}",
-                        Math.Round(polygon.AreaAcres, 2),
-                        Math.Round(polygon.AreaHectaAcres, 2),
-                        Environment.NewLine);
+                sb.AppendFormat("The polygon area is: {0:F3} Ac ({1:F2} Ha).{2}",
+                    Math.Round(polygon.AreaAcres, 2),
+                    Math.Round(polygon.AreaHectaAcres, 2),
+                    Environment.NewLine);
 
-                    sb.AppendFormat("The polygon exterior perimeter is: {0:F2} Ft ({1:F1} M).{2}",
-                        Math.Round(polygon.PerimeterFt, 0),
-                        Math.Round(polygon.Perimeter, 2),
-                        Environment.NewLine);
+                sb.AppendFormat("The polygon exterior perimeter is: {0:F2} Ft ({1:F1} M).{2}",
+                    Math.Round(polygon.PerimeterFt, 0),
+                    Math.Round(polygon.Perimeter, 2),
+                    Environment.NewLine);
 
-                    sb.AppendFormat("The polyline perimeter is: {0:F2} Ft ({1:F1} M).{2}{2}",
-                        Math.Round(polygon.PerimeterLineFt, 0),
-                        Math.Round(polygon.PerimeterLine, 2),
-                        Environment.NewLine);
+                sb.AppendFormat("The polyline perimeter is: {0:F2} Ft ({1:F1} M).{2}{2}",
+                    Math.Round(polygon.PerimeterLineFt, 0),
+                    Math.Round(polygon.PerimeterLine, 2),
+                    Environment.NewLine);
 
-                    if (TotalGpsError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
-                    {
-                        sb.AppendFormat("GPS area-error Contribution: {0:F3} Ac ({1:F2} Ha){2}",
-                            Math.Round(FMSC.Core.Convert.ToAcre(TotalGpsError, Area.MeterSq), 2),
-                            Math.Round(FMSC.Core.Convert.ToHectare(TotalGpsError, Area.MeterSq), 2),
-                            Environment.NewLine);
-
-                        GpsAreaError = TotalGpsError / polygon.Area * 100.0;
-                        sb.AppendFormat("GPS Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
-                            Math.Round(GpsAreaError, 2),
-                            Environment.NewLine);
-                    }
-
-                    if (TotalTraverseError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
-                    {
-                        sb.AppendFormat("Traverse Contribution: {0:F3} Ac ({1:F2} Ha){2}",
-                            Math.Round(FMSC.Core.Convert.ToAcre(TotalTraverseError, Area.MeterSq), 2),
-                            Math.Round(FMSC.Core.Convert.ToHectare(TotalTraverseError, Area.MeterSq), 2),
-                            Environment.NewLine);
-
-                        TraverseAreaError = TotalTraverseError / polygon.Area * 100.0;
-                        sb.AppendFormat("Traverse Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
-                            Math.Round(TraverseAreaError, 2),
-                            Environment.NewLine);
-                    }
-
-                    sb.Append(sbPoints.ToString());
-
-                    SummaryText = sb.ToString();
-
-                    sbPoints.Clear();
-                    sb.Clear();
-                    _LastTtPoint = _LastTtBndPt = _LastTravPoint = _LastGpsPoint = null;
-                }
-                else
+                if (TotalGpsError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
                 {
-                    Result = HaidResult.InsufficientPoints;
-                    SummaryText = "Polygon has Insufficient Points\n\n";
+                    sb.AppendFormat("GPS area-error Contribution: {0:F3} Ac ({1:F2} Ha){2}",
+                        Math.Round(FMSC.Core.Convert.ToAcre(TotalGpsError, Area.MeterSq), 2),
+                        Math.Round(FMSC.Core.Convert.ToHectare(TotalGpsError, Area.MeterSq), 2),
+                        Environment.NewLine);
+
+                    GpsAreaError = TotalGpsError / polygon.Area * 100.0;
+                    sb.AppendFormat("GPS Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
+                        Math.Round(GpsAreaError, 2),
+                        Environment.NewLine);
                 }
+
+                if (TotalTraverseError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
+                {
+                    sb.AppendFormat("Traverse Contribution: {0:F3} Ac ({1:F2} Ha){2}",
+                        Math.Round(FMSC.Core.Convert.ToAcre(TotalTraverseError, Area.MeterSq), 2),
+                        Math.Round(FMSC.Core.Convert.ToHectare(TotalTraverseError, Area.MeterSq), 2),
+                        Environment.NewLine);
+
+                    TraverseAreaError = TotalTraverseError / polygon.Area * 100.0;
+                    sb.AppendFormat("Traverse Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
+                        Math.Round(TraverseAreaError, 2),
+                        Environment.NewLine);
+                }
+
+                sb.Append(sbPoints.ToString());
+
+                SummaryText = sb.ToString();
+
+                sbPoints.Clear();
+                sb.Clear();
+                _LastTtPoint = _LastTtBndPt = _LastTravPoint = _LastGpsPoint = null;
             }
             else
             {

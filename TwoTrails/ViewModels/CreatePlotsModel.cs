@@ -739,7 +739,7 @@ namespace TwoTrails.ViewModels
             SetWindowEnabled(false);
 
             if (MessageBox.Show($"{totalPlots} will be generated. This may take a while and TwoTrails may look frozen. Would you like to continue?",
-                "Massive point generation", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                "Massive point generation", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
             {
                 CancelGeneration();
                 ShouldCancel();
