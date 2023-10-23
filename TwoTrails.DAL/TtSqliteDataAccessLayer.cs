@@ -40,7 +40,7 @@ namespace TwoTrails.DAL
             this._Database = database;
         }
 
-        public static TtSqliteDataAccessLayer Create(string filePath, TtProjectInfo projectInfo)
+        public static TtSqliteDataAccessLayer Create(string filePath, TtProjectInfo projectInfo, TtMetadata defaultMetadata = null)
         {
             if (File.Exists(filePath))
                 File.Delete(filePath);
@@ -65,6 +65,8 @@ namespace TwoTrails.DAL
 
             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(database);
             dal.InsertProjectInfo(projectInfo);
+            if (defaultMetadata != null)
+                dal.InsertMetadata(defaultMetadata);
 
             return dal;
         }

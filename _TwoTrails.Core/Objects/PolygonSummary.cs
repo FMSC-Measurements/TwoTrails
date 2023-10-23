@@ -1,26 +1,24 @@
 ﻿using FMSC.Core;
-using FMSC.Core.ComponentModel;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core
 {
-    public class PolygonSummary : BaseModel
+    public class PolygonSummary
     {
         private TtPoint _LastTtPoint, _LastTtBndPt, _LastTravPoint, _LastGpsPoint;
 
         private List<TtLeg> _Legs = new List<TtLeg>();
 
-        public ReadOnlyCollection<TtLeg> Legs { get; }
-
         private bool traversing = false;
 
         public TtPolygon Polygon { get; }
         public HaidResult Result { get; }
+
+        public GeometricErrorReductionResult GERResult { get; }
 
         public double TotalGpsError { get; private set; } = 0;
         public double TotalTraverseError { get; private set; } = 0;
@@ -40,9 +38,10 @@ namespace TwoTrails.Core
         public PolygonSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false)
         {
             Polygon = polygon;
-            Legs = new ReadOnlyCollection<TtLeg>(_Legs);
 
             List<TtPoint> points = manager.GetPoints(polygon.CN);
+
+            GERResult = new GeometricErrorReductionResult(points.Where(p => p.OnBoundary).ToList(), polygon.Area); 
 
             if (points.Count > 2)
             {
@@ -99,6 +98,13 @@ namespace TwoTrails.Core
                     sb.AppendFormat("GPS Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
                         Math.Round(GpsAreaError, 2),
                         Environment.NewLine);
+
+                    if (GpsAreaError >= 10 && GERResult.AreaError > 0 && GERResult.AreaError < 10)
+                    {
+                        sb.AppendFormat("Geometric Reduction Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
+                        Math.Round(GERResult.AreaError, 2),
+                        Environment.NewLine);
+                    }
                 }
 
                 if (TotalTraverseError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
@@ -120,6 +126,7 @@ namespace TwoTrails.Core
 
                 sbPoints.Clear();
                 sb.Clear();
+                _Legs.Clear();
                 _LastTtPoint = _LastTtBndPt = _LastTravPoint = _LastGpsPoint = null;
             }
             else

@@ -432,43 +432,6 @@ namespace TwoTrails.ViewModels
         public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
         public double TotalPolygonPerimeter { get { return Get<double>(); } set { Set(value); } }
 
-
-        //private AnglePointResult _PolygonAnglePointResult;
-        //public AnglePointResult PolygonAnglePointResult
-        //{
-        //    get => _PolygonAnglePointResult;
-        //    private set {
-        //        SetField(ref _PolygonAnglePointResult, value,
-        //            () => OnPropertyChanged(
-        //                nameof(IsAnglePoint), nameof(AnglePointText),
-        //                nameof(AnglePointToolTip), nameof(AnglePointTextDec)
-        //            ));
-        //    }
-        //}
-
-        //public bool IsAnglePoint => PolygonAnglePointResult == AnglePointResult.Qualifies;
-
-        //public String AnglePointText => IsAnglePoint ? "Qualifies" : "Invalid";
-
-        //public String AnglePointToolTip => IsAnglePoint ? "This unit meets the angle point method requirements." : 
-        //    String.Join("\n", _PolygonAnglePointResult.GetErrorMessages());
-
-        //public String AnglePointTextDec => IsAnglePoint ? "None" : "Underline";
-
-        public GeometricErrorReductionResult _GERResult;
-        public GeometricErrorReductionResult GERResult
-        {
-            get => _GERResult;
-            private set
-            {
-                SetField(ref _GERResult, value);//,
-                    //() => OnPropertyChanged(
-                    //    nameof(IsAnglePoint), nameof(AnglePointText),
-                    //    nameof(AnglePointToolTip), nameof(AnglePointTextDec)
-                    //));
-            }
-        }
-
         public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
 
 
@@ -531,7 +494,6 @@ namespace TwoTrails.ViewModels
         private void GeneratePolygonSummaryAndStats(TtPolygon polygon)
         {
             PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true);
-            GERResult = new GeometricErrorReductionResult(Manager, polygon);
         }
 
 

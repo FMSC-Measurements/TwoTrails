@@ -568,27 +568,27 @@
                                                 </Grid.RowDefinitions>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ac:" ToolTip="Acres"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding GERResult.TotalError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ha:" ToolTip="Hectares"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding GERResult.TotalError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Err Ratio**" ToolTip="Area-Error/Area to be less than 10%"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding GERResult.AreaError, StringFormat={}{0:F3}%}"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.AreaError, StringFormat={}{0:F3}%}"/>
 
                                                 <TextBlock Grid.Column="3" Grid.Row="0" Margin="40 0 0 0" VerticalAlignment="Center" Text="Long Legs"
                                                            ToolTip="Legs longer than 10x the average accuracy of the adjacent points"/>
                                                 <TextBlock Grid.Column="5" Grid.Row="0" VerticalAlignment="Center"
-                                                           Text="{Binding GERResult.LongLegsPercent, StringFormat={}{0:F2}%}"/>
+                                                           Text="{Binding PolygonSummary.GERResult.LongLegsPercent, StringFormat={}{0:F2}%}"/>
 
                                                 <TextBlock Grid.Column="3" Grid.Row="2" Margin="40 0 0 0" VerticalAlignment="Center" Text="Sharp Edges"
                                                            ToolTip="Edges of an angle greater than 45&#186;"/>
                                                 <TextBlock Grid.Column="5" Grid.Row="2" VerticalAlignment="Center"
-                                                           Text="{Binding GERResult.SharpEdgesPercent, StringFormat={}{0:F2}%}"/>
+                                                           Text="{Binding PolygonSummary.GERResult.SharpEdgesPercent, StringFormat={}{0:F2}%}"/>
 
                                                 <TextBlock Grid.Column="3" Grid.Row="4" Margin="40 0 0 0" VerticalAlignment="Center" Text="Reduction Of"
                                                            ToolTip="Reduction from Total GPS Contribution"/>
-                                                <TextBlock Grid.Column="5" Grid.Row="4" VerticalAlignment="Center" Text="{Binding GERResult.TotalReduction, StringFormat={}{0:F3}%}"/>
+                                                <TextBlock Grid.Column="5" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalReduction, StringFormat={}{0:F3}%}"/>
 
                                             </Grid>
                                         </GroupBox>

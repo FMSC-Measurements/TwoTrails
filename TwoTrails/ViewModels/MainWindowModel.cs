@@ -454,7 +454,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             {
                 TtProjectInfo info = dialog.ProjectInfo;
 
-                TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info);
+                TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(dialog.FilePath, info, Settings.MetadataSettings.CreateDefaultMetadata());
                 TtProject proj = new TtProject(dal, null, App.Settings);
                 Trace.WriteLine($"Project Created ({dal.GetDataVersion()}): {dal.FilePath}");
 
