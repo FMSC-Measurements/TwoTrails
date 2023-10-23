@@ -8,10 +8,10 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="CenterOwner"
         Title="Point Minimization Tool"
-        Height="635" MinHeight="300"
-        Width="950" MinWidth="600">
+        Height="655" MinHeight="300"
+        Width="1000" MinWidth="700">
     
     <Window.Resources>
         <fmsccm:EnumDescriptionConverter x:Key="edc"/>
@@ -46,6 +46,10 @@
                 <Style TargetType="CheckBox">
                     <Setter Property="Margin" Value="4, 2.5, 0, 2.5"/>
                 </Style>
+
+                <Style TargetType="RadioButton">
+                    <Setter Property="Margin" Value="4, 2.5, 0, 2.5"/>
+                </Style>
             </Grid.Resources>
 
             <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
@@ -57,6 +61,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -81,30 +86,42 @@
                         <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding LimitBoundaryChange}"
                           ToolTip="Limit the change in boundary location"/>
 
-                        <TextBlock Text="Max Adjust Distance" Grid.Column="0" Grid.Row="3"/>
-                        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding MaximumLegAdjustDist, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
+                        <TextBlock Text="Max Adjust Dist Mode" Grid.Column="0" Grid.Row="3"/>
+                        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center">
+                            <RadioButton Content="Multiplier" IsChecked="{Binding UseMaxDistMultiplier}"
+                                         ToolTip="Max Adjust Distance is a multiplier where the number is multiplied by the point accuracy"/>
+                            <RadioButton Content="Static"
+                                         ToolTip="Max Adjust Distance is an static (absolute) number in meters"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Max Adjust Distance" Grid.Column="0" Grid.Row="4"/>
+                        <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding MaximumLegAdjustDist, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
                          IsEnabled="{Binding LimitBoundaryChange}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble">
                             <TextBox.ToolTip>
                                 <TextBlock>
-                              Maximum Distance a point can be from its original boundary (in meters)
-                              <LineBreak /> 
-                              Default is twice the point accuracy
+                                    Maximum Distance a point can be from its original boundary
+                                <LineBreak /> 
+                                    Multiplier- Number is X time the point accuracy
+                                <LineBreak /> 
+                                    Static- Number is X distance in meters
+                                <LineBreak /> 
+                                    Default is twice the point accuracy
                                 </TextBlock>
                             </TextBox.ToolTip>
                         </TextBox>
 
-                        <TextBlock Text="Respect Curves" Grid.Column="0" Grid.Row="4"/>
-                        <CheckBox Grid.Column="1" Grid.Row="4" IsChecked="{Binding RespectCurves}" IsEnabled="False"
+                        <TextBlock Text="Respect Curves" Grid.Column="0" Grid.Row="5"/>
+                        <CheckBox Grid.Column="1" Grid.Row="5" IsChecked="{Binding RespectCurves}" IsEnabled="False"
                           ToolTip="Do not try and minimize points on continuous curves of the boundary"/>
 
-                        <TextBlock Text="Minimization Angle" Grid.Column="0" Grid.Row="5"/>
-                        <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding MinimumAngle, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBlock Text="Minimization Angle" Grid.Column="0" Grid.Row="6"/>
+                        <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding MinimumAngle, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble"
                           ToolTip="Minimum angle to adjust for (45&#176; is recommended)"/>
 
-                        <TextBlock Text="Minimization Distance" Grid.Column="0" Grid.Row="6"/>
-                        <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding MinimumLegLength, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
+                        <TextBlock Text="Minimization Distance" Grid.Column="0" Grid.Row="7"/>
+                        <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding MinimumLegLength, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble">
                             <TextBox.ToolTip>
                                 <TextBlock>
@@ -115,8 +132,8 @@
                             </TextBox.ToolTip>
                         </TextBox>
 
-                        <TextBlock Text="Accuracy Override" Grid.Column="0" Grid.Row="7"/>
-                        <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding AccuracyOverride, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
+                        <TextBlock Text="Accuracy Override" Grid.Column="0" Grid.Row="8"/>
+                        <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding AccuracyOverride, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble"
                           ToolTip="Override the accuracy of the points" />
 

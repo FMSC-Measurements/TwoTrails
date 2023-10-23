@@ -81,12 +81,27 @@ namespace TwoTrails.ViewModels
         public string TargetPolygonToolTip => TargetPolygon?.ToString();
 
 
-        public double MinimumAngle { get => Get<double>(); set => Set(value, () => AnalyzeTargetPolygon()); }
-        public double? MinimumLegLength { get => Get<double?>(); set => Set(value, () => AnalyzeTargetPolygon()); }
-        public double? MaximumLegAdjustDist { get => Get<double?>(); set => Set(value, () => AnalyzeTargetPolygon()); }
-        public double? AccuracyOverride { get => Get<double?>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+        private double _MinimumAngle;
+        public double MinimumAngle { get => _MinimumAngle; set => SetField(ref _MinimumAngle, value, () => AnalyzeTargetPolygon()); }
 
-        public bool AnalyzeAllPointsInPoly { get => Get<bool>(); set => Set(value, () =>
+
+        private double? _MinimumLegLength;
+        public double? MinimumLegLength { get => _MinimumLegLength; set => SetField(ref _MinimumLegLength, value, () => AnalyzeTargetPolygon()); }
+
+
+        private bool _UseMaxDistMultiplier = true;
+        public bool UseMaxDistMultiplier { get => _UseMaxDistMultiplier; set => SetField(ref _UseMaxDistMultiplier, value, () => AnalyzeTargetPolygon()); }
+
+
+        private double? _MaximumLegAdjustDist;
+        public double? MaximumLegAdjustDist { get => _MaximumLegAdjustDist; set => SetField(ref _MaximumLegAdjustDist, value, () => AnalyzeTargetPolygon()); }
+
+
+        private double? _AccuracyOverride;
+        public double? AccuracyOverride { get => _AccuracyOverride; set => SetField(ref _AccuracyOverride, value, () => AnalyzeTargetPolygon()); }
+
+        private bool _AnalyzeAllPointsInPoly;
+        public bool AnalyzeAllPointsInPoly { get => _AnalyzeAllPointsInPoly; set => SetField( ref _AnalyzeAllPointsInPoly, value, () =>
         {
             if (_OrigPoints != null)
             {
@@ -98,8 +113,13 @@ namespace TwoTrails.ViewModels
             
             AnalyzeTargetPolygon();
         }); }
-        public bool LimitBoundaryChange { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
-        public bool RespectCurves { get => Get<bool>(); set => Set(value, () => AnalyzeTargetPolygon()); }
+
+
+        private bool _LimitBoundaryChange;
+        public bool LimitBoundaryChange { get => _LimitBoundaryChange; set => SetField(ref _LimitBoundaryChange, value, () => AnalyzeTargetPolygon()); }
+
+        private bool _RespectCurves;
+        public bool RespectCurves { get => _RespectCurves; set => SetField(ref _RespectCurves, value, () => AnalyzeTargetPolygon()); }
 
 
         public bool HidePoints {
@@ -229,6 +249,8 @@ namespace TwoTrails.ViewModels
             Map.Children.Add(_MinPoly);
 
             Map.Loaded += OnMapLoaded;
+
+            UseMaxDistMultiplier = true;
 
             TargetPolygon = Polygons.FirstOrDefault();
         }
@@ -484,6 +506,10 @@ namespace TwoTrails.ViewModels
             int segIdx = 0, maxSegIdx = 0, segsCount = segs.Count();
             PMSegment maxSeg = null;
 
+            bool hasMaxAdjustDist = MaximumLegAdjustDist != null;
+            bool useMaxDistMultiplier = UseMaxDistMultiplier;
+            double maxDist = MaximumLegAdjustDist ?? 0;
+
             foreach (PMSegment currSeg in segs)
             {
                 double distFromSESeg = MathEx.DistanceToLine(
@@ -491,7 +517,9 @@ namespace TwoTrails.ViewModels
                     startSeg.CurrCoords.X, startSeg.CurrCoords.Y,
                     endSeg.CurrCoords.X, endSeg.CurrCoords.Y);
 
-                double maxAllowedDistFromSeg = MaximumLegAdjustDist ?? ((AccuracyOverride ?? currSeg.CurrPoint.Accuracy) * 2);
+                double maxAllowedDistFromSeg = hasMaxAdjustDist ? 
+                    (useMaxDistMultiplier ? ((AccuracyOverride ?? currSeg.CurrPoint.Accuracy) * maxDist) : maxDist)
+                    : ((AccuracyOverride ?? currSeg.CurrPoint.Accuracy) * 2);
 
                 if (distFromSESeg > maxAllowedDistFromSeg)
                 {
