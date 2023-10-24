@@ -260,8 +260,8 @@
                     <Separator/>
 
                     <MenuItem Header="Advanced" IsEnabled="{Binding HasOpenedProject}">
-                        <MenuItem Header="Rezone Points" Command="{Binding PointEditor.RezonePointsCommand}"/>
-                        <MenuItem Header="Rezone All Points" Command="{Binding PointEditor.RezoneAllPointsCommand}"/>
+                        <MenuItem Header="Rezone (UTM) Points" Command="{Binding PointEditor.RezonePointsCommand}"/>
+                        <MenuItem Header="Rezone (UTM) All Points" Command="{Binding PointEditor.RezoneAllPointsCommand}"/>
                         <MenuItem Header="Deweb Points" Command="{Binding PointEditor.DewebPointsCommand}"/>
                         <MenuItem Header="Point Minimization" Command="{Binding PointEditor.PointMinimizationCommand}" />
                     </MenuItem>

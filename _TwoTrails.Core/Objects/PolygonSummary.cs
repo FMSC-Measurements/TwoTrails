@@ -101,9 +101,14 @@ namespace TwoTrails.Core
 
                     if (GpsAreaError >= 10 && GERResult.AreaError > 0 && GERResult.AreaError < 10)
                     {
-                        sb.AppendFormat("Geometric Reduction Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
-                        Math.Round(GERResult.AreaError, 2),
-                        Environment.NewLine);
+                        sb.AppendFormat("Geometric area-error Contribution: {0:F3} Ac ({1:F2} Ha){2}",
+                            Math.Round(FMSC.Core.Convert.ToAcre(GERResult.TotalGpsError, Area.MeterSq), 2),
+                            Math.Round(FMSC.Core.Convert.ToHectare(GERResult.TotalGpsError, Area.MeterSq), 2),
+                            Environment.NewLine);
+
+                        sb.AppendFormat("Geometric Error Reduction Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
+                            Math.Round(GERResult.AreaError, 2),
+                            Environment.NewLine);
                     }
                 }
 
