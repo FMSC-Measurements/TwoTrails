@@ -80,7 +80,7 @@
 
                         <TextBlock Text="Analyze All Points" Grid.Column="0" Grid.Row="1"/>
                         <CheckBox Grid.Column="1" Grid.Row="1" IsChecked="{Binding AnalyzeAllPointsInPoly}"
-                          ToolTip="Run minimization on all points instead of the current on boundary points"/>
+                          ToolTip="Run minimization on all points including off boundary points"/>
 
                         <TextBlock Text="Limit Boundary Change" Grid.Column="0" Grid.Row="2"/>
                         <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding LimitBoundaryChange}"
@@ -88,9 +88,9 @@
 
                         <TextBlock Text="Max Adjust Dist Mode" Grid.Column="0" Grid.Row="3"/>
                         <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center">
-                            <RadioButton Content="Multiplier" IsChecked="{Binding UseMaxDistMultiplier}"
+                            <RadioButton Content="Multiplier" IsChecked="{Binding UseMaxDistMultiplier}" IsEnabled="{Binding LimitBoundaryChange}"
                                          ToolTip="Max Adjust Distance is a multiplier where the number is multiplied by the point accuracy"/>
-                            <RadioButton Content="Static"
+                            <RadioButton Content="Static" IsEnabled="{Binding LimitBoundaryChange}"
                                          ToolTip="Max Adjust Distance is an static (absolute) number in meters"/>
                         </StackPanel>
 
@@ -111,8 +111,8 @@
                             </TextBox.ToolTip>
                         </TextBox>
 
-                        <TextBlock Text="Respect Curves" Grid.Column="0" Grid.Row="5"/>
-                        <CheckBox Grid.Column="1" Grid.Row="5" IsChecked="{Binding RespectCurves}" IsEnabled="False"
+                        <TextBlock Text="Respect Curves" Grid.Column="0" Grid.Row="5" Visibility="Collapsed"/>
+                        <CheckBox Grid.Column="1" Grid.Row="5" IsChecked="{Binding RespectCurves}" IsEnabled="False" Visibility="Collapsed"
                           ToolTip="Do not try and minimize points on continuous curves of the boundary"/>
 
                         <TextBlock Text="Minimization Angle" Grid.Column="0" Grid.Row="6"/>
@@ -215,7 +215,8 @@
                                     <TextBlock Text="{Binding AreaDifferenceAc, StringFormat='{}{0:F8}', TargetNullValue=''}"/>
                                 </TextBlock.ToolTip>
                             </TextBlock>
-                            <TextBlock Grid.Column="3" Grid.Row="3" Text="{Binding AreaDifference, StringFormat='{}{0:F2}%', TargetNullValue=''}">
+                            <TextBlock Grid.Column="3" Grid.Row="3" Text="{Binding AreaDifference, StringFormat='{}{0:F2}%', TargetNullValue=''}"
+                                       Foreground="{Binding AreaDifferenceColor}">
                                 <TextBlock.ToolTip>
                                     <TextBlock Text="{Binding AreaDifference, StringFormat='{}{0:F8}%', TargetNullValue=''}"/>
                                 </TextBlock.ToolTip>
@@ -378,7 +379,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="0" Width="75" Content="Cancel" Command="{Binding CancelCommand}"/>
-                    <Button Grid.Column="2" Width="75" Content="Analyze" Command="{Binding AnalyzeCommand}"/>
+                    <Button Grid.Column="2" Width="75" Content="Reset" Command="{Binding ResetCommand}"/>
                     <Button Grid.Column="4" Width="100" Content="Zoom To Poly" Command="{Binding ZoomCommand}"/>
                     <Button Grid.Column="6" Width="75" Content="Apply" Command="{Binding ApplyCommand}"/>
                 </Grid>

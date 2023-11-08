@@ -36,7 +36,7 @@ namespace TwoTrails.ViewModels
         public ICommand PointSelectionChangedCommand { get; }
         public ICommand PointSelectedCommand { get; }
         public ICommand ApplyCommand { get; }
-        public ICommand AnalyzeCommand { get; }
+        public ICommand ResetCommand { get; }
         public ICommand CancelCommand { get; }
         public ICommand ZoomCommand { get; }
 
@@ -146,7 +146,8 @@ namespace TwoTrails.ViewModels
                     nameof(AreaDifference),
                     nameof(AreaDifferenceAc),
                     nameof(PerimeterDifference),
-                    nameof(PerimeterDifferenceFt)
+                    nameof(PerimeterDifferenceFt),
+                    nameof(AreaDifferenceColor)
                 ));
         }
 
@@ -158,6 +159,9 @@ namespace TwoTrails.ViewModels
 
         public double? AreaDifference => APStats != null ? (double?)GetDiff(APStats.Item1, TargetPolygon.Area) : null;
         public double? AreaDifferenceAc => (APStats != null) ? NewAreaAc - TargetPolygon.AreaAcres : null;
+
+        private SolidColorBrush regularBrush = new SolidColorBrush(Colors.Black), overAreaDifferenceBrush = new SolidColorBrush(Colors.Red);
+        public SolidColorBrush AreaDifferenceColor => Math.Abs(AreaDifference ?? 0) > 1 ? overAreaDifferenceBrush: regularBrush;
 
         public double? PerimeterDifference => APStats != null ? (double?)GetDiff(APStats.Item2, TargetPolygon.Perimeter) : null;
         public double? PerimeterDifferenceFt => APStats != null ? NewPerimeterFt - TargetPolygon.PerimeterFt : null;
@@ -210,7 +214,7 @@ namespace TwoTrails.ViewModels
             });
 
             CancelCommand = new RelayCommand(x => _Dialog.Close());
-            AnalyzeCommand = new BindedRelayCommand<PointMinimizationModel>(
+            ResetCommand = new BindedRelayCommand<PointMinimizationModel>(
                 x => AnalyzeTargetPolygon(),
                 x=> TargetPolygon != null,
                 this,
