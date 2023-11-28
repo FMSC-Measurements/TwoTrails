@@ -142,10 +142,8 @@ namespace TwoTrails.DAL
                 new CsvConfiguration(CultureInfo.CurrentCulture)
                 {
                     AllowComments = true,
-                    ShouldSkipRecord = ssra =>
-                    {
-                        return ssra.Record.All(c => String.IsNullOrEmpty(c));
-                    }
+                    HasHeaderRecord = true,
+                    ShouldSkipRecord = ssra => ssra.Row.Parser.Record.All(r => String.IsNullOrEmpty(r))
                 });
 
             reader.Read();

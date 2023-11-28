@@ -173,13 +173,9 @@ namespace TwoTrails.ViewModels
             SetupImportCommand = new BindedRelayCommand<CsvImportModel>(
                 x => SetupImport(), x => CanImport, this, m => m.CanImport);
 
-            //SetupImportCommand = new BindedRelayCommand<CsvImportModel>(
-            //    (x, m) => m.SetupImport(), (x, m) => m.CanImport, this, m => m.CanImport);
-
             Options = new ParseOptions(fileName, zone, startPolyNumber: startPolyNumber);
 
-            Fields = new List<string>();
-            Fields.Add("No Field");
+            Fields = new List<string> { "No Field" };
             Fields.AddRange(Options.Fields);
 
             SetupDefaultFields(Options);
