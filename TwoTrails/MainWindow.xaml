@@ -156,7 +156,7 @@
 
                     <MenuItem Header="View Point Details Table" Command="{Binding ViewPointDetailsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
 
-                    <MenuItem Header="View Sattelite Info" Command="{Binding PointEditor.ViewSatInfoCommand}"
+                    <MenuItem Header="View Satellite Info" Command="{Binding PointEditor.ViewSatInfoCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" Visibility="Visible"/>
 
                     <Separator/>

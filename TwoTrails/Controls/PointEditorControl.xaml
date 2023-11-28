@@ -390,7 +390,7 @@
                 <DataGrid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="View Point Details" Command="{Binding ViewPointDetailsCommand}"/>
-                        <MenuItem Header="View Sattelite Info" Command="{Binding ViewSatInfoCommand}"/>
+                        <MenuItem Header="View Satellite Info" Command="{Binding ViewSatInfoCommand}"/>
 
                         <MenuItem Header="Copy Cell Value" Command="{Binding CopyCellValueCommand}"
 								  CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget}"/>

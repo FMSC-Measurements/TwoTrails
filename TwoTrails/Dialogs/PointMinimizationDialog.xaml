@@ -358,7 +358,9 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <ContentControl x:Name="map" Grid.Column="2" Content="{Binding Map}" />
+            <Border Grid.Column="2" BorderBrush="White" BorderThickness="{Binding MapBorderThickness}">
+                <ContentControl x:Name="map" Content="{Binding Map}" />
+            </Border>
 
             <CheckBox Grid.Column="2" Margin="5" IsChecked="{Binding HidePoints}"
                       Content="Hide Points" Foreground="White"

@@ -24,6 +24,12 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="10"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <CheckBox Grid.Row="0" IsChecked="{Binding Settings.IsAdvancedMode}" Content="Advanced User Mode"/>
@@ -31,6 +37,8 @@
             <CheckBox Grid.Row="2" IsChecked="{Binding Settings.OpenFolderOnExport}" Content="Open Folder On Export" />
 
             <CheckBox Grid.Row="4" IsChecked="{Binding Settings.SortPolysByName}" Content="Sort Polygons by Name" />
+
+            <CheckBox Grid.Row="6" IsChecked="{Binding Settings.DisplayMapBorder}" Content="Display Map Border" />
         </Grid>
 
         <Grid Grid.Row="1">

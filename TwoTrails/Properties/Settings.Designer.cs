@@ -318,5 +318,17 @@ namespace TwoTrails.Properties {
                 this["WindowStartupLocation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisplayMapBorder {
+            get {
+                return ((bool)(this["DisplayMapBorder"]));
+            }
+            set {
+                this["DisplayMapBorder"] = value;
+            }
+        }
     }
 }

@@ -134,6 +134,8 @@ namespace TwoTrails.ViewModels
                     ProjectEditorControl.SwitchToTab(ProjectTabSection.Points);
 
                     MapWindow.Show();
+
+                    MapControl.OnMapContainerChange();
                 }
                 else
                     throw new Exception("ProjectEditorControl Not Loaded");
@@ -308,6 +310,8 @@ namespace TwoTrails.ViewModels
             MapWindow = null;
 
             OnPropertyChanged(nameof(IsMapWindowOpen), nameof(MapWindow));
+
+            MapControl.OnMapContainerChange();
         }
 
         private void Manager_HistoryChanged(object sender, HistoryEventArgs e)

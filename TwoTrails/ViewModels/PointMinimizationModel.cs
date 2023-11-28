@@ -134,6 +134,9 @@ namespace TwoTrails.ViewModels
         }
 
 
+        public Thickness MapBorderThickness => Project.Settings.DisplayMapBorder ?
+            new Thickness(2, 2, 2, 2) : new Thickness(0);
+
 
         private Tuple<double, double, double> APStats {
             get => Get<Tuple<double, double, double>>();

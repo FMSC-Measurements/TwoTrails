@@ -19,6 +19,7 @@ namespace TwoTrails.Settings
         private const string UPGRADE_REQUIRED = "UpgradeRequired";
         private const string SORT_POLYS_BY_NAME = "SortPolysByName";
         private const string WINDOW_STARTUP_LOCATION = "WindowStartupLocation";
+        private const string DISPLAY_MAP_BORDER = "DisplayMapBorder";
 
         public IMetadataSettings MetadataSettings { get; set; }
         public IDeviceSettings DeviceSettings { get; set; }
@@ -147,6 +148,20 @@ namespace TwoTrails.Settings
             }
         }
         public bool HasValidateWindowsStartupLocation => _WindowStartupLocation.X != 0 || _WindowStartupLocation.Y != 0;
+
+
+        private bool _DisplayMapBorder;
+        public bool DisplayMapBorder
+        {
+            get { return _DisplayMapBorder; }
+
+            set
+            {
+                SetField(ref _DisplayMapBorder, value);
+                Properties.Settings.Default[DISPLAY_MAP_BORDER] = value;
+                Properties.Settings.Default.Save();
+            }
+        }
 
 
 

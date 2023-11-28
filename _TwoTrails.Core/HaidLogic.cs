@@ -28,10 +28,13 @@ namespace TwoTrails.Core
             sb.AppendLine($"Creation Version: { projectInfo.CreationVersion }");
             sb.AppendLine("\n");
             sb.AppendLine(
-                "**** GNSS survey area-error is best lowered by applying the correct NTDP\n" +
-                "lesser-canopy-error along roads, trails, and such.\nALWAYS DO THE POINT ACCURACY ASSIGNMENT FIRST. ****\n\n" +
-                "**** AREA-ERROR CANNOT BE LESSENED OR DIVIDED BY TWO UNLESS STRICT CRITERIA IS APPLIED.\n" +
-                "(See https://github.com/FMSC-Measurements/TwoTrails/wiki/Meeting-Area-Error) ****\n\n" +
+                "**** GNSS survey area-error is best lowered by applying the correct\n" +
+                "NTDP lesser-canopy-error along roads, trails, and such.\n" + 
+                "ALWAYS DO THE POINT ACCURACY ASSIGNMENT FIRST. ****\n\n" +
+
+                "**** AREA-ERROR CANNOT BE LESSENED OR DIVIDED BY TWO UNLESS STRICT CRITERIA IS APPLIED. ****\n" +
+                "(See https://github.com/FMSC-Measurements/TwoTrails/wiki/Meeting-Area-Error)\n\n" +
+
                 "**** Points with asterisks are OFF boundary points. ****");
             sb.AppendLine("\n");
             return sb.ToString();

@@ -16,8 +16,10 @@ namespace TwoTrails.Controls
     /// <summary>
     /// Interaction logic for MapControl.xaml
     /// </summary>
-    public partial class MapControl : UserControl
+    public partial class MapControl : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private TtProject Project { get; set; }
 
         public IObservableTtManager Manager => Project.HistoryManager;
@@ -32,9 +34,12 @@ namespace TwoTrails.Controls
         public TtMapManager MapManager { get; private set; }
 
         public bool IsLatLon { get; private set; } = false;
-        
 
-        public MapControl()
+        public Thickness MapBorderThickness => Project.Settings.DisplayMapBorder && this.Parent.GetType() == typeof(ContentControl) ?
+            new Thickness(2, 2, 2, 2) : new Thickness(0);
+
+
+        private MapControl()
         {
             this.Loaded += OnLoaded;
 
@@ -50,6 +55,14 @@ namespace TwoTrails.Controls
         public MapControl(TtProject project) : this()
         {
             Project = project;
+
+            Project.Settings.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(Project.Settings.DisplayMapBorder))
+                {
+                    OnMapContainerChange();
+                }
+            };
         }
 
 
@@ -103,6 +116,11 @@ namespace TwoTrails.Controls
             IEnumerable<Location> locs = MapManager.PolygonManagers.SelectMany(mpm => mpm.Points.Select(p => p.AdjLocation));
             if (locs.Any())
                 map.SetView(locs, new Thickness(30), 0);
+        }
+
+        public void OnMapContainerChange()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MapBorderThickness)));
         }
     }
 }
