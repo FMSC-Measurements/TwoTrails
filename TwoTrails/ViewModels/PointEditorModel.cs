@@ -627,16 +627,25 @@ namespace TwoTrails.ViewModels
                     
                     if (MultipleSelections)
                     {
-                        List<PropertyInfo> properties = new List<PropertyInfo>();
-                        foreach (TtPoint point in SelectedPoints)
-                        {
-                            if (point.OpType == OpType.Quondam)
-                                properties.Add(PointProperties.MAN_ACC_QP);
-                            else
-                                properties.Add(PointProperties.MAN_ACC_GPS);
-                        }
+                        List<TtPoint> points = SelectedPoints.Cast<TtPoint>().ToList();
 
-                        Manager.EditPoints(SelectedPoints.Cast<TtPoint>(), properties, value);
+                        if (points.All(p => p.IsGpsAtBase())) {
+                            Manager.EditPoints(points, PointProperties.MAN_ACC_GPS, value);
+                        }
+                        else
+                        {
+                            List<PropertyInfo> properties = new List<PropertyInfo>();
+
+                            foreach (TtPoint point in points)
+                            {
+                                if (point.OpType == OpType.Quondam)
+                                    properties.Add(PointProperties.MAN_ACC_QP);
+                                else
+                                    properties.Add(PointProperties.MAN_ACC_GPS);
+                            }
+
+                            Manager.EditPoints(points, properties, value);
+                        }
                     }
                     else
                     {

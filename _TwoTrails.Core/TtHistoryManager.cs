@@ -379,6 +379,7 @@ namespace TwoTrails.Core
             AddCommand(new MinimizePointsCommand(BaseManager, points, onBoundary));
         }
 
+
         #region Editing
 
         #region Points
