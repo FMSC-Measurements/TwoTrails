@@ -53,18 +53,24 @@ namespace TwoTrails.Core.Points
 
         public static bool HasSameUnAdjLocation(this TtPoint point, TtPoint otherPoint)
         {
-            return point.UnAdjX == otherPoint.UnAdjX &&
-                point.UnAdjY == otherPoint.UnAdjY &&
-                point.UnAdjY == otherPoint.UnAdjY;
+            return HasSameUnAdjLocation(point, otherPoint.UnAdjX, otherPoint.UnAdjY, otherPoint.UnAdjZ);
+        }
+
+        public static bool HasSameUnAdjLocation(this TtPoint point, double x, double y, double? z = null)
+        {
+            return point.UnAdjX == x && point.UnAdjY == y && (z != null ? point.UnAdjZ == z : true);
         }
 
         public static bool HasSameAdjLocation(this TtPoint point, TtPoint otherPoint)
         {
-            return point.AdjX == otherPoint.AdjX &&
-                point.AdjY == otherPoint.AdjY &&
-                point.AdjY == otherPoint.AdjY;
+            return HasSameAdjLocation(point, otherPoint.AdjX, otherPoint.AdjY, otherPoint.AdjZ);
         }
-        
+
+        public static bool HasSameAdjLocation(this TtPoint point, double x, double y, double? z = null)
+        {
+            return point.AdjX == x && point.AdjY == y && (z != null ? point.AdjZ == z : true);
+        }
+
 
         public static TtPoint DeepCopy(this TtPoint point)
         {
