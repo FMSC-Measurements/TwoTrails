@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TwoTrails.Core.ComponentModel.History
+﻿namespace TwoTrails.Core.ComponentModel.History
 {
     public abstract class ITtBaseCommand : ITtCommand
     {

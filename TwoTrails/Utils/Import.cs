@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TwoTrails.Core;
-using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
 using TwoTrails.DAL;
 

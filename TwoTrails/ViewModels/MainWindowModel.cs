@@ -1,5 +1,4 @@
-﻿using FMSC.Core;
-using FMSC.Core.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Utilities;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.Core.Windows.Utilities;
