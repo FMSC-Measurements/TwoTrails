@@ -21,7 +21,7 @@ namespace TwoTrails.Core.ComponentModel.History
                 //get real utm
                 UTMCoords realCoords = UTMTools.ConvertLatLonSignedDecToUTM(latLon.Y, latLon.X);
 
-                if (realCoords.Zone != point.Metadata.Zone && !point.HasSameUnAdjLocation(realCoords.X, realCoords.Y))
+                if (realCoords.Zone != point.Metadata.Zone && !point.HasSameUnAdjLocation(realCoords))
                 {
                     OldValues.Add(Tuple.Create(point, point.UnAdjX, point.UnAdjY));
                     NewValues.Add(Tuple.Create(point, realCoords.X, realCoords.Y));

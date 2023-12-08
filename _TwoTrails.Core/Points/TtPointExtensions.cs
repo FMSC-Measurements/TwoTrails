@@ -51,9 +51,15 @@ namespace TwoTrails.Core.Points
             return IsGpsType(point) || point.OpType == OpType.Quondam;
         }
 
+
         public static bool HasSameUnAdjLocation(this TtPoint point, TtPoint otherPoint)
         {
             return HasSameUnAdjLocation(point, otherPoint.UnAdjX, otherPoint.UnAdjY, otherPoint.UnAdjZ);
+        }
+
+        public static bool HasSameUnAdjLocation(this TtPoint point, UTMCoords coords)
+        {
+            return HasSameUnAdjLocation(point, coords.X, coords.Y);
         }
 
         public static bool HasSameUnAdjLocation(this TtPoint point, double x, double y, double? z = null)
@@ -61,14 +67,37 @@ namespace TwoTrails.Core.Points
             return point.UnAdjX == x && point.UnAdjY == y && (z != null ? point.UnAdjZ == z : true);
         }
 
+
         public static bool HasSameAdjLocation(this TtPoint point, TtPoint otherPoint)
         {
             return HasSameAdjLocation(point, otherPoint.AdjX, otherPoint.AdjY, otherPoint.AdjZ);
         }
 
+        public static bool HasSameAdjLocation(this TtPoint point, UTMCoords coords)
+        {
+            return HasSameAdjLocation(point, coords.X, coords.Y);
+        }
+
         public static bool HasSameAdjLocation(this TtPoint point, double x, double y, double? z = null)
         {
             return point.AdjX == x && point.AdjY == y && (z != null ? point.AdjZ == z : true);
+        }
+
+
+        public static bool IsMiszoned(this TtPoint point)
+        {
+            if (point is GpsPoint gps)
+            {
+                //get real lat and lon
+                Point latLon = gps.HasLatLon ? new Point((double)gps.Longitude, (double)gps.Latitude) : UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
+                //get real utm
+                UTMCoords realCoords = UTMTools.ConvertLatLonSignedDecToUTM(latLon.Y, latLon.X);
+
+                if (realCoords.Zone != point.Metadata.Zone && !point.HasSameUnAdjLocation(realCoords))
+                    return true;
+            }
+
+            return false;
         }
 
 

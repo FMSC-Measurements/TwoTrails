@@ -45,21 +45,7 @@ namespace TwoTrails.Utils
 
         public static bool AnalyzeMiszonedPoints(ITtManager manager)
         {
-            return manager.GetPoints().Where(p => p.IsGpsType()).Any(point =>
-            {
-                if (point is GpsPoint gps)
-                {
-                    //get real lat and lon
-                    Point latLon = gps.HasLatLon ? new Point((double)gps.Longitude, (double)gps.Latitude) : UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
-                    //get real utm
-                    UTMCoords realCoords = UTMTools.ConvertLatLonSignedDecToUTM(latLon.Y, latLon.X);
-
-                    if (realCoords.Zone != point.Metadata.Zone)
-                        return true;
-                }
-
-                return false;
-            });
+            return manager.GetPoints().Any(p => p.IsGpsType() && p.IsMiszoned());
         }
 
         public static bool AnalyzeOrphanedQuondams(ITtManager manager)

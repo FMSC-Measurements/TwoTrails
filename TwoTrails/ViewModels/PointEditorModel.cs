@@ -2742,17 +2742,13 @@ namespace TwoTrails.ViewModels
         private void RezonePoints(bool rezoneAllPoints = false)
         {
             List<GpsPoint> points = (rezoneAllPoints ?
-                    Manager.GetPoints().Where(p => p.IsGpsType()) :
-                    GetSortedSelectedPoints(x => x.IsGpsType()))
+                    Manager.GetPoints().Where(p => p.IsGpsType() && p.IsMiszoned()) :
+                    GetSortedSelectedPoints(p => p.IsGpsType() && p.IsMiszoned()))
                 .Cast<GpsPoint>().ToList();
 
             if (points.Count > 0)
             {
                 Manager.RezonePoints(points);
-            }
-            else
-            {
-                MessageBox.Show("Only GPS type points can be rezoned.");
             }
         }
 
