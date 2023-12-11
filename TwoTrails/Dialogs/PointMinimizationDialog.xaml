@@ -120,22 +120,22 @@
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble"
                           ToolTip="Minimum angle to adjust for (45&#176; is recommended)"/>
 
-                        <TextBlock Text="Minimization Distance" Grid.Column="0" Grid.Row="7"/>
+                        <TextBlock Text="Minimization Leg Dist" Grid.Column="0" Grid.Row="7"/>
                         <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding MinimumLegLength, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble">
                             <TextBox.ToolTip>
                                 <TextBlock>
-                              Override the minimum distance between points (in meters)
+                              Override the minimum leg distance between points (in meters)
                               <LineBreak /> 
                               Default is 5 times the point accuracy
                                 </TextBlock>
                             </TextBox.ToolTip>
                         </TextBox>
 
-                        <TextBlock Text="Accuracy Override" Grid.Column="0" Grid.Row="8"/>
+                        <TextBlock Text="Accuracy Override" Grid.Column="0" Grid.Row="8" Visibility="Collapsed"/>
                         <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding AccuracyOverride, Mode=TwoWay, Delay=250, UpdateSourceTrigger=PropertyChanged, TargetNullValue={x:Static sys:String.Empty}}"
                          GotFocus="TextBox_GotFocus" PreviewTextInput="TextIsUnsignedDouble"
-                          ToolTip="Override the accuracy of the points" />
+                          ToolTip="Override the accuracy of the points" Visibility="Collapsed" />
 
                     </Grid>
 
