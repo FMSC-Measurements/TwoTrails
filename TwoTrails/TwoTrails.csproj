@@ -2,13 +2,13 @@
   <PropertyGroup>
     <ProjectGuid>{38E886B8-3FCA-4A41-A465-8FD5746E47EF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>TwoTrails</AssemblyTitle>
     <Company>Fortest Management Service Center</Company>
     <Product>TwoTrails</Product>
-    <Copyright>Copyright © USDA Forest Service 2023</Copyright>
+    <Copyright>Copyright © USDA Forest Service 2024</Copyright>
     <FileVersion>1.0.0.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>

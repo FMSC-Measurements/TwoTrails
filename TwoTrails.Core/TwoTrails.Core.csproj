@@ -2,11 +2,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>Fortest Management Service Center</Authors>
-    <Copyright>Copyright © USDA Forest Service 2022</Copyright>
+    <Copyright>Copyright © USDA Forest Service 2024</Copyright>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
-    <AssemblyVersion>1.3.0.0</AssemblyVersion>
-    <Version>1.3.0</Version>
+    <AssemblyVersion>1.3.3.0</AssemblyVersion>
+    <Version>1.3.3</Version>
     <FileVersion>1.0.0.0</FileVersion>
     <Configurations>Debug;Release;Preview</Configurations>
   </PropertyGroup>
