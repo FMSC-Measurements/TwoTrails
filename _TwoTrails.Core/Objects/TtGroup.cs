@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FMSC.Core;
+using System;
 using System.Collections.Generic;
 
 namespace TwoTrails.Core
@@ -63,7 +64,7 @@ namespace TwoTrails.Core
 
         public int Compare(TtGroup @this, TtGroup other)
         {
-            return @this.Name.CompareTo(other.Name);
+            return @this.Name.CompareToNatural(other.Name);
         }
 
         public override string ToString()

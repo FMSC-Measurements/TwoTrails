@@ -1,9 +1,9 @@
-﻿using System.Collections;
+﻿using FMSC.Core;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web.UI.WebControls;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using TwoTrails.Core;
-using TwoTrails.ViewModels;
 
 namespace TwoTrails.Utils
 {
@@ -35,7 +35,7 @@ namespace TwoTrails.Utils
             if (y == null)
                 return 1;
 
-            return SortPolysByName ? x.Name.ToLower().CompareTo(y.Name.ToLower()) : x.CompareTo(y);
+            return SortPolysByName ? x.Name.CompareToNatural(y.Name) : x.CompareTo(y);
         }
     }
 

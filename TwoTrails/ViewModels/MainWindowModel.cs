@@ -738,11 +738,13 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                         if (!Directory.Exists(App.TEMP_DIR))
                             Directory.CreateDirectory(App.TEMP_DIR);
 
-                        string file = Path.Combine(App.TEMP_DIR, $"{Guid.NewGuid().ToString()}.kmz");
-                        Export.KMZ(CurrentProject.HistoryManager, CurrentProject.ProjectInfo, file);
+                        string fileName = Path.Combine(App.TEMP_DIR, Guid.NewGuid().ToString());
+                        Export.KMZ(CurrentProject.HistoryManager, CurrentProject.ProjectInfo, fileName);
 
-                        if (File.Exists(file))
-                            Process.Start(file);
+                        string filePath = $"{fileName}.kmz";
+
+                        if (File.Exists(filePath))
+                            Process.Start(filePath);
                     }
                     catch (Exception ex)
                     {

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using FMSC.Core;
+using System.Collections;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Utils
@@ -26,7 +27,7 @@ namespace TwoTrails.Utils
             if (yp == null)
                 return 1;
 
-            int val = SortPolysByName ? xp.Polygon.Name.ToLower().CompareTo(yp.Polygon.Name.ToLower()) : xp.Polygon.TimeCreated.CompareTo(yp.Polygon.TimeCreated);
+            int val = SortPolysByName ? xp.Polygon.Name.CompareToNatural(yp.Polygon.Name) : xp.Polygon.TimeCreated.CompareTo(yp.Polygon.TimeCreated);
 
             if (val != 0)
                 return val;
