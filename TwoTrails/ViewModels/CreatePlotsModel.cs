@@ -35,6 +35,8 @@ namespace TwoTrails.ViewModels
         public ICommand InclusionPolygonsSelectedCommand { get; }
         public ICommand ExclusionPolygonsSelectedCommand { get; }
 
+        public ICommand ClearSelectedStartPoint { get; }
+
 
         public ObservableFilteredSortableCollection<TtPolygon, string> InclusionPolygons { get; }
         public ObservableCollection<TtPolygon> ExclusionPolygons { get; }
@@ -55,8 +57,8 @@ namespace TwoTrails.ViewModels
         public Distance UomDistance { get { return Get<Distance>(); } set { Set(value); } }
 
 
-        public int GridX { get { return Get<int>(); } set { Set(value); } }
-        public int GridY { get { return Get<int>(); } set { Set(value); } }
+        public double GridX { get { return Get<double>(); } set { Set(value); } }
+        public double GridY { get { return Get<double>(); } set { Set(value); } }
 
         public int Tilt { get { return Get<int>(); } set { Set(value); } }
 
@@ -68,7 +70,7 @@ namespace TwoTrails.ViewModels
         public int SampleAmount { get { return Get<int>(); } set { Set(value); } }
 
         public bool? BoundaryBuffer { get { return Get<bool?>(); } set { Set(value); } }
-        public int BufferAmount { get { return Get<int>(); } set { Set(value); } }
+        public double BufferAmount { get { return Get<double>(); } set { Set(value); } }
 
         public bool IsGenerating { get { return Get<bool>(); } set { Set(value, () => OnPropertyChanged(nameof(CloseCancelBtnText))); } }
         public string CloseCancelBtnText => IsGenerating ? "Cancel" : "Close";
@@ -102,6 +104,8 @@ namespace TwoTrails.ViewModels
 
             InclusionPolygonsSelectedCommand = new RelayCommand(x => InclusionPolygonsSelected(x as IList));
             ExclusionPolygonsSelectedCommand = new RelayCommand(x => ExclusionPolygonsSelected(x as IList));
+
+            ClearSelectedStartPoint = new RelayCommand(x => SelectedPoint = null);
             
             InclusionPolygons = new ObservableFilteredSortableCollection<TtPolygon, string>(
                 project.HistoryManager.Polygons,

@@ -6,10 +6,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <AssemblyVersion>1.3.3.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <Version>1.3.3</Version>
+    <AssemblyVersion>1.3.5</AssemblyVersion>
+    <Version>1.3.5</Version>
     <Configurations>Debug;Release;Preview</Configurations>
+	  <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
   <Import Project="..\_TwoTrails.Core\_TwoTrails.Core.projitems" Label="Shared" />
   <ItemGroup>

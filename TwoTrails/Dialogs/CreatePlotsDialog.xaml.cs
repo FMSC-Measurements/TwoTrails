@@ -34,6 +34,16 @@ namespace TwoTrails.Dialogs
             e.Handled = ControlUtils.TextIsInteger(sender, e);
         }
 
+        private void TextIsDouble(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = ControlUtils.TextIsDouble(sender, e);
+        }
+
+        private void TextIsUnsignedDouble(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = ControlUtils.TextIsUnsignedDouble(sender, e);
+        }
+
 
         public static bool? ShowDialog(TtProject project, Window owner = null)
         {

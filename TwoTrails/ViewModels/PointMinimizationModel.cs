@@ -507,7 +507,7 @@ namespace TwoTrails.ViewModels
         }
 
 
-        private void LimitArea(PMSegment startSeg, PMSegment endSeg, IEnumerable<PMSegment> segs, bool reverseDir = false)
+        private void LimitArea(PMSegment startSeg, PMSegment endSeg, IEnumerable<PMSegment> segs)
         {
             double maxSegDist = 0;
             int segIdx = 0, maxSegIdx = 0, segsCount = segs.Count();

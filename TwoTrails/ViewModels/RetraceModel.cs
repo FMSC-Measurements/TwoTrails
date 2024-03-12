@@ -148,10 +148,10 @@ namespace TwoTrails.ViewModels
                                 }
                                 else
                                 {
-                                    for (int i = sindex; i > -1; i--)
+                                    for (int i = eindex; i > -1; i--)
                                         retracePoints.Add(points[i]);
 
-                                    for (int i = points.Count - 1; i >= eindex; i--)
+                                    for (int i = points.Count - 1; i >= sindex; i--)
                                         retracePoints.Add(points[i]);
                                 }
                             }

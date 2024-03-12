@@ -1,6 +1,4 @@
-﻿using FMSC.Core;
-using FMSC.GeoSpatial.UTM;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,7 +7,6 @@ using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 using TwoTrails.DAL;
-using Point = FMSC.Core.Point;
 
 namespace TwoTrails.Utils
 {

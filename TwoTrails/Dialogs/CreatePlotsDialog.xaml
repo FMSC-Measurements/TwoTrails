@@ -61,7 +61,15 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Column="0" Grid.Row="1" Text="Start Point (Optional)" />
-                <ComboBox  Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Points}" SelectedItem="{Binding SelectedPoint}"/>
+                <Grid Grid.Column="1" Grid.Row="1" Width="Auto">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="50"/>
+                        <ColumnDefinition Width="2"/>
+                        <ColumnDefinition Width="35"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Name="cboSP" Grid.Column="0" ItemsSource="{Binding Points}" SelectedItem="{Binding SelectedPoint}" />
+                    <Button Grid.Column="2" Content="Clear" Height="{Binding ElementName=cboSP, Path=ActualHeight}" Command="{Binding ClearSelectedStartPoint}"/>
+                </Grid>
 
                 <TextBlock Grid.Column="0" Grid.Row="2" Text="UOM Distance" />
                 <ComboBox  Grid.Column="1" Grid.Row="2" ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}}" SelectedItem="{Binding UomDistance}" />
@@ -84,11 +92,11 @@
 
                     <TextBox Grid.Column="0" Grid.Row="1"
                          Text="{Binding GridX}"
-                         PreviewTextInput="TextIsUnsignedInteger"
+                         PreviewTextInput="TextIsUnsignedDouble"
                          GotFocus="TextBox_GotFocus"/>
                     <TextBox Grid.Column="2" Grid.Row="1"
                          Text="{Binding GridY}"
-                         PreviewTextInput="TextIsUnsignedInteger"
+                         PreviewTextInput="TextIsUnsignedDouble"
                          GotFocus="TextBox_GotFocus"/>
                 </Grid>
 
@@ -140,7 +148,7 @@
                     <TextBox Grid.Column="4"  Margin="0, 2.5, 0, 2.5"
                          IsEnabled="{Binding ElementName=cbBuffer, Path=IsChecked}"
                          Text="{Binding BufferAmount}"
-                         PreviewTextInput="TextIsUnsignedInteger"
+                         PreviewTextInput="TextIsUnsignedDouble"
                          GotFocus="TextBox_GotFocus"
                          Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource btv}}"/>
                 </Grid>
@@ -225,6 +233,6 @@
             <Button Grid.Column="2" Content="Generate" Command="{Binding GenerateCommand}" IsEnabled="{Binding IsGenerating, Converter={StaticResource IBC}}" />
         </Grid>
 
-        <ttc:TtProgressControl Grid.ColumnSpan="2" Grid.Row="0" Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}" Background="White" Opacity="70" />
+        <!--<ttc:TtProgressControl Grid.ColumnSpan="2" Grid.Row="0" Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}" Background="White" Opacity="70" />-->
         </Grid>
 </Window>
