@@ -206,7 +206,7 @@ namespace TwoTrails.ViewModels
         public PointMinimizationModel(TtProject project, PointMinimizationDialog dialog)
         {
             Project = project;
-            Polygons = Manager.Polygons.Where(p => Manager.GetPoints(p.CN).Select(pt => pt.CanBeBndPoint()).HasAtLeast(3)).ToList();
+            Polygons = Manager.Polygons.Where(p => Manager.GetPoints(p.CN).HasAtLeast(4, pt => pt.CanBeBndPoint())).ToList();
             Polygons.Sort(new PolygonSorterDirect(project.Settings.SortPolysByName));
             _Dialog = dialog;
 
@@ -393,7 +393,7 @@ namespace TwoTrails.ViewModels
         {
             APStats = null;
 
-            if (TargetPolygon != null)
+            if (TargetPolygon != null && Points.Count > 3)
             {
                 List<PMSegment> segments = new List<PMSegment>();
 
