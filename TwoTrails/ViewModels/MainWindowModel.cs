@@ -176,7 +176,7 @@ namespace TwoTrails.ViewModels
             ExitCommand = new RelayCommand(x => Exit(true, true));
 
             ImportCommand = new RelayCommand(x => ImportDialog.ShowDialog(CurrentProject, this, MainWindow));
-            ExportCommand = new RelayCommand(x => ExportDialog.ShowDialog(CurrentProject, this, MainWindow));
+            ExportCommand = new RelayCommand(x => ExportCurrentProject());
             ViewPointDetailsCommand = new RelayCommand(x => PointDetailsDialog.ShowDialog(CurrentProject.HistoryManager.GetPoints(), MainWindow));
             OpenInEarthCommand = new RelayCommand(x => OpenInGoogleEarth());
 
@@ -343,8 +343,8 @@ namespace TwoTrails.ViewModels
                             {
                                 if (tab.DataContext is ProjectTab projTab && projTab.Project.FilePath == filePath)
                                     SwitchToTab(tab);
-                                MainWindow.Focus();
                             }
+                            MainWindow.Focus();
                         }
                     }
                     else if (filePath.EndsWith(Consts.FILE_EXTENSION_MEDIA, StringComparison.InvariantCultureIgnoreCase))
@@ -609,6 +609,41 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             }
         }
 
+        private void ExportCurrentProject()
+        {
+            if (CurrentProject != null && CurrentProject.HistoryManager.PolygonCount > 0)
+            {
+                if (CurrentProject.HistoryManager.Polygons.Any(p => String.IsNullOrEmpty(p.Name)))
+                {
+                    MessageBox.Show(
+                        "Not all Polygons have a name. Please name them before exporting.",
+                        "Data Issue",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                    return;
+                }
+
+                if (CurrentProject.HistoryManager.Metadata.Any(m => String.IsNullOrEmpty(m.Name)))
+                {
+                    MessageBox.Show(
+                        "Not all Metadata have a name. Please name them before exporting.",
+                        "Data Issue",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                    return;
+                }
+
+                ExportDialog.ShowDialog(CurrentProject, this, MainWindow);
+            }
+            else
+            {
+                MessageBox.Show(
+                        "There are no Polygons to Export",
+                        "No Polygons",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+            }
+        }
         
         private void AddProject(TtProject project)
         {
