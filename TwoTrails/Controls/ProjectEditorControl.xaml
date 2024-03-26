@@ -366,7 +366,7 @@
 
                                     <TextBox Grid.Column="0"
                                      Name="txtPolyAcc"
-                                     Text="{Binding PolygonAccuracy, UpdateSourceTrigger=PropertyChanged, Delay=750}"
+                                     Text="{Binding PolygonAccuracy, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
                                      PreviewTextInput="TextIsDouble" IsUndoEnabled="False">
                                     </TextBox>
                                     <Button Grid.Column="1" Width="75" Command="{Binding PolygonUpdateAccCommand}" Content="Update"/>
@@ -760,7 +760,7 @@
 
                                 <TextBlock Grid.Column="2" Grid.Row="4" Text="Declination" />
                                 <TextBox Grid.Column="2" Grid.Row="5"
-                                          Text="{Binding MetadataMagDec, Delay=750, UpdateSourceTrigger=PropertyChanged}"
+                                          Text="{Binding MetadataMagDec, Delay=1000, UpdateSourceTrigger=PropertyChanged}"
                                           PreviewTextInput="TextIsDouble" IsUndoEnabled="False"/>
 
 

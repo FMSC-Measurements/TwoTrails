@@ -278,6 +278,10 @@
 
                     <Separator/>
 
+                    <MenuItem Header="NTDP GPS Accuracies" Command="{Binding NtdpAccuraciesSiteCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
+
+                    <Separator/>
+
                     <MenuItem Header="Check for Updates" Command="{Binding CheckForUpdatesCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                     <MenuItem Header="About TwoTrails" Command="{Binding AboutCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                 </MenuItem>

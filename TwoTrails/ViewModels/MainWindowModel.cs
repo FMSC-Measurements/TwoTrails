@@ -2,6 +2,7 @@
 using FMSC.Core.Utilities;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.Core.Windows.Utilities;
+using FMSC.GeoSpatial.NTDP;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,9 @@ namespace TwoTrails.ViewModels
 
         public ICommand ViewLogCommand { get; private set; }
         public ICommand ExportReportCommand { get; private set; }
+
+        public ICommand NtdpAccuraciesSiteCommand { get; private set; }
+
         public ICommand CheckForUpdatesCommand { get; private set; }
         public ICommand AboutCommand { get; private set; }
         #endregion
@@ -182,6 +186,9 @@ namespace TwoTrails.ViewModels
             ViewLogCommand = new RelayCommand(x => Process.Start(App.LOG_FILE_PATH));
             ExportReportCommand = new RelayCommand(x => ExportReport());
             EmailReportCommand = new RelayCommand(x => ExportReport(true));
+
+            NtdpAccuraciesSiteCommand = new RelayCommand(x => Process.Start("https://www.fs.usda.gov/database/gps/mtdcrept/accuracy/index.htm"));
+
             CheckForUpdatesCommand = new RelayCommand(x => CheckForUpdates());
             AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(MainWindow));
 

@@ -2415,7 +2415,12 @@ namespace TwoTrails.ViewModels
                     case OpType.SideShot:
                     case OpType.WayPoint:
                         {
-                            CreateGpsPointDialog.ShowDialog(Project, null, optype, MainModel.MainWindow);
+                            CreateGpsPointDialog.ShowDialog(
+                                Project, 
+                                (Project.ProjectSettings.LastCreatePointPolygon != null &&
+                                    Manager.Polygons.Any(p => p.CN == Project.ProjectSettings.LastCreatePointPolygon.CN)) ?
+                                        Project.ProjectSettings.LastCreatePointPolygon : null,
+                                optype, MainModel.MainWindow);
                             break;
                         }
                     case OpType.Quondam: Retrace(); break;

@@ -271,6 +271,8 @@ namespace TwoTrails.Dialogs
                                 _Manager.CreatePoint(point);
                             }
 
+                            _Project.ProjectSettings.LastCreatePointPolygon = poly;
+
                             if (this.IsShownAsDialog())
                                 this.DialogResult = true;
 

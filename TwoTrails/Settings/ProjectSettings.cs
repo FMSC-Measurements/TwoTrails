@@ -12,6 +12,8 @@ namespace TwoTrails.Settings
         public TtPolygon LastRetraceTargetPolygon { get; set; }
         public List<Retrace> LastRetrace { get; set; }
 
+        public TtPolygon LastCreatePointPolygon { get; set; }
+
 
 
         public ProjectSettings(TtProject project)

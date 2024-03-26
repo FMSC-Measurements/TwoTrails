@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
 
         <TabControl SelectedIndex="{Binding StartupSelectedTabIndex, Mode=OneWay}">
-            <TabItem Header="MTDC" IsEnabled="{Binding HasGpsAccuracyReport, Mode=OneWay}">
+            <TabItem Header="NTDP" IsEnabled="{Binding HasGpsAccuracyReport, Mode=OneWay}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -95,12 +95,18 @@
                         </Grid.Resources>
                         
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="70"/>
                             <ColumnDefinition Width="70"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -133,6 +139,21 @@
                         <Button Grid.Column="1" Grid.Row="5" Margin="2.5" Content="{Binding ElementName=tbFt, Path=Text, Converter={StaticResource ResourceKey=cvtMt2Ft}, ConverterParameter=True}" ContentStringFormat="N6"
                                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Command="{Binding FtToMtCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Content}"/>
                         <TextBlock Grid.Column="2" Grid.Row="5" Text="Convert Feet to Meters" TextAlignment="Left"/>
+
+
+                        <Separator Height="10" Grid.Row="6" Grid.ColumnSpan="3"/>
+
+                        <TextBlock Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="2" Padding="5 0 0 0" Text="TruPulse 360 (B/R)" TextAlignment="Left"/>
+                        <TextBlock Grid.Column="2" Grid.Row="7" Text="0.3 Meter" TextAlignment="Left"/>
+
+                        <TextBlock Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="2" Padding="5 0 0 0" Text="TruPulse 200X/360X" TextAlignment="Left"/>
+                        <TextBlock Grid.Column="2" Grid.Row="8" Text="0.3 Meter" TextAlignment="Left"/>
+
+                        <TextBlock Grid.Column="0" Grid.Row="9" Grid.ColumnSpan="2" Padding="5 0 0 0" Text="TruPulse 200 (B/R)" TextAlignment="Left"/>
+                        <TextBlock Grid.Column="2" Grid.Row="9" Text="1 Meter" TextAlignment="Left"/>
+
+                        <TextBlock Grid.Column="0" Grid.Row="10" Grid.ColumnSpan="2" Padding="5 0 0 0" Text="TruPulse L2" TextAlignment="Left"/>
+                        <TextBlock Grid.Column="2" Grid.Row="10" Text="1 Meter" TextAlignment="Left"/>
                     </Grid>
 
                     <Grid Grid.Column="1">
