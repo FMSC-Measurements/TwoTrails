@@ -62,7 +62,8 @@
 
 
             <TextBlock Grid.Column="0" Text="Polygon" VerticalAlignment="Center" Margin="2.5"/>
-            <ComboBox Grid.Column="1" Margin="2.5" Grid.ColumnSpan="1" SelectedItem="{Binding Polygon}" ItemsSource="{Binding Polygons}"/>
+            <ComboBox Grid.Column="1" Margin="2.5" Grid.ColumnSpan="1" SelectedItem="{Binding Polygon}" ItemsSource="{Binding Polygons}"
+                      ToolTip="{Binding Polygon.Name}"/>
 
             <ComboBox Grid.Column="2" Margin="2.5" Grid.ColumnSpan="1" SelectedValue="{Binding Distance}" ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}, Exclusions='Yards,Chains'}">
                 <ComboBox.ItemTemplate>

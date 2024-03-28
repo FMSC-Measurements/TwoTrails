@@ -131,6 +131,8 @@ namespace TwoTrails.Core.Points
             _ManualAccuracy = point._ManualAccuracy;
 
             Accuracy = point.Accuracy;
+
+            _RMSEr = point._RMSEr;
         }
 
 

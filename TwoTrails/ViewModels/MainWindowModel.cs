@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -839,28 +840,30 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             using (StreamWriter sw = new StreamWriter(Path.Combine(tempDirectory, "App.Settings.txt")))
             {
                 sw.WriteLine("--Main App.Settings--");
-                sw.WriteLine($"{nameof(ITtSettings.UserName)}: {App.Settings.UserName}");
-                sw.WriteLine($"{nameof(ITtSettings.DeviceName)}: {App.Settings.DeviceName}");
-                sw.WriteLine($"{nameof(ITtSettings.Region)}: {App.Settings.Region}");
-                sw.WriteLine($"{nameof(ITtSettings.District)}: {App.Settings.District}");
-                sw.WriteLine($"{nameof(TtSettings.IsAdvancedMode)}: {App.Settings.IsAdvancedMode}");
+                foreach (PropertyInfo pi in typeof(TtSettings).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    if (!pi.PropertyType.IsInterface)
+                    {
+                        sw.WriteLine($"{pi.Name}: {pi.GetValue(App.Settings)}");
+                    }
+                }
                 sw.WriteLine("Recent Projects:");
                 foreach (string rp in App.Settings.GetRecentProjects())
-                    sw.WriteLine(rp);
+                    sw.WriteLine($"\t{rp}");
                 sw.WriteLine();
 
                 sw.WriteLine("--Device App.Settings--");
-                sw.WriteLine($"{nameof(App.Settings.DeviceSettings.DeleteExistingPlots)}: {App.Settings.DeviceSettings.DeleteExistingPlots}");
+                foreach (PropertyInfo pi in typeof(DeviceSettings).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    sw.WriteLine($"{pi.Name}: {pi.GetValue(App.Settings.DeviceSettings)}");
+                }
                 sw.WriteLine();
 
                 sw.WriteLine("--Metadata App.Settings--");
-                sw.WriteLine($"{nameof(MetadataSettings.Datum)}: {App.Settings.MetadataSettings.Datum}");
-                sw.WriteLine($"{nameof(MetadataSettings.DecType)}: {App.Settings.MetadataSettings.DecType}");
-                sw.WriteLine($"{nameof(MetadataSettings.Distance)}: {App.Settings.MetadataSettings.Distance}");
-                sw.WriteLine($"{nameof(MetadataSettings.Elevation)}: {App.Settings.MetadataSettings.Elevation}");
-                sw.WriteLine($"{nameof(MetadataSettings.MagDec)}: {App.Settings.MetadataSettings.MagDec}");
-                sw.WriteLine($"{nameof(MetadataSettings.Slope)}: {App.Settings.MetadataSettings.Slope}");
-                sw.WriteLine($"{nameof(MetadataSettings.Zone)}: {App.Settings.MetadataSettings.Zone}");
+                foreach (PropertyInfo pi in typeof(MetadataSettings).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    sw.WriteLine($"{pi.Name}: {pi.GetValue(App.Settings.MetadataSettings)}");
+                }
             }
 
             ZipFile.CreateFromDirectory(tempDirectory, Path.GetFullPath(sfd.FileName));

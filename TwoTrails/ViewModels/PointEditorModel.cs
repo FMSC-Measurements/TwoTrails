@@ -2992,6 +2992,8 @@ namespace TwoTrails.ViewModels
                 CreateDataGridTextColumn("Elev", nameof(GpsPoint.Elevation), stringFormat: defaultNumberFormat,
                     converter: new MetadataValueConverter() { Metadata = Manager.DefaultMetadata, MetadataPropertyName = MetadataPropertyName.Elevation }, visibility: Visibility.Collapsed),
                 CreateDataGridTextColumn(nameof(IManualAccuracy.ManualAccuracy), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
+                CreateDataGridTextColumn(nameof(GpsPoint.RMSEr), stringFormat: defaultNumberFormat, visibility: Visibility.Visible),
+
 
                 CreateDataGridTextColumn("Fwd Az", nameof(TravPoint.FwdAzimuth), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
                 CreateDataGridTextColumn("Back Az", nameof(TravPoint.BkAzimuth), stringFormat: defaultNumberFormat, visibility: Visibility.Collapsed),
