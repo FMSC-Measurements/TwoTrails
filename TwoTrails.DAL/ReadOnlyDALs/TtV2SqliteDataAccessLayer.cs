@@ -159,30 +159,21 @@ namespace TwoTrails.DAL
                 {
                     if (reader != null)
                     {
-                        TtPolygon poly;
                         int milliSeconds = 0;
 
                         while (reader.Read())
                         {
-                            poly = new TtPolygon();
-                            poly.CN = reader.GetString(0);
-                            poly.Name = reader.GetString(1);
-                            if (!reader.IsDBNull(2))
-                                poly.Description = reader.GetString(2);
-                            if (!reader.IsDBNull(3))
-                                poly.Accuracy = reader.GetDouble(3);
-                            if (!reader.IsDBNull(4))
-                                poly.Area = reader.GetDouble(4);
-                            if (!reader.IsDBNull(5))
-                                poly.Perimeter = reader.GetDouble(5);
-                            if (!reader.IsDBNull(6))
-                                poly.Increment = reader.GetInt32(6);
-                            if (!reader.IsDBNull(7))
-                                poly.PointStartIndex = reader.GetInt32(7);
-
-                            poly.TimeCreated = DateTime.Now.AddMilliseconds(milliSeconds++);
-
-                            yield return poly;
+                            yield return new TtPolygon(
+                                reader.GetString(0),
+                                reader.GetString(1),
+                                !reader.IsDBNull(2) ? reader.GetString(2) : null,
+                                !reader.IsDBNull(7) ? reader.GetInt32(7) : 0,
+                                !reader.IsDBNull(6) ? reader.GetInt32(6) : 10,
+                                DateTime.Now.AddMilliseconds(milliSeconds++),
+                                !reader.IsDBNull(3) ? reader.GetDouble(3) : Consts.DEFAULT_POINT_ACCURACY,
+                                !reader.IsDBNull(4) ? reader.GetDouble(4) : 0,
+                                !reader.IsDBNull(5) ? reader.GetDouble(5) : 0,
+                                0);
                         }
 
                         reader.Close();

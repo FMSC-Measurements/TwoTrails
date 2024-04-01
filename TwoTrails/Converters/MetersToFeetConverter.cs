@@ -13,8 +13,9 @@ namespace TwoTrails.Converters
                 try
                 {
                     if ((parameter is bool rev && rev) || (parameter is string str && str.ToLower() == "true"))
-                        return (dvalue * 1200d / 3937d);
-                    return (dvalue * 3937d / 1200d);
+                        return dvalue * FMSC.Core.Convert.FeetToMeters_Coeff;
+                    return dvalue * FMSC.Core.Convert.MetersToFeet_Coeff;
+
                 }
                 catch
                 {

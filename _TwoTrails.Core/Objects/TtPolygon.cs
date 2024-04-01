@@ -7,11 +7,11 @@ namespace TwoTrails.Core
 
     public class TtPolygon : TtObject, IComparable<TtPolygon>, IComparer<TtPolygon>
     {
-        public event PolygonChangedEvent PolygonAccuracyChanged;
         public event PolygonChangedEvent PreviewPolygonAccuracyChanged;
+        public event PolygonChangedEvent PolygonAccuracyChanged;
 
-        public event PolygonChangedEvent PolygonChanged;
         public event PolygonChangedEvent PreviewPolygonChanged;
+        public event PolygonChangedEvent PolygonChanged;
 
         #region Properties
         protected String _Name;
@@ -60,7 +60,7 @@ namespace TwoTrails.Core
         public Double Area
         {
             get { return _Area; }
-            set
+            private set
             {
                 if (SetField(ref _Area, value))
                 {
@@ -69,14 +69,14 @@ namespace TwoTrails.Core
             }
         }
 
-        public Double AreaAcres { get { return _Area * 0.00024711; } }
-        public Double AreaHectaAcres { get { return _Area / 10000; } }
+        public Double AreaAcres => _Area * FMSC.Core.Convert.SquareMeterToAcre_Coeff;
+        public Double AreaHectaAcres => _Area / FMSC.Core.Convert.SquareMeterToHectare_Coeff;
 
         protected Double _Perimeter = 0;
         public Double Perimeter
         {
             get { return _Perimeter; }
-            set
+            private set
             {
                 if (SetField(ref _Perimeter, value))
                 {
@@ -85,14 +85,11 @@ namespace TwoTrails.Core
             }
         }
 
-        public Double PerimeterFt { get { return Perimeter * 3937d / 1200d; } }
-
-
         protected Double _PerimeterLine = 0;
         public Double PerimeterLine
         {
             get { return _PerimeterLine; }
-            set
+            private set
             {
                 if (SetField(ref _PerimeterLine, value))
                 {
@@ -101,7 +98,8 @@ namespace TwoTrails.Core
             }
         }
 
-        public Double PerimeterLineFt { get { return PerimeterLine * 3937d / 1200d; } }
+        public Double PerimeterFt => Perimeter * FMSC.Core.Convert.MetersToFeet_Coeff;
+        public Double PerimeterLineFt => PerimeterLine * FMSC.Core.Convert.MetersToFeet_Coeff;
         #endregion
 
 
