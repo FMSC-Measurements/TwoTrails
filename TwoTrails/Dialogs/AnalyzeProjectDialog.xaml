@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TwoTrails"
         mc:Ignorable="d"
-        Title="Analyze Project" Height="200" Width="350" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="Analyze Project" Height="200" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -50,7 +50,8 @@
                 <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding HasMiszonnedPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Miszonned Points" />
                 <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding HasOrphanedQuondams, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Orphaned Quondams" />
                 <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding HasMissingChildren, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Missing Children" />
-                
+                <CheckBox Grid.Row="3" Grid.Column="0" IsChecked="{Binding HasUnsetPolygonAcc, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Unset Polygon Accuracies"/>
+
                 <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding HasEmptyPolygons, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Empty Polygons" />
                 <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding HasDuplicateMetadata, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Duplicate Metadata" />
                 <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding HasUnusedMetadata, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Content="Unused Metadata" />

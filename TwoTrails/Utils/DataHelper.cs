@@ -60,6 +60,11 @@ namespace TwoTrails.Utils
             return points.Values.Any(p => p.HasQuondamLinks && p.LinkedPoints.Any(lpk => !points.ContainsKey(lpk)));
         }
 
+        public static bool HasUnsetPolygonAccuracies(ITtManager manager)
+        {
+            return manager.GetPolygons().Any(p => p.Accuracy == Consts.DEFAULT_POINT_ACCURACY);
+        }
+
         public static bool AnalyzeEmptyPolygons(ITtManager manager)
         {
             return manager.GetPolygons().Any(poly => !manager.GetPoints().Any(p => p.PolygonCN == poly.CN));

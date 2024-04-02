@@ -19,12 +19,11 @@ namespace TwoTrails.Core
         public HaidResult Result { get; }
 
         public GeometricErrorReductionResult GERResult { get; }
+        public bool GERAvailable { get; }
 
         public ExclusionSummary Exclusions { get; }
-        public int ExclusionsCount => Exclusions != null ? Exclusions.Count() : 0;
-        public bool HasExclusions => Exclusions != null && Exclusions.Any();
-
-        public string EC => ExclusionsCount.ToString();
+        public int ExclusionsCount { get; }
+        public bool HasExclusions { get; }
 
         public double TotalGpsError { get; private set; } = 0;
         public double TotalTraverseError { get; private set; } = 0;
@@ -56,7 +55,12 @@ namespace TwoTrails.Core
 
             List<TtPoint> points = manager.GetPoints(polygon.CN);
 
-            GERResult = new GeometricErrorReductionResult(points.Where(p => p.OnBoundary).ToList(), polygon.Area); 
+            GERAvailable = UnitAnalyzer.QualifiesForGER(points);
+
+            if (GERAvailable)
+            {
+                GERResult = new GeometricErrorReductionResult(points.Where(p => p.OnBoundary).ToList(), polygon.Area);
+            }
 
             if (points.Count > 2)
             {
@@ -92,13 +96,19 @@ namespace TwoTrails.Core
 
                     Exclusions = new ExclusionSummary(manager, manager.GetPolygons().Where(p => p.ParentUnitCN == polygon.CN));
 
+                    ExclusionsCount = Exclusions.Count();
+                    HasExclusions = ExclusionsCount > 0;
+
+
                     if (Exclusions.Any())
                     {
                         TotalAreaWExclusions = polygon.Area;
                         TotalPerimWExclusions = polygon.Perimeter;
 
                         TotalAreaErrorAreaWExclusions = TotalGpsError;
-                        TotalGERAreaErrorAreaWExclusions = GERResult.TotalErrorArea;
+
+                        if (GERAvailable)
+                            TotalGERAreaErrorAreaWExclusions = GERResult.TotalErrorArea;
 
                         foreach (PolygonSummary ps in Exclusions)
                         {
@@ -106,11 +116,15 @@ namespace TwoTrails.Core
                             TotalPerimWExclusions += polygon.Perimeter;
 
                             TotalAreaErrorAreaWExclusions += ps.TotalGpsError;
-                            TotalGERAreaErrorAreaWExclusions += ps.GERResult.TotalErrorArea;
+
+                            if (GERAvailable)
+                                TotalGERAreaErrorAreaWExclusions += ps.GERResult.TotalErrorArea;
                         }
 
                         TotalAreaErrorWExclusions = TotalAreaErrorAreaWExclusions / TotalAreaWExclusions * 100d;
-                        TotalGERAreaErrorWExclusions = TotalGERAreaErrorAreaWExclusions / TotalAreaWExclusions * 100d;
+
+                        if (GERAvailable)
+                            TotalGERAreaErrorWExclusions = TotalGERAreaErrorAreaWExclusions / TotalAreaWExclusions * 100d;
                     }
                 }
 
@@ -145,7 +159,8 @@ namespace TwoTrails.Core
                             Math.Round(GpsAreaError, 2),
                             Environment.NewLine);
 
-                        if (GpsAreaError >= 10 && GERResult.AreaError > 0 && GERResult.AreaError < 10)
+                        if (GERAvailable && GpsAreaError >= Consts.HB_STANDARD_ACC &&
+                            GERResult.AreaError > 0 && GERResult.AreaError < Consts.HB_STANDARD_ACC)
                         {
                             sb.AppendFormat("Geometric area-error Contribution: {0:F3} Ac ({1:F2} Ha){2}",
                                 Math.Round(FMSC.Core.Convert.ToAcre(GERResult.TotalGpsErrorArea, Area.MeterSq), 2),

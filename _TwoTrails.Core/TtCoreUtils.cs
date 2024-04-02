@@ -65,45 +65,6 @@ namespace TwoTrails.Core
             throw new Exception("Polygon Not Found");
         }
 
-        public static bool IsPolygonAnIsland(this ITtManager manager, string polyCN)
-        {
-            return IsPolygonAnIsland(manager.GetPoints(polyCN));
-        }
-
-        public static bool IsPolygonAnIsland(IEnumerable<TtPoint> points)
-        {
-            if (points.HasAtLeast(3, pt => pt.OnBoundary))
-            {
-                bool hasGps = false;
-                int sideShotCount = 0;
-
-                foreach (TtPoint pt in points)
-                {
-                    if (!hasGps && !pt.OnBoundary)
-                    {
-                        if (pt.IsGpsAtBase())
-                            hasGps = true;
-                    }
-                    else if (hasGps && pt.OnBoundary)
-                    {
-                        if (pt.OpType == OpType.SideShot)
-                            sideShotCount++;
-                        else
-                            break;
-                    }
-                    else
-                        break;
-                }
-
-                if (sideShotCount > 2)
-                    return true;
-            }
-
-            return false;
-        }
-
- 
-
         public static Tuple<double, double, double> CalculateAreaPerimeterAndOnBoundTrail(this ITtManager manager, string polyCN)
         {
             return CalculateAreaPerimeterAndOnBoundTrail(manager.GetPoints(polyCN).Where(p => p.OnBoundary).ToList());

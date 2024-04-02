@@ -21,12 +21,23 @@ namespace TwoTrails.Core.Points
 
         public static bool IsGpsAtBase(this TtPoint point)
         {
-            return IsGpsType(point) || (point is QuondamPoint qp && qp.ParentPoint.IsGpsType());
+            return IsGpsType(point) || (point is QuondamPoint qp && IsGpsType(qp.ParentPoint));
         }
 
-        public static bool CanBeBndPoint(this TtPoint point)
+        public static bool IsBndType(this TtPoint point)
         {
             return point.OpType != OpType.WayPoint;
+        }
+
+        public static bool IsGpsBndType(this TtPoint point)
+        {
+            return point.OpType == OpType.Take5 || point.OpType == OpType.GPS ||
+                point.OpType == OpType.Walk;
+        }
+
+        public static bool IsGpsBndTypeAtBase(this TtPoint point)
+        {
+            return IsGpsBndType(point) || (point is QuondamPoint qp && IsGpsBndType(qp.ParentPoint));
         }
 
 

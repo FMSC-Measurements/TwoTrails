@@ -72,6 +72,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionaryTemplate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\ExclusionSummary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\UnitAnalyzer.cs" />
     <Compile Include="..\_TwoTrails.Core\Objects\GeometricReductionResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectProperties\MetadataProperties.cs" />
@@ -98,7 +99,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtProjectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\SideShotSegment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TraverseSegment.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtVersionOld.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtNmeaBurst.cs" />

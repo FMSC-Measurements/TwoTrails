@@ -24,6 +24,10 @@ namespace TwoTrails.Core.Points
         public override double UnAdjY { get { return ParentPoint.UnAdjY; } }
         public override double UnAdjZ { get { return ParentPoint.UnAdjZ; } }
 
+
+        public override bool OnBoundary => false;
+
+
         private TtPoint _ParentPoint;
         public TtPoint ParentPoint
         {

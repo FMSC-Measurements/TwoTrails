@@ -65,7 +65,7 @@ namespace TwoTrails.ViewModels
             set => Set(value, () => {
                 OnPropertyChanged(nameof(TargetPolygonToolTip));
 
-                List<TtPoint> points = Manager.GetPoints(TargetPolygon.CN).Where(p => p.CanBeBndPoint()).ToList();
+                List<TtPoint> points = Manager.GetPoints(TargetPolygon.CN).Where(p => p.IsBndType()).ToList();
                 _OrigPoints = points.ToDictionary(p => p.CN, p => p);
 
                 Points = new ReadOnlyObservableCollection<TtPoint>(
@@ -206,7 +206,7 @@ namespace TwoTrails.ViewModels
         public PointMinimizationModel(TtProject project, PointMinimizationDialog dialog)
         {
             Project = project;
-            Polygons = Manager.Polygons.Where(p => Manager.GetPoints(p.CN).HasAtLeast(4, pt => pt.CanBeBndPoint())).ToList();
+            Polygons = Manager.Polygons.Where(p => Manager.GetPoints(p.CN).HasAtLeast(4, pt => pt.IsBndType())).ToList();
             Polygons.Sort(new PolygonSorterDirect(project.Settings.SortPolysByName));
             _Dialog = dialog;
 

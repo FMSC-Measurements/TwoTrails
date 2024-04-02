@@ -14,6 +14,8 @@ namespace TwoTrails.Core
         public const int DEFAULT_POINT_START_INDEX = 1010;
         public const int DEFAULT_POINT_INCREMENT = 10;
 
+        public const double HB_STANDARD_ACC = 10d;
+
         public const String DefaultGroupName = "Main Group";
         public const String DefaultGroupDesc = "Default Group";
 
