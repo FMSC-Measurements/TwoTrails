@@ -13,6 +13,7 @@ namespace TwoTrails.Core
         public event PolygonChangedEvent PreviewPolygonChanged;
         public event PolygonChangedEvent PolygonChanged;
 
+
         #region Properties
         protected String _Name;
         public String Name
@@ -60,13 +61,7 @@ namespace TwoTrails.Core
         public Double Area
         {
             get { return _Area; }
-            private set
-            {
-                if (SetField(ref _Area, value))
-                {
-                    OnPropertyChanged(nameof(AreaAcres), nameof(AreaHectaAcres));
-                }
-            }
+            private set { SetField(ref _Area, value, () => OnPropertyChanged(nameof(AreaAcres), nameof(AreaHectaAcres))); }
         }
 
         public Double AreaAcres => _Area * FMSC.Core.Convert.SquareMeterToAcre_Coeff;
@@ -76,30 +71,26 @@ namespace TwoTrails.Core
         public Double Perimeter
         {
             get { return _Perimeter; }
-            private set
-            {
-                if (SetField(ref _Perimeter, value))
-                {
-                    OnPropertyChanged(nameof(PerimeterFt));
-                }
-            }
+            private set { SetField(ref _Perimeter, value, () => OnPropertyChanged(nameof(PerimeterFt))); }
         }
 
         protected Double _PerimeterLine = 0;
         public Double PerimeterLine
         {
             get { return _PerimeterLine; }
-            private set
-            {
-                if (SetField(ref _PerimeterLine, value))
-                {
-                    OnPropertyChanged(nameof(PerimeterLineFt));
-                }
-            }
+            private set { SetField(ref _PerimeterLine, value, () => OnPropertyChanged(nameof(PerimeterLineFt))); }
         }
 
         public Double PerimeterFt => Perimeter * FMSC.Core.Convert.MetersToFeet_Coeff;
         public Double PerimeterLineFt => PerimeterLine * FMSC.Core.Convert.MetersToFeet_Coeff;
+
+
+        protected String _ParentUnitCN;
+        public String ParentUnitCN
+        {
+            get { return _ParentUnitCN; }
+            private set { SetField(ref _ParentUnitCN, value); }
+        }
         #endregion
 
 
@@ -115,10 +106,12 @@ namespace TwoTrails.Core
             _Accuracy = polygon._Accuracy;
             _Area = polygon._Area;
             _Perimeter = polygon._Perimeter;
+            _PerimeterLine = polygon._PerimeterLine;
+            _ParentUnitCN = polygon._ParentUnitCN;
         }
 
         public TtPolygon(string cn, string name, string desc, int psi, int inc, DateTime time,
-            double acc, double area, double perim, double perimLine) : base(cn)
+            double acc, double area, double perim, double perimLine, string parentUnitCN = null) : base(cn)
         {
             _Name = name;
             _Description = desc;
@@ -129,13 +122,16 @@ namespace TwoTrails.Core
             _Area = area;
             _Perimeter = perim;
             _PerimeterLine = perimLine;
+            _ParentUnitCN = parentUnitCN;
         }
 
-        protected void OnPolygonAccuracyChanged()
+
+        public void OnPolygonAccuracyChanged()
         {
             PreviewPolygonAccuracyChanged?.Invoke(this);
             PolygonAccuracyChanged?.Invoke(this);
         }
+
 
         public void Update(double area, double perimeter, double linePerimeter)
         {
@@ -166,6 +162,7 @@ namespace TwoTrails.Core
 
             return @this.TimeCreated.CompareTo(other.TimeCreated);
         }
+
 
         public override string ToString() => Name;
 

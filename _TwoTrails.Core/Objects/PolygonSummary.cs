@@ -20,12 +20,27 @@ namespace TwoTrails.Core
 
         public GeometricErrorReductionResult GERResult { get; }
 
+        public ExclusionSummary Exclusions { get; }
+        public int ExclusionsCount => Exclusions != null ? Exclusions.Count() : 0;
+        public bool HasExclusions => Exclusions != null && Exclusions.Any();
+
+        public string EC => ExclusionsCount.ToString();
+
         public double TotalGpsError { get; private set; } = 0;
         public double TotalTraverseError { get; private set; } = 0;
         public double TotalTraverseLength { get; private set; } = 0;
         public int TotalTraverseSegments { get; private set; } = 0;
         public double GpsAreaError { get; private set; } = 0;
         public double TraverseAreaError { get; private set; } = 0;
+
+
+        public double TotalAreaWExclusions { get; private set; } = 0;
+        public double TotalPerimWExclusions { get; private set; } = 0;
+        public double TotalAreaErrorAreaWExclusions { get; private set; } = 0;
+        public double TotalGERAreaErrorAreaWExclusions { get; private set; } = 0;
+        public double TotalAreaErrorWExclusions { get; private set; } = 0;
+        public double TotalGERAreaErrorWExclusions { get; private set; } = 0;
+
 
         public double WorstTravSegmentError { get; private set; } = double.PositiveInfinity;
 
@@ -35,7 +50,7 @@ namespace TwoTrails.Core
         public String SummaryText { get; }
 
 
-        public PolygonSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false)
+        public PolygonSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false, bool generateSummaryText = true)
         {
             Polygon = polygon;
 
@@ -46,6 +61,7 @@ namespace TwoTrails.Core
             if (points.Count > 2)
             {
                 StringBuilder sbPoints = new StringBuilder();
+                StringBuilder sbExclusionInfo = new StringBuilder();
 
                 foreach (TtPoint point in points)
                     ProcessPoint(sbPoints, point, null, showPoints);
@@ -70,67 +86,104 @@ namespace TwoTrails.Core
                     perim += leg.LegLength;
                 }
 
-                StringBuilder sb = new StringBuilder();
-                    
-                sb.AppendFormat("The polygon area is: {0:F3} Ac ({1:F2} Ha).{2}",
-                    Math.Round(polygon.AreaAcres, 2),
-                    Math.Round(polygon.AreaHectaAcres, 2),
-                    Environment.NewLine);
-
-                sb.AppendFormat("The polygon exterior perimeter is: {0:F2} Ft ({1:F1} M).{2}",
-                    Math.Round(polygon.PerimeterFt, 0),
-                    Math.Round(polygon.Perimeter, 2),
-                    Environment.NewLine);
-
-                sb.AppendFormat("The polyline perimeter is: {0:F2} Ft ({1:F1} M).{2}{2}",
-                    Math.Round(polygon.PerimeterLineFt, 0),
-                    Math.Round(polygon.PerimeterLine, 2),
-                    Environment.NewLine);
-
-                if (TotalGpsError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
+                if (TotalGpsError > 0)
                 {
-                    sb.AppendFormat("GPS area-error Contribution: {0:F3} Ac ({1:F2} Ha){2}",
-                        Math.Round(FMSC.Core.Convert.ToAcre(TotalGpsError, Area.MeterSq), 2),
-                        Math.Round(FMSC.Core.Convert.ToHectare(TotalGpsError, Area.MeterSq), 2),
-                        Environment.NewLine);
-
                     GpsAreaError = TotalGpsError / polygon.Area * 100.0;
-                    sb.AppendFormat("GPS Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
-                        Math.Round(GpsAreaError, 2),
-                        Environment.NewLine);
 
-                    if (GpsAreaError >= 10 && GERResult.AreaError > 0 && GERResult.AreaError < 10)
+                    Exclusions = new ExclusionSummary(manager, manager.GetPolygons().Where(p => p.ParentUnitCN == polygon.CN));
+
+                    if (Exclusions.Any())
                     {
-                        sb.AppendFormat("Geometric area-error Contribution: {0:F3} Ac ({1:F2} Ha){2}",
-                            Math.Round(FMSC.Core.Convert.ToAcre(GERResult.TotalGpsError, Area.MeterSq), 2),
-                            Math.Round(FMSC.Core.Convert.ToHectare(GERResult.TotalGpsError, Area.MeterSq), 2),
-                            Environment.NewLine);
+                        TotalAreaWExclusions = polygon.Area;
+                        TotalPerimWExclusions = polygon.Perimeter;
 
-                        sb.AppendFormat("Geometric Error Reduction Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
-                            Math.Round(GERResult.AreaError, 2),
-                            Environment.NewLine);
+                        TotalAreaErrorAreaWExclusions = TotalGpsError;
+                        TotalGERAreaErrorAreaWExclusions = GERResult.TotalErrorArea;
+
+                        foreach (PolygonSummary ps in Exclusions)
+                        {
+                            TotalAreaWExclusions -= ps.Polygon.Area;
+                            TotalPerimWExclusions += polygon.Perimeter;
+
+                            TotalAreaErrorAreaWExclusions += ps.TotalGpsError;
+                            TotalGERAreaErrorAreaWExclusions += ps.GERResult.TotalErrorArea;
+                        }
+
+                        TotalAreaErrorWExclusions = TotalAreaErrorAreaWExclusions / TotalAreaWExclusions * 100d;
+                        TotalGERAreaErrorWExclusions = TotalGERAreaErrorAreaWExclusions / TotalAreaWExclusions * 100d;
                     }
                 }
 
-                if (TotalTraverseError > Consts.MINIMUM_POINT_DIGIT_ACCURACY)
+
+                if (generateSummaryText)
                 {
-                    sb.AppendFormat("Traverse Contribution: {0:F3} Ac ({1:F2} Ha){2}",
-                        Math.Round(FMSC.Core.Convert.ToAcre(TotalTraverseError, Area.MeterSq), 2),
-                        Math.Round(FMSC.Core.Convert.ToHectare(TotalTraverseError, Area.MeterSq), 2),
+                    StringBuilder sb = new StringBuilder();
+
+                    sb.AppendFormat("The polygon area is: {0:F3} Ac ({1:F2} Ha).{2}",
+                        Math.Round(polygon.AreaAcres, 2),
+                        Math.Round(polygon.AreaHectaAcres, 2),
                         Environment.NewLine);
 
-                    TraverseAreaError = TotalTraverseError / polygon.Area * 100.0;
-                    sb.AppendFormat("Traverse Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
-                        Math.Round(TraverseAreaError, 2),
+                    sb.AppendFormat("The polygon exterior perimeter is: {0:F2} Ft ({1:F1} M).{2}",
+                        Math.Round(polygon.PerimeterFt, 0),
+                        Math.Round(polygon.Perimeter, 2),
                         Environment.NewLine);
+
+                    sb.AppendFormat("The polyline perimeter is: {0:F2} Ft ({1:F1} M).{2}{2}",
+                        Math.Round(polygon.PerimeterLineFt, 0),
+                        Math.Round(polygon.PerimeterLine, 2),
+                        Environment.NewLine);
+
+                    if (TotalGpsError > 0)
+                    {
+                        sb.AppendFormat("GPS area-error Contribution: {0:F3} Ac ({1:F2} Ha){2}",
+                            Math.Round(FMSC.Core.Convert.ToAcre(TotalGpsError, Area.MeterSq), 2),
+                            Math.Round(FMSC.Core.Convert.ToHectare(TotalGpsError, Area.MeterSq), 2),
+                            Environment.NewLine);
+
+                        sb.AppendFormat("GPS Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
+                            Math.Round(GpsAreaError, 2),
+                            Environment.NewLine);
+
+                        if (GpsAreaError >= 10 && GERResult.AreaError > 0 && GERResult.AreaError < 10)
+                        {
+                            sb.AppendFormat("Geometric area-error Contribution: {0:F3} Ac ({1:F2} Ha){2}",
+                                Math.Round(FMSC.Core.Convert.ToAcre(GERResult.TotalGpsErrorArea, Area.MeterSq), 2),
+                                Math.Round(FMSC.Core.Convert.ToHectare(GERResult.TotalGpsErrorArea, Area.MeterSq), 2),
+                                Environment.NewLine);
+
+                            sb.AppendFormat("Geometric Error Reduction Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
+                                Math.Round(GERResult.AreaError, 2),
+                                Environment.NewLine);
+                        }
+                    }
+
+                    if (TotalTraverseError > 0)
+                    {
+                        sb.AppendFormat("Traverse Contribution: {0:F3} Ac ({1:F2} Ha){2}",
+                            Math.Round(FMSC.Core.Convert.ToAcre(TotalTraverseError, Area.MeterSq), 2),
+                            Math.Round(FMSC.Core.Convert.ToHectare(TotalTraverseError, Area.MeterSq), 2),
+                            Environment.NewLine);
+
+                        TraverseAreaError = TotalTraverseError / polygon.Area * 100.0;
+                        sb.AppendFormat("Traverse Contribution Ratio of area-error-area to area is: {0:F2}%.{1}{1}",
+                            Math.Round(TraverseAreaError, 2),
+                            Environment.NewLine);
+                    }
+
+                    if (TotalAreaWExclusions > 0)
+                    {
+                        sb.Append(sbExclusionInfo.ToString());
+                    }
+
+                    sb.Append(sbPoints.ToString());
+
+
+                    SummaryText = sb.ToString();
+                    sb.Clear();
                 }
 
-                sb.Append(sbPoints.ToString());
-
-                SummaryText = sb.ToString();
-
                 sbPoints.Clear();
-                sb.Clear();
                 _Legs.Clear();
                 _LastTtPoint = _LastTtBndPt = _LastTravPoint = _LastGpsPoint = null;
             }

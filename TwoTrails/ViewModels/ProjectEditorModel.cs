@@ -242,11 +242,11 @@ namespace TwoTrails.ViewModels
 
             #endregion
 
-
-            PolygonShapeChanged(null);
-
             foreach (TtPolygon poly in Manager.Polygons)
-                poly.PolygonChanged += PolygonShapeChanged;
+            {
+                poly.PolygonChanged += NonActive_PolygonChanged;
+                poly.PolygonAccuracyChanged += NonActive_PolygonAccuracyChanged;
+            }
 
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += PolygonCollectionChanged;
 
@@ -293,7 +293,10 @@ namespace TwoTrails.ViewModels
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged -= PolygonCollectionChanged;
 
             foreach (TtPolygon poly in Manager.Polygons)
-                poly.PolygonChanged -= PolygonShapeChanged;
+            {
+                poly.PolygonChanged -= NonActive_PolygonChanged;
+                poly.PolygonAccuracyChanged -= NonActive_PolygonAccuracyChanged;
+            }
 
             Manager.HistoryChanged -= Manager_HistoryChanged;
 
@@ -433,8 +436,8 @@ namespace TwoTrails.ViewModels
             set => EditPolygonValue(ref _PolygonIncrement, value, PolygonProperties.INCREMENT);
         }
 
-        public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
-        public double TotalPolygonPerimeter { get { return Get<double>(); } set { Set(value); } }
+        //public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
+        //public double TotalPolygonPerimeter { get { return Get<double>(); } set { Set(value); } }
 
         public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
 
@@ -507,11 +510,17 @@ namespace TwoTrails.ViewModels
             {
                 case NotifyCollectionChangedAction.Add:
                     foreach (TtPolygon poly in e.NewItems)
-                        poly.PolygonChanged += PolygonShapeChanged;
+                    {
+                        poly.PolygonChanged += NonActive_PolygonChanged;
+                        poly.PolygonAccuracyChanged += NonActive_PolygonAccuracyChanged;
+                    }
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (TtPolygon poly in e.OldItems)
-                        poly.PolygonChanged -= PolygonShapeChanged;
+                    {
+                        poly.PolygonChanged -= NonActive_PolygonChanged;
+                        poly.PolygonAccuracyChanged -= NonActive_PolygonAccuracyChanged;
+                    }
                     break;
                 case NotifyCollectionChangedAction.Replace:
                 case NotifyCollectionChangedAction.Reset:
@@ -519,19 +528,17 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void PolygonShapeChanged(TtPolygon polygon)
+        private void NonActive_PolygonChanged(TtPolygon polygon)
         {
-            //double area = 0, perim = 0;
-            //foreach (TtPolygon poly in Manager.Polygons)
-            //{
-            //    area += poly.Area;
-            //    perim += poly.Perimeter;
-            //}
-
-            //TotalPolygonArea = area;
-            //TotalPolygonPerimeter = perim;
-
             ValidatePolygon(polygon);
+        }
+
+        private void NonActive_PolygonAccuracyChanged(TtPolygon polygon)
+        {
+            if  (polygon.CN == CurrentPolygon.CN || polygon.ParentUnitCN == CurrentPolygon.CN)
+            {
+                GeneratePolygonSummaryAndStats(CurrentPolygon);
+            }
         }
 
         private void PolygonChanged(TtPolygon poly)
@@ -548,6 +555,7 @@ namespace TwoTrails.ViewModels
             }
 
             OnPropertyChanged(nameof(PolygonAccuracy));
+            GeneratePolygonSummaryAndStats(CurrentPolygon);
         }
 
         private void AccuracyLookup()

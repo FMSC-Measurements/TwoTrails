@@ -836,7 +836,9 @@ namespace TwoTrails.DAL
                                 dr.GetDouble(3),
                                 dr.GetDouble(7),
                                 dr.GetDouble(8),
-                                dr.GetDoubleN(9) ?? 0);
+                                dr.GetDoubleN(9) ?? 0,
+                                dr.GetStringN(10)
+                            );
                         }
 
                         dr.Close();
@@ -986,7 +988,8 @@ namespace TwoTrails.DAL
                 [TTS.PolygonSchema.TimeCreated] = poly.TimeCreated.ToString(Consts.DATE_FORMAT),
                 [TTS.PolygonSchema.Area] = poly.Area,
                 [TTS.PolygonSchema.Perimeter] = poly.Perimeter,
-                [TTS.PolygonSchema.PerimeterLine] = poly.PerimeterLine
+                [TTS.PolygonSchema.PerimeterLine] = poly.PerimeterLine,
+                [TTS.PolygonSchema.ParentUnitCN] = poly.ParentUnitCN,
             };
         }
         #endregion

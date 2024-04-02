@@ -8,19 +8,22 @@ namespace TwoTrails.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && double.TryParse(value as string, out double dvalue))
-            {
-                try
-                {
-                    if ((parameter is bool rev && rev) || (parameter is string str && str.ToLower() == "true"))
-                        return dvalue * FMSC.Core.Convert.FeetToMeters_Coeff;
-                    return dvalue * FMSC.Core.Convert.MetersToFeet_Coeff;
+            double? dvalue = null;
 
-                }
-                catch
+            if (value != null)
+            {
+                if (value is double)
                 {
-                    //
+                    dvalue = (double)value;
                 }
+                else if (double.TryParse(value as string, out double dv))
+                {
+                    dvalue = dv;
+                }
+
+                if ((parameter is bool rev && rev) || (parameter is string str && str.ToLower() == "true"))
+                    return dvalue * FMSC.Core.Convert.FeetToMeters_Coeff;
+                return dvalue * FMSC.Core.Convert.MetersToFeet_Coeff;
             }
 
             return 0;

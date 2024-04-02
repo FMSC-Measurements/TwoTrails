@@ -2,7 +2,6 @@
 using FMSC.Core.Utilities;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using FMSC.Core.Windows.Utilities;
-using FMSC.GeoSpatial.NTDP;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -223,6 +222,13 @@ namespace TwoTrails.ViewModels
 #endif
         }
 
+        protected override void Dispose(bool dispoing)
+        {
+            if (_EndMessageDelayHandler != null)
+                _EndMessageDelayHandler.Dispose();
+
+            base.Dispose(dispoing);
+        }
 
         private void ParseCommandLineArgs(String[] args)
         {

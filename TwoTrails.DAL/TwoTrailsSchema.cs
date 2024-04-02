@@ -246,7 +246,8 @@ namespace TwoTrails.DAL
                 TimeCreated + ", " +
                 Area + ", " +
                 Perimeter + ", " +
-                PerimeterLine;
+                PerimeterLine + ", " +
+                ParentUnitCN;
         }
         #endregion
 

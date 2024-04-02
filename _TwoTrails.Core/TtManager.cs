@@ -34,7 +34,7 @@ namespace TwoTrails.Core
 
         private Dictionary<Guid, Tuple<DataActionType, string>> _DataActions = new Dictionary<Guid, Tuple<DataActionType, string>>();
 
-        private Dictionary<String, DelayActionHandler> _PolygonUpdateHandlers;
+        private Dictionary<String, DelayActionHandler> _PolygonAPUpdateHandlers, _PolygonAccUpdateHandlers;
 
         private ObservableCollection<TtPoint> _Points;
         private ObservableCollection<TtPolygon> _Polygons;
@@ -116,7 +116,8 @@ namespace TwoTrails.Core
                 }).ToDictionary(p => p.CN, p => p);
             _PolyGraphicOptsOrig = _PolyGraphicOpts.Values.ToDictionary(p => p.CN, p => new PolygonGraphicOptions(p.CN, p));
 
-            _PolygonUpdateHandlers = new Dictionary<string, DelayActionHandler>();
+            _PolygonAPUpdateHandlers = new Dictionary<string, DelayActionHandler>();
+            _PolygonAccUpdateHandlers = new Dictionary<string, DelayActionHandler>();
 
             _AddNmea = new Dictionary<string, TtNmeaBurst>();
             _DeleteNmeaByPointCNs = new List<string>();
@@ -272,34 +273,44 @@ namespace TwoTrails.Core
 
         protected void AttachPolygonEvents(TtPolygon poly)
         {
-            poly.PolygonAccuracyChanged += Polygon_PolygonAccuracyChanged;
-
-            DelayActionHandler dah = new DelayActionHandler(() =>
+            DelayActionHandler apStatsDAH = new DelayActionHandler(() =>
             {
                 GeneratePolygonStats(poly);
             }, POLYGON_UPDATE_DELAY);
 
-            if (!_PolygonUpdateHandlers.ContainsKey(poly.CN))
+            if (!_PolygonAPUpdateHandlers.ContainsKey(poly.CN))
             {
-                _PolygonUpdateHandlers.Add(poly.CN, dah);
+                _PolygonAPUpdateHandlers.Add(poly.CN, apStatsDAH);
             }
             else
             {
-                _PolygonUpdateHandlers[poly.CN].Cancel();
-                _PolygonUpdateHandlers[poly.CN] = dah;
+                _PolygonAPUpdateHandlers[poly.CN].Cancel();
+                _PolygonAPUpdateHandlers[poly.CN] = apStatsDAH;
+            }
+
+
+            DelayActionHandler accDAH = new DelayActionHandler(() =>
+            {
+                poly.OnPolygonAccuracyChanged();
+            }, POLYGON_UPDATE_DELAY);
+
+            if (!_PolygonAccUpdateHandlers.ContainsKey(poly.CN))
+            {
+                _PolygonAccUpdateHandlers.Add(poly.CN, accDAH);
+            }
+            else
+            {
+                _PolygonAccUpdateHandlers[poly.CN].Cancel();
+                _PolygonAccUpdateHandlers[poly.CN] = accDAH;
             }
         }
 
         protected void DetachPolygonEvents(TtPolygon poly)
         {
-            poly.PolygonAccuracyChanged -= Polygon_PolygonAccuracyChanged;
-
-            if (_PolygonUpdateHandlers.ContainsKey(poly.CN))
+            if (_PolygonAPUpdateHandlers.ContainsKey(poly.CN))
             {
-				DelayActionHandler dah = _PolygonUpdateHandlers[poly.CN];
-                //_PolygonUpdateHandlers[poly.CN].Cancel();
-                _PolygonUpdateHandlers.Remove(poly.CN);
-				dah.Dispose();
+				_PolygonAPUpdateHandlers[poly.CN].Dispose();
+                _PolygonAPUpdateHandlers.Remove(poly.CN);
             }
         }
 
@@ -345,8 +356,12 @@ namespace TwoTrails.Core
 
             if (point.IsGpsType())
             {
-                ((GpsPoint)point).OnAccuracyChanged += Point_LocationChanged;
                 point.MetadataChanged += Point_MetadataChanged;
+            }
+
+            if (point.IsManualAccType())
+            {
+                point.OnAccuracyChanged += Point_AccuracyChanged;
             }
 
             point.LocationChanged += Point_LocationChanged;
@@ -362,8 +377,12 @@ namespace TwoTrails.Core
 
             if (point.IsGpsType())
             {
-                ((GpsPoint)point).OnAccuracyChanged -= Point_LocationChanged;
                 point.MetadataChanged -= Point_MetadataChanged;
+            }
+
+            if (point.IsManualAccType())
+            {
+                point.OnAccuracyChanged -= Point_AccuracyChanged;
             }
 
             point.LocationChanged -= Point_LocationChanged;
@@ -678,15 +697,6 @@ namespace TwoTrails.Core
         }
 
 
-        private void Polygon_PolygonAccuracyChanged(TtPolygon polygon)
-        {
-            lock (locker)
-            {
-                AdjustAllTravTypesInPolygon(polygon);
-                UpdatePolygonStats(polygon);
-            }
-        }
-
         private void Point_OnBoundaryChanged(TtPoint point)
         {
             if (!IgnorePointEvents)
@@ -694,7 +704,7 @@ namespace TwoTrails.Core
                 lock (locker)
                 {
                     //AdjustAroundPoint(point, _PointsByPoly[point.PolygonCN]);
-                    _PolygonUpdateHandlers[point.PolygonCN].DelayInvoke();
+                    _PolygonAPUpdateHandlers[point.PolygonCN].DelayInvoke();
                 }
             }
         }
@@ -709,6 +719,17 @@ namespace TwoTrails.Core
                         AdjustAroundGpsPoint(point);
 
                     UpdatePolygonStats(point.Polygon);
+                }
+            }
+        }
+
+        private void Point_AccuracyChanged(TtPoint point)
+        {
+            if (!IgnorePointEvents)
+            {
+                lock (locker)
+                {
+                    _PolygonAccUpdateHandlers[point.Polygon.CN].DelayInvoke();
                 }
             }
         }
@@ -895,7 +916,7 @@ namespace TwoTrails.Core
 
                 if (waitForUpdates)
                 {
-                    _PolygonUpdateHandlers[poly.CN].Cancel();
+                    _PolygonAPUpdateHandlers[poly.CN].Cancel();
                     GeneratePolygonStats(poly);
                 }
                 else
@@ -1076,7 +1097,7 @@ namespace TwoTrails.Core
 
         public void UpdatePolygonStats(TtPolygon polygon)
         {
-            _PolygonUpdateHandlers[polygon.CN].DelayInvoke();
+            _PolygonAPUpdateHandlers[polygon.CN].DelayInvoke();
         }
 
         protected void GeneratePolygonStats(TtPolygon polygon)
@@ -1387,7 +1408,7 @@ namespace TwoTrails.Core
                 }
 
                 foreach (string cn in polysToAdjust)
-                    _PolygonUpdateHandlers[cn].DelayInvoke();
+                    _PolygonAPUpdateHandlers[cn].DelayInvoke();
             }
         }
 

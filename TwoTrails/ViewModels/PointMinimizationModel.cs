@@ -188,11 +188,11 @@ namespace TwoTrails.ViewModels
             ));
         }
 
-        public double? GpsAreaError => GERResult != null ? GERResult.TotalGpsError / TargetPolygon.Area * 100d : (double?)null;
-        public double? NewGpsAreaError => NewGERResult != null ? NewGERResult.TotalGpsError / TargetPolygon.Area * 100d : (double?)null;
+        public double? GpsAreaError => GERResult != null ? GERResult.TotalGpsErrorArea / TargetPolygon.Area * 100d : (double?)null;
+        public double? NewGpsAreaError => NewGERResult != null ? NewGERResult.TotalGpsErrorArea / TargetPolygon.Area * 100d : (double?)null;
 
-        public double? VariableAreaError => GERResult != null ? GERResult.TotalError / TargetPolygon.Area * 100d : (double?)null;
-        public double? NewVariableAreaError => NewGERResult != null ? NewGERResult.TotalError / TargetPolygon.Area * 100d : (double?)null;
+        public double? VariableAreaError => GERResult != null ? GERResult.TotalErrorArea / TargetPolygon.Area * 100d : (double?)null;
+        public double? NewVariableAreaError => NewGERResult != null ? NewGERResult.TotalErrorArea / TargetPolygon.Area * 100d : (double?)null;
 
 
         private double GetDiff(double i1, double i2)

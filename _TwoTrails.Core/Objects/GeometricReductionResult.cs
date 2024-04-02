@@ -29,10 +29,10 @@ namespace TwoTrails.Core
 
         private double PolygonArea { get; set; }
 
-        public double TotalGpsError { get; private set; }
-        public double TotalError { get; private set; }
-        public double GpsAreaError => PolygonArea > 0 ? TotalGpsError / PolygonArea * 100d : 0;
-        public double AreaError => PolygonArea > 0 ? TotalError / PolygonArea * 100d : 0;
+        public double TotalGpsErrorArea { get; private set; }
+        public double TotalErrorArea { get; private set; }
+        public double GpsAreaError => PolygonArea > 0 ? TotalGpsErrorArea / PolygonArea * 100d : 0;
+        public double AreaError => PolygonArea > 0 ? TotalErrorArea / PolygonArea * 100d : 0;
 
         public double TotalReduction => GpsAreaError > 0 ? (GpsAreaError - AreaError) : 0;
 
@@ -175,8 +175,8 @@ namespace TwoTrails.Core
 
                     Segments.Add(new GERSegment(lastPoint, currPoint, nextPoint, segAreaError, angle, segmentLength));
 
-                    TotalError += segAreaError;
-                    TotalGpsError += accDistSegB;
+                    TotalErrorArea += segAreaError;
+                    TotalGpsErrorArea += accDistSegB;
 
 
                     lastPoint = currPoint;

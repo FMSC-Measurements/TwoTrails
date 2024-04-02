@@ -22,7 +22,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ConvertQuondamCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateCorridorDoubleSidedCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateCorridorCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\EditTtPolygonsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtBaseCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\ITtPolygonsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\MinimizePointsCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\RetraceCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ComponentModel.History\CreateQuondamsCommand.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtMediaInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionaryTemplate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\ExclusionSummary.cs" />
     <Compile Include="..\_TwoTrails.Core\Objects\GeometricReductionResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectProperties\MetadataProperties.cs" />
