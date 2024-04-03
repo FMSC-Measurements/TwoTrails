@@ -6,7 +6,7 @@
         xmlns:core="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
         mc:Ignorable="d"
         Title="TwoTrails"
-        Width="1000" MinWidth="700"
+        Width="1000" MinWidth="750"
         Height="800" MinHeight="500"
         WindowStartupLocation="Manual">
 

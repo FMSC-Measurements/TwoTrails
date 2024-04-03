@@ -1,10 +1,10 @@
 ﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
-using FMSC.GeoSpatial.NTDP;
 using System;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
+using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
 {

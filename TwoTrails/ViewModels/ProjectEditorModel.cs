@@ -38,7 +38,7 @@ namespace TwoTrails.ViewModels
         public ICommand ViewUserActivityCommand { get; }
 
         #region Polygons
-        public ICommand PolygonChangedCommand { get; }
+        public ICommand PolygonSelctedCommand { get; }
         public ICommand CreatePolygonCommand { get; }
         public ICommand DeletePolygonCommand { get; }
         public BindedRelayCommand<ProjectEditorModel> PolygonUpdateAccCommand { get; }
@@ -94,6 +94,8 @@ namespace TwoTrails.ViewModels
 
         public ReadOnlyObservableCollection<TtPolygon> Polygons => Manager.Polygons;
         public ListCollectionView PolygonsLVC { get; }
+        private Dictionary<string, PolygonSummary> _PolygonSummaries = new Dictionary<string, PolygonSummary>();
+
 
         public ReadOnlyObservableCollection<TtMetadata> Metadata => Manager.Metadata;
         public ReadOnlyObservableCollection<TtGroup> Groups => Manager.Groups;
@@ -155,7 +157,7 @@ namespace TwoTrails.ViewModels
             CalculateLogDeckCommand = new RelayCommand(x => CalculateLogDeck());
 
             #region Polygons
-            PolygonChangedCommand = new RelayCommand(x => PolygonChanged(x as TtPolygon));
+            PolygonSelctedCommand = new RelayCommand(x => PolygonSelected(x as TtPolygon));
             CreatePolygonCommand = new RelayCommand(x => CreatePolygon(x as ListBox));
             DeletePolygonCommand = new RelayCommand(x => DeletePolygon(x as ListBox));
 
@@ -244,8 +246,8 @@ namespace TwoTrails.ViewModels
 
             foreach (TtPolygon poly in Manager.Polygons)
             {
-                poly.PolygonChanged += NonActive_PolygonChanged;
-                poly.PolygonAccuracyChanged += NonActive_PolygonAccuracyChanged;
+                poly.PolygonChanged += PolygonChanged;
+                poly.PolygonAccuracyChanged += PolygonAccuracyChanged;
             }
 
             ((INotifyCollectionChanged)Manager.Polygons).CollectionChanged += PolygonCollectionChanged;
@@ -294,14 +296,14 @@ namespace TwoTrails.ViewModels
 
             foreach (TtPolygon poly in Manager.Polygons)
             {
-                poly.PolygonChanged -= NonActive_PolygonChanged;
-                poly.PolygonAccuracyChanged -= NonActive_PolygonAccuracyChanged;
+                poly.PolygonChanged -= PolygonChanged;
+                poly.PolygonAccuracyChanged -= PolygonAccuracyChanged;
             }
 
             Manager.HistoryChanged -= Manager_HistoryChanged;
 
-            if (_CurrentPolygon != null)
-                _CurrentPolygon.PolygonChanged -= GeneratePolygonSummaryAndStats;
+            //if (_CurrentPolygon != null)
+            //    _CurrentPolygon.PolygonChanged -= GeneratePolygonSummaryAndStats;
         }
 
 
@@ -376,21 +378,21 @@ namespace TwoTrails.ViewModels
             get => _CurrentPolygon;
             private set
             {
-                TtPolygon old = _CurrentPolygon;
+                //TtPolygon old = _CurrentPolygon;
 
                 SetField(ref _CurrentPolygon, value, () => {
-                    if (old != null)
-                    {
-                        old.PolygonChanged -= GeneratePolygonSummaryAndStats;
-                    }
+                    //if (old != null)
+                    //{
+                    //    old.PolygonChanged -= GeneratePolygonSummaryAndStats;
+                    //}
 
                     BindPolygonValues(value);
 
                     if (_CurrentPolygon != null)
                     {
-                        _CurrentPolygon.PolygonChanged += GeneratePolygonSummaryAndStats;
+                        //_CurrentPolygon.PolygonChanged += GeneratePolygonSummaryAndStats;
 
-                        ValidatePolygon(value);
+                        //ValidatePolygon(value);
 
                         GeneratePolygonSummaryAndStats(_CurrentPolygon);
                     }
@@ -500,9 +502,31 @@ namespace TwoTrails.ViewModels
 
         private void GeneratePolygonSummaryAndStats(TtPolygon polygon)
         {
-            PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true);
+            if (polygon.CN == CurrentPolygon.CN)
+            {
+                if (_PolygonSummaries.ContainsKey(polygon.CN))
+                {
+                    PolygonSummary = _PolygonSummaries[polygon.CN];
+                }
+                else
+                {
+                    PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true);
+                    _PolygonSummaries[polygon.CN] = PolygonSummary;
+                }
+            }
         }
 
+        private void ClearPolygonSummary(TtPolygon polygon)
+        {
+            if (_PolygonSummaries.ContainsKey(polygon.CN))
+                _PolygonSummaries.Remove(polygon.CN);
+        }
+
+
+        private void PolygonSelected(TtPolygon poly)
+        {
+            CurrentPolygon = poly;
+        }
 
         private void PolygonCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -511,15 +535,15 @@ namespace TwoTrails.ViewModels
                 case NotifyCollectionChangedAction.Add:
                     foreach (TtPolygon poly in e.NewItems)
                     {
-                        poly.PolygonChanged += NonActive_PolygonChanged;
-                        poly.PolygonAccuracyChanged += NonActive_PolygonAccuracyChanged;
+                        poly.PolygonChanged += PolygonChanged;
+                        poly.PolygonAccuracyChanged += PolygonAccuracyChanged;
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (TtPolygon poly in e.OldItems)
                     {
-                        poly.PolygonChanged -= NonActive_PolygonChanged;
-                        poly.PolygonAccuracyChanged -= NonActive_PolygonAccuracyChanged;
+                        poly.PolygonChanged -= PolygonChanged;
+                        poly.PolygonAccuracyChanged -= PolygonAccuracyChanged;
                     }
                     break;
                 case NotifyCollectionChangedAction.Replace:
@@ -528,22 +552,17 @@ namespace TwoTrails.ViewModels
             }
         }
 
-        private void NonActive_PolygonChanged(TtPolygon polygon)
+        private void PolygonChanged(TtPolygon polygon)
         {
             ValidatePolygon(polygon);
+            ClearPolygonSummary(polygon);
+            GeneratePolygonSummaryAndStats(CurrentPolygon);
         }
 
-        private void NonActive_PolygonAccuracyChanged(TtPolygon polygon)
+        private void PolygonAccuracyChanged(TtPolygon polygon)
         {
-            if  (polygon.CN == CurrentPolygon.CN || polygon.ParentUnitCN == CurrentPolygon.CN)
-            {
-                GeneratePolygonSummaryAndStats(CurrentPolygon);
-            }
-        }
-
-        private void PolygonChanged(TtPolygon poly)
-        {
-            CurrentPolygon = poly;
+            ClearPolygonSummary(polygon);
+            GeneratePolygonSummaryAndStats(CurrentPolygon);
         }
 
 
@@ -569,13 +588,17 @@ namespace TwoTrails.ViewModels
 
             if (dialog.ShowDialog() == true)
             {
-                CurrentPolygon.Accuracy = dialog.Accuracy;
                 PolygonAccuracy = dialog.Accuracy;
+
+                if (!_PolygonAccuracy.Equals(CurrentPolygon.Accuracy))
+                {
+                    Manager.EditPolygon(CurrentPolygon, PolygonProperties.ACCURACY, _PolygonAccuracy);
+                }
                 SessionData.MakeID = dialog.MakeID;
                 SessionData.ModelID = dialog.ModelID;
-                OnPropertyChanged(nameof(PolygonAccuracy));
             }
         }
+
 
         private void CreatePolygon(ListBox listBox)
         {
@@ -663,6 +686,7 @@ namespace TwoTrails.ViewModels
                 }
             }
         }
+
 
         private void ValidatePolygon(TtPolygon polygon)
         {

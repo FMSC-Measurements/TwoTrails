@@ -17,9 +17,13 @@ namespace TwoTrails.Core
 
         public TtPolygon Polygon { get; }
         public HaidResult Result { get; }
+        public UnitAreaType UnitAreaType { get; }
+
+        public bool HasTraverse { get; }
+
 
         public GeometricErrorReductionResult GERResult { get; }
-        public bool GERAvailable { get; }
+        public bool GERAvailable => UnitAreaType == UnitAreaType.General;
 
         public ExclusionSummary Exclusions { get; }
         public int ExclusionsCount { get; }
@@ -55,7 +59,7 @@ namespace TwoTrails.Core
 
             List<TtPoint> points = manager.GetPoints(polygon.CN);
 
-            GERAvailable = UnitAnalyzer.QualifiesForGER(points);
+            UnitAreaType = UnitAnalyzer.GetUnitAreaType(points);
 
             if (GERAvailable)
             {
@@ -100,7 +104,7 @@ namespace TwoTrails.Core
                     HasExclusions = ExclusionsCount > 0;
 
 
-                    if (Exclusions.Any())
+                    if (HasExclusions)
                     {
                         TotalAreaWExclusions = polygon.Area;
                         TotalPerimWExclusions = polygon.Perimeter;
@@ -128,6 +132,8 @@ namespace TwoTrails.Core
                     }
                 }
 
+                if (_LastTravPoint != null)
+                    HasTraverse = true;
 
                 if (generateSummaryText)
                 {
@@ -173,7 +179,7 @@ namespace TwoTrails.Core
                         }
                     }
 
-                    if (TotalTraverseError > 0)
+                    if (HasTraverse)
                     {
                         sb.AppendFormat("Traverse Contribution: {0:F3} Ac ({1:F2} Ha){2}",
                             Math.Round(FMSC.Core.Convert.ToAcre(TotalTraverseError, Area.MeterSq), 2),

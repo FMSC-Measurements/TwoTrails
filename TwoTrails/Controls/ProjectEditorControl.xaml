@@ -283,21 +283,23 @@
                                  ItemContainerStyle="{StaticResource styleListBoxContainer}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding PolygonChangedCommand}"
+                                    <i:InvokeCommandAction Command="{Binding PolygonSelctedCommand}"
                              CommandParameter="{Binding ElementName=lbPolys, Path=SelectedItem}" />
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
+                                    <StackPanel>
+                                        <ToolTipService.ToolTip>
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding Name}"/>
+                                                <TextBlock FontSize="14" Text="{Binding Description}"/>
+                                            </StackPanel>
+                                        </ToolTipService.ToolTip>             
 
-                                        <TextBlock Grid.Row="0" Text="{Binding Name}" FontSize="18"/>
-                                        <TextBlock Grid.Row="1" Text="{Binding Description}"/>
-                                    </Grid>
+                                        <TextBlock Grid.Row="0" TextTrimming="CharacterEllipsis" Text="{Binding Name}" FontSize="18"/>
+                                        <TextBlock Grid.Row="1" TextTrimming="CharacterEllipsis" Text="{Binding Description, Converter={StaticResource RemoveNewLine}}"/>
+                                    </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
@@ -398,11 +400,11 @@
 
                                 <StackPanel Grid.Column="0" Grid.Row="7" Orientation="Horizontal" Margin="0 2 0 0 ">
                                     <TextBlock Text="Created On: "/>
-                                    <TextBlock Text="{Binding CurrentPolygon.TimeCreated}"/>
+                                    <TextBlock Text="{Binding CurrentPolygon.TimeCreated}" ToolTip="{Binding CurrentPolygon.TimeCreated}"/>
                                 </StackPanel>
 
                                 <TextBlock Grid.Column="0" Grid.Row="8" Text="Description" />
-                                <TextBox Grid.Column="0" Grid.Row="10" Grid.ColumnSpan="3" MinLines="3" MaxLines="5" Margin="0 0 5 0"
+                                <TextBox Grid.Column="0" Grid.Row="10" Grid.ColumnSpan="3" MinLines="2" MaxLines="5" Margin="0 0 5 0"
                                 Text="{Binding PolygonDescription, UpdateSourceTrigger=PropertyChanged, Delay=500}" IsUndoEnabled="False"
                                          AcceptsReturn="True" TextWrapping="Wrap"/>
 
@@ -473,83 +475,80 @@
                                 </GroupBox>
 
                                 <GroupBox Header="Polygon Area-Error Summary" Grid.Column="0" Grid.Row="11" Grid.ColumnSpan="3" Margin="-1 0 5 0">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
+                                    <StackPanel Orientation="Vertical">
                                         
-                                        <GroupBox Header="GPS Contribution" Grid.Column="0" Grid.Row="0">
-                                            <Grid Margin="5,0,5,0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="10"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
 
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="*"/>
-                                                    <RowDefinition Height="5"/>
-                                                    <RowDefinition Height="*"/>
-                                                    <RowDefinition Height="5"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
 
-                                                <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ac:"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                            <GroupBox Header="GPS Contribution" Grid.Column="0" Grid.Row="0">
+                                                <Grid Margin="5,0,5,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition MinWidth="120" Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
 
-                                                <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ha:"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="5"/>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="5"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
 
-                                                <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Err Ratio**" ToolTip="Area-Error/Area to be less than 10%"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GpsAreaError, StringFormat={}{0:F3}%}"/>
-                                            </Grid>
-                                        </GroupBox>
+                                                    <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ac:"/>
+                                                    <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
 
-                                        <GroupBox Header="Traverse Contribution" Grid.Column="1" Grid.Row="0">
-                                            <Grid Margin="5,0,5,0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="10"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ha:"/>
+                                                    <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalGpsError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
 
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="*"/>
-                                                    <RowDefinition Height="5"/>
-                                                    <RowDefinition Height="*"/>
-                                                    <RowDefinition Height="5"/>
-                                                    <RowDefinition Height="*"/>
-                                                </Grid.RowDefinitions>
+                                                    <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Err Ratio**" ToolTip="Area-Error/Area to be less than 10%"/>
+                                                    <TextBlock Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GpsAreaError, StringFormat={}{0:F3}%}"/>
+                                                </Grid>
+                                            </GroupBox>
 
-                                                <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ac:" ToolTip="Acres"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalTraverseError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                            <GroupBox Header="Traverse Contribution" Grid.Column="1" Grid.Row="0"
+                                                Visibility="{Binding PolygonSummary.HasTraverse, Converter={StaticResource BoolToVis}}">
+                                                <Grid Margin="5,0,5,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition MinWidth="130" Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
 
-                                                <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ha:" ToolTip="Hectares"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalTraverseError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="5"/>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="5"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
 
-                                                <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Error"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.TraverseAreaError, StringFormat={}{0:F3}%}"/>
-                                            </Grid>
-                                        </GroupBox>
+                                                    <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ac:" ToolTip="Acres"/>
+                                                    <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalTraverseError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+
+                                                    <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ha:" ToolTip="Hectares"/>
+                                                    <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.TotalTraverseError, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+
+                                                    <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Error"/>
+                                                    <TextBlock Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.TraverseAreaError, StringFormat={}{0:F3}%}"/>
+                                                </Grid>
+                                            </GroupBox>
+                                        </Grid>
 
                                         <GroupBox Header="Geometric Error Reduction" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
                                                   Visibility="{Binding PolygonSummary.GERAvailable, Converter={StaticResource BoolToVis}}">
                                             <Grid Margin="5,0,5,0">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="10"/>
+                                                    <ColumnDefinition MinWidth="120" Width="Auto"/>
                                                     <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="10"/>
+                                                    <ColumnDefinition MinWidth="175" Width="Auto"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
 
@@ -564,27 +563,27 @@
                                                 </Grid.RowDefinitions>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ac:" ToolTip="Acres"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalErrorArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalErrorArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ha:" ToolTip="Hectares"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalErrorArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalErrorArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Err Ratio**" ToolTip="Area-Error/Area to be less than 10%"/>
-                                                <TextBlock Grid.Column="2" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.AreaError, StringFormat={}{0:F3}%}"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.AreaError, StringFormat={}{0:F3}%}"/>
 
-                                                <TextBlock Grid.Column="3" Grid.Row="0" Margin="40 0 0 0" VerticalAlignment="Center" Text="Long Legs"
+                                                <TextBlock Grid.Column="2" Grid.Row="0" Margin="40 0 0 0" VerticalAlignment="Center" Text="Long Legs"
                                                            ToolTip="Legs longer than 10x the average accuracy of the adjacent points"/>
-                                                <TextBlock Grid.Column="5" Grid.Row="0" VerticalAlignment="Center"
+                                                <TextBlock Grid.Column="3" Grid.Row="0" VerticalAlignment="Center"
                                                            Text="{Binding PolygonSummary.GERResult.LongLegsPercent, StringFormat={}{0:F2}%}"/>
 
-                                                <TextBlock Grid.Column="3" Grid.Row="2" Margin="40 0 0 0" VerticalAlignment="Center" Text="Sharp Edges"
+                                                <TextBlock Grid.Column="2" Grid.Row="2" Margin="40 0 0 0" VerticalAlignment="Center" Text="Sharp Edges"
                                                            ToolTip="Edges of an angle greater than 45&#186;"/>
-                                                <TextBlock Grid.Column="5" Grid.Row="2" VerticalAlignment="Center"
+                                                <TextBlock Grid.Column="3" Grid.Row="2" VerticalAlignment="Center"
                                                            Text="{Binding PolygonSummary.GERResult.SharpEdgesPercent, StringFormat={}{0:F2}%}"/>
 
-                                                <TextBlock Grid.Column="3" Grid.Row="4" Margin="40 0 0 0" VerticalAlignment="Center" Text="Reduction Of"
+                                                <TextBlock Grid.Column="2" Grid.Row="4" Margin="40 0 0 0" VerticalAlignment="Center" Text="Reduction Of"
                                                            ToolTip="Reduction from Total GPS Contribution"/>
-                                                <TextBlock Grid.Column="5" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalReduction, StringFormat={}{0:F3}%}"/>
+                                                <TextBlock Grid.Column="3" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalReduction, StringFormat={}{0:F3}%}"/>
 
                                             </Grid>
                                         </GroupBox>
@@ -765,7 +764,7 @@
                                             </Grid>
                                         </Expander>
 
-                                    </Grid>
+                                    </StackPanel>
                                 </GroupBox>
 
                                 <TextBlock Grid.Row="14" Grid.ColumnSpan="3" Text="*Such as GPS error or taping error"/>
@@ -823,15 +822,17 @@
                             </i:Interaction.Triggers>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
+                                    <StackPanel>
+                                        <ToolTipService.ToolTip>
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding Name}"/>
+                                                <TextBlock FontSize="14" Text="{Binding Comment}"/>
+                                            </StackPanel>
+                                        </ToolTipService.ToolTip>
 
-                                        <TextBlock Grid.Row="0" Text="{Binding Name}" FontSize="18"/>
-                                        <TextBlock Grid.Row="1" Text="{Binding Comment}"/>
-                                    </Grid>
+                                        <TextBlock Grid.Row="0" TextTrimming="CharacterEllipsis" Text="{Binding Name}" FontSize="18"/>
+                                        <TextBlock Grid.Row="1" TextTrimming="WordEllipsis" Text="{Binding Comment, Converter={StaticResource RemoveNewLine}}"/>
+                                    </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
@@ -1031,15 +1032,17 @@
                             </i:Interaction.Triggers>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
+                                    <StackPanel>
+                                        <ToolTipService.ToolTip>
+                                            <StackPanel Orientation="Vertical">
+                                                <TextBlock FontSize="16" FontWeight="Bold" Text="{Binding Name}"/>
+                                                <TextBlock FontSize="14" Text="{Binding Description}"/>
+                                            </StackPanel>
+                                        </ToolTipService.ToolTip>
 
-                                        <TextBlock Grid.Row="0" Text="{Binding Name}" FontSize="18"/>
-                                        <TextBlock Grid.Row="1" Text="{Binding Description}"/>
-                                    </Grid>
+                                        <TextBlock Grid.Row="0" TextTrimming="CharacterEllipsis" Text="{Binding Name}" FontSize="18"/>
+                                        <TextBlock Grid.Row="1" TextTrimming="CharacterEllipsis" Text="{Binding Description, Converter={StaticResource RemoveNewLine}}"/>
+                                    </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>

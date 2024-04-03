@@ -5,10 +5,18 @@ namespace TwoTrails.Core
 {
     public static class UnitAnalyzer
     {
-        public static bool QualifiesForGER(ITtManager manager, TtPolygon polygon)
+        public static UnitAreaType GetUnitAreaType(ITtManager manager, TtPolygon polygon) => GetUnitAreaType(manager.GetPoints(polygon.CN));
+
+        public static UnitAreaType GetUnitAreaType(IEnumerable<TtPoint> points)
         {
-            return QualifiesForGER(manager.GetPoints(polygon.CN));
+            if (IsAnIsland(points)) return UnitAreaType.Island;
+            if (IsACorridor(points)) return UnitAreaType.Corridor;
+
+            return UnitAreaType.General;
         }
+
+
+        public static bool QualifiesForGER(ITtManager manager, TtPolygon polygon) => QualifiesForGER(manager.GetPoints(polygon.CN));
 
         public static bool QualifiesForGER(IEnumerable<TtPoint> points)
         {
@@ -16,10 +24,7 @@ namespace TwoTrails.Core
         }
 
 
-        public static bool IsAnIsland(this ITtManager manager, string polyCN)
-        {
-            return IsAnIsland(manager.GetPoints(polyCN));
-        }
+        public static bool IsAnIsland(this ITtManager manager, string polyCN) => IsAnIsland(manager.GetPoints(polyCN));
 
         public static bool IsAnIsland(IEnumerable<TtPoint> points)
         {
@@ -57,10 +62,7 @@ namespace TwoTrails.Core
         }
 
 
-        public static bool IsACorridor(this ITtManager manager, string polyCN)
-        {
-            return IsACorridor(manager.GetPoints(polyCN));
-        }
+        public static bool IsACorridor(this ITtManager manager, string polyCN) => IsACorridor(manager.GetPoints(polyCN));
 
         public static bool IsACorridor(IEnumerable<TtPoint> points)
         {

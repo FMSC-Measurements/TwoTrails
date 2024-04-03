@@ -1,8 +1,7 @@
-﻿using FMSC.GeoSpatial.NTDP;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
-using TwoTrails.Core;
+using TwoTrails.Utils;
 
 namespace TwoTrails
 {
@@ -71,7 +70,7 @@ namespace TwoTrails
             }
             catch (Exception e)
             {
-                Trace.WriteLine(e.Message, "SessionData:HasReport");
+                Trace.WriteLine(e.Message, "SessionData:DownloadGpsAccuracyReportFile");
                 return false;
             }
         }
