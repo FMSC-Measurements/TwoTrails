@@ -187,7 +187,7 @@ namespace TwoTrails.ViewModels
             ExportReportCommand = new RelayCommand(x => ExportReport());
             EmailReportCommand = new RelayCommand(x => ExportReport(true));
 
-            NtdpAccuraciesSiteCommand = new RelayCommand(x => Process.Start("https://www.fs.usda.gov/database/gps/mtdcrept/accuracy/index.htm"));
+            NtdpAccuraciesSiteCommand = new RelayCommand(x => Process.Start(Consts.URL_NTDP_ACCURACY_WEBPAGE));
 
             CheckForUpdatesCommand = new RelayCommand(x => CheckForUpdates());
             AboutCommand = new RelayCommand(x => AboutWindow.ShowDialog(MainWindow));

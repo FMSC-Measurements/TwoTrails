@@ -53,7 +53,7 @@ namespace TwoTrails.Core
         public String SummaryText { get; }
 
 
-        public PolygonSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false, bool generateSummaryText = true)
+        public PolygonSummary(ITtManager manager, TtPolygon polygon, bool generateSummaryText = false, bool showPoints = false)
         {
             Polygon = polygon;
 

@@ -17,7 +17,7 @@ namespace TwoTrails.Core
 
         public ExclusionSummary(ITtManager manager, IEnumerable<TtPolygon> polygons) 
         {
-            _Exclusions = polygons.Select(p => new PolygonSummary(manager, p, false, false)).ToList();
+            _Exclusions = polygons.Select(p => new PolygonSummary(manager, p)).ToList();
 
             foreach (var ps in _Exclusions)
             {

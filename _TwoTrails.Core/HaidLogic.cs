@@ -9,7 +9,7 @@ namespace TwoTrails.Core
         {
             lock (manager)
             {
-                return new PolygonSummary(manager, polygon, showPoints);
+                return new PolygonSummary(manager, polygon, true, showPoints);
             }
         }
 

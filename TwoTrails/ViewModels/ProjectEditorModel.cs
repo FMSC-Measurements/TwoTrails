@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -579,7 +580,17 @@ namespace TwoTrails.ViewModels
 
         private void AccuracyLookup()
         {
-            SessionData.HasGpsAccReport();
+            if (SessionData.HasGpsAccReport() == GpsReportStatus.CantGetReport)
+            {
+                if (MessageBox.Show(
+                    "Unable to retrieve NTDP accuracy report. Would you like to go to the website instead?",
+                    "Retrieve report error",
+                    MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+                {
+                    Process.Start(Consts.URL_NTDP_ACCURACY_WEBPAGE);
+                    return;
+                }
+            }
 
             AccuracyDataDialog dialog = new AccuracyDataDialog(SessionData.GpsAccuracyReport, _CurrentPolygon.Accuracy, SessionData.MakeID, SessionData.ModelID)
             {
