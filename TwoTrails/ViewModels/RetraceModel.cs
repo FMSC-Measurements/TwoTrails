@@ -1,9 +1,12 @@
-﻿using FMSC.Core.ComponentModel;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
+using FMSC.Core.Utilities;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
@@ -108,55 +111,7 @@ namespace TwoTrails.ViewModels
                             return false;
                     }
 
-                    List<TtPoint> retracePoints = new List<TtPoint>();
-
-                    foreach (Retrace r in Retraces)
-                    {
-                        if (r.SinglePoint)
-                        {
-                            retracePoints.Add(r.PointFrom);
-                        }
-                        else
-                        {
-                            List<TtPoint> points = r.Points;
-
-                            int sindex = points.IndexOf(r.PointFrom);
-                            int eindex = points.IndexOf(r.PointTo);
-
-                            if (r.DirInc)
-                            {
-                                if (sindex < eindex)
-                                {
-                                    for (int i = sindex; i <= eindex; i++)
-                                        retracePoints.Add(points[i]);
-                                }
-                                else
-                                {
-                                    for (int i = sindex; i < points.Count; i++)
-                                        retracePoints.Add(points[i]);
-
-                                    for (int i = 0; i <= eindex; i++)
-                                        retracePoints.Add(points[i]);
-                                }
-                            }
-                            else
-                            {
-                                if (sindex < eindex)
-                                {
-                                    for (int i = eindex; i >= sindex; i--)
-                                        retracePoints.Add(points[i]);
-                                }
-                                else
-                                {
-                                    for (int i = eindex; i > -1; i--)
-                                        retracePoints.Add(points[i]);
-
-                                    for (int i = points.Count - 1; i >= sindex; i--)
-                                        retracePoints.Add(points[i]);
-                                }
-                            }
-                        }
-                    }
+                    List<TtPoint> retracePoints = Retraces.SelectMany(r => r.RetracePoints).ToList();
                     
                     if (MovePoints)
                     {
@@ -199,6 +154,7 @@ namespace TwoTrails.ViewModels
         }
     }
 
+
     public class Retrace : BaseModel
     {
         public string GCN { get; } = Guid.NewGuid().ToString();
@@ -208,31 +164,130 @@ namespace TwoTrails.ViewModels
 
         public List<TtPolygon> Polygons { get; }
         
-        public List<TtPoint> Points { get { return Get<List<TtPoint>>(); } set { Set(value); } }
+        public List<TtPoint> Points { get { return Get<List<TtPoint>>(); } set { Set(value, UpdateRetraceDelay); } }
 
-        public TtPoint PointFrom { get { return Get<TtPoint>(); } set { Set(value); } }
-        public TtPoint PointTo { get { return Get<TtPoint>(); } set { Set(value); } }
+        public TtPoint PointFrom { get { return Get<TtPoint>(); } set { Set(value, UpdateRetraceDelay); } }
+        public TtPoint PointTo { get { return Get<TtPoint>(); } set { Set(value, UpdateRetraceDelay); } }
 
-        public bool DirInc { get { return Get<bool>(); } set { Set(value); } }
-        public bool SinglePoint { get { return Get<bool>(); } set { Set(value); } }
+        public bool DirFwd { get { return Get<bool>(); } set { Set(value, UpdateRetraceDelay); } }
+        public bool DirRev { get { return Get<bool>(); } set { Set(value, UpdateRetraceDelay); } }
+        public bool SinglePoint { get { return Get<bool>(); } set { Set(value, UpdateRetraceDelay); } }
 
         public bool IsValid { get { return PointFrom != null && PointTo != null || SinglePoint; } }
 
         
         public TtPolygon SelectedPolygon { get { return Get<TtPolygon>(); } set { Set(value, () => PolygonChanged(value)); } }
-        
+
+
+
+        private readonly DelayActionHandler updateRetraceDAH;
+
+        public ReadOnlyCollection<TtPoint> RetracePoints
+        {
+            get { return Get<ReadOnlyCollection<TtPoint>>(); }
+            set { Set(value, () => OnPropertyChanged(nameof(NumberOfPoints), nameof(PreviewText))); }
+        }
+
+        public int NumberOfPoints => RetracePoints != null ? RetracePoints.Count : 0;
+
+        public string PreviewText
+        {
+            get
+            {
+                if (RetracePoints == null || RetracePoints.Count == 0) return "No Points";
+
+                Func<int, int> pid = (i) => RetracePoints[i].PID;
+
+                if (RetracePoints.Count > 4)
+                {
+                    return $"{pid(0)}, {pid(1)} ... {pid(RetracePoints.Count - 2)}, {pid(RetracePoints.Count - 1)}";
+                }
+                else
+                {
+                    return RetracePoints.ToStringContents(p => p.PID.ToString(), ", ");
+                }
+            }
+        }
+
 
         public Retrace(TtProject project)
         {
             _Project = project;
+            updateRetraceDAH = new DelayActionHandler(UpdateRetrace, 100);
+
             PointFrom = PointTo = null;
             Polygons = _Project.GetSortedPolygons();
-            DirInc = true;
+            DirFwd = true;
         }
+
 
         private void PolygonChanged(TtPolygon polygon)
         {
             Points = polygon == null ? new List<TtPoint>() : _Manager.GetPoints(polygon.CN);
+        }
+
+
+        private void UpdateRetraceDelay()
+        {
+            updateRetraceDAH.DelayInvoke();
+        }
+
+        private void UpdateRetrace()
+        {
+            RetracePoints = null;
+
+            if (PointFrom == null) return;
+
+            List<TtPoint> retracePoints = new List<TtPoint>();
+
+            if (SinglePoint)
+            {
+                retracePoints.Add(PointFrom);
+            }
+            else
+            {
+                if (PointFrom == null || PointTo == null) return;
+
+                List<TtPoint> points = Points;
+
+                int sindex = points.IndexOf(PointFrom);
+                int eindex = points.IndexOf(PointTo);
+
+                if (DirFwd)
+                {
+                    if (sindex < eindex)
+                    {
+                        for (int i = sindex; i <= eindex; i++)
+                            retracePoints.Add(points[i]);
+                    }
+                    else
+                    {
+                        for (int i = sindex; i < points.Count; i++)
+                            retracePoints.Add(points[i]);
+
+                        for (int i = 0; i <= eindex; i++)
+                            retracePoints.Add(points[i]);
+                    }
+                }
+                else if (DirRev)
+                {
+                    if (sindex < eindex)
+                    {
+                        for (int i = eindex; i >= sindex; i--)
+                            retracePoints.Add(points[i]);
+                    }
+                    else
+                    {
+                        for (int i = eindex; i > -1; i--)
+                            retracePoints.Add(points[i]);
+
+                        for (int i = points.Count - 1; i >= sindex; i--)
+                            retracePoints.Add(points[i]);
+                    }
+                }
+            }
+
+            RetracePoints = new ReadOnlyCollection<TtPoint>(retracePoints);
         }
     }
 }
