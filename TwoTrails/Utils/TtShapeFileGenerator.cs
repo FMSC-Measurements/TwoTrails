@@ -298,7 +298,7 @@ namespace TwoTrails.Utils
                     sdw = new ShapefileDataWriter(fileName, geoFac);
                     attTable["Poly"] = "Boundary Adjusted Points";
 
-                    features = GetPointFeatures(points.Where(p => p.OnBoundary), true, zone);
+                    features = GetPointFeatures(points.OnBndPoints(), true, zone);
                     adjBndPoints = features.Select(f => f.Geometry as Point).ToList();
 
                     if (features.Count > 0)
@@ -340,7 +340,7 @@ namespace TwoTrails.Utils
                     sdw = new ShapefileDataWriter(fileName, geoFac);
                     attTable["Poly"] = "Boundary UnAdjusted Points";
 
-                    features = GetPointFeatures(points.Where(p => p.OnBoundary), false, zone);
+                    features = GetPointFeatures(points.OnBndPoints(), false, zone);
 
                     if (features.Count > 0)
                     {

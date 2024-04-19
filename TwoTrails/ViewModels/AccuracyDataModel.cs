@@ -35,8 +35,6 @@ namespace TwoTrails.ViewModels
             {
                 StartupSelectedTabIndex = 1;
                 HasGpsAccuracyReport = false;
-
-                MessageBox.Show("Unable to get MTDC Accuracy Reports.");
             }
             else
             {
@@ -54,11 +52,6 @@ namespace TwoTrails.ViewModels
                 x => { Window.DialogResult = true; Window.Close(); },
                 x => Accuracy > 0,
                 this, m => m.Accuracy);
-
-            //OkCommand = new BindedRelayCommand<AccuracyDataModel>(
-            //    (x, m) => { m.Window.DialogResult = true; m.Window.Close(); },
-            //    (x, m) => m.Accuracy > 0,
-            //    this, m => m.Accuracy);
 
             CancelCommand = new RelayCommand(x => window.Close());
 

@@ -124,7 +124,7 @@ namespace TwoTrails.ViewModels
             {
                 _EndMessageDelayHandler = new DelayActionHandler(() =>
                 {
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current?.Dispatcher.Invoke(() =>
                     {
                         StatusMessage = String.Empty;
                     });

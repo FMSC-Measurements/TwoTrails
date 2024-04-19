@@ -40,7 +40,7 @@ namespace TwoTrails.Core
         {
             AnglePointResult result = AnglePointResult.Qualifies;
 
-            List<TtPoint> bpoints = points.Where(p => p.OnBoundary).ToList();
+            List<TtPoint> bpoints = points.OnBndPointsList();
 
             if (bpoints.Count > 2)
             {

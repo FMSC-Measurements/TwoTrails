@@ -4,7 +4,7 @@ namespace TwoTrails.Core.Points
 {
     public class WayPoint : GpsPoint
     {
-        public override bool OnBoundary { get => false; }
+        public override bool OnBoundary => false;
 
 
         public WayPoint() : base() { }

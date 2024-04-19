@@ -18,21 +18,21 @@ namespace TwoTrails.Core
         protected String _Name;
         public String Name
         {
-            get { return _Name; }
+            get => _Name;
             set { SetField(ref _Name, value); }
         }
         
         private String _Description = String.Empty;
         public String Description
         {
-            get { return _Description; }
+            get => _Description;
             set { SetField(ref _Description, value); }
         }
 
         protected Int32 _PointStartIndex = Consts.DEFAULT_POINT_START_INDEX;
         public Int32 PointStartIndex
         {
-            get { return _PointStartIndex; }
+            get => _PointStartIndex;
             set { SetField(ref _PointStartIndex, value); }
         }
 
@@ -46,21 +46,21 @@ namespace TwoTrails.Core
         private DateTime _TimeCreated = DateTime.Now;
         public DateTime TimeCreated
         {
-            get { return _TimeCreated; }
+            get => _TimeCreated;
             set { SetField(ref _TimeCreated, value); }
         }
 
         protected Double _Accuracy = Consts.DEFAULT_POINT_ACCURACY;
         public Double Accuracy
         {
-            get { return _Accuracy; }
+            get => _Accuracy;
             set { SetField(ref _Accuracy, value, OnPolygonAccuracyChanged); }
         }
 
         protected Double _Area = 0;
         public Double Area
         {
-            get { return _Area; }
+            get => _Area;
             private set { SetField(ref _Area, value, () => OnPropertyChanged(nameof(AreaAcres), nameof(AreaHectaAcres))); }
         }
 
@@ -70,14 +70,14 @@ namespace TwoTrails.Core
         protected Double _Perimeter = 0;
         public Double Perimeter
         {
-            get { return _Perimeter; }
+            get => _Perimeter;
             private set { SetField(ref _Perimeter, value, () => OnPropertyChanged(nameof(PerimeterFt))); }
         }
 
         protected Double _PerimeterLine = 0;
         public Double PerimeterLine
         {
-            get { return _PerimeterLine; }
+            get => _PerimeterLine;
             private set { SetField(ref _PerimeterLine, value, () => OnPropertyChanged(nameof(PerimeterLineFt))); }
         }
 
@@ -85,10 +85,37 @@ namespace TwoTrails.Core
         public Double PerimeterLineFt => PerimeterLine * FMSC.Core.Convert.MetersToFeet_Coeff;
 
 
+        protected TtPolygon _ParentUnit;
+        public TtPolygon ParentUnit
+        {
+            get => _ParentUnit;
+            set
+            {
+                TtPolygon oldParent = _ParentUnit;
+                
+                //TODO check unit type if area-less throw area (for multi unit types)
+
+                if (SetField(ref _ParentUnit, value))
+                {
+                    ParentUnitCN = _ParentUnit?.CN;
+
+                    if (oldParent != null && oldParent.PolygonChanged != null)
+                    {
+                        oldParent.PolygonChanged.Invoke(oldParent);
+                    }
+                    else if (_ParentUnit.PolygonChanged != null)
+                    {
+                        _ParentUnit.PolygonChanged.Invoke(_ParentUnit);
+                    }
+                }
+            }
+        }
+
+
         protected String _ParentUnitCN;
         public String ParentUnitCN
         {
-            get { return _ParentUnitCN; }
+            get => _ParentUnitCN;
             private set { SetField(ref _ParentUnitCN, value); }
         }
         #endregion

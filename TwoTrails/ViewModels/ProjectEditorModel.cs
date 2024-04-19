@@ -1,5 +1,6 @@
 ﻿using FMSC.Core;
 using FMSC.Core.ComponentModel;
+using FMSC.Core.Utilities;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System;
@@ -14,6 +15,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
@@ -373,6 +375,9 @@ namespace TwoTrails.ViewModels
         #region Polygons
 
         #region Properties
+        private static readonly TtPolygon NO_EXCLUSION_POLY = new TtPolygon(Consts.EmptyGuid, "*No Exclusion*", "", 0, 0, DateTime.Now, 0, 0, 0, 0);
+
+
         private TtPolygon _CurrentPolygon;
         public TtPolygon CurrentPolygon
         {
@@ -439,8 +444,44 @@ namespace TwoTrails.ViewModels
             set => EditPolygonValue(ref _PolygonIncrement, value, PolygonProperties.INCREMENT);
         }
 
-        //public double TotalPolygonArea { get { return Get<double>(); } set { Set(value); } }
-        //public double TotalPolygonPerimeter { get { return Get<double>(); } set { Set(value); } }
+
+        public bool ValidExclusion { get; private set; }
+        public string PolygonExclusionToolTip { get; private set; }
+
+
+        private TtPolygon _PolygonExclusion;
+        public TtPolygon PolygonExclusion
+        {
+            get => _PolygonExclusion;
+            set
+            {
+                if (value?.CN == Consts.EmptyGuid)
+                {
+                    EditPolygonValue(ref _PolygonExclusion, null, PolygonProperties.PARENT_UNIT, true);
+                    _PolygonExclusion = NO_EXCLUSION_POLY;
+                }
+                else
+                {
+                    EditPolygonValue(ref _PolygonExclusion, value, PolygonProperties.PARENT_UNIT, true);
+                }
+
+                ValidateExclusion();
+            }
+        }
+
+        public ObservableCollection<TtPolygon> PolygonPossibleExclusions
+        {
+            get
+            {
+                if (CurrentPolygon == null) return new ObservableCollection<TtPolygon>();
+
+                List<TtPolygon> polygons = Manager.Polygons.Where(p => p.Area > 0 && p.CN != CurrentPolygon.CN).ToList();
+                polygons.Sort(new PolygonSorterDirect());
+                polygons.Insert(0, NO_EXCLUSION_POLY);
+                return new ObservableCollection<TtPolygon>(polygons);
+            }
+        }
+
 
         public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
 
@@ -460,7 +501,7 @@ namespace TwoTrails.ViewModels
 
         private void EditPolygonValue<T>(ref T origValue, T newValue, PropertyInfo property, bool allowNull = false) where T : class
         {
-            if (origValue == null ^ newValue == null || !origValue.Equals(newValue))
+            if (origValue == null ^ newValue == null || (origValue != newValue && !origValue.Equals(newValue)))
             {
                 origValue = newValue;
 
@@ -482,6 +523,7 @@ namespace TwoTrails.ViewModels
                 _PolygonPointStartIndex = polygon.PointStartIndex;
                 _PolygonIncrement = polygon.Increment;
                 _PolygonDescription = polygon.Description;
+                _PolygonExclusion = polygon.ParentUnit;
             }
             else
             {
@@ -490,6 +532,7 @@ namespace TwoTrails.ViewModels
                 _PolygonPointStartIndex = Consts.DEFAULT_POINT_START_INDEX;
                 _PolygonIncrement = Consts.DEFAULT_POINT_INCREMENT;
                 _PolygonDescription = String.Empty;
+                _PolygonExclusion = null;
             }
 
             OnPropertyChanged(
@@ -497,7 +540,11 @@ namespace TwoTrails.ViewModels
                 nameof(PolygonAccuracy),
                 nameof(PolygonPointStartIndex),
                 nameof(PolygonIncrement),
-                nameof(PolygonDescription));
+                nameof(PolygonDescription),
+                nameof(PolygonPossibleExclusions),
+                nameof(PolygonExclusion));
+
+            ValidateExclusion();
         }
 
 
@@ -737,6 +784,35 @@ namespace TwoTrails.ViewModels
                     }
                 } 
             }
+        }
+
+        public void ValidateExclusion()
+        {
+            if (_PolygonExclusion != null)
+            {
+                if (_CurrentPolygon != null && _PolygonExclusion.CN != Consts.EmptyGuid)
+                {
+                    TtMetadata defMeta = Manager.DefaultMetadata;
+                    PolygonCalculator pc = new PolygonCalculator(
+                        Manager.GetPoints(_PolygonExclusion.CN).OnBndPoints()
+                        .Select(pp => pp.GetCoords(defMeta.Zone).ToPoint()));
+
+                    ValidExclusion = !Manager.GetPoints(_CurrentPolygon.CN).OnBndPoints()
+                        .Where(pp => !pc.IsPointInPolygon(pp.GetCoords(defMeta.Zone).ToPoint())).Any();
+                }
+                else
+                {
+                    ValidExclusion = true;
+                }
+
+                PolygonExclusionToolTip = ValidExclusion ? _PolygonExclusion.Name : $"The boundary of {_PolygonExclusion.Name} is not located within {_CurrentPolygon.Name}.";
+            }
+            else
+            {
+                PolygonExclusionToolTip = NO_EXCLUSION_POLY.Name;
+            }
+
+            OnPropertyChanged(nameof(ValidExclusion), nameof(PolygonExclusionToolTip));
         }
         #endregion
 

@@ -305,175 +305,215 @@
                         </ListBox>
 
                         <ScrollViewer Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
-                            <Grid Margin="10 5 5 5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="5"/>
-                                    <ColumnDefinition Width="200"/>
-                                </Grid.ColumnDefinitions>
+                            <ScrollViewer.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="FontSize" Value="20"/>
+                                    <Setter Property="IsEnabled" Value="False" />
 
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=lbPolys, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                                
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="FontSize" Value="16"/>
+                                </Style>
 
-                                <Grid.Resources>
-                                    <Style TargetType="TextBox">
-                                        <Setter Property="FontSize" Value="20"/>
-                                        <Setter Property="IsEnabled" Value="False" />
+                                <Style TargetType="GroupBox">
+                                    <Setter Property="FontSize" Value="20"/>
+                                    <Setter Property="Margin" Value="5,0,5,5"/>
+                                </Style>
 
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=lbPolys, Path=SelectedItem, Converter={StaticResource NotNullConverter}}" Value="True">
-                                                <Setter Property="IsEnabled" Value="True" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontSize" Value="20"/>
+                                </Style>
+                            </ScrollViewer.Resources>
 
-                                    <Style TargetType="GroupBox">
-                                        <Setter Property="FontSize" Value="20"/>
-                                        <Setter Property="Margin" Value="5,0,5,5"/>
-                                    </Style>
-
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="FontSize" Value="20"/>
-                                    </Style>
-
-                                </Grid.Resources>
-
-                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Name" />
-                                <TextBox Grid.Column="0" Grid.Row="1" Text="{Binding PolygonName, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                                         PreviewTextInput="TextHasRestrictedCharacters" IsUndoEnabled="False" Grid.ColumnSpan="2"/>
-
-                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Accuracy (Meters)*" />
-                                <Grid Grid.Column="0" Grid.Row="3">
+                            <StackPanel Margin="10 5 5 0" Orientation="Vertical">
+                                <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="5"/>
+                                        <ColumnDefinition Width="200"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBox Grid.Column="0"
-                                     Name="txtPolyAcc"
-                                     Text="{Binding PolygonAccuracy, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
-                                     PreviewTextInput="TextIsDouble" IsUndoEnabled="False">
-                                    </TextBox>
-                                    <Button Grid.Column="1" Width="75" Command="{Binding PolygonUpdateAccCommand}" Content="Update"/>
-                                    <Button Grid.Column="2" Width="100" Command="{Binding PolygonAccuracyLookupCommand}" Content="Acc Lookup"
-                                            ToolTip="Lookup using NTDP Accuracy Matrix"/>
-                                </Grid>
-
-                                <Grid Grid.Column="0" Grid.Row="4" Grid.RowSpan="2" Margin="0 4 0 0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="105"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <TextBlock Grid.Column="0" Grid.Row="0" Text="Start Index" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Column="1" Grid.Row="0" Margin="0,4,0,2"
-                                         Text="{Binding PolygonPointStartIndex, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                                         PreviewTextInput="TextIsUnsignedInteger" IsUndoEnabled="False"/>
+                                    <Grid Grid.Column="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <StackPanel Grid.Row="0" Orientation="Vertical">
+                                            <TextBlock Text="Name" />
+                                            <TextBox Text="{Binding PolygonName, UpdateSourceTrigger=PropertyChanged, Delay=500}"
+                                                PreviewTextInput="TextHasRestrictedCharacters" IsUndoEnabled="False" Grid.ColumnSpan="2"/>
+
+                                            <TextBlock Text="Accuracy (Meters)*" />
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBox Grid.Column="0" Name="txtPolyAcc"
+                                                     Text="{Binding PolygonAccuracy, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
+                                                     PreviewTextInput="TextIsDouble" IsUndoEnabled="False">
+                                                </TextBox>
+                                                <Button Grid.Column="1" Width="75" Command="{Binding PolygonUpdateAccCommand}" Content="Update"/>
+                                                <Button Grid.Column="2" Width="100" Command="{Binding PolygonAccuracyLookupCommand}" Content="Acc Lookup"
+                                                    ToolTip="Lookup using NTDP Accuracy Matrix"/>
+                                            </Grid>
+
+                                            <Grid Margin="0 4 0 0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Start Index" VerticalAlignment="Center"/>
+                                                <TextBox Grid.Column="1" Grid.Row="0" Margin="0,4,0,2"
+                                                     Text="{Binding PolygonPointStartIndex, UpdateSourceTrigger=PropertyChanged, Delay=500}"
+                                                     PreviewTextInput="TextIsUnsignedInteger" IsUndoEnabled="False"/>
 
 
-                                    <TextBlock Grid.Column="0" Grid.Row="1" Text="Increment" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Column="1" Grid.Row="1" Margin="0,2,0,4"
-                                         Text="{Binding PolygonIncrement, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                                         PreviewTextInput="TextIsUnsignedInteger" IsUndoEnabled="False"/>
+                                                <TextBlock Grid.Column="0" Grid.Row="1" Text="Increment" VerticalAlignment="Center"/>
+                                                <TextBox Grid.Column="1" Grid.Row="1" Margin="0,2,0,4"
+                                                     Text="{Binding PolygonIncrement, UpdateSourceTrigger=PropertyChanged, Delay=500}"
+                                                     PreviewTextInput="TextIsUnsignedInteger" IsUndoEnabled="False"/>
+
+
+                                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Exclusion" VerticalAlignment="Center"/>
+                                                <!--<Border Grid.Column="1" Grid.Row="2" Height="34">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding ValidExclusion}" Value="False">
+                                                                    <Setter Property="Height" Value="32"/>
+                                                                    <Setter Property="BorderBrush" Value="Red"/>
+                                                                    <Setter Property="BorderThickness" Value="2"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>-->
+                                                <ComboBox Grid.Column="1" Grid.Row="2" Height="34"
+                                                    ItemsSource="{Binding PolygonPossibleExclusions}"
+                                                    SelectedItem="{Binding PolygonExclusion}"
+                                                    ToolTip="{Binding PolygonExclusionToolTip}">
+                                                    
+                                                    <ComboBox.Style>
+                                                        <Style TargetType="{x:Type ComboBox}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding ValidExclusion}" Value="False">
+                                                                    <Setter Property="Foreground" Value="Red" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </ComboBox.Style>
+                                                    <ComboBox.ItemContainerStyle>
+                                                        <Style TargetType="ComboBoxItem">
+                                                            <Setter Property="Foreground" Value="Black" />
+                                                        </Style>
+                                                    </ComboBox.ItemContainerStyle>
+                                                </ComboBox>
+                                                <!--</Border>-->
+                                            </Grid>
+
+                                            <StackPanel Orientation="Horizontal" Margin="0 2 0 0 ">
+                                                <TextBlock Text="Created On: "/>
+                                                <TextBlock Text="{Binding CurrentPolygon.TimeCreated}" ToolTip="{Binding CurrentPolygon.TimeCreated}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Row="1" Text="Description" />
+                                    </Grid>
+                                    
+                                    <TextBox Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" MinLines="2" MaxLines="5" Margin="0 0 5 0"
+                                        Text="{Binding PolygonDescription, UpdateSourceTrigger=PropertyChanged, Delay=500}" IsUndoEnabled="False"
+                                        AcceptsReturn="True" TextWrapping="Wrap"/>
+
+                                    <StackPanel Grid.Column="2" Orientation="Vertical">
+                                        <GroupBox Header="Area">
+                                            <Grid Margin="5,0,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition Width="23*"/>
+                                                    <ColumnDefinition Width="110*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ac:" ToolTip="Acres"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"
+                                                           Text="{Binding CurrentPolygon.AreaAcres, StringFormat=F4}" Grid.ColumnSpan="2"/>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Text="Ha:" ToolTip="Hectares"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"
+                                                           Text="{Binding CurrentPolygon.AreaHectaAcres, StringFormat=F4}" Grid.ColumnSpan="2"/>
+                                            </Grid>
+                                        </GroupBox>
+
+                                        <GroupBox Header="Polygon Perimeter">
+                                            <Grid Margin="5,0,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ft:" ToolTip="Feet"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding CurrentPolygon.PerimeterFt, StringFormat=F3}"/>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Text="M:" ToolTip="Meters"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Text="{Binding CurrentPolygon.Perimeter, StringFormat=F3}"/>
+                                            </Grid>
+                                        </GroupBox>
+
+                                        <GroupBox Header="Poly Line Length">
+                                            <Grid Margin="5,0,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ft:" ToolTip="Feet"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"
+                                                           Text="{Binding CurrentPolygon.PerimeterLineFt, StringFormat=F3}" Grid.ColumnSpan="2"/>
+
+                                                <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Text="M:" ToolTip="Meters"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"
+                                                           Text="{Binding CurrentPolygon.PerimeterLine, StringFormat=F3}" Grid.ColumnSpan="2" Margin="0,1,0,0"/>
+                                            </Grid>
+                                        </GroupBox>
+                                    </StackPanel>
+
                                 </Grid>
-
-                                <StackPanel Grid.Column="0" Grid.Row="7" Orientation="Horizontal" Margin="0 2 0 0 ">
-                                    <TextBlock Text="Created On: "/>
-                                    <TextBlock Text="{Binding CurrentPolygon.TimeCreated}" ToolTip="{Binding CurrentPolygon.TimeCreated}"/>
-                                </StackPanel>
-
-                                <TextBlock Grid.Column="0" Grid.Row="8" Text="Description" />
-                                <TextBox Grid.Column="0" Grid.Row="10" Grid.ColumnSpan="3" MinLines="2" MaxLines="5" Margin="0 0 5 0"
-                                Text="{Binding PolygonDescription, UpdateSourceTrigger=PropertyChanged, Delay=500}" IsUndoEnabled="False"
-                                         AcceptsReturn="True" TextWrapping="Wrap"/>
-
-                                <GroupBox Header="Area" Grid.Column="2" Grid.Row="0" Grid.RowSpan="3">
-                                    <Grid Margin="5,0,0,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="40"/>
-                                            <ColumnDefinition Width="23*"/>
-                                            <ColumnDefinition Width="110*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-
-                                        <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ac:" ToolTip="Acres"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"
-                                                   Text="{Binding CurrentPolygon.AreaAcres, StringFormat=F4}" Grid.ColumnSpan="2"/>
-
-                                        <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Text="Ha:" ToolTip="Hectares"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"
-                                                   Text="{Binding CurrentPolygon.AreaHectaAcres, StringFormat=F4}" Grid.ColumnSpan="2"/>
-                                    </Grid>
-                                </GroupBox>
-
-                                <GroupBox Header="Polygon Perimeter" Grid.Column="2" Grid.Row="3" Grid.RowSpan="3">
-                                    <Grid Margin="5,0,0,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="40"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-
-                                        <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ft:" ToolTip="Feet"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding CurrentPolygon.PerimeterFt, StringFormat=F3}"/>
-
-                                        <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Text="M:" ToolTip="Meters"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Text="{Binding CurrentPolygon.Perimeter, StringFormat=F3}"/>
-                                    </Grid>
-                                </GroupBox>
-
-                                <GroupBox Header="Poly Line Length" Grid.Column="2" Grid.Row="6" Grid.RowSpan="3">
-                                    <Grid Margin="5,0,0,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="40"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-
-                                        <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ft:" ToolTip="Feet"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"
-                                                   Text="{Binding CurrentPolygon.PerimeterLineFt, StringFormat=F3}" Grid.ColumnSpan="2"/>
-
-                                        <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" Text="M:" ToolTip="Meters"/>
-                                        <TextBlock Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"
-                                                   Text="{Binding CurrentPolygon.PerimeterLine, StringFormat=F3}" Grid.ColumnSpan="2" Margin="0,1,0,0"/>
-                                    </Grid>
-                                </GroupBox>
-
+                                
                                 <GroupBox Header="Polygon Area-Error Summary" Grid.Column="0" Grid.Row="11" Grid.ColumnSpan="3" Margin="-1 0 5 0">
                                     <StackPanel Orientation="Vertical">
                                         
@@ -769,7 +809,7 @@
 
                                 <TextBlock Grid.Row="14" Grid.ColumnSpan="3" Text="*Such as GPS error or taping error"/>
                                 <TextBlock Grid.Row="15" Grid.ColumnSpan="3" Text="**Area-Error/Area to be less than 10%"/>
-                            </Grid>
+                            </StackPanel>
                         </ScrollViewer>
 
                         <Grid Grid.Column="0" Grid.Row="2" Margin="2.5">

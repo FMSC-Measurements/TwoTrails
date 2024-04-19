@@ -63,7 +63,7 @@ namespace TwoTrails.Core
 
             if (GERAvailable)
             {
-                GERResult = new GeometricErrorReductionResult(points.Where(p => p.OnBoundary).ToList(), polygon.Area);
+                GERResult = new GeometricErrorReductionResult(points.OnBndPointsList(), polygon.Area);
             }
 
             if (points.Count > 2)

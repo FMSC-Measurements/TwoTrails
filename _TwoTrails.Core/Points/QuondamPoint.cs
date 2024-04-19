@@ -16,22 +16,19 @@ namespace TwoTrails.Core.Points
             }
         }
 
-        public override double AdjX { get { return ParentPoint.AdjX; } }
-        public override double AdjY { get { return ParentPoint.AdjY; } }
-        public override double AdjZ{ get { return ParentPoint.AdjZ; } }
+        public override double AdjX => ParentPoint.AdjX;
+        public override double AdjY => ParentPoint.AdjY;
+        public override double AdjZ => ParentPoint.AdjZ;
 
-        public override double UnAdjX { get { return ParentPoint.UnAdjX; } }
-        public override double UnAdjY { get { return ParentPoint.UnAdjY; } }
-        public override double UnAdjZ { get { return ParentPoint.UnAdjZ; } }
-
-
-        public override bool OnBoundary => false;
+        public override double UnAdjX => ParentPoint.UnAdjX;
+        public override double UnAdjY => ParentPoint.UnAdjY;
+        public override double UnAdjZ => ParentPoint.UnAdjZ;
 
 
         private TtPoint _ParentPoint;
         public TtPoint ParentPoint
         {
-            get { return _ParentPoint; }
+            get => _ParentPoint;
             set
             {
                 TtPoint oldParent = _ParentPoint;
@@ -49,6 +46,10 @@ namespace TwoTrails.Core.Points
                         _ParentPoint.OnAccuracyChanged += ParentPoint_OnAccuracyChanged;
 
                         SetAccuracy(_ParentPoint.Accuracy);
+                    }
+                    else
+                    {
+                        ParentPointCN = null;
                     }
 
                     if (oldParent != null)

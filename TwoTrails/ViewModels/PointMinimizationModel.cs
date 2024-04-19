@@ -138,8 +138,8 @@ namespace TwoTrails.ViewModels
             new Thickness(2, 2, 2, 2) : new Thickness(0);
 
 
-        private Tuple<double, double, double> APStats {
-            get => Get<Tuple<double, double, double>>();
+        private APStats APStats {
+            get => Get<APStats>();
             set => Set(value, () =>
                 OnPropertyChanged(
                     nameof(NewAreaHa),
@@ -154,19 +154,19 @@ namespace TwoTrails.ViewModels
                 ));
         }
 
-        public double? NewAreaAc => APStats != null ? Convert.ToAcre(APStats.Item1, Area.MeterSq) : (double?)null;
-        public double? NewAreaHa => APStats != null ? Convert.ToHectare(APStats.Item1, Area.MeterSq) : (double?)null;
+        public double? NewAreaAc => APStats != null ? Convert.ToAcre(APStats.Area, Area.MeterSq) : (double?)null;
+        public double? NewAreaHa => APStats != null ? Convert.ToHectare(APStats.Area, Area.MeterSq) : (double?)null;
 
-        public double? NewPerimeterFt => APStats != null ? Convert.ToFeetTenths(APStats.Item2, Distance.Meters) : (double?)null;
-        public double? NewPerimeterM => APStats?.Item2;
+        public double? NewPerimeterFt => APStats != null ? Convert.ToFeetTenths(APStats.Perimeter, Distance.Meters) : (double?)null;
+        public double? NewPerimeterM => APStats?.Perimeter;
 
-        public double? AreaDifference => APStats != null ? (double?)GetDiff(APStats.Item1, TargetPolygon.Area) : null;
+        public double? AreaDifference => APStats != null ? (double?)GetDiff(APStats.Area, TargetPolygon.Area) : null;
         public double? AreaDifferenceAc => (APStats != null) ? NewAreaAc - TargetPolygon.AreaAcres : null;
 
         private SolidColorBrush regularBrush = new SolidColorBrush(Colors.Black), overAreaDifferenceBrush = new SolidColorBrush(Colors.Red);
         public SolidColorBrush AreaDifferenceColor => Math.Abs(AreaDifference ?? 0) > 1 ? overAreaDifferenceBrush: regularBrush;
 
-        public double? PerimeterDifference => APStats != null ? (double?)GetDiff(APStats.Item2, TargetPolygon.Perimeter) : null;
+        public double? PerimeterDifference => APStats != null ? (double?)GetDiff(APStats.Perimeter, TargetPolygon.Perimeter) : null;
         public double? PerimeterDifferenceFt => APStats != null ? NewPerimeterFt - TargetPolygon.PerimeterFt : null;
 
 
@@ -375,7 +375,7 @@ namespace TwoTrails.ViewModels
                 _MinPoly.Locations = locations;
                 _MinPoly.Visibility = Visibility.Visible;
 
-                APStats = TtCoreUtils.CalculateAreaPerimeterAndOnBoundTrail(points);
+                APStats = TtCoreUtils.CalculateBoundaryAreaPerimeterAndTrail(points);
                 NewGERResult = new GeometricErrorReductionResult(points, TargetPolygon.Area);
             }
             else

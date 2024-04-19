@@ -69,6 +69,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ITtMediaLayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtMediaExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Media\TtMediaInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\APStats.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionary.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\DataDictionaryTemplate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\ExclusionSummary.cs" />

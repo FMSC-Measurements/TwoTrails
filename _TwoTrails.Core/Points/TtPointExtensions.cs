@@ -222,5 +222,16 @@ namespace TwoTrails.Core.Points
             }
         }
 
+
+        public static IEnumerable<TtPoint> OnBndPoints(this IEnumerable<TtPoint> points) => points.Where(p => p.OnBoundary);
+        public static List<TtPoint> OnBndPointsList(this IEnumerable<TtPoint> points) => points.OnBndPoints().ToList();
+
+
+        public static IEnumerable<Point> SyncPointsToZone(this IEnumerable<TtPoint> points) =>
+            SyncPointsToZone(points, points.Any() ? points.First().Metadata.Zone : 0);
+
+        public static IEnumerable<Point> SyncPointsToZone(this IEnumerable<TtPoint> points, int zone) =>
+            points.Select(p => p.GetCoords(zone).ToPoint());
+
     }
 }

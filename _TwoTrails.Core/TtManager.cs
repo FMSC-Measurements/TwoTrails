@@ -1,5 +1,4 @@
-﻿using FMSC.Core;
-using FMSC.Core.Utilities;
+﻿using FMSC.Core.Utilities;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
@@ -195,6 +194,18 @@ namespace TwoTrails.Core
                 _Points.Add(qp);
 
                 AttachPoint(qp);
+            }
+
+            foreach (TtPolygon poly in _PolygonsMap.Values.Where(p => p.ParentUnitCN != null))
+            {
+                if (_PolygonsMap.ContainsKey(poly.ParentUnitCN))
+                {
+                    poly.ParentUnit = _PolygonsMap[poly.ParentUnitCN];
+                }
+                else
+                {
+                    throw new Exception("Foreign Polygon Parent Unit");
+                }
             }
 
             Points = new ReadOnlyObservableCollection<TtPoint>(_Points);
@@ -1106,8 +1117,8 @@ namespace TwoTrails.Core
             {
                 if (_PointsByPoly.ContainsKey(polygon.CN))
                 {
-                    Tuple<double, double, double> stats = TtCoreUtils.CalculateAreaPerimeterAndOnBoundTrail(_PointsByPoly[polygon.CN].Where(p => p.OnBoundary).ToList());
-                    polygon.Update(stats.Item1, stats.Item2, stats.Item3);
+                    APStats stats = TtCoreUtils.CalculateBoundaryAreaPerimeterAndTrail(_PointsByPoly[polygon.CN]);
+                    polygon.Update(stats.Area, stats.Perimeter, stats.LinePerimeter);
                 }
             }
         }

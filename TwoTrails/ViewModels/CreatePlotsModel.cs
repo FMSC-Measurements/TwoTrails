@@ -345,11 +345,11 @@ namespace TwoTrails.ViewModels
 
             poly.Description = $"Angle: {Tilt}°, Grid({UomDistance.ToStringAbv()}) X:{GridX} Y:{GridY}, Created from Polygon{(IncludedPolygons.Count > 1 ? $"s {String.Join(", ", IncludedPolygons)}" : $" {IncludedPolygons.First().Name}")}";
 
-            List<IEnumerable<TtPoint>> polyIncludeTtPoints = IncludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.OnBoundary)).ToList();
+            List<IEnumerable<TtPoint>> polyIncludeTtPoints = IncludedPolygons.Select(p => _Manager.GetPoints(p.CN).OnBndPoints()).ToList();
 
             TtMetadata defMeta = _Manager.DefaultMetadata;
 
-            List<IEnumerable<Point>> polyIncudePoints = polyIncludeTtPoints.Select(pp => pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint())).ToList();
+            List<IEnumerable<Point>> polyIncudePoints = polyIncludeTtPoints.Select(pp => pp.SyncPointsToZone()).ToList();
             List<Point> allPoints = polyIncudePoints.SelectMany(pts => pts).ToList(); ;
             
             UtmExtent.Builder builder = new UtmExtent.Builder(defMeta.Zone);
@@ -375,7 +375,7 @@ namespace TwoTrails.ViewModels
 
             if (ShouldCancel()) return;
 
-            List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.OnBoundary))
+            List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).OnBndPoints())
                                                     .Select(pp => pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint()))
                                                     .Select(pp => new PolygonCalculator(pp)).ToList();
             if (ShouldCancel()) return;
@@ -528,7 +528,7 @@ namespace TwoTrails.ViewModels
             List<Tuple<TtPolygon, IEnumerable<Point>, string>> polyIncudePoints =
                 polys.Select(p => Tuple.Create(
                     p.Item1,
-                    _Manager.GetPoints(p.Item2).Where(pt => pt.OnBoundary).Select(po => po.GetCoords(defMeta.Zone).ToPoint()),
+                    _Manager.GetPoints(p.Item2).OnBndPoints().SyncPointsToZone(defMeta.Zone),
                     p.Item2))
                 .ToList();
 
@@ -559,8 +559,8 @@ namespace TwoTrails.ViewModels
 
             if (ShouldCancel()) return;
 
-            List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).Where(pt => pt.OnBoundary))
-                                                    .Select(pp => new PolygonCalculator(pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint()))).ToList();
+            List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).OnBndPoints())
+                                                    .Select(pp => new PolygonCalculator(pp.SyncPointsToZone(defMeta.Zone))).ToList();
 
             if (ShouldCancel()) return;
 

@@ -26,7 +26,7 @@ namespace TwoTrails.Dialogs
             this.DataContext = model;
             InitializeComponent();
 
-            List<TtPoint> points = model.Points.Where(p => p.OnBoundary).ToList();
+            List<TtPoint> points = model.Points.OnBndPointsList();
 
             foreach (TtPoint p in points)
             {

@@ -65,19 +65,31 @@ namespace TwoTrails.Core
             throw new Exception("Polygon Not Found");
         }
 
-        public static Tuple<double, double, double> CalculateAreaPerimeterAndOnBoundTrail(this ITtManager manager, string polyCN)
+
+
+        public static APStats CalculateBoundaryAreaPerimeterAndTrail(this ITtManager manager, string polyCN)
         {
-            return CalculateAreaPerimeterAndOnBoundTrail(manager.GetPoints(polyCN).Where(p => p.OnBoundary).ToList());
+            return CalculateAreaPerimeterAndTrail(manager.GetPoints(polyCN).OnBndPoints());
         }
 
-        public static Tuple<double, double, double> CalculateAreaPerimeterAndOnBoundTrail(List<TtPoint> points)
+        public static APStats CalculateBoundaryAreaPerimeterAndTrail(IEnumerable<TtPoint> points)
+        {
+            return CalculateAreaPerimeterAndTrail(points.OnBndPoints());
+        }
+
+        public static APStats CalculateAreaPerimeterAndTrail(IEnumerable<TtPoint> points)
+        {
+            return CalculateAreaPerimeterAndTrail(points.SyncPointsToZone().ToList());
+        }
+        
+        public static APStats CalculateAreaPerimeterAndTrail(List<Point> points)
         {
             if (points.Count > 2)
             {
                 double perim = 0, linePerim, area = 0;
 
-                TtPoint p1 = points[0], fBndPt = null, lBndPt;
-                TtPoint p2;
+                Point p1 = points[0], fBndPt = points[0], lBndPt;
+                Point p2;
 
                 lBndPt = p1;
 
@@ -86,28 +98,25 @@ namespace TwoTrails.Core
                     p1 = points[i];
                     p2 = points[i + 1];
 
-                    if (fBndPt == null)
-                        fBndPt = p1;
-
                     lBndPt = p2;
 
-                    perim += MathEx.Distance(p1.AdjX, p1.AdjY, p2.AdjX, p2.AdjY);
-                    area += (p2.AdjX - p1.AdjX) * (p2.AdjY + p1.AdjY);
+                    perim += MathEx.Distance(p1.X, p1.Y, p2.X, p2.Y);
+                    area += (p2.X - p1.X) * (p2.Y + p1.Y);
                 }
 
                 linePerim = perim;
 
-                if (!fBndPt.HasSameAdjLocation(lBndPt))
+                if (fBndPt != lBndPt)
                 {
-                    perim += MathEx.Distance(fBndPt.AdjX, fBndPt.AdjY, lBndPt.AdjX, lBndPt.AdjY);
-                    area += (fBndPt.AdjX - lBndPt.AdjX) * (fBndPt.AdjY + lBndPt.AdjY);
+                    perim += MathEx.Distance(fBndPt.X, fBndPt.Y, lBndPt.X, lBndPt.Y);
+                    area += (fBndPt.X - lBndPt.X) * (fBndPt.Y + lBndPt.Y);
                 }
 
-                return Tuple.Create(Math.Abs(area) / 2, perim, linePerim);
+                return new APStats(Math.Abs(area) / 2, perim, linePerim);
             }
             else
             {
-                return Tuple.Create(0d, 0d, 0d);
+                return new APStats();
             }
         }
     }
