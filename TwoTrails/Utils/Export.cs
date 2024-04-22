@@ -277,6 +277,7 @@ namespace TwoTrails.Utils
                 sb.Append("Perimeter_M,");
                 sb.Append("Line_Perimeter_M,");
                 sb.Append("Description,");
+                sb.Append("Parent_Exclusion_CN");
                 sb.Append("CN");
 
                 sw.WriteLine(sb.ToString());
@@ -287,7 +288,7 @@ namespace TwoTrails.Utils
                     sb = new StringBuilder();
                     sb.AppendFormat("{0},{1},", poly.Name.Scrub(), poly.Accuracy);
                     sb.AppendFormat("{0},{1},{2},", poly.Area, poly.Perimeter, poly.PerimeterLine);
-                    sb.AppendFormat("\"{0}\",{1}", poly.Description.Scrub(), poly.CN);
+                    sb.AppendFormat("\"{0}\",{1}", poly.Description.Scrub(), poly.ParentUnitCN, poly.CN);
 
                     sw.WriteLine(sb.ToString());
                 }
