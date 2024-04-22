@@ -396,23 +396,11 @@
 
 
                                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Exclusion" VerticalAlignment="Center"/>
-                                                <!--<Border Grid.Column="1" Grid.Row="2" Height="34">
-                                                    <Border.Style>
-                                                        <Style TargetType="Border">
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding ValidExclusion}" Value="False">
-                                                                    <Setter Property="Height" Value="32"/>
-                                                                    <Setter Property="BorderBrush" Value="Red"/>
-                                                                    <Setter Property="BorderThickness" Value="2"/>
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Border.Style>-->
                                                 <ComboBox Grid.Column="1" Grid.Row="2" Height="34"
                                                     ItemsSource="{Binding PolygonPossibleExclusions}"
                                                     SelectedItem="{Binding PolygonExclusion}"
                                                     ToolTip="{Binding PolygonExclusionToolTip}">
-                                                    
+
                                                     <ComboBox.Style>
                                                         <Style TargetType="{x:Type ComboBox}">
                                                             <Style.Triggers>
@@ -428,7 +416,6 @@
                                                         </Style>
                                                     </ComboBox.ItemContainerStyle>
                                                 </ComboBox>
-                                                <!--</Border>-->
                                             </Grid>
 
                                             <StackPanel Orientation="Horizontal" Margin="0 2 0 0 ">

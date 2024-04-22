@@ -408,7 +408,10 @@ namespace TwoTrails.Utils
                 using (StreamWriter swcsv = new StreamWriter($"{fileName}.csv"))
                 {
                     sw.Write(HaidLogic.GenerateSummaryHeader(projectInfo, projectFilePath));
-                    swcsv.WriteLine("Unit,Area_Ac,Perim_Ft,GpsAE_Ac,GpsAE_Ratio,TravAE_ac,TravAE_Ratio");
+                    swcsv.WriteLine(
+                        "Unit,Area_Ac,Perim_Ft,GpsAE_Ac,GpsAE_Ratio,GER-AE_Ac,GER-AE_Ratio,TravAE_ac,TravAE_Ratio," +
+                        "ExclUnits_Cnt,Area_W_Excl_Ac,Perim_W_Excl_Ft," + 
+                        "Excl_Area_Ac,Excl_Perim_Ft,GpsAE_W_Excl_Ac,GpsAE_W_Excl_Ratio,GER-AE_W_Excl_Ac,GER-AE_W_Excl_Ratio,ExclUnits");
 
                     foreach (TtPolygon poly in manager.GetPolygons())
                     {
@@ -418,7 +421,33 @@ namespace TwoTrails.Utils
 
                         swcsv.Write($"{poly.Name},{poly.AreaAcres},{poly.PerimeterFt},");
                         swcsv.Write($"{Convert.ToAcre(ps.TotalGpsError, Area.MeterSq)},{ps.GpsAreaError},");
-                        swcsv.WriteLine($"{Convert.ToAcre(ps.TotalTraverseError, Area.MeterSq)},{ps.TraverseAreaError}");
+                        swcsv.Write(ps.GERAvailable ? $"{ps.GERResult.TotalErrorArea},{ps.GERResult.AreaError}" : ",,");
+                        swcsv.Write($"{Convert.ToAcre(ps.TotalTraverseError, Area.MeterSq)},{ps.TraverseAreaError},");
+
+                        if (ps.ExclusionsCount > 0)
+                        {
+                            swcsv.Write($"{ps.ExclusionsCount},{Convert.ToAcre(ps.TotalAreaWExclusions, Area.MeterSq)},{Convert.ToFeetTenths(ps.TotalPerimWExclusions, Distance.Meters)},");
+                            swcsv.Write($"{Convert.ToAcre(ps.Exclusions.TotalArea, Area.MeterSq)},{Convert.ToFeetTenths(ps.Exclusions.TotalPerimeter, Distance.Meters)},");
+                            swcsv.Write($"{Convert.ToAcre(ps.TotalAreaErrorAreaWExclusions, Area.MeterSq)},{ps.TotalAreaErrorWExclusions},");
+
+                            if (ps.Exclusions.GERAvailable)
+                            {
+                                swcsv.Write($"{Convert.ToAcre(ps.TotalGERAreaErrorAreaWExclusions, Area.MeterSq)},{ps.TotalGERAreaErrorWExclusions},");
+                            }
+                            else
+                            {
+                                swcsv.Write(",,");
+                            }
+
+
+                            swcsv.Write(String.Join("|", ps.Exclusions.Select(e => e.Polygon.Name)));
+                        }
+                        else
+                        {
+                            swcsv.Write(",,,,,,,,,");
+                        }
+
+                        swcsv.WriteLine();
                     }
                 }
             }

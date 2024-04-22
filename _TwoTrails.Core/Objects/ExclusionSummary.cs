@@ -1,6 +1,10 @@
-﻿using System.Collections;
+﻿using FMSC.Core;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using FSConvert = FMSC.Core.Convert;
 
 namespace TwoTrails.Core
 {
@@ -14,18 +18,61 @@ namespace TwoTrails.Core
         public double TotalAreaErrorArea { get; private set; }
         public double TotalGERAreaErrorArea { get; private set; }
 
+        public bool GERAvailable { get; private set; } = true;
 
-        public ExclusionSummary(ITtManager manager, IEnumerable<TtPolygon> polygons) 
+        public string SummaryText { get; private set; }
+
+
+        public ExclusionSummary(ITtManager manager, IEnumerable<TtPolygon> polygons, bool generateSummaryText = false) 
         {
             _Exclusions = polygons.Select(p => new PolygonSummary(manager, p)).ToList();
+
+            StringBuilder sbExc = new StringBuilder();
+
+            if (generateSummaryText)
+            {
+                sbExc.AppendLine($"Excluded Units:");
+            }
 
             foreach (var ps in _Exclusions)
             {
                 TotalArea += ps.Polygon.Area;
                 TotalPerimeter += ps.Polygon.Perimeter;
                 TotalAreaErrorArea += ps.TotalGpsError;
-                TotalGERAreaErrorArea += ps.GERResult.TotalErrorArea;
+
+                if (ps.GERAvailable)
+                    TotalGERAreaErrorArea += ps.GERResult.TotalErrorArea;
+                else
+                    GERAvailable = false;
+
+                if (generateSummaryText)
+                {
+                    sbExc.AppendLine($" {ps.Polygon.Name}");
+                    sbExc.AppendFormat("  Area: {0:F3} Ac ({1:F2} Ha){2}",
+                        Math.Round(FSConvert.ToAcre(ps.Polygon.Area, Area.MeterSq), 3),
+                        Math.Round(FSConvert.ToHectare(ps.Polygon.Area, Area.MeterSq), 2),
+                        Environment.NewLine);
+
+                    sbExc.AppendFormat("  Perimeter: {0:F2} Ft ({1:F2} M){2}",
+                        Math.Round(ps.Polygon.PerimeterFt, 2),
+                        Math.Round(ps.Polygon.Perimeter),
+                        Environment.NewLine);
+                    
+                    sbExc.AppendFormat("  Area-Error: {0:F3} Ac ({1:F2} Ha){2}",
+                        Math.Round(FSConvert.ToAcre(ps.TotalGpsError, Area.MeterSq), 3),
+                        Math.Round(FSConvert.ToHectare(ps.TotalGpsError, Area.MeterSq), 2),
+                        Environment.NewLine);
+
+                    if (ps.GERAvailable)
+                        sbExc.AppendFormat("  GER Area-Error: {0:F3} Ac ({1:F2} Ha){2}",
+                            Math.Round(FSConvert.ToAcre(ps.GERResult.TotalErrorArea, Area.MeterSq), 3),
+                            Math.Round(FSConvert.ToHectare(ps.GERResult.TotalErrorArea, Area.MeterSq), 2),
+                            Environment.NewLine);
+                    sbExc.AppendLine();
+                }
             }
+
+            SummaryText = sbExc.ToString();
         }
 
 
