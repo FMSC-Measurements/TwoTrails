@@ -413,8 +413,8 @@ namespace TwoTrails.Utils
                         "Unit,Area_Ac,Perim_Ft,GpsAE_Ac,GpsAE_Ratio,GER-AE_Ac,GER-AE_Ratio,TravAE_ac,TravAE_Ratio," +
                         "ExclUnits_Cnt,Area_W_Excl_Ac,Perim_W_Excl_Ft," + 
                         "Excl_Area_Ac,Excl_Perim_Ft,GpsAE_W_Excl_Ac,GpsAE_W_Excl_Ratio,GER-AE_W_Excl_Ac,GER-AE_W_Excl_Ratio,ExclUnits");
-
-                    foreach (TtPolygon poly in manager.GetPolygons())
+                    
+                    foreach (TtPolygon poly in manager.GetPolygons().Sort(true))
                     {
                         PolygonSummary ps = HaidLogic.GenerateSummary(manager, poly);
                         sw.WriteLine($"{poly.Name}{Environment.NewLine}{new String('-', poly.Name.Length)}");
@@ -422,8 +422,8 @@ namespace TwoTrails.Utils
 
                         swcsv.Write($"{poly.Name},{poly.AreaAcres},{poly.PerimeterFt},");
                         swcsv.Write($"{Convert.ToAcre(ps.TotalGpsError, Area.MeterSq)},{ps.GpsAreaError},");
-                        swcsv.Write(ps.GERAvailable ? $"{ps.GERResult.TotalErrorArea},{ps.GERResult.AreaError}" : ",,");
-                        swcsv.Write($"{Convert.ToAcre(ps.TotalTraverseError, Area.MeterSq)},{ps.TraverseAreaError},");
+                        swcsv.Write(ps.GERAvailable ? $"{ps.GERResult.TotalErrorArea},{ps.GERResult.AreaError}," : ",,");
+                        swcsv.Write(ps.TotalTraverseError > 0 ? $"{Convert.ToAcre(ps.TotalTraverseError, Area.MeterSq)},{ps.TraverseAreaError}," : ",,");
 
                         if (ps.ExclusionsCount > 0)
                         {

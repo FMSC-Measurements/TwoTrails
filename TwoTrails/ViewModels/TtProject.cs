@@ -141,11 +141,7 @@ namespace TwoTrails.ViewModels
             OnPropertyChanged(nameof(MAL));
         }
 
-        public List<TtPolygon> GetSortedPolygons()
-        {
-            List<TtPolygon> polygons = HistoryManager.Polygons.ToList();
-            polygons.Sort(new PolygonSorterDirect(Settings.SortPolysByName));
-            return polygons;
-        }
+        public List<TtPolygon> GetSortedPolygons() =>
+            HistoryManager.Polygons.Sort(Settings.SortPolysByName);
     }
 }

@@ -206,8 +206,7 @@ namespace TwoTrails.ViewModels
         public PointMinimizationModel(TtProject project, PointMinimizationDialog dialog)
         {
             Project = project;
-            Polygons = Manager.Polygons.Where(p => Manager.GetPoints(p.CN).HasAtLeast(4, pt => pt.IsBndType())).ToList();
-            Polygons.Sort(new PolygonSorterDirect(project.Settings.SortPolysByName));
+            Polygons = Manager.Polygons.Where(p => Manager.GetPoints(p.CN).HasAtLeast(4, pt => pt.IsBndType())).Sort(project.Settings.SortPolysByName);
             _Dialog = dialog;
 
             PointSelectedCommand = new RelayCommand(x =>

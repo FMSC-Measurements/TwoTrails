@@ -475,8 +475,7 @@ namespace TwoTrails.ViewModels
             {
                 if (CurrentPolygon == null) return new ObservableCollection<TtPolygon>();
 
-                List<TtPolygon> polygons = Manager.Polygons.Where(p => p.Area > 0 && p.CN != CurrentPolygon.CN).ToList();
-                polygons.Sort(new PolygonSorterDirect());
+                List<TtPolygon> polygons = Manager.Polygons.Where(p => p.Area > 0 && p.CN != CurrentPolygon.CN).Sort();
                 polygons.Insert(0, NO_EXCLUSION_POLY);
                 return new ObservableCollection<TtPolygon>(polygons);
             }

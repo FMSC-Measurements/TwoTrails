@@ -1,8 +1,7 @@
 ﻿using FMSC.Core;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text.RegularExpressions;
+using System.Linq;
 using TwoTrails.Core;
 
 namespace TwoTrails.Utils
@@ -42,5 +41,15 @@ namespace TwoTrails.Utils
     public class PolygonSorterDirect : PolygonSorter, IComparer<TtPolygon>
     {
         public PolygonSorterDirect(bool sortPolysByName = true) : base(sortPolysByName) { }
+    }
+
+    public static class PolygonSorterExtensions
+    {
+        public static List<TtPolygon> Sort(this IEnumerable<TtPolygon> polygons, bool sortPolysByName = true)
+        {
+            List<TtPolygon> polys = polygons.ToList();
+            polys.Sort(new PolygonSorterDirect(sortPolysByName));
+            return polys;
+        }
     }
 }
