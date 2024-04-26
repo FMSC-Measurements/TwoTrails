@@ -581,8 +581,14 @@ namespace TwoTrails.ViewModels
         {
             if (APStats != null)
             {
-                Project.HistoryManager.MinimizePoints(Points.Select(p => _OrigPoints[p.CN]), Points.Select(p => p.OnBoundary));
-                _Dialog.Close();
+                if (Math.Abs((double)AreaDifference) <= 1d ||
+                    MessageBox.Show("The area difference between the original unit and the minimized unit is greater than 1% " +
+                    "which is more than recommened. Would you like to minimize the unit anyway?", "Large Area Difference",
+                    MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    Project.HistoryManager.MinimizePoints(Points.Select(p => _OrigPoints[p.CN]), Points.Select(p => p.OnBoundary));
+                    _Dialog.Close();
+                }
             }
             else
             {

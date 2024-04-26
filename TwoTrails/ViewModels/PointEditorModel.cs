@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -42,6 +43,7 @@ namespace TwoTrails.ViewModels
         public BindedRelayCommand<PointEditorModel> ConvertPointsCommand { get; }
         public BindedRelayCommand<PointEditorModel> ResetPointCommand { get; }
         public BindedRelayCommand<PointEditorModel> ResetPointFieldCommand { get; }
+        public BindedRelayCommand<PointEditorModel> AccLookupCommand { get; }
         public BindedRelayCommand<PointEditorModel> ChangeQuondamParentCommand { get; }
 
         public BindedRelayCommand<PointEditorModel> MovePointsCommand { get; }
@@ -915,6 +917,10 @@ namespace TwoTrails.ViewModels
 
             ResetPointFieldCommand = new BindedRelayCommand<PointEditorModel>(
                 x => ResetPointField(x as DataGrid), x => HasSelection,
+                this, m => m.HasSelection);
+
+            AccLookupCommand = new BindedRelayCommand<PointEditorModel>(
+                x => AccuracyLookup(), x => HasSelection,
                 this, m => m.HasSelection);
 
             ChangeQuondamParentCommand = new BindedRelayCommand<PointEditorModel>(
@@ -2093,6 +2099,35 @@ namespace TwoTrails.ViewModels
 
 
         #region Create/Delete/Edit
+        private void AccuracyLookup()
+        {
+            if (SessionData.HasGpsAccReport() == GpsReportStatus.CantGetReport)
+            {
+                if (MessageBox.Show(
+                    "Unable to retrieve NTDP accuracy report. Would you like to go to the website instead?",
+                    "Retrieve report error",
+                    MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+                {
+                    Process.Start(Consts.URL_NTDP_ACCURACY_WEBPAGE);
+                    return;
+                }
+            }
+
+            AccuracyDataDialog dialog = new AccuracyDataDialog(SessionData.GpsAccuracyReport, _ManAcc, SessionData.MakeID, SessionData.ModelID)
+            {
+                Owner = MainModel.MainWindow
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                ManAcc = dialog.Accuracy;
+                SessionData.MakeID = dialog.MakeID;
+                SessionData.ModelID = dialog.ModelID;
+
+                OnPropertyChanged(nameof(ManAcc));
+            }
+        }
+
         private void ChangeQuondamParent()
         {
             if (!MultipleSelections || MessageBox.Show("Multiple Quondams are selected. Do you wish to change all of their ParentPoints to a new Point?",

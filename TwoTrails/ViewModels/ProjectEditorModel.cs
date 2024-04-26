@@ -603,13 +603,13 @@ namespace TwoTrails.ViewModels
         {
             ValidatePolygon(polygon);
             ClearPolygonSummary(polygon);
-            GeneratePolygonSummaryAndStats(CurrentPolygon);
+            GeneratePolygonSummaryAndStats(polygon);
         }
 
         private void PolygonAccuracyChanged(TtPolygon polygon)
         {
             ClearPolygonSummary(polygon);
-            GeneratePolygonSummaryAndStats(CurrentPolygon);
+            GeneratePolygonSummaryAndStats(polygon);
         }
 
 

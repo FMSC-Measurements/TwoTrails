@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 
@@ -108,19 +109,19 @@ namespace TwoTrails.Utils
 
                 foreach (TtPoint p in points)
                 {
-                    UTMCoords adj = p.GetCoords(zone, true);
-                    UTMCoords unadj = p.GetCoords(zone, false);
+                    Coordinate adj = p.GetCoords(zone, true).ToCoordinate();
+                    Coordinate unadj = p.GetCoords(zone, false).ToCoordinate();
 
                     if (p.OnBoundary)
                     {
-                        bndAdjCoords.Add(new NetTopologySuite.Geometries.Coordinate(adj.X, adj.Y));
-                        bndUnAdjCoords.Add(new NetTopologySuite.Geometries.Coordinate(unadj.X, unadj.Y));
+                        bndAdjCoords.Add(adj);
+                        bndUnAdjCoords.Add(unadj);
                     }
 
                     if (p.IsNavPoint())
                     {
-                        navAdjCoords.Add(new NetTopologySuite.Geometries.Coordinate(adj.X, adj.Y));
-                        navUnAdjCoords.Add(new NetTopologySuite.Geometries.Coordinate(unadj.X, unadj.Y));
+                        navAdjCoords.Add(adj);
+                        navUnAdjCoords.Add(new Coordinate(unadj.X, unadj.Y));
                     }
                 }
 
@@ -308,6 +309,67 @@ namespace TwoTrails.Utils
                         sdw.Write(features);
                         WriteProjection(fileName, zone);
                     }
+                    
+                    //Exclusions
+                    List<TtPolygon> exclPolys = manager.GetPolygons().Where(p => p.ParentUnitCN == polygon.CN).ToList();
+                    if (exclPolys.Count > 0)
+                    {
+                        fileName = baseFileName + "_BndAdj_With_Exclusions";
+                        geoFac = new GeometryFactory();
+                        polyizer = new Polygonizer();
+
+                        features = new List<IFeature>();
+
+                        feat = new Feature();
+
+                        sdw = new ShapefileDataWriter(fileName, geoFac);
+
+                        List<Coordinate> pointsGeom = new List<Coordinate>(bndAdjCoords);
+
+                        List<Polygon> exclPolysGeom = new List<Polygon>()
+                            .Concat(exclPolys.Select(poly =>
+                            {
+                                List<Coordinate> coords = manager.GetPoints(poly.CN).OnBndPoints().Select(pt => pt.GetCoords(zone).ToCoordinate()).ToList();
+                                if (coords[0] != coords[coords.Count - 1])
+                                    coords.Add(coords[0]);
+                                pointsGeom.AddRange(coords);
+                                return new Polygon(new LinearRing(coords.ToArray()));
+                            })).ToList();
+
+                        feat.Geometry = new MultiPolygon(new Polygon[] { new Polygon(new LinearRing(bndAdjCoords.ToArray())) }.Concat(exclPolysGeom).ToArray());
+
+                        feat.Attributes = new AttributesTable
+                        {
+                            { "Exclusions", exclPolysGeom.Count }
+                        };
+
+                        features.Add(feat);
+
+                        dbh = ShapefileDataWriter.GetHeader(feat, 1);
+
+                        sdw.Header = dbh;
+                        sdw.Write(features);
+                        WriteProjection(fileName, manager.DefaultMetadata.Zone);
+
+                        //points
+                        fileName = baseFileName + "_BndAdj_Points_With_Exclusions";
+                        geoFac = new GeometryFactory();
+                        sdw = new ShapefileDataWriter(fileName, geoFac);
+
+                        features = new List<IFeature>
+                        {
+                            new Feature(
+                                new MultiPoint(pointsGeom.Select(c => new Point(c)).ToArray()),
+                                new AttributesTable { { "Points", pointsGeom.Count } })
+                        };
+
+                        dbh = ShapefileDataWriter.GetHeader(
+                            features[0],
+                            1);
+                        sdw.Header = dbh;
+                        sdw.Write(features);
+                        WriteProjection(fileName, manager.DefaultMetadata.Zone);
+                    }
                 }
                 #endregion
 
@@ -446,8 +508,7 @@ namespace TwoTrails.Utils
 
 
                 feat = new Feature();
-                UTMCoords c = p.GetCoords(zone, adjusted);
-                feat.Geometry = new Point(c.X, c.Y);
+                feat.Geometry = p.GetCoords(zone, adjusted).ToPointG();
 
                 feat.Attributes = attPointTable;
 
@@ -479,6 +540,17 @@ namespace TwoTrails.Utils
         private static string Sanitize(this string text)
         {
             return Regex.Replace(text.Replace(" ", "_"), "[^a-zA-Z0-9_]", "").Trim();
+        }
+
+
+        private static Coordinate ToCoordinate(this UTMCoords coords)
+        {
+            return new Coordinate(coords.X, coords.Y);
+        }
+
+        private static Point ToPointG(this UTMCoords coords)
+        {
+            return new Point(coords.X, coords.Y);
         }
     }
 }

@@ -41,6 +41,8 @@ namespace TwoTrails.Core
 
         public double TotalAreaWExclusions { get; private set; } = 0;
         public double TotalPerimWExclusions { get; private set; } = 0;
+        public double ExcludedAreaPercent { get; private set; } = 0;
+        public double ExcludedPerimeterPercent { get; private set; } = 0;
         public double TotalAreaErrorAreaWExclusions { get; private set; } = 0;
         public double TotalGERAreaErrorAreaWExclusions { get; private set; } = 0;
         public double TotalAreaErrorWExclusions { get; private set; } = 0;
@@ -125,6 +127,9 @@ namespace TwoTrails.Core
                             if (GERAvailable && ps.GERAvailable)
                                 TotalGERAreaErrorAreaWExclusions += ps.GERResult.TotalErrorArea;
                         }
+
+                        ExcludedAreaPercent = Exclusions.TotalArea / Polygon.Area * 100d;
+                        ExcludedPerimeterPercent = Exclusions.TotalPerimeter / Polygon.Perimeter * 100d;
 
                         TotalAreaErrorWExclusions = TotalAreaErrorAreaWExclusions / TotalAreaWExclusions * 100d;
 

@@ -609,11 +609,19 @@
                             </TextBox>
 
                             <TextBlock Grid.Row="9" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Man Acc"/>
-                            <TextBox Grid.Row="9" Grid.Column="1" Style="{StaticResource ResourceKey=styleManAccEnable}"
-							 Text="{Binding ManAcc, Converter={StaticResource ndblcvtr}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             PreviewTextInput="TextIsUnsignedDouble"
-							 cp:CustomProperties.BackgroundEnabled="{Binding SameManAcc, Converter={StaticResource IBC}}"
-							 LostFocus="TextBox_UpdateBinding"/>
+                            <Grid Grid.Row="9" Grid.Column="1">
+                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="25"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Style="{StaticResource ResourceKey=styleManAccEnable}"
+							     Text="{Binding ManAcc, Converter={StaticResource ndblcvtr}, Delay=500, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 PreviewTextInput="TextIsUnsignedDouble"
+							     cp:CustomProperties.BackgroundEnabled="{Binding SameManAcc, Converter={StaticResource IBC}}"
+							     LostFocus="TextBox_UpdateBinding"/>
+
+                                <Button Grid.Column="1" Content="^" Height="25" Command="{Binding AccLookupCommand}"/>
+                            </Grid>
 
                             <TextBlock Grid.Row="10" Grid.Column="0" Style="{StaticResource ResourceKey=styleFieldTitle}" Text="Fwd Az"/>
                             <TextBox Grid.Row="10" Grid.Column="1" Style="{StaticResource ResourceKey=styleTravEnable}"
