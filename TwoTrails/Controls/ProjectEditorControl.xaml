@@ -395,7 +395,8 @@
                                                      PreviewTextInput="TextIsUnsignedInteger" IsUndoEnabled="False"/>
 
 
-                                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Exclusion" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center"
+                                                           Text="Exclusion" ToolTip="Unit that this will be excluded from"/>
                                                 <ComboBox Grid.Column="1" Grid.Row="2" Height="34"
                                                     ItemsSource="{Binding PolygonPossibleExclusions}"
                                                     SelectedItem="{Binding PolygonExclusion}"
