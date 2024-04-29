@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FSConvert = FMSC.Core.Convert;
 
 namespace TwoTrails.Core
 {
@@ -64,8 +65,8 @@ namespace TwoTrails.Core
             private set { SetField(ref _Area, value, () => OnPropertyChanged(nameof(AreaAcres), nameof(AreaHectaAcres))); }
         }
 
-        public Double AreaAcres => _Area * FMSC.Core.Convert.SquareMeterToAcre_Coeff;
-        public Double AreaHectaAcres => _Area / FMSC.Core.Convert.SquareMeterToHectare_Coeff;
+        public Double AreaAcres => _Area * FSConvert.SquareMeterToAcre_Coeff;
+        public Double AreaHectaAcres => _Area * FSConvert.SquareMeterToHectare_Coeff;
 
         protected Double _Perimeter = 0;
         public Double Perimeter
@@ -81,8 +82,8 @@ namespace TwoTrails.Core
             private set { SetField(ref _PerimeterLine, value, () => OnPropertyChanged(nameof(PerimeterLineFt))); }
         }
 
-        public Double PerimeterFt => Perimeter * FMSC.Core.Convert.MetersToFeet_Coeff;
-        public Double PerimeterLineFt => PerimeterLine * FMSC.Core.Convert.MetersToFeet_Coeff;
+        public Double PerimeterFt => Perimeter * FSConvert.MetersToFeet_Coeff;
+        public Double PerimeterLineFt => PerimeterLine * FSConvert.MetersToFeet_Coeff;
 
 
         protected TtPolygon _ParentUnit;

@@ -804,7 +804,7 @@ namespace TwoTrails.ViewModels
                     ValidExclusion = true;
                 }
 
-                PolygonExclusionToolTip = ValidExclusion ? _PolygonExclusion.Name : $"The boundary of {_PolygonExclusion.Name} is not located within {_CurrentPolygon.Name}.";
+                PolygonExclusionToolTip = ValidExclusion ? _PolygonExclusion.Name : $"The boundary of {_CurrentPolygon.Name} is not entirely located within {_PolygonExclusion.Name}.";
             }
             else
             {
