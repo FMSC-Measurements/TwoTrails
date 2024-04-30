@@ -591,10 +591,10 @@
                                                 </Grid.RowDefinitions>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Text="Ac:" ToolTip="Acres"/>
-                                                <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalErrorArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalErrorArea, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" Text="Ha:" ToolTip="Hectares"/>
-                                                <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalErrorArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                <TextBlock Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.TotalErrorArea, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
 
                                                 <TextBlock Grid.Column="0" Grid.Row="4" VerticalAlignment="Center" Text="Err Ratio**" ToolTip="Area-Error/Area to be less than 10%"/>
                                                 <TextBlock Grid.Column="1" Grid.Row="4" VerticalAlignment="Center" Text="{Binding PolygonSummary.GERResult.AreaError, StringFormat={}{0:F3}%}"/>
@@ -651,18 +651,18 @@
                                                         </Grid.RowDefinitions>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="0" Text="Total Ac:" ToolTip="Total Acres with Exclusions"/>
-                                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PolygonSummary.TotalAreaWExclusions, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PolygonSummary.TotalAreaWExclusions, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="2" Text="Total Ha:" ToolTip="Total Hectacres with Exclusions"/>
-                                                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding PolygonSummary.TotalAreaWExclusions, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding PolygonSummary.TotalAreaWExclusions, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="4" Text="Total AE Ac:"
                                                             ToolTip="Total Area-Error Area with Exclusions in Acres"/>
-                                                        <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding PolygonSummary.TotalAreaErrorAreaWExclusions, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding PolygonSummary.TotalAreaErrorAreaWExclusions, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="6" Text="Total AE Ha:"
                                                             ToolTip="Total Area-Error Area with Exclusions in Hectacres"/>
-                                                        <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding PolygonSummary.TotalAreaErrorAreaWExclusions, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding PolygonSummary.TotalAreaErrorAreaWExclusions, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="8" Text="Total AE Ratio**"
                                                             ToolTip="Total Area-Error with Exclusions Ratio to be less than 10%"/>
@@ -689,11 +689,11 @@
 
                                                         <TextBlock Grid.Column="0" Grid.Row="0" Text="Total Perim Ft:"
                                                            ToolTip="Total Perimeter with Exclusions in Feet" />
-                                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PolygonSummary.TotalPerimWExclusions, StringFormat=F3, Converter={StaticResource MtoFConverter}}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PolygonSummary.TotalPerimWExclusions, StringFormat=F2, Converter={StaticResource MtoFConverter}}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="2" Text="Total Perim M:"
                                                            ToolTip="Total Perimeter with Exclusions in Meters" />
-                                                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding PolygonSummary.TotalPerimWExclusions, StringFormat=F3}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding PolygonSummary.TotalPerimWExclusions, StringFormat=F2}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="4" Text="Total AE GER Ac:" Visibility="{Binding PolygonSummary.GERAvailable, Converter={StaticResource BoolToVis}}"
                                                            ToolTip="Total Geometric Error Reduction Area-Error area with Exclusions in Acres"/>
@@ -737,19 +737,19 @@
                                                         </Grid.RowDefinitions>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="0" Text="Excluded Ac:" ToolTip="Excluded Total area in Acres"/>
-                                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PolygonSummary.Exclusions.TotalArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PolygonSummary.Exclusions.TotalArea, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="2" Text="Excluded Ha:" ToolTip="Excluded Total area in Hectares"/>
-                                                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding PolygonSummary.Exclusions.TotalArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding PolygonSummary.Exclusions.TotalArea, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="4" Text="Excluded Area %:" ToolTip="Excluded area to Polygon perimeter"/>
-                                                        <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding PolygonSummary.ExcludedAreaPercent, StringFormat={}{0:F3}%}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding PolygonSummary.ExcludedAreaPercent, StringFormat={}{0:F2}%}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="6" Text="Excluded AE Ac:" ToolTip="Excluded Total Area-Error area in Acres"/>
-                                                        <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding PolygonSummary.Exclusions.TotalAreaErrorArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding PolygonSummary.Exclusions.TotalAreaErrorArea, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="8" Text="Excluded AE Ha:" ToolTip="Excluded Total Area-Error area in Hectacres"/>
-                                                        <TextBlock Grid.Column="1" Grid.Row="8" Text="{Binding PolygonSummary.Exclusions.TotalAreaErrorArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="8" Text="{Binding PolygonSummary.Exclusions.TotalAreaErrorArea, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
 
                                                     </Grid>
 
@@ -772,23 +772,23 @@
                                                         </Grid.RowDefinitions>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="0" Text="Excluded Perim Ft:" ToolTip="Total Perimeter of Excluded units in Feet" />
-                                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PolygonSummary.Exclusions.TotalPerimeter, StringFormat=F3, Converter={StaticResource MtoFConverter}}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding PolygonSummary.Exclusions.TotalPerimeter, StringFormat=F2, Converter={StaticResource MtoFConverter}}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="2" Text="Excluded Perim M:" ToolTip="Total Perimeter of Excluded units Meters" />
-                                                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding PolygonSummary.Exclusions.TotalPerimeter, StringFormat=F3}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding PolygonSummary.Exclusions.TotalPerimeter, StringFormat=F2}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="4" Text="Excluded Perim %:" ToolTip="Excluded perimeter to Polygon perimeter"/>
-                                                        <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding PolygonSummary.ExcludedPerimeterPercent, StringFormat={}{0:F3}%}"/>
+                                                        <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding PolygonSummary.ExcludedPerimeterPercent, StringFormat={}{0:F2}%}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="6" Text="Excluded AE GER Ac:" Visibility="{Binding PolygonSummary.GERAvailable, Converter={StaticResource BoolToVis}}"
                                                                    ToolTip="Excluded Total Total Geometric Error Reduction Area-Error in Acres" />
                                                         <TextBlock Grid.Column="1" Grid.Row="6" Visibility="{Binding PolygonSummary.GERAvailable, Converter={StaticResource BoolToVis}}"
-                                                                   Text="{Binding PolygonSummary.Exclusions.TotalGERAreaErrorArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
+                                                                   Text="{Binding PolygonSummary.Exclusions.TotalGERAreaErrorArea, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=Acres}"/>
 
                                                         <TextBlock Grid.Column="0" Grid.Row="8" Text="Excluded AE GER Ha:" Visibility="{Binding PolygonSummary.GERAvailable, Converter={StaticResource BoolToVis}}"
                                                                    ToolTip="Excluded Total Geometric Error Reduction Area-Error area in Hectacres"/>
                                                         <TextBlock Grid.Column="1" Grid.Row="8" Visibility="{Binding PolygonSummary.GERAvailable, Converter={StaticResource BoolToVis}}"
-                                                                   Text="{Binding PolygonSummary.Exclusions.TotalGERAreaErrorArea, StringFormat=F4, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
+                                                                   Text="{Binding PolygonSummary.Exclusions.TotalGERAreaErrorArea, StringFormat=F3, Converter={StaticResource M2Converter}, ConverterParameter=HectaAcres}"/>
                                                     </Grid>
                                                 </Grid>
                                             </StackPanel>
