@@ -1,6 +1,5 @@
-﻿using FMSC.GeoSpatial.Types;
+﻿using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
-using GeoAPI.Geometries;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;

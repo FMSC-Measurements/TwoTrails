@@ -1,4 +1,5 @@
-﻿using FMSC.Core;
+﻿using CsvHelper;
+using FMSC.Core;
 using FMSC.Core.Xml.GPX;
 using FMSC.Core.Xml.KML;
 using FMSC.GeoSpatial.NMEA.Sentences;
@@ -625,42 +626,34 @@ namespace TwoTrails.Utils
 
         public static void KMZ(ITtManager manager, TtProjectInfo projectInfo, String fileName)
         {
-            string kmlName = $"{fileName}.kml";
-            fileName = $"{fileName}.kmz";
+            string kmzFileName = $"{fileName}.kmz";
 
             KmlDocument doc = TtKmlGenerator.Generate(manager, projectInfo.Name.ScrubFileName(), projectInfo.Description);
             
-            string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);
+            if (File.Exists(kmzFileName))
+                File.Delete(kmzFileName);
 
-            KmlWriter.WriteKmlFile(kmlFile, doc);
-
-            if (File.Exists(fileName))
-                File.Delete(fileName);
-
-            using (ZipArchive kmzFile = ZipFile.Open(fileName, ZipArchiveMode.Create))
-                kmzFile.CreateEntryFromFile(kmlFile, kmlName);
-
-            File.Delete(kmlFile);
+            using (ZipArchive kmzFile = ZipFile.Open(kmzFileName, ZipArchiveMode.Create))
+            {
+                ZipArchiveEntry entry = kmzFile.CreateEntry($"{projectInfo.Name.ScrubFileName()}.kml");
+                KmlWriter.WriteToStream(entry.Open(), doc);
+            }
         }
 
         public static void KMZ(IEnumerable<TtProject> projects, String fileName)
         {
-            string kmlName = "multiproject.kml";
-            fileName = $"{fileName}.kmz";
+            String kmzFileName = $"{fileName}.kmz";
 
             KmlDocument doc = TtKmlGenerator.Generate(projects.Select(p => p.HistoryManager), "MultiProject");
 
-            string kmlFile = Path.Combine(Path.GetDirectoryName(fileName), kmlName);
+            if (File.Exists(kmzFileName))
+                File.Delete(kmzFileName);
 
-            KmlWriter.WriteKmlFile(kmlFile, doc);
-
-            if (File.Exists(fileName))
-                File.Delete(fileName);
-
-            using (ZipArchive kmzFile = ZipFile.Open(fileName, ZipArchiveMode.Create))
-                kmzFile.CreateEntryFromFile(kmlFile, kmlName);
-
-            File.Delete(kmlFile);
+            using (ZipArchive kmzFile = ZipFile.Open(kmzFileName, ZipArchiveMode.Create))
+            {
+                ZipArchiveEntry entry = kmzFile.CreateEntry($"multiproject_{projects.Count()}.kml");
+                KmlWriter.WriteToStream(entry.Open(), doc);
+            }
         }
 
         public static void Shapes(ITtManager manager, TtProjectInfo projectInfo, String folderPath)

@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 using TwoTrails.Core;
 using FMSC.Core;
+using FSConvert = FMSC.Core.Convert;
 
 namespace TwoTrails.Converters
 {
@@ -47,11 +48,11 @@ namespace TwoTrails.Converters
                     switch (MetadataPropertyName)
                     {
                         case MetadataPropertyName.Elevation:
-                            return FMSC.Core.Convert.Distance((double)value, Metadata.Elevation, Distance.Meters);
+                            return FSConvert.Distance((double)value, Metadata.Elevation, Distance.Meters);
                         case MetadataPropertyName.Distance:
-                            return FMSC.Core.Convert.Distance((double)value, Metadata.Distance, Distance.Meters);
+                            return FSConvert.Distance((double)value, Metadata.Distance, Distance.Meters);
                         case MetadataPropertyName.SlopeAngle:
-                            return FMSC.Core.Convert.Angle((double)value, Metadata.Slope, Slope.Percent);
+                            return FSConvert.Angle((double)value, Metadata.Slope, Slope.Percent);
                     }
                 }
             }
@@ -70,11 +71,11 @@ namespace TwoTrails.Converters
                         switch (MetadataPropertyName)
                         {
                             case MetadataPropertyName.Elevation:
-                                return FMSC.Core.Convert.Distance(dval, Distance.Meters, Metadata.Elevation);
+                                return FSConvert.Distance(dval, Distance.Meters, Metadata.Elevation);
                             case MetadataPropertyName.Distance:
-                                return FMSC.Core.Convert.Distance(dval, Distance.Meters, Metadata.Distance);
+                                return FSConvert.Distance(dval, Distance.Meters, Metadata.Distance);
                             case MetadataPropertyName.SlopeAngle:
-                                return FMSC.Core.Convert.Angle(dval, Slope.Percent, Metadata.Slope);
+                                return FSConvert.Angle(dval, Slope.Percent, Metadata.Slope);
                         }
                     }
                 }

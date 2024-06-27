@@ -51,6 +51,11 @@ namespace TwoTrails.Controls
                         }
                     }
                 }
+                
+                if (ti.Name == "tiPolygons" && _ProjectEditor.SortPolysOnChange)
+                {
+                    _ProjectEditor.SortPolygons();
+                }
             }
         }
 

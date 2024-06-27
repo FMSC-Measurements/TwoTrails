@@ -2,7 +2,6 @@
 using FMSC.Core.Databases;
 using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.NMEA.Sentences;
-using FMSC.GeoSpatial.Types;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -112,7 +111,7 @@ namespace TwoTrails.DAL
                             if (!reader.IsDBNull(3))
                                 md.Crew = reader.GetString(3);
                             if (!reader.IsDBNull(4))
-                                md.Datum = Types.ParseDatum(reader.GetString(4));
+                                md.Datum = GeoSpatialTypes.ParseDatum(reader.GetString(4));
                             if (!reader.IsDBNull(5))
                                 md.DecType = Types.ParseDeclinationType(reader.GetString(5));
                             md.Name = reader.GetString(6);
@@ -520,15 +519,16 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                 dataReader.GetString(1),
                 dataReader.GetBoolean(2),
                 new GeoPosition(
-                    dataReader.GetDouble(4), NorthSouthExtentions.Parse(dataReader.GetString(5)),
-                    dataReader.GetDouble(6), EastWestExtentions.Parse(dataReader.GetString(7)),
-                    dataReader.GetDouble(8), UomElevationExtensions.Parse(dataReader.GetString(9))
+                    dataReader.GetDouble(4),
+                    dataReader.GetDouble(6),
+                    dataReader.GetDouble(8),
+                    UomElevationExtensions.Parse(dataReader.GetString(9))
                 ),
                 time,
                 dataReader.GetDouble(21),
                 dataReader.GetDouble(22),
                 dataReader.GetDouble(10),
-                EastWestExtentions.Parse(dataReader.GetString(11)),
+                EastWestEx.Parse(dataReader.GetString(11)),
                 (Mode)(dataReader.GetInt32N(12) ?? 0),
                 parseFix(dataReader.GetInt32(14) - 1),     //converts from real value
                 ParseNmeaIds(dataReader.GetString(25)),

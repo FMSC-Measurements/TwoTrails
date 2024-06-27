@@ -1,7 +1,7 @@
 ﻿using FMSC.Core;
 using FMSC.Core.ComponentModel;
-using FMSC.Core.Utilities;
 using FMSC.Core.Windows.ComponentModel.Commands;
+using FMSC.GeoSpatial;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Threading;
 using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Media;
@@ -304,9 +303,6 @@ namespace TwoTrails.ViewModels
             }
 
             Manager.HistoryChanged -= Manager_HistoryChanged;
-
-            //if (_CurrentPolygon != null)
-            //    _CurrentPolygon.PolygonChanged -= GeneratePolygonSummaryAndStats;
         }
 
 
@@ -376,7 +372,7 @@ namespace TwoTrails.ViewModels
 
         #region Properties
         private static readonly TtPolygon NO_EXCLUSION_POLY = new TtPolygon(Consts.EmptyGuid, "*No Exclusion*", "", 0, 0, DateTime.Now, 0, 0, 0, 0);
-
+        public bool SortPolysOnChange { get; private set; } = false;
 
         private TtPolygon _CurrentPolygon;
         public TtPolygon CurrentPolygon
@@ -384,25 +380,19 @@ namespace TwoTrails.ViewModels
             get => _CurrentPolygon;
             private set
             {
-                //TtPolygon old = _CurrentPolygon;
-
                 SetField(ref _CurrentPolygon, value, () => {
-                    //if (old != null)
-                    //{
-                    //    old.PolygonChanged -= GeneratePolygonSummaryAndStats;
-                    //}
-
                     BindPolygonValues(value);
 
                     if (_CurrentPolygon != null)
                     {
-                        //_CurrentPolygon.PolygonChanged += GeneratePolygonSummaryAndStats;
-
-                        //ValidatePolygon(value);
-
                         GeneratePolygonSummaryAndStats(_CurrentPolygon);
                     }
                 });
+
+                if (SortPolysOnChange)
+                {
+                    SortPolygons();
+                }
             }
         }
 
@@ -410,7 +400,10 @@ namespace TwoTrails.ViewModels
         public string PolygonName
         {
             get => _PolygonName;
-            set => EditPolygonValue(ref _PolygonName, value, PolygonProperties.NAME);
+            set {
+                EditPolygonValue(ref _PolygonName, value, PolygonProperties.NAME);
+                SortPolysOnChange = true;
+            }
         }
 
         private double _PolygonAccuracy;
@@ -812,6 +805,16 @@ namespace TwoTrails.ViewModels
             }
 
             OnPropertyChanged(nameof(ValidExclusion), nameof(PolygonExclusionToolTip));
+        }
+
+
+        public void SortPolygons()
+        {
+            if (SortPolysOnChange)
+            {
+                PolygonsLVC.CustomSort = new PolygonSorter(Project.Settings.SortPolysByName);
+                SortPolysOnChange = false;
+            }
         }
         #endregion
 

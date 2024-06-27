@@ -1,5 +1,5 @@
-﻿using System;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.GeoSpatial;
 using TwoTrails.Core;
 
 namespace TwoTrails.Settings
@@ -14,7 +14,7 @@ namespace TwoTrails.Settings
         private const string SLOPE = "Slope";
         private const string ZONE = "Zone";
 
-        public Datum Datum { get; set; } = Datum.NAD83;
+        public Datum Datum { get; set; } = Datum.WGS84;
 
         public DeclinationType DecType { get; set; } = DeclinationType.MagDec;
 

@@ -202,11 +202,14 @@ namespace TwoTrails.Core
             return base.Equals(polygon) &&
                 _Area == polygon._Area &&
                 _Perimeter == polygon._Perimeter &&
+                _PerimeterLine == polygon._PerimeterLine &&
                 _Name == polygon._Name &&
                 _Accuracy == polygon._Accuracy &&
                 _Description == polygon._Description &&
                 _PointStartIndex == polygon._PointStartIndex &&
-                _Increment == polygon._Increment;
+                _Increment == polygon._Increment &&
+                _ParentUnitCN == polygon._ParentUnitCN &&
+                _TimeCreated == polygon._TimeCreated;
         }
 
         public override int GetHashCode()

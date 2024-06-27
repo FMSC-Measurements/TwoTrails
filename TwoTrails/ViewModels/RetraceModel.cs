@@ -22,7 +22,6 @@ namespace TwoTrails.ViewModels
 
         public ObservableCollection<Retrace> Retraces { get { return Get<ObservableCollection<Retrace>>(); } set { Set(value); } }
 
-        public ICommand CommitCommand { get; }
 
         public List<TtPolygon> Polygons { get; }
         public TtPolygon TargetPolygon { get { return Get<TtPolygon>(); } set { Set(value, () => PolygonChanged(value)); } }
@@ -56,8 +55,6 @@ namespace TwoTrails.ViewModels
                     new Retrace(_Project)
                 };
             }
-
-            CommitCommand = new RelayCommand(x => RetracePoints());
         }
 
 
@@ -85,6 +82,13 @@ namespace TwoTrails.ViewModels
         {
             if (Retraces.Count > 1 && sender != null)
                 Retraces.Remove(sender);
+        }
+
+        public void ClearRetraces()
+        {
+            if (MessageBox.Show("Are you sure you would like to clear all retraces?", "Clear Retraces",
+                MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
+                Retraces.Clear();
         }
 
         public bool RetracePoints()
@@ -288,6 +292,13 @@ namespace TwoTrails.ViewModels
             }
 
             RetracePoints = new ReadOnlyCollection<TtPoint>(retracePoints);
+        }
+
+        public void SwapPointFromTo()
+        {
+            TtPoint from = PointFrom;
+            PointFrom = PointTo;
+            PointTo = from;
         }
     }
 }

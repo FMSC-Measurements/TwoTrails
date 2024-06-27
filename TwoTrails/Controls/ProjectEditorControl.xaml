@@ -9,6 +9,7 @@
              xmlns:tt="clr-namespace:TwoTrails"
              xmlns:ttc="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
              xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
+             xmlns:fmscgs="clr-namespace:FMSC.GeoSpatial;assembly=FMSC.GeoSpatial"
              xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800"
@@ -374,7 +375,7 @@
 
                                             <Grid Margin="0 4 0 0">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="140"/>
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <Grid.RowDefinitions>
@@ -396,7 +397,7 @@
 
 
                                                 <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center"
-                                                           Text="Exclusion" ToolTip="Unit that this will be excluded from"/>
+                                                           Text="Excluded From" ToolTip="Unit that this will be excluded from"/>
                                                 <ComboBox Grid.Column="1" Grid.Row="2" Height="34"
                                                     ItemsSource="{Binding PolygonPossibleExclusions}"
                                                     SelectedItem="{Binding PolygonExclusion}"
@@ -993,7 +994,7 @@
                                 <TextBlock Grid.Column="2" Grid.Row="8" Text="Datum" />
                                 <ComboBox Grid.Column="2" Grid.Row="9" IsEnabled="False"
                                           SelectedItem="{Binding MetadataDatum, UpdateSourceTrigger=PropertyChanged, Delay=500}"
-                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Datum}}"/>
+                                          ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmscgs:Datum}}"/>
 
                                 <TextBlock Grid.Column="0" Grid.Row="10" Text="GPS Receiver" />
                                 <ComboBox Grid.Column="0" Grid.Row="11" IsEditable="True"

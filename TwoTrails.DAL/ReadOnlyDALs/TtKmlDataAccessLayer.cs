@@ -1,5 +1,5 @@
 ﻿using FMSC.Core.Xml.KML;
-using FMSC.GeoSpatial.Types;
+using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;

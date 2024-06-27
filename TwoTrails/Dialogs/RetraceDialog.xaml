@@ -8,8 +8,8 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Retrace"
-        Height="350" MinHeight="350" MaxHeight="600"
-        Width="675" MinWidth="675" MaxWidth="675">
+        Height="350" MinHeight="350" MaxHeight="720"
+        Width="715" MinWidth="715" MaxWidth="715">
     
     <Window.Resources>
         <fmsccm:EnumDescriptionConverter x:Key="edc"/>
@@ -108,52 +108,58 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="0" Width="75" Content="Cancel" Click="Cancel_Click"/>
-                    <Button Grid.Column="2" Width="75" Content="Create" Click="Create_Click"/>
+                    <Button Grid.Column="2" Width="75" Margin="5 0 5 0" Content="Clear" Click="Clear_Click"/>
+                    <Button Grid.Column="3" Width="75" Content="Create" Click="Create_Click"/>
                 </Grid>
             </Border>
         </Grid>
 
-        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Retraces}" Margin="0"
+        <ScrollViewer DockPanel.Dock="Top" Margin="0" BorderThickness="0" VerticalScrollBarVisibility="Auto">
+            <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Retraces}" Margin="0"
                  HorizontalContentAlignment="Stretch" BorderThickness="0">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Grid Margin="5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="105"/>
-                            <ColumnDefinition Width="125"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="125"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="105"/>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
 
-                        <ComboBox Grid.Column="0" ItemsSource="{Binding Polygons}" SelectedItem="{Binding SelectedPolygon}"
+                            <ComboBox Grid.Column="0" ItemsSource="{Binding Polygons}" SelectedItem="{Binding SelectedPolygon}"
                                   ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
-                        <ComboBox Grid.Column="1" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointFrom}" Margin="5 0 5 0"
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointFrom}" Margin="5 0 5 0"
                                   ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
-                        <RadioButton Grid.Column="2" GroupName="{Binding GCN}" Content="Fwd" IsChecked="{Binding DirFwd, Mode=TwoWay}" ToolTip="The Quondams will be added in order from how their parent's were collected." Padding="4 0 5 0"/>
-                        <RadioButton Name="rbSingle" Grid.Column="3" GroupName="{Binding GCN}" Content="Single" IsChecked="{Binding SinglePoint}" ToolTip="Only a single Quondam will be created." Padding="4 0 5 0"/>
-                        <RadioButton Grid.Column="4" GroupName="{Binding GCN}" IsChecked="{Binding DirRev, Mode=TwoWay}" Content="Rev" ToolTip="The Quondams will be added in the reverse order from how their parent's were collected." Padding="4 0 5 0"/>
-                        <ComboBox Grid.Column="5" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointTo}" IsEnabled="{Binding ElementName=rbSingle, Path=IsChecked, Converter={StaticResource IBC}}"
+                            <RadioButton Grid.Column="2" GroupName="{Binding GCN}" Content="Fwd" IsChecked="{Binding DirFwd, Mode=TwoWay}" ToolTip="The Quondams will be added in order from how their parent's were collected." Padding="4 0 5 0"/>
+                            <RadioButton Name="rbSingle" Grid.Column="3" GroupName="{Binding GCN}" Content="Single" IsChecked="{Binding SinglePoint}" ToolTip="Only a single Quondam will be created." Padding="4 0 5 0"/>
+                            <RadioButton Grid.Column="4" GroupName="{Binding GCN}" IsChecked="{Binding DirRev, Mode=TwoWay}" Content="Rev" ToolTip="The Quondams will be added in the reverse order from how their parent's were collected." Padding="4 0 5 0"/>
+                            <ComboBox Grid.Column="5" ItemsSource="{Binding Points, Mode=OneWay}" SelectedItem="{Binding PointTo}" IsEnabled="{Binding ElementName=rbSingle, Path=IsChecked, Converter={StaticResource IBC}}"
                                   ToolTip="{Binding Path=SelectedItem, RelativeSource={RelativeSource Self}}"/>
-                        <!--<Image Grid.Column="6" Width="25" Height="25" Source="/Resources/ic_loop_black.png" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5 0 0 0"/>-->
+                            <!--<Image Grid.Column="6" Width="25" Height="25" Source="/Resources/ic_loop_black.png" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5 0 0 0"/>-->
 
-                        <TextBlock Grid.Column="8" Margin="6 0 4 0" VerticalAlignment="Center" 
+                            <TextBlock Grid.Column="8" Margin="6 0 4 0" VerticalAlignment="Center" 
                                    Text="{Binding NumberOfPoints, StringFormat='Points: {0}'}" ToolTip="{Binding PreviewText}"/>
 
-                        <Button Grid.Column="9" Width="30" Content="+" Margin="2" Click="Add_Click" ToolTip="Add New Retrace"/>
-                        <Button Grid.Column="10" Width="30" Content="-" Margin="2" Click="Delete_Click" ToolTip="Delete Retrace"/>
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                            <Button Grid.Column="9" Width="30" Content="&gt;&lt;" Margin="2" Click="SwapPointFromTo_Click" ToolTip="Swap From and To Point"/>
+                            <Button Grid.Column="10" Width="30" Content="+" Margin="2" Click="Add_Click" ToolTip="Add New Retrace"/>
+                            <Button Grid.Column="11" Width="30" Content="-" Margin="2" Click="Delete_Click" ToolTip="Delete Retrace"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </DockPanel>
 </Window>

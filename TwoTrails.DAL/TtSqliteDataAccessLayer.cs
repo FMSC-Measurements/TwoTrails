@@ -11,7 +11,6 @@ using FMSC.Core;
 using FMSC.Core.Databases;
 using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.NMEA.Sentences;
-using FMSC.GeoSpatial.Types;
 
 using TTS = TwoTrails.DAL.TwoTrailsSchema;
 
@@ -72,10 +71,9 @@ namespace TwoTrails.DAL
         }
 
 
-        public bool RequiresUpgrade
-        {
-            get { return GetDataVersion() < TTS.SchemaVersion; }
-        }
+        public bool RequiresUpgrade => GetDataVersion() < TTS.SchemaVersion;
+
+        public bool RequiresAppUpgrade => GetDataVersion() > TTS.SchemaVersion;
 
         public bool HandlesAllPointTypes => true;
 
@@ -1693,9 +1691,10 @@ namespace TwoTrails.DAL
                 dataReader.GetString(1),
                 dataReader.GetBoolean(2),
                 new GeoPosition(
-                    dataReader.GetDouble(5), (NorthSouth)dataReader.GetInt32(6),
-                    dataReader.GetDouble(7), (EastWest)dataReader.GetInt32(8),
-                    dataReader.GetDouble(9), (UomElevation)dataReader.GetInt32(10)
+                    dataReader.GetDouble(5), 
+                    dataReader.GetDouble(7),
+                    dataReader.GetDouble(9),
+                    (UomElevation)dataReader.GetInt32(10)
                 ),
                 TtCoreUtils.ParseTime(dataReader.GetString(4)),
                 dataReader.GetDoubleN(22),

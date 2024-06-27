@@ -30,6 +30,16 @@ namespace TwoTrails.Dialogs
             model.DeleteRetrace(((sender as Button).DataContext as Retrace));
         }
 
+        private void SwapPointFromTo_Click(object sender, RoutedEventArgs e)
+        {
+            ((sender as Button).DataContext as Retrace).SwapPointFromTo();
+        }
+
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            model.ClearRetraces();
+        }
+
         private void Create_Click(object sender, RoutedEventArgs e)
         {
             if (model.RetracePoints())

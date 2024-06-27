@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
 

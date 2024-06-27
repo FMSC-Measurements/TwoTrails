@@ -286,17 +286,33 @@ namespace TwoTrails.ViewModels
                         {
                             try
                             {
+                                if (!DataHelper.IsFileOnStableMedia(filePath))
+                                {
+                                    if (MessageBox.Show(
+                                    $@"File '{filePath}' is not located locally and may be on a network drive. Files not located locally may have issues loading and saving. It is suggested to copy the file locally before opening. Would you like to open the file from this location anyway?",
+                                    "File Located on Network", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
+                                    return;
+                                }
+
                                 if (DataHelper.IsEmptyFile(filePath))
                                 {
                                     MessageBox.Show(
-                                    $@"""File '{filePath}' has a size of 0. This sometimes is happens when copying over from a mobile device. 
-                                    Try to copy the file over again and see if it fixes this issue.""",
+                                    $@"File '{filePath}' has a size of 0. This sometimes is happens when copying over from a mobile device. Try to copy the file over again and see if it fixes this issue.",
                                     "Empty File", MessageBoxButton.OK);
                                     return;
                                 }
 
                                 TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
                                 TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
+
+                                if (dal.RequiresAppUpgrade)
+                                {
+                                    MessageBox.Show(
+                                    $@"File '{filePath}' was created with a newer version of TwoTrails. Please upgrade TwoTrails to the most recent version before opening.",
+                                    "TwoTrails Requires Upgrade", MessageBoxButton.OK);
+                                    return;
+                                }
+
 
                                 if (!DataHelper.CheckAndFixErrors(dal, Settings))
                                     return;

@@ -72,12 +72,12 @@ namespace TwoTrails.Utils
 
         public static bool AnalyzeUnusedMetadata(ITtManager manager)
         {
-            return manager.GetMetadata().Any(meta => !manager.GetPoints().Any(p => p.MetadataCN == meta.CN));
+            return manager.GetMetadata().Where(meta => meta.CN != Consts.EmptyGuid).Any(meta => !manager.GetPoints().Any(p => p.MetadataCN == meta.CN));
         }
 
         public static bool AnalyzeUnusedGroups(ITtManager manager)
         {
-            return manager.GetGroups().Any(group => !manager.GetPoints().Any(g => g.GroupCN == group.CN));
+            return manager.GetGroups().Where(group => group.CN != Consts.EmptyGuid).Any(group => !manager.GetPoints().Any(g => g.GroupCN == group.CN));
         }
 
         public static bool AnalyzeDuplicateMetadata(ITtManager manager)
@@ -190,6 +190,24 @@ namespace TwoTrails.Utils
         public static bool IsEmptyFile(string path)
         {
             return new FileInfo(path).Length == 0;
+        }
+
+        public static bool IsFileOnStableMedia(string path)
+        {
+            try
+            {
+                switch (new DriveInfo(Path.GetPathRoot(path)).DriveType)
+                {
+                    case DriveType.Fixed:
+                    case DriveType.Removable: return true;
+                }
+            }
+            catch
+            {
+                //
+            }
+
+            return false;
         }
     }
 

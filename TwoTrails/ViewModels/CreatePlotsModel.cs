@@ -2,6 +2,7 @@
 using FMSC.Core;
 using FMSC.Core.Collections;
 using FMSC.Core.Windows.ComponentModel.Commands;
+using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections;
@@ -364,6 +365,7 @@ namespace TwoTrails.ViewModels
                 new UTMCoords(
                     (rand.NextDouble() * (totalExtents.East - totalExtents.West) + totalExtents.West),
                     (rand.NextDouble() * (totalExtents.North - totalExtents.South) + totalExtents.South),
+                    polyIncludeTtPoints.First().First().Metadata.Datum,
                     defMeta.Zone
                 );
             
@@ -548,6 +550,7 @@ namespace TwoTrails.ViewModels
                 new UTMCoords(
                     (rand.NextDouble() * (totalExtents.East - totalExtents.West) + totalExtents.West),
                     (rand.NextDouble() * (totalExtents.North - totalExtents.South) + totalExtents.South),
+                    SelectedPoint.Metadata.Datum,
                     defMeta.Zone
                 );
 

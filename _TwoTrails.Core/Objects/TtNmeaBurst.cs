@@ -2,7 +2,6 @@
 using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.NMEA;
 using FMSC.GeoSpatial.NMEA.Sentences;
-using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
@@ -28,17 +27,17 @@ namespace TwoTrails.Core
 
 
         private GeoPosition _Position;
-        public GeoPosition Position { get { return new GeoPosition(_Position); } }
-        public bool HasPosition { get { return Position != null; } }
+        public GeoPosition Position => new GeoPosition(_Position);
+        public bool HasPosition => Position != null;
 
-        public double Latitude { get { return _Position.Latitude.toSignedDecimal(); } }
-        public NorthSouth LatDir { get { return _Position.Latitude.Hemisphere; } }
+        public double Latitude => _Position.Latitude;
+        public NorthSouth LatDir => _Position.LatDir;
 
-        public double Longitude { get { return _Position.Longitude.toSignedDecimal(); } }
-        public EastWest LonDir { get { return _Position.Longitude.Hemisphere; } }
+        public double Longitude => _Position.Longitude;
+        public EastWest LonDir => _Position.LonDir;
 
-        public double Elevation { get { return _Position.Elevation; } }
-        public UomElevation UomElevation { get { return _Position.UomElevation; } }
+        public double Elevation => _Position.Elevation;
+        public UomElevation UomElevation => _Position.UomElevation;
 
 
         public double HorizDilution { get; }
@@ -76,7 +75,7 @@ namespace TwoTrails.Core
             }
         }
 
-        public int UsedSatelliteIDsCount { get { return UsedSatelliteIDs.Count; } }
+        public int UsedSatelliteIDsCount => UsedSatelliteIDs.Count;
 
         public List<Satellite> SatellitesInView { get; private set; }
 

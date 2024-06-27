@@ -199,9 +199,9 @@ namespace TwoTrails.Core.Points
             else
             {
                 if (adjusted)
-                    return new UTMCoords(point.AdjX, point.AdjY, targetZone);
+                    return new UTMCoords(point.AdjX, point.AdjY, point.Metadata.Datum, targetZone);
                 else
-                    return new UTMCoords(point.UnAdjX, point.UnAdjY, targetZone);
+                    return new UTMCoords(point.UnAdjX, point.UnAdjY, point.Metadata.Datum, targetZone);
             }
         }
 

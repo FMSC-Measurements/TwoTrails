@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:cvt="clr-namespace:TwoTrails.Converters"
-             xmlns:gtypes="clr-namespace:FMSC.GeoSpatial.Types;assembly=FMSC.GeoSpatial"
+             xmlns:fmscgs="clr-namespace:FMSC.GeoSpatial;assembly=FMSC.GeoSpatial"
              xmlns:fmsccmw="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="400">
@@ -32,14 +32,14 @@
 
             <TextBlock Grid.Column="0" Grid.Row="1" Margin="0,5,5,5" Text="Has Elevation" />
             <RadioButton Grid.Column="1" Grid.Row="1" Name="rbYes" Margin="0,5,5,5" VerticalAlignment="Center" Content="Yes" GroupName="uom"
-                     IsChecked="{Binding Path=Options.UomElevation, Converter={StaticResource ebc}, ConverterParameter=gtypes:UomElevation.Feet}"/>
+                     IsChecked="{Binding Path=Options.UomElevation, Converter={StaticResource ebc}, ConverterParameter=fmscgs:UomElevation.Feet}"/>
             <RadioButton Grid.Column="2" Grid.Row="1" Content="No" Margin="0,5,5,5" VerticalAlignment="Center" GroupName="uom"
                      IsChecked="{Binding Path=Options.UomElevation, Converter={StaticResource ebc}, ConverterParameter=.Meters}"/>
 
             <TextBlock Grid.Column="0" Grid.Row="2" Margin="0,5,5,5" Text="UOM Elevation" VerticalAlignment="Center" />
             <ComboBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Margin="5,0,0,0" VerticalAlignment="Center"
                   IsEnabled="{Binding IsChecked, ElementName=rbYes}"
-                  ItemsSource="{fmsccmw:EnumToItemsSource {x:Type gtypes:UomElevation}}"
+                  ItemsSource="{fmsccmw:EnumToItemsSource {x:Type fmscgs:UomElevation}}"
                   SelectedItem="{Binding PathOptions.UomElevation, Mode=OneWayToSource}"
                   SelectedIndex="0"/>
 

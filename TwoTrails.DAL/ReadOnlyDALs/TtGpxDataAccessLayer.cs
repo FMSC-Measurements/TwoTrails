@@ -1,5 +1,4 @@
 ﻿using FMSC.GeoSpatial;
-using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;

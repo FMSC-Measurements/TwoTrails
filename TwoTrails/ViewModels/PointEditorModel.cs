@@ -236,7 +236,7 @@ namespace TwoTrails.ViewModels
                 UTMCoords GetCoords(TtPoint p, int tzone)
                 {
                     if (p.Metadata.Zone == tzone)
-                        return new UTMCoords(p.AdjX, p.AdjY, tzone);
+                        return new UTMCoords(p.AdjX, p.AdjY, p.Metadata.Datum, tzone);
                     else
                         return UTMTools.ShiftZones(p.AdjX, p.AdjY, tzone, p.Metadata.Zone);
                 }
