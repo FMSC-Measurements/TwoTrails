@@ -233,7 +233,7 @@ namespace TwoTrails.Core.Points
             get { return _LocationChangedEventEnabled; }
             set
             {
-                _LocationChangedEventEnabled = true;
+                _LocationChangedEventEnabled = value;
 
                 if (LocationHasChanged)
                     OnLocationChanged();
@@ -406,8 +406,6 @@ namespace TwoTrails.Core.Points
             UnAdjZ = z;
 
             LocationChangedEventEnabled = locEventEnabled;
-
-            OnLocationChanged();
         }
 
         public void SetAdjLocation(double x, double y, double z)

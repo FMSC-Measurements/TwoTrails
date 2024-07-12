@@ -109,24 +109,10 @@ namespace TwoTrails.Core
 
                     if (HasExclusions)
                     {
-                        TotalAreaWExclusions = polygon.Area;
-                        TotalPerimWExclusions = polygon.Perimeter;
+                        TotalAreaWExclusions = polygon.Area + Exclusions.TotalArea;
+                        TotalPerimWExclusions = polygon.Perimeter + Exclusions.TotalPerimeter;
 
-                        TotalAreaErrorAreaWExclusions = TotalGpsError;
-
-                        if (GERAvailable && Exclusions.GERAvailable)
-                            TotalGERAreaErrorAreaWExclusions = GERResult.TotalErrorArea;
-
-                        foreach (PolygonSummary ps in Exclusions)
-                        {
-                            TotalAreaWExclusions -= ps.Polygon.Area;
-                            TotalPerimWExclusions += polygon.Perimeter;
-
-                            TotalAreaErrorAreaWExclusions += ps.TotalGpsError;
-
-                            if (GERAvailable && ps.GERAvailable)
-                                TotalGERAreaErrorAreaWExclusions += ps.GERResult.TotalErrorArea;
-                        }
+                        TotalAreaErrorAreaWExclusions = TotalGpsError + Exclusions.TotalAreaErrorArea;
 
                         ExcludedAreaPercent = Exclusions.TotalArea / Polygon.Area * 100d;
                         ExcludedPerimeterPercent = Exclusions.TotalPerimeter / Polygon.Perimeter * 100d;
@@ -134,7 +120,10 @@ namespace TwoTrails.Core
                         TotalAreaErrorWExclusions = TotalAreaErrorAreaWExclusions / TotalAreaWExclusions * 100d;
 
                         if (GERAvailable && Exclusions.GERAvailable)
+                        {
+                            TotalGERAreaErrorAreaWExclusions = GERResult.TotalErrorArea + Exclusions.TotalGERAreaErrorArea;
                             TotalGERAreaErrorWExclusions = TotalGERAreaErrorAreaWExclusions / TotalAreaWExclusions * 100d;
+                        }
                     }
                 }
 
