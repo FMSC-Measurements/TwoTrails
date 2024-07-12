@@ -127,7 +127,7 @@
                                 <TextBlock>
                               Override the minimum leg distance between points (in meters)
                               <LineBreak /> 
-                              Default is 5 times the point accuracy
+                              Default is 5 times the point accuracy to allow for a more defined shape
                                 </TextBlock>
                             </TextBox.ToolTip>
                         </TextBox>

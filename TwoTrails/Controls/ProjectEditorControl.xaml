@@ -334,6 +334,12 @@
 
                             <StackPanel Margin="10 5 5 0" Orientation="Vertical">
                                 <Grid>
+                                    <TextBlock Margin="0 5 0 5" Text="{Binding PolygonWarning}"
+                                               Visibility="{Binding PolygonWarning, Converter={StaticResource NotNullVisibilityConverter}}"
+                                               Foreground="Red"/>
+                                </Grid>
+
+                                <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="5"/>

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using FMSC.Core;
+using System.Collections.Generic;
+using System.Linq;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core
@@ -102,6 +104,64 @@ namespace TwoTrails.Core
 
             if (bndCount > 2 && onBndGpsCount > 1 && qndmToOnBndSSCount > 0)
                 return true;
+
+            return false;
+        }
+
+
+        public static bool HasTies(this ITtManager manager, string polyCN, bool advancedDetection = false) => HasTies(manager.GetPoints(polyCN), advancedDetection);
+
+        public static bool HasTies(IEnumerable<TtPoint> points, bool advancedDetection = false)
+        {
+            return HasTies(points.OnBndPoints().SyncPointsToZone(), advancedDetection);
+        }
+
+        public static bool HasTies(IEnumerable<Point> points, bool advancedDetection = false)
+        {
+            List<Point> pts = points.RemoveSequencialDuplicates().ToList();
+
+            if (pts.Count > 3)
+            {
+                if (advancedDetection)
+                {
+                    Point p1, p2;
+
+                    for (int i = 0; i < pts.Count - 2; i++)
+                    {
+                        p1 = pts[i];
+                        p2 = pts[i + 1];
+
+                        for (int j = 0; j + 1 < i; j++)
+                        {
+                            if (MathEx.LineSegmentsIntersect(p1, p2, pts[j], pts[j + 1])) return true;
+                        }
+
+                        for (int j = i + 2; j + 1 < pts.Count; j++)
+                        {
+                            if (MathEx.LineSegmentsIntersect(p1, p2, pts[j], pts[j + 1])) return true;
+                        }
+                    }
+
+                    p1 = pts[0];
+                    p2 = pts[pts.Count - 1];
+
+                    for (int i = 1; i < pts.Count - 2; i++)
+                    {
+                        if (MathEx.LineSegmentsIntersect(p1, p2, pts[i], pts[i + 1])) return true;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < pts.Count - 3; i++)
+                    {
+                        if (MathEx.LineSegmentsIntersect(pts[i], pts[i + 1], pts[i + 2], pts[i + 3])) return true;
+                    }
+
+                    if (MathEx.LineSegmentsIntersect(pts[pts.Count - 3], pts[pts.Count - 2], pts[pts.Count - 1], pts[0])) return true;
+                    if (MathEx.LineSegmentsIntersect(pts[pts.Count - 2], pts[pts.Count - 1], pts[0], pts[1])) return true;
+                    if (MathEx.LineSegmentsIntersect(pts[pts.Count - 1], pts[0], pts[1], pts[2])) return true;
+                }
+            }
 
             return false;
         }

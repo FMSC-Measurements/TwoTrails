@@ -29,7 +29,7 @@
                 <DataTemplate>
                     <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
                         <CheckBox.Content>
-                            <Grid>
+                            <Grid ToolTip="{Binding Polygon.Name}">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>

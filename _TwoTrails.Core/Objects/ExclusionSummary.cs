@@ -20,12 +20,14 @@ namespace TwoTrails.Core
 
         public bool GERAvailable { get; private set; } = true;
 
+        public bool HasTies { get; private set; }
+
         public string SummaryText { get; private set; }
 
 
-        public ExclusionSummary(ITtManager manager, IEnumerable<TtPolygon> polygons, bool generateSummaryText = false) 
+        public ExclusionSummary(ITtManager manager, IEnumerable<TtPolygon> polygons, bool generateSummaryText = false, bool advancedProcessing = false) 
         {
-            _Exclusions = polygons.Select(p => new PolygonSummary(manager, p)).ToList();
+            _Exclusions = polygons.Select(p => new PolygonSummary(manager, p, generateSummaryText, false, advancedProcessing)).ToList();
 
             StringBuilder sbExc = new StringBuilder();
 
@@ -40,6 +42,9 @@ namespace TwoTrails.Core
                 TotalPerimeter += ps.Polygon.Perimeter;
                 TotalAreaErrorArea += ps.TotalGpsError;
 
+                if (ps.HasTies)
+                    HasTies = true;
+
                 if (ps.GERAvailable)
                     TotalGERAreaErrorArea += ps.GERResult.TotalErrorArea;
                 else
@@ -47,6 +52,9 @@ namespace TwoTrails.Core
 
                 if (generateSummaryText)
                 {
+                    if (ps.HasTies)
+                        sbExc.AppendLine($" Warning: Unit has ties.");
+
                     sbExc.AppendLine($" {ps.Polygon.Name}");
                     sbExc.AppendFormat("  Area: {0:F3} Ac ({1:F2} Ha){2}",
                         Math.Round(FSConvert.ToAcre(ps.Polygon.Area, Area.MeterSq), 3),

@@ -5,11 +5,11 @@ namespace TwoTrails.Core
 {
     public static class HaidLogic
     {
-        public static PolygonSummary GenerateSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false)
+        public static PolygonSummary GenerateSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false, bool advancedProcessing = false)
         {
             lock (manager)
             {
-                return new PolygonSummary(manager, polygon, true, showPoints);
+                return new PolygonSummary(manager, polygon, true, showPoints, advancedProcessing);
             }
         }
 

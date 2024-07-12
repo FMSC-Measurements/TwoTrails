@@ -233,5 +233,27 @@ namespace TwoTrails.Core.Points
         public static IEnumerable<Point> SyncPointsToZone(this IEnumerable<TtPoint> points, int zone) =>
             points.Select(p => p.GetCoords(zone).ToPoint());
 
+
+
+        public static IEnumerable<Point> RemoveSequencialDuplicates(this IEnumerable<Point> points)
+        {
+            if (points.Any())
+            {
+                Point firstPoint = points.First();
+                Point prevPoint = points.Last();
+
+                if (firstPoint != prevPoint)
+                    yield return firstPoint;
+
+                foreach (Point point in points.Skip(1))
+                {
+                    if (point != prevPoint)
+                        yield return point;
+
+                    prevPoint = point;
+                }
+            }
+        }
+
     }
 }

@@ -81,6 +81,13 @@ namespace TwoTrails.ViewModels
         {
             if (IsCheckAll != false)
             {
+                if (!DataHelper.IsFileOnStableMedia(FolderLocation))
+                {
+                    if (MessageBox.Show($@"Export folder is not located locally and may be on a network drive. Files not located locally may have issues loading and saving. It is suggested to copy the file locally before opening. Would you like to open the file from this location anyway?",
+                        "Folder Located on Network", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
+                        return;
+                }
+
                 if (Directory.Exists(FolderLocation))
                 {
                     string path = Path.Combine(FolderLocation, Path.GetFileNameWithoutExtension(_Project.DAL.FilePath)).Trim();

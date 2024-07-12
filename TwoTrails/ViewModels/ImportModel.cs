@@ -94,14 +94,6 @@ namespace TwoTrails.ViewModels
                 x => ImportData(), x => CanImport,
                 this, m => m.CanImport);
 
-            //BrowseFileCommand = new BindedRelayCommand<ImportModel>(
-            //    (x, m) => m.BrowseFile(), (x, m) => !m.IsImporting,
-            //    this, m => m.IsImporting);
-
-            //_ImportCommand = new BindedRelayCommand<ImportModel>(
-            //    (x, m) => m.ImportData(), (x, m) => m.CanImport,
-            //    this, m => m.CanImport);
-
             CancelCommand = new RelayCommand(x => Cancel());
 
             if (fileName != null)

@@ -21,6 +21,8 @@ namespace TwoTrails.Core
         public HaidResult Result { get; }
         public UnitAreaType UnitAreaType { get; }
 
+        public bool HasTies { get; }
+
         public bool HasTraverse { get; }
 
 
@@ -57,13 +59,15 @@ namespace TwoTrails.Core
         public String SummaryText { get; }
 
 
-        public PolygonSummary(ITtManager manager, TtPolygon polygon, bool generateSummaryText = false, bool showPoints = false)
+        public PolygonSummary(ITtManager manager, TtPolygon polygon, bool generateSummaryText = false, bool showPoints = false, bool advancedProcessing = false)
         {
             Polygon = polygon;
 
             List<TtPoint> points = manager.GetPoints(polygon.CN);
 
             UnitAreaType = UnitAnalyzer.GetUnitAreaType(points);
+
+            HasTies = UnitAnalyzer.HasTies(points, advancedProcessing);
 
             if (GERAvailable)
             {
@@ -101,7 +105,7 @@ namespace TwoTrails.Core
                 {
                     GpsAreaError = TotalGpsError / polygon.Area * 100.0;
 
-                    Exclusions = new ExclusionSummary(manager, manager.GetPolygons().Where(p => p.ParentUnitCN == polygon.CN), generateSummaryText);
+                    Exclusions = new ExclusionSummary(manager, manager.GetPolygons().Where(p => p.ParentUnitCN == polygon.CN), generateSummaryText, advancedProcessing);
 
                     ExclusionsCount = Exclusions.Count();
                     HasExclusions = ExclusionsCount > 0;
@@ -133,6 +137,9 @@ namespace TwoTrails.Core
                 if (generateSummaryText)
                 {
                     StringBuilder sb = new StringBuilder();
+
+                    if (HasTies)
+                        sb.AppendFormat("Warning: Unit has ties.{0}{0}", Environment.NewLine);
 
                     sb.AppendFormat("Polygon Area: {0:F3} Ac ({1:F2} Ha).{2}",
                         Math.Round(polygon.AreaAcres, 3),
@@ -189,7 +196,10 @@ namespace TwoTrails.Core
 
                     if (TotalAreaWExclusions > 0)
                     {
-                        sb.Append($"Total Exclusions: {ExclusionsCount}\n");
+                        sb.AppendFormat($"Total Exclusions: {ExclusionsCount}{0}", Environment.NewLine);
+
+                        if (Exclusions.HasTies)
+                            sb.AppendFormat("Warning: Some Exclusions have ties.", Environment.NewLine);
                             
                         sb.AppendFormat("Polygon Area with Exclusions: {0:F3} Ac ({1:F2} Ha).{2}",
                         Math.Round(FSConvert.ToAcre(TotalAreaWExclusions, Area.MeterSq), 3),

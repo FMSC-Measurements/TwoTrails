@@ -36,7 +36,7 @@ namespace TwoTrails.DAL
         public TtKmlDataAccessLayer(ParseOptions options)
         {
             _Options = options;
-            _KDoc = KmlDocument.Load(_Options.FilePath);
+            _KDoc = KmlDocument.LoadFile(_Options.FilePath);
             polyCount = options.StartPolygonNumber;
         }
 

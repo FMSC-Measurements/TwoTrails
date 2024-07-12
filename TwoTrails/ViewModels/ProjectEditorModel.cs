@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -441,6 +442,32 @@ namespace TwoTrails.ViewModels
         public bool ValidExclusion { get; private set; }
         public string PolygonExclusionToolTip { get; private set; }
 
+        public string PolygonWarning
+        {
+            get
+            {
+                StringBuilder sbText = new StringBuilder("Warning: ");
+                bool hasWarning = false;
+
+                if (PolygonSummary != null)
+                {
+                    if (PolygonSummary.HasTies)
+                    {
+                        sbText.Append("Unit has ties. ");
+                        hasWarning = true;
+                    }
+
+                    if (PolygonSummary.HasExclusions && PolygonSummary.Exclusions.HasTies)
+                    {
+                        sbText.Append("One or more exclusions have ties. ");
+                        hasWarning = true;
+                    }
+                }
+
+                return hasWarning ? sbText.ToString() : null;
+            }
+        }
+
 
         private TtPolygon _PolygonExclusion;
         public TtPolygon PolygonExclusion
@@ -475,7 +502,7 @@ namespace TwoTrails.ViewModels
         }
 
 
-        public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value); } }
+        public PolygonSummary PolygonSummary { get { return Get<PolygonSummary>(); } set { Set(value, () => OnPropertyChanged(nameof(PolygonWarning))); } }
 
 
         private void EditPolygonValue<T>(ref T? origValue, T? newValue, PropertyInfo property, bool allowNull = false) where T : struct, IEquatable<T>
@@ -542,7 +569,7 @@ namespace TwoTrails.ViewModels
 
         private void GeneratePolygonSummaryAndStats(TtPolygon polygon)
         {
-            if (polygon.CN == CurrentPolygon.CN)
+            if (polygon.CN == CurrentPolygon?.CN)
             {
                 if (_PolygonSummaries.ContainsKey(polygon.CN))
                 {
@@ -550,7 +577,7 @@ namespace TwoTrails.ViewModels
                 }
                 else
                 {
-                    PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true);
+                    PolygonSummary = HaidLogic.GenerateSummary(Manager, polygon, true, Project.Settings.UseAdvancedProcessing);
                     _PolygonSummaries[polygon.CN] = PolygonSummary;
                 }
             }
@@ -597,6 +624,9 @@ namespace TwoTrails.ViewModels
             ValidatePolygon(polygon);
             ClearPolygonSummary(polygon);
             GeneratePolygonSummaryAndStats(polygon);
+
+            if (polygon.ParentUnit != null)
+                PolygonChanged(polygon.ParentUnit);
         }
 
         private void PolygonAccuracyChanged(TtPolygon polygon)

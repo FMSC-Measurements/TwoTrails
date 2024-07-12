@@ -40,13 +40,13 @@ namespace TwoTrails.ViewModels
         public IReadOnlyTtDataLayer DAL { get; }
 
         public bool HasMetadata { get; }
-        public bool IncludeMetadata { get; set; } = true;
+        public bool IncludeMetadata { get; set; }
 
         public bool HasGroups { get; }
-        public bool IncludeGroups { get; set; } = true;
+        public bool IncludeGroups { get; set; }
 
         public bool HasNmea { get; }
-        public bool IncludeNmea { get; set; } = true;
+        public bool IncludeNmea { get; set; }
 
 
         public bool HasSelectedPolygons { get { return Polygons.Where(p => p.IsSelected).Any(); } }
@@ -78,8 +78,13 @@ namespace TwoTrails.ViewModels
             }
 
             HasMetadata = hasMetadata;
+            IncludeMetadata = hasMetadata;
+
             HasGroups = hasGroups;
+            IncludeGroups = hasGroups;
+
             HasNmea = hasNmea;
+            IncludeNmea = hasNmea;
         }
 
         public class SelectablePolygon : BaseModel

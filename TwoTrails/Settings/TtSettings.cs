@@ -14,6 +14,7 @@ namespace TwoTrails.Settings
         private const string REGION = "Region";
         private const string RECENT_PROJECTS = "RecentProjects";
         private const string ADVANCED_MODE = "AdvancedMode";
+        private const string USE_ADVANCED_PROCESSING = "UseAdvancedProcessing";
         private const string OPEN_FOLDER_ON_EXPORT = "OpenFolderOnExport";
         private const string LAST_UPDATE_CHECK = "LastUpdateCheck";
         private const string UPGRADE_REQUIRED = "UpgradeRequired";
@@ -25,7 +26,12 @@ namespace TwoTrails.Settings
         public IDeviceSettings DeviceSettings { get; set; }
         public IPolygonGraphicSettings PolygonGraphicSettings { get; set; }
 
-        public string UserName => Environment.UserName;
+        public string UserName =>
+#if DEBUG
+            "-";
+#else
+            Environment.UserName;
+# endif
 
         public string DeviceName =>
 #if DEBUG
@@ -36,10 +42,11 @@ namespace TwoTrails.Settings
 
         public string AppVersion => AppInfo.Version.ToString();
 
+
         private string _Region;
         public string Region
         {
-            get { return _Region ?? (_Region = Properties.Settings.Default[REGION] as string); }
+            get => _Region ?? (_Region = Properties.Settings.Default[REGION] as string);
 
             set
             {
@@ -49,10 +56,11 @@ namespace TwoTrails.Settings
             }
         }
 
+
         private string _District;
         public string District
         {
-            get { return _District ?? (_District = Properties.Settings.Default[DISTRICT] as string); }
+            get => _District ?? (_District = Properties.Settings.Default[DISTRICT] as string);
 
             set
             {
@@ -62,10 +70,11 @@ namespace TwoTrails.Settings
             }
         }
 
+
         private bool? _OpenFolderOnExport;
         public bool OpenFolderOnExport
         {
-            get { return _OpenFolderOnExport ?? (bool)(_OpenFolderOnExport = (bool?)Properties.Settings.Default[OPEN_FOLDER_ON_EXPORT]); }
+            get => _OpenFolderOnExport ?? (bool)(_OpenFolderOnExport = (bool?)Properties.Settings.Default[OPEN_FOLDER_ON_EXPORT]);
 
             set
             {
@@ -75,10 +84,11 @@ namespace TwoTrails.Settings
             }
         }
 
+
         private bool _IsAdvancedMode;
         public bool IsAdvancedMode
         {
-            get { return _IsAdvancedMode; }
+            get => _IsAdvancedMode;
 
             set
             {
@@ -87,6 +97,21 @@ namespace TwoTrails.Settings
                 Properties.Settings.Default.Save();
             }
         }
+
+
+        private bool _UseAdvancedProcessing;
+        public bool UseAdvancedProcessing
+        {
+            get => _UseAdvancedProcessing;
+
+            set
+            {
+                SetField(ref _UseAdvancedProcessing, value);
+                Properties.Settings.Default[USE_ADVANCED_PROCESSING] = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+
 
         private DateTime? _LastUpdateCheck;
         public DateTime? LastUpdateCheck
@@ -109,10 +134,11 @@ namespace TwoTrails.Settings
             }
         }
 
+
         private bool _UpgradeRequired = true;
         public bool UpgradeRequired
         {
-            get { return _UpgradeRequired; }
+            get => _UpgradeRequired;
 
             set
             {
@@ -122,10 +148,11 @@ namespace TwoTrails.Settings
             }
         }
 
+
         private bool _SortPolysByName;
         public bool SortPolysByName
         {
-            get { return _SortPolysByName; }
+            get => _SortPolysByName;
 
             set
             {
@@ -135,10 +162,11 @@ namespace TwoTrails.Settings
             }
         }
 
+
         private Point _WindowStartupLocation;
         public Point WindowStartupLocation
         {
-            get { return _WindowStartupLocation; }
+            get => _WindowStartupLocation;
 
             set
             {
@@ -153,7 +181,7 @@ namespace TwoTrails.Settings
         private bool _DisplayMapBorder;
         public bool DisplayMapBorder
         {
-            get { return _DisplayMapBorder; }
+            get => _DisplayMapBorder;
 
             set
             {
@@ -185,8 +213,11 @@ namespace TwoTrails.Settings
             _IsAdvancedMode = (bool)Properties.Settings.Default[ADVANCED_MODE];
 #endif
 
+            _UseAdvancedProcessing = (bool)Properties.Settings.Default[USE_ADVANCED_PROCESSING];
+
             _SortPolysByName = (bool)Properties.Settings.Default[SORT_POLYS_BY_NAME];
             _WindowStartupLocation = (Point)Properties.Settings.Default[WINDOW_STARTUP_LOCATION];
+            _DisplayMapBorder = (bool)Properties.Settings.Default[DISPLAY_MAP_BORDER];
         }
 
 

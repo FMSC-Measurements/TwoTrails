@@ -70,7 +70,7 @@ namespace TwoTrails.Core
             _MAL = mal;
             _Settings = settings;
 
-            _Activity = new TtUserAction(_Settings.UserName, _Settings.DeviceName, $"PC: {settings.AppVersion}");
+            _Activity = new TtUserAction(_Settings.UserName, _Settings.DeviceName, $"PC: {_Settings.AppVersion}");
 
             Load();
             LoadMedia();
@@ -795,7 +795,7 @@ namespace TwoTrails.Core
 
         protected void AdjustAroundGpsPoint(TtPoint point)
         {
-            IList<TtPoint> points = _PointsByPoly[point.PolygonCN];
+            IList<TtPoint> points = GetPoints(point.PolygonCN);
 
             if (points.Count > point.Index - 1)
             {
@@ -840,7 +840,7 @@ namespace TwoTrails.Core
         {
             if (points == null)
             {
-                points = _PointsByPoly[point.PolygonCN];
+                points = GetPoints(point.PolygonCN);
             }
 
             if (point.Index > 0)
@@ -878,7 +878,7 @@ namespace TwoTrails.Core
         {
             if (points == null)
             {
-                points = _PointsByPoly[point.PolygonCN];
+                points = GetPoints(point.PolygonCN);
             }
 
             if (point.Index < points.Count - 1 || point.IsGpsAtBase()) // make sure traverse isnt at end
@@ -952,7 +952,7 @@ namespace TwoTrails.Core
                 ssSeg.Add(point);
             };
 
-            IList<TtPoint> points = _PointsByPoly[poly.CN];
+            IList<TtPoint> points = GetPoints(poly.CN);
             if (points.Count > 1)
             {
                 TtPoint lastGps = null;
@@ -1015,7 +1015,7 @@ namespace TwoTrails.Core
         {
             List<TraverseSegment> segments = new List<TraverseSegment>();
 
-            IList<TtPoint> points = _PointsByPoly[poly.CN];
+            IList<TtPoint> points = GetPoints(poly.CN);
             if (points.Count > 2)
             {
                 TtPoint lastPoint = points[0];
@@ -1038,7 +1038,7 @@ namespace TwoTrails.Core
             List<SideShotSegment> segments = new List<SideShotSegment>();
             SideShotSegment seg = new SideShotSegment();
 
-            IList<TtPoint> points = _PointsByPoly[poly.CN];
+            IList<TtPoint> points = GetPoints(poly.CN);
             if (points.Count > 1)
             {
                 TtPoint lastPoint = null;
@@ -1110,7 +1110,7 @@ namespace TwoTrails.Core
             {
                 if (_PointsByPoly.ContainsKey(polygon.CN))
                 {
-                    APStats stats = TtCoreUtils.CalculateBoundaryAreaPerimeterAndTrail(_PointsByPoly[polygon.CN]);
+                    APStats stats = TtCoreUtils.CalculateBoundaryAreaPerimeterAndTrail(GetPoints(polygon.CN));
                     polygon.Update(stats.Area, stats.Perimeter, stats.LinePerimeter);
                 }
             }
@@ -1216,7 +1216,7 @@ namespace TwoTrails.Core
             if (polyCN != null)
             {
                 if (_PointsByPoly.ContainsKey(polyCN))
-                    return _PointsByPoly[polyCN].ToList();
+                    return _PointsByPoly[polyCN].OrderBy(p => p.Index).ToList();
                 throw new Exception("Polygon Not Found");
             }
             else
