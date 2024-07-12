@@ -348,12 +348,13 @@ namespace TwoTrails.ViewModels
 
             List<IEnumerable<TtPoint>> polyIncludeTtPoints = IncludedPolygons.Select(p => _Manager.GetPoints(p.CN).OnBndPoints()).ToList();
 
-            TtMetadata defMeta = _Manager.DefaultMetadata;
+            TtMetadata meta = polyIncludeTtPoints.First().First().Metadata;
+
 
             List<IEnumerable<Point>> polyIncudePoints = polyIncludeTtPoints.Select(pp => pp.SyncPointsToZone()).ToList();
             List<Point> allPoints = polyIncudePoints.SelectMany(pts => pts).ToList(); ;
             
-            UtmExtent.Builder builder = new UtmExtent.Builder(defMeta.Zone);
+            UtmExtent.Builder builder = new UtmExtent.Builder(meta.Zone);
             builder.Include(allPoints);
             UtmExtent totalExtents = builder.Build();
 
@@ -361,12 +362,12 @@ namespace TwoTrails.ViewModels
 
             Random rand = new Random();
             UTMCoords startCoords = SelectedPoint != null ?
-                SelectedPoint.GetCoords(defMeta.Zone) :
+                SelectedPoint.GetCoords(meta.Zone) :
                 new UTMCoords(
                     (rand.NextDouble() * (totalExtents.East - totalExtents.West) + totalExtents.West),
                     (rand.NextDouble() * (totalExtents.North - totalExtents.South) + totalExtents.South),
                     polyIncludeTtPoints.First().First().Metadata.Datum,
-                    defMeta.Zone
+                    meta.Zone
                 );
             
             PolygonCalculator.Boundaries totalPolyBnds = new PolygonCalculator(allPoints).PointBoundaries;
@@ -378,7 +379,7 @@ namespace TwoTrails.ViewModels
             if (ShouldCancel()) return;
 
             List<PolygonCalculator> polyExcludeCalcs = ExcludedPolygons.Select(p => _Manager.GetPoints(p.CN).OnBndPoints())
-                                                    .Select(pp => pp.Select(p => p.GetCoords(defMeta.Zone).ToPoint()))
+                                                    .Select(pp => pp.Select(p => p.GetCoords(meta.Zone).ToPoint()))
                                                     .Select(pp => new PolygonCalculator(pp)).ToList();
             if (ShouldCancel()) return;
 
@@ -479,7 +480,7 @@ namespace TwoTrails.ViewModels
                         UnAdjY = p.Y,
                         Polygon = poly,
                         Group = _Manager.MainGroup,
-                        Metadata = defMeta,
+                        Metadata = meta,
                         Index = index++,
                         Comment = "Generated Point",
                         PID = PointNamer.NamePoint(poly, prev)

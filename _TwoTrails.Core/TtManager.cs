@@ -1092,16 +1092,9 @@ namespace TwoTrails.Core
 
         protected void ChangeGpsZone(GpsPoint point, int zone, int oldZone)
         {
-            UTMCoords coords;
-
-            if (point.HasLatLon)
-            {
-                coords = UTMTools.ConvertLatLonSignedDecToUTM((double)point.Latitude, (double)point.Longitude, zone);
-            }
-            else
-            {
-                coords = UTMTools.ShiftZones(point.UnAdjX, point.UnAdjY, zone, oldZone);
-            }
+            UTMCoords coords = point.HasLatLon ?
+                UTMTools.ConvertLatLonSignedDecToUTM((double)point.Latitude, (double)point.Longitude, zone) :
+                UTMTools.ShiftZones(point.UnAdjX, point.UnAdjY, zone, oldZone);
 
             point.SetUnAdjLocation(coords.X, coords.Y, point.UnAdjZ);
         }
