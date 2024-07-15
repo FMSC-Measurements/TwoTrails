@@ -192,6 +192,13 @@ namespace TwoTrails.Utils
             return String.Empty;
         }
 
+
+        public static string GetMalFilePathFromDalFilePath(string dalFilePath)
+        {
+            return Path.Combine(Path.GetDirectoryName(dalFilePath),
+                $"{Path.GetFileNameWithoutExtension(dalFilePath)}{Consts.FILE_EXTENSION_MEDIA}");
+        }
+
     }
 
     public struct UpdateStatus

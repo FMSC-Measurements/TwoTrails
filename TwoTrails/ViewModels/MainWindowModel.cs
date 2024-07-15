@@ -303,7 +303,7 @@ namespace TwoTrails.ViewModels
                                 }
 
                                 TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(filePath);
-                                TtSqliteMediaAccessLayer mal = GetMalIfExists(filePath);
+                                TtSqliteMediaAccessLayer mal = TryGetMAL(TtUtils.GetMalFilePathFromDalFilePath(filePath));
 
                                 if (dal.RequiresAppUpgrade)
                                 {
@@ -425,7 +425,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                                 }
 
                                 TtSqliteDataAccessLayer dal = TtSqliteDataAccessLayer.Create(upgradedFile, info);
-                                TtSqliteMediaAccessLayer mal = GetMalIfExists(upgradedFile);
+                                TtSqliteMediaAccessLayer mal = TryGetMAL(TtUtils.GetMalFilePathFromDalFilePath(filePath));
 
                                 Upgrade.DAL(dal, App.Settings, dalv2);
 
@@ -463,17 +463,26 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
             }
         }
 
-        private TtSqliteMediaAccessLayer GetMalIfExists(string dalFilePath)
+        private TtSqliteMediaAccessLayer TryGetMAL(string filePath)
         {
-            string malFilePath = Path.Combine(Path.GetDirectoryName(dalFilePath),
-                                $"{Path.GetFileNameWithoutExtension(dalFilePath)}{Consts.FILE_EXTENSION_MEDIA}");
+            TtSqliteMediaAccessLayer mal = null;
 
-            if (File.Exists(malFilePath))
-                return new TtSqliteMediaAccessLayer(malFilePath);
+            if (File.Exists(filePath))
+            {
+                if (DataHelper.IsEmptyFile(filePath))
+                {
+                    MessageBox.Show(
+                    $@"File '{filePath}' has a size of 0. This sometimes is happens when copying over from a mobile device. Try to copy the file over again and see if it fixes this issue.",
+                    "Empty File", MessageBoxButton.OK);
+                }
+                else
+                {
+                    mal = new TtSqliteMediaAccessLayer(filePath);
+                }
+            }
 
-            return null;
+            return mal;
         }
-
 
         public bool CreateProject(TtProjectInfo ttProjectInfo = null)
         {

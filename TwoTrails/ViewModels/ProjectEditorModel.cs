@@ -275,6 +275,12 @@ namespace TwoTrails.ViewModels
                 {
                     PolygonsLVC.CustomSort = new PolygonSorter(Project.Settings.SortPolysByName);
                 }
+                else if (pce.PropertyName == nameof(TtSettings.UseAdvancedProcessing))
+                {
+                    _PolygonSummaries.Clear();
+                    GeneratePolygonSummaryAndStats(CurrentPolygon);
+                }
+
             };
         }
 
