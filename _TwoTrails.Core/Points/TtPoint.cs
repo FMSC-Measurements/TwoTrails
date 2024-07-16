@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 
 namespace TwoTrails.Core.Points
 {
@@ -491,6 +492,8 @@ namespace TwoTrails.Core.Points
                 _PolyCN == point._PolyCN &&
                 _GroupCN == point._GroupCN &&
                 _MetadataCN == point._MetadataCN &&
+                _LinkedPoints.Count == point._LinkedPoints.Count && 
+                _LinkedPoints.All(point._LinkedPoints.Contains) &&
                 _ExtendedData.Equals(point._ExtendedData);
         }
 

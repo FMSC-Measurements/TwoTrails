@@ -26,10 +26,7 @@ namespace TwoTrails.Core
         {
             TtObject tto = obj as TtObject;
 
-            if (tto == null)
-                return false;
-
-            return CN == tto.CN;
+            return tto != null && CN == tto.CN;
         }
 
         public override int GetHashCode()

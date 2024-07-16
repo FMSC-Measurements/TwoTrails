@@ -6,7 +6,7 @@ namespace TwoTrails.Core
 {
     public delegate void PolygonChangedEvent(TtPolygon polygon);
 
-    public class TtPolygon : TtObject, IComparable<TtPolygon>, IComparer<TtPolygon>
+    public class TtPolygon : TtObject, IEquatable<TtPolygon> , IComparable<TtPolygon>, IComparer<TtPolygon>
     {
         public event PolygonChangedEvent PreviewPolygonAccuracyChanged;
         public event PolygonChangedEvent PolygonAccuracyChanged;
@@ -195,10 +195,8 @@ namespace TwoTrails.Core
         public override string ToString() => Name;
 
 
-        public override bool Equals(object obj)
+        public bool Equals(TtPolygon polygon)
         {
-            TtPolygon polygon = obj as TtPolygon;
-
             return base.Equals(polygon) &&
                 _Area == polygon._Area &&
                 _Perimeter == polygon._Perimeter &&
@@ -210,6 +208,12 @@ namespace TwoTrails.Core
                 _Increment == polygon._Increment &&
                 _ParentUnitCN == polygon._ParentUnitCN &&
                 _TimeCreated == polygon._TimeCreated;
+        }
+
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as TtPolygon);
         }
 
         public override int GetHashCode()
