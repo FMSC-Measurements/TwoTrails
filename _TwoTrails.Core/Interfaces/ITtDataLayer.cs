@@ -110,7 +110,7 @@ namespace TwoTrails.DAL
         MissingMetadata = 1 << 4,
         MissingGroup    = 1 << 5,
         OrphanedQuondams= 1 << 6,
-        MissingChildren = 1 << 7,
+        MissingQuondams = 1 << 7,
         CriticalIssue   = 1 << 8
     }
 }

@@ -2626,9 +2626,9 @@ namespace TwoTrails.DAL
 
 
         #region Utils
-        public void FixErrors(bool removeErrors = false)
+        public void FixErrors(bool deleteInvalid = false)
         {
-            if (removeErrors)
+            if (deleteInvalid)
             {
                 List<string> badPointCns = GetPointsWithMissingPolygons()
                     .Union(GetPointsWithMissingMetadata())
@@ -2636,9 +2636,6 @@ namespace TwoTrails.DAL
                     .Union(GetOrphanedQuondams()).ToList();
 
                 DeletePoints(GetPoints().Where(p => badPointCns.Contains(p.CN)));
-
-                FixNullAdjLocs();
-                ReindexPolygons();
             }
             else
             {
@@ -2649,10 +2646,6 @@ namespace TwoTrails.DAL
 
                 List<QuondamPoint> orphanedQuondams = GetOrphanedQuondams()
                     .Select(cn => GetPoint(cn) as QuondamPoint)
-                    .ToList();
-
-                List<Tuple<TtPoint, List<string>>> pointsWithMissingChildren = GetPointsWithMissingChildren()
-                    .Select(kvpl => Tuple.Create(GetPoint(kvpl.Item1), kvpl.Item2))
                     .ToList();
 
                 if (missingPointsByPolygons.Any())
@@ -2680,7 +2673,6 @@ namespace TwoTrails.DAL
                     }
                 }
 
-                FixNullAdjLocs();
 
                 if (orphanedQuondams.Any())
                 {
@@ -2704,19 +2696,6 @@ namespace TwoTrails.DAL
                     }
                 }
 
-                if (pointsWithMissingChildren.Any())
-                {
-                    foreach (Tuple<TtPoint, List<string>> pointAndGoodList in pointsWithMissingChildren)
-                    {
-                        TtPoint updatedPoint = pointAndGoodList.Item1.DeepCopy();
-
-                        pointAndGoodList.Item2.ForEach(lpCN => updatedPoint.AddLinkedPoint(lpCN));
-
-                        UpdatePoint(updatedPoint, pointAndGoodList.Item1);
-                    }
-                }
-
-                ReindexPolygons();
 
                 _Database.Update(TTS.PointSchema.TableName,
                         new Dictionary<string, string> { [TTS.PointSchema.MetadataCN] = Consts.EmptyGuid },
@@ -2727,6 +2706,27 @@ namespace TwoTrails.DAL
                         $"{TTS.PointSchema.GroupCN} not in (select {TTS.SharedSchema.CN} from {TTS.GroupSchema.TableName});");
             }
 
+
+            List<Tuple<TtPoint, List<string>>> pointsWithMissingChildren = GetPointsWithMissingChildren()
+                .Select(kvpl => Tuple.Create(GetPoint(kvpl.Item1), kvpl.Item2))
+                .ToList();
+
+            if (pointsWithMissingChildren.Any())
+            {
+                foreach (Tuple<TtPoint, List<string>> pointAndGoodList in pointsWithMissingChildren)
+                {
+                    TtPoint updatedPoint = pointAndGoodList.Item1.DeepCopy();
+
+                    pointAndGoodList.Item2.ForEach(lpCN => updatedPoint.AddLinkedPoint(lpCN));
+
+                    UpdatePoint(updatedPoint, pointAndGoodList.Item1);
+                }
+            }
+
+
+            FixNullAdjLocs();
+
+            ReindexPolygons();
         }
 
         protected int GetItemCount(String tableName, string where = null)
@@ -2833,7 +2833,7 @@ namespace TwoTrails.DAL
 
             if (GetPointsWithMissingChildren().Any())
             {
-                errors |= DalError.MissingChildren;
+                errors |= DalError.MissingQuondams;
             }
 
             return errors;

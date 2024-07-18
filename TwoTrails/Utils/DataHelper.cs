@@ -115,8 +115,8 @@ namespace TwoTrails.Utils
 
                 if (errors.HasFlag(DalError.OrphanedQuondams))
                     errList.Add("Orphaned Quondams");
-                if (errors.HasFlag(DalError.MissingChildren))
-                    errList.Add("Points with Missing Children");
+                if (errors.HasFlag(DalError.MissingQuondams))
+                    errList.Add("Missing Quondams");
                 if (errors.HasFlag(DalError.PointIndexes))
                     errList.Add("Skipped Point Indexes");
                 if (errors.HasFlag(DalError.NullAdjLocs))
@@ -128,13 +128,17 @@ namespace TwoTrails.Utils
                 if (errors.HasFlag(DalError.MissingGroup))
                     errList.Add("Missing Groups");
 
+                bool softErrors =
+                    errors.HasFlag(DalError.MissingQuondams) || errors.HasFlag(DalError.PointIndexes) ||
+                    errors.HasFlag(DalError.NullAdjLocs);
+
                 bool hardErrors =
-                    errors.HasFlag(DalError.OrphanedQuondams) || errors.HasFlag(DalError.MissingChildren) ||
+                    errors.HasFlag(DalError.OrphanedQuondams) || 
                     errors.HasFlag(DalError.MissingGroup) || errors.HasFlag(DalError.MissingMetadata) ||
                     errors.HasFlag(DalError.MissingPolygon);
 
                 MessageBoxResult mbr = MessageBox.Show(
-                    $"It appears part of the TwoTrails data {(hardErrors ? "is corrupt" : "needs adjusting")}. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(" | ", errList)}. " +
+                    $"It appears part of the TwoTrails data {(hardErrors ? "is corrupt" : "requires fixing")}. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(" | ", errList)}. " +
                     (hardErrors ? $"Would you like to try and fix the data by recreating, moving and modifing (Yes) or removing invalid (No)?" :
                     "Would you like to fix the data?"),
                     hardErrors ? "Data is corrupted" : "Data needs adjusting",
@@ -167,7 +171,7 @@ namespace TwoTrails.Utils
                                 action.UpdateAction(DataActionType.ModifiedPoints);
                         }
 
-                        if (errors.HasFlag(DalError.NullAdjLocs) || errors.HasFlag(DalError.MissingChildren))
+                        if (softErrors)
                             action.UpdateAction(DataActionType.ModifiedPoints);
 
                         if (errors.HasFlag(DalError.PointIndexes))
