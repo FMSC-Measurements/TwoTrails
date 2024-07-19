@@ -26,7 +26,10 @@ namespace TwoTrails.Core.ComponentModel.History
 
         public override void Undo()
         {
-            foreach (ITtCommand command in _Commands)
+            List<ITtCommand> commands = _Commands.ToList();
+            commands.Reverse();
+
+            foreach (ITtCommand command in commands)
                 command.Undo();
         }
 
