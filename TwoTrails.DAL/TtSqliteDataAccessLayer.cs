@@ -2787,18 +2787,10 @@ namespace TwoTrails.DAL
 
         public DalError GetErrors()
         {
-            try
-            {
-                using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
-                    if (_Database.ExecuteScalar("PRAGMA integrity_check;", conn) as string != "ok") return DalError.CorruptDatabase;
-            }
-            catch
-            {
-                return DalError.CriticalIssue;
-            }
+            DalError errors = FileIntegrityCheck();
 
-
-            DalError errors = DalError.None;
+            if (errors == DalError.CriticalIssue || errors == DalError.CorruptDatabase)
+                return errors;
 
             if (GetItemCount(TTS.PointSchema.TableName, $@"{ TTS.PointSchema.AdjX } IS NULL OR { TTS.PointSchema.AdjY
                         } IS NULL OR { TTS.PointSchema.AdjZ } IS NULL OR { TTS.PointSchema.Accuracy } IS NULL") > 0)
@@ -2843,7 +2835,24 @@ namespace TwoTrails.DAL
         {
             return GetErrors() > 0;
         }
+
+
+        public DalError FileIntegrityCheck()
+        {
+            try
+            {
+                using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                    if (_Database.ExecuteScalar("PRAGMA integrity_check;", conn) as string != "ok") return DalError.CorruptDatabase;
+            }
+            catch
+            {
+                return DalError.CriticalIssue;
+            }
+
+            return DalError.None;
+        }
         
+
         public IEnumerable<string> GetPolysInNeedOfReindex()
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())

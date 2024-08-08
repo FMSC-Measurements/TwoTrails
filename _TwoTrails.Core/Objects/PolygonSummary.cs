@@ -113,7 +113,7 @@ namespace TwoTrails.Core
 
                     if (HasExclusions)
                     {
-                        TotalAreaWExclusions = polygon.Area + Exclusions.TotalArea;
+                        TotalAreaWExclusions = polygon.Area - Exclusions.TotalArea;
                         TotalPerimWExclusions = polygon.Perimeter + Exclusions.TotalPerimeter;
 
                         TotalAreaErrorAreaWExclusions = TotalGpsError + Exclusions.TotalAreaErrorArea;
@@ -196,7 +196,7 @@ namespace TwoTrails.Core
 
                     if (TotalAreaWExclusions > 0)
                     {
-                        sb.AppendFormat($"Total Exclusions: {ExclusionsCount}{0}", Environment.NewLine);
+                        sb.AppendFormat("Total Exclusions: {0}{1}", ExclusionsCount, Environment.NewLine);
 
                         if (Exclusions.HasTies)
                             sb.AppendFormat("Warning: Some Exclusions have ties.", Environment.NewLine);
