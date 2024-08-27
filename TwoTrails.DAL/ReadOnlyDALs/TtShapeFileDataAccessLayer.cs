@@ -472,7 +472,7 @@ namespace TwoTrails.DAL
             if (CultureInfo.CurrentCulture.CompareInfo.IndexOf(
                 tmp, "nad_1983", CompareOptions.IgnoreCase) >= 0)
             {
-                tmp = tmp.Substring(tmp.IndexOf("nad"), 21);
+                tmp = tmp.Substring(tmp.IndexOf("nad"));
                 if (tmp.Contains("zone"))
                 {
                     tmp = new string(tmp.Substring(tmp.IndexOf("zone") + 5, 2).Where(Char.IsDigit).ToArray());
