@@ -28,9 +28,9 @@ namespace TwoTrails.Utils
 
                     if (tokens.Length > 0)
                     {
-                        status.CheckStatus = new Version(tokens[0].Trim()) > Assembly.GetExecutingAssembly().GetName().Version;
+                        status.NewVersionAvailable = new Version(tokens[0].Trim()) > Assembly.GetExecutingAssembly().GetName().Version;
 
-                        if (status.CheckStatus == true && tokens.Length > 1)
+                        if (status.NewVersionAvailable == true && tokens.Length > 1)
                         {
                             UpdateType updateType = UpdateType.None;
 
@@ -46,7 +46,7 @@ namespace TwoTrails.Utils
 
                             status.UpdateType = updateType;
 
-                            status.UpdateMessage = (tokens.Length > 2) ? tokens[2] : String.Empty;
+                            status.UpdateMessage = (tokens.Length > 2) ? tokens[2].Replace("\\n", "\n") : String.Empty;
 
                         }
                     }
@@ -203,7 +203,7 @@ namespace TwoTrails.Utils
 
     public struct UpdateStatus
     {
-        public bool? CheckStatus { get; set; }
+        public bool? NewVersionAvailable { get; set; }
         public UpdateType UpdateType { get; set; }
         public string UpdateMessage { get; set; }
     }

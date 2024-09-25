@@ -926,11 +926,11 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
         {
             UpdateStatus status = TtUtils.CheckForUpdate();
 
-            if (status.CheckStatus != null)
+            if (status.NewVersionAvailable != null)
             {
                 Settings.LastUpdateCheck = DateTime.Now;
 
-                if (status.CheckStatus == true)
+                if (status.NewVersionAvailable == true)
                 {
                     if (MessageBox.Show($@"A new version of TwoTrails is ready for download.{
                         (status.UpdateType.HasFlag(UpdateType.CriticalBugFixes) ? " There are CRITICAL updates implemented that should be installed. " : String.Empty)
@@ -940,7 +940,7 @@ Upgrading will not delete this file. Would you like to upgrade it now?", "Upgrad
                         Process.Start(Consts.URL_TWOTRAILS);
                     }
                 }
-                else if (status.CheckStatus == false)
+                else if (status.NewVersionAvailable == false)
                 {
                     MessageBox.Show("You have the most recent version of TwoTrails", "TwoTrails Update");
                 }
