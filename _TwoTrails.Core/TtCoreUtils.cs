@@ -1,8 +1,9 @@
-﻿using CSUtil;
+﻿using FMSC.Core;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core
@@ -57,7 +58,6 @@ namespace TwoTrails.Core
 
 
 
-
         public static bool IsPolygonValid(this ITtManager manager, string polyCN)
         {
             if (manager.PolygonExists(polyCN))
@@ -65,41 +65,59 @@ namespace TwoTrails.Core
             throw new Exception("Polygon Not Found");
         }
 
-        public static bool IsIslandPolygon(this ITtManager manager, string polyCN)
+
+
+        public static APStats CalculateBoundaryAreaPerimeterAndTrail(this ITtManager manager, string polyCN)
         {
-            return IsIslandPolygon(manager.GetPoints(polyCN));
+            return CalculateAreaPerimeterAndTrail(manager.GetPoints(polyCN).OnBndPoints());
         }
 
-        public static bool IsIslandPolygon(IEnumerable<TtPoint> points)
+        public static APStats CalculateBoundaryAreaPerimeterAndTrail(IEnumerable<TtPoint> points)
         {
-            if (points.HasAtLeast(3, pt => pt.OnBoundary))
-            {
-                bool hasGps = false;
-                int sideShotCount = 0;
+            return CalculateAreaPerimeterAndTrail(points.OnBndPoints());
+        }
 
-                foreach (TtPoint pt in points)
+        public static APStats CalculateAreaPerimeterAndTrail(IEnumerable<TtPoint> points)
+        {
+            return CalculateAreaPerimeterAndTrail(points.SyncPointsToZone().ToList());
+        }
+        
+        public static APStats CalculateAreaPerimeterAndTrail(List<Point> points)
+        {
+            if (points.Count > 2)
+            {
+                double perim = 0, linePerim, area = 0;
+
+                Point p1 = points[0], fBndPt = points[0], lBndPt;
+                Point p2;
+
+                lBndPt = p1;
+
+                for (int i = 0; i < points.Count - 1; i++)
                 {
-                    if (!hasGps && !pt.OnBoundary)
-                    {
-                        if (pt.IsGpsAtBase())
-                            hasGps = true;
-                    }
-                    else if (hasGps && pt.OnBoundary)
-                    {
-                        if (pt.OpType == OpType.SideShot)
-                            sideShotCount++;
-                        else
-                            break;
-                    }
-                    else
-                        break;
+                    p1 = points[i];
+                    p2 = points[i + 1];
+
+                    lBndPt = p2;
+
+                    perim += MathEx.Distance(p1.X, p1.Y, p2.X, p2.Y);
+                    area += (p2.X - p1.X) * (p2.Y + p1.Y);
                 }
 
-                if (sideShotCount > 2)
-                    return true;
-            }
+                linePerim = perim;
 
-            return false;
+                if (fBndPt != lBndPt)
+                {
+                    perim += MathEx.Distance(fBndPt.X, fBndPt.Y, lBndPt.X, lBndPt.Y);
+                    area += (fBndPt.X - lBndPt.X) * (fBndPt.Y + lBndPt.Y);
+                }
+
+                return new APStats(Math.Abs(area) / 2, perim, linePerim);
+            }
+            else
+            {
+                return new APStats();
+            }
         }
     }
 }

@@ -38,7 +38,7 @@
 
             <TextBlock Grid.Row="0" Text="TwoTrails"/>
             <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right">
-                <Hyperlink NavigateUri="https://www.fs.fed.us/forestmanagement/products/measurement/area-determination/" RequestNavigate="Hyperlink_RequestNavigate">
+                <Hyperlink NavigateUri="https://www.fs.usda.gov/forestmanagement/products/measurement/area-determination/" RequestNavigate="Hyperlink_RequestNavigate">
                     Area-Determination
                 </Hyperlink>
             </TextBlock>
@@ -54,13 +54,13 @@
 
             <TextBlock Grid.Row="4" Text="Group"/>
             <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
-                <Hyperlink NavigateUri="https://www.fs.fed.us/forestmanagement/products/measurement/" RequestNavigate="Hyperlink_RequestNavigate">
+                <Hyperlink NavigateUri="https://www.fs.usda.gov/forestmanagement/products/measurement/" RequestNavigate="Hyperlink_RequestNavigate">
                     Forest Management Service Center
                 </Hyperlink>
             </TextBlock>
             
             <TextBlock Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right">
-                <Hyperlink NavigateUri="https://www.fs.fed.us/forestmanagement/products/measurement/" RequestNavigate="Hyperlink_RequestNavigate">
+                <Hyperlink NavigateUri="https://www.fs.usda.gov/forestmanagement/products/measurement/" RequestNavigate="Hyperlink_RequestNavigate">
                     Forest Products Measurement
                 </Hyperlink>
             </TextBlock>

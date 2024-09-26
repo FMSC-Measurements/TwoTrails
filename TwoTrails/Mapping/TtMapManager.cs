@@ -1,71 +1,84 @@
-﻿using System;
+﻿using FMSC.Core.Windows.ComponentModel.Commands;
+using Microsoft.Maps.MapControl.WPF;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using TwoTrails.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
-using Windows.UI.Xaml.Controls.Maps;
+using TwoTrails.Settings;
+using TwoTrails.Utils;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails.Mapping
 {
     public class TtMapManager
     {
         private Dictionary<string, ObservableCollection<TtPoint>> _PointsByPolys = new Dictionary<string, ObservableCollection<TtPoint>>();
-        private Dictionary<string, TtMapPolygonManager> _PolygonManagers = new Dictionary<string, TtMapPolygonManager>();
-        private ReadOnlyObservableCollection<TtPoint> _Points;
-        private ReadOnlyObservableCollection<TtPolygon> _Polygons;
-        private MapControl _Map;
-
-        //private TtPoint _LastPoint;
-        //private List<TtPoint> _SelectedPoints { get; } =  new List<TtPoint>();
+        private Dictionary<string, TtMapPolygonManager> _PolygonManagersMap = new Dictionary<string, TtMapPolygonManager>();
+        private Map _Map;
+        private MapControl _MapControl;
 
         public ObservableCollection<TtMapPolygonManager> PolygonManagers { get; } = new ObservableCollection<TtMapPolygonManager>();
-        
+        public ListCollectionView PolygonManagersLVC { get; }
+
+
         private IObservableTtManager _Manager;
 
-        private bool CtrlKeyPressed, SettingVisibilities;
+        private bool SettingVisibilities;
+
+        public ICommand ZoomToPolygonCommand { get; }
 
 
-        public TtMapManager(MapControl map, IObservableTtManager manager)
+        public TtMapManager(MapControl mapControl, Map map, TtProject project)
         {
+            _MapControl = mapControl;
             _Map = map;
-            _Manager = manager;
-            _Polygons = _Manager.Polygons;
-            _Points = _Manager.Points;
-            
-            foreach (TtPolygon poly in _Polygons)
+            _Manager = project.HistoryManager;
+
+            foreach (TtPolygon poly in _Manager.Polygons)
             {
                 CreateMapPolygon(poly);
             }
             
-            ((INotifyCollectionChanged)_Points).CollectionChanged += Points_CollectionChanged;
-            ((INotifyCollectionChanged)_Polygons).CollectionChanged += Polygons_CollectionChanged;
+            ((INotifyCollectionChanged)_Manager.Points).CollectionChanged += Points_CollectionChanged;
+            ((INotifyCollectionChanged)_Manager.Polygons).CollectionChanged += Polygons_CollectionChanged;
 
-            foreach (TtPoint point in _Points)
+            foreach (TtPoint point in _Manager.Points)
             {
                 point.PolygonChanged += Point_PolygonChanged;
             }
 
-            EventManager.RegisterClassHandler(typeof(Control), Control.KeyDownEvent, new KeyEventHandler((s, e) => {
-                if (e.Key == Key.LeftCtrl)
-                    CtrlKeyPressed = true;
-            }), true);
+            ZoomToPolygonCommand = new RelayCommand(x =>
+            {
+                if (x is TtPolygon poly)
+                {
+                    ZoomToPolygon(poly);
+                }
+            });
 
-            EventManager.RegisterClassHandler(typeof(Control), Control.KeyUpEvent, new KeyEventHandler((s, e) => {
-                if (e.Key == Key.LeftCtrl)
-                    CtrlKeyPressed = false;
-            }), true);
+
+            PolygonManagersLVC = CollectionViewSource.GetDefaultView(PolygonManagers) as ListCollectionView;
+            PolygonManagersLVC.CustomSort = new PolygonSorterEx<TtMapPolygonManager>(x => x.Polygon, project.Settings.SortPolysByName);
+
+            project.Settings.PropertyChanged += (s, pce) =>
+            {
+                if (pce.PropertyName == nameof(TtSettings.SortPolysByName))
+                {
+                    PolygonManagersLVC.CustomSort = new PolygonSorterEx<TtMapPolygonManager>(x => x.Polygon, project.Settings.SortPolysByName);
+                }
+            };
         }
 
 
         private void CreateMapPolygon(TtPolygon polygon)
         {
-            ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Points.Where(p => p.PolygonCN == polygon.CN));
+            ObservableCollection<TtPoint> ocPoints = new ObservableCollection<TtPoint>(_Manager.Points.Where(p => p.PolygonCN == polygon.CN));
             _PointsByPolys.Add(polygon.CN, ocPoints);
 
             TtMapPolygonManager mpm = new TtMapPolygonManager(_Map, polygon, ocPoints, _Manager.GetPolygonGraphicOption(polygon.CN));
@@ -83,16 +96,15 @@ namespace TwoTrails.Mapping
                 mpm.AdjMiscPointsVisible = true;
             }
 
-            _PolygonManagers.Add(polygon.CN, mpm);
+            _PolygonManagersMap.Add(polygon.CN, mpm);
             PolygonManagers.Add(mpm);
 
-            //mpm.PointSelected += PointSelected;
             mpm.PropertyChanged += TtMapPolygonManager_PropertyChanged;
         }
 
         private void TtMapPolygonManager_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!SettingVisibilities && CtrlKeyPressed && e.PropertyName == nameof(TtMapPolygonManager.Visible) &&
+            if (!SettingVisibilities && e.PropertyName == nameof(TtMapPolygonManager.Visible) && Keyboard.IsKeyDown(Key.LeftCtrl) &&
                 sender is TtMapPolygonManager mapPolyManager)
             {
                 SettingVisibilities = true;
@@ -178,11 +190,15 @@ namespace TwoTrails.Mapping
 
         private void RemoveMapPolygon(TtPolygon polygon)
         {
-            TtMapPolygonManager mpm = _PolygonManagers[polygon.CN];
-            mpm.Detach();
+            TtMapPolygonManager mpm = _PolygonManagersMap[polygon.CN];
+
+            mpm.PropertyChanged -= TtMapPolygonManager_PropertyChanged;
+
             PolygonManagers.Remove(mpm);
-            _PolygonManagers.Remove(polygon.CN);
+            _PolygonManagersMap.Remove(polygon.CN);
             _PointsByPolys.Remove(polygon.CN);
+
+            mpm.Detach();
         }
 
 
@@ -251,6 +267,14 @@ namespace TwoTrails.Mapping
                 points.Insert(point.Index, point);
             else
                 points.Add(point);
+        }
+
+        public void ZoomToPolygon(TtPolygon polygon)
+        {
+            if (_PolygonManagersMap.ContainsKey(polygon.CN))
+            {
+                _PolygonManagersMap[polygon.CN].ZoomToPolygon();
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 
 namespace TwoTrails.Core.Points
 {
@@ -138,6 +139,7 @@ namespace TwoTrails.Core.Points
 
 
         protected Double _AdjX;
+        internal Double __AdjX => _AdjX;
         public virtual Double AdjX
         {
             get { return _AdjX; }
@@ -145,6 +147,7 @@ namespace TwoTrails.Core.Points
         }
 
         protected Double _AdjY;
+        internal Double __AdjY => _AdjY;
         public virtual Double AdjY
         {
             get { return _AdjY; }
@@ -152,6 +155,7 @@ namespace TwoTrails.Core.Points
         }
 
         protected Double _AdjZ;
+        internal Double __AdjZ => _AdjZ;
         public virtual Double AdjZ
         {
             get { return _AdjZ; }
@@ -190,11 +194,6 @@ namespace TwoTrails.Core.Points
 
         private ObservableCollection<String> _LinkedPoints = new ObservableCollection<string>();
         public ReadOnlyCollection<String> LinkedPoints => new ReadOnlyCollection<string>(_LinkedPoints);
-
-        internal void ClearLinkedPoints()
-        {
-            _LinkedPoints.Clear();
-        }
 
         public abstract OpType OpType { get; }
 
@@ -235,7 +234,7 @@ namespace TwoTrails.Core.Points
             get { return _LocationChangedEventEnabled; }
             set
             {
-                _LocationChangedEventEnabled = true;
+                _LocationChangedEventEnabled = value;
 
                 if (LocationHasChanged)
                     OnLocationChanged();
@@ -259,20 +258,17 @@ namespace TwoTrails.Core.Points
             _PID = point._PID;
             _TimeCreated = point._TimeCreated;
 
+            _PolyCN = point._PolyCN;
             if (point._Polygon != null)
-                Polygon = point._Polygon;
-            else
-                _PolyCN = point._PolyCN;
+                _Polygon = point._Polygon;
 
+            _GroupCN = point._GroupCN;
             if (point._Group != null)
-                Group = point._Group;
-            else
-                _GroupCN = point._GroupCN;
+                _Group = point._Group;
 
+            _MetadataCN = point._MetadataCN;
             if (point._Metadata != null)
-                Metadata = point._Metadata;
-            else
-                _MetadataCN = point._MetadataCN;
+                _Metadata = point._Metadata;
 
             _Comment = point._Comment;
             _OnBoundary = point._OnBoundary;
@@ -287,7 +283,7 @@ namespace TwoTrails.Core.Points
 
             _Accuracy = point._Accuracy;
 
-            ExtendedData = new DataDictionary(point._ExtendedData);
+            _ExtendedData = new DataDictionary(point._ExtendedData);
         }
 
         public TtPoint(string cn, int index, int pid, DateTime time, string polycn, string metacn, string groupcn,
@@ -375,17 +371,28 @@ namespace TwoTrails.Core.Points
             if (!_LinkedPoints.Contains(point.CN))
             {
                 _LinkedPoints.Add(point.CN);
+                OnPropertyChanged(nameof(LinkedPoints), nameof(HasQuondamLinks));
+            }
+        }
+
+        internal void AddLinkedPoint(string pointCN)
+        {
+            if (!_LinkedPoints.Contains(pointCN))
+            {
+                _LinkedPoints.Add(pointCN);
             }
         }
 
         public void RemoveLinkedPoint(QuondamPoint point)
         {
             _LinkedPoints.Remove(point.CN);
+            OnPropertyChanged(nameof(LinkedPoints), nameof(HasQuondamLinks));
         }
 
-        public void ClearLinks()
+        public void ClearLinkedPoints()
         {
             _LinkedPoints.Clear();
+            OnPropertyChanged(nameof(LinkedPoints), nameof(HasQuondamLinks));
         }
 
 
@@ -400,8 +407,6 @@ namespace TwoTrails.Core.Points
             UnAdjZ = z;
 
             LocationChangedEventEnabled = locEventEnabled;
-
-            OnLocationChanged();
         }
 
         public void SetAdjLocation(double x, double y, double z)
@@ -469,7 +474,7 @@ namespace TwoTrails.Core.Points
             return obj is TtPoint point && Equals(point);
         }
         
-        public bool Equals(TtPoint point)
+        public virtual bool Equals(TtPoint point)
         {
             return base.Equals(point) &&
                 OpType == point.OpType &&
@@ -487,6 +492,8 @@ namespace TwoTrails.Core.Points
                 _PolyCN == point._PolyCN &&
                 _GroupCN == point._GroupCN &&
                 _MetadataCN == point._MetadataCN &&
+                _LinkedPoints.Count == point._LinkedPoints.Count && 
+                _LinkedPoints.All(point._LinkedPoints.Contains) &&
                 _ExtendedData.Equals(point._ExtendedData);
         }
 

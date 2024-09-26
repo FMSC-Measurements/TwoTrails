@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="150" d:DesignWidth="300">
     <Grid>
-        <Border CornerRadius="5" Background="WhiteSmoke" BorderBrush="{StaticResource colorPriamryLight}" BorderThickness="1">
+        <Border CornerRadius="5" Background="WhiteSmoke" BorderBrush="{StaticResource scbPrimaryLight}" BorderThickness="1">
             <StackPanel Margin="5, 2.5, 5, 2.5">
                 <DockPanel LastChildFill="True">
                     <TextBlock FontSize="14" FontWeight="Bold" DockPanel.Dock="Right" Text="{Binding IsAdjusted}"/>

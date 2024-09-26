@@ -6,8 +6,7 @@
         xmlns:ddm="clr-namespace:TwoTrails.ViewModels.DataDictionary"
         xmlns:ttcore="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:cp="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
         mc:Ignorable="d"
         Title="Data Dictionary Editor"
@@ -63,7 +62,7 @@
                                 <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}" ToolTip="Field Name">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewTextInput" >
-                                            <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </TextBox>
@@ -76,7 +75,7 @@
                                 <TextBox Grid.Column="3" Text="{Binding DefaultValue}" ToolTip="Default Value" Style="{StaticResource fieldStyle}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewTextInput" >
-                                            <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateText"  />
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="ValidateText"  />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </TextBox>
@@ -106,7 +105,7 @@
                                 <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}" ToolTip="Field Name">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewTextInput">
-                                            <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </TextBox>
@@ -145,7 +144,7 @@
                                 <TextBox Grid.Column="0" Text="{Binding Name}" Style="{StaticResource fieldStyle}" ToolTip="Field Name">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewTextInput" >
-                                            <ei:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
+                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="ValidateName"  />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </TextBox>

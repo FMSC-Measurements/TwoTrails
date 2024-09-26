@@ -1,5 +1,4 @@
 ﻿using FMSC.GeoSpatial;
-using FMSC.GeoSpatial.Types;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
@@ -222,6 +221,18 @@ namespace TwoTrails.DAL
             return linked ? GetLinkedPoints(points) : points.DeepCopy(); ;
         }
 
+        public int GetPointCount(params string[] polyCNs)
+        {
+            if (polyCNs == null || !polyCNs.Any())
+            {
+                return _Points.Count;
+            }
+            else
+            {
+                return _Points.Values.Count(p => polyCNs.Contains(p.PolygonCN));
+            }
+        }
+
         public bool HasPolygons()
         {
             Parse();
@@ -244,6 +255,11 @@ namespace TwoTrails.DAL
         public IEnumerable<TtGroup> GetGroups()
         {
             return new List<TtGroup>();
+        }
+
+        public TtNmeaBurst GetNmeaBurst(string nmeaCN)
+        {
+            throw new NotImplementedException(nameof(GetNmeaBurst));
         }
 
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)

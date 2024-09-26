@@ -7,11 +7,11 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class EditTtPointMultiPropertyCommand : ITtPointCommand
     {
-        private List<object> NewValues;
-        private List<object> OldValues = new List<object>();
-        private List<PropertyInfo> Properties;
+        private readonly List<object> NewValues;
+        private readonly List<object> OldValues = new List<object>();
+        private readonly List<PropertyInfo> Properties;
 
-        public EditTtPointMultiPropertyCommand(TtPoint point, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues) : base(point)
+        public EditTtPointMultiPropertyCommand(TtManager manager, TtPoint point, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues) : base(manager, point)
         {
             RequireRefresh = properties.Any(p => p == PointProperties.INDEX);
 
@@ -39,5 +39,8 @@ namespace TwoTrails.Core.ComponentModel.History
                 Properties[i].SetValue(Point, OldValues[i]);
             }
         }
+
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
+        protected override string GetCommandInfoDescription() => $"Edit {Properties.Count} properties of {Point}";
     }
 }

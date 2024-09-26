@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
 using System.Collections.Generic;
@@ -77,7 +77,7 @@ namespace TwoTrails.Controls
             }
         }
 
-        public class PointFieldController : NotifyPropertyChangedEx
+        public class PointFieldController : BaseModel
         {
             public bool Index { get { return Get<bool>(); } set { Set(value); } }
             public bool PID { get { return Get<bool>(); } set { Set(value); } }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Data;
@@ -15,7 +16,7 @@ namespace TwoTrails.Converters
             if (values != null && values.Length > 1 &&
                 values[0] is IEnumerable<DataDictionaryField> ddfs && values[1] is PointEditorModel dem)
             {
-                return ddfs.Select<DataDictionaryField, ExtendedDataField>(ddf =>
+                return new ObservableCollection<ExtendedDataField>(ddfs.Select<DataDictionaryField, ExtendedDataField>(ddf =>
                 {
                     switch (ddf.FieldType)
                     {
@@ -24,7 +25,7 @@ namespace TwoTrails.Converters
                         default:
                         case FieldType.TextBox: return new TextBoxExtendedDataField(ddf, dem);
                     }
-                });
+                }));
             }
 
             return null;

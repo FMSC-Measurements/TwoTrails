@@ -1,10 +1,7 @@
-﻿using CSUtil.ComponentModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Windows.Controls;
-using TwoTrails.Core;
 using TwoTrails.DAL;
+using TwoTrails.ViewModels;
 
 namespace TwoTrails.Controls
 {
@@ -13,60 +10,19 @@ namespace TwoTrails.Controls
     /// </summary>
     public partial class ImportControl : UserControl
     {
-        public event EventHandler PolygonSelectionChanged;
-
-        public List<SelectablePolygon> Polygons { get; }
-
-        public IEnumerable<string> SelectedPolygons { get { return Polygons.Where(p => p.IsSelected).Select(p => p.Polygon.CN); } }
-
-        public IReadOnlyTtDataLayer DAL { get; }
-
-        public bool HasMetadata { get; }
-        public bool IncludeMetadata { get; set; } = true;
-
-        public bool HasGroups { get; }
-        public bool IncludeGroups { get; set; } = true;
-
-        public bool HasNmea { get; }
-        public bool IncludeNmea { get; set; } = true;
-
-
-        public bool HasSelectedPolygons { get { return Polygons.Where(p => p.IsSelected).Any(); } }
-
-        public ImportControl(IReadOnlyTtDataLayer dal, bool hasMetadata = false, bool hasGroups = false, bool hasNmea = false)
+        public event EventHandler PolygonSelectionChanged
         {
-            DAL = dal;
-            Polygons = dal.GetPolygons().Select(p => new SelectablePolygon(p)).ToList();
-
-            foreach (SelectablePolygon sp in Polygons)
-            {
-                sp.PropertyChanged += (Object sender, System.ComponentModel.PropertyChangedEventArgs e) => {
-                    if (e.PropertyName == nameof(SelectablePolygon.IsSelected))
-                    {
-                        PolygonSelectionChanged?.Invoke(this, new EventArgs());
-                    }
-                };
-            }
-
-            HasMetadata = hasMetadata;
-            HasGroups = hasGroups;
-            HasNmea = hasNmea;
-
-            InitializeComponent();
-
-            this.DataContext = this;
+            add => Context.PolygonSelectionChanged += value;
+            remove => Context.PolygonSelectionChanged -= value;
         }
 
-        public class SelectablePolygon : NotifyPropertyChangedEx
-        {
-            public TtPolygon Polygon { get; }
-            public bool IsSelected { get { return Get<bool>(); } set { Set(value); } }
+        public ImportControlModel Context { get; }
 
-            public SelectablePolygon(TtPolygon polygon)
-            {
-                Polygon = polygon;
-                IsSelected = true;
-            }
+        public ImportControl(IReadOnlyTtDataLayer dal, bool sortByName, bool hasMetadata = false, bool hasGroups = false, bool hasNmea = false)
+        {
+            InitializeComponent();
+
+            this.DataContext = Context = new ImportControlModel(dal, sortByName, hasMetadata, hasGroups, hasNmea);
         }
     }
 }

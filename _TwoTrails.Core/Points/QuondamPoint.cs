@@ -16,21 +16,25 @@ namespace TwoTrails.Core.Points
             }
         }
 
-        public override double AdjX { get { return ParentPoint.AdjX; } }
-        public override double AdjY { get { return ParentPoint.AdjY; } }
-        public override double AdjZ{ get { return ParentPoint.AdjZ; } }
+        public override double AdjX => ParentPoint.AdjX;
+        public override double AdjY => ParentPoint.AdjY;
+        public override double AdjZ => ParentPoint.AdjZ;
 
-        public override double UnAdjX { get { return ParentPoint.UnAdjX; } }
-        public override double UnAdjY { get { return ParentPoint.UnAdjY; } }
-        public override double UnAdjZ { get { return ParentPoint.UnAdjZ; } }
+        public override double UnAdjX => ParentPoint.UnAdjX;
+        public override double UnAdjY => ParentPoint.UnAdjY;
+        public override double UnAdjZ => ParentPoint.UnAdjZ;
+
 
         private TtPoint _ParentPoint;
         public TtPoint ParentPoint
         {
-            get { return _ParentPoint; }
+            get => _ParentPoint;
             set
             {
                 TtPoint oldParent = _ParentPoint;
+
+                if (value != null && value.OpType == OpType.Quondam) throw new Exception("Invalid Parent Point Type");
+
                 if (SetField(ref _ParentPoint, value))
                 {
                     if (_ParentPoint != null)
@@ -43,14 +47,18 @@ namespace TwoTrails.Core.Points
 
                         SetAccuracy(_ParentPoint.Accuracy);
                     }
+                    else
+                    {
+                        ParentPointCN = null;
+                    }
 
                     if (oldParent != null)
                     {
                         oldParent.LocationChanged -= ParentPoint_LocationChanged;
-                        _ParentPoint.OnAccuracyChanged -= ParentPoint_OnAccuracyChanged;
+                        oldParent.OnAccuracyChanged -= ParentPoint_OnAccuracyChanged;
                         oldParent.RemoveLinkedPoint(this);
 
-                        if (_ParentPoint != null && !oldParent.HasSameAdjLocation(_ParentPoint))
+                        if (_ParentPoint != null && (oldParent.OpType == OpType.Quondam || !oldParent.HasSameAdjLocation(_ParentPoint)))
                         {
                             OnLocationChanged();
                         }
@@ -71,8 +79,6 @@ namespace TwoTrails.Core.Points
         }
 
         public override OpType OpType { get { return OpType.Quondam; } }
-
-        //public override bool OnBoundary { get => false; set => base.OnBoundary = value; }
         #endregion
 
 
@@ -102,12 +108,13 @@ namespace TwoTrails.Core.Points
         private void CopyQndmValues(QuondamPoint point)
         {
             _ManualAccuracy = point._ManualAccuracy;
-            ParentPoint = point.ParentPoint;
+            _ParentPoint = point.ParentPoint;
         }
 
 
         private void ParentPoint_LocationChanged(TtPoint point)
         {
+            OnPropertyChanged(nameof(UnAdjX), nameof(UnAdjY), nameof(UnAdjZ), nameof(AdjX), nameof(AdjY), nameof(AdjZ));
             OnLocationChanged();
         }
 
@@ -124,17 +131,17 @@ namespace TwoTrails.Core.Points
 
         public override string ToString()
         {
-            return $"{base.ToString()}{(ParentPoint != null ? $" \u2794 {ParentPoint.ToString()} : {ParentPoint.Polygon.Name}" : String.Empty)}";
+            return $"{base.ToString()}{(ParentPoint != null ? $" \u2794 {ParentPoint} : {ParentPoint?.Polygon.Name}" : String.Empty)}";
         }
 
 
-        public override bool Equals(object obj)
+        public override bool Equals(TtPoint point)
         {
-            QuondamPoint point = obj as QuondamPoint;
+            QuondamPoint qPoint = point as QuondamPoint;
 
             return base.Equals(point) &&
-                _ParentPointCN == point._ParentPointCN &&
-                _ManualAccuracy == point._ManualAccuracy;
+                _ParentPointCN == qPoint._ParentPointCN &&
+                _ManualAccuracy == qPoint._ManualAccuracy;
         }
 
         public override int GetHashCode()

@@ -224,15 +224,15 @@ namespace TwoTrails.Core.Points
         }
 
 
-        public override bool Equals(object obj)
+        public override bool Equals(TtPoint point)
         {
-            TravPoint point = obj as TravPoint;
+            TravPoint travPoint = point as TravPoint;
 
-            return base.Equals(obj) &&
-                _FwdAzimuth == point._FwdAzimuth &&
-                _BkAzimuth == point._BkAzimuth &&
-                _SlopeDistance == point._SlopeDistance &&
-                _SlopeAngle == point._SlopeAngle;
+            return base.Equals(point) &&
+                _FwdAzimuth == travPoint._FwdAzimuth &&
+                _BkAzimuth == travPoint._BkAzimuth &&
+                _SlopeDistance == travPoint._SlopeDistance &&
+                _SlopeAngle == travPoint._SlopeAngle;
         }
 
         public override int GetHashCode()

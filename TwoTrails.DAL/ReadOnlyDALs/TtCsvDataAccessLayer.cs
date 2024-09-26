@@ -4,6 +4,7 @@ using FMSC.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using TwoTrails.Core;
@@ -138,13 +139,11 @@ namespace TwoTrails.DAL
             List<Tuple<string, QuondamPoint>> quondams = new List<Tuple<string, QuondamPoint>>();
 
             CsvReader reader = new CsvReader(new StreamReader(_Options.PointsFile),
-                new Configuration()
+                new CsvConfiguration(CultureInfo.CurrentCulture)
                 {
                     AllowComments = true,
-                    ShouldSkipRecord = r =>
-                    {
-                        return r.All(c => String.IsNullOrEmpty(c));
-                    }
+                    HasHeaderRecord = true,
+                    ShouldSkipRecord = ssra => ssra.Row.Parser.Record.All(r => String.IsNullOrEmpty(r))
                 });
 
             reader.Read();
@@ -511,6 +510,18 @@ namespace TwoTrails.DAL
             return linked ? GetLinkedPoints(points) : points.DeepCopy();
         }
 
+        public int GetPointCount(params string[] polyCNs)
+        {
+            if (polyCNs == null || !polyCNs.Any())
+            {
+                return _Points.Count;
+            }
+            else
+            {
+                return _Points.Values.Count(p => polyCNs.Contains(p.PolygonCN));
+            }
+        }
+
         public bool HasPolygons()
         {
             Parse();
@@ -537,6 +548,13 @@ namespace TwoTrails.DAL
             Parse();
 
             return _Groups.Values.DeepCopy();
+        }
+
+        public TtNmeaBurst GetNmeaBurst(string nmeaCN)
+        {
+            Parse();
+
+            return _Nmea.Values.Where(n => n.CN == nmeaCN).FirstOrDefault()?.DeepCopy();
         }
 
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)

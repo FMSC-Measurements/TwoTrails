@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.Controls;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using TwoTrails.Core;
 
 namespace TwoTrails.ViewModels.DataDictionary
 {
-    public class BaseFieldModel : NotifyPropertyChangedEx, IEquatable<BaseFieldModel>, IEquatable<DataDictionaryField>
+    public class BaseFieldModel : BaseModel, IEquatable<BaseFieldModel>, IEquatable<DataDictionaryField>
     {
         public string CN { get; }
 

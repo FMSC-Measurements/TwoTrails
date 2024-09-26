@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +10,7 @@ using TwoTrails.Core.Media;
 
 namespace TwoTrails.Core
 {
-    public class TtHistoryManager : NotifyPropertyChangedEx, IObservableTtManager
+    public class TtHistoryManager : BaseModel, IObservableTtManager
     {
         public TtManager BaseManager { get; private set; }
 
@@ -29,8 +29,11 @@ namespace TwoTrails.Core
         public bool CanUndo => _UndoStack.Any();
         public bool CanRedo => _RedoStack.Any();
 
-        public Type UndoCommandType => CanUndo ? _UndoStack.Peek().DataType : null;
-        public Type RedoCommandType => CanRedo ? _RedoStack.Peek().DataType : null;
+        public DataActionType UndoCommandType => CanUndo ? _UndoStack.Peek().CommandInfo.ActionType : DataActionType.None;
+        public DataActionType RedoCommandType => CanRedo ? _RedoStack.Peek().CommandInfo.ActionType : DataActionType.None;
+
+        public CommandInfo UndoCommandInfo => CanUndo ? _UndoStack.Peek().CommandInfo : null;
+        public CommandInfo RedoCommandInfo => CanRedo ? _RedoStack.Peek().CommandInfo : null;
 
 
         public bool HasDataDictionary { get { return BaseManager.HasDataDictionary; } }
@@ -60,7 +63,7 @@ namespace TwoTrails.Core
                     case nameof(TtMetadata.Slope):
                     case nameof(TtMetadata.Distance):
                     case nameof(TtMetadata.Elevation):
-                        OnHistoryChanged(HistoryEventType.Reset, typeof(TtMetadata), true);
+                        OnHistoryChanged(HistoryEventType.Reset, new CommandInfo(DataActionType.ModifiedMetadata, $"{e.PropertyName} change in Default Metadata"), true);
                         break;
                 }
             };
@@ -84,7 +87,7 @@ namespace TwoTrails.Core
 
 
         #region History Management
-        internal void AddCommand(ITtCommand command, bool runCommand = true)
+        private void AddCommand(ITtCommand command)
         {
             if (ComplexActionStarted)
             {
@@ -92,13 +95,10 @@ namespace TwoTrails.Core
             }
             else
             {
-                if (runCommand)
-                {
-                    command.Redo();
-                }
+                command.Redo();
                 _UndoStack.Push(command);
                 _RedoStack.Clear();
-                OnHistoryChanged(HistoryEventType.Commit, command.DataType, command.RequireRefresh);
+                OnHistoryChanged(HistoryEventType.Commit, command.CommandInfo, command.RequireRefresh);
             }
         }
 
@@ -109,22 +109,24 @@ namespace TwoTrails.Core
             _ComplexActionCommands = new List<ITtCommand>();
         }
 
-        public void CommitMultiCommand()
+        public void CommitMultiCommand(DataActionType dataAction, string notes = null)
         {
             if (_ComplexActionCommands == null)
-                throw new Exception("Complex Action not started");
+                throw new Exception("Complex Action not started!");
 
             if (_ComplexActionCommands.Count > 0)
             {
-                MultiTtCommand command = new MultiTtCommand(_ComplexActionCommands);
+                _ComplexActionCommands.Add(new AddDataActionCommand(BaseManager, dataAction, notes));
+
+                MultiTtCommand command = new MultiTtCommand(BaseManager, _ComplexActionCommands, notes);
                 _ComplexActionCommands = null;
                 AddCommand(command);
             }
-            else
-                _ComplexActionCommands = null;
+                
+            _ComplexActionCommands = null;
         }
 
-        public void RevertMultiCommand()
+        public void CancelMultiCommand()
         {
             _ComplexActionCommands = null;
         }
@@ -137,7 +139,7 @@ namespace TwoTrails.Core
                 _RedoStack.Push(command);
                 command.Undo();
 
-                OnHistoryChanged(HistoryEventType.Undone, command.DataType, command.RequireRefresh);
+                OnHistoryChanged(HistoryEventType.Undone, command.CommandInfo, command.RequireRefresh);
             }
         }
 
@@ -156,7 +158,7 @@ namespace TwoTrails.Core
                     command.Undo();
                 }
 
-                OnHistoryChanged(HistoryEventType.Undone, command?.DataType, requireRefresh);
+                OnHistoryChanged(HistoryEventType.Undone, command?.CommandInfo, requireRefresh);
             }
         }
 
@@ -168,7 +170,7 @@ namespace TwoTrails.Core
                 _UndoStack.Push(command);
                 command.Redo();
 
-                OnHistoryChanged(HistoryEventType.Redone, command.DataType, command.RequireRefresh);
+                OnHistoryChanged(HistoryEventType.Redone, command.CommandInfo, command.RequireRefresh);
             }
         }
 
@@ -187,7 +189,7 @@ namespace TwoTrails.Core
                     command.Redo();
                 }
 
-                OnHistoryChanged(HistoryEventType.Redone, command?.DataType, requireRefresh);
+                OnHistoryChanged(HistoryEventType.Redone, command?.CommandInfo, requireRefresh);
             }
         }
 
@@ -198,10 +200,13 @@ namespace TwoTrails.Core
             OnPropertyChanged(nameof(CanUndo), nameof(CanRedo));
         }
 
-        private void OnHistoryChanged(HistoryEventType historyEventType, Type dataType, bool requireRefresh)
+        private void OnHistoryChanged(HistoryEventType historyEventType, CommandInfo cmdInfo, bool requireRefresh)
         {
-            HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, dataType, requireRefresh));
-            OnPropertyChanged(nameof(CanUndo), nameof(CanRedo));
+            HistoryChanged?.Invoke(this, new HistoryEventArgs(historyEventType, cmdInfo, requireRefresh));
+            OnPropertyChanged(
+                nameof(CanUndo), nameof(CanRedo),
+                nameof(UndoCommandType), nameof(RedoCommandType),
+                nameof(UndoCommandInfo), nameof(RedoCommandInfo));
         }
         #endregion
 
@@ -268,38 +273,43 @@ namespace TwoTrails.Core
         #region Adding and Deleting
         public void AddPoint(TtPoint point)
         {
-            AddCommand(new AddTtPointCommand(point, BaseManager));
+            AddCommand(new AddTtPointCommand(BaseManager, point));
         }
 
         public void AddPoints(IEnumerable<TtPoint> points)
         {
-            AddCommand(new AddTtPointsCommand(points, BaseManager));
+            AddCommand(new AddTtPointsCommand(BaseManager, points));
+        }
+
+        public void CreatePoint(TtPoint point)
+        {
+            AddCommand(new CreateTtPointCommand(BaseManager, point));
         }
 
         public void DeletePoint(TtPoint point)
         {
-            AddCommand(new DeleteTtPointCommand(point, BaseManager));
+            AddCommand(new DeleteTtPointCommand(BaseManager, point));
         }
 
         public void DeletePoints(IEnumerable<TtPoint> points)
         {
-            AddCommand(new DeleteTtPointsCommand(points, BaseManager));
+            AddCommand(new DeleteTtPointsCommand(BaseManager, points));
         }
 
         public void DeletePointsInPolygon(string polyCN)
         {
-            AddCommand(new DeleteTtPointsCommand(BaseManager.GetPoints(polyCN), BaseManager));
+            AddCommand(new DeleteTtPointsCommand(BaseManager, BaseManager.GetPoints(polyCN)));
         }
 
 
         public void AddPolygon(TtPolygon polygon)
         {
-            AddCommand(new AddTtPolygonCommand(polygon, BaseManager));
+            AddCommand(new AddTtPolygonCommand(BaseManager, polygon));
         }
 
         public void DeletePolygon(TtPolygon polygon)
         {
-            AddCommand(new DeleteTtPolygonCommand(polygon, BaseManager));
+            AddCommand(new DeleteTtPolygonCommand(BaseManager, polygon));
         }
 
 
@@ -310,40 +320,63 @@ namespace TwoTrails.Core
 
         public void DeleteMetadata(TtMetadata metadata)
         {
-            AddCommand(new DeleteTtMetadataCommand(metadata, BaseManager));
+            AddCommand(new DeleteTtMetadataCommand(BaseManager, metadata));
         }
 
 
         public void AddGroup(TtGroup group)
         {
-            AddCommand(new AddTtGroupCommand(group, BaseManager));
+            AddCommand(new AddTtGroupCommand(BaseManager, group));
         }
 
         public void DeleteGroup(TtGroup group)
         {
-            AddCommand(new DeleteTtGroupCommand(group, BaseManager));
+            AddCommand(new DeleteTtGroupCommand(BaseManager, group));
         }
         #endregion
 
 
         public void CreateQuondamLinks(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit, bool reverse = false)
         {
-            AddCommand(new CreateQuondamsCommand(reverse ? points.Reverse() : points, BaseManager, targetPolygon, insertIndex, bndMode));
+            AddCommand(new CreateQuondamsCommand(BaseManager, reverse ? points.Reverse() : points, targetPolygon, insertIndex, bndMode));
         }
+
+        public void CreateRetrace(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, QuondamBoundaryMode bndMode = QuondamBoundaryMode.Inherit, bool reverse = false)
+        {
+            AddCommand(new RetraceCommand(BaseManager, reverse ? points.Reverse() : points, targetPolygon, insertIndex, bndMode));
+        }
+
 
         public void CreateCorridor(IEnumerable<TtPoint> points, TtPolygon targetPolygon)
         {
-            AddCommand(new CreateCorridorCommand(points, targetPolygon, BaseManager));
+            AddCommand(new CreateCorridorCommand(BaseManager, points, targetPolygon));
         }
+        public void CreateDoubleSidedCorridor(IEnumerable<TtPoint> points, TtPolygon targetPolygon)
+        {
+            AddCommand(new CreateCorridorDoubleSidedCommand(BaseManager, points, targetPolygon));
+        }
+
 
         public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex)
         {
-            AddCommand(new MovePointsCommand(points, BaseManager, targetPolygon, insertIndex));
+            AddCommand(new MovePointsCommand(BaseManager, points, targetPolygon, insertIndex));
         }
 
         public void MovePointsToPolygon(IEnumerable<TtPoint> points, TtPolygon targetPolygon, int insertIndex, bool reverse)
         {
-            AddCommand(new MovePointsCommand(reverse ? points.Reverse() : points, BaseManager, targetPolygon, insertIndex));
+            AddCommand(new MovePointsCommand(BaseManager, reverse ? points.Reverse() : points, targetPolygon, insertIndex));
+        }
+
+
+        public void RezonePoints(IEnumerable<GpsPoint> points)
+        {
+            AddCommand(new RezonePointsCommand(BaseManager, points));
+        }
+
+
+        public void MinimizePoints(IEnumerable<TtPoint> points, IEnumerable<bool> onBoundary)
+        {
+            AddCommand(new MinimizePointsCommand(BaseManager, points, onBoundary));
         }
 
 
@@ -352,65 +385,65 @@ namespace TwoTrails.Core
         #region Points
         public void EditPoint<T>(TtPoint point, PropertyInfo property, T newValue)
         {
-            AddCommand(new EditTtPointCommand<T>(point, property, newValue));
+            AddCommand(new EditTtPointCommand<T>(BaseManager, point, property, newValue));
         }
 
         public void EditPoint(TtPoint point, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues)
         {
-            AddCommand(new EditTtPointMultiPropertyCommand(point, properties, newValues));
+            AddCommand(new EditTtPointMultiPropertyCommand(BaseManager, point, properties, newValues));
         }
 
 
         public void EditPoints<T>(IEnumerable<TtPoint> points, PropertyInfo property, T newValue)
         {
-            AddCommand(new EditTtPointsCommand(points, property, newValue));
+            AddCommand(new EditTtPointsCommand(BaseManager, points, property, newValue));
         }
 
         public void EditPointsMultiValues<T>(IEnumerable<TtPoint> points, PropertyInfo property, IEnumerable<T> newValues)
         {
-            AddCommand(new EditTtPointsMultiValueCommand<T>(points, property, newValues));
+            AddCommand(new EditTtPointsMultiValueCommand<T>(BaseManager, points, property, newValues));
         }
 
         public void EditPoints<T>(IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, T newValue)
         {
-            AddCommand(new EditTtPointsMultiPropertyCommand<T>(points, properties, points.Select(p => newValue)));
+            AddCommand(new EditTtPointsMultiPropertyCommand<T>(BaseManager, points, properties, points.Select(p => newValue)));
         }
 
         public void EditPointsMultiValues(IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues)
         {
-            AddCommand(new EditTtPointsMultiPropertyMultiValueCommand(points, properties, newValues));
+            AddCommand(new EditTtPointsMultiPropertyMultiValueCommand(BaseManager, points, properties, newValues));
         }
 
 
         public void ResetPoint(TtPoint point, bool keepIndexAndPoly = false)
         {
-            AddCommand(new ResetTtPointCommand(point, BaseManager, keepIndexAndPoly));
+            AddCommand(new ResetTtPointCommand(BaseManager, point, keepIndexAndPoly));
         }
 
         public void ResetPoints(IEnumerable<TtPoint> points, bool keepIndexAndPoly = false)
         {
-            AddCommand(new ResetTtPointsCommand(points, BaseManager, keepIndexAndPoly));
+            AddCommand(new ResetTtPointsCommand(BaseManager, points, keepIndexAndPoly));
         }
         #endregion
 
         #region Polygons
         public void EditPolygon<T>(TtPolygon polygon, PropertyInfo property, T newValue)
         {
-            AddCommand(new EditTtPolygonCommand<T>(polygon, property, newValue));
+            AddCommand(new EditTtPolygonCommand<T>(BaseManager, polygon, property, newValue));
         }
         #endregion
 
         #region Metadata
         public void EditMetadata<T>(TtMetadata metadata, PropertyInfo property, T newValue)
         {
-            AddCommand(new EditTtMetadataCommand<T>(metadata, property, newValue));
+            AddCommand(new EditTtMetadataCommand<T>(BaseManager, metadata, property, newValue));
         }
         #endregion
 
         #region Groups
         public void EditGroup<T>(TtGroup group, PropertyInfo property, T newValue)
         {
-            AddCommand(new EditTtGroupCommand<T>(group, property, newValue));
+            AddCommand(new EditTtGroupCommand<T>(BaseManager, group, property, newValue));
         }
         #endregion
         #endregion
@@ -419,24 +452,35 @@ namespace TwoTrails.Core
         public void ReplacePoint(TtPoint point)
         {
 
-            AddCommand(new ReplaceTtPointCommand(point, BaseManager));
+            AddCommand(new ReplaceTtPointCommand(BaseManager, point));
         }
 
         public void ReplacePoints(IEnumerable<TtPoint> points)
         {
-            AddCommand(new ReplaceTtPointsCommand(points, BaseManager));
+            AddCommand(new ReplaceTtPointsCommand(BaseManager, points));
         }
-        
+
+
+        public void ConvertQuondam(QuondamPoint point)
+        {
+            AddCommand(new ConvertQuondamCommand(BaseManager, point));
+        }
+
+        public void ConvertQuondams(IEnumerable<QuondamPoint> points)
+        {
+            AddCommand(new ConvertQuondamsCommand(BaseManager, points));
+        }
+
+
         public void RebuildPolygon(TtPolygon polygon, bool reindex = false)
         {
-            AddCommand(new RebuildPolygonCommand(polygon, reindex, BaseManager));
+            AddCommand(new RebuildPolygonCommand(BaseManager, polygon, reindex));
         }
 
         public void RecalculatePolygons()
         {
             AddCommand(new RecalculatePolygonsCommand(BaseManager));
         }
-
 
 
 
@@ -455,6 +499,10 @@ namespace TwoTrails.Core
             return BaseManager.GetDefaultPolygonGraphicOption();
         }
 
+        bool ITtManager.NmeaExists(string nmeaCN)
+        {
+            return BaseManager.NmeaExists(nmeaCN);
+        }
 
         List<TtNmeaBurst> ITtManager.GetNmeaBursts(string pointCN)
         {
@@ -504,10 +552,7 @@ namespace TwoTrails.Core
         }
 
 
-        void ITtManager.UpdateDataAction(DataActionType action, string notes)
-        {
-            BaseManager.UpdateDataAction(action, notes);
-        }
+        public List<TtUserAction> GetUserActions() => BaseManager.GetUserActions();
     }
 
     public enum HistoryEventType
@@ -521,13 +566,13 @@ namespace TwoTrails.Core
     public class HistoryEventArgs : EventArgs
     {
         public HistoryEventType HistoryEventType { get; }
-        public Type DataType { get; }
+        public CommandInfo CommandInfo { get; }
         public bool RequireRefresh { get; }
 
-        public HistoryEventArgs(HistoryEventType historyEventType, Type dataType, bool requireRefresh)
+        public HistoryEventArgs(HistoryEventType historyEventType, CommandInfo cmdInfo, bool requireRefresh)
         {
             HistoryEventType = historyEventType;
-            DataType = dataType;
+            CommandInfo = cmdInfo;
             RequireRefresh = requireRefresh;
         }
     }

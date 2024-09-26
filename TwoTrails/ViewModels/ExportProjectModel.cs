@@ -1,19 +1,23 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
 using TwoTrails.Utils;
 
+using WF = System.Windows.Forms;
+
 namespace TwoTrails.ViewModels
 {
-    public class ExportProjectModel : NotifyPropertyChangedEx
+    public class ExportProjectModel : BaseModel
     {
-        private TtProject Project;
-        private Window Window;
+        private readonly TtProject _Project;
+        private readonly Window _Window;
+        private readonly MainWindowModel _MainModel;
 
         public string FolderLocation { get { return Get<string>(); } set { Set(value); } }
 
@@ -39,17 +43,21 @@ namespace TwoTrails.ViewModels
         public bool ExportMediaFiles { get { return Get<bool>(); } set { Set(value, () => CheckChanged()); } }
 
 
-        public bool DataDictionaryEnabled { get { return Project.Manager.HasDataDictionary; } }
+        public bool DataDictionaryEnabled { get { return _Project.HistoryManager.HasDataDictionary; } }
 
 
-        public ExportProjectModel(Window window, TtProject project)
+        public ExportProjectModel(Window window, TtProject project, MainWindowModel mainWindowModel)
         {
-            this.Window = window;
-            this.Project = project;
+            this._Window = window;
+            this._Project = project;
+            _MainModel = mainWindowModel;
+
             FolderLocation = Path.GetDirectoryName(project.FilePath);
 
             BrowseCommand = new RelayCommand(x => BrowseFolder());
-            ExportCommand = new BindedRelayCommand<ExportProjectModel>(x => CreateFiles(), x => IsCheckAll != false, this, x => x.IsCheckAll);
+            ExportCommand = new BindedRelayCommand<ExportProjectModel>(
+                x => CreateFiles(), x => IsCheckAll != false,
+                this, m => m.IsCheckAll);
             CancelCommand = new RelayCommand(x => Cancel());
             CheckAllCommand = new RelayCommand(x => CheckAll((bool?)x));
 
@@ -61,9 +69,9 @@ namespace TwoTrails.ViewModels
 
         private void BrowseFolder()
         {
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            WF.FolderBrowserDialog dialog = new WF.FolderBrowserDialog();
 
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (dialog.ShowDialog() == WF.DialogResult.OK)
             {
                 FolderLocation = dialog.SelectedPath;
             }
@@ -73,13 +81,33 @@ namespace TwoTrails.ViewModels
         {
             if (IsCheckAll != false)
             {
+                if (!DataHelper.IsFileOnStableMedia(FolderLocation))
+                {
+                    if (MessageBox.Show($@"Export folder is not located locally and may be on a network drive. Files not located locally may have issues loading and saving. It is suggested to copy the file locally before opening. Would you like to open the file from this location anyway?",
+                        "Folder Located on Network", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) != MessageBoxResult.Yes)
+                        return;
+                }
+
                 if (Directory.Exists(FolderLocation))
                 {
-                    string path = Path.Combine(FolderLocation, Path.GetFileNameWithoutExtension(Project.DAL.FilePath)).Trim();
+                    string path = Path.Combine(FolderLocation, Path.GetFileNameWithoutExtension(_Project.DAL.FilePath)).Trim();
+
+                    int pathLen = path.Length;
+                    List<String> tlPolyNames = _Project.HistoryManager.Polygons
+                        .Where(p => (pathLen + p.Name.Length * 2 + 20) >= byte.MaxValue) //max possible length for generated path
+                        .Select(p => p.Name).ToList();
+
+                    if (tlPolyNames.Count > 0)
+                    {
+                        MessageBox.Show(
+                            $"The following Polygon names are too long to export:\n\n{String.Join(", ", tlPolyNames)}\n\nPlease rename the polygons or choose a shallower path to place the export.",
+                            "Polygon Names Too Long", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
 
                     if (Directory.Exists(path))
                     {
-                        if(System.Windows.MessageBox.Show("An export already exists, would you like to overwrite the existing file(s)?",
+                        if(MessageBox.Show("An export already exists, would you like to overwrite the existing file(s)?",
                             "Overwrite Export", MessageBoxButton.YesNo, MessageBoxImage.Hand)
                             == MessageBoxResult.No)
                         {
@@ -91,70 +119,77 @@ namespace TwoTrails.ViewModels
                     {
                         if (IsCheckAll == true)
                         {
-                            Export.All(Project.Manager, Project.MAL, Project.ProjectInfo, Project.FilePath, path);
+                            Export.All(_Project.HistoryManager, _Project.MAL, _Project.ProjectInfo, _Project.FilePath, path);
                         }
                         else
                         {
                             Export.CheckCreateFolder(path);
 
+                            string projectName = _Project.ProjectName.ScrubFileName().Trim();
+
                             if (ExportPoints)
-                                Export.Points(Project.Manager, Path.Combine(path, "Points.csv"));
+                                Export.Points(_Project.HistoryManager, Path.Combine(path, "Points"));
 
                             if (ExportDataDictionary)
-                                Export.DataDictionary(Project.Manager, Path.Combine(path, "DataDictionary.csv"));
+                                Export.DataDictionary(_Project.HistoryManager, Path.Combine(path, "DataDictionary"));
 
                             if (ExportNMEA)
-                                Export.TtNmea(Project.Manager, Path.Combine(path, "TTNmea.csv"));
+                                Export.TtNmea(_Project.HistoryManager, Path.Combine(path, "TTNmea"));
 
                             if (ExportPolygons)
-                                Export.Polygons(Project.Manager, Path.Combine(path, "Polygons.csv"));
+                                Export.Polygons(_Project.HistoryManager, Path.Combine(path, "Polygons"));
 
                             if (ExportMetadata)
-                                Export.Metadata(Project.Manager, Path.Combine(path, "Metadata.csv"));
+                                Export.Metadata(_Project.HistoryManager, Path.Combine(path, "Metadata"));
 
                             if (ExportGroups)
-                                Export.Groups(Project.Manager, Path.Combine(path, "Groups.csv"));
+                                Export.Groups(_Project.HistoryManager, Path.Combine(path, "Groups"));
 
-                            if (ExportMediaInfo && Project.MAL != null)
-                                Export.ImageInfo(Project.Manager, Path.Combine(path, "ImageInfo.csv"));
+                            if (ExportMediaInfo && _Project.MAL != null)
+                                Export.ImageInfo(_Project.HistoryManager, Path.Combine(path, "ImageInfo"));
 
-                            if (ExportMediaFiles && Project.MAL != null)
-                                Export.MediaFiles(Project.MAL, path);
+                            if (ExportMediaFiles && _Project.MAL != null)
+                                Export.MediaFiles(_Project.MAL, path);
 
                             if (ExportProject)
-                                Export.Project(Project.ProjectInfo, Path.Combine(path, "ProjectInfo.txt"));
+                                Export.Project(_Project.ProjectInfo, Path.Combine(path, "ProjectInfo"));
 
                             if (ExportSummary)
-                                Export.Summary(Project.Manager, Project.ProjectInfo, Project.FilePath, Path.Combine(path, "Summary.txt"));
+                                Export.Summary(_Project.HistoryManager, _Project.ProjectInfo, _Project.FilePath, Path.Combine(path, "Summary"));
 
                             if (ExportGPX)
-                                Export.GPX(Project.Manager, Project.ProjectInfo, Path.Combine(path, $"{Project.ProjectName.Trim()}.gpx"));
+                                Export.GPX(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, projectName));
 
                             if (ExportKMZ)
-                                Export.KMZ(Project.Manager, Project.ProjectInfo, Path.Combine(path, $"{Project.ProjectName.Trim()}.kmz"));
+                                Export.KMZ(_Project.HistoryManager, _Project.ProjectInfo, Path.Combine(path, projectName));
 
                             if (ExportShapes)
-                                Export.Shapes(Project.Manager, Project.ProjectInfo, Path.Combine(path));
+                                Export.Shapes(_Project.HistoryManager, _Project.ProjectInfo, path);
                         }
 
-                        Window.Close();
+                        _Window.Close();
 
-                        Project.MainModel.PostMessage($"Project Exported to: '{path}'");
+                        _MainModel.PostMessage($"Project Exported to: '{path}'");
+
+                        if (_Project.Settings.OpenFolderOnExport)
+                        {
+                            Process.Start(path);
+                        }
                     }
                     catch (Exception ex)
                     {
                         Trace.WriteLine($"{ ex.Message }\n\t{ ex.StackTrace }", "ExportProjectModel");
-                        System.Windows.MessageBox.Show("An error has occured. Please see log for details.");
+                        MessageBox.Show("An error has occured. Please see log for details.");
                     }
                 }
                 else
-                    System.Windows.MessageBox.Show("Invalid Folder Location"); 
+                    MessageBox.Show("Invalid Folder Location"); 
             }
         }
 
         private void Cancel()
         {
-            Window.Close();
+            _Window.Close();
         }
 
         private void CheckAll(bool? isChecked)

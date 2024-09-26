@@ -1,5 +1,5 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using static TwoTrails.DAL.TtCsvDataAccessLayer;
 
 namespace TwoTrails.ViewModels
 {
-    public class CsvImportModel : NotifyPropertyChangedEx, IFileImportModel
+    public class CsvImportModel : BaseModel, IFileImportModel
     {
         private Action<TtCsvDataAccessLayer> OnSetup { get; }
 
@@ -170,12 +170,12 @@ namespace TwoTrails.ViewModels
 
             OnSetup = onSetup;
 
-            SetupImportCommand = new BindedRelayCommand<CsvImportModel>(x => SetupImport(), x => CanImport, this, x => x.CanImport);
+            SetupImportCommand = new BindedRelayCommand<CsvImportModel>(
+                x => SetupImport(), x => CanImport, this, m => m.CanImport);
 
             Options = new ParseOptions(fileName, zone, startPolyNumber: startPolyNumber);
 
-            Fields = new List<string>();
-            Fields.Add("No Field");
+            Fields = new List<string> { "No Field" };
             Fields.AddRange(Options.Fields);
 
             SetupDefaultFields(Options);

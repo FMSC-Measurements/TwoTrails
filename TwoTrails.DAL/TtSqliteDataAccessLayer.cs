@@ -6,13 +6,11 @@ using System.Text;
 using System.Diagnostics;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
-using CSUtil.Databases;
 using System.Data.SQLite;
-using CSUtil;
 using FMSC.Core;
+using FMSC.Core.Databases;
 using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.NMEA.Sentences;
-using FMSC.GeoSpatial.Types;
 
 using TTS = TwoTrails.DAL.TwoTrailsSchema;
 
@@ -41,7 +39,7 @@ namespace TwoTrails.DAL
             this._Database = database;
         }
 
-        public static TtSqliteDataAccessLayer Create(string filePath, TtProjectInfo projectInfo)
+        public static TtSqliteDataAccessLayer Create(string filePath, TtProjectInfo projectInfo, TtMetadata defaultMetadata = null)
         {
             if (File.Exists(filePath))
                 File.Delete(filePath);
@@ -66,15 +64,16 @@ namespace TwoTrails.DAL
 
             TtSqliteDataAccessLayer dal = new TtSqliteDataAccessLayer(database);
             dal.InsertProjectInfo(projectInfo);
+            if (defaultMetadata != null)
+                dal.InsertMetadata(defaultMetadata);
 
             return dal;
         }
 
 
-        public bool RequiresUpgrade
-        {
-            get { return GetDataVersion() < TTS.SchemaVersion; }
-        }
+        public bool RequiresUpgrade => GetDataVersion() < TTS.SchemaVersion;
+
+        public bool RequiresAppUpgrade => GetDataVersion() > TTS.SchemaVersion;
 
         public bool HandlesAllPointTypes => true;
 
@@ -101,11 +100,11 @@ namespace TwoTrails.DAL
                 linked
             );
         }
-        
+
         protected IEnumerable<TtPoint> GetPoints(String where, int limit = 0, bool linked = true)
         {
             string ddQuerySelect = null, ddQueryTable = null;
-            
+
             List<DataDictionaryField> fields = GetDataDictionaryTemplate()?.ToList();
 
             if (fields != null && fields.Any())
@@ -116,7 +115,7 @@ namespace TwoTrails.DAL
                     TTS.PointSchema.TableName,
                     TTS.SharedSchema.CN);
 
-                ddQuerySelect = $", {( string.Join(", ", fields.Select(f => $"[{ f.CN }]").ToArray()) )}"; 
+                ddQuerySelect = $", {(string.Join(", ", fields.Select(f => $"[{ f.CN }]").ToArray()))}";
             }
 
             String query = String.Format(@"select {0}.{1}, {2}, {3}, {4}{5} from {0} left join {6} on {6}.{10} = {0}.{10} 
@@ -157,7 +156,7 @@ namespace TwoTrails.DAL
                         {
                             if (dr.IsDBNull(7))
                                 throw new Exception("Point has no OpType");
-                            
+
                             cn = dr.GetString(0);
                             index = dr.GetInt32(1);
                             pid = dr.GetInt32(2);
@@ -181,7 +180,7 @@ namespace TwoTrails.DAL
                             acc = dr.GetDoubleN(16) ?? Consts.DEFAULT_POINT_ACCURACY;
 
                             qlinks = dr.GetStringN(17);
-                            
+
                             if (fields != null)
                             {
                                 extendedData = new DataDictionary();
@@ -287,7 +286,7 @@ namespace TwoTrails.DAL
                     }
 
                     conn.Close();
-                } 
+                }
             }
         }
         #endregion
@@ -355,18 +354,18 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return points.Count();
         }
-        
+
 
         private void InsertBasePoint(TtPoint point, SQLiteConnection conn, SQLiteTransaction transaction)
         {
             _Database.Insert(TTS.PointSchema.TableName, GetBasePointValues(point), conn, transaction);
         }
-        
+
         private void InsertExtendedData(TtPoint point, SQLiteConnection conn, SQLiteTransaction transaction)
         {
             if (point.ExtendedData != null)
@@ -426,7 +425,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return true;
@@ -465,15 +464,15 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return points.Count();
         }
-        
 
 
-        private void UpdateBasePoint(TtPoint point, TtPoint oldPoint, SQLiteConnection conn, SQLiteTransaction transaction, string  where)
+
+        private void UpdateBasePoint(TtPoint point, TtPoint oldPoint, SQLiteConnection conn, SQLiteTransaction transaction, string where)
         {
             _Database.Update(TTS.PointSchema.TableName,
                 GetBasePointValues(point),
@@ -540,10 +539,6 @@ namespace TwoTrails.DAL
             }
         }
 
-        public bool ChangePointOp(TtPoint point, TtPoint oldPoint)
-        {
-            return UpdatePoint(point, oldPoint);
-        }
 
 
         private Dictionary<string, object> GetBasePointValues(TtPoint point)
@@ -659,7 +654,7 @@ namespace TwoTrails.DAL
                     try
                     {
                         String where = $"{TTS.SharedSchema.CN} = '{point.CN}'";
-                        if (DeleteBasePoints(where, conn, trans))
+                        if (DeleteBasePoint(where, conn, trans))
                         {
                             if (HasDataDictionary)
                                 DeleteExtendedData(where, conn, trans);
@@ -697,20 +692,15 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return false;
         }
 
-        //todo optimize
         public int DeletePoints(IEnumerable<TtPoint> points)
         {
-            StringBuilder sb = new StringBuilder();
-            int remaining = points.Count();
-            int count = 0;
-
-            String where = String.Empty;
+            int deleted = 0;
 
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
             {
@@ -720,10 +710,10 @@ namespace TwoTrails.DAL
                     {
                         foreach (TtPoint point in points)
                         {
-                            count++;
-                            where = $"{TTS.SharedSchema.CN} = '{point.CN}'";
-                            
-                            sb.Append($"{where}{(count < remaining ? " or " : String.Empty)}");
+                            String where = $"{TTS.SharedSchema.CN} = '{point.CN}'";
+
+                            if (DeleteBasePoint(where, conn, trans))
+                                deleted++;
 
                             if (HasDataDictionary)
                                 DeleteExtendedData(where, conn, trans);
@@ -745,28 +735,7 @@ namespace TwoTrails.DAL
                                     DeleteQndmPointData(where, conn, trans);
                                     break;
                             }
-
-                            if (count == 50)
-                            {
-                                where = sb.ToString();
-                                where = where.Remove(where.Length - 4);
-                                if (!DeleteBasePoints(where, conn, trans))
-                                {
-                                    trans.Rollback();
-                                    return -1;
-                                }
-
-                                sb.Clear();
-
-                                remaining -= 50;
-                                count = 0;
-                            }
                         }
-
-                        where = sb.ToString();
-
-                        if (!String.IsNullOrEmpty(where))
-                            DeleteBasePoints(where, conn, trans);
 
                         trans.Commit();
                     }
@@ -780,14 +749,14 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
-            return remaining;
-        } 
+            return deleted;
+        }
 
 
-        private bool DeleteBasePoints(String where, SQLiteConnection conn, SQLiteTransaction transaction)
+        private bool DeleteBasePoint(String where, SQLiteConnection conn, SQLiteTransaction transaction)
         {
             return _Database.Delete(TTS.PointSchema.TableName, where, conn, transaction) > 0;
         }
@@ -865,16 +834,18 @@ namespace TwoTrails.DAL
                                 dr.GetDouble(3),
                                 dr.GetDouble(7),
                                 dr.GetDouble(8),
-                                dr.GetDoubleN(9)??0);
+                                dr.GetDoubleN(9) ?? 0,
+                                dr.GetStringN(10)
+                            );
                         }
 
                         dr.Close();
                     }
 
                     conn.Close();
-                } 
+                }
             }
-        } 
+        }
         #endregion
 
 
@@ -900,7 +871,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return true;
@@ -931,7 +902,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return polygons.Count();
@@ -964,7 +935,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return true;
@@ -995,7 +966,7 @@ namespace TwoTrails.DAL
                         trans.Rollback();
                         return -1;
                     }
-                } 
+                }
             }
 
             return polygons.Count();
@@ -1015,7 +986,8 @@ namespace TwoTrails.DAL
                 [TTS.PolygonSchema.TimeCreated] = poly.TimeCreated.ToString(Consts.DATE_FORMAT),
                 [TTS.PolygonSchema.Area] = poly.Area,
                 [TTS.PolygonSchema.Perimeter] = poly.Perimeter,
-                [TTS.PolygonSchema.PerimeterLine] = poly.PerimeterLine
+                [TTS.PolygonSchema.PerimeterLine] = poly.PerimeterLine,
+                [TTS.PolygonSchema.ParentUnitCN] = poly.ParentUnitCN,
             };
         }
         #endregion
@@ -1047,7 +1019,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return true;
@@ -1072,7 +1044,7 @@ namespace TwoTrails.DAL
                         }
 
                         string where = sb.ToString();
-                        
+
                         if (!String.IsNullOrEmpty(where) &&
                             _Database.Delete(TTS.PolygonSchema.TableName,
                             where, conn, transaction) < 0)
@@ -1093,7 +1065,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return total;
@@ -1148,7 +1120,7 @@ namespace TwoTrails.DAL
                     }
 
                     conn.Close();
-                } 
+                }
             }
         }
         #endregion
@@ -1176,7 +1148,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return true;
@@ -1207,7 +1179,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return metadata.Count();
@@ -1238,7 +1210,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return true;
@@ -1269,7 +1241,7 @@ namespace TwoTrails.DAL
                         trans.Rollback();
                         return -1;
                     }
-                } 
+                }
             }
 
             return metadata.Count();
@@ -1324,7 +1296,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return true;
@@ -1357,6 +1329,8 @@ namespace TwoTrails.DAL
                             trans.Rollback();
                             return -1;
                         }
+
+                        trans.Commit();
                     }
                     catch (Exception ex)
                     {
@@ -1368,7 +1342,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return total;
@@ -1434,7 +1408,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return true;
@@ -1465,7 +1439,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return groups.Count();
@@ -1497,7 +1471,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return true;
@@ -1528,7 +1502,7 @@ namespace TwoTrails.DAL
                         trans.Rollback();
                         return -1;
                     }
-                } 
+                }
             }
 
             return groups.Count();
@@ -1573,7 +1547,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return true;
@@ -1618,7 +1592,7 @@ namespace TwoTrails.DAL
                     {
                         conn.Close();
                     }
-                } 
+                }
             }
 
             return total;
@@ -1628,12 +1602,62 @@ namespace TwoTrails.DAL
 
 
         #region TTNmea
+        public TtNmeaBurst GetNmeaBurst(String nmeaCN)
+        {
+            String query = $@"select {TTS.TtNmeaSchema.SelectItems} from {TTS.TtNmeaSchema.TableName} where {TTS.SharedSchema.CN} = '{nmeaCN}'";
+
+            TtNmeaBurst burst = null;
+
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = _Database.ExecuteReader(query, conn))
+                {
+                    if (dr != null && dr.Read())
+                    {
+                        burst = ParseNmeaBurst(dr);
+                    }
+
+                    conn.Close();
+                }
+            }
+
+            return burst;
+        }
+
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
         {
             return GetNmeaBursts(pointCN != null ? new string[] { pointCN } : null);
         }
 
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
+        {
+            const int QUERY_MAX = 100;
+
+            if (pointCNs == null || !pointCNs.HasAtLeast(QUERY_MAX))
+            {
+                return GetNmeaBurstsUnlimitedByPointCNs(pointCNs);
+            }
+            else
+            {
+                List<string> pointCNsQueue = pointCNs.ToList();
+                int index = 0;
+
+                List<TtNmeaBurst> res = new List<TtNmeaBurst>();
+
+                while (index < pointCNsQueue.Count)
+                {
+                    res.AddRange(GetNmeaBurstsUnlimitedByPointCNs(pointCNsQueue.GetRange(index, 
+                        (index + QUERY_MAX) < pointCNsQueue.Count ? QUERY_MAX : pointCNsQueue.Count - index)
+                    ));
+
+                    index += QUERY_MAX;
+                }
+
+                return res;
+            }
+        }
+
+        private IEnumerable<TtNmeaBurst> GetNmeaBurstsUnlimitedByPointCNs(IEnumerable<string> pointCNs)
         {
             String query = $@"select {TTS.TtNmeaSchema.SelectItems} from {TTS.TtNmeaSchema.TableName} 
             {(pointCNs == null ? String.Empty : $" where { String.Join(" OR ", pointCNs.Select(pcn => $"{TTS.TtNmeaSchema.PointCN} = '{pcn}'"))}")}";
@@ -1644,57 +1668,50 @@ namespace TwoTrails.DAL
                 {
                     if (dr != null)
                     {
-                        Func<string, List<int>> ParseIds = s =>
-                        {
-                            List<int> ids = new List<int>();
-                            if (s != null)
-                            {
-                                foreach (string prn in s.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries))
-                                {
-                                    ids.Add(Int32.Parse(prn));
-                                }
-                            }
-
-                            return ids;
-                        };
-
                         while (dr.Read())
                         {
-                            yield return new TtNmeaBurst(
-                                dr.GetString(0),
-                                TtCoreUtils.ParseTime(dr.GetString(3)),
-                                dr.GetString(1),
-                                dr.GetBoolean(2),
-                                new GeoPosition(
-                                    dr.GetDouble(5), (NorthSouth)dr.GetInt32(6),
-                                    dr.GetDouble(7), (EastWest)dr.GetInt32(8),
-                                    dr.GetDouble(9), (UomElevation)dr.GetInt32(10)
-                                ),
-                                TtCoreUtils.ParseTime(dr.GetString(4)),
-                                dr.GetDouble(22),
-                                dr.GetDouble(23),
-                                dr.GetDoubleN(11), (EastWest?)dr.GetInt32N(12),
-                                (Mode)dr.GetInt32(15), (Fix)dr.GetInt32(13),
-                                ParseIds(dr.GetStringN(27)),
-                                dr.GetDouble(16),
-                                dr.GetDouble(17),
-                                dr.GetDouble(18),
-                                (GpsFixType)dr.GetInt32(14),
-                                dr.GetInt32(25),
-                                dr.GetDouble(19),
-                                dr.GetDouble(20), (UomElevation)dr.GetInt32(21),
-                                dr.GetInt32(26),
-                                dr.GetStringN(28)
-                            );
+                            yield return ParseNmeaBurst(dr);
                         }
-
-                        dr.Close();
                     }
 
                     conn.Close();
                 }
             }
         }
+
+        private List<int> ParseNmeaIds(string s) =>
+                    s != null ?
+                        s.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries).Select(Int32.Parse).ToList() :
+                        new List<int>();
+
+        private TtNmeaBurst ParseNmeaBurst(SQLiteDataReader dataReader) => 
+            new TtNmeaBurst(
+                dataReader.GetString(0),
+                TtCoreUtils.ParseTime(dataReader.GetString(3)),
+                dataReader.GetString(1),
+                dataReader.GetBoolean(2),
+                new GeoPosition(
+                    dataReader.GetDouble(5), 
+                    dataReader.GetDouble(7),
+                    dataReader.GetDouble(9),
+                    (UomElevation)dataReader.GetInt32(10)
+                ),
+                TtCoreUtils.ParseTime(dataReader.GetString(4)),
+                dataReader.GetDoubleN(22),
+                dataReader.GetDoubleN(23),
+                dataReader.GetDoubleN(11), (EastWest?)dataReader.GetInt32N(12),
+                (Mode)dataReader.GetInt32(15), (Fix)dataReader.GetInt32(13),
+                ParseNmeaIds(dataReader.GetStringN(27)),
+                dataReader.GetDouble(16),
+                dataReader.GetDouble(17),
+                dataReader.GetDouble(18),
+                (GpsFixType)dataReader.GetInt32(14),
+                dataReader.GetInt32(25),
+                dataReader.GetDouble(19),
+                dataReader.GetDouble(20), (UomElevation)dataReader.GetInt32(21),
+                dataReader.GetInt32(26),
+                dataReader.GetStringN(28)
+            );
 
         public bool InsertNmeaBurst(TtNmeaBurst burst)
         {
@@ -2194,6 +2211,7 @@ namespace TwoTrails.DAL
             {
                 [TTS.ActivitySchema.UserName] = activity.UserName,
                 [TTS.ActivitySchema.DeviceName] = activity.DeviceName,
+                [TTS.ActivitySchema.AppVersion] = activity.AppVersion,
                 [TTS.ActivitySchema.ActivityDate] = activity.Date,
                 [TTS.ActivitySchema.ActivityType] = (int)activity.Action,
                 [TTS.ActivitySchema.ActivityNotes] = activity.Notes
@@ -2210,7 +2228,7 @@ namespace TwoTrails.DAL
                 {
                     if (dr != null)
                     {
-                        string username, devicename, notes;
+                        string username, devicename, appVersion, notes;
                         DateTime date;
                         DataActionType dat;
 
@@ -2218,11 +2236,12 @@ namespace TwoTrails.DAL
                         {
                             username = dr.GetString(0);
                             devicename = dr.GetString(1);
-                            date = TtCoreUtils.ParseTime(dr.GetString(2));
-                            dat = (DataActionType)dr.GetInt32(3);
-                            notes = dr.GetStringN(4);
+                            appVersion = dr.IsDBNull(2) ? "Unknown" : dr.GetString(2);
+                            date = TtCoreUtils.ParseTime(dr.GetString(3));
+                            dat = (DataActionType)dr.GetInt32(4);
+                            notes = dr.IsDBNull(5) ? String.Empty : dr.GetStringN(5);
 
-                            yield return new TtUserAction(username, devicename, date, dat, notes);
+                            yield return new TtUserAction(username, devicename, appVersion, date, dat, notes);
                         }
 
                         dr.Close();
@@ -2607,31 +2626,76 @@ namespace TwoTrails.DAL
 
 
         #region Utils
-        public void FixErrors(bool removeErrors = false)
+        public void FixErrors(bool deleteInvalid = false)
         {
-            if (removeErrors)
+            if (deleteInvalid)
             {
                 List<string> badPointCns = GetPointsWithMissingPolygons()
                     .Union(GetPointsWithMissingMetadata())
-                    .Union(GetPointsWithMissingGroups()).ToList();
+                    .Union(GetPointsWithMissingGroups())
+                    .Union(GetOrphanedQuondams()).ToList();
 
                 DeletePoints(GetPoints().Where(p => badPointCns.Contains(p.CN)));
             }
             else
             {
-                if (GetPointsWithMissingPolygons().Any())
+                List<Tuple<string, TtPoint>> missingPointsByPolygons = GetPointsWithMissingPolygons()
+                    .Select(pointCN => GetPoint(pointCN, true))
+                    .GroupBy(p => p.PolygonCN)
+                    .Select(g => Tuple.Create(g.Key, g.First())).ToList();
+
+                List<QuondamPoint> orphanedQuondams = GetOrphanedQuondams()
+                    .Select(cn => GetPoint(cn) as QuondamPoint)
+                    .ToList();
+
+                if (missingPointsByPolygons.Any())
                 {
-                    TtPolygon mPoly = GetPolygons($"{TTS.SharedSchema.CN} = {Consts.EmptyGuid}").FirstOrDefault() ??
-                        new TtPolygon(Consts.EmptyGuid, "Fix Point Poly",
-                            "Polygon that contains points that were fixed from having no polygon.",
-                            Consts.DEFAULT_POINT_START_INDEX, 10, DateTime.Now, Consts.DEFAULT_POINT_ACCURACY, 0, 0, 0);
+                    int index = 1;
 
-                    InsertPolygon(mPoly);
+                    foreach (Tuple<string, TtPoint> pointGroup in missingPointsByPolygons)
+                    {
+                        TtPoint firstPoint = pointGroup.Item2;
 
-                    _Database.Update(TTS.PointSchema.TableName,
-                        new Dictionary<string, string> { [TTS.PointSchema.PolyCN] = mPoly.CN, [TTS.PointSchema.PolyName] = mPoly.Name },
-                        $"{TTS.PointSchema.PolyCN} not in (select {TTS.SharedSchema.CN} from {TTS.PolygonSchema.TableName});");
+                        string polyName = GetItemList(TTS.PointSchema.TableName, TTS.PointSchema.PolyName, $"{TTS.SharedSchema.CN} = '{firstPoint.CN}'").FirstOrDefault();
+
+                        TtPolygon mPoly = new TtPolygon(pointGroup.Item1, String.IsNullOrEmpty(polyName) ? $"Fix Point Poly {index++}" : polyName,
+                            "Polygon that was rebuild from points which had a missing or corrupt polygon.",
+                            firstPoint.PID, 10, firstPoint.TimeCreated,
+                            (firstPoint is IManualAccuracy imanpt) ?
+                                (firstPoint is QuondamPoint qp && qp.ParentPoint.IsGpsType() ?
+                                    (imanpt.ManualAccuracy == null ?
+                                        firstPoint.Accuracy : Consts.DEFAULT_POINT_ACCURACY) :
+                                    Consts.DEFAULT_POINT_ACCURACY) :
+                                Consts.DEFAULT_POINT_ACCURACY,
+                            0, 0, 0);
+
+                        InsertPolygon(mPoly);
+                    }
                 }
+
+
+                if (orphanedQuondams.Any())
+                {
+                    foreach (QuondamPoint qpoint in orphanedQuondams)
+                    {
+                        if (qpoint.__AdjX == 0 && qpoint.__AdjY == 0)
+                        {
+                            DeletePoint(qpoint);
+                        }
+                        else
+                        {
+                            GpsPoint gpsPoint = new GpsPoint(qpoint)
+                            {
+                                Comment = String.IsNullOrWhiteSpace(qpoint.Comment) ?
+                                    "Converted from Quondam Point" :
+                                    qpoint.Comment + "Converted from Quondam Point"
+                            };
+
+                            UpdatePoint(gpsPoint, qpoint);
+                        }
+                    }
+                }
+
 
                 _Database.Update(TTS.PointSchema.TableName,
                         new Dictionary<string, string> { [TTS.PointSchema.MetadataCN] = Consts.EmptyGuid },
@@ -2639,10 +2703,29 @@ namespace TwoTrails.DAL
 
                 _Database.Update(TTS.PointSchema.TableName,
                         new Dictionary<string, string> { [TTS.PointSchema.GroupCN] = Consts.EmptyGuid, [TTS.PointSchema.GroupName] = Consts.DefaultGroupName },
-                        $"{TTS.PointSchema.PolyCN} not in (select {TTS.SharedSchema.CN} from {TTS.GroupSchema.TableName});");
+                        $"{TTS.PointSchema.GroupCN} not in (select {TTS.SharedSchema.CN} from {TTS.GroupSchema.TableName});");
             }
 
+
+            List<Tuple<TtPoint, List<string>>> pointsWithMissingChildren = GetPointsWithMissingChildren()
+                .Select(kvpl => Tuple.Create(GetPoint(kvpl.Item1), kvpl.Item2))
+                .ToList();
+
+            if (pointsWithMissingChildren.Any())
+            {
+                foreach (Tuple<TtPoint, List<string>> pointAndGoodList in pointsWithMissingChildren)
+                {
+                    TtPoint updatedPoint = pointAndGoodList.Item1.DeepCopy();
+
+                    pointAndGoodList.Item2.ForEach(lpCN => updatedPoint.AddLinkedPoint(lpCN));
+
+                    UpdatePoint(updatedPoint, pointAndGoodList.Item1);
+                }
+            }
+
+
             FixNullAdjLocs();
+
             ReindexPolygons();
         }
 
@@ -2673,6 +2756,19 @@ namespace TwoTrails.DAL
             return count;
         }
 
+        public int GetPointCount(params string[] polyCNs)
+        {
+            if (polyCNs == null || !polyCNs.Any())
+            {
+                return GetItemCount(TwoTrailsSchema.PointSchema.TableName);
+            }
+            else
+            {
+                return polyCNs.Sum(cn => GetItemCount(TwoTrailsSchema.PointSchema.TableName, $"{TwoTrailsSchema.PointSchema.PolyCN} == '{cn}'"));
+            }
+        }
+
+
         protected IEnumerable<string> GetItemList(string tableName, string field, string where = null)
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
@@ -2691,7 +2787,10 @@ namespace TwoTrails.DAL
 
         public DalError GetErrors()
         {
-            DalError errors = DalError.None;
+            DalError errors = FileIntegrityCheck();
+
+            if (errors == DalError.CriticalIssue || errors == DalError.CorruptDatabase)
+                return errors;
 
             if (GetItemCount(TTS.PointSchema.TableName, $@"{ TTS.PointSchema.AdjX } IS NULL OR { TTS.PointSchema.AdjY
                         } IS NULL OR { TTS.PointSchema.AdjZ } IS NULL OR { TTS.PointSchema.Accuracy } IS NULL") > 0)
@@ -2724,6 +2823,11 @@ namespace TwoTrails.DAL
                 errors |= DalError.OrphanedQuondams;
             }
 
+            if (GetPointsWithMissingChildren().Any())
+            {
+                errors |= DalError.MissingQuondams;
+            }
+
             return errors;
         }
 
@@ -2731,7 +2835,24 @@ namespace TwoTrails.DAL
         {
             return GetErrors() > 0;
         }
+
+
+        public DalError FileIntegrityCheck()
+        {
+            try
+            {
+                using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+                    if (_Database.ExecuteScalar("PRAGMA integrity_check;", conn) as string != "ok") return DalError.CorruptDatabase;
+            }
+            catch
+            {
+                return DalError.CriticalIssue;
+            }
+
+            return DalError.None;
+        }
         
+
         public IEnumerable<string> GetPolysInNeedOfReindex()
         {
             using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
@@ -2783,6 +2904,37 @@ namespace TwoTrails.DAL
         {
             return GetItemList(TTS.QuondamPointSchema.TableName, TTS.SharedSchema.CN,
                 $"{TTS.QuondamPointSchema.ParentPointCN} not in (select distinct {TTS.SharedSchema.CN} from {TTS.PointSchema.TableName})");
+        }
+
+        public IEnumerable<Tuple<string, List<string>, List<string>>> GetPointsWithMissingChildren()
+        {
+            Dictionary<string, string> pointsAndLinks = new Dictionary<string, string>();
+
+            using (SQLiteConnection conn = _Database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = _Database.ExecuteReader(
+                    $"SELECT {TTS.SharedSchema.CN}, {TTS.PointSchema.QuondamLinks} from {TTS.PointSchema.TableName}", conn))
+                {
+
+                    while (dr.Read())
+                    {
+                        pointsAndLinks.Add(dr.GetString(0), dr.GetStringN(1));
+                    }
+                }
+            }
+
+            return pointsAndLinks
+                .Where(kvp => !String.IsNullOrEmpty(kvp.Value))
+                .Select(kvp =>
+                {
+                    string[] allLinks = kvp.Value.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
+                    List<string> goodLinks = allLinks.Where(lcn => pointsAndLinks.ContainsKey(lcn)).ToList();
+                    List<string> badLinks = allLinks.Where(link => !goodLinks.Contains(link)).ToList();
+
+                    return Tuple.Create(kvp.Key, goodLinks, badLinks);
+                })
+                .Where(pgb => pgb.Item3.Any())
+                .ToList();
         }
 
         protected bool ReindexPolygons()

@@ -92,6 +92,9 @@ namespace TwoTrails.Core.Points
         {
             if (point is GpsPoint gps)
                 CopyGpsValues(gps);
+
+            if (point is IManualAccuracy imanacc)
+                _ManualAccuracy = imanacc.ManualAccuracy;
         }
 
         public GpsPoint(GpsPoint point) : base(point)
@@ -128,6 +131,8 @@ namespace TwoTrails.Core.Points
             _ManualAccuracy = point._ManualAccuracy;
 
             Accuracy = point.Accuracy;
+
+            _RMSEr = point._RMSEr;
         }
 
 
@@ -168,15 +173,16 @@ namespace TwoTrails.Core.Points
             SetAccuracy(Polygon.Accuracy);
         }
 
-        public override bool Equals(object obj)
-        {
-            GpsPoint point = obj as GpsPoint;
 
-            return base.Equals(point) &&
-                _Latitude == point._Latitude &&
-                _Longitude == point._Longitude &&
-                _Elevation == point._Elevation &&
-                _ManualAccuracy == point._ManualAccuracy;
+        public override bool Equals(TtPoint point)
+        {
+            GpsPoint gpsPoint = point as GpsPoint;
+
+            return base.Equals(gpsPoint) &&
+                _Latitude == gpsPoint._Latitude &&
+                _Longitude == gpsPoint._Longitude &&
+                _Elevation == gpsPoint._Elevation &&
+                _ManualAccuracy == gpsPoint._ManualAccuracy;
         }
 
         public override int GetHashCode()

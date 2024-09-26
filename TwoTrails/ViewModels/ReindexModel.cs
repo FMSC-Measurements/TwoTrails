@@ -1,5 +1,5 @@
-﻿using CSUtil;
-using CSUtil.ComponentModel;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,22 +12,25 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.ViewModels
 {
-    public class ReindexModel : NotifyPropertyChangedEx
+    public class ReindexModel : BaseModel
     {
-        private TtHistoryManager _Manager;
-        private Window _Window;
-        public ReadOnlyObservableCollection<TtPolygon> Polygons => _Manager.Polygons;
+        private TtProject _Project;
+        private TtHistoryManager _Manager => _Project.HistoryManager;
+
+        public List<TtPolygon> Polygons { get; }
         public TtPolygon SelectedPolygon { get { return Get<TtPolygon>(); } set { Set(value); } }
         public ReindexMode ReindexMode { get { return Get<ReindexMode>(); } set { Set(value); } }
 
         public ICommand ReindexCommand { get; }
 
 
-        public ReindexModel(Window window, TtHistoryManager manager)
+        public ReindexModel(TtProject project)
         {
-            _Window = window;
-            _Manager = manager;
-            ReindexCommand = new BindedRelayCommand<ReindexModel>(x => Reindex(), x => SelectedPolygon != null, this, x => new { x.SelectedPolygon, x.ReindexMode });
+            _Project = project;
+            Polygons = _Project.GetSortedPolygons();
+            ReindexCommand = new BindedRelayCommand<ReindexModel>(
+                x=> Reindex(), x=> SelectedPolygon != null,
+                this, m => new { m.SelectedPolygon, m.ReindexMode });
         }
 
 
@@ -51,8 +54,6 @@ namespace TwoTrails.ViewModels
                     {
                         _Manager.EditPointsMultiValues(points, PointProperties.INDEX, Enumerable.Range(0, points.Count));
                     }
-                    
-                    _Manager.BaseManager.UpdateDataAction(DataActionType.ReindexPoints);
 
                     MessageBox.Show($"Polygon '{SelectedPolygon.Name}' reindexed by {ReindexMode.GetDescription()}.", "Reindex Polyon", MessageBoxButton.OK);
                 }

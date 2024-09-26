@@ -5,23 +5,17 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    class RebuildPolygonCommand : ITtCommand
+    public class RebuildPolygonCommand : ITtPolygonCommand
     {
-        private TtManager pointsManager;
-
-        private List<TtPoint> Points;
-
-        private TtPolygon Polygon;
-        private bool Reindex;
+        private readonly List<TtPoint> _Points;
+        private readonly bool _Reindex;
 
 
-        public RebuildPolygonCommand(TtPolygon polygon, bool reindex, TtManager pointsManager)
+        public RebuildPolygonCommand(TtManager manager, TtPolygon polygon, bool reindex) : base(manager, polygon)
         {
-            this.pointsManager = pointsManager;
-            this.Polygon = polygon;
-            this.Reindex = reindex;
+            this._Reindex = reindex;
 
-            Points = pointsManager.GetPoints(polygon.CN).Select(pt => pt.DeepCopy()).ToList();
+            _Points = manager.GetPoints(polygon.CN).Select(pt => pt.DeepCopy()).ToList();
 
             List<string> polyCNs = new List<string>() { polygon.CN };
             List<TtPoint> addPoints = new List<TtPoint>();
@@ -32,11 +26,11 @@ namespace TwoTrails.Core.ComponentModel.History
                 {
                     foreach (String cn in point.LinkedPoints)
                     {
-                        QuondamPoint qp = pointsManager.GetPoint(cn) as QuondamPoint;
+                        QuondamPoint qp = manager.GetPoint(cn) as QuondamPoint;
 
                         if (qp.PolygonCN != point.PolygonCN && !polyCNs.Contains(qp.PolygonCN))
                         {
-                            List<TtPoint> spoints = pointsManager.GetPoints(qp.PolygonCN).DeepCopy().ToList();
+                            List<TtPoint> spoints = manager.GetPoints(qp.PolygonCN).DeepCopy().ToList();
                             addPoints.AddRange(spoints);
                             polyCNs.Add(qp.PolygonCN);
 
@@ -49,29 +43,28 @@ namespace TwoTrails.Core.ComponentModel.History
                 }
             }
 
-            foreach (TtPoint point in Points)
+            foreach (TtPoint point in _Points)
             {
                 addFromLinks(point);
             }
 
-            Points.AddRange(addPoints);
+            _Points.AddRange(addPoints);
         }
 
-        public Type DataType => PointProperties.DataType;
-
-        public bool RequireRefresh => true;
-
-        public void Redo()
+        public override void Redo()
         {
-            pointsManager.RebuildPolygon(Polygon, Reindex);
+            Manager.RebuildPolygon(Polygon, _Reindex);
         }
 
-        public void Undo()
+        public override void Undo()
         {
-            foreach (TtPoint point in Points)
+            foreach (TtPoint point in _Points)
             {
-                pointsManager.ReplacePoint(point);
+                Manager.ReplacePoint(point);
             }
         }
+
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
+        protected override string GetCommandInfoDescription() => $"Reindex unit {Polygon.Name}";
     }
 }

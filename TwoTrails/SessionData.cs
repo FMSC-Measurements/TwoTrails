@@ -1,8 +1,7 @@
-﻿using FMSC.GeoSpatial.MTDC;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
-using TwoTrails.Core;
+using TwoTrails.Utils;
 
 namespace TwoTrails
 {
@@ -14,6 +13,8 @@ namespace TwoTrails
 
         public static String MakeID { get; set; }
         public static String ModelID { get; set; }
+
+        public static DateTime? LastWebCheck { get; private set; }
         
 
         public static GpsReportStatus HasGpsAccReport()
@@ -24,13 +25,7 @@ namespace TwoTrails
                 {
                     if (File.GetCreationTime(GpsAccuracyReportFile) < DateTime.Now.Subtract(TimeSpan.FromDays(1)))
                     {
-                        if (!DownloadGpsAccuracyReportFile())
-                        {
-                            if (LoadGpsAccuracyReportFromFile())
-                                return GpsReportStatus.HasOldReport;
-                            else
-                                return GpsReportStatus.CantGetReport;
-                        }
+                        return CheckFromWeb();
                     }
                     else
                     {
@@ -40,12 +35,35 @@ namespace TwoTrails
                 }
                 else
                 {
-                    if (!DownloadGpsAccuracyReportFile())
-                        return GpsReportStatus.CantGetReport;
+                    return CheckFromWeb();
                 } 
             }
 
             return GpsReportStatus.HasReport;
+        }
+
+        private static GpsReportStatus CheckFromWeb()
+        {
+            if (LastWebCheck == null || LastWebCheck < DateTime.Now.Subtract(TimeSpan.FromMinutes(15)))
+            {
+                if (!DownloadGpsAccuracyReportFile())
+                {
+                    LastWebCheck = DateTime.Now;
+
+                    if (LoadGpsAccuracyReportFromFile())
+                        return GpsReportStatus.HasOldReport;
+                    else
+                        return GpsReportStatus.CantGetReport;
+                }
+                else
+                {
+                    return GpsReportStatus.HasReport;
+                }
+            }
+            else
+            {
+                return GpsReportStatus.CantGetReport;
+            }
         }
 
         private static bool LoadGpsAccuracyReportFromFile()
@@ -71,12 +89,10 @@ namespace TwoTrails
             }
             catch (Exception e)
             {
-                Trace.WriteLine(e.Message, "SessionData:HasReport");
+                Trace.WriteLine(e.Message, "SessionData:DownloadGpsAccuracyReportFile");
                 return false;
             }
         }
-
-        public static TtPolygon TargetPolygon { get; set; }
     }
 
     public enum GpsReportStatus

@@ -5,21 +5,19 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class AddTtPointsCommand : ITtPointsCommand
     {
-        private ITtManager pointsManager;
-
-        public AddTtPointsCommand(IEnumerable<TtPoint> points, ITtManager pointsManager) : base(points)
-        {
-            this.pointsManager = pointsManager;
-        }
+        public AddTtPointsCommand(TtManager manager, IEnumerable<TtPoint> points) : base(manager, points) { }
 
         public override void Redo()
         {
-            pointsManager.AddPoints(Points);
+            Manager.AddPoints(Points);
         }
 
         public override void Undo()
         {
-            pointsManager.DeletePoints(Points);
+            Manager.DeletePoints(Points);
         }
+
+        protected override DataActionType GetActionType() => DataActionType.InsertedPoints;
+        protected override string GetCommandInfoDescription() => $"Add {Points.Count} points";
     }
 }

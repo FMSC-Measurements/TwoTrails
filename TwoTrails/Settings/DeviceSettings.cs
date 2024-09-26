@@ -1,21 +1,21 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.Core.ComponentModel;
 using System;
 using TwoTrails.Core;
 
-namespace TwoTrails
+namespace TwoTrails.Settings
 {
-    public class DeviceSettings : NotifyPropertyChangedEx, IDeviceSettings
+    public class DeviceSettings : BaseModel, IDeviceSettings
     {
-        private const String DELETE_EXISTING_PLOTS = "DeleteExistingPlots";
-        private const String SPLIT_INTO_INDIVIDUAL_POLYS = "SplitIntoIndividualPolys";
-        private const String LOG_DECK_VOLUME = "LogDeckVolume";
-        private const String LOG_DECK_DISTANCE = "LogDeckDistance";
-        private const String LOG_DECK_LENGTH = "LogDeckLength";
-        private const String LOG_DECK_COLLAR_WIDTH = "LogDeckCollarWidth";
-        private const String LOG_DECK_DEFECT = "LogDeckDefect";
-        private const String LOG_DECK_VOID = "LogDeckVoid";
-        private const String DELETE_POINT_WARNING = "DeletePointWarning";
+        private const string DELETE_EXISTING_PLOTS = "DeleteExistingPlots";
+        private const string SPLIT_INTO_INDIVIDUAL_POLYS = "SplitIntoIndividualPolys";
+        private const string LOG_DECK_VOLUME = "LogDeckVolume";
+        private const string LOG_DECK_DISTANCE = "LogDeckDistance";
+        private const string LOG_DECK_LENGTH = "LogDeckLength";
+        private const string LOG_DECK_COLLAR_WIDTH = "LogDeckCollarWidth";
+        private const string LOG_DECK_DEFECT = "LogDeckDefect";
+        private const string LOG_DECK_VOID = "LogDeckVoid";
+        private const string DELETE_POINT_WARNING = "DeletePointWarning";
 
         private bool _DeleteExistingPlots;
         public bool DeleteExistingPlots
@@ -91,7 +91,7 @@ namespace TwoTrails
             set
             {
                 SetField(ref _LogDeckCollarWidth, value);
-                Properties.Settings.Default[LOG_DECK_COLLAR_WIDTH] = (double)value;
+                Properties.Settings.Default[LOG_DECK_COLLAR_WIDTH] = value;
                 Properties.Settings.Default.Save();
             }
         }
@@ -105,7 +105,7 @@ namespace TwoTrails
             set
             {
                 SetField(ref _LogDeckLength, value);
-                Properties.Settings.Default[LOG_DECK_LENGTH] = (double)value;
+                Properties.Settings.Default[LOG_DECK_LENGTH] = value;
                 Properties.Settings.Default.Save();
             }
         }
@@ -118,7 +118,7 @@ namespace TwoTrails
             set
             {
                 SetField(ref _LogDeckDefect, value);
-                Properties.Settings.Default[LOG_DECK_DEFECT] = (double)value;
+                Properties.Settings.Default[LOG_DECK_DEFECT] = value;
                 Properties.Settings.Default.Save();
             }
         }
@@ -132,10 +132,12 @@ namespace TwoTrails
             set
             {
                 SetField(ref _LogDeckVoid, value);
-                Properties.Settings.Default[LOG_DECK_VOID] = (double)value;
+                Properties.Settings.Default[LOG_DECK_VOID] = value;
                 Properties.Settings.Default.Save();
             }
         }
+
+
 
         public DeviceSettings()
         {
@@ -150,7 +152,6 @@ namespace TwoTrails
 
             _LogDeckDistance = (Distance)Properties.Settings.Default[LOG_DECK_DISTANCE];
             _LogDeckVolume = (Volume)Properties.Settings.Default[LOG_DECK_VOLUME];
-
         }
     }
 }

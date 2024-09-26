@@ -27,6 +27,7 @@ packages/
 *.res
 *.csproj.user
 
-TwoTrails/ApiKeys.cs
+*/ApiKeys.cs
+*/Consts-Secure.cs
 Installer/*
 DvlErrLog.txt

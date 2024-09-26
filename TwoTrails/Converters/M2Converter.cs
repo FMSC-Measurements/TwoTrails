@@ -18,8 +18,8 @@ namespace TwoTrails.Converters
 
                     switch (def)
                     {
-                        case AreaDef.Acres: return (val * 0.00024711);
-                        case AreaDef.HectaAcres: return (val * 0.0001);
+                        case AreaDef.Acres: return val * FMSC.Core.Convert.SquareMeterToAcre_Coeff;
+                        case AreaDef.HectaAcres: return val * FMSC.Core.Convert.SquareMeterToHectare_Coeff;
                     }
                 }
                 catch

@@ -1,5 +1,5 @@
 ﻿using FMSC.Core.Xml.KML;
-using FMSC.GeoSpatial.Types;
+using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
@@ -36,7 +36,7 @@ namespace TwoTrails.DAL
         public TtKmlDataAccessLayer(ParseOptions options)
         {
             _Options = options;
-            _KDoc = KmlDocument.Load(_Options.FilePath);
+            _KDoc = KmlDocument.LoadFile(_Options.FilePath);
             polyCount = options.StartPolygonNumber;
         }
 
@@ -205,6 +205,18 @@ namespace TwoTrails.DAL
                 .OrderBy(p => p.Index).DeepCopy();
         }
 
+        public int GetPointCount(params string[] polyCNs)
+        {
+            if (polyCNs == null || !polyCNs.Any())
+            {
+                return _Points.Count;
+            }
+            else
+            {
+                return _Points.Values.Count(p => polyCNs.Contains(p.PolygonCN));
+            }
+        }
+
 
         public bool HasPolygons()
         {
@@ -228,6 +240,11 @@ namespace TwoTrails.DAL
         public IEnumerable<TtGroup> GetGroups()
         {
             return new List<TtGroup>();
+        }
+
+        public TtNmeaBurst GetNmeaBurst(string nmeaCN)
+        {
+            throw new NotImplementedException(nameof(GetNmeaBurst));
         }
 
         public IEnumerable<TtNmeaBurst> GetNmeaBursts(String pointCN = null)

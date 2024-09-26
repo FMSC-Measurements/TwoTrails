@@ -1,20 +1,26 @@
 ﻿using FMSC.Core.Windows.Controls;
+using System;
+using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.Controls
 {
-    //TODO dispaly project version and other info in project tab
-
     /// <summary>
     /// Interaction logic for ProjectEditorControl.xaml
     /// </summary>
     public partial class ProjectEditorControl : UserControl
     {
+        private ProjectEditorModel _ProjectEditor;
+
         public ProjectEditorControl(ProjectEditorModel projectEditor, ProjectTabSection tab = ProjectTabSection.Project)
         {
-            this.DataContext = projectEditor;
+            _ProjectEditor = projectEditor;
+            this.DataContext = _ProjectEditor;
+
+            this.Loaded += ProjectEditorControl_Loaded;
 
             InitializeComponent();
 
@@ -25,12 +31,51 @@ namespace TwoTrails.Controls
                 lbPolys.SelectedIndex = 0;
 
             SwitchToTab(tab);
+
+            tabControl.SelectionChanged += TabControl_SelectionChanged;
         }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0 && e.AddedItems[0] is TabItem ti)
+            {
+                if (ti.Name == "tiActivity")
+                {
+                    object res = ti.FindName("uac");
+
+                    if (res is ContentControl cc)
+                    {
+                        if (cc.Content is UserActivityControl uac)
+                        {
+                            uac.RefreshCommand.Execute(null);
+                        }
+                    }
+                }
+                
+                if (ti.Name == "tiPolygons" && _ProjectEditor.SortPolysOnChange)
+                {
+                    _ProjectEditor.SortPolygons();
+                }
+            }
+        }
+
+        private void ProjectEditorControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            this.Loaded -= ProjectEditorControl_Loaded;
+
+            if (_ProjectEditor.MapControl != null)
+                MapContainer.Children.Add(_ProjectEditor.MapControl);
+
+            lbMetadata.Items.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+            lbGroups.Items.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+        }
+
 
         public void SwitchToTab(ProjectTabSection tab)
         {
             tabControl.SelectedIndex = (int)tab;
         }
+
 
         private void TextIsUnsignedInteger(object sender, TextCompositionEventArgs e)
         {
@@ -46,6 +91,7 @@ namespace TwoTrails.Controls
         {
             e.Handled = ControlUtils.TextHasRestrictedCharacters(sender, e);
         }
+
 
         private void CommandInterceptor(object sender, KeyEventArgs e)
         {
@@ -92,6 +138,8 @@ namespace TwoTrails.Controls
         Metadata = 3,
         Groups = 4,
         Media = 5,
-        Map = 6
+        DataDictionary = 6,
+        Map = 7,
+        Actions = 8
     }
 }

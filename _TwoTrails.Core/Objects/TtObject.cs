@@ -1,9 +1,9 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using System;
 
 namespace TwoTrails.Core
 {
-    public class TtObject : NotifyPropertyChangedEx
+    public class TtObject : BaseModel
     {
         private String _CN;
         public String CN
@@ -26,16 +26,12 @@ namespace TwoTrails.Core
         {
             TtObject tto = obj as TtObject;
 
-            if (tto == null)
-                return false;
-
-            return CN == tto.CN;
+            return tto != null && CN == tto.CN;
         }
 
         public override int GetHashCode()
         {
             return CN.GetHashCode();
         }
-
     }
 }

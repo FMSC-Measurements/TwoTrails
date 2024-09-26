@@ -5,35 +5,32 @@ using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    class RecalculatePolygonsCommand : ITtCommand
+    public class RecalculatePolygonsCommand : ITtBaseCommand
     {
-        private TtManager pointsManager;
+        private readonly List<TtPoint> _Points;
 
-        private List<TtPoint> Points;
-
-
-        public RecalculatePolygonsCommand(TtManager pointsManager)
+        public RecalculatePolygonsCommand(TtManager manager) : base(manager)
         {
-            this.pointsManager = pointsManager;
-
-            Points = pointsManager.Points.Select(pt => pt.DeepCopy()).ToList();
+            _Points = manager.Points.Select(pt => pt.DeepCopy()).ToList();
         }
 
-        public Type DataType => PointProperties.DataType;
 
-        public bool RequireRefresh => true;
-
-        public void Redo()
+        public override void Redo()
         {
-            pointsManager.RecalculatePolygons();
+            Manager.RecalculatePolygons();
         }
 
-        public void Undo()
+        public override void Undo()
         {
-            foreach (TtPoint point in Points)
+            foreach (TtPoint point in _Points)
             {
-                pointsManager.ReplacePoint(point);
+                Manager.ReplacePoint(point);
             }
         }
+
+
+        protected override int GetAffectedItemCount() => _Points.Count;
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
+        protected override string GetCommandInfoDescription() => "Recalculate all polygons";
     }
 }

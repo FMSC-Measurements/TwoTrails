@@ -1,8 +1,7 @@
-﻿using CSUtil.Databases;
-using FMSC.Core;
+﻿using FMSC.Core;
+using FMSC.Core.Databases;
 using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.NMEA.Sentences;
-using FMSC.GeoSpatial.Types;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -112,7 +111,7 @@ namespace TwoTrails.DAL
                             if (!reader.IsDBNull(3))
                                 md.Crew = reader.GetString(3);
                             if (!reader.IsDBNull(4))
-                                md.Datum = Types.ParseDatum(reader.GetString(4));
+                                md.Datum = GeoSpatialTypes.ParseDatum(reader.GetString(4));
                             if (!reader.IsDBNull(5))
                                 md.DecType = Types.ParseDeclinationType(reader.GetString(5));
                             md.Name = reader.GetString(6);
@@ -159,30 +158,21 @@ namespace TwoTrails.DAL
                 {
                     if (reader != null)
                     {
-                        TtPolygon poly;
                         int milliSeconds = 0;
 
                         while (reader.Read())
                         {
-                            poly = new TtPolygon();
-                            poly.CN = reader.GetString(0);
-                            poly.Name = reader.GetString(1);
-                            if (!reader.IsDBNull(2))
-                                poly.Description = reader.GetString(2);
-                            if (!reader.IsDBNull(3))
-                                poly.Accuracy = reader.GetDouble(3);
-                            if (!reader.IsDBNull(4))
-                                poly.Area = reader.GetDouble(4);
-                            if (!reader.IsDBNull(5))
-                                poly.Perimeter = reader.GetDouble(5);
-                            if (!reader.IsDBNull(6))
-                                poly.Increment = reader.GetInt32(6);
-                            if (!reader.IsDBNull(7))
-                                poly.PointStartIndex = reader.GetInt32(7);
-
-                            poly.TimeCreated = DateTime.Now.AddMilliseconds(milliSeconds++);
-
-                            yield return poly;
+                            yield return new TtPolygon(
+                                reader.GetString(0),
+                                reader.GetString(1),
+                                !reader.IsDBNull(2) ? reader.GetString(2) : null,
+                                !reader.IsDBNull(7) ? reader.GetInt32(7) : 0,
+                                !reader.IsDBNull(6) ? reader.GetInt32(6) : 10,
+                                DateTime.Now.AddMilliseconds(milliSeconds++),
+                                !reader.IsDBNull(3) ? reader.GetDouble(3) : Consts.DEFAULT_POINT_ACCURACY,
+                                !reader.IsDBNull(4) ? reader.GetDouble(4) : 0,
+                                !reader.IsDBNull(5) ? reader.GetDouble(5) : 0,
+                                0);
                         }
 
                         reader.Close();
@@ -239,6 +229,8 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                 {
                     if (dr != null)
                     {
+                        Dictionary<String, TtPoint> cachedPoints = new Dictionary<string, TtPoint>();
+
                         TtPoint point = null;
                         OpType op;
 
@@ -255,6 +247,13 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                                 throw new Exception("Point has no OpType");
 
                             cn = dr.GetString(0);
+
+                            if (cachedPoints.ContainsKey(cn))
+                            {
+                                yield return cachedPoints[cn];
+                                continue;
+                            }
+
                             index = dr.GetInt32(1);
                             pid = dr.GetInt32(2);
                             polycn = dr.GetString(3);
@@ -345,10 +344,32 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                                 if (linkPoints)
                                 {
                                     QuondamPoint qp = point as QuondamPoint;
-                                    qp.ParentPoint = GetTtPoints($"{TTV2S.PointSchema.TableName}.{TTV2S.SharedSchema.CN} = '{qp.ParentPointCN}'", false).FirstOrDefault();
+
+                                    if (!cachedPoints.ContainsKey(qp.ParentPointCN))
+                                    {
+                                        TtPoint pp = GetTtPoints($"{TTV2S.PointSchema.TableName}.{TTV2S.SharedSchema.CN} = '{qp.ParentPointCN}'", false).FirstOrDefault();
+                                        
+                                        while (pp != null && pp.OpType == OpType.Quondam)
+                                        {
+                                            pp = GetTtPoints($"{TTV2S.PointSchema.TableName}.{TTV2S.SharedSchema.CN} = '{((QuondamPoint)pp).ParentPoint}'", false).FirstOrDefault();
+                                        }
+
+                                        if (pp != null)
+                                        {
+                                            cachedPoints.Add(pp.CN, pp);
+                                        }
+                                        else
+                                        {
+                                            cachedPoints.Add(qp.ParentPointCN, new GpsPoint(point));
+                                        }
+                                    }
+
+                                    qp.ParentPoint = cachedPoints[qp.ParentPointCN];
                                 }
                             }
-                            
+
+                            if (point.OpType != OpType.Quondam)
+                                cachedPoints.Add(cn, point);
                             yield return point;
                         }
 
@@ -401,12 +422,63 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
         }
 
 
-        public IEnumerable<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
+        public TtNmeaBurst GetNmeaBurst(string nmeaCN)
         {
-            return GetNmeaBursts(new string[] { pointCN });
+            CheckVersion();
+
+            String query = $@"select {TTV2S.TtNmeaSchema.SelectItems} from {TTV2S.TtNmeaSchema.TableName}  where {TTV2S.SharedSchema.CN} = '{nmeaCN}'";
+
+            TtNmeaBurst burst = null;
+            using (SQLiteConnection conn = database.CreateAndOpenConnection())
+            {
+                using (SQLiteDataReader dr = database.ExecuteReader(query, conn))
+                {
+                    if (dr != null && dr.Read())
+                    {
+                        burst = ParseNmeaBurst(dr);
+                    }
+
+                    conn.Close();
+                }
+            }
+
+            return burst;
         }
 
-        public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<String> pointCNs)
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(string pointCN = null)
+        {
+            return GetNmeaBursts(pointCN != null ? new string[] { pointCN } : null);
+        }
+
+        public IEnumerable<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs)
+        {
+            const int QUERY_MAX = 100;
+
+            if (pointCNs == null || !pointCNs.HasAtLeast(QUERY_MAX))
+            {
+                return GetNmeaBurstsUnlimitedByPointCNs(pointCNs);
+            }
+            else
+            {
+                List<string> pointCNsQueue = pointCNs.ToList();
+                int index = 0;
+
+                List<TtNmeaBurst> res = new List<TtNmeaBurst>();
+
+                while (index < pointCNsQueue.Count)
+                {
+                    res.AddRange(GetNmeaBurstsUnlimitedByPointCNs(pointCNsQueue.GetRange(index,
+                        (index + QUERY_MAX) < pointCNsQueue.Count ? QUERY_MAX : pointCNsQueue.Count - index)
+                    ));
+
+                    index += QUERY_MAX;
+                }
+
+                return res;
+            }
+        }
+
+        private IEnumerable<TtNmeaBurst> GetNmeaBurstsUnlimitedByPointCNs(IEnumerable<string> pointCNs)
         {
             CheckVersion();
 
@@ -419,61 +491,58 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
                 {
                     if (dr != null)
                     {
-                        Func<string, List<int>> ParseIds = s =>
-                        {
-                            List<int> ids = new List<int>();
-                            if (s != null)
-                            {
-                                foreach (string prn in s.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries))
-                                {
-                                    ids.Add(Int32.Parse(prn));
-                                }
-                            }
-
-                            return ids;
-                        };
-
                         while (dr.Read())
                         {
-                            DateTime time = TtCoreUtils.ParseTime(dr.GetString(3));
-                            
-                            yield return new TtNmeaBurst(
-                                dr.GetString(0),
-                                time,
-                                dr.GetString(1),
-                                dr.GetBoolean(2),
-                                new GeoPosition(
-                                    dr.GetDouble(4), NorthSouthExtentions.Parse(dr.GetString(5)),
-                                    dr.GetDouble(6), EastWestExtentions.Parse(dr.GetString(7)),
-                                    dr.GetDouble(8), UomElevationExtensions.Parse(dr.GetString(9))
-                                ),
-                                time,
-                                dr.GetDouble(21),
-                                dr.GetDouble(22),
-                                dr.GetDouble(10),
-                                EastWestExtentions.Parse(dr.GetString(11)),
-                                (Mode)(dr.GetInt32N(12) ?? 0),
-                                (Fix)(dr.GetInt32(14) - 1),     //converts from real value
-                                ParseIds(dr.GetString(25)),
-                                dr.GetDouble(15),
-                                dr.GetDouble(16),
-                                dr.GetDouble(17),
-                                (GpsFixType)(dr.GetInt32(13)),  //original file type had wrong field name
-                                0,
-                                dr.GetDouble(19),
-                                dr.GetDouble(18),
-                                UomElevationExtensions.Parse(dr.GetString(20)),
-                                dr.GetInt32(24),
-                                String.Empty
-                            );
+                            yield return ParseNmeaBurst(dr);
                         }
-
-                        dr.Close();
                     }
 
                     conn.Close();
                 }
             }
+        }
+
+        private List<int> ParseNmeaIds(string s) =>
+            s != null ?
+                s.Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries).Select(Int32.Parse).ToList() :
+                new List<int>();
+
+        private TtNmeaBurst ParseNmeaBurst(SQLiteDataReader dataReader)
+        {
+            DateTime time = TtCoreUtils.ParseTime(dataReader.GetString(3));
+
+            Func<int?, Fix> parseFix = (val) => val == null ? Fix.NoFix : (Fix)(val + 1);
+
+            return new TtNmeaBurst(
+                dataReader.GetString(0),
+                time,
+                dataReader.GetString(1),
+                dataReader.GetBoolean(2),
+                new GeoPosition(
+                    dataReader.GetDouble(4),
+                    dataReader.GetDouble(6),
+                    dataReader.GetDouble(8),
+                    UomElevationExtensions.Parse(dataReader.GetString(9))
+                ),
+                time,
+                dataReader.GetDouble(21),
+                dataReader.GetDouble(22),
+                dataReader.GetDouble(10),
+                EastWestEx.Parse(dataReader.GetString(11)),
+                (Mode)(dataReader.GetInt32N(12) ?? 0),
+                parseFix(dataReader.GetInt32(14) - 1),     //converts from real value
+                ParseNmeaIds(dataReader.GetString(25)),
+                dataReader.GetDouble(15),
+                dataReader.GetDouble(16),
+                dataReader.GetDouble(17),
+                (GpsFixType)(dataReader.GetInt32(13)),  //original file type had wrong field name
+                0,
+                dataReader.GetDouble(19),
+                dataReader.GetDouble(18),
+                UomElevationExtensions.Parse(dataReader.GetString(20)),
+                dataReader.GetInt32(24),
+                String.Empty
+            );
         }
 
 
@@ -558,7 +627,6 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
             return new List<DataDictionary>();
         }
 
-        
 
         protected int GetItemCount(String tableName, string where = null)
         {
@@ -585,6 +653,18 @@ left join {6} on {6}.{8} = {0}.{8} left join {7} on {7}.{8} = {0}.{8}{9} order b
             }
 
             return count;
+        }
+
+        public int GetPointCount(params string[] polyCNs)
+        {
+            if (polyCNs == null || !polyCNs.Any())
+            {
+                return GetItemCount(TwoTrailsV2Schema.PointSchema.TableName);
+            }
+            else
+            {
+                return polyCNs.Sum(cn => GetItemCount(TwoTrailsV2Schema.PointSchema.TableName, $"{TwoTrailsV2Schema.PointSchema.PolyCN} == '{cn}'"));
+            }
         }
 
         protected IEnumerable<string> GetItemList(string tableName, string field, string where = null)

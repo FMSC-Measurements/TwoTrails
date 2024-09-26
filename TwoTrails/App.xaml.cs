@@ -9,6 +9,7 @@ using System.Security.Permissions;
 using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.DAL;
+using TwoTrails.Settings;
 using TwoTrails.Utils;
 
 namespace TwoTrails
@@ -68,7 +69,7 @@ namespace TwoTrails
                         if (status.CheckStatus == true &&
                             MessageBox.Show($@"A new version of TwoTrails is ready for download.{
                                 (status.UpdateType.HasFlag(UpdateType.CriticalBugFixes) ? " There are CRITICAL updates implemented that should be installed. " : String.Empty)
-                            }Would you like to download it now?", "TwoTrails Update",
+                            } Would you like to download it now?", "TwoTrails Update",
                                 MessageBoxButton.YesNo, MessageBoxImage.Information, MessageBoxResult.Yes) == MessageBoxResult.Yes)
                         {
                             Process.Start(Consts.URL_TWOTRAILS);
@@ -96,7 +97,7 @@ namespace TwoTrails
 
             _Listener = new TtTextWriterTraceListener(LOG_FILE_PATH);
 
-            _Listener.WriteLine($"TwoTrails Started ({Assembly.GetExecutingAssembly().GetName().Version}|{TwoTrailsSchema.SchemaVersion}D)");
+            _Listener.WriteLine($"TwoTrails Started ({Assembly.GetExecutingAssembly().GetName().Version.GetVersionWithBuildType()}|{TwoTrailsSchema.SchemaVersion}D)");
 
 #if DEBUG
             Debug.Listeners.Add(_Listener);
@@ -110,6 +111,8 @@ namespace TwoTrails
                 
                 _Listener.WriteLine($"{ex.Message}\n\t{ex.StackTrace}", "[UnhandledException]");
                 _Listener.Flush();
+
+                MessageBox.Show("An Unexpected Error has Occured. Please See log file for details.");
             };
         }
 

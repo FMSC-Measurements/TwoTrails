@@ -1,28 +1,36 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <ProjectGuid>{38E886B8-3FCA-4A41-A465-8FD5746E47EF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>TwoTrails</AssemblyTitle>
     <Company>Fortest Management Service Center</Company>
     <Product>TwoTrails</Product>
-    <Copyright>Copyright © USDA Forest Service 2020</Copyright>
-    <FileVersion>1.0.0.0</FileVersion>
+    <Copyright>Copyright © USDA Forest Service 2024</Copyright>
+    <FileVersion></FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
     <StartupObject />
-    <Win32Resource>App.res</Win32Resource>
-    <AssemblyVersion>1.1.11.0</AssemblyVersion>
-    <PackageProjectUrl>https://www.fs.fed.us/forestmanagement/products/measurement/area-determination/twotrails/</PackageProjectUrl>
+    <Win32Resource></Win32Resource>
+    <PackageProjectUrl>https://www.fs.usda.gov/forestmanagement/products/measurement/area-determination/twotrails/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FMSC-Measurements/TwoTrails</RepositoryUrl>
     <Description>TwoTrails is a timber cruising and timber sales admin surveying package. It is maintained and developed by the Forest Management Service Center. Though it is specifically written for USDA forestry personnel, it is freely available to anyone.</Description>
-    <Version>1.1.11</Version>
+    <Version>1.3.5</Version>
     <Authors>Fortest Management Service Center</Authors>
     <Platforms>AnyCPU</Platforms>
+    <Configurations>Debug;Release;Preview</Configurations>
+    <ApplicationIcon>Resources\TwoTrailsIcon.ico</ApplicationIcon>
+    <NoWin32Manifest>true</NoWin32Manifest>
+	  <UseWindowsForms>true</UseWindowsForms>
+	  <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+	  <AssemblyVersion>1.3.5</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Preview|AnyCPU'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
@@ -32,25 +40,22 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="GeoAPI" Version="1.7.5" />
     <PackageReference Include="GeoAPI.CoordinateSystems" Version="1.7.5" />
     <PackageReference Include="GeoAPI.Core" Version="1.7.5" />
-    <PackageReference Include="Microsoft.Toolkit.Wpf.UI.Controls" Version="6.0.0" />
-    <PackageReference Include="NetTopologySuite" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Maps.MapControl.WPF" Version="1.0.0.3" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
+    <PackageReference Include="NetTopologySuite" Version="2.5.0" />
     <PackageReference Include="NetTopologySuite.CoordinateSystems" Version="1.15.3" />
     <PackageReference Include="NetTopologySuite.Core" Version="1.15.3" />
-    <PackageReference Include="NetTopologySuite.Features" Version="2.0.0" />
-    <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.0.0" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.112" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.6.0" />
-    <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
+    <PackageReference Include="NetTopologySuite.Features" Version="2.1.0" />
+    <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.1.0" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CSUtilSlim, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5d20ef7f7003f986, processorArchitecture=MSIL">
-      <HintPath>..\..\libs\CSUtilSlim.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="FMSC.Core">
       <HintPath>..\..\libs\FMSC.Core.dll</HintPath>
     </Reference>
@@ -62,7 +67,7 @@
     </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Web" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Net.Http" />
@@ -78,14 +83,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </Page>
+    <Compile Remove="Tabs\MapTab.cs" />
+    <Compile Remove="Tabs\UserActivityTab.cs" />
+    <None Remove="AnalyzeProjectWindow.xaml" />
     <None Remove="Dialogs\HistoryDialog.xaml" />
+    <None Remove="Dialogs\PointMinimizationDialog.xaml" />
     <None Remove="Dialogs\ReindexDialog.xaml" />
     <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />
 
     <!-- Resources -->
     <EmbeddedResource Update="Properties\Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
-    <Compile Update="Controls\TtMapControl.xaml.cs">
-      <DependentUpon>TtMapControl.xaml</DependentUpon>
+    <Compile Update="Controls\UserActivityControl.xaml.cs">
+      <DependentUpon>UserActivityControl.xaml</DependentUpon>
     </Compile>
     <Compile Update="Dialogs\HistoryDialog.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
@@ -93,12 +102,16 @@
     <Compile Update="Dialogs\ReindexDialog.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
+    <Compile Update="Dialogs\PointMinimizationDialog.xaml.cs">
+      <DependentUpon>PointMinimizationDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Resources.Designer.cs" AutoGen="True" DependentUpon="Resources.resx" DesignTime="True" />
 
     <!-- Settings -->
     <None Update="Properties\Settings.settings" Generator="SettingsSingleFileGenerator" LastGenOutput="Settings.Designer.cs" />
     <Compile Update="Properties\Settings.Designer.cs" AutoGen="True" DependentUpon="Settings.settings">
       <DesignTime>True</DesignTime>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +135,8 @@
     <Resource Include="Resources\ic_ttpoint_way_black.png" />
     <Resource Include="Resources\ic_ttpoint_way_white.png" />
     <None Include="Resources\TwoTrailsIcon.ico" />
+    <None Include="Tabs\MapTab.cs" />
+    <None Include="Tabs\UserActivityTab.cs" />
     <Resource Include="Resources\TwoTrailsIcon.png" />
     <None Include="Resources\Icon_TTMPX.ico" />
     <None Include="Resources\Icon_TTX.ico" />
@@ -137,11 +152,7 @@
     <ProjectReference Include="..\TwoTrails.Core.Windows\TwoTrails.Core.Windows.csproj" />
     <ProjectReference Include="..\TwoTrails.DAL\TwoTrails.DAL.csproj" />
   </ItemGroup>
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86\rc.exe&quot; /v &quot;$(ProjectDir)App.rc&quot;" />
-  </Target>
-  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="del &quot;$(TargetDir)SQLite.Interop.dll&quot;" />
+    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;$(SolutionDir)Installer\InsertIcons.exe $(TargetPath) $(ProjectDir)Resources\Icon_TTX.ico;$(ProjectDir)Resources\Icon_TTMPX.ico&#xD;&#xA;)" />
   </Target>
 </Project>

@@ -2,12 +2,7 @@
 {
     public class AddTtPolygonCommand : ITtPolygonCommand
     {
-        private ITtManager Manager;
-
-        public AddTtPolygonCommand(TtPolygon polygon, ITtManager manager) : base(polygon)
-        {
-            this.Manager = manager;
-        }
+        public AddTtPolygonCommand(TtManager manager, TtPolygon polygon) : base(manager, polygon) { }
 
         public override void Redo()
         {
@@ -18,5 +13,8 @@
         {
             Manager.DeletePolygon(Polygon);
         }
+
+        protected override DataActionType GetActionType() => DataActionType.InsertedPolygons;
+        protected override string GetCommandInfoDescription() => $"Add Polygon {Polygon.Name}";
     }
 }

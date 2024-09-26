@@ -1,7 +1,7 @@
-﻿using FMSC.GeoSpatial.MTDC;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using TwoTrails.Utils;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.Dialogs
@@ -19,7 +19,7 @@ namespace TwoTrails.Dialogs
 
         public AccuracyDataDialog(GpsAccuracyReport report, double? accuracy, string make = null, string model = null)
         {
-            _Model = new AccuracyDataModel(report,accuracy, make, model, this);
+            _Model = new AccuracyDataModel(report, accuracy, make, model, this);
             DataContext = _Model;
             InitializeComponent();
         }

@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -10,7 +10,7 @@ using TwoTrails.Core;
 
 namespace TwoTrails.Mapping
 {
-    public class PolygonVisibilityControl : NotifyPropertyChangedEx
+    public class PolygonVisibilityControl : BaseModel, IDisposable
     {
         private ObservableCollection<TtMapPolygonManager> PolygonManagers { get; set; }
 
@@ -194,9 +194,15 @@ namespace TwoTrails.Mapping
             return fieldChanged;
         }
 
+        protected override void Dispose(bool disposed)
+        {
+            foreach (TtMapPolygonManager pm in PolygonManagers)
+            {
+                pm.PropertyChanged -= PolyManager_PropertyChanged;
+            }
 
-
-        private object locker = new object();
+            PolygonManagers.CollectionChanged -= PolygonManagers_CollectionChanged;
+        }
         
         private bool? _Visible = true;
         public bool? Visible

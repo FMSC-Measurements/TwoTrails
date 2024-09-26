@@ -1,4 +1,4 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Utilities;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using Microsoft.Win32;
@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,10 +18,11 @@ using TwoTrails.Core.Interfaces;
 using TwoTrails.Core.Points;
 using TwoTrails.DAL;
 using TwoTrails.Utils;
+using static TwoTrails.Utils.Import;
 
 namespace TwoTrails.ViewModels
 {
-    public class ImportModel : NotifyPropertyChangedEx
+    public class ImportModel : BaseModel
     {
         public ICommand BrowseFileCommand { get; }
 
@@ -32,8 +34,10 @@ namespace TwoTrails.ViewModels
         public ICommand CancelCommand { get; }
 
         private Window _Window;
-        private ITtManager _Manager => _Project.Manager;
+        private ITtManager _Manager => _Project.HistoryManager;
         private TtProject _Project;
+
+        private readonly MainWindowModel MainModel;
 
         public Control MainContent
         {
@@ -68,22 +72,27 @@ namespace TwoTrails.ViewModels
 
         public string CurrentFile { get { return Get<string>(); } set { Set(value); } }
 
-        public bool CanImport { get { return ImportControl != null && ImportControl.HasSelectedPolygons && !IsImporting; } }
+        public bool CanImport { get { return ImportControl != null && ImportControl.Context.HasSelectedPolygons && !IsImporting; } }
 
         private bool _AutoCloseOnImport;
 
 
-        public ImportModel(Window window, TtProject project, string fileName = null, bool autoCloseOnImport = false)
+        public ImportModel(TtProject project, MainWindowModel mainWindowModel, Window window, string fileName = null, bool autoCloseOnImport = false)
         {
             _Window = window;
             _Project = project;
             MainContent = null;
             CurrentFile = null;
 
-            BrowseFileCommand = new BindedRelayCommand<ImportModel>(x => BrowseFile(), x => !IsImporting,
+            MainModel = mainWindowModel;
+
+            BrowseFileCommand = new BindedRelayCommand<ImportModel>(
+                x => BrowseFile(), x => !IsImporting,
                 this, m => m.IsImporting);
 
-            _ImportCommand = new BindedRelayCommand<ImportModel>(x => ImportData(), x => CanImport, this, m => m.CanImport);
+            _ImportCommand = new BindedRelayCommand<ImportModel>(
+                x => ImportData(), x => CanImport,
+                this, m => m.CanImport);
 
             CancelCommand = new RelayCommand(x => Cancel());
 
@@ -128,7 +137,13 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
         {
             if (FileUtils.IsFileLocked(fileName))
             {
-                MessageBox.Show($"File '{Path.GetFileName(fileName)}' is currently locked. Make sure it is not in use by any other programs.");
+                MessageBox.Show($"File '{Path.GetFileName(fileName)}' is currently locked. Make sure it is not in use by any other programs.",
+                    "File Locked", MessageBoxButton.OK, MessageBoxImage.Stop);
+            }
+            else if (MainModel.GetListOfOpenedProjects().Contains(fileName))
+            {
+                MessageBox.Show($"File '{Path.GetFileName(fileName)}' is currently opened in TwoTrails. Please save and close it before trying to import.",
+                    "File Locked", MessageBoxButton.OK, MessageBoxImage.Stop);
             }
             else
             {
@@ -139,7 +154,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
                         TtSqliteDataAccessLayer idal = new TtSqliteDataAccessLayer(fileName);
                         
-                        if (!TtUtils.CheckAndFixErrors(idal))
+                        if (!DataHelper.CheckAndFixErrors(idal, _Project.Settings))
                         {
                             IsSettingUp = false;
                             return;
@@ -164,11 +179,11 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                             }
                         }
 
-                        ImportControl = new ImportControl(idal, true, true, true);
+                        ImportControl = new ImportControl(idal, _Project.Settings.SortPolysByName, true, true, true);
                         break;
                     case Consts.FILE_EXTENSION_V2:
                         IsSettingUp = true;
-                        ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), true, true, true);
+                        ImportControl = new ImportControl(new TtV2SqliteDataAccessLayer(fileName), _Project.Settings.SortPolysByName, true, true, true);
                         break;
                     case Consts.CSV_EXT:
                     case Consts.TEXT_EXT:
@@ -186,7 +201,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                                         dal.Parse();
                                         MainContent.Dispatcher.Invoke(() =>
                                         {
-                                            ImportControl = new ImportControl(dal, false, dal.GetGroups().Any(), false);
+                                            ImportControl = new ImportControl(dal, _Project.Settings.SortPolysByName, false, dal.GetGroups().Any(), false);
                                         });
                                     });
                                 }
@@ -219,7 +234,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                                         dal.Parse();
                                         MainContent.Dispatcher.Invoke(() =>
                                         {
-                                            ImportControl = new ImportControl(dal, false, false, false);
+                                            ImportControl = new ImportControl(dal, _Project.Settings.SortPolysByName, false, false, false);
                                         });
                                     });
                                 }
@@ -245,7 +260,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                                 ImportControl = new ImportControl(
                                     new TtKmlDataAccessLayer(
                                         new TtKmlDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, true, startPolyNumber: _Manager.PolygonCount)
-                                ), false, false, false);
+                                ), _Project.Settings.SortPolysByName, false, false, false);
 
                                 IsSettingUp = true;
                             }
@@ -267,7 +282,7 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                                     ImportControl = new ImportControl(
                                         new TtShapeFileDataAccessLayer(
                                             new TtShapeFileDataAccessLayer.ParseOptions(fileName, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
-                                        ), false, false, false
+                                        ), _Project.Settings.SortPolysByName, false, false, false
                                     );
                                     IsSettingUp = true;
                                     break;
@@ -316,7 +331,8 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
                     ImportControl = new ImportControl(
                                 new TtShapeFileDataAccessLayer(
                                     new TtShapeFileDataAccessLayer.ParseOptions(shapefiles, _Manager.DefaultMetadata.Zone, _Manager.PolygonCount)
-                                )
+                                ),
+                                _Project.Settings.SortPolysByName
                             );
                     IsSettingUp = true;
                 } 
@@ -329,33 +345,79 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
         public void ImportData()
         {
-            IEnumerable<string> selectedPolys = ImportControl.SelectedPolygons;
+            IEnumerable<string> selectedPolys = ImportControl.Context.SelectedPolygons;
             bool convertForeignQuondams = false;
             
-            if (ImportControl.DAL.HandlesAllPointTypes)
+            if (ImportControl.Context.DAL.HandlesAllPointTypes)
             {
                 List<string> neededPolys = new List<string>();
+                Dictionary<string, List<TtPoint>> dupPoints = new Dictionary<string, List<TtPoint>>();
 
                 foreach (string polyCN in selectedPolys)
                 {
-                    foreach (QuondamPoint qp in ImportControl.DAL.GetPoints(polyCN, true)
-                        .Where(p => p.OpType == OpType.Quondam).Cast<QuondamPoint>())
+                    foreach (TtPoint point in ImportControl.Context.DAL.GetPoints(polyCN, true))
                     {
-                        if (qp.ParentPoint.PolygonCN != polyCN && !selectedPolys.Contains(qp.ParentPoint.PolygonCN) && !neededPolys.Contains(qp.ParentPoint.PolygonCN))
-                            neededPolys.Add(qp.ParentPoint.PolygonCN);
+                        if (_Project.HistoryManager.PointExists(point.CN))
+                        {
+                            if (dupPoints.ContainsKey(point.PolygonCN))
+                            {
+                                dupPoints[point.PolygonCN].Add(point);
+                            }
+                            else
+                            {
+                                dupPoints.Add(point.PolygonCN, new List<TtPoint>() { point });
+                            }
+                        }
+
+                        if (point.OpType == OpType.Quondam && point is QuondamPoint qp)
+                        {
+                            if (qp.ParentPoint.PolygonCN != polyCN && !selectedPolys.Contains(qp.ParentPoint.PolygonCN) && !neededPolys.Contains(qp.ParentPoint.PolygonCN))
+                                neededPolys.Add(qp.ParentPoint.PolygonCN);
+                        }
                     }
                 }
-                
-                if (neededPolys.Count > 0)
+
+                if (dupPoints.Count > 0)
                 {
-                    MessageBoxResult res = MessageBox.Show("Some quondams are linked to points that are not within the list of improted polygons. Would you like to import these polygons (YES) or convert the points to GPS (NO)?", "Foreign Quondams",
+                    if (MessageBox.Show(@"Some points being imported already exist in this project. 
+This means a polygon being imported may already exist. Would you like to import the points anyway?",
+                    "Points Already Exist", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+                    {
+                        if (MessageBox.Show("Would you like to see a list of the already existing points?", "Existing Points",
+                            MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                        {
+                            StringBuilder sb = new StringBuilder();
+
+                            sb.AppendLine("** Current Existing Points **\n");
+
+                            foreach (TtPolygon poly in ImportControl.Context.DAL.GetPolygons())
+                            {
+                                if (dupPoints.ContainsKey(poly.CN))
+                                {
+                                    sb.AppendLine($"Polygon: {poly.Name}\n\t{String.Join("\n\t", dupPoints[poly.CN])}\n");
+                                }
+                            }
+
+                            String existingPointsFilePath = Path.Combine(Path.GetTempPath(), "dupPoints.txt");
+
+                            File.WriteAllText(existingPointsFilePath, sb.ToString());
+
+                            Process.Start(existingPointsFilePath);
+                        }
+                        
+                        return;
+                    }
+                }
+                else if (neededPolys.Count > 0)
+                {
+                    MessageBoxResult res = MessageBox.Show("Some quondams are linked to points that are not within the list of improted polygons. Would you like to convert the points to GPS (YES) or import these polygons (NO)?", "Foreign Quondams",
                         MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
-                    if (res == MessageBoxResult.Yes)
+                    if (res == MessageBoxResult.No)
                     {
                         selectedPolys = selectedPolys.Concat(neededPolys);
                     }
-                    else if (res == MessageBoxResult.No)
+                    else if (res == MessageBoxResult.Yes)
                     {
                         convertForeignQuondams = true;
                     }
@@ -369,13 +431,19 @@ CSV files (*.csv)|*.csv|Text Files (*.txt)|*.txt|Shape Files (*.shp)|*.shp|GPX F
 
             try
             {
-                Import.DAL(_Manager, ImportControl.DAL, selectedPolys, ImportControl.IncludeMetadata,
-                    ImportControl.IncludeGroups, ImportControl.IncludeNmea, convertForeignQuondams);
+                Import.DAL(_Manager, ImportControl.Context.DAL, selectedPolys, ImportControl.Context.IncludeMetadata,
+                    ImportControl.Context.IncludeGroups, ImportControl.Context.IncludeNmea, convertForeignQuondams);
 
                 MessageBox.Show($"{selectedPolys.Count()} Polygons Imported",
                     String.Empty, MessageBoxButton.OK, MessageBoxImage.None);
             }
-            catch (Exception ex) when (!_AutoCloseOnImport)
+            catch (ForiegnQuondamException fq)
+            {
+                Trace.WriteLine(fq.Message, "ImportModel:ImportData:FQE");
+                MessageBox.Show("Import Failed. Foriegn Quondams found.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Error);
+
+            }
+            catch (Exception ex) //when (!_AutoCloseOnImport)
             {
                 Trace.WriteLine(ex.Message, "ImportModel:ImportData");
                 MessageBox.Show("Import Failed. See log file for details.", String.Empty, MessageBoxButton.OK, MessageBoxImage.Error);

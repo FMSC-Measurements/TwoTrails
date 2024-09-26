@@ -6,7 +6,7 @@
         xmlns:ttc="clr-namespace:TwoTrails.Controls"
         xmlns:fmsc="clr-namespace:FMSC.Core;assembly=FMSC.Core"
         xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         mc:Ignorable="d"
         Title="Create Grid Sample Points"
@@ -61,7 +61,15 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Column="0" Grid.Row="1" Text="Start Point (Optional)" />
-                <ComboBox  Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Points}" SelectedItem="{Binding SelectedPoint}"/>
+                <Grid Grid.Column="1" Grid.Row="1" Width="Auto">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="50"/>
+                        <ColumnDefinition Width="2"/>
+                        <ColumnDefinition Width="35"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Name="cboSP" Grid.Column="0" ItemsSource="{Binding Points}" SelectedItem="{Binding SelectedPoint}" />
+                    <Button Grid.Column="2" Content="Clear" Height="{Binding ElementName=cboSP, Path=ActualHeight}" Command="{Binding ClearSelectedStartPoint}"/>
+                </Grid>
 
                 <TextBlock Grid.Column="0" Grid.Row="2" Text="UOM Distance" />
                 <ComboBox  Grid.Column="1" Grid.Row="2" ItemsSource="{fmsccm:EnumToItemsSource {x:Type fmsc:Distance}}" SelectedItem="{Binding UomDistance}" />
@@ -84,10 +92,12 @@
 
                     <TextBox Grid.Column="0" Grid.Row="1"
                          Text="{Binding GridX}"
-                         PreviewTextInput="TextIsUnsignedInteger"/>
+                         PreviewTextInput="TextIsUnsignedDouble"
+                         GotFocus="TextBox_GotFocus"/>
                     <TextBox Grid.Column="2" Grid.Row="1"
                          Text="{Binding GridY}"
-                         PreviewTextInput="TextIsUnsignedInteger"/>
+                         PreviewTextInput="TextIsUnsignedDouble"
+                         GotFocus="TextBox_GotFocus"/>
                 </Grid>
 
                 <Grid Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2">
@@ -100,7 +110,8 @@
                     <TextBlock Grid.Column="0" Text="Tilt Y Axis (-45° ↔ +45°)" />
                     <TextBox Grid.Column="2" Text="{Binding Tilt}"
                          Margin="0, 2.5, 0, 2.5"
-                         PreviewTextInput="TextIsInteger"/>
+                         PreviewTextInput="TextIsInteger"
+                         GotFocus="TextBox_GotFocus"/>
                 </Grid>
 
                 <Grid Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2">
@@ -120,7 +131,8 @@
                     <TextBox Grid.Column="4"  Margin="0, 2.5, 0, 2.5"
                          IsEnabled="{Binding ElementName=cbSample, Path=IsChecked}"
                          Text="{Binding SampleAmount}"
-                         PreviewTextInput="TextIsUnsignedInteger"/>
+                         PreviewTextInput="TextIsUnsignedInteger"
+                         GotFocus="TextBox_GotFocus"/>
                 </Grid>
 
                 <Grid Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2">
@@ -136,7 +148,8 @@
                     <TextBox Grid.Column="4"  Margin="0, 2.5, 0, 2.5"
                          IsEnabled="{Binding ElementName=cbBuffer, Path=IsChecked}"
                          Text="{Binding BufferAmount}"
-                         PreviewTextInput="TextIsUnsignedInteger"
+                         PreviewTextInput="TextIsUnsignedDouble"
+                         GotFocus="TextBox_GotFocus"
                          Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource btv}}"/>
                 </Grid>
 
@@ -199,7 +212,7 @@
                 </i:Interaction.Triggers>
             </ListBox>
 
-            <TextBlock Grid.Column="2" Grid.Row="0" Text="Exlude" TextAlignment="Center" />
+            <TextBlock Grid.Column="2" Grid.Row="0" Text="Exclude" TextAlignment="Center" />
             <ListBox Name="lstExcPoly" Grid.Column="2" Grid.Row="1" ItemsSource="{Binding ExclusionPolygons}" SelectionMode="Multiple" ItemTemplate="{StaticResource listToolTip}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
@@ -216,8 +229,8 @@
                 <ColumnDefinition Width="75"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Close" Command="{Binding CloseCommand}" />
-            <Button Grid.Column="2" Content="Generate" Command="{Binding GenerateCommand}" />
+            <Button Grid.Column="0" Content="{Binding CloseCancelBtnText}" Command="{Binding CloseCancelCommand}" />
+            <Button Grid.Column="2" Content="Generate" Command="{Binding GenerateCommand}" IsEnabled="{Binding IsGenerating, Converter={StaticResource IBC}}" />
         </Grid>
 
         <!--<ttc:TtProgressControl Grid.ColumnSpan="2" Grid.Row="0" Visibility="{Binding IsGenerating, Converter={StaticResource BoolToVis}}" Background="White" Opacity="70" />-->

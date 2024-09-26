@@ -1,29 +1,24 @@
-﻿using CSUtil.ComponentModel;
-using FMSC.Core.Collections;
+﻿using FMSC.Core.Collections;
+using FMSC.Core.ComponentModel;
+using FMSC.GeoSpatial;
+using Microsoft.Maps.MapControl.WPF;
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System;
+using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
-using System.Linq;
-using System.Windows.Input;
-using FMSC.Core.Windows.ComponentModel.Commands;
-using FMSC.GeoSpatial;
-using Windows.UI.Xaml.Controls.Maps;
-using Windows.Devices.Geolocation;
-using System.Collections.Generic;
 
 namespace TwoTrails.Mapping
 {
-    public class TtMapPolygonManager : NotifyPropertyChangedEx
+    public class TtMapPolygonManager : BaseModel
     {
         private const double BOUNDARY_ZOOM_MARGIN = 0.00035;
 
         public event MapPointSelectedEvent PointSelected;
 
-        public ICommand ZoomToPolygonCommand { get; }
 
-        public ObservableConvertedCollection<TtPoint, TtMapPoint> Points { get; set; }
+        public ObservableConvertedCollection<TtPoint, TtMapPoint> Points { get; private set; }
 
         private TtMapPolygon _AdjBnd, _UnAdjBnd;
         public TtMapPolygon AdjBoundary { get { return _AdjBnd; } private set { SetField(ref _AdjBnd, value); } }
@@ -39,7 +34,9 @@ namespace TwoTrails.Mapping
 
         public Extent Extents { get; private set; }
 
-        private MapControl Map { get; }
+        private Map Map { get; }
+
+        private bool _detach;
 
         #region Visibility
         private bool _Visible;
@@ -279,11 +276,11 @@ namespace TwoTrails.Mapping
         #endregion
 
 
-        public TtMapPolygonManager(MapControl map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo) :
+        public TtMapPolygonManager(Map map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo) :
             this(map, polygon, points, pgo, true, true, true, false, false, false, false, false, false, false, false, false)
         { }
 
-        public TtMapPolygonManager(MapControl map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo,
+        public TtMapPolygonManager(Map map, TtPolygon polygon, ObservableCollection<TtPoint> points, PolygonGraphicOptions pgo,
             bool vis, bool adjBndVis, bool adjBndPtsVis, bool unadjBndVis, bool unadjBndPtsVis,
             bool adjNavVis, bool adjNavPtsVis, bool unadjNavVis, bool unadjNavPtsVis,
             bool adjMiscPtsVis, bool unadjMiscPtsVis, bool wayPtsVis)
@@ -309,23 +306,19 @@ namespace TwoTrails.Mapping
             _WayPointsVisible = wayPtsVis;
 
 
-            polygon.PolygonChanged += UpdatePolygonShape;
+            Polygon.PolygonChanged += UpdatePolygonShape;
 
-            AdjBoundary = new TtMapPolygon(map, polygon, new List<BasicGeoposition>(), Graphics, true, _AdjBndVisible);
-            UnAdjBoundary = new TtMapPolygon(map, polygon, new List<BasicGeoposition>(), Graphics, false, _UnAdjBndVisible);
-            AdjNavigation = new TtMapPath(map, polygon, new List<BasicGeoposition>(), Graphics, true, _AdjNavVisible);
-            UnAdjNavigation = new TtMapPath(map, polygon, new List<BasicGeoposition>(), Graphics, false, _UnAdjNavVisible);
+            AdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, true, _AdjBndVisible);
+            UnAdjBoundary = new TtMapPolygon(map, polygon, new LocationCollection(), Graphics, false, _UnAdjBndVisible);
+            AdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, true, _AdjNavVisible);
+            UnAdjNavigation = new TtMapPath(map, polygon, new LocationCollection(), Graphics, false, _UnAdjNavVisible);
 
-            Points = new ObservableConvertedCollection<TtPoint, TtMapPoint>(
-                points,
-                p => new TtMapPoint(map, p, Graphics, Visible, _AdjBndPointsVisible, _UnAdjBndPointsVisible,
-                        _AdjNavPointsVisible, _UnAdjNavPointsVisible, _AdjMiscPointsVisible, _UnAdjMiscPointsVisible,
-                        _WayPointsVisible)
-                );
+            Points = new ObservableConvertedCollection<TtPoint, TtMapPoint>(points, p => CreateMapPoint(p));
 
             UpdatePolygonShape(polygon);
 
-            ((INotifyCollectionChanged)Points).CollectionChanged += Points_CollectionChanged;
+            Points.PreviewCollectionChanged += Points_PreviewCollectionChanged;
+            Points.CollectionChanged += Points_CollectionChanged;
 
             foreach (TtMapPoint p in Points)
             {
@@ -333,31 +326,15 @@ namespace TwoTrails.Mapping
             }
 
             BuildExtents();
-
-            ZoomToPolygonCommand = new RelayCommand(x =>
-            {
-                if (Points.Any())
-                {
-                    if (Extents == null)
-                        BuildExtents();
-                    if (Extents != null)
-                    {
-                        MapScene scene = MapScene.CreateFromLocations(new Geopoint[] {
-                            new Geopoint(
-                                new BasicGeoposition() { Latitude = Extents.North + BOUNDARY_ZOOM_MARGIN, Longitude = Extents.West - BOUNDARY_ZOOM_MARGIN }),
-                            new Geopoint(
-                                new BasicGeoposition() { Latitude = Extents.South + BOUNDARY_ZOOM_MARGIN, Longitude = Extents.East - BOUNDARY_ZOOM_MARGIN })
-                        });
-                        _ = Map.TrySetSceneAsync(scene);
-
-                        //Map.SetView(
-                        //    new LocationRect(
-                        //        new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BsOUNDARY_ZOOM_MARGIN),
-                        //        new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN))); 
-                    }
-                }
-            });
         }
+
+        private TtMapPoint CreateMapPoint(TtPoint point)
+        {
+            return new TtMapPoint(Map, point, Graphics, Visible, _AdjBndPointsVisible, _UnAdjBndPointsVisible,
+                        _AdjNavPointsVisible, _UnAdjNavPointsVisible, _AdjMiscPointsVisible, _UnAdjMiscPointsVisible,
+                        _WayPointsVisible);
+        }
+
 
         private void BuildExtents()
         {
@@ -367,6 +344,29 @@ namespace TwoTrails.Mapping
                 builder.Include(p.AdjLocation.Latitude, p.AdjLocation.Longitude);
 
             Extents = builder.HasPositions ? builder.Build() : null;
+        }
+
+
+        private void Points_PreviewCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            lock (locker)
+            {
+                switch (e.Action)
+                {
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (TtMapPoint p in e.OldItems)
+                        {
+                            p.PointSelected -= MapPointSelected;
+                        }
+                        break;
+                    case NotifyCollectionChangedAction.Reset:
+                        foreach (TtMapPoint p in Points)
+                        {
+                            p.PointSelected -= MapPointSelected;
+                        }
+                        break;
+                }
+            }
         }
 
         private void Points_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -385,7 +385,6 @@ namespace TwoTrails.Mapping
                         foreach (TtMapPoint p in e.OldItems)
                         {
                             p.Detach();
-                            p.PointSelected -= MapPointSelected;
                         }
                         break;
                     case NotifyCollectionChangedAction.Replace:
@@ -393,11 +392,6 @@ namespace TwoTrails.Mapping
                     case NotifyCollectionChangedAction.Move:
                         break;
                     case NotifyCollectionChangedAction.Reset:
-                        foreach (TtMapPoint p in Points)
-                        {
-                            p.Detach();
-                            p.PointSelected -= MapPointSelected;
-                        }
                         break;
                     default:
                         break;
@@ -416,10 +410,10 @@ namespace TwoTrails.Mapping
         {
             lock (locker)
             {
-                List<BasicGeoposition> adjBndLocs = new List<BasicGeoposition>();
-                List<BasicGeoposition> unadjBndLocs = new List<BasicGeoposition>();
-                List<BasicGeoposition> adjNavLocs = new List<BasicGeoposition>();
-                List<BasicGeoposition> unadjNavLocs = new List<BasicGeoposition>();
+                LocationCollection adjBndLocs = new LocationCollection();
+                LocationCollection unadjBndLocs = new LocationCollection();
+                LocationCollection adjNavLocs = new LocationCollection();
+                LocationCollection unadjNavLocs = new LocationCollection();
 
                 Extent.Builder builder = new Extent.Builder();
 
@@ -449,18 +443,44 @@ namespace TwoTrails.Mapping
                 UnAdjNavigation.UpdateLocations(unadjNavLocs);
             }
         }
-        
+
+
+        public void ZoomToPolygon()
+        {
+            if (Points.Any())
+            {
+                if (Extents == null)
+                    BuildExtents();
+                if (Extents != null)
+                {
+                    Map.SetView(
+                        new LocationRect(
+                            new Location(Extents.North + BOUNDARY_ZOOM_MARGIN, Extents.West - BOUNDARY_ZOOM_MARGIN),
+                            new Location(Extents.South - BOUNDARY_ZOOM_MARGIN, Extents.East + BOUNDARY_ZOOM_MARGIN)));
+                }
+            }
+        }
+
+
         public void Detach()
         {
-            AdjBoundary.Detach();
-            UnAdjBoundary.Detach();
-
-            AdjNavigation.Detach();
-            UnAdjNavigation.Detach();
-
-            foreach (TtMapPoint p in Points)
+            if (_detach)
             {
-                p.Detach();
+                Points.PreviewCollectionChanged -= Points_PreviewCollectionChanged;
+                Points.CollectionChanged -= Points_CollectionChanged;
+
+                foreach (TtMapPoint p in Points)
+                {
+                    p.PointSelected -= MapPointSelected;
+                    p.Detach();
+                }
+
+                AdjBoundary.Detach();
+                UnAdjBoundary.Detach();
+                AdjNavigation.Detach();
+                UnAdjNavigation.Detach();
+
+                _detach = true;
             }
         }
     }

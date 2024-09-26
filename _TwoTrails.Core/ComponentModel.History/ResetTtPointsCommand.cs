@@ -6,16 +6,12 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class ResetTtPointsCommand : ITtPointsCommand
     {
-        private TtManager pointsManager;
-
-        private List<TtPoint> _ResetPoints = null;
+        private readonly List<TtPoint> _ResetPoints = null;
 
 
-        public ResetTtPointsCommand(IEnumerable<TtPoint> points, TtManager pointsManager, bool keepIndexAndPoly = false) : base(points.Where(p => pointsManager.HasOriginalPoint(p.CN)))
+        public ResetTtPointsCommand(TtManager manager, IEnumerable<TtPoint> points, bool keepIndexAndPoly = false) : base(manager, points.Where(p => manager.HasOriginalPoint(p.CN)))
         {
-            this.pointsManager = pointsManager;
-            
-            _ResetPoints = Points.Select(pt => pointsManager.GetOriginalPoint(pt.CN).DeepCopy()).ToList();
+            _ResetPoints = Points.Select(pt => manager.GetOriginalPoint(pt.CN).DeepCopy()).ToList();
 
             if (keepIndexAndPoly)
             {
@@ -34,7 +30,7 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             if (_ResetPoints != null && _ResetPoints.Count > 0)
             {
-                pointsManager.ReplacePoints(_ResetPoints);
+                Manager.ReplacePoints(_ResetPoints);
             }
         }
 
@@ -42,8 +38,11 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             if (_ResetPoints != null && _ResetPoints.Count > 0)
             {
-                pointsManager.ReplacePoints(Points);
+                Manager.ReplacePoints(Points);
             }
         }
+
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
+        protected override string GetCommandInfoDescription() => $"Reset {Points.Count} points";
     }
 }

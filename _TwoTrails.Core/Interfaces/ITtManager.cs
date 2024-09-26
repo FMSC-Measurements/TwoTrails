@@ -9,7 +9,7 @@ namespace TwoTrails.Core
     {
         TtMetadata DefaultMetadata { get; }
         TtGroup MainGroup { get; }
-        
+
         bool HasDataDictionary { get; }
 
         int PolygonCount { get; }
@@ -48,26 +48,26 @@ namespace TwoTrails.Core
         void DeleteGroup(TtGroup group);
 
 
+        bool NmeaExists(string nmeaCN);
         List<TtNmeaBurst> GetNmeaBursts(string pointCN = null);
         List<TtNmeaBurst> GetNmeaBursts(IEnumerable<string> pointCNs);
         void AddNmeaBurst(TtNmeaBurst burst);
         void AddNmeaBursts(IEnumerable<TtNmeaBurst> bursts);
         void DeleteNmeaBursts(string pointCN);
-        
+
         List<TtImage> GetImages(String pointCN = null);
         void InsertMedia(TtMedia media);
         void DeleteMedia(TtMedia media);
 
+        List<TtUserAction> GetUserActions();
+
 
         DataDictionaryTemplate GetDataDictionaryTemplate();
-        
+
 
         PolygonGraphicOptions GetPolygonGraphicOption(string polyCN);
         List<PolygonGraphicOptions> GetPolygonGraphicOptions();
 
         PolygonGraphicOptions GetDefaultPolygonGraphicOption();
-
-
-        void UpdateDataAction(DataActionType action, string notes = null);
     }
 }

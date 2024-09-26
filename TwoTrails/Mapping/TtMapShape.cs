@@ -1,30 +1,20 @@
-﻿using CSUtil.ComponentModel;
-using System.Collections.Generic;
+﻿using FMSC.Core.ComponentModel;
+using Microsoft.Maps.MapControl.WPF;
 using TwoTrails.Core;
-using Windows.Devices.Geolocation;
-using Windows.UI.Xaml.Controls.Maps;
 
 namespace TwoTrails.Mapping
 {
-    public abstract class TtMapShape : NotifyPropertyChangedEx
+    public abstract class TtMapShape : TtMapBaseModel
     {
-        public abstract bool Visible { get; set; }
-
-        protected MapControl Map { get; }
-
-
-        public TtMapShape(MapControl map, TtPolygon polygon, IEnumerable<BasicGeoposition> locations, PolygonGraphicOptions pgo)
+        public TtMapShape(Map map, TtPolygon polygon, LocationCollection locations, PolygonGraphicOptions pgo) : base(map, pgo)
         {
-            this.Map = map;
         }
 
-        public void UpdateLocations(IEnumerable<BasicGeoposition> locations)
+        public void UpdateLocations(LocationCollection locations)
         {
             UpdateShape(locations);
         }
 
-        protected abstract void UpdateShape(IEnumerable<BasicGeoposition> locations);
-
-        public abstract void Detach();
+        protected abstract void UpdateShape(LocationCollection locations);
     }
 }

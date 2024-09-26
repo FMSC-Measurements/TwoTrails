@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TwoTrails.Core.Points;
@@ -10,11 +11,11 @@ namespace TwoTrails.Core.ComponentModel.History
     /// </summary>
     public class EditTtPointsMultiPropertyCommand : ITtPointsCommand
     {
-        private List<object> NewValues;
-        private List<object> OldValues = new List<object>();
-        private List<PropertyInfo> Properties;
+        private readonly List<object> NewValues;
+        private readonly List<object> OldValues = new List<object>();
+        private readonly List<PropertyInfo> Properties;
 
-        public EditTtPointsMultiPropertyCommand(IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues) : base(points)
+        public EditTtPointsMultiPropertyCommand(TtManager manager, IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, IEnumerable<object> newValues) : base(manager, points)
         {
             RequireRefresh = properties.Any(p => p == PointProperties.INDEX);
 
@@ -42,6 +43,9 @@ namespace TwoTrails.Core.ComponentModel.History
                 Properties[i].SetValue(Points[i], OldValues[i]);
             }
         }
+
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
+        protected override String GetCommandInfoDescription() => $"Edit {Properties.Count} properties of {Points.Count} points";
     }
 
     /// <summary>
@@ -49,11 +53,11 @@ namespace TwoTrails.Core.ComponentModel.History
     /// </summary>
     public class EditTtPointsMultiPropertyCommand<T> : ITtPointsCommand
     {
-        private List<T> NewValues;
-        private List<T> OldValues = new List<T>();
-        private List<PropertyInfo> Properties;
+        private readonly List<T> NewValues;
+        private readonly List<T> OldValues = new List<T>();
+        private readonly List<PropertyInfo> Properties;
 
-        public EditTtPointsMultiPropertyCommand(IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, IEnumerable<T> newValues) : base(points)
+        public EditTtPointsMultiPropertyCommand(TtManager manager, IEnumerable<TtPoint> points, IEnumerable<PropertyInfo> properties, IEnumerable<T> newValues) : base(manager, points)
         {
             RequireRefresh = properties.Any(p => p == PointProperties.INDEX);
 
@@ -81,5 +85,8 @@ namespace TwoTrails.Core.ComponentModel.History
                 Properties[i].SetValue(Points[i], OldValues[i]);
             }
         }
+
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
+        protected override String GetCommandInfoDescription() => $"Edit {Properties.Count} properties of {Points.Count} points";
     }
 }

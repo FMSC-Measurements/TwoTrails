@@ -10,20 +10,17 @@ namespace TwoTrails
     /// </summary>
     public partial class MapWindow : Window
     {
-        public TtMapControl MapControl { get; private set; }
+        public MapControl MapControl { get; private set; }
 
 
-        public MapWindow(TtProject project) :
-            this($"Map - {project.ProjectName}", new TtMapControl(project.Manager))
-        { }
-
-        public MapWindow(string projectName, TtMapControl mapControl)
+        public MapWindow(string projectName, MapControl mapControl)
         {
             InitializeComponent();
 
             Title = $"Map - {projectName}";
             cc.Content = MapControl = mapControl;
         }
+
 
         protected override void OnClosing(CancelEventArgs e)
         {

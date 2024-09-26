@@ -6,22 +6,22 @@
         xmlns:core="clr-namespace:TwoTrails.Core;assembly=TwoTrails.DAL"
         mc:Ignorable="d"
         Title="TwoTrails"
-        Width="1000" MinWidth="700"
+        Width="1000" MinWidth="750"
         Height="800" MinHeight="500"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="Manual">
 
     <Window.InputBindings>
-        <KeyBinding Command="{Binding CurrentProject.UndoCommand}" Key="Z" Modifiers="Ctrl"/>
-        <KeyBinding Command="{Binding CurrentProject.RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
+        <KeyBinding Command="{Binding CurrentTab.UndoCommand}" Key="Z" Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding CurrentTab.RedoCommand}" Key="Z" Modifiers="Ctrl+Shift"/>
         <KeyBinding Command="{Binding OpenCommand}" Key="O" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SaveCommand}" Key="S" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SaveAsCommand}" Key="S" Modifiers="Ctrl+Alt"/>
-        <KeyBinding Command="{Binding CurrentProject.RecalculateAllPolygonsCommand}" Key="R" Modifiers="Ctrl+Shift"/>
-        <KeyBinding Command="{Binding CurrentEditor.CreatePlotsCommand}" Key="P" Modifiers="Ctrl+Alt"/>
-        <KeyBinding Command="{Binding CurrentEditor.CreateCorridorCommand}" Key="C" Modifiers="Ctrl+Alt"/>
-        <KeyBinding Command="{Binding CurrentEditor.RetraceCommand}" Key="R" Modifiers="Ctrl+Alt"/>
-        <KeyBinding Command="{Binding CurrentEditor.MovePointsCommand}" Key="M" Modifiers="Ctrl+Alt"/>
-        <KeyBinding Command="{Binding CurrentEditor.CreateQuondamsCommand}" Key="Q" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding ProjectEditor.RecalculateAllPolygonsCommand}" Key="R" Modifiers="Ctrl+Shift"/>
+        <KeyBinding Command="{Binding PointEditor.CreatePlotsCommand}" Key="P" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding PointEditor.CreateCorridorCommand}" Key="C" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding PointEditor.RetraceCommand}" Key="R" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding PointEditor.MovePointsCommand}" Key="M" Modifiers="Ctrl+Alt"/>
+        <KeyBinding Command="{Binding PointEditor.CreateQuondamsCommand}" Key="Q" Modifiers="Ctrl+Alt"/>
         <KeyBinding Command="{Binding OpenInEarthCommand}" Key="G" Modifiers="Ctrl+Alt"/>
     </Window.InputBindings>
 
@@ -43,7 +43,7 @@
         <Style x:Key="styleTabButtonBorderStyle" TargetType="Border">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource colorPriamry}" />
+                    <Setter Property="Background" Value="{StaticResource scbPrimary}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -54,7 +54,7 @@
                 <DataTrigger Binding="{Binding HasOpenedProject}" Value="False">
                     <Setter Property="IsEnabled" Value="False"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding CurrentEditor.Manager.Polygons.Count}" Value="0">
+                <DataTrigger Binding="{Binding PointEditor.Manager.Polygons.Count}" Value="0">
                     <Setter Property="IsEnabled" Value="False"/>
                 </DataTrigger>
             </Style.Triggers>
@@ -88,12 +88,12 @@
                     </MenuItem>
 
                     <MenuItem Header="Save As" Command="{Binding SaveAsCommand}" CommandParameter="{Binding CurrentProject}" InputGestureText="Ctrl+Alt+S"
-                          IsEnabled="{Binding Path=HasOpenedProject}"/>
+                            IsEnabled="{Binding Path=HasOpenedProject}"/>
 
                     <Separator/>
 
-                    <MenuItem Header="Close Project" Command="{Binding CloseProjectCommand}" CommandParameter="{Binding CurrentProject}"
-                          IsEnabled="{Binding Path=HasOpenedProject}"/>
+                    <MenuItem Header="Close Project" Command="{Binding CloseProjectCommand}" CommandParameter="{Binding CurrentTab}"
+                            IsEnabled="{Binding Path=HasOpenedProject}"/>
                     <MenuItem Header="Recent Projects" Name="miRecent" IsEnabled="{Binding Path=RecentItemsAvail}" />
 
                     <Separator/>
@@ -102,89 +102,169 @@
                 </MenuItem>
 
                 <MenuItem Header="_Edit">
-                    <MenuItem Header="Undo" Command="{Binding CurrentProject.UndoCommand}" InputGestureText="Ctrl+Z"
-                          Style="{StaticResource styleMiPointEdit}">
+                    <MenuItem Header="Undo" Command="{Binding CurrentTab.UndoCommand}" InputGestureText="Ctrl+Z"
+                            ToolTip="{Binding CurrentTab.UndoCommandInfo}" ToolTipService.ShowOnDisabled="True"
+                            Style="{StaticResource styleMiPointEdit}">
                         <!-- Menu for action history -->
                     </MenuItem>
-                    <MenuItem Header="Redo" Command="{Binding CurrentProject.RedoCommand}" InputGestureText="Ctrl+Shift+Z"
-                          Style="{StaticResource styleMiPointEdit}"/>
+                    <MenuItem Header="Redo" Command="{Binding CurrentTab.RedoCommand}" InputGestureText="Ctrl+Shift+Z"
+                            ToolTip="{Binding CurrentTab.RedoCommandInfo}" ToolTipService.ShowOnDisabled="True"
+                            Style="{StaticResource styleMiPointEdit}"/>
 
-                    <MenuItem Header="History" Command="{Binding CurrentProject.HistoryCommand}" InputGestureText="Ctrl+H"
-                          Style="{StaticResource styleMiPointEdit}" Visibility="Collapsed"/>
+                    <MenuItem Header="History" Command="{Binding ProjectEditor.HistoryCommand}" InputGestureText="Ctrl+H"
+                            Style="{StaticResource styleMiPointEdit}" Visibility="Collapsed"/>
                     <Separator/>
 
-                    <MenuItem Header="Rename Points" Command="{Binding CurrentEditor.RenamePointsCommand}"
-                          Style="{StaticResource styleMiHiddenNullCommand}"/>
-                    <MenuItem Header="{Binding CurrentEditor.ReverseTypeHeader}" Command="{Binding CurrentEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
-                          Style="{StaticResource styleMiHiddenNullCommand}"/>
+                    <MenuItem Header="Rename Points" Command="{Binding PointEditor.RenamePointsCommand}"
+                            Style="{StaticResource styleMiHiddenNullCommand}" IsEnabled="{Binding InPointEdior}"/>
+                    <MenuItem Header="{Binding PointEditor.ReverseTypeHeader}" Command="{Binding PointEditor.ReverseSelectedCommand}" InputGestureText="Ctrl+Alt+R"
+                            Style="{StaticResource styleMiHiddenNullCommand}" IsEnabled="{Binding InPointEdior}"/>
 
-                    <MenuItem Header="{Binding CurrentEditor.ConvertTypeHeader}" Command="{Binding CurrentEditor.ConvertPointsCommand}" Visibility="{Binding CurrentEditor, Converter={StaticResource NotNullVisibilityConverter}}" />
+                    <MenuItem Header="Sort Points">
+                        <MenuItem.IsEnabled>
+                            <MultiBinding Converter="{StaticResource MultiBoolConverter}">
+                                <Binding Path="PointEditor.MultipleSelections"/>
+                                <Binding Path="InPointEdior"/>
+                            </MultiBinding>
+                        </MenuItem.IsEnabled>
+
+                        <MenuItem Header="PID" Command="{Binding PointEditor.SortSelectedByPIDCommand}"/>
+                        <MenuItem Header="Time Created" Command="{Binding PointEditor.SortSelectedByTimeCreatedCommand}" />
+                    </MenuItem>
+
+                    <MenuItem Header="{Binding PointEditor.ConvertTypeHeader}" Command="{Binding PointEditor.ConvertPointsCommand}"
+                                IsEnabled="{Binding InPointEdior}" />
 
                     <Separator/>
 
-                    <MenuItem Header="Reset Point" Command="{Binding CurrentEditor.ResetPointCommand}" InputGestureText="Ctrl+R"
-                          Style="{StaticResource ResourceKey=styleMiPointEdit}"/>
-                    <MenuItem Header="Discard All Changes" Command="{Binding Project.DiscardChangesCommand}"
-                          Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
+                    <MenuItem Header="Reset Point" Command="{Binding PointEditor.ResetPointCommand}" InputGestureText="Ctrl+R"
+                            Style="{StaticResource ResourceKey=styleMiPointEdit}" IsEnabled="{Binding InPointEdior}"/>
+                    <MenuItem Header="Discard All Changes" Command="{Binding ProjectEditor.DiscardChangesCommand}"
+                            Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" IsEnabled="{Binding InPointEdior}"/>
 
                     <Separator/>
 
-                    <MenuItem Header="Delete" Command="{Binding CurrentEditor.DeleteCommand}" InputGestureText="Del"
-                          Style="{StaticResource styleMiPointEdit}"/>
+                    <MenuItem Header="Delete" Command="{Binding PointEditor.DeleteCommand}" InputGestureText="Del"
+                            Style="{StaticResource styleMiPointEdit}" IsEnabled="{Binding InPointEdior}"/>
                 </MenuItem>
 
                 <MenuItem Header="_Data">
                     <MenuItem Header="Import Data" Command="{Binding ImportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
                     <MenuItem Header="Export Project" Command="{Binding ExportCommand}" IsEnabled="{Binding HasOpenedProject}"/>
 
+                    <Separator/>
+
                     <MenuItem Header="View Point Details Table" Command="{Binding ViewPointDetailsCommand}" IsEnabled="{Binding HasOpenedProject}"/>
 
-                    <MenuItem Header="View Sattelite Info" Command="{Binding CurrentEditor.ViewSatInfoCommand}"
+                    <MenuItem Header="View Satellite Info" Command="{Binding PointEditor.ViewSatInfoCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" Visibility="Visible"/>
+
+                    <Separator/>
+
+                    <MenuItem Header="Analyze Project" IsEnabled="{Binding HasOpenedProject}" Command="{Binding ProjectEditor.AnalyzeProjectCommand}"/>
+
+                    <MenuItem Header="Cleanup" IsEnabled="{Binding HasOpenedProject}">
+                        <MenuItem Header="Remove Duplicate Metadata" Command="{Binding ProjectEditor.RemoveDuplicateMetadataCommand}"/>
+
+                        <Separator/>
+
+                        <MenuItem Header="Remove Empty Polygons" Command="{Binding ProjectEditor.RemoveUnusedPolygonsCommand}"/>
+
+                        <MenuItem Header="Remove Unused Metadata" Command="{Binding ProjectEditor.RemoveUnusedMetadataCommand}"/>
+
+                        <MenuItem Header="Remove Unused Groups" Command="{Binding ProjectEditor.RemoveUnusedGroupsCommand}"/>
+                    </MenuItem>
+
+                    <MenuItem Header="Selections" IsEnabled="{Binding HasOpenedProject}">
+
+                        <MenuItem Header="Operation">
+                            <MenuItem Header="GPS" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.GPS}"/>
+                            <MenuItem Header="Take5" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.Take5}"/>
+                            <MenuItem Header="Walk" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.Walk}"/>
+                            <MenuItem Header="WayPoint" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.WayPoint}"/>
+                            <MenuItem Header="SideShot" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.SideShot}"/>
+                            <MenuItem Header="Traverse" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.Traverse}"/>
+                            <MenuItem Header="Quondam" Command="{Binding PointEditor.SelectByTypeCommand}" CommandParameter="{x:Static core:OpType.Quondam}"/>
+                        </MenuItem>
+
+                        <Separator/>
+
+                        <MenuItem Header="Alternate Points" Command="{Binding PointEditor.SelectAlternateCommand}"/>
+                        <MenuItem Header="Gps Type Points" Command="{Binding PointEditor.SelectGpsTypeCommand}"/>
+                        <MenuItem Header="Traverse &amp; Sideshot Points" Command="{Binding PointEditor.SelectTravCommand}"/>
+                        <MenuItem Header="Inverse Selection" Command="{Binding PointEditor.SelectInverseCommand}"/>
+                        <MenuItem Header="Deselect All" Command="{Binding PointEditor.DeselectCommand}"/>
+
+                        <Separator/>
+
+                        <MenuItem Header="Non-3D Points" Command="{Binding PointEditor.SelectNon3DPointsCommand}"/>
+                        <MenuItem Header="Non-Differential Points" Command="{Binding PointEditor.SelectNonDiffPointsCommand}"/>
+                        <MenuItem Header="Gps Points w/o NMEA" Command="{Binding PointEditor.SelectGpsPointsWithoutNmeaCommand}" />
+                    </MenuItem>
+
+                    <Separator/>
 
                     <MenuItem Header="Open in Google Earth" Command="{Binding OpenInEarthCommand}" IsEnabled="{Binding HasOpenedProject}" />
                 </MenuItem>
 
                 <MenuItem Header="_Tools">
-                    <MenuItem Header="Recalculate All Polygons" Command="{Binding CurrentProject.RecalculateAllPolygonsCommand}"
+                    <MenuItem Header="Recalculate All Polygons" Command="{Binding ProjectEditor.RecalculateAllPolygonsCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+Shift+R"/>
 
-                    <MenuItem Header="Calculate Log Deck" Command="{Binding CurrentProject.CalculateLogDeckCommand}"
+                    <MenuItem Header="Calculate Log Deck" Command="{Binding ProjectEditor.CalculateLogDeckCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+L"/>
 
                     <Separator/>
 
                     <MenuItem Header="Create New Point" Style="{StaticResource styleHasPolygons}">
-
-                        <MenuItem Header="GPS" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.GPS}"/>
-                        <MenuItem Header="WayPoint" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.WayPoint}"/>
+                        <MenuItem Header="GPS" Command="{Binding PointEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.GPS}"/>
+                        <MenuItem Header="WayPoint" Command="{Binding PointEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.WayPoint}"/>
                         <Separator/>
-                        <MenuItem Header="Traverse" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.Traverse}"/>
-                        <MenuItem Header="SideShot" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.SideShot}"/>
+                        <MenuItem Header="Traverse" Command="{Binding PointEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.Traverse}"/>
+                        <MenuItem Header="SideShot" Command="{Binding PointEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.SideShot}"/>
                         <Separator/>
-                        <MenuItem Header="Quondam" Command="{Binding CurrentEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.Quondam}"/>
+                        <MenuItem Header="Quondam" Command="{Binding PointEditor.CreatePointCommand}" CommandParameter="{x:Static core:OpType.Quondam}"/>
                     </MenuItem>
-                    <MenuItem Header="Create Quondams" Command="{Binding CurrentEditor.CreateQuondamsCommand}"
+
+                    <MenuItem Header="Create Quondams" Command="{Binding PointEditor.CreateQuondamsCommand}"
                         Style="{StaticResource ResourceKey=styleMiPointEdit}" InputGestureText="Ctrl+Alt+Q"/>
-                    <MenuItem Header="Move Points" Command="{Binding CurrentEditor.MovePointsCommand}"
+                    <MenuItem Header="Move Points" Command="{Binding PointEditor.MovePointsCommand}"
                         Style="{StaticResource ResourceKey=styleMiPointEdit}" InputGestureText="Ctrl+Alt+M"/>
-                    <MenuItem Header="Retrace Points" Command="{Binding CurrentEditor.RetraceCommand}"
+                    <MenuItem Header="Retrace Points" Command="{Binding PointEditor.RetraceCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}" InputGestureText="Ctrl+Alt+R"/>
-                    <MenuItem Header="Reindex Points" Command="{Binding CurrentEditor.ReindexCommand}"
+                    <MenuItem Header="Reindex Points" Command="{Binding PointEditor.ReindexCommand}"
                         Style="{StaticResource ResourceKey=styleMiDisableNullCommand}"/>
 
                     <Separator/>
 
-                    <MenuItem Header="Create Grid Sample Points" Command="{Binding CurrentEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
-                          InputGestureText="Ctrl+Alt+P"/>
-                    <MenuItem Header="Create Subsample" Command="{Binding CurrentEditor.CreateSubsampleCommand}" IsEnabled="{Binding HasOpenedProject}"/>
-                    <MenuItem Header="Create Corridor" Command="{Binding CurrentEditor.CreateCorridorCommand}"
-                          Style="{StaticResource styleMiPointEdit}" InputGestureText="Ctrl+Alt+C"/>
+                    <MenuItem Header="Create Grid Sample Points" Command="{Binding PointEditor.CreatePlotsCommand}" IsEnabled="{Binding HasOpenedProject}"
+                            InputGestureText="Ctrl+Alt+P"/>
+                    <MenuItem Header="Create Subsample" Command="{Binding PointEditor.CreateSubsampleCommand}" IsEnabled="{Binding HasOpenedProject}"/>
+                    <MenuItem Header="Create Corridor" Command="{Binding PointEditor.CreateCorridorCommand}"
+                            Style="{StaticResource styleMiPointEdit}" InputGestureText="Ctrl+Alt+C"/>
+                    <MenuItem Header="Create Double Sided Corridor" Command="{Binding PointEditor.CreateDoubleSidedCorridorCommand}"
+                            Style="{StaticResource styleMiPointEdit}"/>
 
                     <Separator Visibility="Collapsed"/>
 
-                    <MenuItem Header="Modify Data Dictionary" Command="{Binding CurrentEditor.ModifyDataDictionaryCommand}" IsEnabled="{Binding HasOpenedProject}"
-                              Style="{StaticResource styleMiDisableNullCommand}" />
+                    <MenuItem Header="Modify Data Dictionary" Command="{Binding PointEditor.ModifyDataDictionaryCommand}"
+                                Style="{StaticResource styleMiDisableNullCommand}" Visibility="Collapsed">
+                        <MenuItem.IsEnabled>
+                            <MultiBinding Converter="{StaticResource MultiBoolConverter}">
+                                <Binding Path="CurrentProject.Settings.IsAdvancedMode"/>
+                                <Binding Path="HasOpenedProject"/>
+                            </MultiBinding>
+                        </MenuItem.IsEnabled>
+                    </MenuItem>
+
+                    <Separator/>
+
+                    <MenuItem Header="Advanced" IsEnabled="{Binding HasOpenedProject}">
+                        <MenuItem Header="Rezone (UTM) Points" Command="{Binding PointEditor.RezonePointsCommand}"/>
+                        <MenuItem Header="Rezone (UTM) All Points" Command="{Binding PointEditor.RezoneAllPointsCommand}"/>
+                        <MenuItem Header="Deweb Points" Command="{Binding PointEditor.DewebPointsCommand}"/>
+                        <MenuItem Header="Point Minimization" Command="{Binding PointEditor.PointMinimizationCommand}" />
+                    </MenuItem>
 
                     <Separator/>
 
@@ -193,10 +273,12 @@
 
                 <MenuItem Header="_Help">
                     <MenuItem Header="View Log File" Command="{Binding ViewLogCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
+                    <MenuItem Header="Email Error Report" Command="{Binding EmailReportCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
                     <MenuItem Header="Export Error Report" Command="{Binding ExportReportCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
-                    <MenuItem Header="View User Activity" Command="{Binding CurrentProject.ViewUserActivityCommand}"
-                        Visibility="{Binding Settings.IsAdvancedMode, Converter={StaticResource ResourceKey=BoolToVis}}"
-                              Style="{StaticResource styleMiDisableNullCommand}"/>
+
+                    <Separator/>
+
+                    <MenuItem Header="NTDP GPS Accuracies" Command="{Binding NtdpAccuraciesSiteCommand}" Style="{StaticResource styleMiDisableNullCommand}"/>
 
                     <Separator/>
 
@@ -205,7 +287,7 @@
                 </MenuItem>
             </Menu>
 
-            <StatusBar Height="25" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="{StaticResource colorPriamryDark}">
+            <StatusBar Height="25" VerticalAlignment="Bottom" DockPanel.Dock="Bottom" Background="{StaticResource scbPrimaryDark}">
                 <StatusBar.Resources>
                     <Style TargetType="TextBlock">
                         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -238,11 +320,11 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type TabItem}">
-                                        <Grid Name="Grid" VerticalAlignment="Bottom" Background="{StaticResource colorBackground}" Margin="-3, 0, 2, 0" HorizontalAlignment="Stretch">
+                                        <Grid Name="Grid" VerticalAlignment="Bottom" Background="{StaticResource scbBackground}" Margin="-3, 0, 2, 0" HorizontalAlignment="Stretch">
                                             <Border>
                                                 <DockPanel Margin="2">
                                                     <TextBlock x:Name="ContentSite" Text="{Binding TabTitle}" DockPanel.Dock="Left" HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center" Margin="4,2,8,2" ToolTip="{Binding ToolTip}"/>
+                                                        VerticalAlignment="Center" Margin="4,2,8,2" ToolTip="{Binding ToolTip}"/>
 
                                                     <Button Name="btnCloseProject" Visibility="Hidden" DockPanel.Dock="Right" HorizontalAlignment="Right"
                                                             BorderThickness="0" Style="{StaticResource styleTabButtonStyle}"

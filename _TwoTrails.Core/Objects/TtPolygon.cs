@@ -1,37 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using FSConvert = FMSC.Core.Convert;
 
 namespace TwoTrails.Core
 {
     public delegate void PolygonChangedEvent(TtPolygon polygon);
 
-    public class TtPolygon : TtObject, IComparable<TtPolygon>, IComparer<TtPolygon>
+    public class TtPolygon : TtObject, IEquatable<TtPolygon> , IComparable<TtPolygon>, IComparer<TtPolygon>
     {
-        public event PolygonChangedEvent PolygonAccuracyChanged;
         public event PolygonChangedEvent PreviewPolygonAccuracyChanged;
+        public event PolygonChangedEvent PolygonAccuracyChanged;
 
-        public event PolygonChangedEvent PolygonChanged;
         public event PolygonChangedEvent PreviewPolygonChanged;
+        public event PolygonChangedEvent PolygonChanged;
+
 
         #region Properties
         protected String _Name;
         public String Name
         {
-            get { return _Name; }
+            get => _Name;
             set { SetField(ref _Name, value); }
         }
         
         private String _Description = String.Empty;
         public String Description
         {
-            get { return _Description; }
+            get => _Description;
             set { SetField(ref _Description, value); }
         }
 
         protected Int32 _PointStartIndex = Consts.DEFAULT_POINT_START_INDEX;
         public Int32 PointStartIndex
         {
-            get { return _PointStartIndex; }
+            get => _PointStartIndex;
             set { SetField(ref _PointStartIndex, value); }
         }
 
@@ -45,63 +47,78 @@ namespace TwoTrails.Core
         private DateTime _TimeCreated = DateTime.Now;
         public DateTime TimeCreated
         {
-            get { return _TimeCreated; }
+            get => _TimeCreated;
             set { SetField(ref _TimeCreated, value); }
         }
 
         protected Double _Accuracy = Consts.DEFAULT_POINT_ACCURACY;
         public Double Accuracy
         {
-            get { return _Accuracy; }
+            get => _Accuracy;
             set { SetField(ref _Accuracy, value, OnPolygonAccuracyChanged); }
         }
 
         protected Double _Area = 0;
         public Double Area
         {
-            get { return _Area; }
-            set
-            {
-                if (SetField(ref _Area, value))
-                {
-                    OnPropertyChanged(nameof(AreaAcres), nameof(AreaHectaAcres));
-                }
-            }
+            get => _Area;
+            private set { SetField(ref _Area, value, () => OnPropertyChanged(nameof(AreaAcres), nameof(AreaHectaAcres))); }
         }
 
-        public Double AreaAcres { get { return _Area * 0.00024711; } }
-        public Double AreaHectaAcres { get { return _Area / 10000; } }
+        public Double AreaAcres => _Area * FSConvert.SquareMeterToAcre_Coeff;
+        public Double AreaHectaAcres => _Area * FSConvert.SquareMeterToHectare_Coeff;
 
         protected Double _Perimeter = 0;
         public Double Perimeter
         {
-            get { return _Perimeter; }
-            set
-            {
-                if (SetField(ref _Perimeter, value))
-                {
-                    OnPropertyChanged(nameof(PerimeterFt));
-                }
-            }
+            get => _Perimeter;
+            private set { SetField(ref _Perimeter, value, () => OnPropertyChanged(nameof(PerimeterFt))); }
         }
-
-        public Double PerimeterFt { get { return Perimeter * 3937d / 1200d; } }
-
 
         protected Double _PerimeterLine = 0;
         public Double PerimeterLine
         {
-            get { return _PerimeterLine; }
+            get => _PerimeterLine;
+            private set { SetField(ref _PerimeterLine, value, () => OnPropertyChanged(nameof(PerimeterLineFt))); }
+        }
+
+        public Double PerimeterFt => Perimeter * FSConvert.MetersToFeet_Coeff;
+        public Double PerimeterLineFt => PerimeterLine * FSConvert.MetersToFeet_Coeff;
+
+
+        protected TtPolygon _ParentUnit;
+        public TtPolygon ParentUnit
+        {
+            get => _ParentUnit;
             set
             {
-                if (SetField(ref _PerimeterLine, value))
+                TtPolygon oldParent = _ParentUnit;
+                
+                //TODO check unit type if area-less throw area (for multi unit types)
+
+                if (SetField(ref _ParentUnit, value))
                 {
-                    OnPropertyChanged(nameof(PerimeterLineFt));
+                    ParentUnitCN = _ParentUnit?.CN;
+
+                    if (oldParent != null && oldParent.PolygonChanged != null)
+                    {
+                        oldParent.PolygonChanged.Invoke(oldParent);
+                    }
+                    else if (_ParentUnit.PolygonChanged != null)
+                    {
+                        _ParentUnit.PolygonChanged.Invoke(_ParentUnit);
+                    }
                 }
             }
         }
 
-        public Double PerimeterLineFt { get { return PerimeterLine * 3937d / 1200d; } }
+
+        protected String _ParentUnitCN;
+        public String ParentUnitCN
+        {
+            get => _ParentUnitCN;
+            private set { SetField(ref _ParentUnitCN, value); }
+        }
         #endregion
 
 
@@ -117,10 +134,12 @@ namespace TwoTrails.Core
             _Accuracy = polygon._Accuracy;
             _Area = polygon._Area;
             _Perimeter = polygon._Perimeter;
+            _PerimeterLine = polygon._PerimeterLine;
+            _ParentUnitCN = polygon._ParentUnitCN;
         }
 
         public TtPolygon(string cn, string name, string desc, int psi, int inc, DateTime time,
-            double acc, double area, double perim, double perimLine) : base(cn)
+            double acc, double area, double perim, double perimLine, string parentUnitCN = null) : base(cn)
         {
             _Name = name;
             _Description = desc;
@@ -131,13 +150,16 @@ namespace TwoTrails.Core
             _Area = area;
             _Perimeter = perim;
             _PerimeterLine = perimLine;
+            _ParentUnitCN = parentUnitCN;
         }
 
-        protected void OnPolygonAccuracyChanged()
+
+        public void OnPolygonAccuracyChanged()
         {
             PreviewPolygonAccuracyChanged?.Invoke(this);
             PolygonAccuracyChanged?.Invoke(this);
         }
+
 
         public void Update(double area, double perimeter, double linePerimeter)
         {
@@ -169,24 +191,29 @@ namespace TwoTrails.Core
             return @this.TimeCreated.CompareTo(other.TimeCreated);
         }
 
-        public override string ToString()
+
+        public override string ToString() => Name;
+
+
+        public bool Equals(TtPolygon polygon)
         {
-            return Name;
+            return base.Equals(polygon) &&
+                _Area == polygon._Area &&
+                _Perimeter == polygon._Perimeter &&
+                _PerimeterLine == polygon._PerimeterLine &&
+                _Name == polygon._Name &&
+                _Accuracy == polygon._Accuracy &&
+                _Description == polygon._Description &&
+                _PointStartIndex == polygon._PointStartIndex &&
+                _Increment == polygon._Increment &&
+                _ParentUnitCN == polygon._ParentUnitCN &&
+                _TimeCreated == polygon._TimeCreated;
         }
 
 
         public override bool Equals(object obj)
         {
-            TtPolygon polygon = obj as TtPolygon;
-
-            return base.Equals(polygon) &&
-                _Area == polygon._Area &&
-                _Perimeter == polygon._Perimeter &&
-                _Name == polygon._Name &&
-                _Accuracy == polygon._Accuracy &&
-                _Description == polygon._Description &&
-                _PointStartIndex == polygon._PointStartIndex &&
-                _Increment == polygon._Increment;
+            return Equals(obj as TtPolygon);
         }
 
         public override int GetHashCode()

@@ -5,13 +5,11 @@ namespace TwoTrails.Core
 {
     public static class HaidLogic
     {
-        public static object locker = new object();
-
-        public static PolygonSummary GenerateSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false)
+        public static PolygonSummary GenerateSummary(ITtManager manager, TtPolygon polygon, bool showPoints = false, bool advancedProcessing = false)
         {
-            lock (locker)
+            lock (manager)
             {
-                return new PolygonSummary(manager, polygon, showPoints);
+                return new PolygonSummary(manager, polygon, true, showPoints, advancedProcessing);
             }
         }
 
@@ -26,13 +24,18 @@ namespace TwoTrails.Core
             sb.AppendLine($"Description: { projectInfo.Description }");
             sb.AppendLine($"Created On: { projectInfo.CreationDate }");
             sb.AppendLine($"Version: { projectInfo.Version }");
-            sb.AppendLine($"Data Version: { projectInfo.Version }");
+            sb.AppendLine($"Data Version: { projectInfo.DbVersion }");
             sb.AppendLine($"Creation Version: { projectInfo.CreationVersion }");
             sb.AppendLine("\n");
-            sb.AppendLine("**** GPS Error can be divided by 2 if an appropriate ANGLE POINT METHOD is used instead of the WALK METHOD ****");
-            sb.AppendLine("**** Appropriate means that the boundary legs are reasonably long between verticies where the boundary direction changes by 90 degree angles where possible and changes at least more than 30 degrees most of the time. ****");
-            sb.AppendLine("**** If the unit is totally a direction distance-traverse. Use only the traverse contribution area-error. ****");
-            sb.AppendLine("**** Points with asterisks are OFF boundary points. ****");
+            sb.AppendLine(
+                "**** GNSS survey area-error is best lowered by applying the correct\n" +
+                "NTDP lesser-canopy-error along roads, trails, and such.\n" + 
+                "ALWAYS DO THE POINT ACCURACY ASSIGNMENT FIRST. ****\n\n" +
+
+                "**** AREA-ERROR CANNOT BE LESSENED OR DIVIDED BY TWO UNLESS STRICT CRITERIA IS APPLIED. ****\n" +
+                "(See https://github.com/FMSC-Measurements/TwoTrails/wiki/Meeting-Area-Error)\n\n" +
+
+                "**** Points with asterisks are OFF boundary points. ****");
             sb.AppendLine("\n");
             return sb.ToString();
         }

@@ -1,14 +1,12 @@
-﻿using CSUtil;
-using FMSC.Core;
+﻿using FMSC.Core;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace TwoTrails.Core
 {
     public class PolygonCalculator
     {
-        private int polyCorners;
+        private int polyEdges;
         private double[] polyX, polyY, constant, multiple;
 
 
@@ -19,7 +17,7 @@ namespace TwoTrails.Core
                 throw new Exception("Insufficent number of points.");
             }
 
-            Point current = points.First(), temp = new Point(double.PositiveInfinity, double.PositiveInfinity);
+            Point temp = new Point(double.PositiveInfinity, double.PositiveInfinity);
             List<Point> nPoints = new List<Point>();
             
             foreach (Point p in points)
@@ -36,22 +34,22 @@ namespace TwoTrails.Core
                 throw new Exception("Input points are not a polygon.");
             }
             
-            polyCorners = nPoints.Count;
-            polyX = new double[polyCorners];
-            polyY = new double[polyCorners];
-            constant = new double[polyCorners];
-            multiple = new double[polyCorners];
+            polyEdges = nPoints.Count;
+            polyX = new double[polyEdges];
+            polyY = new double[polyEdges];
+            constant = new double[polyEdges];
+            multiple = new double[polyEdges];
 
-            for (int k = 0; k < polyCorners; k++)
+            for (int k = 0; k < polyEdges; k++)
             {
                 temp = nPoints[k];
                 polyX[k] = temp.X;
                 polyY[k] = temp.Y;
             }
 
-            int i, j = polyCorners - 1;
+            int i, j = polyEdges - 1;
 
-            for (i = 0; i < polyCorners; i++)
+            for (i = 0; i < polyEdges; i++)
             {
                 if (polyY[j] == polyY[i])
                 {
@@ -79,10 +77,10 @@ namespace TwoTrails.Core
 
         public bool IsPointInPolygon(double x, double y)
         {
-            int i, j = polyCorners - 1;
+            int i, j = polyEdges - 1;
             bool oddNodes = false;
 
-            for (i = 0; i < polyCorners; i++)
+            for (i = 0; i < polyEdges; i++)
             {
                 if ((polyY[i] < y && polyY[j] >= y || polyY[j] < y && polyY[i] >= y))
                 {
@@ -104,9 +102,9 @@ namespace TwoTrails.Core
         {
             double shortestDist = double.MaxValue, temp;
 
-            for (int i = 0; i < polyX.Length; i++)
+            for (int i = 0; i < polyX.Length - 1; i++)
             {
-                temp = MathEx.LineToPointDistance2D(polyX[i], polyY[i], polyX[i + 1], polyY[i + 1], x, y);
+                temp = MathEx.DistanceToLine(x, y, polyX[i], polyY[i], polyX[i + 1], polyY[i + 1]);
                 if (temp < shortestDist)
                 {
                     shortestDist = temp;
@@ -129,7 +127,7 @@ namespace TwoTrails.Core
                     left = right = polyX[0];
                     top = bottom = polyY[0];
 
-                    for (int i = 1; i < polyCorners; i++)
+                    for (int i = 1; i < polyEdges; i++)
                     {
                         x = polyX[i];
                         y = polyY[i];

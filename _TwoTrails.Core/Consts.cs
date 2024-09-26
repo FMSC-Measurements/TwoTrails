@@ -2,7 +2,7 @@
 
 namespace TwoTrails.Core
 {
-    public static class Consts
+    public static partial class Consts
     {
         public const String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.FFF";
 
@@ -14,8 +14,12 @@ namespace TwoTrails.Core
         public const int DEFAULT_POINT_START_INDEX = 1010;
         public const int DEFAULT_POINT_INCREMENT = 10;
 
+        public const double HB_STANDARD_ACC = 10d;
+
         public const String DefaultGroupName = "Main Group";
         public const String DefaultGroupDesc = "Default Group";
+
+        public const String FILE_EXTENSION_FILTER_ALL_TT = "All TwoTrails Files |*.ttx;*.tt2";
 
         public const String FILE_EXTENSION = ".ttx";
         public const String FILE_EXTENSION_FILTER = "TwoTrails Files (*.ttx)|*.ttx";
@@ -40,8 +44,13 @@ namespace TwoTrails.Core
         public const string SHAPE_DBF_EXT = ".dbf";
 
 
-        public const string URL_TWOTRAILS_UPDATE = @"https://www.fs.fed.us/fmsc/ftp/measure/geospatial/TwoTrails/twotrails.version";
-        public const string URL_TWOTRAILS = @"https://www.fs.fed.us/forestmanagement/products/measurement/area-determination/twotrails/";
-        public const string URL_FMSC = @"https://www.fs.fed.us/forestmanagement/products/measurement/";
+        public const string URL_TWOTRAILS_UPDATE = @"https://www.fs.usda.gov/fmsc/ftp/measure/geospatial/TwoTrails/twotrails.version";
+        public const string URL_TWOTRAILS = @"https://www.fs.usda.gov/forestmanagement/products/measurement/area-determination/twotrails/";
+        public const string URL_FMSC = @"https://www.fs.usda.gov/forestmanagement/products/measurement/";
+
+        public const string URL_NTDP_ACCURACY_WEBPAGE = "https://www.fs.usda.gov/database/gps/mtdcrept/accuracy/index.htm";
+
+        public const String EMAIL_SUBJECT = "TwoTrails Error Report";
+        public const String EMAIL_BODY = "I am experiencing issues in TwoTrails PC Android Support and would like to report it to the development team.%0A%0ANotes: ";
     }
 }

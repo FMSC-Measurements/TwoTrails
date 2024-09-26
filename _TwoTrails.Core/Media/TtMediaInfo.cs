@@ -1,11 +1,11 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using System;
 using System.Collections.ObjectModel;
 using TwoTrails.Core.Points;
 
 namespace TwoTrails.Core.Media
 {
-    public class TtMediaInfo : NotifyPropertyChangedEx
+    public class TtMediaInfo : BaseModel
     {
         private TtPoint _Point;
         public String Title { get { return ToString(); } }

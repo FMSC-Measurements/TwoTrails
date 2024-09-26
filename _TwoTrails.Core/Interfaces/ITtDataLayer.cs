@@ -16,8 +16,6 @@ namespace TwoTrails.DAL
         bool UpdatePoint(Tuple<TtPoint, TtPoint> point);
         int UpdatePoints(IEnumerable<Tuple<TtPoint, TtPoint>> points);
 
-        bool ChangePointOp(TtPoint point, TtPoint oldPoint);
-
         bool DeletePoint(TtPoint point);
         int DeletePoints(IEnumerable<TtPoint> points);
         #endregion
@@ -105,11 +103,14 @@ namespace TwoTrails.DAL
     public enum DalError
     {
         None            = 0,
-        PointIndexes    = 1 << 0,
-        NullAdjLocs     = 1 << 1,
-        MissingPolygon  = 1 << 2,
-        MissingMetadata = 1 << 3,
-        MissingGroup    = 1 << 4,
-        OrphanedQuondams= 1 << 5
+        CorruptDatabase = 1 << 0,
+        PointIndexes    = 1 << 1,
+        NullAdjLocs     = 1 << 2,
+        MissingPolygon  = 1 << 3,
+        MissingMetadata = 1 << 4,
+        MissingGroup    = 1 << 5,
+        OrphanedQuondams= 1 << 6,
+        MissingQuondams = 1 << 7,
+        CriticalIssue   = 1 << 8
     }
 }

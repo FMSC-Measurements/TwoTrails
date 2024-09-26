@@ -9,44 +9,54 @@ namespace TwoTrails.Core
         public String DeviceName { get; }
         public DateTime Date { get; private set; }
         public DataActionType Action { get; private set; }
-        public String Notes { get; private set; }
+        public String Notes { get; private set; } = String.Empty;
+
+        public String AppVersion { get; private set; }
         
-        public bool ProjectModified { get { return Action.HasFlag(DataActionType.ModifiedProject); } }
+        public bool ProjectModified => Action.HasFlag(DataActionType.ModifiedProject);
 
-        public bool PointsInserted { get { return Action.HasFlag(DataActionType.InsertedPoints); } }
-        public bool PointsModified { get { return Action.HasFlag(DataActionType.ModifiedPoints); } }
-        public bool PointsDeleted { get { return Action.HasFlag(DataActionType.DeletedPoints); } }
+        public bool PointsInserted => Action.HasFlag(DataActionType.InsertedPoints);
+        public bool PointsModified => Action.HasFlag(DataActionType.ModifiedPoints);
+        public bool PointsDeleted => Action.HasFlag(DataActionType.DeletedPoints);
 
-        public bool PolygonsInserted { get { return Action.HasFlag(DataActionType.InsertedPolygons); } }
-        public bool PolygonsModified { get { return Action.HasFlag(DataActionType.ModifiedPolygons); } }
-        public bool PolygonsDeleted { get { return Action.HasFlag(DataActionType.DeletedPolygons); } }
+        public bool PolygonsInserted => Action.HasFlag(DataActionType.InsertedPolygons);
+        public bool PolygonsModified => Action.HasFlag(DataActionType.ModifiedPolygons);
+        public bool PolygonsDeleted => Action.HasFlag(DataActionType.DeletedPolygons);
 
-        public bool MetadataInserted { get { return Action.HasFlag(DataActionType.InsertedMetadata); } }
-        public bool MetadataModified { get { return Action.HasFlag(DataActionType.ModifiedMetadata); } }
-        public bool MetadataDeleted { get { return Action.HasFlag(DataActionType.DeletedMetadata); } }
+        public bool MetadataInserted => Action.HasFlag(DataActionType.InsertedMetadata);
+        public bool MetadataModified => Action.HasFlag(DataActionType.ModifiedMetadata);
+        public bool MetadataDeleted => Action.HasFlag(DataActionType.DeletedMetadata);
 
-        public bool GroupsInserted { get { return Action.HasFlag(DataActionType.InsertedGroups); } }
-        public bool GroupsModified { get { return Action.HasFlag(DataActionType.ModifiedGroups); } }
-        public bool GroupsDeleted { get { return Action.HasFlag(DataActionType.DeletedGroups); } }
+        public bool GroupsInserted => Action.HasFlag(DataActionType.InsertedGroups);
+        public bool GroupsModified => Action.HasFlag(DataActionType.ModifiedGroups);
+        public bool GroupsDeleted => Action.HasFlag(DataActionType.DeletedGroups);
 
-        public bool MediaInserted { get { return Action.HasFlag(DataActionType.InsertedMedia); } }
-        public bool MediaModified { get { return Action.HasFlag(DataActionType.ModifiedMedia); } }
-        public bool MediaDeleted { get { return Action.HasFlag(DataActionType.DeletedMedia); } }
+        public bool MediaInserted => Action.HasFlag(DataActionType.InsertedMedia);
+        public bool MediaModified => Action.HasFlag(DataActionType.ModifiedMedia);
+        public bool MediaDeleted => Action.HasFlag(DataActionType.DeletedMedia);
 
-        public bool ManualCreatedPoints { get { return Action.HasFlag(DataActionType.ManualPointCreation); } }
-        public bool PointsMoved { get { return Action.HasFlag(DataActionType.MovePoints); } }
-        public bool PointsRetraced { get { return Action.HasFlag(DataActionType.RetracePoints); } }
-        public bool PointsReindexed { get { return Action.HasFlag(DataActionType.ReindexPoints); } }
-        public bool PointsConverted { get { return Action.HasFlag(DataActionType.ConvertPoints); } }
+        public bool NmeaInserted => Action.HasFlag(DataActionType.InsertedNmea);
+        public bool NmeaDeleted => Action.HasFlag(DataActionType.DeletedNmea);
+        public bool NmeaModified => Action.HasFlag(DataActionType.ModifiedNmea);
+
+        public bool ManualCreatedPoints => Action.HasFlag(DataActionType.ManualPointCreation);
+        public bool PointsMoved => Action.HasFlag(DataActionType.MovedPoints);
+        public bool PointsRetraced => Action.HasFlag(DataActionType.RetracePoints);
+        public bool PointsReindexed => Action.HasFlag(DataActionType.ReindexPoints);
+        public bool PointsConverted => Action.HasFlag(DataActionType.ConvertedPoints);
+        public bool PointsRezoned => Action.HasFlag(DataActionType.RezonedPoints);
         
-        public bool DataImported { get { return Action.HasFlag(DataActionType.DataImported); } }
-        public bool ModifiedDataDictionary { get { return Action.HasFlag(DataActionType.ModifiedDataDictionary); } }
+        public bool DataImported => Action.HasFlag(DataActionType.DataImported);
+        public bool DataDictionaryModified => Action.HasFlag(DataActionType.ModifiedDataDictionary);
 
-        public TtUserAction(String userName, String deviceName) :
-            this(userName, deviceName, DateTime.Now, DataActionType.None)
+        public bool ProjectUpgraded => Action.HasFlag(DataActionType.ProjectUpgraded);
+
+
+        public TtUserAction(String userName, String deviceName, String appVersion) :
+            this(userName, deviceName, appVersion, DateTime.Now, DataActionType.None)
         { }
 
-        public TtUserAction(String userName, String deviceName,
+        public TtUserAction(String userName, String deviceName, String appVersion,
             DateTime date, DataActionType action, String notes = null)
         {
             if (String.IsNullOrEmpty(userName))
@@ -55,8 +65,12 @@ namespace TwoTrails.Core
             if (String.IsNullOrEmpty(deviceName))
                 throw new ArgumentNullException(nameof(deviceName));
 
+            if (String.IsNullOrEmpty(appVersion))
+                throw new ArgumentNullException(nameof(appVersion));
+
             UserName = userName;
             DeviceName = deviceName;
+            AppVersion = appVersion;
             Date = date;
             Action = action;
             Notes = notes;
@@ -74,11 +88,13 @@ namespace TwoTrails.Core
         {
             if (notes != null)
             {
-                if (Notes == null)
+                if (String.IsNullOrWhiteSpace(Notes))
                     Notes = notes;
                 else
-                    Notes += $"|{notes}"; 
+                    Notes += $" | {notes}"; 
             }
+
+            Date = DateTime.Now;
         }
 
         public void Reset()

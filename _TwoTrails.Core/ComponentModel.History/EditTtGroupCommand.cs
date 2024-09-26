@@ -4,11 +4,11 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class EditTtGroupCommand<T> : ITtGroupCommand
     {
-        private T NewValue;
-        private T OldValue;
-        private PropertyInfo Property;
+        private readonly T NewValue;
+        private readonly T OldValue;
+        private readonly PropertyInfo Property;
 
-        public EditTtGroupCommand(TtGroup group, PropertyInfo property, T newValue) : base(group)
+        public EditTtGroupCommand(TtManager manager, TtGroup group, PropertyInfo property, T newValue) : base(manager, group)
         {
             this.Property = property;
             this.NewValue = newValue;
@@ -24,5 +24,8 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             Property.SetValue(Group, OldValue);
         }
+
+        protected override DataActionType GetActionType() => DataActionType.ModifiedGroups;
+        protected override string GetCommandInfoDescription() => $"Edit {Property.Name} of group {Group.Name}";
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FMSC.Core;
+using FMSC.GeoSpatial;
 using System;
 using System.Collections.Generic;
 
@@ -175,7 +176,7 @@ namespace TwoTrails.Core
 
         public int Compare(TtMetadata @this, TtMetadata other)
         {
-            return @this.Name.CompareTo(other);
+            return @this.Name.CompareToNatural(other.Name);
         }
 
 

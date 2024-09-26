@@ -1,71 +1,49 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
 using System;
-using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails
 {
-    public abstract class TtTabModel : NotifyPropertyChangedEx
+    public abstract class TtTabModel : BaseModel
     {
+        public ICommand CloseTabCommand { get; }
+        public virtual ICommand OpenInWinndowCommand { get; } = null;
+
+        protected MainWindowModel MainModel { get; }
+
         public TabItem Tab { get; private set; }
 
-        public virtual String TabTitle
-        {
-            get { return $"{Project.ProjectName}{(Project.RequiresSave ? "*" : String.Empty)}"; }
-        }
-
-        public virtual String TabInfo { get { return String.Empty; } }
-
-        public TtProject Project { get; private set; }
-
-        public virtual String ToolTip { get { return Project.FilePath; } } 
+        public abstract String TabTitle { get; }
 
         public abstract bool IsDetachable { get; }
 
-        public bool IsEditingPoints { get { return Get<bool>(); } protected set { Set(value); } }
+        public virtual String TabInfo => String.Empty;
 
-        public ICommand CloseTabCommand { get; }
-        public ICommand SaveCommand { get; }
-        public virtual ICommand OpenInWinndowCommand { get; } = null;
-        
-        public TtTabModel(TtProject project) : base()
+        public virtual String ToolTip => String.Empty;
+
+
+        public TtTabModel(MainWindowModel mainWindowModel) : base()
         {
-            Project = project;
-
             this.Tab = new TabItem();
-            
-            SaveCommand = new RelayCommand(x => Project.Save());
-            CloseTabCommand = new RelayCommand(x => Project.CloseTab(this));
+            MainModel = mainWindowModel;
 
-            Project.PropertyChanged += Project_PropertyChanged;
+            CloseTabCommand = new RelayCommand(x => CloseTab());
 
             Tab.DataContext = this;
-
-            IsEditingPoints = false;
         }
 
-        private void Project_PropertyChanged(object sender, PropertyChangedEventArgs e)
+
+        public void CloseTab()
         {
-            if (e.PropertyName == "ProjectName" || e.PropertyName == "RequiresSave")
+            if (OnTabClose())
             {
-                Tab.Dispatcher.Invoke(() =>
-                {
-                    Tab.Header = TabTitle;
-                });
-                OnPropertyChanged(nameof(TabTitle));
-            }
-            else if (e.PropertyName == "DAL")
-            {
-                OnPropertyChanged(nameof(ToolTip));
+                MainModel.RemoveTab(this, false);
             }
         }
 
-        public virtual void Close()
-        {
-
-        }
+        protected abstract bool OnTabClose();
     }
 }

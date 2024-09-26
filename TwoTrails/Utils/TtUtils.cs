@@ -1,18 +1,14 @@
 ﻿using FMSC.Core;
-using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.UTM;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Windows;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
-using TwoTrails.DAL;
-using Windows.UI;
+using Point = FMSC.Core.Point;
 
 namespace TwoTrails.Utils
 {
@@ -32,9 +28,9 @@ namespace TwoTrails.Utils
 
                     if (tokens.Length > 0)
                     {
-                        status.CheckStatus = new Version(tokens[0].Trim()) > Assembly.GetExecutingAssembly().GetName().Version;
+                        status.NewVersionAvailable = new Version(tokens[0].Trim()) > Assembly.GetExecutingAssembly().GetName().Version;
 
-                        if (status.CheckStatus == true && tokens.Length > 1)
+                        if (status.NewVersionAvailable == true && tokens.Length > 1)
                         {
                             UpdateType updateType = UpdateType.None;
 
@@ -50,7 +46,7 @@ namespace TwoTrails.Utils
 
                             status.UpdateType = updateType;
 
-                            status.UpdateMessage = (tokens.Length > 2) ? tokens[2] : String.Empty;
+                            status.UpdateMessage = (tokens.Length > 2) ? tokens[2].Replace("\\n", "\n") : String.Empty;
 
                         }
                     }
@@ -75,67 +71,19 @@ namespace TwoTrails.Utils
             UtmExtent.Builder buider = new UtmExtent.Builder(zone);
             
             foreach (TtPoint p in points)
-                buider.Include(GetCoords(p, zone, adjusted));
+                buider.Include(p.GetCoords(zone, adjusted));
 
             return buider.Build();
         }
 
-
-        public static UTMCoords GetCoords(TtPoint point, int targetZone, bool adjusted = true)
+        public static Point GetFarthestCorner(double pX, double pY, double top, double bottom, double left, double right)
         {
-            if (point.Metadata.Zone != targetZone)
-            {
-                if (point is GpsPoint gps && gps.HasLatLon)
-                {
-                    return UTMTools.ConvertLatLonSignedDecToUTM((double)gps.Latitude, (double)gps.Longitude, targetZone);
-                }
-                else //Use reverse location calculation
-                {
-                    Position pos;
-
-                    if (adjusted)
-                        pos = UTMTools.ConvertUTMtoLatLonSignedDec(point.AdjX, point.AdjY, point.Metadata.Zone);
-                    else
-                        pos = UTMTools.ConvertUTMtoLatLonSignedDec(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
-
-                    return UTMTools.ConvertLatLonToUTM(pos, targetZone);
-                }
-            }
-            else
-            {
-                if (adjusted)
-                    return new UTMCoords(point.AdjX, point.AdjY, targetZone);
-                else
-                    return new UTMCoords(point.UnAdjX, point.UnAdjY, targetZone);
-            }
-        }
-
-        public static FMSC.Core.Point GetLatLon(TtPoint point, bool adjusted = true)
-        {
-            if (point is GpsPoint gps && gps.HasLatLon)
-            {
-                return new FMSC.Core.Point((double)gps.Longitude, (double)gps.Latitude);
-            }
-            else
-            {
-                if (point.Metadata == null)
-                    throw new Exception("Missing Metadata");
-
-                return adjusted ?
-                    UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.AdjX, point.AdjY, point.Metadata.Zone) :
-                    UTMTools.ConvertUTMtoLatLonSignedDecAsPoint(point.UnAdjX, point.UnAdjY, point.Metadata.Zone);
-            }
-        }
-
-
-        public static FMSC.Core.Point GetFarthestCorner(double pX, double pY, double top, double bottom, double left, double right)
-        {
-            FMSC.Core.Point fp;
+            Point fp;
 
             double dist, temp;
 
             dist = MathEx.Distance(pX, pY, left, top);
-            fp = new FMSC.Core.Point(left, top);
+            fp = new Point(left, top);
 
             temp = MathEx.Distance(pX, pY, right, top);
 
@@ -245,88 +193,17 @@ namespace TwoTrails.Utils
         }
 
 
-        public static bool CheckAndFixErrors(TtSqliteDataAccessLayer dal)
+        public static string GetMalFilePathFromDalFilePath(string dalFilePath)
         {
-            DalError errors = dal.GetErrors();
-
-            if (errors > 0)
-            {
-                List<string> errList = new List<string>();
-
-                if (errors.HasFlag(DalError.PointIndexes))
-                    errList.Add("Skipped Point Indexes");
-                if (errors.HasFlag(DalError.NullAdjLocs))
-                    errList.Add("Invalid Point Locations");
-                if (errors.HasFlag(DalError.MissingPolygon))
-                    errList.Add("Missing Polygons");
-                if (errors.HasFlag(DalError.MissingMetadata))
-                    errList.Add("Missing Metadata");
-                if (errors.HasFlag(DalError.MissingGroup))
-                    errList.Add("Missing Groups");
-
-                bool hardErrors = errors.HasFlag(DalError.MissingGroup) || errors.HasFlag(DalError.MissingMetadata) || errors.HasFlag(DalError.MissingPolygon);
-
-                MessageBoxResult mbr =  MessageBox.Show(
-                    $"It appears part of the TwoTrails file is corrupt. The error{(errList.Count > 1 ? "s include" : " is")}: {String.Join(", ", errList)}. " +
-                    (hardErrors ? $"Would you like to try and fix the file by moving and editing the data (Yes) or removing invalid data (No)?" :
-                    "Would you like to fix the data?"),
-                    "Data is corrupted",
-                    hardErrors ? MessageBoxButton.YesNoCancel : MessageBoxButton.OKCancel, MessageBoxImage.Error, MessageBoxResult.Cancel);
-
-                if (mbr == MessageBoxResult.Cancel)
-                    return false;
-                else
-                {
-                    try
-                    {
-                        File.Copy(dal.FilePath, $"{dal.FilePath}.corrupt", true);
-
-                        dal.FixErrors(mbr == MessageBoxResult.No);
-                    }
-                    catch (Exception e)
-                    {
-                        Trace.WriteLine(e.Message);
-                        MessageBox.Show("Error fixing file.");
-                        return false;
-                    }
-                }
-            }
-            
-            return true;
+            return Path.Combine(Path.GetDirectoryName(dalFilePath),
+                $"{Path.GetFileNameWithoutExtension(dalFilePath)}{Consts.FILE_EXTENSION_MEDIA}");
         }
 
-
-
-
-        public static Color GetColor(int argb)
-        {
-            return Color.FromArgb(GetAlpha(argb), GetRed(argb), GetGreen(argb), GetBlue(argb));
-        }
-
-        public static byte GetAlpha(int color)
-        {
-            return (byte)((color >> 24) & 255);
-        }
-
-        public static byte GetRed(int color)
-        {
-            return (byte)((color >> 16) & 255);
-        }
-
-        public static byte GetGreen(int color)
-        {
-            return (byte)((color >> 8) & 255);
-        }
-
-        public static byte GetBlue(int color)
-        {
-            return (byte)(color & 255);
-        }
     }
 
     public struct UpdateStatus
     {
-        public bool? CheckStatus { get; set; }
+        public bool? NewVersionAvailable { get; set; }
         public UpdateType UpdateType { get; set; }
         public string UpdateMessage { get; set; }
     }
@@ -340,6 +217,5 @@ namespace TwoTrails.Utils
         CriticalBugFixes = 1 << 3,
         Optimiztions = 1 << 4,
         FeatureUpdates = 1 << 5
-
     }
 }

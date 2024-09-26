@@ -1,14 +1,14 @@
-﻿using CSUtil.ComponentModel;
+﻿using FMSC.Core.ComponentModel;
 using FMSC.Core.Windows.ComponentModel.Commands;
-using FMSC.GeoSpatial.MTDC;
 using System;
 using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
+using TwoTrails.Utils;
 
 namespace TwoTrails.ViewModels
 {
-    public class AccuracyDataModel : NotifyPropertyChangedEx
+    public class AccuracyDataModel : BaseModel
     {
         public GpsAccuracyReport Report { get; }
 
@@ -24,14 +24,17 @@ namespace TwoTrails.ViewModels
         public int StartupSelectedTabIndex { get; }
         public bool HasGpsAccuracyReport { get; }
 
+        public Window Window { get; private set; }
+
+
         public AccuracyDataModel(GpsAccuracyReport report, double? accuracy, string make, string model, Window window)
         {
+            Window = window;
+
             if (report == null)
             {
                 StartupSelectedTabIndex = 1;
                 HasGpsAccuracyReport = false;
-
-                MessageBox.Show("Unable to get MTDC Accuracy Reports.");
             }
             else
             {
@@ -46,8 +49,9 @@ namespace TwoTrails.ViewModels
             ModelID = model;
 
             OkCommand = new BindedRelayCommand<AccuracyDataModel>(
-                x => { window.DialogResult = true; window.Close(); },
-                x => Accuracy > 0, this, x => x.Accuracy);
+                x => { Window.DialogResult = true; Window.Close(); },
+                x => Accuracy > 0,
+                this, m => m.Accuracy);
 
             CancelCommand = new RelayCommand(x => window.Close());
 

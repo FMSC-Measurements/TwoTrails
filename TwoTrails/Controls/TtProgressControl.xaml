@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:TwoTrails.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             Background="White">
+             Background="#A0FFFFFF">
     <Grid>
         <Viewbox Width="75" Height="75">
             <Canvas Width="50" Height="50"

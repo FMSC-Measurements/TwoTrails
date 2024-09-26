@@ -1,6 +1,6 @@
 ﻿using TwoTrails.Core;
 
-namespace TwoTrails
+namespace TwoTrails.Settings
 {
     public class TtPolygonGraphicSettings : IPolygonGraphicSettings
     {
@@ -23,7 +23,7 @@ namespace TwoTrails
 
         //FFE65100
         public int WayPtsColor { get; } = -1683200;
-        
+
         public float AdjWidth { get; } = 2;
         public float UnAdjWidth { get; } = 5;
 

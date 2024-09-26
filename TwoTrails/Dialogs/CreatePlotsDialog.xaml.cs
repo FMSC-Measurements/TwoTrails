@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using TwoTrails.ViewModels;
 
@@ -18,6 +19,11 @@ namespace TwoTrails.Dialogs
             InitializeComponent();
         }
 
+        private async void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            await Application.Current.Dispatcher.InvokeAsync((sender as TextBox).SelectAll);
+        }
+
         private void TextIsUnsignedInteger(object sender, TextCompositionEventArgs e)
         {
             e.Handled = ControlUtils.TextIsUnsignedInteger(sender, e);
@@ -28,6 +34,16 @@ namespace TwoTrails.Dialogs
             e.Handled = ControlUtils.TextIsInteger(sender, e);
         }
 
+        private void TextIsDouble(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = ControlUtils.TextIsDouble(sender, e);
+        }
+
+        private void TextIsUnsignedDouble(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = ControlUtils.TextIsUnsignedDouble(sender, e);
+        }
+
 
         public static bool? ShowDialog(TtProject project, Window owner = null)
         {
@@ -35,8 +51,6 @@ namespace TwoTrails.Dialogs
 
             if (owner != null)
                 dialog.Owner = owner;
-            else
-                dialog.Owner = project.MainModel.MainWindow;
 
             return dialog.ShowDialog();
         }
@@ -47,8 +61,6 @@ namespace TwoTrails.Dialogs
 
             if (owner != null)
                 dialog.Owner = owner;
-            else
-                dialog.Owner = project.MainModel.MainWindow;
 
             if (onClose != null)
             {

@@ -4,24 +4,24 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class ReplaceTtPointCommand : ITtPointCommand
     {
-        private TtManager pointsManager;
-        private TtPoint _ReplacedPoint;
+        private readonly TtPoint _ReplacedPoint;
 
-        public ReplaceTtPointCommand(TtPoint point, TtManager pointsManager) : base(point)
+        public ReplaceTtPointCommand(TtManager manager, TtPoint point) : base(manager, point)
         {
-            this.pointsManager = pointsManager;
-            
-            _ReplacedPoint = pointsManager.GetPoint(point.CN);
+            _ReplacedPoint = manager.GetPoint(point.CN);
         }
 
         public override void Redo()
         {
-            pointsManager.ReplacePoint(Point);
+            Manager.ReplacePoint(Point);
         }
 
         public override void Undo()
         {
-            pointsManager.ReplacePoint(_ReplacedPoint);
+            Manager.ReplacePoint(_ReplacedPoint);
         }
+
+        protected override DataActionType GetActionType() => DataActionType.ModifiedPoints;
+        protected override string GetCommandInfoDescription() => $"Repalce point {Point.PID} with {_ReplacedPoint.PID}";
     }
 }

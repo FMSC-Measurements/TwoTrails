@@ -7,34 +7,36 @@ namespace TwoTrails.Core.ComponentModel.History
 {
     public class DeleteTtPointCommand : ITtPointCommand
     {
-        private TtManager pointsManager;
-
-        private List<Tuple<QuondamPoint, TtPoint>> _ConvertedPoints = null;
+        private List<Tuple<QuondamPoint, GpsPoint>> _ConvertedPoints = null;
         private List<TtNmeaBurst> _AddNmea = new List<TtNmeaBurst>();
+        private TtPoint _QpParentPoint = null;
 
-        public DeleteTtPointCommand(TtPoint point, TtManager pointsManager) : base(point)
+        public DeleteTtPointCommand(TtManager manager, TtPoint point) : base(manager, point)
         {
-            this.pointsManager = pointsManager;
-
             if (point.HasQuondamLinks)
             {
-                _ConvertedPoints = new List<Tuple<QuondamPoint, TtPoint>>();
+                _ConvertedPoints = new List<Tuple<QuondamPoint, GpsPoint>>();
 
                 QuondamPoint child;
                 foreach (string ccn in point.LinkedPoints)
                 {
-                    if (pointsManager.PointExists(ccn))
+                    if (manager.PointExists(ccn))
                     {
-                        child = pointsManager.GetPoint(ccn) as QuondamPoint;
+                        child = manager.GetPoint(ccn) as QuondamPoint;
                         
                         _ConvertedPoints.Add(Tuple.Create(child, child.ConvertQuondam()));
 
                         if (point.IsGpsType())
                         {
-                            _AddNmea.AddRange(pointsManager.GetNmeaBursts(point.CN).Select(n => new TtNmeaBurst(n, child.CN)));
+                            _AddNmea.AddRange(manager.GetNmeaBursts(point.CN).Select(n => new TtNmeaBurst(n, child.CN)));
                         }
                     }
                 }
+            }
+
+            if (point.OpType == OpType.Quondam && point is QuondamPoint qp)
+            {
+                _QpParentPoint = qp.ParentPoint;
             }
         }
 
@@ -42,41 +44,56 @@ namespace TwoTrails.Core.ComponentModel.History
         {
             if (_ConvertedPoints != null)
             {
-                foreach (Tuple<QuondamPoint, TtPoint> tuple in _ConvertedPoints)
+                foreach (Tuple<QuondamPoint, GpsPoint> tuple in _ConvertedPoints)
                 {
-                    pointsManager.ReplacePoint(tuple.Item2);
+                    Manager.ReplacePoint(tuple.Item2);
                     Point.RemoveLinkedPoint(tuple.Item1);
                 }
 
-                pointsManager.AddNmeaBursts(_AddNmea);
+                Manager.AddNmeaBursts(_AddNmea);
             }
 
-            pointsManager.DeletePoint(Point);
+            if (_QpParentPoint != null)
+            {
+                _QpParentPoint.RemoveLinkedPoint(Point as QuondamPoint);
+            }
+
+            Manager.DeletePoint(Point);
 
             if (Point.IsGpsType())
             {
-                pointsManager.DeleteNmeaBursts(Point.CN);
+                Manager.DeleteNmeaBursts(Point.CN);
             }
         }
 
         public override void Undo()
         {
-            if (_ConvertedPoints != null)
-            {
-                foreach (Tuple<QuondamPoint, TtPoint> tuple in _ConvertedPoints)
-                {
-                    pointsManager.ReplacePoint(tuple.Item1);
-                    Point.AddLinkedPoint(tuple.Item1);
-                    pointsManager.DeleteNmeaBursts(tuple.Item2.CN);
-                }
-            }
-
-            pointsManager.AddPoint(Point);
-
             if (Point.IsGpsType())
             {
-                pointsManager.RestoreNmeaBurts(Point.CN);
+                Manager.RestoreNmeaBurts(Point.CN);
+            }
+
+            Manager.AddPoint(Point);
+
+            if (_QpParentPoint != null)
+            {
+                _QpParentPoint.AddLinkedPoint(Point as QuondamPoint);
+            }
+
+            if (_ConvertedPoints != null)
+            {
+                foreach (Tuple<QuondamPoint, GpsPoint> tuple in _ConvertedPoints)
+                {
+                    Manager.ReplacePoint(tuple.Item1);
+                    Point.AddLinkedPoint(tuple.Item1);
+                    Manager.DeleteNmeaBursts(tuple.Item2.CN);
+                }
             }
         }
+
+
+        protected override int GetAffectedItemCount() => (_ConvertedPoints != null ? _ConvertedPoints.Count : 0) + 1;
+        protected override DataActionType GetActionType() => DataActionType.DeletedPoints;
+        protected override string GetCommandInfoDescription() => $"Delete Point {Point.PID}";
     }
 }

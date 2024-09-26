@@ -2,21 +2,17 @@
 
 namespace TwoTrails.Core.ComponentModel.History
 {
-    public abstract class ITtPolygonCommand : ITtCommand
+    public abstract class ITtPolygonCommand : ITtBaseCommand
     {
-        public bool RequireRefresh { get; } = false;
-
-        public Type DataType => PolygonProperties.DataType;
-
         protected TtPolygon Polygon;
 
-        public ITtPolygonCommand(TtPolygon polygon)
+        public ITtPolygonCommand(TtManager manager, TtPolygon polygon) : base(manager)
         {
             this.Polygon = polygon ?? throw new ArgumentNullException(nameof(polygon));
         }
 
-        public abstract void Redo();
 
-        public abstract void Undo();
+        protected override int GetAffectedItemCount() => 1;
+        protected override String GetCommandInfoDescription() => "Polygon";
     }
 }

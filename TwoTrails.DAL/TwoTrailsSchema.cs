@@ -9,8 +9,12 @@ namespace TwoTrails.DAL
         public static readonly Version OSV_2_0_2 = new Version(2, 0, 2);
         public static readonly Version OSV_2_0_3 = new Version(2, 0, 3);
 
+        public static readonly Version OSV_2_1_0 = new Version(2, 1, 0);
+        public const int OSV_2_1_0_INT = 4;
+
         //Schema Version
-        public static readonly Version SchemaVersion = OSV_2_0_3;
+        public static readonly Version SchemaVersion = OSV_2_1_0;
+        public const int SchemaVersionInt = OSV_2_1_0_INT;
 
 
         public static class SharedSchema
@@ -204,6 +208,7 @@ namespace TwoTrails.DAL
             public const String TableName = "Polygons";
 
             public const String Name = "Name";
+            public const String UnitType = "UnitType";
             public const String Accuracy = "Accuracy";
             public const String Description = "Description";
             public const String Area = "Area";
@@ -212,10 +217,12 @@ namespace TwoTrails.DAL
             public const String IncrementBy = "Increment";
             public const String PointStartIndex = "PointStartIndex";
             public const String TimeCreated = "TimeCreated";
+            public const String ParentUnitCN = "ParentUnitCN";
 
             public const String CreateTable =
                 "CREATE TABLE " + TableName + " (" +
                 SharedSchema.CN + " TEXT, " +
+                UnitType + " INTEGER, " +
                 Name + " TEXT, " +
                 Accuracy + " REAL, " +
                 Description + " TEXT, " +
@@ -224,6 +231,7 @@ namespace TwoTrails.DAL
                 PerimeterLine + " REAL, " +
                 IncrementBy + " INTEGER, " +
                 PointStartIndex + " INTEGER, " +
+                ParentUnitCN + " TEXT, " +
                 TimeCreated + " TEXT, " +
                 "PRIMARY KEY (" + SharedSchema.CN + "));";
 
@@ -238,7 +246,8 @@ namespace TwoTrails.DAL
                 TimeCreated + ", " +
                 Area + ", " +
                 Perimeter + ", " +
-                PerimeterLine;
+                PerimeterLine + ", " +
+                ParentUnitCN;
         }
         #endregion
 
@@ -511,6 +520,7 @@ namespace TwoTrails.DAL
 
             public const String UserName = "UserName";
             public const String DeviceName = "DeviceName";
+            public const String AppVersion = "AppVersion";
             public const String ActivityDate = "ActivityDate";
             public const String ActivityType = "ActivityType";
             public const String ActivityNotes = "ActivityNotes";
@@ -519,6 +529,7 @@ namespace TwoTrails.DAL
                 "CREATE TABLE " + TableName + " (" +
                 UserName + " TEXT, " +
                 DeviceName + " TEXT, " +
+                AppVersion + " TEXT, " +
                 ActivityDate + " TEXT, " +
                 ActivityType + " INTEGER, " +
                 ActivityNotes + " TEXT" +
@@ -528,6 +539,7 @@ namespace TwoTrails.DAL
             public const String SelectItems =
                 UserName + ", " +
                 DeviceName + ", " +
+                AppVersion + ", " +
                 ActivityDate + ", " +
                 ActivityType + ", " +
                 ActivityNotes;
@@ -590,6 +602,11 @@ ALTER TABLE {TtNmeaSchema.TableName} ADD {TtNmeaSchema.SatellitesInView} TEXT; U
 
         public static readonly string UPGRADE_OSV_2_0_3 = $@"UPDATE {TtNmeaSchema.TableName} SET {TtNmeaSchema.Fix} = {TtNmeaSchema.Fix} + 1;
 UPDATE {ProjectInfoSchema.TableName} SET {ProjectInfoSchema.TtDbSchemaVersion} = '{OSV_2_0_3}';";
+
+
+        public static readonly string UPGRADE_OSV_2_1_0 = $@"ALTER TABLE {PolygonSchema.TableName} ADD {PolygonSchema.ParentUnitCN} TEXT;
+ALTER TABLE {PolygonSchema.TableName} ADD {PolygonSchema.UnitType} INTEGER; ALTER TABLE {ActivitySchema.TableName} ADD {ActivitySchema.AppVersion} TEXT;
+UPDATE {ProjectInfoSchema.TableName} SET {ProjectInfoSchema.TtDbSchemaVersion} = '{OSV_2_1_0}'; PRAGMA user_version = {OSV_2_1_0_INT};";
         #endregion
     }
 }

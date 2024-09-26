@@ -12,11 +12,11 @@ namespace TwoTrails
     /// </summary>
     public partial class AboutWindow : Window
     {
-        public string Version { get { return AppInfo.Version.ToString(); } }
+        public string Version => AppInfo.Version.GetVersionWithBuildType();
 
-        public string DBVersion { get { return TwoTrailsSchema.SchemaVersion.ToString(); } }
+        public string DBVersion => TwoTrailsSchema.SchemaVersion.ToString();
 
-        public string Copyright { get { return $"USDA Forest Service {DateTime.Now.Year}"; } }
+        public string Copyright => $"USDA Forest Service {DateTime.Now.Year}";
 
         public ICommand CloseCommand { get; }
 

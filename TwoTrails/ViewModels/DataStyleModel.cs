@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,18 +13,23 @@ namespace TwoTrails.ViewModels
 {
     public class DataStyleModel
     {
+        private readonly ReadOnlyObservableCollection<TtPolygon> _Polygons;
         private Dictionary<String, Style> _PolygonStyles, _PolygonStylesAlt;
+        public bool Disposed { get; private set; }
 
-
-        public DataStyleModel(TtProject project)
+        public DataStyleModel(ReadOnlyObservableCollection<TtPolygon> polygons)
         {
+            _Polygons = polygons;
             _PolygonStyles = new Dictionary<string, Style>();
             _PolygonStylesAlt = new Dictionary<string, Style>();
 
-            foreach (TtPolygon poly in project.Manager.GetPolygons())
+            foreach (TtPolygon poly in polygons)
                 CreatePolygonStyle(poly);
 
-            ((INotifyCollectionChanged)project.Manager.Polygons).CollectionChanged += DataStyleModel_CollectionChanged;
+            if (!_PolygonStyles.ContainsKey(Consts.EmptyGuid))
+                CreatePolygonStyle(new TtPolygon() { CN = Consts.EmptyGuid });
+
+            ((INotifyCollectionChanged)polygons).CollectionChanged += DataStyleModel_CollectionChanged;
         }
 
         private void DataStyleModel_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -85,7 +92,9 @@ namespace TwoTrails.ViewModels
 
         public Style GetRowStyle(TtPoint point)
         {
-            return point.Index % 2 == 0 ? _PolygonStyles[point.PolygonCN] : _PolygonStylesAlt[point.PolygonCN];
+            string id = point == null || !_PolygonStyles.ContainsKey(point.CN) ? Consts.EmptyGuid : point.PolygonCN;
+
+            return (point == null ? 0 : point.Index) % 2 == 0 ? _PolygonStyles[id] : _PolygonStylesAlt[id];
         }
     }
 }

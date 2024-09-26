@@ -7,7 +7,7 @@
         xmlns:cvt="clr-namespace:TwoTrails.Converters"
         xmlns:fmsccm="clr-namespace:FMSC.Core.Windows.ComponentModel;assembly=FMSC.Core.Windows"
         mc:Ignorable="d"
-        Title="ViewSatInfoDialog" Height="450" Width="800"
+        Title="View Satellite Info" Height="450" Width="800"
         WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <cvt:DmsToDecDegConverter x:Key="dmsToDD"/>
