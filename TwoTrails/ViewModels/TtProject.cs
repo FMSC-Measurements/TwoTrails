@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using TwoTrails.Core;
+using TwoTrails.Core.Units;
 using TwoTrails.DAL;
 using TwoTrails.Settings;
 using TwoTrails.Utils;

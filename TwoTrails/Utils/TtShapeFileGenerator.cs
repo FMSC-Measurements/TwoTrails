@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Utils
 {

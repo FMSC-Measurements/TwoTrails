@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
 using System.Windows.Threading;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.ViewModels
 {

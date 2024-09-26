@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Input;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.ViewModels
 {

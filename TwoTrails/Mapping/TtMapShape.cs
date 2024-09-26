@@ -1,6 +1,7 @@
 ﻿using FMSC.Core.ComponentModel;
 using Microsoft.Maps.MapControl.WPF;
 using TwoTrails.Core;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Mapping
 {

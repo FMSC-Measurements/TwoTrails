@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 using TwoTrails.Utils;
 using TwoTrails.ViewModels;
 

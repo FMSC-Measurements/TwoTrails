@@ -1,6 +1,7 @@
 ﻿using FMSC.Core.ComponentModel;
 using System.Collections.Generic;
 using TwoTrails.Core;
+using TwoTrails.Core.Units;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails.Settings

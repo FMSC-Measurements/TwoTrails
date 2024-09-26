@@ -13,6 +13,7 @@ using FMSC.GeoSpatial;
 using FMSC.GeoSpatial.NMEA.Sentences;
 
 using TTS = TwoTrails.DAL.TwoTrailsSchema;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.DAL
 {

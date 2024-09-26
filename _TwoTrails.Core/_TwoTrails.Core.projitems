@@ -105,7 +105,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtNmeaBurst.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtObject.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\TtPolygon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Units\TtPolygon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TtUserAction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PointNamer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObjectProperties\PointProperties.cs" />
@@ -125,5 +125,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)TtManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\GroupType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types\OpType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Units\" />
   </ItemGroup>
 </Project>

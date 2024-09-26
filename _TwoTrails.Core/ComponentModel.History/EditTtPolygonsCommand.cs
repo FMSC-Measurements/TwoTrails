@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core.ComponentModel.History
 {

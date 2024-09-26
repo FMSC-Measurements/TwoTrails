@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using TwoTrails.Core;
+using TwoTrails.Core.Units;
 using TwoTrails.DAL;
 
 namespace TwoTrails.ViewModels

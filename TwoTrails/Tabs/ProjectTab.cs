@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using TwoTrails.Controls;
 using TwoTrails.Core;
+using TwoTrails.Core.Units;
 using TwoTrails.ViewModels;
 
 namespace TwoTrails

@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.ViewModels
 {

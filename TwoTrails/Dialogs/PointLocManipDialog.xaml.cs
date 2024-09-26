@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using TwoTrails.Core;
 using TwoTrails.Core.ComponentModel.History;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Dialogs
 {

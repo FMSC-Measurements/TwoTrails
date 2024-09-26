@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows.Media;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 using Point = FMSC.Core.Point;
 
 namespace TwoTrails.Utils

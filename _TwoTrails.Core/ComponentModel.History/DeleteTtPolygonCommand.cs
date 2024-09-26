@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core.ComponentModel.History
 {

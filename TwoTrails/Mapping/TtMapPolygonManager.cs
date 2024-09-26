@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using TwoTrails.Core;
 using TwoTrails.Core.Points;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Mapping
 {

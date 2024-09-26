@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FSConvert = FMSC.Core.Convert;
 
-namespace TwoTrails.Core
+namespace TwoTrails.Core.Units
 {
     public delegate void PolygonChangedEvent(TtPolygon polygon);
 

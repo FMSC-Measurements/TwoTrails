@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Media;
 using TwoTrails.Core;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Mapping
 {

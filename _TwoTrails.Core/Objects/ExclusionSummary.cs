@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TwoTrails.Core.Units;
 using FSConvert = FMSC.Core.Convert;
 
 namespace TwoTrails.Core

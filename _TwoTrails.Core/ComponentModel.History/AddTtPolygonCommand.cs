@@ -1,4 +1,6 @@
-﻿namespace TwoTrails.Core.ComponentModel.History
+﻿using TwoTrails.Core.Units;
+
+namespace TwoTrails.Core.ComponentModel.History
 {
     public class AddTtPolygonCommand : ITtPolygonCommand
     {

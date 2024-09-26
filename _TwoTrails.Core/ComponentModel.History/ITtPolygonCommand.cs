@@ -1,4 +1,5 @@
 ﻿using System;
+using TwoTrails.Core.Units;
 
 namespace TwoTrails.Core.ComponentModel.History
 {
