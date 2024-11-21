@@ -351,7 +351,7 @@ namespace TwoTrails.ViewModels
             TtMetadata meta = polyIncludeTtPoints.First().First().Metadata;
 
 
-            List<IEnumerable<Point>> polyIncudePoints = polyIncludeTtPoints.Select(pp => pp.SyncPointsToZone()).ToList();
+            List<List<Point>> polyIncudePoints = polyIncludeTtPoints.Select(pp => pp.SyncPointsToZone().ToList()).ToList();
             List<Point> allPoints = polyIncudePoints.SelectMany(pts => pts).ToList(); ;
             
             UtmExtent.Builder builder = new UtmExtent.Builder(meta.Zone);
@@ -429,22 +429,24 @@ namespace TwoTrails.ViewModels
             if (BoundaryBuffer == true)
             {
                 double ba = FMSC.Core.Convert.Distance(BufferAmount, Distance.Meters, UomDistance);
-                
+
+                List<Point> ap2 = addPoints.ToList();
+
                 for (i = addPoints.Count - 1; i > -1; i--)
                 {
                     Point p = addPoints[i];
-                    foreach (List<Point> points in polyIncudePoints.Select(pts => pts.ToList()))
+
+                    foreach (PolygonCalculator pc in polyIncludeCalcs.Concat(polyExcludeCalcs))
                     {
-                        for (int m = 0; m < points.Count - 1; m++)
+                        if (pc.ShortestDistanceToPolygonEdge(p) < ba)
                         {
-                            if (MathEx.DistanceToLine(points[m], points[m + 1], p) < ba)
-                            {
-                                addPoints.RemoveAt(i);
-                                break;
-                            }
+                            addPoints.RemoveAt(i);
                         }
 
-                        if (ShouldCancel()) return;
+                        if (ShouldCancel())
+                        {
+                            return;
+                        }
                     }
                 }
             }
@@ -551,7 +553,7 @@ namespace TwoTrails.ViewModels
                 new UTMCoords(
                     (rand.NextDouble() * (totalExtents.East - totalExtents.West) + totalExtents.West),
                     (rand.NextDouble() * (totalExtents.North - totalExtents.South) + totalExtents.South),
-                    SelectedPoint.Metadata.Datum,
+                    defMeta.Datum,
                     defMeta.Zone
                 );
 
@@ -583,23 +585,30 @@ namespace TwoTrails.ViewModels
             double farTop = startCoords.Y + (ptAmtY * gridY);
             double farBottom = startCoords.Y - (ptAmtY * gridY);
 
-            int i = 0;
             double j = farLeft;
             double k = farTop;
 
             Dictionary<string, Tuple<TtPolygon, List<Point>>> addPoints = polys.ToDictionary(p => p.Item2, p => Tuple.Create(p.Item1, new List<Point>()));
-            Point tmp;
+            Point pt;
+            double ba = FMSC.Core.Convert.Distance(BufferAmount, Distance.Meters, UomDistance);
 
             while (j <= farRight)
             {
                 while (k >= farBottom)
                 {
-                    tmp = angle != 0 ? MathEx.RotatePoint(j, k, angle, startCoords.X, startCoords.Y) : new Point(j, k);
+                    pt = angle != 0 ? MathEx.RotatePoint(j, k, angle, startCoords.X, startCoords.Y) : new Point(j, k);
 
                     foreach (Tuple<TtPolygon, PolygonCalculator, string> tpc in polyIncludeCalcs)
                     {
-                        if (tpc.Item2.IsPointInPolygon(tmp.X, tmp.Y) && !polyExcludeCalcs.Any(pec => pec.IsPointInPolygon(tmp.X, tmp.Y)))
-                            addPoints[tpc.Item3].Item2.Add(tmp);
+                        if (tpc.Item2.IsPointInPolygon(pt) && !polyExcludeCalcs.Any(pec => pec.IsPointInPolygon(pt)) &&
+                            (BoundaryBuffer != true ||
+                                (tpc.Item2.ShortestDistanceToPolygonEdge(pt) > ba && 
+                                polyExcludeCalcs.All(pec => pec.ShortestDistanceToPolygonEdge(pt) > ba))
+                            )
+                        )
+                        {
+                            addPoints[tpc.Item3].Item2.Add(pt);
+                        }
 
                         if (ShouldCancel())
                             return;
@@ -609,32 +618,6 @@ namespace TwoTrails.ViewModels
                 }
                 j += gridX;
                 k = farTop;
-            }
-
-            if (BoundaryBuffer == true)
-            {
-                double ba = FMSC.Core.Convert.Distance(BufferAmount, Distance.Meters, UomDistance);
-
-                foreach (List<Point> points in addPoints.Values.Select(plypts => plypts.Item2))
-                {
-                    for (i = points.Count - 1; i > -1; i--)
-                    {
-                        Point p = points[i];
-                        foreach (List<Point> ipoints in polyIncudePoints.Select(pts => pts.Item2.ToList()))
-                        {
-                            for (int m = 0; m < ipoints.Count - 1; m++)
-                            {
-                                if (MathEx.DistanceToLine(ipoints[m], ipoints[m + 1], p) < ba)
-                                {
-                                    points.RemoveAt(i);
-                                    break;
-                                }
-                            }
-
-                            if (ShouldCancel()) return;
-                        }
-                    }
-                }
             }
 
             if (SamplePoints == true)

@@ -1,6 +1,7 @@
 ﻿using FMSC.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TwoTrails.Core
 {
@@ -32,6 +33,12 @@ namespace TwoTrails.Core
             if (nPoints.Count < 3)
             {
                 throw new Exception("Input points are not a polygon.");
+            }
+
+            //close unit if not already closed
+            if (nPoints[0] != temp)
+            {
+                nPoints.Add(nPoints[0]);
             }
             
             polyEdges = nPoints.Count;
@@ -93,7 +100,7 @@ namespace TwoTrails.Core
         }
 
 
-        public double ShortestDistanceFromPolygonEdge(Point point)
+        public double ShortestDistanceToPolygonEdge(Point point)
         {
             return ShortestDistanceToPolygonEdge(point.X, point.Y);
         }

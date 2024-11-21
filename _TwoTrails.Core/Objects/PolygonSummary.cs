@@ -27,7 +27,7 @@ namespace TwoTrails.Core
 
 
         public GeometricErrorReductionResult GERResult { get; }
-        public bool GERAvailable => UnitAreaType == UnitAreaType.General;
+        public bool GERAvailable => UnitAreaType == UnitAreaType.General && !HasTraverse;
 
         public ExclusionSummary Exclusions { get; }
         public int ExclusionsCount { get; }
